@@ -1,142 +1,108 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, UserCheck, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Users, Shield, ArrowLeft } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const B2BRoleSelectionPage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <Building2 className="h-12 w-12 text-indigo-500 mr-3" />
-            <span className="text-3xl font-bold">EmotionsCare Business</span>
+    <>
+      <Helmet>
+        <title>Sélection du rôle - EmotionsCare Entreprise</title>
+        <meta name="description" content="Choisissez votre rôle dans l'espace entreprise" />
+      </Helmet>
+      
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl">
+          <div className="text-center mb-8">
+            <Link to="/choose-mode" className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour au choix du mode
+            </Link>
+            <h1 className="text-3xl font-bold mb-2">Espace Entreprise</h1>
+            <p className="text-gray-600">
+              Choisissez votre rôle pour accéder à votre espace
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Choisissez votre type d'accès
-          </h1>
-          <p className="text-gray-600">
-            Sélectionnez le profil qui correspond à votre rôle dans l'entreprise
-          </p>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Collaborateur */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <Users className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-              <CardTitle className="text-xl">Collaborateur</CardTitle>
-              <CardDescription>
-                Accès personnel aux outils de bien-être pour les employés
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                  Analyse émotionnelle personnalisée
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Collaborator Access */}
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <CardHeader className="text-center">
+                <Users className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl">Collaborateur</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3">Accès collaborateur :</h3>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li>• Scanner d'émotions personnel</li>
+                    <li>• Suivi de votre bien-être</li>
+                    <li>• Accès aux ressources d'entreprise</li>
+                    <li>• Communauté d'équipe</li>
+                    <li>• Musique de travail</li>
+                    <li>• Coach IA adapté au travail</li>
+                  </ul>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                  Coach IA dédié au bien-être au travail
+                
+                <div className="space-y-3">
+                  <Link to="/b2b/user/login" className="block">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
+                      Se connecter
+                    </Button>
+                  </Link>
+                  <Link to="/b2b/user/register" className="block">
+                    <Button variant="outline" className="w-full">
+                      Créer un compte
+                    </Button>
+                  </Link>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                  Journal de bord professionnel
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                  Communauté d'entraide
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Button 
-                  className="w-full" 
-                  onClick={() => navigate('/b2b/user/register')}
-                >
-                  S'inscrire comme collaborateur
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => navigate('/b2b/user/login')}
-                >
-                  Se connecter
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Administrateur */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <UserCheck className="h-16 w-16 text-purple-500 mx-auto mb-4" />
-              <CardTitle className="text-xl">Administrateur</CardTitle>
-              <CardDescription>
-                Gestion et supervision du bien-être des équipes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                  Tableau de bord analytique
+            {/* Admin Access */}
+            <Card className="p-6 hover:shadow-lg transition-shadow">
+              <CardHeader className="text-center">
+                <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl">Administrateur RH</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3">Tableau de bord RH :</h3>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li>• Vue d'ensemble des équipes</li>
+                    <li>• Analyse du climat émotionnel</li>
+                    <li>• Rapports et statistiques</li>
+                    <li>• Gestion des utilisateurs</li>
+                    <li>• Alertes et notifications</li>
+                    <li>• Outils de prévention RPS</li>
+                  </ul>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                  Gestion des utilisateurs
+                
+                <div className="space-y-3">
+                  <Link to="/b2b/admin/login" className="block">
+                    <Button className="w-full bg-red-600 hover:bg-red-700" size="lg">
+                      Accès administrateur
+                    </Button>
+                  </Link>
+                  <p className="text-xs text-gray-500 text-center">
+                    Réservé aux administrateurs RH
+                  </p>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                  Rapports de bien-être d'équipe
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                  Configuration des programmes
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Button 
-                  className="w-full bg-purple-500 hover:bg-purple-600" 
-                  onClick={() => navigate('/b2b/admin/login')}
-                >
-                  Accès Administrateur
-                </Button>
-                <p className="text-xs text-gray-500 text-center">
-                  Accès réservé aux responsables RH et managers
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
 
-        <div className="text-center mt-8">
-          <Link 
-            to="/" 
-            className="inline-flex items-center text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour à l'accueil
-          </Link>
-        </div>
-
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>
-            Besoin d'aide ? Contactez votre responsable RH ou 
-            <a href="mailto:support@emotionscare.com" className="text-blue-600 hover:underline ml-1">
-              notre support
-            </a>
-          </p>
+          <div className="text-center mt-8">
+            <p className="text-sm text-gray-500">
+              Votre entreprise n'est pas encore inscrite ? Contactez notre équipe commerciale
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

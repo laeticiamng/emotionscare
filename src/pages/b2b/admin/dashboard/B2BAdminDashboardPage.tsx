@@ -1,250 +1,172 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle,
-  Calendar,
-  Building2,
-  BarChart3,
-  Settings,
-  Shield,
-  Activity
-} from 'lucide-react';
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, TrendingUp, AlertTriangle, Activity, Heart, Shield } from 'lucide-react';
 
 const B2BAdminDashboardPage: React.FC = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [companyWellness, setCompanyWellness] = useState(78);
-  const [activeUsers, setActiveUsers] = useState(145);
-  const [totalUsers, setTotalUsers] = useState(180);
-  const [alertsCount, setAlertsCount] = useState(3);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  const adminActions = [
+  const stats = [
     {
-      title: 'Gestion des utilisateurs',
-      description: 'Gérer les comptes et les permissions',
-      icon: <Users className="h-6 w-6" />,
-      path: '/b2b/admin/users',
-      color: 'bg-blue-500'
+      title: "Collaborateurs actifs",
+      value: "145",
+      change: "+12%",
+      icon: Users,
+      color: "text-blue-500"
     },
     {
-      title: 'Analyses et rapports',
-      description: 'Voir les statistiques détaillées',
-      icon: <BarChart3 className="h-6 w-6" />,
-      path: '/b2b/admin/analytics',
-      color: 'bg-green-500'
+      title: "Score bien-être moyen",
+      value: "82%",
+      change: "+5%",
+      icon: Heart,
+      color: "text-green-500"
     },
     {
-      title: 'Paramètres système',
-      description: 'Configuration de l\'organisation',
-      icon: <Settings className="h-6 w-6" />,
-      path: '/settings',
-      color: 'bg-purple-500'
+      title: "Alertes en cours",
+      value: "3",
+      change: "-2",
+      icon: AlertTriangle,
+      color: "text-orange-500"
     },
     {
-      title: 'Gestion des équipes',
-      description: 'Organiser les groupes de travail',
-      icon: <Building2 className="h-6 w-6" />,
-      path: '/b2b/admin/teams',
-      color: 'bg-orange-500'
+      title: "Participation",
+      value: "94%",
+      change: "+8%",
+      icon: Activity,
+      color: "text-purple-500"
     }
   ];
 
-  const handleAdminAction = (path: string) => {
-    setIsLoading(true);
-    navigate(path);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 p-6">
-        <div className="container mx-auto space-y-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 p-6">
-      <div className="container mx-auto space-y-6">
-        {/* En-tête administrateur */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-slate-700 dark:text-slate-300" />
-            <span className="text-sm text-muted-foreground">Administrateur B2B</span>
+    <>
+      <Helmet>
+        <title>Tableau de bord Administrateur - EmotionsCare</title>
+        <meta name="description" content="Dashboard administrateur RH EmotionsCare" />
+      </Helmet>
+      
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Tableau de bord RH
+            </h1>
+            <p className="text-gray-600">
+              Vue d'ensemble du bien-être de vos équipes
+            </p>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Tableau de bord administrateur
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Gérez votre organisation EmotionsCare
-          </p>
+          <div className="flex items-center space-x-2">
+            <Shield className="h-6 w-6 text-red-500" />
+            <span className="text-sm font-medium">Mode Administrateur</span>
+          </div>
         </div>
 
-        {/* Métriques clés */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{activeUsers}/{totalUsers}</div>
-              <Progress value={(activeUsers / totalUsers) * 100} className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-2">
-                {Math.round((activeUsers / totalUsers) * 100)}% d'engagement
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bien-être général</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{companyWellness}%</div>
-              <Progress value={companyWellness} className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-2">
-                Score moyen de l'organisation
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Alertes</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{alertsCount}</div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Nécessitent votre attention
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Sessions cette semaine</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">347</div>
-              <p className="text-xs text-green-600 mt-2">
-                +15% vs semaine précédente
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Actions administrateur */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Actions administrateur</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {adminActions.map((action, index) => (
-              <Card 
-                key={index} 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => handleAdminAction(action.path)}
-              >
-                <CardHeader>
-                  <div className={`${action.color} w-12 h-12 rounded-full flex items-center justify-center text-white mb-2`}>
-                    {action.icon}
-                  </div>
-                  <CardTitle className="text-lg">{action.title}</CardTitle>
-                  <CardDescription>{action.description}</CardDescription>
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat) => {
+            const IconComponent = stat.icon;
+            return (
+              <Card key={stat.title}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
+                  <IconComponent className={`h-4 w-4 ${stat.color}`} />
                 </CardHeader>
                 <CardContent>
-                  <Button variant="ghost" className="w-full">
-                    Accéder →
-                  </Button>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.change} par rapport au mois dernier
+                  </p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        {/* Tableaux de bord et alertes */}
+        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Tendances de l'organisation
-              </CardTitle>
+              <CardTitle>Évolution du bien-être</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Engagement utilisateur</span>
-                  <span className="text-sm font-medium text-green-600">+8%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Score de bien-être</span>
-                  <span className="text-sm font-medium text-green-600">+5%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Sessions complétées</span>
-                  <span className="text-sm font-medium text-green-600">+15%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Satisfaction</span>
-                  <span className="text-sm font-medium text-green-600">+3%</span>
-                </div>
+              <div className="h-64 flex items-center justify-center text-gray-500">
+                Graphique d'évolution du bien-être
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Alertes et notifications
-              </CardTitle>
+              <CardTitle>Répartition par département</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-2 bg-orange-50 border-l-4 border-orange-500 rounded">
-                  <span className="text-sm">3 utilisateurs nécessitent un suivi</span>
-                  <Button variant="ghost" size="sm">Voir</Button>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-blue-50 border-l-4 border-blue-500 rounded">
-                  <span className="text-sm">Rapport mensuel disponible</span>
-                  <Button variant="ghost" size="sm">Voir</Button>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-green-50 border-l-4 border-green-500 rounded">
-                  <span className="text-sm">Nouvel utilisateur inscrit</span>
-                  <Button variant="ghost" size="sm">Voir</Button>
-                </div>
+              <div className="space-y-4">
+                {[
+                  { dept: "Développement", score: 85, color: "bg-blue-500" },
+                  { dept: "Marketing", score: 78, color: "bg-green-500" },
+                  { dept: "RH", score: 92, color: "bg-purple-500" },
+                  { dept: "Commercial", score: 76, color: "bg-orange-500" }
+                ].map((dept) => (
+                  <div key={dept.dept} className="flex items-center space-x-3">
+                    <div className="w-16 text-sm">{dept.dept}</div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`${dept.color} h-2 rounded-full`}
+                        style={{ width: `${dept.score}%` }}
+                      />
+                    </div>
+                    <div className="w-12 text-sm font-medium">{dept.score}%</div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Activité récente</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                {
+                  user: "Marie Dubois",
+                  action: "a effectué un scan émotionnel",
+                  time: "Il y a 5 minutes",
+                  status: "positive"
+                },
+                {
+                  user: "Thomas Martin",
+                  action: "a marqué un niveau de stress élevé",
+                  time: "Il y a 15 minutes",
+                  status: "warning"
+                },
+                {
+                  user: "Sophie Leclerc",
+                  action: "a terminé sa session de méditation",
+                  time: "Il y a 30 minutes",
+                  status: "positive"
+                }
+              ].map((activity, index) => (
+                <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50">
+                  <div className={`w-2 h-2 rounded-full ${
+                    activity.status === 'positive' ? 'bg-green-500' : 'bg-orange-500'
+                  }`} />
+                  <div className="flex-1">
+                    <p className="text-sm">
+                      <span className="font-medium">{activity.user}</span> {activity.action}
+                    </p>
+                    <p className="text-xs text-gray-500">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </>
   );
 };
 

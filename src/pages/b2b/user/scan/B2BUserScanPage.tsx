@@ -1,10 +1,6 @@
 
-import React from 'react';
 import B2CScanPage from '@/pages/b2c/scan/B2CScanPage';
 
-// Réutilisation du composant B2C avec adaptation pour B2B User
-const B2BUserScanPage: React.FC = () => {
-  return <B2CScanPage />;
-};
-
-export default B2BUserScanPage;
+// For now, B2B User scan is identical to B2C scan
+// In the future, this could have enterprise-specific features
+export default B2CScanPage;
