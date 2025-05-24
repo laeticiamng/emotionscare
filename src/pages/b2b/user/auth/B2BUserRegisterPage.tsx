@@ -7,26 +7,41 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { ArrowLeft, Mail, Lock, User, Building, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Building2, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    confirmPassword: '',
     company: '',
-    department: ''
+    password: '',
+    confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.name || !formData.email || !formData.company || !formData.password) {
+      toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast.error('Les mots de passe ne correspondent pas');
       return;
@@ -37,17 +52,21 @@ const B2BUserRegisterPage: React.FC = () => {
       return;
     }
 
+    if (!acceptTerms) {
+      toast.error('Veuillez accepter les conditions d\'utilisation');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { error } = await signUp(formData.email, formData.password, {
         name: formData.name,
-        role: 'b2b_user',
         company: formData.company,
-        department: formData.department
+        role: 'b2b_user'
       });
       
       if (error) {
-        toast.error('Erreur lors de l\'inscription : ' + error.message);
+        toast.error('Erreur lors de l\'inscription: ' + error.message);
       } else {
         setUserMode('b2b_user');
         toast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
@@ -60,22 +79,15 @@ const B2BUserRegisterPage: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
         <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
+          <CardHeader className="text-center relative">
             <Button
               variant="ghost"
               size="icon"
@@ -84,9 +96,12 @@ const B2BUserRegisterPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
+            <div className="mx-auto mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
+              <Building2 className="h-8 w-8 text-blue-600" />
+            </div>
             <CardTitle className="text-2xl">Inscription Collaborateur</CardTitle>
             <CardDescription>
-              Créez votre compte collaborateur EmotionsCare
+              Rejoignez votre équipe sur EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -97,24 +112,24 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Input
                     name="name"
                     type="text"
-                    placeholder="Nom complet"
+                    placeholder="Votre nom complet"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     name="email"
                     type="email"
-                    placeholder="Email professionnel"
+                    placeholder="votre@entreprise.com"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
@@ -123,29 +138,15 @@ const B2BUserRegisterPage: React.FC = () => {
 
               <div className="space-y-2">
                 <div className="relative">
-                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     name="company"
                     type="text"
-                    placeholder="Entreprise"
+                    placeholder="Nom de votre entreprise"
                     value={formData.company}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="relative">
-                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    name="department"
-                    type="text"
-                    placeholder="Département (optionnel)"
-                    value={formData.department}
-                    onChange={handleInputChange}
-                    className="pl-10"
                   />
                 </div>
               </div>
@@ -155,14 +156,22 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     name="password"
-                    type="password"
-                    placeholder="Mot de passe"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mot de passe (min. 6 caractères)"
                     value={formData.password}
-                    onChange={handleInputChange}
-                    className="pl-10"
+                    onChange={handleChange}
+                    className="pl-10 pr-10"
                     required
-                    minLength={6}
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
                 </div>
               </div>
 
@@ -171,29 +180,49 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     name="confirmPassword"
-                    type="password"
-                    placeholder="Confirmer le mot de passe"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirmez le mot de passe"
                     value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="pl-10"
+                    onChange={handleChange}
+                    className="pl-10 pr-10"
                     required
-                    minLength={6}
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1 h-8 w-8"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
                 </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={acceptTerms}
+                  onCheckedChange={setAcceptTerms}
+                />
+                <label htmlFor="terms" className="text-sm text-muted-foreground">
+                  J'accepte les conditions d'utilisation professionnelle
+                </label>
               </div>
               
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Créer mon compte
+                Créer mon compte collaborateur
               </Button>
             </form>
             
-            <div className="text-center mt-4">
+            <div className="text-center mt-6">
+              <span className="text-sm text-muted-foreground">Déjà un compte ? </span>
               <Link 
                 to="/b2b/user/login" 
-                className="text-sm text-muted-foreground hover:text-primary"
+                className="text-sm text-primary hover:underline"
               >
-                Déjà un compte ? Se connecter
+                Se connecter
               </Link>
             </div>
           </CardContent>

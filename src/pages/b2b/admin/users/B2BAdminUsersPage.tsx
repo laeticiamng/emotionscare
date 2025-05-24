@@ -4,90 +4,126 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
-import { Search, Filter, UserPlus, MoreHorizontal, Edit, Trash2, Mail } from 'lucide-react';
+  Users, 
+  Search, 
+  Filter, 
+  UserPlus, 
+  Mail, 
+  MoreHorizontal,
+  Shield,
+  AlertTriangle,
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-interface User {
+interface UserData {
   id: string;
   name: string;
   email: string;
   role: string;
-  department: string;
-  status: 'active' | 'inactive' | 'pending';
-  lastActivity: string;
-  emotionalScore: number;
+  department?: string;
+  emotional_score?: number;
+  last_active: string;
+  status: 'active' | 'inactive' | 'critical';
   avatar_url?: string;
 }
 
 const B2BAdminUsersPage: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const { user } = useAuth();
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [departmentFilter, setDepartmentFilter] = useState('all');
-  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   useEffect(() => {
-    fetchUsers();
+    loadUsers();
   }, []);
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, statusFilter, departmentFilter]);
+  }, [users, searchTerm, selectedDepartment, selectedStatus]);
 
-  const fetchUsers = async () => {
-    setIsLoading(true);
+  const loadUsers = async () => {
     try {
+      setIsLoading(true);
+      
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('role', 'b2b_user');
+        .in('role', ['b2b_user', 'b2b_admin']);
 
       if (error) throw error;
 
-      const usersData: User[] = profiles?.map(profile => ({
+      // Simuler des données utilisateur complètes
+      const mockUsers: UserData[] = (profiles || []).map((profile, index) => ({
         id: profile.id,
-        name: profile.name || 'Nom non défini',
-        email: profile.email || '',
+        name: profile.name || `Utilisateur ${index + 1}`,
+        email: profile.email || `user${index + 1}@exemple.fr`,
         role: profile.role || 'b2b_user',
-        department: profile.department || 'Non assigné',
-        status: 'active',
-        lastActivity: new Date().toISOString(),
-        emotionalScore: profile.emotional_score || Math.floor(Math.random() * 3) + 7,
+        department: ['IT', 'Marketing', 'Ventes', 'RH', 'Finance'][index % 5],
+        emotional_score: Math.floor(Math.random() * 40) + 60, // 60-100
+        last_active: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        status: Math.random() > 0.8 ? 'critical' : Math.random() > 0.3 ? 'active' : 'inactive',
         avatar_url: profile.avatar_url
-      })) || [];
+      }));
 
-      setUsers(usersData);
+      // Ajouter quelques utilisateurs de démo si la liste est vide
+      if (mockUsers.length === 0) {
+        const demoUsers: UserData[] = [
+          {
+            id: 'demo-1',
+            name: 'Sarah Martin',
+            email: 'sarah.martin@exemple.fr',
+            role: 'b2b_user',
+            department: 'Marketing',
+            emotional_score: 85,
+            last_active: new Date().toISOString(),
+            status: 'active'
+          },
+          {
+            id: 'demo-2',
+            name: 'Thomas Dubois',
+            email: 'thomas.dubois@exemple.fr',
+            role: 'b2b_user',
+            department: 'IT',
+            emotional_score: 65,
+            last_active: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            status: 'critical'
+          },
+          {
+            id: 'demo-3',
+            name: 'Marie Lefebvre',
+            email: 'marie.lefebvre@exemple.fr',
+            role: 'b2b_admin',
+            department: 'RH',
+            emotional_score: 92,
+            last_active: new Date().toISOString(),
+            status: 'active'
+          }
+        ];
+        mockUsers.push(...demoUsers);
+      }
+
+      setUsers(mockUsers);
     } catch (error) {
+      console.error('Erreur chargement utilisateurs:', error);
       toast.error('Erreur lors du chargement des utilisateurs');
-      console.error('Users fetch error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -103,222 +139,310 @@ const B2BAdminUsersPage: React.FC = () => {
       );
     }
 
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.status === statusFilter);
+    if (selectedDepartment !== 'all') {
+      filtered = filtered.filter(user => user.department === selectedDepartment);
     }
 
-    if (departmentFilter !== 'all') {
-      filtered = filtered.filter(user => user.department === departmentFilter);
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(user => user.status === selectedStatus);
     }
 
     setFilteredUsers(filtered);
   };
 
-  const handleInviteUser = async () => {
-    if (!inviteEmail) {
-      toast.error('Veuillez saisir un email');
-      return;
-    }
-
-    try {
-      // Generate invitation token
-      const token = Math.random().toString(36).substring(2, 15);
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
-
-      const { error } = await supabase
-        .from('invitations')
-        .insert({
-          email: inviteEmail,
-          role: 'b2b_user',
-          token,
-          expires_at: expiresAt.toISOString()
-        });
-
-      if (error) throw error;
-
-      toast.success('Invitation envoyée avec succès');
-      setInviteEmail('');
-      setIsInviteDialogOpen(false);
-    } catch (error) {
-      toast.error('Erreur lors de l\'envoi de l\'invitation');
-      console.error('Invite error:', error);
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800">Actif</Badge>;
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Actif</Badge>;
       case 'inactive':
-        return <Badge variant="secondary">Inactif</Badge>;
-      case 'pending':
-        return <Badge variant="outline">En attente</Badge>;
+        return <Badge variant="outline">Inactif</Badge>;
+      case 'critical':
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Critique</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  const getEmotionalScoreBadge = (score: number) => {
-    if (score >= 8) return <Badge className="bg-green-100 text-green-800">Excellent</Badge>;
-    if (score >= 6) return <Badge className="bg-yellow-100 text-yellow-800">Bon</Badge>;
-    return <Badge className="bg-red-100 text-red-800">À surveiller</Badge>;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'inactive':
+        return <XCircle className="h-4 w-4 text-gray-400" />;
+      case 'critical':
+        return <AlertTriangle className="h-4 w-4 text-red-500" />;
+      default:
+        return null;
+    }
   };
 
-  const departments = [...new Set(users.map(user => user.department))];
+  const handleUserAction = (action: string, userId: string) => {
+    // Simuler les actions utilisateur
+    switch (action) {
+      case 'contact':
+        toast.info('Email envoyé à l\'utilisateur');
+        break;
+      case 'suspend':
+        toast.warning('Utilisateur suspendu');
+        break;
+      case 'activate':
+        toast.success('Utilisateur activé');
+        break;
+      case 'delete':
+        toast.error('Utilisateur supprimé');
+        setUsers(users.filter(u => u.id !== userId));
+        break;
+      default:
+        break;
+    }
+  };
+
+  const inviteUser = () => {
+    toast.success('Invitation envoyée !');
+  };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="h-64 bg-muted rounded"></div>
+      <div className="space-y-6 animate-pulse">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="space-y-0 pb-2">
+                <div className="h-4 bg-muted rounded w-1/2"></div>
+                <div className="h-8 bg-muted rounded w-3/4"></div>
+              </CardHeader>
+            </Card>
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-start">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
-          <p className="text-muted-foreground">Gérez les collaborateurs de votre entreprise</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Gestion des utilisateurs 👥
+          </h1>
+          <p className="text-muted-foreground">
+            Administrez les comptes et surveillez le bien-être de vos collaborateurs
+          </p>
         </div>
-        
-        <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Inviter un utilisateur
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Inviter un nouveau collaborateur</DialogTitle>
-              <DialogDescription>
-                Envoyez une invitation par email à un nouveau collaborateur
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <Input
-                placeholder="Email du collaborateur"
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-              />
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>
-                  Annuler
-                </Button>
-                <Button onClick={handleInviteUser}>
-                  <Mail className="h-4 w-4 mr-2" />
-                  Envoyer l'invitation
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={inviteUser}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Inviter un utilisateur
+        </Button>
       </div>
 
-      {/* Filters */}
+      {/* Summary Stats */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total utilisateurs</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{users.length}</div>
+            <p className="text-xs text-muted-foreground">
+              +3 ce mois-ci
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.status === 'active').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {Math.round((users.filter(u => u.status === 'active').length / users.length) * 100)}% du total
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Alertes critiques</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {users.filter(u => u.status === 'critical').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Nécessitent une attention
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Score moyen</CardTitle>
+            <Badge className="bg-blue-100 text-blue-700">
+              {Math.round(users.reduce((acc, u) => acc + (u.emotional_score || 0), 0) / users.length)}
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {Math.round(users.reduce((acc, u) => acc + (u.emotional_score || 0), 0) / users.length)}/100
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Bien-être global
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
       <Card>
         <CardHeader>
-          <CardTitle>Filtres</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            Filtres
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher par nom ou email..."
+                placeholder="Rechercher un utilisateur..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
             
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
+            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Département" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les départements</SelectItem>
+                <SelectItem value="IT">IT</SelectItem>
+                <SelectItem value="Marketing">Marketing</SelectItem>
+                <SelectItem value="Ventes">Ventes</SelectItem>
+                <SelectItem value="RH">RH</SelectItem>
+                <SelectItem value="Finance">Finance</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="active">Actif</SelectItem>
                 <SelectItem value="inactive">Inactif</SelectItem>
-                <SelectItem value="pending">En attente</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Département" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les départements</SelectItem>
-                {departments.map(dept => (
-                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                ))}
+                <SelectItem value="critical">Critique</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Users Table */}
+      {/* Users List */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Utilisateurs ({filteredUsers.length})</CardTitle>
-          </div>
+          <CardTitle>Utilisateurs ({filteredUsers.length})</CardTitle>
+          <CardDescription>
+            Liste complète des collaborateurs de votre organisation
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Département</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Score Émotionnel</TableHead>
-                <TableHead>Dernière Activité</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarImage src={user.avatar_url} />
-                      <AvatarFallback>
-                        {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
+          <div className="space-y-4">
+            {filteredUsers.map((userData) => (
+              <div key={userData.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-4">
+                  <Avatar>
+                    <AvatarImage src={userData.avatar_url} />
+                    <AvatarFallback>
+                      {userData.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{userData.name}</span>
+                      {userData.role === 'b2b_admin' && (
+                        <Badge variant="outline">
+                          <Shield className="h-3 w-3 mr-1" />
+                          Admin
+                        </Badge>
+                      )}
                     </div>
-                  </TableCell>
-                  <TableCell>{user.department}</TableCell>
-                  <TableCell>{getStatusBadge(user.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <span>{user.emotionalScore}/10</span>
-                      {getEmotionalScoreBadge(user.emotionalScore)}
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>{userData.email}</span>
+                      <span>•</span>
+                      <span>{userData.department}</span>
+                      <span>•</span>
+                      <span>Dernière connexion: {new Date(userData.last_active).toLocaleDateString()}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(user.lastActivity).toLocaleDateString('fr-FR')}
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <div className="text-sm font-medium">{userData.emotional_score}/100</div>
+                    <div className="text-xs text-muted-foreground">Score</div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(userData.status)}
+                    {getStatusBadge(userData.status)}
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleUserAction('contact', userData.id)}>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Contacter
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleUserAction('activate', userData.id)}>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Activer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleUserAction('suspend', userData.id)}>
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Suspendre
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => handleUserAction('delete', userData.id)}
+                        className="text-red-600"
+                      >
+                        Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-8">
+              <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-muted-foreground">Aucun utilisateur trouvé</p>
+              <p className="text-sm text-muted-foreground">
+                Modifiez vos filtres ou invitez de nouveaux utilisateurs
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

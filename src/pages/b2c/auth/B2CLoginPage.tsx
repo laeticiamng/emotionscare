@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Mail, Lock, Loader2, Eye, EyeOff, User } from 'lucide-react';
-import { toast } from 'sonner';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
+import AuthTransition from '@/components/auth/AuthTransition';
 
 const B2CLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -30,157 +31,112 @@ const B2CLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          toast.error('Email ou mot de passe incorrect');
-        } else if (error.message.includes('Email not confirmed')) {
-          toast.error('Veuillez confirmer votre email avant de vous connecter');
-        } else {
-          toast.error('Erreur de connexion : ' + error.message);
-        }
+        toast.error('Erreur de connexion: ' + error.message);
       } else {
         setUserMode('b2c');
         toast.success('Connexion réussie !');
         navigate('/b2c/dashboard');
       }
     } catch (error) {
-      toast.error('Erreur de connexion');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await signIn('demo@exemple.fr', 'demo123');
-      if (!error) {
-        setUserMode('b2c');
-        toast.success('Connexion en mode démo !');
-        navigate('/b2c/dashboard');
-      }
-    } catch (error) {
-      toast.error('Compte de démo non disponible');
+      toast.error('Erreur lors de la connexion');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900/20 dark:via-slate-900 dark:to-blue-800/20 flex items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="w-full max-w-md"
-      >
-        <Card className="shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/choose-mode')}
-              className="self-start"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
-            </Button>
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto">
-              <User className="h-8 w-8 text-blue-600" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-300">
-              Espace Personnel
-            </CardTitle>
-            <CardDescription>
-              Connectez-vous à votre compte EmotionsCare
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
+    <AuthTransition>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/choose-mode')}
+                className="absolute left-4 top-4"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
+              <CardDescription>
+                Connectez-vous à votre espace personnel EmotionsCare
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="votre@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Mot de passe</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-1 top-1 h-8 w-8 p-0"
+                
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Mot de passe"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1 h-8 w-8"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Se connecter
+                </Button>
+              </form>
+              
+              <div className="space-y-4 mt-6">
+                <div className="text-center">
+                  <Link 
+                    to="/b2c/reset-password" 
+                    className="text-sm text-muted-foreground hover:text-primary"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
+                    Mot de passe oublié ?
+                  </Link>
                 </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connexion...
-                  </>
-                ) : (
-                  'Se connecter'
-                )}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={handleDemoLogin}
-                disabled={isLoading}
-              >
-                Essayer en mode démo
-              </Button>
-
-              <div className="text-center space-y-2">
-                <Link 
-                  to="/b2c/reset-password" 
-                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                >
-                  Mot de passe oublié ?
-                </Link>
-                <div className="text-sm text-slate-600 dark:text-slate-400">
-                  Pas encore de compte ?{' '}
+                
+                <div className="text-center">
+                  <span className="text-sm text-muted-foreground">Pas encore de compte ? </span>
                   <Link 
                     to="/b2c/register" 
-                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium"
+                    className="text-sm text-primary hover:underline"
                   >
                     S'inscrire
                   </Link>
                 </div>
               </div>
-            </form>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </AuthTransition>
   );
 };
 

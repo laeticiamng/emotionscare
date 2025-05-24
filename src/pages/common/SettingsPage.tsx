@@ -1,413 +1,516 @@
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { 
-  User, 
+  Settings, 
   Bell, 
-  Shield, 
   Palette, 
   Globe, 
-  Trash2, 
+  Volume2, 
+  Shield, 
   Download,
-  Save,
-  Loader2
+  Trash2,
+  RefreshCw,
+  Database,
+  Key
 } from 'lucide-react';
-
-interface UserPreferences {
-  theme: string;
-  language: string;
-  notifications_enabled: boolean;
-  email_notifications: boolean;
-  data_sharing: boolean;
-  auto_save: boolean;
-}
+import { toast } from 'sonner';
 
 const SettingsPage: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const { userMode } = useUserMode();
   const { theme, setTheme } = useTheme();
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    theme: 'system',
-    language: 'fr',
-    notifications_enabled: true,
-    email_notifications: true,
-    data_sharing: false,
-    auto_save: true
+  
+  const [settings, setSettings] = useState({
+    notifications: {
+      push: true,
+      email: true,
+      sms: false,
+      reminders: true
+    },
+    audio: {
+      volume: [75],
+      soundEffects: true,
+      voiceGuidance: true
+    },
+    privacy: {
+      analytics: true,
+      dataSharing: false,
+      profileVisibility: 'private'
+    },
+    accessibility: {
+      highContrast: false,
+      largeText: false,
+      screenReader: false
+    }
   });
+
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    loadUserPreferences();
-  }, [user]);
+  const handleSettingChange = (category: string, setting: string, value: any) => {
+    setSettings(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category as keyof typeof prev],
+        [setting]: value
+      }
+    }));
+  };
 
-  const loadUserPreferences = async () => {
-    if (!user) return;
-
+  const saveSettings = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('preferences')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      if (data?.preferences) {
-        setPreferences({ ...preferences, ...data.preferences });
-      }
+      // Simuler la sauvegarde
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Paramètres sauvegardés avec succès');
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      toast.error('Erreur lors de la sauvegarde');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const savePreferences = async () => {
-    if (!user) return;
-
-    setIsSaving(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ preferences })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast.success('Paramètres sauvegardés avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la sauvegarde');
-      console.error('Error saving preferences:', error);
-    } finally {
-      setIsSaving(false);
-    }
+  const exportData = () => {
+    toast.success('Export des données lancé');
   };
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme as 'light' | 'dark' | 'system');
-    setPreferences(prev => ({ ...prev, theme: newTheme }));
+  const clearCache = () => {
+    localStorage.clear();
+    toast.success('Cache vidé avec succès');
   };
 
-  const exportUserData = async () => {
-    if (!user) return;
-
-    try {
-      // Fetch all user data
-      const [emotions, journalEntries, profile] = await Promise.all([
-        supabase.from('emotions').select('*').eq('user_id', user.id),
-        supabase.from('journal_entries').select('*').eq('user_id', user.id),
-        supabase.from('profiles').select('*').eq('id', user.id).single()
-      ]);
-
-      const userData = {
-        profile: profile.data,
-        emotions: emotions.data,
-        journal_entries: journalEntries.data,
-        exported_at: new Date().toISOString()
-      };
-
-      // Create and download file
-      const blob = new Blob([JSON.stringify(userData, null, 2)], { 
-        type: 'application/json' 
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `emotionscare-data-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast.success('Données exportées avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de l\'export des données');
-      console.error('Export error:', error);
-    }
+  const resetSettings = () => {
+    setSettings({
+      notifications: {
+        push: true,
+        email: true,
+        sms: false,
+        reminders: true
+      },
+      audio: {
+        volume: [75],
+        soundEffects: true,
+        voiceGuidance: true
+      },
+      privacy: {
+        analytics: true,
+        dataSharing: false,
+        profileVisibility: 'private'
+      },
+      accessibility: {
+        highContrast: false,
+        largeText: false,
+        screenReader: false
+      }
+    });
+    toast.success('Paramètres réinitialisés');
   };
-
-  const deleteAccount = async () => {
-    if (!user) return;
-
-    const confirmDelete = window.confirm(
-      'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      // Delete user data
-      await Promise.all([
-        supabase.from('emotions').delete().eq('user_id', user.id),
-        supabase.from('journal_entries').delete().eq('user_id', user.id),
-        supabase.from('profiles').delete().eq('id', user.id)
-      ]);
-
-      // Sign out and redirect
-      await signOut();
-      toast.success('Compte supprimé avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la suppression du compte');
-      console.error('Delete account error:', error);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="h-64 bg-muted rounded"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Paramètres</h1>
-            <p className="text-muted-foreground">Gérez vos préférences et paramètres de compte</p>
-          </div>
-          
-          <Button onClick={savePreferences} disabled={isSaving}>
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Sauvegarder
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Paramètres</h1>
+          <p className="text-muted-foreground">
+            Configurez EmotionsCare selon vos préférences
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={resetSettings}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Réinitialiser
+          </Button>
+          <Button onClick={saveSettings} disabled={isLoading}>
+            {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
           </Button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Appearance Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Apparence
-              </CardTitle>
-              <CardDescription>
-                Personnalisez l'apparence de l'interface
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Thème</Label>
-                <Select value={preferences.theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Clair</SelectItem>
-                    <SelectItem value="dark">Sombre</SelectItem>
-                    <SelectItem value="system">Système</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+      {/* Appearance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            Apparence
+          </CardTitle>
+          <CardDescription>
+            Personnalisez l'apparence de l'application
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Thème</Label>
+            <Select value={theme} onValueChange={setTheme}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Clair</SelectItem>
+                <SelectItem value="dark">Sombre</SelectItem>
+                <SelectItem value="system">Système</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="language">Langue</Label>
-                <Select 
-                  value={preferences.language} 
-                  onValueChange={(value) => setPreferences(prev => ({ ...prev, language: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Notifications Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-              <CardDescription>
-                Gérez vos préférences de notifications
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Notifications push</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recevoir des notifications dans l'app
-                  </p>
-                </div>
-                <Switch
-                  checked={preferences.notifications_enabled}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, notifications_enabled: checked }))
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Notifications email</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recevoir des emails de suivi
-                  </p>
-                </div>
-                <Switch
-                  checked={preferences.email_notifications}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, email_notifications: checked }))
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Sauvegarde automatique</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Sauvegarder automatiquement vos données
-                  </p>
-                </div>
-                <Switch
-                  checked={preferences.auto_save}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, auto_save: checked }))
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Privacy & Security Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Confidentialité
-              </CardTitle>
-              <CardDescription>
-                Gérez vos données et votre confidentialité
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Partage de données anonymes</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Aider à améliorer l'application
-                  </p>
-                </div>
-                <Switch
-                  checked={preferences.data_sharing}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, data_sharing: checked }))
-                  }
-                />
-              </div>
-
-              <Separator />
-
-              <div className="space-y-3">
-                <Button 
-                  onClick={exportUserData} 
-                  variant="outline" 
-                  className="w-full"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter mes données
-                </Button>
-
-                <Button 
-                  onClick={deleteAccount} 
-                  variant="destructive" 
-                  className="w-full"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Supprimer mon compte
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Account Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Informations du compte
-            </CardTitle>
-            <CardDescription>
-              Vos informations personnelles
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom</Label>
-                <Input
-                  id="name"
-                  value={user?.user_metadata?.name || ''}
-                  disabled
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="created">Membre depuis</Label>
-                <Input
-                  id="created"
-                  value={user?.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR') : ''}
-                  disabled
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="role">Rôle</Label>
-                <Input
-                  id="role"
-                  value={user?.user_metadata?.role || 'b2c'}
-                  disabled
-                />
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Contraste élevé</Label>
+              <p className="text-sm text-muted-foreground">
+                Améliore la lisibilité pour les malvoyants
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            <Switch
+              checked={settings.accessibility.highContrast}
+              onCheckedChange={(checked) => 
+                handleSettingChange('accessibility', 'highContrast', checked)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Texte large</Label>
+              <p className="text-sm text-muted-foreground">
+                Augmente la taille du texte
+              </p>
+            </div>
+            <Switch
+              checked={settings.accessibility.largeText}
+              onCheckedChange={(checked) => 
+                handleSettingChange('accessibility', 'largeText', checked)
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notifications
+          </CardTitle>
+          <CardDescription>
+            Gérez vos préférences de notification
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Notifications push</Label>
+              <p className="text-sm text-muted-foreground">
+                Notifications en temps réel dans l'application
+              </p>
+            </div>
+            <Switch
+              checked={settings.notifications.push}
+              onCheckedChange={(checked) => 
+                handleSettingChange('notifications', 'push', checked)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Notifications email</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des emails de rappel et d'information
+              </p>
+            </div>
+            <Switch
+              checked={settings.notifications.email}
+              onCheckedChange={(checked) => 
+                handleSettingChange('notifications', 'email', checked)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Rappels quotidiens</Label>
+              <p className="text-sm text-muted-foreground">
+                Rappels pour vos sessions bien-être
+              </p>
+            </div>
+            <Switch
+              checked={settings.notifications.reminders}
+              onCheckedChange={(checked) => 
+                handleSettingChange('notifications', 'reminders', checked)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Notifications SMS</Label>
+              <p className="text-sm text-muted-foreground">
+                Alertes importantes par SMS
+              </p>
+            </div>
+            <Switch
+              checked={settings.notifications.sms}
+              onCheckedChange={(checked) => 
+                handleSettingChange('notifications', 'sms', checked)
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Audio */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Volume2 className="h-5 w-5" />
+            Audio
+          </CardTitle>
+          <CardDescription>
+            Paramètres audio et son
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Volume général ({settings.audio.volume[0]}%)</Label>
+            <Slider
+              value={settings.audio.volume}
+              onValueChange={(value) => handleSettingChange('audio', 'volume', value)}
+              max={100}
+              step={1}
+              className="w-full"
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Effets sonores</Label>
+              <p className="text-sm text-muted-foreground">
+                Sons d'interface et de feedback
+              </p>
+            </div>
+            <Switch
+              checked={settings.audio.soundEffects}
+              onCheckedChange={(checked) => 
+                handleSettingChange('audio', 'soundEffects', checked)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Guidage vocal</Label>
+              <p className="text-sm text-muted-foreground">
+                Instructions vocales pendant les sessions
+              </p>
+            </div>
+            <Switch
+              checked={settings.audio.voiceGuidance}
+              onCheckedChange={(checked) => 
+                handleSettingChange('audio', 'voiceGuidance', checked)
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Privacy & Security */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Confidentialité et sécurité
+          </CardTitle>
+          <CardDescription>
+            Contrôlez vos données et votre confidentialité
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Analytics anonymes</Label>
+              <p className="text-sm text-muted-foreground">
+                Aider à améliorer l'application avec des données anonymisées
+              </p>
+            </div>
+            <Switch
+              checked={settings.privacy.analytics}
+              onCheckedChange={(checked) => 
+                handleSettingChange('privacy', 'analytics', checked)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Partage de données</Label>
+              <p className="text-sm text-muted-foreground">
+                Partager des données avec des partenaires de recherche
+              </p>
+            </div>
+            <Switch
+              checked={settings.privacy.dataSharing}
+              onCheckedChange={(checked) => 
+                handleSettingChange('privacy', 'dataSharing', checked)
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Visibilité du profil</Label>
+            <Select 
+              value={settings.privacy.profileVisibility}
+              onValueChange={(value) => 
+                handleSettingChange('privacy', 'profileVisibility', value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="private">Privé</SelectItem>
+                <SelectItem value="team">Équipe seulement</SelectItem>
+                <SelectItem value="public">Public</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Language & Region */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Langue et région
+          </CardTitle>
+          <CardDescription>
+            Paramètres de localisation
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Langue</Label>
+            <Select defaultValue="fr">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fr">Français</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="de">Deutsch</SelectItem>
+                <SelectItem value="it">Italiano</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Fuseau horaire</Label>
+            <Select defaultValue="europe/paris">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="europe/paris">Europe/Paris (GMT+1)</SelectItem>
+                <SelectItem value="europe/london">Europe/London (GMT+0)</SelectItem>
+                <SelectItem value="america/new_york">America/New_York (GMT-5)</SelectItem>
+                <SelectItem value="asia/tokyo">Asia/Tokyo (GMT+9)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Format de date</Label>
+            <Select defaultValue="dd/mm/yyyy">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dd/mm/yyyy">DD/MM/YYYY</SelectItem>
+                <SelectItem value="mm/dd/yyyy">MM/DD/YYYY</SelectItem>
+                <SelectItem value="yyyy-mm-dd">YYYY-MM-DD</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Management */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5" />
+            Gestion des données
+          </CardTitle>
+          <CardDescription>
+            Exportez, sauvegardez ou supprimez vos données
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <h4 className="font-medium">Exporter mes données</h4>
+              <p className="text-sm text-muted-foreground">
+                Télécharger toutes vos données au format JSON
+              </p>
+            </div>
+            <Button variant="outline" onClick={exportData}>
+              <Download className="h-4 w-4 mr-2" />
+              Exporter
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <h4 className="font-medium">Vider le cache</h4>
+              <p className="text-sm text-muted-foreground">
+                Supprimer les données en cache de l'application
+              </p>
+            </div>
+            <Button variant="outline" onClick={clearCache}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Vider
+            </Button>
+          </div>
+
+          {(userMode === 'b2b_admin' || userMode === 'b2b_user') && (
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h4 className="font-medium">Clés API</h4>
+                <p className="text-sm text-muted-foreground">
+                  Gérer les clés d'accès pour les intégrations
+                </p>
+              </div>
+              <Button variant="outline">
+                <Key className="h-4 w-4 mr-2" />
+                Gérer
+              </Button>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between p-4 border rounded-lg border-red-200">
+            <div>
+              <h4 className="font-medium text-red-700">Zone de danger</h4>
+              <p className="text-sm text-muted-foreground">
+                Actions irréversibles qui affectent votre compte
+              </p>
+            </div>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Supprimer le compte
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

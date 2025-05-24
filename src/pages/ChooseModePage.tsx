@@ -1,118 +1,218 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Briefcase, Building2, ArrowLeft } from 'lucide-react';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
+import { User, Building2, ArrowRight, Heart, Users, BarChart3, CheckCircle } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
 
-  const handleSelectMode = (mode: 'b2c' | 'b2b_user' | 'b2b_admin') => {
-    setUserMode(mode);
-    localStorage.setItem('userMode', mode);
-    
+  const handleModeSelection = (mode: 'b2c' | 'b2b') => {
     if (mode === 'b2c') {
       navigate('/b2c/login');
-    } else if (mode === 'b2b_user') {
-      navigate('/b2b/user/login');
     } else {
-      navigate('/b2b/admin/login');
+      navigate('/b2b/selection');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-4xl"
-      >
-        <Card>
-          <CardHeader className="text-center relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/')}
-              className="absolute left-4 top-4"
-            >
-              <ArrowLeft className="h-4 w-4" />
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center space-y-6 mb-12"
+        >
+          <Badge variant="outline" className="mx-auto">
+            <Heart className="h-3 w-3 mr-1" />
+            Choisissez votre expérience EmotionsCare
+          </Badge>
+          
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            Comment souhaitez-vous
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {' '}utiliser EmotionsCare ?
+            </span>
+          </h1>
+          
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Sélectionnez le mode qui correspond le mieux à vos besoins. 
+            Vous pourrez toujours changer par la suite.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* B2C Card */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+            className="h-full"
+          >
+            <Card className="h-full border-2 hover:border-primary/50 transition-all duration-300 cursor-pointer">
+              <CardHeader className="text-center pb-6">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User className="h-8 w-8 text-blue-600" />
+                </div>
+                <CardTitle className="text-2xl">Usage Personnel</CardTitle>
+                <CardDescription className="text-lg">
+                  Pour votre bien-être individuel et votre développement personnel
+                </CardDescription>
+                <Badge className="mx-auto w-fit">
+                  3 jours d'essai gratuit
+                </Badge>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Scanner émotionnel personnel avec IA</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Coach virtuel personnalisé 24/7</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Journal intime intelligent et sécurisé</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Musique thérapie adaptative</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Suivi de progression personnel</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Confidentialité totale garantie</span>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                    🎯 Idéal pour : Gestion du stress, amélioration du bien-être, 
+                    développement personnel, accompagnement émotionnel quotidien
+                  </p>
+                </div>
+
+                <Button 
+                  onClick={() => handleModeSelection('b2c')} 
+                  className="w-full text-lg py-6"
+                  size="lg"
+                >
+                  Commencer mon parcours personnel
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+
+                <div className="text-center text-sm text-muted-foreground">
+                  ✨ Accès immédiat • Sans engagement • Données privées
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* B2B Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+            className="h-full"
+          >
+            <Card className="h-full border-2 hover:border-primary/50 transition-all duration-300 cursor-pointer">
+              <CardHeader className="text-center pb-6">
+                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Building2 className="h-8 w-8 text-purple-600" />
+                </div>
+                <CardTitle className="text-2xl">Usage Professionnel</CardTitle>
+                <CardDescription className="text-lg">
+                  Pour les entreprises, organisations et équipes
+                </CardDescription>
+                <Badge variant="secondary" className="mx-auto w-fit">
+                  Solution complète
+                </Badge>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-purple-500 flex-shrink-0" />
+                    <span>Gestion multi-utilisateurs avancée</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="h-5 w-5 text-purple-500 flex-shrink-0" />
+                    <span>Analytics et rapports d'équipe</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Dashboard administrateur complet</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Toutes les fonctionnalités B2C incluses</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Support prioritaire et formation</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Conformité RGPD et sécurité renforcée</span>
+                  </div>
+                </div>
+
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                  <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">
+                    🏢 Idéal pour : RH, managers, dirigeants, consultants, 
+                    organisations soucieuses du bien-être de leurs équipes
+                  </p>
+                </div>
+
+                <Button 
+                  onClick={() => handleModeSelection('b2b')} 
+                  variant="outline"
+                  className="w-full text-lg py-6"
+                  size="lg"
+                >
+                  Explorer les solutions entreprise
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+
+                <div className="text-center text-sm text-muted-foreground">
+                  📞 Démo personnalisée • Tarifs sur mesure • Intégration complète
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="text-center mt-12 space-y-4"
+        >
+          <p className="text-sm text-muted-foreground">
+            💡 Besoin d'aide pour choisir ? Nos équipes sont là pour vous accompagner
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button variant="ghost" onClick={() => navigate('/')}>
+              ← Retour à l'accueil
             </Button>
-            <CardTitle className="text-3xl font-bold">Bienvenue sur EmotionsCare</CardTitle>
-            <CardDescription className="text-lg mt-2">
-              Choisissez comment vous souhaitez utiliser notre plateforme
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Button
-                onClick={() => handleSelectMode('b2c')}
-                variant="outline"
-                className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all w-full"
-              >
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Brain className="h-8 w-8 text-primary" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-medium mb-2">Particulier</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Accédez à toutes les fonctionnalités personnalisables pour votre bien-être émotionnel
-                  </p>
-                </div>
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Button
-                onClick={() => handleSelectMode('b2b_user')}
-                variant="outline"
-                className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all w-full"
-              >
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Briefcase className="h-8 w-8 text-primary" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-medium mb-2">Collaborateur</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Utilisez EmotionsCare dans le cadre de votre entreprise ou organisation
-                  </p>
-                </div>
-              </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Button
-                onClick={() => handleSelectMode('b2b_admin')}
-                variant="outline"
-                className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all w-full"
-              >
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Building2 className="h-8 w-8 text-primary" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-medium mb-2">Administration</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Gérez EmotionsCare pour votre entreprise et accédez aux tableaux de bord
-                  </p>
-                </div>
-              </Button>
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            <Button variant="outline">
+              📞 Nous contacter
+            </Button>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };

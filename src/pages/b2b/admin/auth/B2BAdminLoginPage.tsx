@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Mail, Lock, Loader2, Eye, EyeOff, Shield } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2BAdminLoginPage: React.FC = () => {
@@ -16,6 +17,7 @@ const B2BAdminLoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  const { setUserMode } = useUserMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,13 +30,14 @@ const B2BAdminLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast.error('Email ou mot de passe incorrect');
+        toast.error('Erreur de connexion: ' + error.message);
       } else {
-        toast.success('Connexion réussie !');
+        setUserMode('b2b_admin');
+        toast.success('Connexion administrateur réussie !');
         navigate('/b2b/admin/dashboard');
       }
     } catch (error) {
-      toast.error('Erreur de connexion');
+      toast.error('Erreur lors de la connexion');
     } finally {
       setIsLoading(false);
     }
@@ -46,34 +49,30 @@ const B2BAdminLoginPage: React.FC = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-md"
       >
-        <Card className="shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-4">
+        <Card className="w-full max-w-md border-slate-200">
+          <CardHeader className="text-center relative">
             <Button
               variant="ghost"
+              size="icon"
               onClick={() => navigate('/b2b/selection')}
-              className="self-start"
+              className="absolute left-4 top-4"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
+              <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto">
-              <Shield className="h-8 w-8 text-slate-600" />
+            <div className="mx-auto mb-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-full w-fit">
+              <Shield className="h-8 w-8 text-slate-700 dark:text-slate-300" />
             </div>
-            <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
-              Administration
-            </CardTitle>
+            <CardTitle className="text-2xl">Connexion Administrateur</CardTitle>
             <CardDescription>
-              Accédez à votre console de gestion RH et bien-être
+              Accès sécurisé à l'interface d'administration EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email administrateur</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="email"
                     placeholder="admin@entreprise.com"
@@ -84,14 +83,13 @@ const B2BAdminLoginPage: React.FC = () => {
                   />
                 </div>
               </div>
-
+              
               <div className="space-y-2">
-                <label className="text-sm font-medium">Mot de passe</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mot de passe administrateur"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10"
@@ -100,37 +98,37 @@ const B2BAdminLoginPage: React.FC = () => {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                    size="icon"
+                    className="absolute right-1 top-1 h-8 w-8"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-1 top-1 h-8 w-8 p-0"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connexion...
-                  </>
-                ) : (
-                  'Accéder à l\'administration'
-                )}
+              
+              <Button type="submit" className="w-full bg-slate-800 hover:bg-slate-700" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Accès administrateur
               </Button>
-
-              <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
-                <p className="text-xs text-slate-600 dark:text-slate-400">
-                  <strong>Accès sécurisé :</strong> Cette interface est réservée aux administrateurs RH 
-                  et responsables bien-être en entreprise.
+            </form>
+            
+            <div className="space-y-4 mt-6">
+              <div className="text-center">
+                <Link 
+                  to="/b2b/user/login" 
+                  className="text-sm text-muted-foreground hover:text-primary"
+                >
+                  Accès collaborateur
+                </Link>
+              </div>
+              
+              <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground text-center">
+                  ⚠️ Accès réservé aux administrateurs autorisés
                 </p>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </motion.div>
