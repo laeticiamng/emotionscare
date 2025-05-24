@@ -1,25 +1,25 @@
 
 import React from 'react';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { UserModeProvider } from '@/contexts/UserModeContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import AppRouter from './AppRouter';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import LandingPage from '@/pages/LandingPage';
 import { Toaster } from 'sonner';
-import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <BrowserRouter>
+      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
         <UserModeProvider>
-          <div className="min-h-screen w-full">
-            <AppRouter />
-            <Toaster position="top-right" />
-          </div>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="*" element={<div>Page not found</div>} />
+          </Routes>
+          <Toaster position="top-right" />
         </UserModeProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
