@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { User, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Heart } from 'lucide-react';
+import { Mail, Lock, User, Loader2, ArrowLeft, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2CRegisterPage: React.FC = () => {
@@ -17,22 +17,22 @@ const B2CRegisterPage: React.FC = () => {
     password: '',
     confirmPassword: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast.error('Veuillez remplir tous les champs');
       return;
     }
@@ -52,25 +52,25 @@ const B2CRegisterPage: React.FC = () => {
       const { error } = await signUp(formData.email, formData.password, {
         name: formData.name,
         role: 'b2c',
-        trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString() // 3 jours gratuits
+        trial_ends_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
       });
       
       if (error) {
-        toast.error('Erreur lors de l\'inscription: ' + error.message);
+        toast.error('Erreur: ' + error.message);
       } else {
         setUserMode('b2c');
-        toast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
+        toast.success('Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.');
         navigate('/b2c/onboarding');
       }
     } catch (error) {
-      toast.error('Erreur lors de l\'inscription');
+      toast.error('Erreur lors de la création du compte');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-red-900 dark:via-slate-800 dark:to-pink-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -86,12 +86,12 @@ const B2CRegisterPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="mx-auto mb-4 p-3 bg-red-100 dark:bg-red-900/30 rounded-full w-fit">
-              <Heart className="h-8 w-8 text-red-500" />
+            <div className="mx-auto mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
+              <Heart className="h-8 w-8 text-blue-500" />
             </div>
-            <CardTitle className="text-2xl">Inscription Particulier</CardTitle>
+            <CardTitle className="text-2xl">Créer un compte</CardTitle>
             <CardDescription>
-              Créez votre compte EmotionsCare (3 jours gratuits)
+              Rejoignez EmotionsCare et découvrez votre bien-être émotionnel
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -102,16 +102,13 @@ const B2CRegisterPage: React.FC = () => {
                   <Input
                     type="text"
                     name="name"
-                    placeholder="Nom complet"
+                    placeholder="Votre nom complet"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -119,77 +116,56 @@ const B2CRegisterPage: React.FC = () => {
                     name="email"
                     placeholder="votre@email.com"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="password"
+                    name="password"
+                    placeholder="Mot de passe (min. 6 caractères)"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirmer le mot de passe"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Mot de passe (min. 6 caractères)"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="Confirmer le mot de passe"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
+              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg text-center">
+                <p className="text-sm text-green-700 dark:text-green-300 font-medium">
+                  🎉 3 jours d'essai gratuit inclus !
+                </p>
               </div>
               
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                S'inscrire (3 jours gratuits)
+                Créer mon compte
               </Button>
             </form>
             
-            <div className="space-y-4 mt-6">
-              <div className="text-center">
-                <span className="text-sm text-muted-foreground">Déjà un compte ? </span>
-                <Link 
-                  to="/b2c/login" 
-                  className="text-sm text-primary hover:underline"
-                >
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Déjà un compte ?{' '}
+                <Link to="/b2c/login" className="text-primary hover:underline">
                   Se connecter
                 </Link>
-              </div>
+              </p>
             </div>
           </CardContent>
         </Card>

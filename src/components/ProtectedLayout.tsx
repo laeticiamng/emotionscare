@@ -7,23 +7,24 @@ import LoadingAnimation from '@/components/ui/loading-animation';
 
 const ProtectedLayout: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { isLoading: modeLoading } = useUserMode();
+  const { userMode, isLoading: modeLoading } = useUserMode();
 
-  // Show loading state while checking authentication
   if (authLoading || modeLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex h-screen items-center justify-center">
         <LoadingAnimation text="Vérification de l'authentification..." />
       </div>
     );
   }
 
-  // Redirect to mode selection if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/choose-mode" replace />;
   }
 
-  // Render the protected content
+  if (!userMode) {
+    return <Navigate to="/choose-mode" replace />;
+  }
+
   return <Outlet />;
 };
 

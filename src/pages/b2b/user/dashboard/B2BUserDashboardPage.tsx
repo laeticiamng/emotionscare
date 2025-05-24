@@ -1,251 +1,298 @@
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Brain, 
+  Users, 
+  Building2, 
   Heart, 
-  Music, 
-  BookOpen, 
-  TrendingUp, 
-  Users,
+  Brain,
+  BarChart3, 
   Calendar,
   Award,
-  Target,
-  Building2
+  TrendingUp
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const B2BUserDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [teamWellness, setTeamWellness] = useState(82);
-  const [personalScore, setPersonalScore] = useState(75);
-  const [weeklyGoal, setWeeklyGoal] = useState(5);
-  const [completedSessions, setCompletedSessions] = useState(3);
   const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    teamMoodAverage: 0,
+    myMoodAverage: 0,
+    teamSize: 0,
+    completedSessions: 0,
+    upcomingEvents: 0
+  });
 
   useEffect(() => {
-    // Simuler le chargement des données
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const loadTeamData = async () => {
+      setIsLoading(true);
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setStats({
+          teamMoodAverage: Math.floor(Math.random() * 30) + 70,
+          myMoodAverage: Math.floor(Math.random() * 30) + 65,
+          teamSize: Math.floor(Math.random() * 15) + 5,
+          completedSessions: Math.floor(Math.random() * 20) + 8,
+          upcomingEvents: Math.floor(Math.random() * 5) + 1
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTeamData();
   }, []);
 
   const quickActions = [
     {
-      title: 'Scanner d\'émotions',
-      description: 'Analysez votre état émotionnel',
-      icon: <Brain className="h-6 w-6" />,
-      path: '/scan',
-      color: 'bg-blue-500'
+      title: 'Scanner mes émotions',
+      description: 'Analyse personnelle quotidienne',
+      icon: Brain,
+      action: () => navigate('/scan'),
+      color: 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20'
     },
     {
-      title: 'Coach IA',
-      description: 'Accompagnement personnalisé',
-      icon: <Heart className="h-6 w-6" />,
-      path: '/coach',
-      color: 'bg-red-500'
+      title: 'Mon coach personnel',
+      description: 'Session de coaching individuel',
+      icon: Heart,
+      action: () => navigate('/coach'),
+      color: 'bg-red-50 hover:bg-red-100 dark:bg-red-900/20'
     },
     {
-      title: 'Musique thérapeutique',
-      description: 'Sons apaisants personnalisés',
-      icon: <Music className="h-6 w-6" />,
-      path: '/music',
-      color: 'bg-purple-500'
+      title: 'Humeur de l\'équipe',
+      description: 'Voir le moral de mes collègues',
+      icon: Users,
+      action: () => {}, // TODO: implémenter la vue équipe
+      color: 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20'
     },
     {
-      title: 'Journal personnel',
-      description: 'Exprimez vos pensées',
-      icon: <BookOpen className="h-6 w-6" />,
-      path: '/journal',
-      color: 'bg-green-500'
+      title: 'Journal d\'équipe',
+      description: 'Partager avec mes collègues',
+      icon: Calendar,
+      action: () => navigate('/journal'),
+      color: 'bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20'
     }
   ];
 
-  const handleQuickAction = (path: string) => {
-    setIsLoading(true);
-    navigate(path);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 p-6">
-        <div className="container mx-auto space-y-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 p-6">
-      <div className="container mx-auto space-y-6">
-        {/* En-tête de bienvenue */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-blue-600" />
-            <span className="text-sm text-muted-foreground">Collaborateur B2B</span>
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Bonjour, {user?.user_metadata?.name || 'Collaborateur'} ! 👋
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Tableau de bord collaborateur - {user?.user_metadata?.company || 'Votre entreprise'}
+            </p>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Bonjour {user?.name || 'Collaborateur'} 👋
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Votre tableau de bord collaborateur EmotionsCare
-          </p>
+          <div className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {user?.user_metadata?.department || 'Département'}
+            </span>
+          </div>
         </div>
+      </motion.div>
 
-        {/* Indicateurs clés */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Statistiques équipe */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mon score</CardTitle>
-              <Target className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{personalScore}%</div>
-              <Progress value={personalScore} className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-2">
-                Score de bien-être personnel
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Équipe</CardTitle>
+              <CardTitle className="text-sm font-medium">Humeur Équipe</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{teamWellness}%</div>
-              <Progress value={teamWellness} className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-2">
-                Bien-être moyen de l'équipe
-              </p>
+              {isLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats.teamMoodAverage}/100</div>
+                  <p className="text-xs text-muted-foreground">
+                    Moyenne de l'équipe
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
+        </motion.div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Objectif hebdo</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Mon Score</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{completedSessions}/{weeklyGoal}</div>
-              <Progress value={(completedSessions / weeklyGoal) * 100} className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-2">
-                Sessions complétées
-              </p>
+              {isLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats.myMoodAverage}/100</div>
+                  <p className="text-xs text-muted-foreground">
+                    Votre moyenne mensuelle
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
+        </motion.div>
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Série active</CardTitle>
+              <CardTitle className="text-sm font-medium">Équipe</CardTitle>
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats.teamSize}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Membres actifs
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Sessions</CardTitle>
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">5 jours</div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Série de connexions quotidiennes
-              </p>
+              {isLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stats.completedSessions}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Complétées ce mois
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
-        </div>
-
-        {/* Actions rapides */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action, index) => (
-              <Card 
-                key={index} 
-                className="cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => handleQuickAction(action.path)}
-              >
-                <CardHeader>
-                  <div className={`${action.color} w-12 h-12 rounded-full flex items-center justify-center text-white mb-2`}>
-                    {action.icon}
-                  </div>
-                  <CardTitle className="text-lg">{action.title}</CardTitle>
-                  <CardDescription>{action.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="ghost" className="w-full">
-                    Commencer →
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Activité et équipe */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Ma progression cette semaine
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Scans émotionnels</span>
-                  <span className="text-sm font-medium">3 complétés</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Sessions de méditation</span>
-                  <span className="text-sm font-medium">2 complétées</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Entrées journal</span>
-                  <span className="text-sm font-medium">5 écrites</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Participation équipe</span>
-                  <span className="text-sm font-medium">Actif</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Activité de l'équipe
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-2 bg-muted rounded">
-                  <span className="text-sm">Membres actifs aujourd'hui</span>
-                  <span className="text-sm font-medium">8/12</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-muted rounded">
-                  <span className="text-sm">Sessions d'équipe cette semaine</span>
-                  <span className="text-sm font-medium">3 programmées</span>
-                </div>
-                <div className="flex justify-between items-center p-2 bg-muted rounded">
-                  <span className="text-sm">Score moyen équipe</span>
-                  <span className="text-sm font-medium">{teamWellness}%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        </motion.div>
       </div>
+
+      {/* Actions rapides */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Actions Rapides</CardTitle>
+            <CardDescription>
+              Accès rapide à vos outils de bien-être
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {quickActions.map((action, index) => {
+                const Icon = action.icon;
+                return (
+                  <motion.div
+                    key={action.title}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.6 + index * 0.1 }}
+                  >
+                    <Button
+                      variant="outline"
+                      className={`h-auto p-4 w-full justify-start ${action.color} border-2 hover:border-primary/50 transition-all`}
+                      onClick={action.action}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Icon className="h-6 w-6" />
+                        <div className="text-left">
+                          <div className="font-medium">{action.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {action.description}
+                          </div>
+                        </div>
+                      </div>
+                    </Button>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Suivi équipe */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.9 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Suivi d'Équipe
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="font-medium">Réunion bien-être d'équipe</p>
+                  <p className="text-sm text-muted-foreground">Demain à 14h00</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  Rejoindre
+                </Button>
+              </div>
+              
+              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="font-medium">Challenge collectif du mois</p>
+                  <p className="text-sm text-muted-foreground">Méditation 5 min/jour</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  Participer
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

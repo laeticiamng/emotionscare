@@ -7,13 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Building } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowLeft, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2BUserLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
@@ -30,7 +29,7 @@ const B2BUserLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast.error('Erreur de connexion: ' + error.message);
+        toast.error('Erreur: ' + error.message);
       } else {
         setUserMode('b2b_user');
         toast.success('Connexion réussie !');
@@ -44,7 +43,7 @@ const B2BUserLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-green-900 dark:via-slate-800 dark:to-emerald-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -60,8 +59,8 @@ const B2BUserLoginPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="mx-auto mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
-              <Building className="h-8 w-8 text-blue-600" />
+            <div className="mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-full w-fit">
+              <Users className="h-8 w-8 text-green-500" />
             </div>
             <CardTitle className="text-2xl">Connexion Collaborateur</CardTitle>
             <CardDescription>
@@ -75,35 +74,23 @@ const B2BUserLoginPage: React.FC = () => {
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="email"
-                    placeholder="votre@entreprise.com"
+                    placeholder="votre.email@entreprise.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                     required
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     placeholder="Mot de passe"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pl-10"
                     required
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
                 </div>
               </div>
               
@@ -113,25 +100,32 @@ const B2BUserLoginPage: React.FC = () => {
               </Button>
             </form>
             
-            <div className="space-y-4 mt-6">
+            <div className="mt-6 space-y-4">
               <div className="text-center">
-                <span className="text-sm text-muted-foreground">Pas encore de compte ? </span>
                 <Link 
-                  to="/b2b/user/register" 
+                  to="/b2c/reset-password" 
                   className="text-sm text-primary hover:underline"
                 >
-                  S'inscrire
+                  Mot de passe oublié ?
                 </Link>
               </div>
               
-              <div className="text-center">
-                <Link 
-                  to="/b2b/admin/login" 
-                  className="text-sm text-muted-foreground hover:text-primary"
-                >
-                  Accès administrateur
-                </Link>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Nouveau collaborateur ?
+                  </span>
+                </div>
               </div>
+              
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/b2b/user/register">
+                  Créer un compte
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

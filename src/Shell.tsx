@@ -1,31 +1,34 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet } from 'react-router-dom';
-import UnifiedHeader from '@/components/unified/UnifiedHeader';
-import UnifiedSidebar from '@/components/unified/UnifiedSidebar';
+import { Sidebar } from '@/components/layout/Sidebar';
+import { TopNav } from '@/components/layout/TopNav';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const Shell: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isLoading: modeLoading } = useUserMode();
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  if (authLoading || modeLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement..." />
+      </div>
+    );
+  }
 
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
+  if (!isAuthenticated) {
+    return <Outlet />;
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <UnifiedHeader onMenuClick={toggleSidebar} />
-      
-      <div className="flex">
-        <UnifiedSidebar 
-          open={sidebarOpen} 
-          onClose={closeSidebar}
-        />
-        
-        <main className="flex-1 md:ml-64">
+    <div className="flex h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopNav />
+        <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
         </main>
       </div>

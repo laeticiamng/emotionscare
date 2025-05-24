@@ -7,13 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Heart } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowLeft, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2CLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
@@ -30,7 +29,7 @@ const B2CLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast.error('Erreur de connexion: ' + error.message);
+        toast.error('Erreur: ' + error.message);
       } else {
         setUserMode('b2c');
         toast.success('Connexion réussie !');
@@ -43,14 +42,8 @@ const B2CLoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = () => {
-    setEmail('demo@exemple.fr');
-    setPassword('demo123');
-    toast.info('Données de démonstration chargées');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-red-900 dark:via-slate-800 dark:to-pink-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -66,12 +59,12 @@ const B2CLoginPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="mx-auto mb-4 p-3 bg-red-100 dark:bg-red-900/30 rounded-full w-fit">
-              <Heart className="h-8 w-8 text-red-500" />
+            <div className="mx-auto mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
+              <Heart className="h-8 w-8 text-blue-500" />
             </div>
             <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
             <CardDescription>
-              Accédez à votre espace personnel EmotionsCare
+              Connectez-vous à votre espace personnel EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -88,28 +81,16 @@ const B2CLoginPage: React.FC = () => {
                     required
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     placeholder="Mot de passe"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pl-10"
                     required
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
                 </div>
               </div>
               
@@ -119,33 +100,32 @@ const B2CLoginPage: React.FC = () => {
               </Button>
             </form>
             
-            <div className="space-y-4 mt-6">
-              <Button
-                variant="outline"
-                onClick={handleDemoLogin}
-                className="w-full"
-              >
-                Essayer la démo
-              </Button>
-              
-              <div className="text-center">
-                <span className="text-sm text-muted-foreground">Pas encore de compte ? </span>
-                <Link 
-                  to="/b2c/register" 
-                  className="text-sm text-primary hover:underline"
-                >
-                  S'inscrire
-                </Link>
-              </div>
-              
+            <div className="mt-6 space-y-4">
               <div className="text-center">
                 <Link 
                   to="/b2c/reset-password" 
-                  className="text-sm text-muted-foreground hover:text-primary"
+                  className="text-sm text-primary hover:underline"
                 >
                   Mot de passe oublié ?
                 </Link>
               </div>
+              
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Nouveau sur EmotionsCare ?
+                  </span>
+                </div>
+              </div>
+              
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/b2c/register">
+                  Créer un compte
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
