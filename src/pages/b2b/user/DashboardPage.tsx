@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, Scan, Brain, Music } from 'lucide-react';
+import { Users, Scan, Brain, Music, Building2, Target } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -11,25 +11,46 @@ const DashboardPage: React.FC = () => {
 
   const modules = [
     {
-      title: "Scanner Émotionnel",
-      description: "Analysez votre état émotionnel",
-      icon: <Scan className="h-8 w-8 text-blue-500" />,
-      path: "/b2b/user/scan",
-      color: "from-blue-500 to-cyan-500"
+      title: 'Scanner Émotionnel',
+      description: 'Analysez l\'état émotionnel de votre équipe',
+      icon: Scan,
+      path: '/b2b/user/scan',
+      color: 'from-blue-500 to-cyan-500'
     },
     {
-      title: "Coach IA",
-      description: "Votre accompagnateur professionnel",
-      icon: <Brain className="h-8 w-8 text-purple-500" />,
-      path: "/b2b/user/coach",
-      color: "from-purple-500 to-pink-500"
+      title: 'Coach IA Professionnel',
+      description: 'Accompagnement pour le bien-être au travail',
+      icon: Brain,
+      path: '/b2b/user/coach',
+      color: 'from-purple-500 to-indigo-500'
     },
     {
-      title: "Musicothérapie",
-      description: "Musique pour votre bien-être au travail",
-      icon: <Music className="h-8 w-8 text-green-500" />,
-      path: "/b2b/user/music",
-      color: "from-green-500 to-emerald-500"
+      title: 'Musicothérapie',
+      description: 'Musique adaptée à l\'environnement de travail',
+      icon: Music,
+      path: '/b2b/user/music',
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      title: 'Équipe',
+      description: 'Collaborez avec vos collègues',
+      icon: Users,
+      path: '/b2b/user/team',
+      color: 'from-green-500 to-teal-500'
+    },
+    {
+      title: 'Défis d\'équipe',
+      description: 'Participez aux challenges collectifs',
+      icon: Target,
+      path: '/b2b/user/challenges',
+      color: 'from-orange-500 to-red-500'
+    },
+    {
+      title: 'Espace Organisation',
+      description: 'Ressources de votre entreprise',
+      icon: Building2,
+      path: '/b2b/user/organization',
+      color: 'from-gray-500 to-slate-500'
     }
   ];
 
@@ -41,38 +62,38 @@ const DashboardPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-4">
-              <Users className="h-16 w-16 text-blue-500" />
-            </div>
+          <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Tableau de Bord Utilisateur B2B
+              Tableau de Bord Collaborateur
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
               Votre espace de bien-être professionnel
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {modules.map((module, index) => (
               <motion.div
-                key={index}
+                key={module.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer">
-                  <CardHeader className="text-center pb-4">
-                    <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
-                      {module.icon}
+                <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
+                  <CardHeader className="text-center">
+                    <div className={`mx-auto mb-4 p-4 rounded-full bg-gradient-to-r ${module.color} text-white group-hover:scale-110 transition-transform`}>
+                      <module.icon className="h-8 w-8" />
                     </div>
                     <CardTitle className="text-lg">{module.title}</CardTitle>
-                    <CardDescription>{module.description}</CardDescription>
+                    <CardDescription className="text-sm">
+                      {module.description}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button 
+                  <CardContent>
+                    <Button
                       onClick={() => navigate(module.path)}
-                      className={`w-full bg-gradient-to-r ${module.color} hover:opacity-90`}
+                      className="w-full"
+                      variant="outline"
                     >
                       Accéder
                     </Button>
@@ -80,6 +101,22 @@ const DashboardPage: React.FC = () => {
                 </Card>
               </motion.div>
             ))}
+          </div>
+
+          <div className="mt-12">
+            <Card className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">Bienvenue dans votre espace professionnel</CardTitle>
+                <CardDescription className="text-blue-100">
+                  Découvrez tous les outils pour améliorer votre bien-être au travail
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-blue-100">
+                  Explorez les différents modules disponibles pour optimiser votre expérience professionnelle et maintenir un équilibre émotionnel sain.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </motion.div>
       </div>

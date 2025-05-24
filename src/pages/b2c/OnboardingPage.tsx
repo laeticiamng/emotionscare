@@ -1,70 +1,114 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, ArrowLeft } from 'lucide-react';
+import { Heart, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const steps = [
+    {
+      title: 'Bienvenue sur EmotionsCare',
+      description: 'Votre plateforme de bien-être émotionnel personnalisée',
+      content: 'Nous sommes ravis de vous accompagner dans votre parcours de développement personnel et de bien-être émotionnel.'
+    },
+    {
+      title: 'Découvrez nos modules',
+      description: 'Des outils puissants pour votre équilibre',
+      content: 'Journal émotionnel, musicothérapie, scanner émotionnel, coach IA et bien plus encore vous attendent.'
+    },
+    {
+      title: 'Personnalisez votre expérience',
+      description: 'Adaptez la plateforme à vos besoins',
+      content: 'Configurez vos préférences pour une expérience sur mesure qui évolue avec vous.'
+    },
+    {
+      title: 'Prêt à commencer',
+      description: 'Votre voyage vers le bien-être commence maintenant',
+      content: 'Explorez votre tableau de bord et découvrez tous les outils à votre disposition.'
+    }
+  ];
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      navigate('/b2c/dashboard');
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-2xl"
       >
-        <Button
-          onClick={() => navigate('/b2c/dashboard')}
-          variant="ghost"
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Aller au tableau de bord
-        </Button>
-
         <Card>
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <Heart className="h-12 w-12 text-green-500" />
+              <Heart className="h-12 w-12 text-pink-500" />
             </div>
-            <CardTitle className="text-2xl">Bienvenue dans EmotionsCare</CardTitle>
-            <CardDescription>
-              Commençons votre parcours de bien-être émotionnel
-            </CardDescription>
+            <div className="flex justify-center space-x-2 mb-4">
+              {steps.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-3 h-3 rounded-full ${
+                    index <= currentStep ? 'bg-pink-500' : 'bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+            <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
+            <CardDescription>{steps[currentStep].description}</CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-4">Configuration de votre profil</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Nous allons personnaliser votre expérience pour mieux vous accompagner
-                </p>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <h4 className="font-medium text-green-800 dark:text-green-300">Étape 1</h4>
-                  <p className="text-sm text-green-600 dark:text-green-400">Définir vos objectifs de bien-être</p>
-                </div>
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <h4 className="font-medium text-blue-800 dark:text-blue-300">Étape 2</h4>
-                  <p className="text-sm text-blue-600 dark:text-blue-400">Configurer vos préférences</p>
-                </div>
-                <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                  <h4 className="font-medium text-purple-800 dark:text-purple-300">Étape 3</h4>
-                  <p className="text-sm text-purple-600 dark:text-purple-400">Découvrir les fonctionnalités</p>
-                </div>
-              </div>
+          <CardContent className="text-center space-y-6">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="text-gray-600 dark:text-gray-300"
+            >
+              {steps[currentStep].content}
+            </motion.div>
 
-              <Button 
-                onClick={() => navigate('/b2c/dashboard')}
-                className="w-full bg-green-500 hover:bg-green-600"
+            <div className="flex justify-between pt-6">
+              <Button
+                onClick={handlePrevious}
+                variant="outline"
+                disabled={currentStep === 0}
               >
-                Commencer l'aventure
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Précédent
+              </Button>
+
+              <Button
+                onClick={handleNext}
+                className="bg-pink-500 hover:bg-pink-600"
+              >
+                {currentStep === steps.length - 1 ? (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Commencer
+                  </>
+                ) : (
+                  <>
+                    Suivant
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Users, BarChart, Settings, FileText, Activity } from 'lucide-react';
+import { Shield, Users, BarChart3, Settings, AlertTriangle, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -11,35 +11,60 @@ const DashboardPage: React.FC = () => {
 
   const adminModules = [
     {
-      title: "Gestion des Utilisateurs",
-      description: "Administrez les comptes de votre équipe",
-      icon: <Users className="h-8 w-8 text-blue-500" />,
-      color: "from-blue-500 to-cyan-500"
+      title: 'Gestion des Utilisateurs',
+      description: 'Administrer les comptes collaborateurs',
+      icon: Users,
+      path: '/b2b/admin/users',
+      color: 'from-blue-500 to-cyan-500',
+      stats: '156 utilisateurs'
     },
     {
-      title: "Analytics Équipe",
-      description: "Visualisez les données de bien-être",
-      icon: <BarChart className="h-8 w-8 text-purple-500" />,
-      color: "from-purple-500 to-pink-500"
+      title: 'Analyses & Rapports',
+      description: 'Tableaux de bord et métriques RH',
+      icon: BarChart3,
+      path: '/b2b/admin/analytics',
+      color: 'from-green-500 to-teal-500',
+      stats: '23 rapports'
     },
     {
-      title: "Rapports",
-      description: "Générez des rapports détaillés",
-      icon: <FileText className="h-8 w-8 text-green-500" />,
-      color: "from-green-500 to-emerald-500"
+      title: 'Paramètres Organisation',
+      description: 'Configuration de l\'entreprise',
+      icon: Settings,
+      path: '/b2b/admin/settings',
+      color: 'from-purple-500 to-indigo-500',
+      stats: 'Configuration'
     },
     {
-      title: "Activité Temps Réel",
-      description: "Surveillez l'activité en direct",
-      icon: <Activity className="h-8 w-8 text-orange-500" />,
-      color: "from-orange-500 to-red-500"
+      title: 'Alertes RH',
+      description: 'Suivi des indicateurs critiques',
+      icon: AlertTriangle,
+      path: '/b2b/admin/alerts',
+      color: 'from-orange-500 to-red-500',
+      stats: '3 alertes'
     },
     {
-      title: "Configuration",
-      description: "Paramètres de l'organisation",
-      icon: <Settings className="h-8 w-8 text-gray-500" />,
-      color: "from-gray-500 to-slate-500"
+      title: 'Validation des Comptes',
+      description: 'Approuver les nouvelles inscriptions',
+      icon: UserCheck,
+      path: '/b2b/admin/approvals',
+      color: 'from-indigo-500 to-purple-500',
+      stats: '7 en attente'
+    },
+    {
+      title: 'Support Équipes',
+      description: 'Assistance et accompagnement',
+      icon: Shield,
+      path: '/b2b/admin/support',
+      color: 'from-teal-500 to-green-500',
+      stats: '12 tickets'
     }
+  ];
+
+  const quickStats = [
+    { label: 'Utilisateurs Actifs', value: '142', change: '+12%' },
+    { label: 'Taux de Satisfaction', value: '87%', change: '+5%' },
+    { label: 'Sessions Aujourd\'hui', value: '89', change: '+23%' },
+    { label: 'Alertes Ouvertes', value: '3', change: '-2' }
   ];
 
   return (
@@ -50,40 +75,67 @@ const DashboardPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <Shield className="h-16 w-16 text-green-500" />
+              <Shield className="h-12 w-12 text-green-500" />
             </div>
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               Tableau de Bord Administrateur RH
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Gérez le bien-être de votre équipe
+              Gérez et supervisez le bien-être de votre organisation
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {adminModules.map((module, index) => (
+          {/* Statistiques rapides */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            {quickStats.map((stat, index) => (
               <motion.div
-                key={index}
+                key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer">
-                  <CardHeader className="text-center pb-4">
-                    <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
-                      {module.icon}
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-green-600">{stat.value}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">{stat.label}</div>
+                    <div className="text-xs text-green-500">{stat.change}</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Modules d'administration */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {adminModules.map((module, index) => (
+              <motion.div
+                key={module.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
+                  <CardHeader className="text-center">
+                    <div className={`mx-auto mb-4 p-4 rounded-full bg-gradient-to-r ${module.color} text-white group-hover:scale-110 transition-transform`}>
+                      <module.icon className="h-8 w-8" />
                     </div>
                     <CardTitle className="text-lg">{module.title}</CardTitle>
-                    <CardDescription>{module.description}</CardDescription>
+                    <CardDescription className="text-sm">
+                      {module.description}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button 
-                      className={`w-full bg-gradient-to-r ${module.color} hover:opacity-90`}
-                      disabled
+                  <CardContent className="text-center">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      {module.stats}
+                    </div>
+                    <Button
+                      onClick={() => navigate(module.path)}
+                      className="w-full"
+                      variant="outline"
                     >
-                      Bientôt disponible
+                      Gérer
                     </Button>
                   </CardContent>
                 </Card>
@@ -91,18 +143,20 @@ const DashboardPage: React.FC = () => {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <Card className="max-w-2xl mx-auto">
+          <div className="mt-12">
+            <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
               <CardHeader>
-                <CardTitle>Fonctionnalités en Développement</CardTitle>
-                <CardDescription>
-                  L'interface administrateur complète sera bientôt disponible
+                <CardTitle className="text-xl text-white flex items-center">
+                  <Shield className="mr-3 h-6 w-6" />
+                  Administration RH
+                </CardTitle>
+                <CardDescription className="text-green-100">
+                  Pilotez le bien-être émotionnel de vos équipes
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Vous pourrez bientôt gérer tous les aspects du bien-être de votre équipe 
-                  depuis cette interface centralisée.
+                <p className="text-green-100">
+                  Accédez à tous les outils nécessaires pour superviser, analyser et optimiser l'expérience de vos collaborateurs sur la plateforme EmotionsCare.
                 </p>
               </CardContent>
             </Card>
