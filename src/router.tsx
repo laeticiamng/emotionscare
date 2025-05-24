@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/MainLayout';
+import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 // B2C Pages
