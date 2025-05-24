@@ -1,68 +1,78 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
+import { authenticateRequest, checkRateLimit, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
 
 serve(async (req) => {
+  // Headers CORS sécurisés
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Security-Policy': "default-src 'self'",
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY'
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { text, emojis, userId } = await req.json();
-
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    // Vérification de l'authentification
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200) {
+      await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
+      return new Response(
+        JSON.stringify({ error: authResult.error }),
+        { status: authResult.status, headers: corsHeaders }
+      );
     }
 
-    // Construire le prompt d'analyse
-    let analysisPrompt = `Analyse l'état émotionnel basé sur ces données :
+    // Rate limiting
+    const clientId = authResult.user.id;
+    if (!checkRateLimit(clientId, 10, 60000)) { // 10 requêtes par minute
+      return new Response(
+        JSON.stringify({ error: 'Trop de requêtes. Veuillez patienter.' }),
+        { status: 429, headers: corsHeaders }
+      );
+    }
+
+    const { text } = await req.json();
     
-    Texte : "${text}"
-    Émojis sélectionnés : ${emojis.join(' ')}
-    
-    Fournis une analyse structurée avec :
-    1. Émotion principale (un mot : Joyeux, Triste, Anxieux, Colère, Calme, etc.)
-    2. Niveau de confiance (0-1)
-    3. Intensité émotionnelle (1-10)
-    4. Analyse détaillée (2-3 phrases)
-    5. 3 recommandations pratiques
-    
-    Réponds en JSON avec cette structure :
-    {
-      "emotion": "string",
-      "confidence": number,
-      "intensity": number,
-      "analysis": "string",
-      "recommendations": ["string", "string", "string"]
-    }`;
+    if (!text || typeof text !== 'string' || text.length > 1000) {
+      return new Response(
+        JSON.stringify({ error: 'Texte invalide ou trop long (max 1000 caractères)' }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      console.error('OPENAI_API_KEY non configurée');
+      return new Response(
+        JSON.stringify({ error: 'Service temporairement indisponible' }),
+        { status: 503, headers: corsHeaders }
+      );
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert en analyse émotionnelle. Réponds uniquement en JSON valide.'
-          },
-          {
-            role: 'user',
-            content: analysisPrompt
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.3,
-      }),
+        model: 'gpt-3.5-turbo',
+        messages: [{
+          role: 'system',
+          content: 'Tu es un expert en analyse émotionnelle. Analyse le texte et retourne uniquement un objet JSON avec: emotion (string), intensity (number 0-10), confidence (number 0-1).'
+        }, {
+          role: 'user',
+          content: text
+        }],
+        max_tokens: 150,
+        temperature: 0.3
+      })
     });
 
     if (!response.ok) {
@@ -70,47 +80,24 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0]?.message?.content;
-
-    try {
-      const analysisResult = JSON.parse(aiResponse);
-      return new Response(
-        JSON.stringify(analysisResult),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    } catch (parseError) {
-      // Fallback si le JSON n'est pas valide
-      return new Response(
-        JSON.stringify({
-          emotion: 'Neutre',
-          confidence: 0.7,
-          intensity: 5,
-          analysis: 'Analyse en cours de traitement...',
-          recommendations: [
-            'Prenez quelques minutes pour respirer profondément',
-            'Notez vos sentiments dans votre journal',
-            'Pratiquez une courte méditation'
-          ]
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const content = data.choices[0]?.message?.content;
+    
+    if (!content) {
+      throw new Error('Réponse OpenAI invalide');
     }
 
-  } catch (error) {
-    console.error('Error in analyze-emotion function:', error);
+    const analysis = JSON.parse(content);
+    
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        emotion: 'Erreur',
-        confidence: 0,
-        intensity: 0,
-        analysis: 'Une erreur est survenue lors de l\'analyse.',
-        recommendations: []
-      }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify(analysis),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Erreur dans analyze-emotion:', error);
+    return new Response(
+      JSON.stringify({ error: 'Erreur lors de l\'analyse émotionnelle' }),
+      { status: 500, headers: corsHeaders }
     );
   }
 });
