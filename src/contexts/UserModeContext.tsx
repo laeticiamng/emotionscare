@@ -1,13 +1,11 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
 
 interface UserModeContextType {
-  userMode: UserMode | null;
+  userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
-  isLoading: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
@@ -20,59 +18,15 @@ export const useUserMode = () => {
   return context;
 };
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserMode | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { user, isAuthenticated } = useAuth();
+interface UserModeProviderProps {
+  children: ReactNode;
+}
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Get mode from user metadata or localStorage
-      const userRole = user.user_metadata?.role || user.role;
-      const savedMode = localStorage.getItem('user-mode') as UserMode;
-      
-      let mode: UserMode | null = null;
-      
-      if (userRole) {
-        switch (userRole) {
-          case 'b2c':
-            mode = 'b2c';
-            break;
-          case 'b2b_user':
-            mode = 'b2b_user';
-            break;
-          case 'b2b_admin':
-            mode = 'b2b_admin';
-            break;
-          default:
-            mode = savedMode || 'b2c';
-        }
-      } else if (savedMode) {
-        mode = savedMode;
-      }
-      
-      setUserModeState(mode);
-    } else if (!isAuthenticated) {
-      setUserModeState(null);
-      localStorage.removeItem('user-mode');
-    }
-    
-    setIsLoading(false);
-  }, [user, isAuthenticated]);
-
-  const setUserMode = (mode: UserMode) => {
-    setUserModeState(mode);
-    localStorage.setItem('user-mode', mode);
-  };
-
-  const value = {
-    userMode,
-    setUserMode,
-    isLoading,
-  };
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserMode>(null);
 
   return (
-    <UserModeContext.Provider value={value}>
+    <UserModeContext.Provider value={{ userMode, setUserMode }}>
       {children}
     </UserModeContext.Provider>
   );

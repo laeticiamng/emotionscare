@@ -6,12 +6,13 @@ export interface Track {
   duration: number;
   url: string;
   artwork?: string;
+  emotion?: string;
 }
 
 export interface MusicTrack extends Track {
   audioUrl?: string;
-  emotion?: string;
   genre?: string;
+  coverUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -22,6 +23,12 @@ export interface MusicPlaylist {
   description?: string;
   tags?: string[];
   creator?: string;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  genre?: string;
 }
 
 export interface MusicContextType {
@@ -38,4 +45,5 @@ export interface MusicContextType {
   previous: () => void;
   setVolume: (volume: number) => void;
   setPlaylist: (tracks: Track[]) => void;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
 }

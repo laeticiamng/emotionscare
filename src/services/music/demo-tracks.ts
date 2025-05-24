@@ -1,42 +1,37 @@
 
-import { Track } from '@/contexts/MusicContext';
+import { Track } from '@/types/music';
 
-// Tracks de démonstration avec des URLs d'audio libres de droits
 export const demoTracks: Track[] = [
   {
     id: 'demo-1',
-    title: 'Relaxation Douce',
+    title: 'Méditation Matinale',
     artist: 'Nature Sounds',
     duration: 180,
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
-    artwork: '/images/demo-track-1.jpg'
+    url: '/audio/demo/meditation.mp3',
+    artwork: '/images/covers/meditation.jpg'
   },
   {
-    id: 'demo-2', 
-    title: 'Méditation Profonde',
-    artist: 'Zen Master',
+    id: 'demo-2',
+    title: 'Focus Profond',
+    artist: 'Ambient Creator',
     duration: 240,
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
-    artwork: '/images/demo-track-2.jpg'
+    url: '/audio/demo/focus.mp3',
+    artwork: '/images/covers/focus.jpg'
   },
   {
     id: 'demo-3',
-    title: 'Ambiance Calme',
-    artist: 'Peaceful Mind',
+    title: 'Relaxation Océan',
+    artist: 'Ocean Waves',
+    duration: 300,
+    url: '/audio/demo/ocean.mp3',
+    artwork: '/images/covers/ocean.jpg'
+  },
+  {
+    id: 'demo-4',
+    title: 'Énergie Positive',
+    artist: 'Uplifting Vibes',
     duration: 200,
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
-    artwork: '/images/demo-track-3.jpg'
+    url: '/audio/demo/energy.mp3',
+    artwork: '/images/covers/energy.jpg'
   }
 ];
-
-// Fonction pour charger la playlist de démonstration
-export const loadDemoPlaylist = (): Track[] => {
-  console.log('🎵 Chargement de la playlist de démonstration');
-  return demoTracks;
-};
-
-// Fonction pour obtenir un track aléatoire
-export const getRandomTrack = (): Track => {
-  const randomIndex = Math.floor(Math.random() * demoTracks.length);
-  return demoTracks[randomIndex];
-};

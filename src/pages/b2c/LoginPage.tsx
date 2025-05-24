@@ -4,14 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useNavigate } from 'react-router-dom';
 
 const B2CLoginPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    // Simulation de connexion
+    navigate('/b2c/dashboard');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Connexion Particulier</CardTitle>
-          <CardDescription>Connectez-vous à votre compte personnel</CardDescription>
+          <CardDescription>Accédez à votre espace personnel</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -22,7 +30,17 @@ const B2CLoginPage: React.FC = () => {
             <Label htmlFor="password">Mot de passe</Label>
             <Input id="password" type="password" />
           </div>
-          <Button className="w-full">Se connecter</Button>
+          <Button onClick={handleLogin} className="w-full">
+            Se connecter
+          </Button>
+          <div className="text-center space-y-2">
+            <Button variant="link" onClick={() => navigate('/b2c/register')}>
+              Créer un compte
+            </Button>
+            <Button variant="link" onClick={() => navigate('/b2c/reset-password')}>
+              Mot de passe oublié ?
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

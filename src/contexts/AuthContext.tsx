@@ -1,18 +1,18 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
   id: string;
   email: string;
-  name?: string;
+  name: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
 }
 
 interface AuthContextType {
   user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, role: User['role']) => Promise<void>;
   logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,29 +26,27 @@ export const useAuth = () => {
 };
 
 interface AuthProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Simuler la vérification de l'authentification
-    const checkAuth = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setIsLoading(false);
-    };
-    
-    checkAuth();
-  }, []);
-
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, role: User['role']) => {
     setIsLoading(true);
     try {
-      // Simuler la connexion
+      // Simulation d'authentification
       await new Promise(resolve => setTimeout(resolve, 1000));
-      setUser({ id: '1', email, name: 'Utilisateur Test' });
+      
+      const mockUser: User = {
+        id: 'user-123',
+        email,
+        name: 'Utilisateur Test',
+        role
+      };
+      
+      setUser(mockUser);
     } finally {
       setIsLoading(false);
     }
@@ -58,16 +56,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
-  const value: AuthContextType = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    logout,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
