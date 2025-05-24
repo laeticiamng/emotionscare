@@ -1,59 +1,75 @@
 
 import { useState, useCallback } from 'react';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/contexts/MusicContext';
-import { demoTracks } from '@/services/music/demo-tracks';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { useToast } from '@/hooks/use-toast';
 
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { play, setPlaylist } = useMusic();
+  const { loadPlaylistForEmotion, setPlaylist, play } = useMusic();
+  const { toast } = useToast();
 
-  const getMusicRecommendationForEmotion = useCallback((emotion: string) => {
-    // Simuler une recommandation basée sur l'émotion
-    const emotionTracks = demoTracks.filter(track => 
-      track.emotion?.toLowerCase() === emotion.toLowerCase()
-    );
-    return emotionTracks.length > 0 ? emotionTracks : demoTracks;
-  }, []);
+  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+    if (!loadPlaylistForEmotion) {
+      console.error('loadPlaylistForEmotion not available');
+      return null;
+    }
 
-  const playEmotion = useCallback(async (emotion: string) => {
     setIsLoading(true);
     try {
-      const tracks = getMusicRecommendationForEmotion(emotion);
-      setPlaylist(tracks);
-      if (tracks.length > 0) {
-        play(tracks[0]);
+      const playlist = await loadPlaylistForEmotion(params);
+      if (playlist && playlist.tracks.length > 0) {
+        // Jouer automatiquement le premier morceau
+        play(playlist.tracks[0]);
+        toast({
+          title: "Musique activée",
+          description: `Playlist "${playlist.name}" chargée pour ${params.emotion}`,
+        });
       }
-      return { id: 'emotion-playlist', name: `Playlist ${emotion}`, tracks };
+      return playlist;
     } catch (error) {
-      console.error('Error playing emotion music:', error);
+      console.error('Error activating music for emotion:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la musique pour cette émotion",
+        variant: "destructive",
+      });
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, [getMusicRecommendationForEmotion, setPlaylist, play]);
+  }, [loadPlaylistForEmotion, play, toast]);
 
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams) => {
-    return await playEmotion(params.emotion);
-  }, [playEmotion]);
+  const getMusicRecommendationForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
+    return await activateMusicForEmotion({ emotion });
+  }, [activateMusicForEmotion]);
 
-  const getEmotionMusicDescription = useCallback((emotion: string) => {
+  const playEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
+    return await activateMusicForEmotion({ emotion });
+  }, [activateMusicForEmotion]);
+
+  const getEmotionMusicDescription = useCallback((emotion: string): string => {
     const descriptions: Record<string, string> = {
-      calm: "Musique apaisante pour la détente",
-      happy: "Mélodies joyeuses et énergisantes",
-      sad: "Musique douce et mélancolique",
-      energetic: "Rythmes dynamiques et motivants",
+      calm: "Musique apaisante pour la relaxation",
+      happy: "Mélodies joyeuses pour booster l'humeur",
       focused: "Sons ambiants pour la concentration",
-      relaxed: "Ambiances zen et relaxantes"
+      energetic: "Musique dynamique pour l'énergie",
+      sad: "Musique douce pour accompagner la mélancolie",
+      stressed: "Sons relaxants pour réduire le stress",
+      angry: "Musique apaisante pour calmer la colère",
+      neutral: "Musique d'ambiance générale",
     };
-    return descriptions[emotion] || "Musique adaptée à votre état émotionnel";
+
+    return descriptions[emotion.toLowerCase()] || "Musique adaptée à votre humeur";
   }, []);
 
   return {
+    activateMusicForEmotion,
     getMusicRecommendationForEmotion,
     playEmotion,
-    activateMusicForEmotion,
     getEmotionMusicDescription,
-    isLoading
+    isLoading,
   };
 };
+
+export default useMusicEmotionIntegration;

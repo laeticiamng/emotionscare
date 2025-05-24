@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { Track, MusicContextType } from '@/types/music';
+import { Track, MusicContextType, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { mockMusicPlaylists } from '@/mocks/musicTracks';
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
@@ -102,6 +103,38 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     play(playlist[prevIndex]);
   };
 
+  // Implémentation de la fonction loadPlaylistForEmotion
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+    setIsLoading(true);
+    try {
+      // Simuler un délai de chargement
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Trouver une playlist correspondant à l'émotion
+      const matchingPlaylist = mockMusicPlaylists.find(
+        playlist => playlist.name?.toLowerCase().includes(params.emotion.toLowerCase())
+      );
+      
+      if (matchingPlaylist) {
+        setPlaylist(matchingPlaylist.tracks);
+        return matchingPlaylist;
+      }
+      
+      // Si aucune playlist spécifique, retourner la première
+      if (mockMusicPlaylists.length > 0) {
+        setPlaylist(mockMusicPlaylists[0].tracks);
+        return mockMusicPlaylists[0];
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error loading playlist for emotion:', error);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: MusicContextType = {
     currentTrack,
     isPlaying,
@@ -116,6 +149,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     previous,
     setVolume,
     setPlaylist,
+    loadPlaylistForEmotion,
   };
 
   return (

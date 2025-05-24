@@ -1,45 +1,77 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const B2CLoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Simulation de connexion
-    navigate('/b2c/dashboard');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await login(email, password, 'b2c');
+      navigate('/b2c/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Connexion Particulier</CardTitle>
-          <CardDescription>Accédez à votre espace personnel</CardDescription>
+          <CardDescription>Connectez-vous à votre espace personnel</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="votre@email.com" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
-            <Input id="password" type="password" />
-          </div>
-          <Button onClick={handleLogin} className="w-full">
-            Se connecter
-          </Button>
-          <div className="text-center space-y-2">
-            <Button variant="link" onClick={() => navigate('/b2c/register')}>
-              Créer un compte
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
-            <Button variant="link" onClick={() => navigate('/b2c/reset-password')}>
-              Mot de passe oublié ?
-            </Button>
+          </form>
+          <div className="mt-4 text-center space-y-2">
+            <p>
+              <Link to="/b2c/register" className="text-primary hover:underline">
+                Créer un compte
+              </Link>
+            </p>
+            <p>
+              <Link to="/b2c/reset-password" className="text-primary hover:underline">
+                Mot de passe oublié ?
+              </Link>
+            </p>
+            <p>
+              <Link to="/choose-mode" className="text-muted-foreground hover:underline">
+                Retour au choix du mode
+              </Link>
+            </p>
           </div>
         </CardContent>
       </Card>
