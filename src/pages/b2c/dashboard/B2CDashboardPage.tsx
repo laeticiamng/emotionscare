@@ -1,124 +1,162 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Mic, Music, BookOpen, Users, Zap } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Heart, Brain, Music, Camera, BookOpen, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const B2CDashboardPage: React.FC = () => {
-  const navigate = useNavigate();
-
-  const quickActions = [
+  const modules = [
     {
-      title: "Scanner mes émotions",
-      description: "Analysez vos émotions en temps réel",
-      icon: Heart,
-      path: "/b2c/scan",
-      color: "text-red-500"
+      title: 'Scan Émotionnel',
+      description: 'Analysez vos émotions en temps réel',
+      icon: Camera,
+      href: '/b2c/scan',
+      color: 'bg-blue-500',
     },
     {
-      title: "Journal personnel", 
-      description: "Écrivez vos pensées et émotions",
-      icon: BookOpen,
-      path: "/b2c/journal",
-      color: "text-blue-500"
+      title: 'Coach IA',
+      description: 'Votre assistant personnel pour le bien-être',
+      icon: Brain,
+      href: '/b2c/coach',
+      color: 'bg-green-500',
     },
     {
-      title: "Musique thérapeutique",
-      description: "Découvrez la musique adaptée à votre humeur",
+      title: 'Musicothérapie',
+      description: 'Musique adaptée à vos émotions',
       icon: Music,
-      path: "/b2c/music",
-      color: "text-purple-500"
+      href: '/b2c/music',
+      color: 'bg-purple-500',
     },
     {
-      title: "Coach IA",
-      description: "Discutez avec votre coach personnel",
-      icon: Zap,
-      path: "/b2c/coach",
-      color: "text-green-500"
+      title: 'Journal Émotionnel',
+      description: 'Suivez votre parcours émotionnel',
+      icon: BookOpen,
+      href: '/b2c/journal',
+      color: 'bg-orange-500',
     },
     {
-      title: "Communauté",
-      description: "Partagez avec d'autres utilisateurs",
+      title: 'Communauté',
+      description: 'Partagez avec d\'autres utilisateurs',
       icon: Users,
-      path: "/b2c/social",
-      color: "text-orange-500"
-    }
+      href: '/b2c/social',
+      color: 'bg-pink-500',
+    },
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Tableau de bord - EmotionsCare</title>
-        <meta name="description" content="Votre espace personnel EmotionsCare" />
-      </Helmet>
-      
-      <div className="space-y-8">
-        {/* Welcome Section */}
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Bienvenue sur EmotionsCare
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Votre espace personnel pour explorer, comprendre et améliorer votre bien-être émotionnel.
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Tableau de bord</h1>
+          <p className="text-muted-foreground">
+            Bienvenue dans votre espace bien-être personnel
           </p>
         </div>
+        <Heart className="h-8 w-8 text-pink-500" />
+      </div>
 
-        {/* Quick Actions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quickActions.map((action) => {
-            const IconComponent = action.icon;
-            return (
-              <Card 
-                key={action.title} 
-                className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(action.path)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-3">
-                    <IconComponent className={`h-6 w-6 ${action.color}`} />
-                    <CardTitle className="text-lg">{action.title}</CardTitle>
+      {/* Welcome Card */}
+      <Card className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-pink-500" />
+            Comment vous sentez-vous aujourd'hui ?
+          </CardTitle>
+          <CardDescription>
+            Prenez un moment pour scanner vos émotions et découvrir la musique parfaite pour votre humeur.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link to="/b2c/scan">
+            <Button className="bg-pink-500 hover:bg-pink-600">
+              Commencer un scan émotionnel
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+
+      {/* Modules Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {modules.map((module) => {
+          const IconComponent = module.icon;
+          return (
+            <Card key={module.href} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${module.color}`}>
+                    <IconComponent className="h-6 w-6 text-white" />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {action.description}
-                  </p>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <div>
+                    <CardTitle className="text-lg">{module.title}</CardTitle>
+                    <CardDescription>{module.description}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Link to={module.href}>
+                  <Button variant="outline" className="w-full">
                     Accéder
                   </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-primary">12</CardTitle>
-              <p className="text-sm text-gray-600">Entrées de journal</p>
-            </CardHeader>
-          </Card>
-          
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-primary">85%</CardTitle>
-              <p className="text-sm text-gray-600">Score de bien-être</p>
-            </CardHeader>
-          </Card>
-          
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-primary">7</CardTitle>
-              <p className="text-sm text-gray-600">Jours consécutifs</p>
-            </CardHeader>
-          </Card>
-        </div>
+                </Link>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
-    </>
+
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Activité récente</CardTitle>
+          <CardDescription>
+            Vos dernières sessions et progrès
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Camera className="h-5 w-5 text-blue-500" />
+                <div>
+                  <p className="font-medium">Scan émotionnel</p>
+                  <p className="text-sm text-muted-foreground">Il y a 2 heures</p>
+                </div>
+              </div>
+              <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                Joie
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Music className="h-5 w-5 text-purple-500" />
+                <div>
+                  <p className="font-medium">Session musicale</p>
+                  <p className="text-sm text-muted-foreground">Hier</p>
+                </div>
+              </div>
+              <span className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                15 min
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-orange-500" />
+                <div>
+                  <p className="font-medium">Entrée de journal</p>
+                  <p className="text-sm text-muted-foreground">Il y a 3 jours</p>
+                </div>
+              </div>
+              <span className="text-sm bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                Réflexion
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

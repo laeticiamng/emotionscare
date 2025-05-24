@@ -1,296 +1,304 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Heart, Target, Music, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Progress } from '@/components/ui/progress';
+import { Heart, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Helmet } from 'react-helmet-async';
-
-const objectives = [
-  { id: 'stress', label: 'Gérer le stress', icon: '🧘' },
-  { id: 'emotions', label: 'Comprendre mes émotions', icon: '💭' },
-  { id: 'relationships', label: 'Améliorer mes relations', icon: '👥' },
-  { id: 'confidence', label: 'Gagner en confiance', icon: '💪' },
-  { id: 'mindfulness', label: 'Pratiquer la pleine conscience', icon: '🌸' },
-  { id: 'sleep', label: 'Mieux dormir', icon: '😴' },
-];
-
-const musicGenres = [
-  { id: 'ambient', label: 'Ambiant', description: 'Sons apaisants et naturels' },
-  { id: 'classical', label: 'Classique', description: 'Musique orchestrale relaxante' },
-  { id: 'jazz', label: 'Jazz doux', description: 'Mélodies jazz douces' },
-  { id: 'nature', label: 'Sons de la nature', description: 'Pluie, océan, forêt' },
-  { id: 'meditation', label: 'Méditation', description: 'Musiques de méditation' },
-  { id: 'lo-fi', label: 'Lo-fi', description: 'Beats calmes et répétitifs' },
-];
 
 const B2COnboardingPage: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedObjectives, setSelectedObjectives] = useState<string[]>([]);
-  const [selectedMusicGenre, setSelectedMusicGenre] = useState<string>('');
-  const [musicVolume, setMusicVolume] = useState([70]);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    age: '',
+    goals: [] as string[],
+    emotionalState: '',
+    preferences: {
+      musicGenres: [] as string[],
+      activityTimes: [] as string[],
+    },
+  });
 
-  const totalSteps = 3;
+  const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
-  const handleObjectiveToggle = (objectiveId: string) => {
-    setSelectedObjectives(prev => 
-      prev.includes(objectiveId) 
-        ? prev.filter(id => id !== objectiveId)
-        : [...prev, objectiveId]
-    );
+  const goals = [
+    'Réduire le stress',
+    'Améliorer mon humeur',
+    'Mieux comprendre mes émotions',
+    'Développer ma résilience',
+    'Améliorer mon sommeil',
+    'Augmenter ma confiance en soi',
+  ];
+
+  const musicGenres = [
+    'Classique',
+    'Ambient',
+    'Nature',
+    'Jazz',
+    'Méditation',
+    'Lofi',
+  ];
+
+  const activityTimes = [
+    'Matin (6h-12h)',
+    'Après-midi (12h-18h)',
+    'Soirée (18h-22h)',
+    'Nuit (22h-6h)',
+  ];
+
+  const handleGoalChange = (goal: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      goals: checked 
+        ? [...prev.goals, goal]
+        : prev.goals.filter(g => g !== goal)
+    }));
   };
 
-  const nextStep = () => {
+  const handleMusicGenreChange = (genre: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        musicGenres: checked 
+          ? [...prev.preferences.musicGenres, genre]
+          : prev.preferences.musicGenres.filter(g => g !== genre)
+      }
+    }));
+  };
+
+  const handleActivityTimeChange = (time: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        activityTimes: checked 
+          ? [...prev.preferences.activityTimes, time]
+          : prev.preferences.activityTimes.filter(t => t !== time)
+      }
+    }));
+  };
+
+  const handleNext = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      completeOnboarding();
+      handleComplete();
     }
   };
 
-  const prevStep = () => {
+  const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const completeOnboarding = async () => {
-    setIsLoading(true);
+  const handleComplete = () => {
+    // Save onboarding data
+    localStorage.setItem('b2c_onboarding_data', JSON.stringify(formData));
     
-    try {
-      // Sauvegarder les préférences de l'utilisateur
-      const preferences = {
-        objectives: selectedObjectives,
-        music_genre: selectedMusicGenre,
-        music_volume: musicVolume[0],
-        onboarding_completed: true,
-      };
-
-      // Ici on pourrait appeler une API pour sauvegarder les préférences
-      console.log('Preferences saved:', preferences);
-      
-      toast({
-        title: "Profil configuré !",
-        description: "Bienvenue dans EmotionsCare. Votre parcours commence maintenant.",
-      });
-      
-      navigate('/b2c/dashboard');
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de finaliser la configuration. Veuillez réessayer.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    toast({
+      title: "Onboarding terminé !",
+      description: "Votre profil a été configuré avec succès.",
+    });
+    
+    navigate('/b2c/dashboard');
   };
 
-  const canProceed = () => {
+  const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return true; // Étape de bienvenue
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Bienvenue sur EmotionsCare !</h2>
+              <p className="text-muted-foreground">
+                Commençons par apprendre à vous connaître.
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="age">Quel âge avez-vous ?</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  placeholder="Votre âge"
+                  value={formData.age}
+                  onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
       case 2:
-        return selectedObjectives.length > 0;
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Quels sont vos objectifs ?</h2>
+              <p className="text-muted-foreground">
+                Sélectionnez tous les objectifs qui vous correspondent.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {goals.map((goal) => (
+                <div key={goal} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={goal}
+                    checked={formData.goals.includes(goal)}
+                    onCheckedChange={(checked) => handleGoalChange(goal, checked as boolean)}
+                  />
+                  <Label htmlFor={goal} className="text-sm font-normal">
+                    {goal}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
       case 3:
-        return selectedMusicGenre !== '';
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Comment vous sentez-vous aujourd'hui ?</h2>
+              <p className="text-muted-foreground">
+                Choisissez l'état qui décrit le mieux votre humeur actuelle.
+              </p>
+            </div>
+            
+            <RadioGroup
+              value={formData.emotionalState}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, emotionalState: value }))}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="excellent" id="excellent" />
+                <Label htmlFor="excellent">😊 Excellent - Je me sens fantastique</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="good" id="good" />
+                <Label htmlFor="good">🙂 Bien - Je me sens plutôt en forme</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="neutral" id="neutral" />
+                <Label htmlFor="neutral">😐 Neutre - Ni bien ni mal</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="tired" id="tired" />
+                <Label htmlFor="tired">😴 Fatigué - J'ai besoin de repos</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="stressed" id="stressed" />
+                <Label htmlFor="stressed">😰 Stressé - Je me sens tendu</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Vos préférences</h2>
+              <p className="text-muted-foreground">
+                Aidez-nous à personnaliser votre expérience.
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <Label className="text-base font-medium mb-3 block">
+                  Quels genres musicaux préférez-vous ?
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {musicGenres.map((genre) => (
+                    <div key={genre} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={genre}
+                        checked={formData.preferences.musicGenres.includes(genre)}
+                        onCheckedChange={(checked) => handleMusicGenreChange(genre, checked as boolean)}
+                      />
+                      <Label htmlFor={genre} className="text-sm font-normal">
+                        {genre}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <Label className="text-base font-medium mb-3 block">
+                  À quels moments préférez-vous utiliser l'app ?
+                </Label>
+                <div className="space-y-2">
+                  {activityTimes.map((time) => (
+                    <div key={time} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={time}
+                        checked={formData.preferences.activityTimes.includes(time)}
+                        onCheckedChange={(checked) => handleActivityTimeChange(time, checked as boolean)}
+                      />
+                      <Label htmlFor={time} className="text-sm font-normal">
+                        {time}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default:
-        return false;
+        return null;
     }
   };
 
   return (
-    <>
-      <Helmet>
-        <title>Configuration - EmotionsCare</title>
-        <meta name="description" content="Configurez votre profil EmotionsCare" />
-      </Helmet>
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardHeader className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Heart className="h-8 w-8 text-primary mr-2" />
-              <span className="text-2xl font-bold">EmotionsCare</span>
-            </div>
-            <CardTitle className="text-2xl">Configuration de votre profil</CardTitle>
-            <div className="mt-4">
-              <Progress value={progress} className="w-full" />
-              <p className="text-sm text-muted-foreground mt-2">
-                Étape {currentStep} sur {totalSteps}
-              </p>
-            </div>
-          </CardHeader>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <Heart className="h-8 w-8 text-pink-500 mr-2" />
+            <span className="text-2xl font-bold">EmotionsCare</span>
+          </div>
+          <CardTitle>Configuration de votre profil</CardTitle>
+          <CardDescription>
+            Étape {currentStep} sur {totalSteps}
+          </CardDescription>
+          <Progress value={progress} className="mt-4" />
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {renderStep()}
           
-          <CardContent className="min-h-[400px]">
-            <AnimatePresence mode="wait">
-              {currentStep === 1 && (
-                <motion.div
-                  key="step1"
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  className="space-y-6 text-center"
-                >
-                  <div className="text-6xl mb-4">🎉</div>
-                  <h3 className="text-2xl font-semibold">Bienvenue dans EmotionsCare !</h3>
-                  <p className="text-lg text-muted-foreground">
-                    Nous allons personnaliser votre expérience en quelques étapes simples.
-                    Cela ne prendra que 2 minutes.
-                  </p>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-green-800 font-medium">
-                      ✨ Essai gratuit de 3 jours activé !
-                    </p>
-                    <p className="text-green-600 text-sm mt-1">
-                      Explorez toutes les fonctionnalités sans engagement
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-
-              {currentStep === 2 && (
-                <motion.div
-                  key="step2"
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center">
-                    <Target className="h-12 w-12 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Quels sont vos objectifs ?</h3>
-                    <p className="text-muted-foreground">
-                      Sélectionnez un ou plusieurs domaines que vous souhaitez améliorer
-                    </p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    {objectives.map((objective) => (
-                      <motion.div
-                        key={objective.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Button
-                          variant={selectedObjectives.includes(objective.id) ? "default" : "outline"}
-                          className="w-full h-auto p-4 flex flex-col items-center space-y-2"
-                          onClick={() => handleObjectiveToggle(objective.id)}
-                        >
-                          <span className="text-2xl">{objective.icon}</span>
-                          <span className="text-sm font-medium">{objective.label}</span>
-                          {selectedObjectives.includes(objective.id) && (
-                            <Check className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </motion.div>
-                    ))}
-                  </div>
-                  
-                  {selectedObjectives.length > 0 && (
-                    <div className="text-center">
-                      <Badge variant="secondary">
-                        {selectedObjectives.length} objectif{selectedObjectives.length > 1 ? 's' : ''} sélectionné{selectedObjectives.length > 1 ? 's' : ''}
-                      </Badge>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-
-              {currentStep === 3 && (
-                <motion.div
-                  key="step3"
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center">
-                    <Music className="h-12 w-12 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Préférences musicales</h3>
-                    <p className="text-muted-foreground">
-                      Choisissez le type de musique qui vous apaise le mieux
-                    </p>
-                  </div>
-                  
-                  <RadioGroup 
-                    value={selectedMusicGenre} 
-                    onValueChange={setSelectedMusicGenre}
-                    className="space-y-3"
-                  >
-                    {musicGenres.map((genre) => (
-                      <div key={genre.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
-                        <RadioGroupItem value={genre.id} id={genre.id} />
-                        <Label htmlFor={genre.id} className="flex-1 cursor-pointer">
-                          <div className="font-medium">{genre.label}</div>
-                          <div className="text-sm text-muted-foreground">{genre.description}</div>
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                  
-                  {selectedMusicGenre && (
-                    <div className="space-y-3">
-                      <Label>Volume par défaut: {musicVolume[0]}%</Label>
-                      <Slider
-                        value={musicVolume}
-                        onValueChange={setMusicVolume}
-                        max={100}
-                        min={10}
-                        step={10}
-                        className="w-full"
-                      />
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </CardContent>
-          
-          <div className="p-6 border-t flex justify-between">
-            <Button 
-              variant="outline" 
-              onClick={prevStep}
+          <div className="flex justify-between pt-6">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
               disabled={currentStep === 1}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
+              Précédent
             </Button>
             
-            <Button 
-              onClick={nextStep}
-              disabled={!canProceed() || isLoading}
-            >
-              {isLoading ? (
-                "Configuration..."
-              ) : currentStep === totalSteps ? (
-                <>
-                  <Check className="mr-2 h-4 w-4" />
-                  Terminer
-                </>
-              ) : (
-                <>
-                  Suivant
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
+            <Button onClick={handleNext}>
+              {currentStep === totalSteps ? 'Terminer' : 'Suivant'}
+              {currentStep !== totalSteps && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
           </div>
-        </Card>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,28 +13,27 @@ import { Loader2, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-const resetSchema = z.object({
+const resetPasswordSchema = z.object({
   email: z.string().email({ message: 'Adresse e-mail invalide' }),
 });
 
-type ResetFormValues = z.infer<typeof resetSchema>;
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 const B2CResetPasswordPage: React.FC = () => {
   const { resetPassword } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   
-  const form = useForm<ResetFormValues>({
-    resolver: zodResolver(resetSchema),
+  const form = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       email: '',
     },
   });
 
-  const onSubmit = async (data: ResetFormValues) => {
+  const onSubmit = async (data: ResetPasswordFormValues) => {
     setIsLoading(true);
     setError(null);
     
@@ -48,28 +47,28 @@ const B2CResetPasswordPage: React.FC = () => {
       
       setSuccess(true);
       toast({
-        title: "Instructions envoyées",
-        description: "Vérifiez votre boîte email pour réinitialiser votre mot de passe.",
+        title: "Email envoyé",
+        description: "Vérifiez votre boîte mail pour réinitialiser votre mot de passe",
       });
     } catch (err: any) {
       console.error('Erreur de réinitialisation:', err);
-      setError(err.message || 'Échec de l\'envoi des instructions. Veuillez réessayer.');
+      setError(err.message || 'Échec de l\'envoi. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center mb-4">
-            <Heart className="h-8 w-8 text-primary mr-2" />
+            <Heart className="h-8 w-8 text-pink-500 mr-2" />
             <span className="text-2xl font-bold">EmotionsCare</span>
           </div>
           <CardTitle className="text-2xl">Réinitialiser le mot de passe</CardTitle>
           <CardDescription>
-            Entrez votre email pour recevoir les instructions
+            Entrez votre adresse e-mail pour recevoir un lien de réinitialisation
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -79,21 +78,22 @@ const B2CResetPasswordPage: React.FC = () => {
             </Alert>
           )}
           
-          {success ? (
-            <Alert className="bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-100">
+          {success && (
+            <Alert>
               <AlertDescription>
-                Si un compte existe avec cet email, les instructions de réinitialisation ont été envoyées.
-                Veuillez vérifier votre boîte de réception.
+                Un email de réinitialisation a été envoyé à votre adresse e-mail.
               </AlertDescription>
             </Alert>
-          ) : (
+          )}
+          
+          {!success && (
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Adresse e-mail</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="exemple@email.com"
+                  placeholder="votre@email.com"
                   {...form.register('email')}
                 />
                 {form.formState.errors.email && (
@@ -107,7 +107,7 @@ const B2CResetPasswordPage: React.FC = () => {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi...
                   </>
                 ) : (
-                  'Envoyer les instructions'
+                  'Envoyer le lien de réinitialisation'
                 )}
               </Button>
             </form>
@@ -116,7 +116,7 @@ const B2CResetPasswordPage: React.FC = () => {
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-center text-sm">
             <Link to="/b2c/login" className="text-primary hover:underline">
-              Retour à la connexion
+              ← Retour à la connexion
             </Link>
           </div>
         </CardFooter>

@@ -1,24 +1,29 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+
+export interface User {
+  id: string;
+  email: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  firstName?: string;
+  lastName?: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, metadata?: any) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error?: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
@@ -26,77 +31,74 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Configurer l'écoute des changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setIsLoading(false);
-      }
-    );
-
-    // Obtenir la session actuelle
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Check for existing session
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setIsLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Simulate authentication
+      const mockUser: User = {
+        id: '1',
         email,
-        password,
-      });
+        role: email.includes('@admin') ? 'b2b_admin' : 
+              email.includes('@company') ? 'b2b_user' : 'b2c',
+        firstName: 'John',
+        lastName: 'Doe',
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      
+      return { error: null };
+    } catch (error) {
       return { error };
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const signUp = async (email: string, password: string, metadata?: any) => {
-    setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // Simulate registration
+      const mockUser: User = {
+        id: '1',
         email,
-        password,
-        options: {
-          data: metadata
-        }
-      });
+        role: 'b2c',
+        firstName: metadata?.first_name,
+        lastName: metadata?.last_name,
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      
+      return { error: null };
+    } catch (error) {
       return { error };
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const signOut = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    setUser(null);
+    localStorage.removeItem('auth_user');
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    return { error };
+    try {
+      // Simulate password reset
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
   };
 
   const value = {
     user,
-    session,
     isAuthenticated: !!user,
     isLoading,
     signIn,
@@ -111,3 +113,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;
