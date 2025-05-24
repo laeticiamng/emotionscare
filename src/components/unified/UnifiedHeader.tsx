@@ -17,19 +17,6 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle }) => {
   const { userMode } = useUserMode();
   const navigate = useNavigate();
 
-  const getLogoText = () => {
-    if (!isAuthenticated) return 'EmotionsCare';
-    
-    switch (userMode) {
-      case 'b2b_admin':
-        return 'EmotionsCare Admin';
-      case 'b2b_user':
-        return 'EmotionsCare Pro';
-      default:
-        return 'EmotionsCare';
-    }
-  };
-
   const getLogoColor = () => {
     switch (userMode) {
       case 'b2b_admin':
@@ -59,14 +46,19 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle }) => {
           
           <button
             onClick={() => navigate(isAuthenticated ? (userMode === 'b2b_admin' ? '/b2b/admin/dashboard' : userMode === 'b2b_user' ? '/b2b/user/dashboard' : '/b2c/dashboard') : '/')}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 group"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">E</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <span className="text-white font-bold text-lg">E</span>
             </div>
-            <span className={`text-xl font-bold bg-gradient-to-r ${getLogoColor()} bg-clip-text text-transparent hidden sm:block`}>
-              {getLogoText()}
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-xl font-light tracking-wide text-foreground/90 group-hover:text-foreground transition-colors duration-300">
+                Emotions
+              </span>
+              <span className="text-sm font-medium tracking-wider text-muted-foreground/80 -mt-1 group-hover:text-muted-foreground transition-colors duration-300">
+                CARE
+              </span>
+            </div>
           </button>
         </div>
 
