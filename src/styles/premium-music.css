@@ -1,0 +1,179 @@
+
+/* Premium Music Player Styles */
+.premium-music-player {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 20%, 
+    hsl(var(--background)) 100%);
+  border-radius: 1rem;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-music-player::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    hsl(var(--primary)) 20%, 
+    hsl(var(--secondary)) 80%, 
+    transparent);
+}
+
+/* Dark mode enhancements */
+.dark .premium-music-player {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 10%, 
+    hsl(var(--background)) 100%);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Glow effects for interactive elements */
+.premium-music-player button:hover {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Enhanced scroll areas */
+.premium-music-player .scroll-area {
+  background: linear-gradient(180deg, 
+    rgba(var(--background-rgb), 0.8) 0%,
+    rgba(var(--muted-rgb), 0.4) 100%);
+  border-radius: 0.5rem;
+}
+
+/* Visualization enhancements */
+.visualization-container {
+  background: radial-gradient(circle at center, 
+    rgba(var(--primary-rgb), 0.1) 0%,
+    transparent 70%);
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.visualization-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(var(--secondary-rgb), 0.1) 50%, 
+    transparent 70%);
+  pointer-events: none;
+}
+
+/* Equalizer styling */
+.equalizer-band {
+  background: linear-gradient(180deg, 
+    hsl(var(--primary)) 0%,
+    hsl(var(--secondary)) 100%);
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.equalizer-band:hover {
+  background: linear-gradient(180deg, 
+    hsl(var(--primary)) 0%,
+    hsl(var(--secondary)) 50%,
+    hsl(var(--primary)) 100%);
+  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5);
+}
+
+/* Lyrics styling */
+.lyrics-line {
+  background: linear-gradient(135deg, 
+    rgba(var(--background-rgb), 0.8) 0%,
+    rgba(var(--muted-rgb), 0.4) 100%);
+  border-radius: 0.75rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.lyrics-line.active {
+  background: linear-gradient(135deg, 
+    rgba(var(--primary-rgb), 0.2) 0%,
+    rgba(var(--secondary-rgb), 0.1) 100%);
+  box-shadow: 
+    0 4px 15px rgba(var(--primary-rgb), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-line.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(180deg, 
+    hsl(var(--primary)), 
+    hsl(var(--secondary)));
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+/* Shadow effects */
+.shadow-premium {
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-premium {
+  box-shadow: 
+    0 15px 50px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation keyframes */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8);
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: float-gentle 3s ease-in-out infinite;
+}
+
+/* Glassmorphism effects */
+.glass-effect-premium {
+  background: rgba(var(--background-rgb), 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-effect-premium {
+  background: rgba(var(--background-rgb), 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
