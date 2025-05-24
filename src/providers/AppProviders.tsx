@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
@@ -14,16 +13,14 @@ interface AppProvidersProps {
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-      <BrowserRouter>
-        <AuthProvider>
-          <UserModeProvider>
-            <OnboardingProvider>
-              {children}
-              <Toaster />
-            </OnboardingProvider>
-          </UserModeProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <AuthProvider>
+        <UserModeProvider>
+          <OnboardingProvider>
+            {children}
+            <Toaster />
+          </OnboardingProvider>
+        </UserModeProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 };

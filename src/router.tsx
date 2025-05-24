@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -47,14 +48,14 @@ const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
 const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
 const HelpPage = React.lazy(() => import('@/pages/HelpPage'));
 
-const routes = [
+export const routes = [
   {
     path: '/',
-    element: <HomePage />
+    element: <HomePage />,
   },
   {
     path: '/choose-mode',
-    element: <ChooseModePage />
+    element: <ChooseModePage />,
   },
   
   // B2C Routes
@@ -63,15 +64,15 @@ const routes = [
     children: [
       {
         path: 'login',
-        element: <B2CLoginPage />
+        element: <B2CLoginPage />,
       },
       {
         path: 'register',
-        element: <B2CRegisterPage />
+        element: <B2CRegisterPage />,
       },
       {
         path: 'reset-password',
-        element: <B2CResetPasswordPage />
+        element: <B2CResetPasswordPage />,
       },
       {
         path: 'onboarding',
@@ -79,7 +80,7 @@ const routes = [
           <ProtectedRoute requiredRole="b2c">
             <B2COnboardingPage />
           </ProtectedRoute>
-        )
+        ),
       },
       {
         path: 'dashboard',
@@ -91,31 +92,31 @@ const routes = [
         children: [
           {
             index: true,
-            element: <B2CDashboardPage />
-          }
-        ]
+            element: <B2CDashboardPage />,
+          },
+        ],
       },
       {
         path: 'scan',
-        element: <B2CScanPage />
+        element: <B2CScanPage />,
       },
       {
         path: 'social',
-        element: <B2CSocialPage />
+        element: <B2CSocialPage />,
       },
       {
         path: 'journal',
-        element: <B2CJournalPage />
+        element: <B2CJournalPage />,
       },
       {
         path: 'music',
-        element: <B2CMusicPage />
+        element: <B2CMusicPage />,
       },
       {
         path: 'coach',
-        element: <B2CCoachPage />
-      }
-    ]
+        element: <B2CCoachPage />,
+      },
+    ],
   },
 
   // B2B User Routes
@@ -124,11 +125,11 @@ const routes = [
     children: [
       {
         path: 'login',
-        element: <B2BUserLoginPage />
+        element: <B2BUserLoginPage />,
       },
       {
         path: 'register',
-        element: <B2BUserRegisterPage />
+        element: <B2BUserRegisterPage />,
       },
       {
         path: 'dashboard',
@@ -140,31 +141,31 @@ const routes = [
         children: [
           {
             index: true,
-            element: <B2BUserDashboardPage />
-          }
-        ]
+            element: <B2BUserDashboardPage />,
+          },
+        ],
       },
       {
         path: 'scan',
-        element: <B2BUserScanPage />
+        element: <B2BUserScanPage />,
       },
       {
         path: 'social',
-        element: <B2BUserSocialPage />
+        element: <B2BUserSocialPage />,
       },
       {
         path: 'journal',
-        element: <B2BUserJournalPage />
+        element: <B2BUserJournalPage />,
       },
       {
         path: 'music',
-        element: <B2BUserMusicPage />
+        element: <B2BUserMusicPage />,
       },
       {
         path: 'coach',
-        element: <B2BUserCoachPage />
-      }
-    ]
+        element: <B2BUserCoachPage />,
+      },
+    ],
   },
 
   // B2B Admin Routes
@@ -173,7 +174,7 @@ const routes = [
     children: [
       {
         path: 'login',
-        element: <B2BAdminLoginPage />
+        element: <B2BAdminLoginPage />,
       },
       {
         path: 'dashboard',
@@ -185,62 +186,64 @@ const routes = [
         children: [
           {
             index: true,
-            element: <B2BAdminDashboardPage />
-          }
-        ]
+            element: <B2BAdminDashboardPage />,
+          },
+        ],
       },
       {
         path: 'users',
-        element: <B2BAdminUsersPage />
+        element: <B2BAdminUsersPage />,
       },
       {
         path: 'analytics',
-        element: <B2BAdminAnalyticsPage />
-      }
-    ]
+        element: <B2BAdminAnalyticsPage />,
+      },
+    ],
   },
 
   // B2B Selection
   {
     path: '/b2b/selection',
-    element: <B2BRoleSelectionPage />
+    element: <B2BRoleSelectionPage />,
   },
 
-  // Shared routes
+  // Shared routes that redirect based on user mode
   {
     path: '/scan',
-    element: <ScanPage />
+    element: <ScanPage />,
   },
   {
     path: '/coach',
-    element: <Coach />
+    element: <Coach />,
   },
   {
     path: '/music',
-    element: <Music />
+    element: <Music />,
   },
   {
     path: '/journal',
-    element: <Journal />
+    element: <Journal />,
   },
+
+  // Common pages
   {
     path: '/profile',
-    element: <ProfilePage />
+    element: <ProfilePage />,
   },
   {
     path: '/settings',
-    element: <SettingsPage />
+    element: <SettingsPage />,
   },
   {
     path: '/help',
-    element: <HelpPage />
+    element: <HelpPage />,
   },
 
   // Catch all route
   {
     path: '*',
-    element: <Navigate to="/" replace />
-  }
+    element: <Navigate to="/" replace />,
+  },
 ];
 
 export default routes;
