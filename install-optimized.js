@@ -2,57 +2,59 @@
 #!/usr/bin/env node
 
 /**
- * Optimized installation script with timeout handling and fallbacks
- * This script addresses the ProcessIOError timeout issue with bun install
+ * Script d'installation optimisé avec gestion robuste des timeouts
+ * Résout les erreurs ProcessIOError avec bun install
  */
 
 const { spawn, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🚀 Starting optimized installation process...');
+console.log('🚀 Démarrage de l\'installation optimisée...');
 
-// Set environment variables to skip heavy dependencies
+// Variables d'environnement pour éviter les téléchargements lourds
 process.env.CYPRESS_INSTALL_BINARY = '0';
 process.env.CYPRESS_SKIP_BINARY_INSTALL = '1';
 process.env.HUSKY_SKIP_INSTALL = '1';
 process.env.PUPPETEER_SKIP_DOWNLOAD = '1';
 process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 
-// Create optimized .npmrc if it doesn't exist or is incomplete
-const npmrcPath = '.npmrc';
+// Configuration .npmrc optimisée
 const npmrcContent = `
-# Skip heavy binary installations
+# Éviter les téléchargements lourds
 cypress_skip_binary_install=1
 husky_skip_install=1
 puppeteer_skip_download=1
 
-# Optimize installation
+# Optimisations d'installation
 prefer-offline=true
 fund=false
 audit=false
 loglevel=error
 progress=false
 
-# Increase timeouts significantly
-network-timeout=600000
-fetch-retry-mintimeout=30000
-fetch-retry-maxtimeout=180000
-fetch-retries=5
+# Timeouts étendus pour éviter ProcessIOError
+network-timeout=900000
+fetch-retry-mintimeout=60000
+fetch-retry-maxtimeout=300000
+fetch-retries=10
 
-# Peer dependency handling
+# Gestion des dépendances
 legacy-peer-deps=true
 auto-install-peers=true
 strict-peer-dependencies=false
+
+# Cache
+cache-min=86400
 `.trim();
 
-fs.writeFileSync(npmrcPath, npmrcContent);
-console.log('✅ Created optimized .npmrc configuration');
+fs.writeFileSync('.npmrc', npmrcContent);
+console.log('✅ Configuration .npmrc optimisée créée');
 
-// Function to run installation with timeout handling
-function runInstallationWithTimeout(command, args, timeoutMs = 300000) {
+// Fonction d'installation avec timeout personnalisé
+function runInstallation(command, args, timeoutMs = 600000) {
   return new Promise((resolve, reject) => {
-    console.log(`🔄 Running: ${command} ${args.join(' ')}`);
+    console.log(`🔄 Exécution: ${command} ${args.join(' ')}`);
     
     const process = spawn(command, args, {
       stdio: 'inherit',
@@ -60,82 +62,84 @@ function runInstallationWithTimeout(command, args, timeoutMs = 300000) {
     });
     
     const timeout = setTimeout(() => {
-      console.log(`⚠️ Process timed out after ${timeoutMs / 1000}s, terminating...`);
+      console.log(`⚠️ Timeout après ${timeoutMs / 1000}s, arrêt du processus...`);
       process.kill('SIGTERM');
       setTimeout(() => process.kill('SIGKILL'), 5000);
-      reject(new Error(`Process timed out after ${timeoutMs / 1000}s`));
+      reject(new Error(`Timeout après ${timeoutMs / 1000}s`));
     }, timeoutMs);
     
     process.on('exit', (code) => {
       clearTimeout(timeout);
       if (code === 0) {
-        console.log(`✅ ${command} completed successfully`);
+        console.log(`✅ ${command} terminé avec succès`);
         resolve();
       } else {
-        console.log(`❌ ${command} failed with exit code ${code}`);
-        reject(new Error(`Process failed with exit code ${code}`));
+        console.log(`❌ ${command} a échoué avec le code ${code}`);
+        reject(new Error(`Processus échoué avec le code ${code}`));
       }
     });
     
     process.on('error', (err) => {
       clearTimeout(timeout);
-      console.log(`❌ Error running ${command}: ${err.message}`);
+      console.log(`❌ Erreur d'exécution ${command}: ${err.message}`);
       reject(err);
     });
   });
 }
 
-// Main installation function with fallbacks
+// Installation principale avec fallbacks
 async function install() {
+  console.log('\n📊 Informations système:');
+  console.log(`Node.js: ${process.version}`);
+  console.log(`Plateforme: ${process.platform}`);
+  
   try {
-    // Try bun install first with extended timeout
-    try {
-      await runInstallationWithTimeout('bun', ['install', '--no-save'], 300000);
-      console.log('🎉 Installation completed successfully with bun!');
-      return;
-    } catch (bunError) {
-      console.log('⚠️ Bun installation failed, trying npm...');
-    }
-    
-    // Fallback to npm install
-    try {
-      await runInstallationWithTimeout('npm', ['install', '--prefer-offline', '--no-audit', '--no-fund'], 600000);
-      console.log('🎉 Installation completed successfully with npm!');
-      return;
-    } catch (npmError) {
-      console.log('⚠️ npm installation failed, trying yarn...');
-    }
-    
-    // Final fallback to yarn
-    await runInstallationWithTimeout('yarn', ['install', '--prefer-offline', '--silent'], 600000);
-    console.log('🎉 Installation completed successfully with yarn!');
-    
+    const memInfo = require('os');
+    console.log(`Mémoire totale: ${Math.round(memInfo.totalmem() / 1024 / 1024 / 1024)}GB`);
+    console.log(`Mémoire libre: ${Math.round(memInfo.freemem() / 1024 / 1024)}MB`);
+  } catch (e) {
+    console.log('Impossible de récupérer les informations mémoire');
+  }
+
+  try {
+    // Essayer bun avec timeout étendu
+    console.log('\n🔄 Tentative avec bun (timeout 10 minutes)...');
+    await runInstallation('bun', ['install', '--no-save'], 600000);
+    console.log('🎉 Installation réussie avec bun!');
+    return;
+  } catch (bunError) {
+    console.log('⚠️ Échec avec bun, fallback vers npm...');
+  }
+
+  try {
+    // Fallback npm avec timeout étendu
+    console.log('\n🔄 Tentative avec npm (timeout 15 minutes)...');
+    await runInstallation('npm', ['install', '--prefer-offline', '--no-audit', '--no-fund', '--legacy-peer-deps'], 900000);
+    console.log('🎉 Installation réussie avec npm!');
+    return;
+  } catch (npmError) {
+    console.log('⚠️ Échec avec npm, tentative finale avec yarn...');
+  }
+
+  try {
+    // Fallback final yarn
+    console.log('\n🔄 Tentative finale avec yarn...');
+    await runInstallation('yarn', ['install', '--prefer-offline', '--silent'], 900000);
+    console.log('🎉 Installation réussie avec yarn!');
   } catch (error) {
-    console.error('💥 All installation methods failed!');
-    console.error('Error:', error.message);
-    console.log('\n🔍 Troubleshooting suggestions:');
-    console.log('1. Check your internet connection');
-    console.log('2. Clear npm cache: npm cache clean --force');
-    console.log('3. Try running: rm -rf node_modules && npm install');
-    console.log('4. Check available disk space');
+    console.error('\n💥 Toutes les méthodes d\'installation ont échoué!');
+    console.error('Erreur:', error.message);
+    
+    console.log('\n🔍 Suggestions de dépannage:');
+    console.log('1. Vérifiez votre connexion internet');
+    console.log('2. Nettoyez le cache: npm cache clean --force');
+    console.log('3. Supprimez node_modules: rm -rf node_modules');
+    console.log('4. Vérifiez l\'espace disque disponible');
+    console.log('5. Essayez sur un autre réseau');
     
     process.exit(1);
   }
 }
 
-// Check system requirements
-console.log('\n📊 System Information:');
-console.log(`Node.js: ${process.version}`);
-console.log(`Platform: ${process.platform}`);
-console.log(`Architecture: ${process.arch}`);
-
-try {
-  const memInfo = require('os');
-  console.log(`Total Memory: ${Math.round(memInfo.totalmem() / 1024 / 1024 / 1024)}GB`);
-  console.log(`Free Memory: ${Math.round(memInfo.freemem() / 1024 / 1024)}MB`);
-} catch (e) {
-  console.log('Could not retrieve memory information');
-}
-
-// Start installation
+// Démarrer l'installation
 install();
