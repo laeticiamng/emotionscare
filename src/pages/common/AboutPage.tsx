@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Users, Award, Globe, Heart } from 'lucide-react';
+import { ArrowLeft, Heart, Brain, Shield, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
@@ -9,11 +9,27 @@ import { useNavigate } from 'react-router-dom';
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const stats = [
-    { icon: <Users className="h-8 w-8 text-blue-500" />, value: "10K+", label: "Utilisateurs actifs" },
-    { icon: <Award className="h-8 w-8 text-green-500" />, value: "95%", label: "Satisfaction client" },
-    { icon: <Globe className="h-8 w-8 text-purple-500" />, value: "25+", label: "Pays couverts" },
-    { icon: <Heart className="h-8 w-8 text-red-500" />, value: "1M+", label: "Sessions de bien-être" },
+  const values = [
+    {
+      icon: <Heart className="h-8 w-8 text-red-500" />,
+      title: "Bienveillance",
+      description: "Nous plaçons l'humain au cœur de nos préoccupations"
+    },
+    {
+      icon: <Brain className="h-8 w-8 text-blue-500" />,
+      title: "Innovation",
+      description: "Nous utilisons les dernières avancées de l'IA pour le bien-être"
+    },
+    {
+      icon: <Shield className="h-8 w-8 text-green-500" />,
+      title: "Confidentialité",
+      description: "Vos données émotionnelles sont protégées et privées"
+    },
+    {
+      icon: <Users className="h-8 w-8 text-purple-500" />,
+      title: "Accessibilité",
+      description: "Le bien-être émotionnel doit être accessible à tous"
+    }
   ];
 
   return (
@@ -38,24 +54,27 @@ const AboutPage: React.FC = () => {
               À propos d'EmotionsCare
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Pionniers du bien-être émotionnel numérique, nous révolutionnons la façon 
-              dont les individus et les organisations prennent soin de leur santé mentale.
+              Nous sommes une équipe passionnée qui développe des solutions innovantes 
+              pour le bien-être émotionnel, en combinant intelligence artificielle 
+              et approches thérapeutiques reconnues.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6 mb-16">
-            {stats.map((stat, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {values.map((value, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card className="text-center">
+                <Card className="text-center h-full">
                   <CardContent className="pt-6">
-                    <div className="flex justify-center mb-4">{stat.icon}</div>
-                    <div className="text-3xl font-bold mb-2">{stat.value}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
+                    <div className="flex justify-center mb-4">{value.icon}</div>
+                    <h3 className="font-semibold mb-2">{value.title}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {value.description}
+                    </p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -64,20 +83,26 @@ const AboutPage: React.FC = () => {
 
           <Card className="max-w-4xl mx-auto">
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Notre Histoire</CardTitle>
+              <CardTitle className="text-2xl text-center">Notre Mission</CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               <div className="prose prose-lg dark:prose-invert max-w-none">
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                  Fondée en 2023, EmotionsCare est née de la conviction que le bien-être émotionnel 
-                  est un droit fondamental qui devrait être accessible à tous. Notre équipe 
-                  multidisciplinaire combine expertise technologique et connaissance approfondie 
-                  de la psychologie pour créer des solutions innovantes.
+                  EmotionsCare naît de la conviction que le bien-être émotionnel 
+                  est un droit fondamental qui devrait être accessible à tous. 
+                  Notre plateforme combine les dernières avancées en intelligence 
+                  artificielle avec des approches thérapeutiques éprouvées.
+                </p>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+                  Que vous soyez un particulier cherchant à mieux comprendre vos 
+                  émotions ou une entreprise souhaitant améliorer le bien-être de 
+                  vos équipes, nous vous accompagnons avec des outils personnalisés 
+                  et respectueux de votre intimité.
                 </p>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  Aujourd'hui, nous accompagnons des milliers d'utilisateurs et des dizaines 
-                  d'entreprises dans leur parcours vers un meilleur équilibre émotionnel, 
-                  en utilisant l'intelligence artificielle comme catalyseur de transformation positive.
+                  Notre approche se base sur la science, l'empathie et l'innovation 
+                  pour créer un environnement où chacun peut développer son 
+                  intelligence émotionnelle et trouver son équilibre.
                 </p>
               </div>
             </CardContent>
