@@ -39,7 +39,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'tts-1',
         input: text,
-        voice: voice || 'alloy', // alloy, echo, fable, onyx, nova, or shimmer
+        voice: voice || 'alloy',
         response_format: 'mp3',
       }),
     });
