@@ -1,43 +1,46 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Mail, MessageCircle, Send } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 
 const ContactPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Message envoyé",
-      description: "Nous vous répondrons dans les plus brefs délais.",
-    });
-    setFormData({ name: '', email: '', subject: '', message: '' });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+  const contactInfo = [
+    {
+      icon: <Mail className="h-6 w-6 text-blue-500" />,
+      title: "Email",
+      content: "contact@emotionscare.com",
+      description: "Nous répondons sous 24h"
+    },
+    {
+      icon: <Phone className="h-6 w-6 text-green-500" />,
+      title: "Téléphone",
+      content: "+33 1 23 45 67 89",
+      description: "Lun-Ven 9h-18h"
+    },
+    {
+      icon: <MapPin className="h-6 w-6 text-red-500" />,
+      title: "Adresse",
+      content: "123 Rue du Bien-être, 75001 Paris",
+      description: "France"
+    },
+    {
+      icon: <Clock className="h-6 w-6 text-purple-500" />,
+      title: "Horaires",
+      content: "Lundi - Vendredi",
+      description: "9h00 - 18h00"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <Button
           onClick={() => navigate('/')}
@@ -54,121 +57,89 @@ const ContactPage: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
               Contactez-nous
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Une question, une suggestion ou besoin d'aide ? 
-              Nous sommes là pour vous accompagner.
+              Notre équipe est là pour vous aider. N'hésitez pas à nous contacter pour toute question.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-blue-500" />
-                  Écrivez-nous
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nom complet</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Votre nom"
-                      required
-                    />
+          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {/* Informations de contact */}
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Nos coordonnées</h2>
+              <div className="grid sm:grid-cols-2 gap-6">
+                {contactInfo.map((info, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-3">
+                          {info.icon}
+                          <CardTitle className="text-lg">{info.title}</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="font-medium mb-1">{info.content}</p>
+                        <CardDescription>{info.description}</CardDescription>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Formulaire de contact */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">Envoyez-nous un message</CardTitle>
+                  <CardDescription>
+                    Remplissez le formulaire ci-dessous et nous vous répondrons rapidement.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Prénom</Label>
+                      <Input id="firstName" placeholder="Votre prénom" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Nom</Label>
+                      <Input id="lastName" placeholder="Votre nom" />
+                    </div>
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="votre@email.com"
-                      required
-                    />
+                    <Input id="email" type="email" placeholder="votre@email.com" />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="subject">Sujet</Label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      placeholder="Objet de votre message"
-                      required
-                    />
+                    <Input id="subject" placeholder="Sujet de votre message" />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label htmlFor="message">Message</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Votre message..."
+                    <Textarea 
+                      id="message" 
+                      placeholder="Décrivez votre demande..."
                       rows={5}
-                      required
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    <Send className="mr-2 h-4 w-4" />
+                  <Button className="w-full">
                     Envoyer le message
                   </Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-green-500" />
-                  Autres moyens de contact
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Support technique</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Pour toute question technique ou problème d'utilisation
-                  </p>
-                  <p className="font-mono text-sm text-blue-600 dark:text-blue-400">
-                    support@emotionscare.fr
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Partenariats entreprise</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Pour les demandes de collaboration et partenariats B2B
-                  </p>
-                  <p className="font-mono text-sm text-blue-600 dark:text-blue-400">
-                    business@emotionscare.fr
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Confidentialité & RGPD</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
-                    Pour toute question relative à vos données personnelles
-                  </p>
-                  <p className="font-mono text-sm text-blue-600 dark:text-blue-400">
-                    privacy@emotionscare.fr
-                  </p>
-                </div>
-                <div className="pt-4 border-t">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Nous nous engageons à répondre à tous les messages dans un délai de 48h.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </motion.div>
       </div>
