@@ -13,6 +13,7 @@ import { MeditationPage } from "@/utils/lazyRoutes";
 import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBoundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import SecurityProvider from "@/components/security/SecurityProvider";
+import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
 import { initServiceWorker } from "@/services/serviceWorker";
 import { usePushNotifications } from "@/services/pushNotifications";
 
@@ -69,6 +70,7 @@ function App() {
                 <SkipToContent />
                 <Toaster />
                 <Sonner />
+                <PerformanceMonitor enabled={process.env.NODE_ENV === 'development'} />
                 <BrowserRouter>
                   <Suspense fallback={<PageLoadingFallback />}>
                     <main id="main-content" tabIndex={-1}>
