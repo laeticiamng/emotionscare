@@ -1,65 +1,58 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Home, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, ArrowLeft, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const goBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg text-center">
-        <CardHeader>
-          <div className="mx-auto mb-4 text-6xl font-bold text-muted-foreground">
-            404
-          </div>
-          <CardTitle className="text-2xl">Page introuvable</CardTitle>
-          <CardDescription className="text-lg">
-            Désolé, la page que vous cherchez n'existe pas ou a été déplacée.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-sm text-muted-foreground">
-            Voici quelques suggestions pour continuer :
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button onClick={goBack} variant="outline" className="flex items-center">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
-            </Button>
-            
-            <Button onClick={() => navigate('/')} className="flex items-center">
-              <Home className="mr-2 h-4 w-4" />
-              Accueil
-            </Button>
-          </div>
-
-          <div className="pt-4 border-t">
-            <p className="text-sm text-muted-foreground mb-3">
-              Vous ne trouvez pas ce que vous cherchez ?
-            </p>
-            <Button 
-              variant="link" 
-              onClick={() => navigate('/help')}
-              className="flex items-center mx-auto"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Consulter l'aide
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md"
+      >
+        <Card className="text-center">
+          <CardHeader>
+            <div className="flex justify-center mb-4">
+              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
+                <Search className="h-12 w-12 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl">Page introuvable</CardTitle>
+            <CardDescription>
+              La page que vous recherchez n'existe pas ou a été déplacée.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-6xl font-bold text-primary/20 mb-4">
+              404
+            </div>
+            <div className="space-y-2">
+              <Button 
+                onClick={() => navigate('/')}
+                className="w-full"
+              >
+                <Home className="mr-2 h-4 w-4" />
+                Retour à l'accueil
+              </Button>
+              <Button 
+                onClick={() => navigate(-1)}
+                variant="outline"
+                className="w-full"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Page précédente
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

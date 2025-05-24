@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,31 +16,25 @@ const ContactPage: React.FC = () => {
     {
       icon: <Mail className="h-6 w-6 text-blue-500" />,
       title: "Email",
-      content: "contact@emotionscare.com",
-      description: "Nous répondons sous 24h"
+      value: "contact@emotionscare.com",
+      description: "Réponse sous 24h"
     },
     {
       icon: <Phone className="h-6 w-6 text-green-500" />,
       title: "Téléphone",
-      content: "+33 1 23 45 67 89",
+      value: "+33 1 23 45 67 89",
       description: "Lun-Ven 9h-18h"
     },
     {
-      icon: <MapPin className="h-6 w-6 text-red-500" />,
+      icon: <MapPin className="h-6 w-6 text-purple-500" />,
       title: "Adresse",
-      content: "123 Rue du Bien-être, 75001 Paris",
-      description: "France"
-    },
-    {
-      icon: <Clock className="h-6 w-6 text-purple-500" />,
-      title: "Horaires",
-      content: "Lundi - Vendredi",
-      description: "9h00 - 18h00"
+      value: "123 Avenue de la Santé",
+      description: "75000 Paris, France"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <Button
           onClick={() => navigate('/')}
@@ -56,85 +50,86 @@ const ContactPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Contactez-nous
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Notre équipe est là pour vous aider. N'hésitez pas à nous contacter pour toute question.
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Notre équipe est là pour vous accompagner dans votre parcours de bien-être émotionnel.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12">
             {/* Informations de contact */}
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Nos coordonnées</h2>
-              <div className="grid sm:grid-cols-2 gap-6">
-                {contactInfo.map((info, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                  >
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-3">
-                          {info.icon}
-                          <CardTitle className="text-lg">{info.title}</CardTitle>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold mb-6">Nos coordonnées</h2>
+              {contactInfo.map((info, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        {info.icon}
+                        <div>
+                          <h3 className="font-semibold">{info.title}</h3>
+                          <p className="text-lg">{info.value}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {info.description}
+                          </p>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="font-medium mb-1">{info.content}</p>
-                        <CardDescription>{info.description}</CardDescription>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
 
             {/* Formulaire de contact */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
             >
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">Envoyez-nous un message</CardTitle>
+                  <CardTitle>Envoyez-nous un message</CardTitle>
                   <CardDescription>
-                    Remplissez le formulaire ci-dessous et nous vous répondrons rapidement.
+                    Nous vous répondrons dans les plus brefs délais
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
                       <Label htmlFor="firstName">Prénom</Label>
                       <Input id="firstName" placeholder="Votre prénom" />
                     </div>
-                    <div className="space-y-2">
+                    <div>
                       <Label htmlFor="lastName">Nom</Label>
                       <Input id="lastName" placeholder="Votre nom" />
                     </div>
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" placeholder="votre@email.com" />
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="subject">Sujet</Label>
                     <Input id="subject" placeholder="Sujet de votre message" />
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="message">Message</Label>
                     <Textarea 
                       id="message" 
-                      placeholder="Décrivez votre demande..."
-                      rows={5}
+                      placeholder="Votre message..."
+                      className="min-h-[120px]"
                     />
                   </div>
                   <Button className="w-full">
+                    <Send className="mr-2 h-4 w-4" />
                     Envoyer le message
                   </Button>
                 </CardContent>
