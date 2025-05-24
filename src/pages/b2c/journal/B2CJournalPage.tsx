@@ -2,15 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, Calendar, Heart, TrendingUp, BookOpen } from 'lucide-react';
+import { Plus, BookOpen, Calendar, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import JournalEntryModal from '@/components/journal/JournalEntryModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import JournalEntryModal from '@/components/journal/JournalEntryModal';
-import { analytics } from '@/utils/analytics';
 
 interface JournalEntry {
   id: string;
@@ -22,53 +19,54 @@ interface JournalEntry {
 }
 
 const B2CJournalPage: React.FC = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
-      fetchJournalEntries();
+      fetchEntries();
     }
   }, [user]);
 
-  const fetchJournalEntries = async () => {
-    if (!user) return;
-    
+  const fetchEntries = async () => {
     setIsLoading(true);
-    setError(null);
-    
     try {
       const { data, error } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
       setEntries(data || []);
-    } catch (err: any) {
-      console.error('Error fetching journal entries:', err);
-      setError('Erreur lors du chargement des entrées');
+    } catch (error) {
+      console.error('Erreur récupération entrées:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger vos entrées de journal",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleNewEntry = async (entryData: Omit<JournalEntry, 'id' | 'created_at'>) => {
-    if (!user) return;
-
+  const handleSaveEntry = async (entryData: {
+    title: string;
+    content: string;
+    emotion: string;
+    intensity: number;
+  }) => {
     try {
       const { data, error } = await supabase
         .from('journal_entries')
         .insert({
           ...entryData,
-          user_id: user.id,
+          user_id: user?.id
         })
         .select()
         .single();
@@ -78,204 +76,175 @@ const B2CJournalPage: React.FC = () => {
       setEntries(prev => [data, ...prev]);
       setIsModalOpen(false);
       
-      // Track analytics event
-      await analytics.journalEntryAdded(user.id, {
-        emotion: entryData.emotion,
-        intensity: entryData.intensity,
+      // Envoyer l'événement analytics
+      await supabase.functions.invoke('analytics', {
+        body: {
+          event: 'journalEntryAdded',
+          properties: {
+            emotion: entryData.emotion,
+            intensity: entryData.intensity,
+            contentLength: entryData.content.length
+          }
+        }
       });
-      
+
       toast({
-        title: "Entrée ajoutée",
-        description: "Votre entrée de journal a été sauvegardée avec succès",
+        title: "Entrée sauvegardée",
+        description: "Votre entrée de journal a été ajoutée avec succès",
       });
-    } catch (err: any) {
-      console.error('Error creating journal entry:', err);
+    } catch (error) {
+      console.error('Erreur sauvegarde entrée:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de sauvegarder l'entrée",
-        variant: "destructive",
+        description: "Impossible de sauvegarder votre entrée",
+        variant: "destructive"
       });
     }
   };
 
-  const getEmotionColor = (emotion: string) => {
-    const colors: Record<string, string> = {
-      happy: 'bg-yellow-100 text-yellow-800',
-      sad: 'bg-blue-100 text-blue-800',
-      angry: 'bg-red-100 text-red-800',
-      anxious: 'bg-purple-100 text-purple-800',
-      calm: 'bg-green-100 text-green-800',
-      excited: 'bg-orange-100 text-orange-800',
+  const getEmotionEmoji = (emotion: string): string => {
+    const emojiMap: Record<string, string> = {
+      happy: '😊',
+      sad: '😢',
+      angry: '😠',
+      anxious: '😰',
+      calm: '😌',
+      excited: '🤩',
+      confused: '😕',
+      grateful: '🙏'
     };
-    return colors[emotion] || 'bg-gray-100 text-gray-800';
+    return emojiMap[emotion] || '😐';
   };
 
-  const EmptyState = () => (
-    <div className="text-center py-12">
-      <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-      <h3 className="text-lg font-semibold mb-2">Aucune entrée pour le moment</h3>
-      <p className="text-muted-foreground mb-6">
-        Commencez votre voyage de bien-être en créant votre première entrée de journal
-      </p>
-      <Button onClick={() => setIsModalOpen(true)}>
-        <Plus className="h-4 w-4 mr-2" />
-        Créer ma première entrée
-      </Button>
-    </div>
+  const filteredEntries = entries.filter(entry =>
+    entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    entry.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const EntrySkeleton = () => (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-2/3 mb-4" />
-        <div className="flex gap-2">
-          <Skeleton className="h-6 w-16" />
-          <Skeleton className="h-6 w-12" />
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  if (error) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Mon Journal</h1>
+            <p className="text-muted-foreground">Vos pensées et émotions</p>
+          </div>
+          <BookOpen className="h-8 w-8 text-primary" />
+        </div>
+        
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-1/2"></div>
+                  <div className="h-3 bg-muted rounded w-full"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Mon Journal</h1>
           <p className="text-muted-foreground">
-            Suivez votre parcours émotionnel et vos réflexions quotidiennes
+            Vos pensées et émotions au fil du temps
           </p>
         </div>
+        <BookOpen className="h-8 w-8 text-primary" />
+      </div>
+
+      {/* Actions et recherche */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full sm:w-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher dans vos entrées..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 w-full sm:w-80"
+          />
+        </div>
+        
         <Button onClick={() => setIsModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Nouvelle entrée
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Liste des entrées */}
+      {filteredEntries.length === 0 ? (
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Total des entrées
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{entries.length}</div>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">
+              {searchTerm ? 'Aucun résultat' : 'Aucune entrée de journal'}
+            </h3>
+            <p className="text-muted-foreground text-center mb-4">
+              {searchTerm 
+                ? 'Essayez avec d\'autres mots-clés'
+                : 'Commencez à écrire vos pensées et émotions'
+              }
+            </p>
+            {!searchTerm && (
+              <Button onClick={() => setIsModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Créer ma première entrée
+              </Button>
+            )}
           </CardContent>
         </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Calendar className="h-4 w-4 mr-2" />
-              Cette semaine
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {entries.filter(entry => {
-                const entryDate = new Date(entry.created_at);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                return entryDate >= weekAgo;
-              }).length}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Série actuelle
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">7 jours</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Timeline de vos entrées</CardTitle>
-          <CardDescription>
-            Vos réflexions et émotions au fil du temps
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <EntrySkeleton key={i} />
-              ))}
-            </div>
-          ) : entries.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="space-y-4">
-              {entries.map((entry) => (
-                <Card key={entry.id} className="relative">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{entry.title}</CardTitle>
-                        <CardDescription>
-                          {new Date(entry.created_at).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </CardDescription>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getEmotionColor(entry.emotion)}>
-                          {entry.emotion}
-                        </Badge>
-                        <div className="flex items-center">
-                          <Heart className="h-4 w-4 text-red-500 mr-1" />
-                          <span className="text-sm">{entry.intensity}/10</span>
-                        </div>
-                      </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredEntries.map((entry) => (
+            <Card key={entry.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="text-lg">{getEmotionEmoji(entry.emotion)}</span>
+                      {entry.title}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-2 mt-1">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(entry.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </CardDescription>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-muted-foreground">
+                      Intensité: {entry.intensity}/10
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground line-clamp-3">
-                      {entry.content}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground line-clamp-3">
+                  {entry.content}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
-      {/* Journal Entry Modal */}
+      {/* Modal pour ajouter une entrée */}
       <JournalEntryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleNewEntry}
+        onSave={handleSaveEntry}
       />
     </div>
   );
