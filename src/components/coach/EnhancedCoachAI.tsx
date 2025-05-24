@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { analyzeEmotion } from '@/lib/scan/enhancedAnalyzeService';
+import { enhancedAnalyzeService } from '@/lib/scan/enhancedAnalyzeService';
 import { EmotionResult } from '@/types/emotion';
 
 const EnhancedCoachAI = () => {
@@ -55,7 +55,7 @@ const EnhancedCoachAI = () => {
   const handleAnalyze = async () => {
     setIsLoading(true);
     try {
-      const result = await analyzeEmotion(userText);
+      const result = await enhancedAnalyzeService.analyzeTextEmotion(userText);
       if (result) {
         setAnalysisResult(result);
         handleEmotionDetected(result);
