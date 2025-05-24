@@ -1,81 +1,101 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, Bell } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { Menu, Heart, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '@/components/layout/UserNav';
-import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
+import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 
 interface UnifiedHeaderProps {
-  onMenuToggle?: () => void;
+  onMenuClick?: () => void;
 }
 
-const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle }) => {
-  const { user, isAuthenticated } = useAuth();
+const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuClick }) => {
+  const { user, signOut } = useAuth();
   const { userMode } = useUserMode();
   const navigate = useNavigate();
 
-  const getLogoColor = () => {
-    switch (userMode) {
-      case 'b2b_admin':
-        return 'from-slate-600 to-slate-800';
-      case 'b2b_user':
-        return 'from-blue-600 to-slate-600';
-      default:
-        return 'from-blue-600 to-purple-600';
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
+  const isDemo = user?.email?.endsWith('@exemple.fr');
+  const modeDisplay = getUserModeDisplayName(userMode);
+
   return (
-    <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-6">
-        {/* Left section */}
-        <div className="flex items-center gap-4">
-          {isAuthenticated && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onMenuToggle}
-              className="md:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
-          
-          <button
-            onClick={() => navigate(isAuthenticated ? (userMode === 'b2b_admin' ? '/b2b/admin/dashboard' : userMode === 'b2b_user' ? '/b2b/user/dashboard' : '/b2c/dashboard') : '/')}
-            className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 group"
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            className="md:hidden"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <span className="text-white font-bold text-lg">E</span>
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="text-xl font-light tracking-wide text-foreground/90 group-hover:text-foreground transition-colors duration-300">
-                Emotions
-              </span>
-              <span className="text-sm font-medium tracking-wider text-muted-foreground/80 -mt-1 group-hover:text-muted-foreground transition-colors duration-300">
-                CARE
-              </span>
-            </div>
-          </button>
+            <Menu className="h-5 w-5" />
+          </Button>
+          <a className="mr-6 flex items-center space-x-2" href="/">
+            <Heart className="h-6 w-6 text-red-500" />
+            <span className="hidden font-bold sm:inline-block">
+              EmotionsCare
+            </span>
+          </a>
         </div>
 
-        {/* Right section */}
-        <div className="flex items-center gap-3">
-          <ThemeSwitcher />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onMenuClick}
+          className="mr-2 md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none" />
           
-          {isAuthenticated && (
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                3
-              </span>
-            </Button>
-          )}
-          
-          <UserNav />
+          <nav className="flex items-center space-x-2">
+            {user && (
+              <div className="flex items-center space-x-3">
+                <div className="hidden md:block text-right">
+                  <p className="text-sm font-medium">{user.user_metadata?.name || 'Utilisateur'}</p>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {modeDisplay}
+                    </Badge>
+                    {isDemo && (
+                      <Badge variant="outline" className="text-xs">
+                        Démo
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate('/profile')}
+                >
+                  <User className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </nav>
         </div>
       </div>
     </header>

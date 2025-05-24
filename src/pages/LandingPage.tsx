@@ -10,14 +10,15 @@ import {
   Brain, 
   Music, 
   Scan, 
-  Users, 
-  Building, 
-  ArrowRight, 
+  Bot, 
+  BookOpen, 
+  ArrowRight,
   CheckCircle,
-  Star,
+  Users,
   Shield,
-  Zap
+  Sparkles
 } from 'lucide-react';
+import HeroSection from '@/components/home/HeroSection';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,347 +26,114 @@ const LandingPage: React.FC = () => {
   const features = [
     {
       icon: Scan,
-      title: 'Scanner Émotionnel',
-      description: 'Analysez vos émotions en temps réel avec notre IA avancée'
+      title: 'Scanner d\'émotions IA',
+      description: 'Analysez vos émotions en temps réel grâce à l\'intelligence artificielle avancée',
+      color: 'bg-blue-500'
     },
     {
-      icon: Brain,
-      title: 'Coach IA Personnel',
-      description: 'Recevez des conseils personnalisés pour votre bien-être'
+      icon: Bot,
+      title: 'Coach personnel',
+      description: 'Un assistant IA disponible 24h/24 pour vous accompagner dans votre bien-être',
+      color: 'bg-green-500'
     },
     {
       icon: Music,
-      title: 'Musique Thérapie',
-      description: 'Musiques adaptées à votre état émotionnel'
+      title: 'Musicothérapie',
+      description: 'Musiques personnalisées selon votre état émotionnel pour optimiser votre humeur',
+      color: 'bg-purple-500'
     },
     {
-      icon: Heart,
-      title: 'Journal Personnel',
-      description: 'Suivez votre évolution avec un journal intelligent'
+      icon: BookOpen,
+      title: 'Journal intelligent',
+      description: 'Tenez un journal avec des insights IA pour mieux comprendre vos émotions',
+      color: 'bg-orange-500'
     }
   ];
 
-  const testimonials = [
+  const plans = [
     {
-      name: 'Marie Dubois',
-      role: 'Responsable RH',
-      company: 'TechCorp',
-      content: 'EmotionsCare a transformé le bien-être de nos équipes. +40% de satisfaction.',
-      rating: 5
+      name: 'Particulier',
+      price: 'Gratuit',
+      period: '3 jours d\'essai',
+      description: 'Parfait pour découvrir EmotionsCare',
+      features: [
+        'Scanner d\'émotions illimité',
+        'Coach IA personnel',
+        'Musicothérapie de base',
+        'Journal personnel'
+      ],
+      action: () => navigate('/b2c/register'),
+      highlight: false
     },
     {
-      name: 'Thomas Martin',
-      role: 'Particulier',
-      company: 'Utilisateur B2C',
-      content: 'Une application révolutionnaire pour gérer mon stress quotidien.',
-      rating: 5
-    },
-    {
-      name: 'Sophie Lefebvre',
-      role: 'Directrice Innovation',
-      company: 'StartupInc',
-      content: 'Les insights sur le bien-être de nos collaborateurs sont précieux.',
-      rating: 5
+      name: 'Entreprise',
+      price: 'Sur devis',
+      period: 'par collaborateur/mois',
+      description: 'Solution complète pour votre organisation',
+      features: [
+        'Toutes les fonctionnalités particulier',
+        'Analytics équipe',
+        'Gestion des utilisateurs',
+        'Support prioritaire',
+        'Rapports de bien-être'
+      ],
+      action: () => navigate('/b2b/selection'),
+      highlight: true
     }
   ];
 
-  const stats = [
-    { value: '10k+', label: 'Utilisateurs actifs' },
-    { value: '95%', label: 'Satisfaction client' },
-    { value: '500+', label: 'Entreprises partenaires' },
-    { value: '24/7', label: 'Support disponible' }
+  const benefits = [
+    'Amélioration du bien-être émotionnel',
+    'Réduction du stress et de l\'anxiété',
+    'Meilleure connaissance de soi',
+    'Outils basés sur la science',
+    'Interface intuitive et sécurisée',
+    'Support professionnel continu'
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-6">
-        <div className="container mx-auto max-w-7xl">
+      <HeroSection />
+
+      {/* Fonctionnalités principales */}
+      <section className="py-16 bg-white dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center space-y-8"
+            viewport={{ once: true }}
+            className="text-center mb-12"
           >
-            <Badge variant="outline" className="mx-auto">
-              <Zap className="h-3 w-3 mr-1" />
-              Nouveau : IA Émotionnelle Avancée
-            </Badge>
-            
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              Transformez votre
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {' '}bien-être émotionnel
-              </span>
-            </h1>
-            
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              EmotionsCare utilise l'intelligence artificielle pour analyser, comprendre et améliorer 
-              votre bien-être émotionnel, que vous soyez particulier ou entreprise.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="text-lg px-8"
-                onClick={() => navigate('/choose-mode')}
-              >
-                Commencer gratuitement
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="text-lg px-8"
-                onClick={() => navigate('/choose-mode')}
-              >
-                Découvrir les plans
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                3 jours d'essai gratuit
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-blue-500" />
-                Données sécurisées
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-purple-500" />
-                Support 24/7
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 px-6 bg-muted/50">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="text-3xl md:text-4xl font-bold text-primary">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-6">
-        <div className="container mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center space-y-4 mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Fonctionnalités innovantes
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Une plateforme complète pour votre bien-être
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Découvrez nos outils révolutionnaires pour améliorer votre bien-être émotionnel
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Découvrez nos outils innovants basés sur l'intelligence artificielle pour prendre soin de votre santé émotionnelle
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <motion.div
-                key={index}
+                key={feature.title}
                 initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
               >
-                <Card className="h-full hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                      <feature.icon className="h-6 w-6 text-primary" />
+                <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+                  <CardHeader className="text-center">
+                    <div className={`mx-auto p-3 ${feature.color} rounded-full w-fit mb-4`}>
+                      <feature.icon className="h-8 w-8 text-white" />
                     </div>
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>{feature.description}</CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Solutions Section */}
-      <section className="py-20 px-6 bg-muted/50">
-        <div className="container mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center space-y-4 mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Solutions adaptées à vos besoins
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Que vous soyez particulier ou entreprise, nous avons la solution parfaite
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* B2C Solution */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Card className="h-full">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-2xl">Pour les Particuliers</CardTitle>
-                      <CardDescription>Solution personnelle de bien-être</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Scanner émotionnel personnel</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Coach IA personnalisé</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Journal intime intelligent</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Musique thérapie adaptative</span>
-                    </li>
-                  </ul>
-                  <Button 
-                    className="w-full" 
-                    onClick={() => navigate('/b2c/register')}
-                  >
-                    Commencer mon parcours
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* B2B Solution */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <Card className="h-full">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Building className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-2xl">Pour les Entreprises</CardTitle>
-                      <CardDescription>Solution complète pour organisations</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <ul className="space-y-3">
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Dashboard d'administration</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Analytics avancées d'équipe</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Gestion des utilisateurs</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>Rapports de bien-être organisationnel</span>
-                    </li>
-                  </ul>
-                  <Button 
-                    className="w-full" 
-                    variant="outline"
-                    onClick={() => navigate('/b2b/selection')}
-                  >
-                    Découvrir les solutions B2B
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 px-6">
-        <div className="container mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center space-y-4 mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Ils nous font confiance
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Découvrez ce que nos utilisateurs disent d'EmotionsCare
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center gap-1 mb-2">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                    <CardDescription className="text-base italic">
-                      "{testimonial.content}"
+                    <CardDescription className="text-center">
+                      {feature.description}
                     </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div>
-                      <div className="font-medium">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {testimonial.role} • {testimonial.company}
-                      </div>
-                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -374,39 +142,146 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="container mx-auto max-w-4xl text-center">
+      {/* Bénéfices */}
+      <section className="py-16 bg-blue-50 dark:bg-blue-900/20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8"
+            viewport={{ once: true }}
+            className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Prêt à transformer votre bien-être ?
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Pourquoi choisir EmotionsCare ?
             </h2>
-            <p className="text-xl opacity-90">
-              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie 
-              avec EmotionsCare. Commencez votre essai gratuit dès aujourd'hui.
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Une approche scientifique du bien-être émotionnel
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {benefits.map((benefit, index) => (
+              <motion.div
+                key={benefit}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-center space-x-3"
+              >
+                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
+                <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Plans et tarifs */}
+      <section className="py-16 bg-white dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Choisissez votre formule
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Solutions adaptées à vos besoins personnels et professionnels
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {plans.map((plan, index) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
+                <Card className={`h-full relative ${plan.highlight ? 'border-blue-500 border-2' : ''}`}>
+                  {plan.highlight && (
+                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500">
+                      Populaire
+                    </Badge>
+                  )}
+                  <CardHeader className="text-center">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      {plan.name === 'Particulier' ? (
+                        <Heart className="h-6 w-6 text-blue-500" />
+                      ) : (
+                        <Users className="h-6 w-6 text-green-500" />
+                      )}
+                      <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                    </div>
+                    <div className="text-3xl font-bold">{plan.price}</div>
+                    <CardDescription>{plan.period}</CardDescription>
+                    <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center space-x-3">
+                          <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      onClick={plan.action}
+                      className="w-full"
+                      variant={plan.highlight ? "default" : "outline"}
+                    >
+                      {plan.name === 'Particulier' ? 'Essayer gratuitement' : 'Demander un devis'}
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA final */}
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Prêt à prendre soin de votre bien-être ?
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie avec EmotionsCare
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
+                onClick={() => navigate('/choose-mode')}
                 size="lg" 
                 variant="secondary"
-                className="text-lg px-8"
-                onClick={() => navigate('/choose-mode')}
+                className="text-blue-600"
               >
-                Essai gratuit 3 jours
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <Sparkles className="h-5 w-5 mr-2" />
+                Commencer maintenant
               </Button>
               <Button 
+                onClick={() => navigate('/b2b/selection')}
                 size="lg" 
                 variant="outline"
-                className="text-lg px-8 border-white text-white hover:bg-white hover:text-primary"
-                onClick={() => navigate('/choose-mode')}
+                className="border-white text-white hover:bg-white hover:text-blue-600"
               >
-                Demander une démo
+                <Shield className="h-5 w-5 mr-2" />
+                Solutions entreprise
               </Button>
             </div>
           </motion.div>

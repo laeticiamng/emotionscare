@@ -1,276 +1,395 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Music as MusicIcon, Play, Pause, Download, Loader2, Heart, Brain, Zap, Leaf } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Music as MusicIcon, 
+  Play, 
+  Pause, 
+  SkipForward, 
+  SkipBack,
+  Volume2,
+  Heart,
+  Brain,
+  Leaf,
+  Zap,
+  Moon,
+  Sun,
+  Shuffle,
+  Repeat
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-
-interface GeneratedMusic {
-  audio_url: string;
-  duration: number;
-  prompt: string;
-  mood: string;
-  timestamp: string;
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 const Music: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
-  const [mood, setMood] = useState('relaxing');
-  const [duration, setDuration] = useState([30]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedMusic, setGeneratedMusic] = useState<GeneratedMusic | null>(null);
+  const { user } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<any>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(180); // 3 minutes par défaut
+  const [volume, setVolume] = useState(70);
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      toast.error('Veuillez entrer une description pour générer de la musique');
-      return;
+  const isDemo = user?.email?.endsWith('@exemple.fr');
+
+  const moodCategories = [
+    {
+      id: 'calm',
+      name: 'Calme & Sérénité',
+      icon: Leaf,
+      color: 'bg-green-500',
+      description: 'Musiques apaisantes pour la relaxation',
+      tracks: [
+        { id: 1, title: 'Forêt Enchantée', artist: 'Nature Sounds', duration: '4:23', url: '/audio/calm1.mp3' },
+        { id: 2, title: 'Méditation Océanique', artist: 'Zen Masters', duration: '6:15', url: '/audio/calm2.mp3' },
+        { id: 3, title: 'Jardin Paisible', artist: 'Ambient Nature', duration: '5:42', url: '/audio/calm3.mp3' }
+      ]
+    },
+    {
+      id: 'energy',
+      name: 'Énergie & Motivation',
+      icon: Zap,
+      color: 'bg-yellow-500',
+      description: 'Rythmes dynamisants pour se motiver',
+      tracks: [
+        { id: 4, title: 'Nouvelle Journée', artist: 'Motivational Beats', duration: '3:45', url: '/audio/energy1.mp3' },
+        { id: 5, title: 'Force Intérieure', artist: 'Power Vibes', duration: '4:12', url: '/audio/energy2.mp3' },
+        { id: 6, title: 'Dépassement', artist: 'Epic Soundtracks', duration: '5:30', url: '/audio/energy3.mp3' }
+      ]
+    },
+    {
+      id: 'focus',
+      name: 'Focus & Concentration',
+      icon: Brain,
+      color: 'bg-blue-500',
+      description: 'Sons pour améliorer la concentration',
+      tracks: [
+        { id: 7, title: 'Ondes Alpha', artist: 'Brainwave Therapy', duration: '8:00', url: '/audio/focus1.mp3' },
+        { id: 8, title: 'Café Studieux', artist: 'Lo-Fi Collective', duration: '3:28', url: '/audio/focus2.mp3' },
+        { id: 9, title: 'Pluie Productive', artist: 'White Noise Studio', duration: '10:00', url: '/audio/focus3.mp3' }
+      ]
+    },
+    {
+      id: 'joy',
+      name: 'Joie & Bonheur',
+      icon: Sun,
+      color: 'bg-orange-500',
+      description: 'Mélodies joyeuses pour égayer l\'humeur',
+      tracks: [
+        { id: 10, title: 'Sourire du Matin', artist: 'Happy Melodies', duration: '3:15', url: '/audio/joy1.mp3' },
+        { id: 11, title: 'Danse de Joie', artist: 'Uplifting Sounds', duration: '4:05', url: '/audio/joy2.mp3' },
+        { id: 12, title: 'Éclat de Rire', artist: 'Joyful Tunes', duration: '2:58', url: '/audio/joy3.mp3' }
+      ]
+    },
+    {
+      id: 'sleep',
+      name: 'Sommeil & Repos',
+      icon: Moon,
+      color: 'bg-purple-500',
+      description: 'Sons doux pour favoriser l\'endormissement',
+      tracks: [
+        { id: 13, title: 'Berceuse Étoilée', artist: 'Sleep Therapy', duration: '12:00', url: '/audio/sleep1.mp3' },
+        { id: 14, title: 'Nuit Paisible', artist: 'Dream Sounds', duration: '15:30', url: '/audio/sleep2.mp3' },
+        { id: 15, title: 'Vagues Nocturnes', artist: 'Ocean Dreams', duration: '20:00', url: '/audio/sleep3.mp3' }
+      ]
+    },
+    {
+      id: 'love',
+      name: 'Amour & Bienveillance',
+      icon: Heart,
+      color: 'bg-pink-500',
+      description: 'Musiques douces pour cultiver l\'amour',
+      tracks: [
+        { id: 16, title: 'Cœur Ouvert', artist: 'Love Frequencies', duration: '5:45', url: '/audio/love1.mp3' },
+        { id: 17, title: 'Compassion Infinie', artist: 'Healing Hearts', duration: '6:20', url: '/audio/love2.mp3' },
+        { id: 18, title: 'Tendresse', artist: 'Soft Emotions', duration: '4:33', url: '/audio/love3.mp3' }
+      ]
     }
+  ];
 
-    setIsGenerating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-music', {
-        body: {
-          prompt: prompt.trim(),
-          mood,
-          duration: duration[0]
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.success) {
-        setGeneratedMusic(data);
-        toast.success('Musique générée avec succès !');
-      } else {
-        throw new Error(data?.error || 'Erreur lors de la génération');
-      }
-    } catch (error) {
-      console.error('Erreur génération musique:', error);
-      toast.error('Erreur lors de la génération de musique');
-    } finally {
-      setIsGenerating(false);
+  const playTrack = (track: any) => {
+    if (isDemo) {
+      // Simulation pour les comptes démo
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      setCurrentTime(0);
+      setDuration(parseInt(track.duration.split(':')[0]) * 60 + parseInt(track.duration.split(':')[1]));
+      toast.success(`Lecture : ${track.title}`);
+      
+      // Simulation de progression
+      const interval = setInterval(() => {
+        setCurrentTime(prev => {
+          if (prev >= duration - 1) {
+            clearInterval(interval);
+            setIsPlaying(false);
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } else {
+      // Intégration réelle avec les APIs de musique
+      setCurrentTrack(track);
+      setIsPlaying(true);
+      toast.success(`Lecture : ${track.title}`);
     }
   };
 
-  const togglePlayback = () => {
+  const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
-    toast.info(isPlaying ? 'Lecture en pause' : 'Lecture en cours');
-  };
-
-  const handleDownload = () => {
-    if (generatedMusic?.audio_url) {
-      toast.success('Téléchargement initié');
-      // Simulate download
-      const link = document.createElement('a');
-      link.href = generatedMusic.audio_url;
-      link.download = `musique-${Date.now()}.mp3`;
-      link.click();
+    if (isPlaying) {
+      toast.info('Pause');
+    } else {
+      toast.success('Lecture reprise');
     }
   };
 
-  const moodEmojis = {
-    relaxing: '😌',
-    energetic: '⚡',
-    peaceful: '🕊️',
-    mysterious: '🌙',
-    uplifting: '☀️'
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  const selectMood = (moodId: string) => {
+    setSelectedMood(moodId);
+    const mood = moodCategories.find(m => m.id === moodId);
+    if (mood) {
+      toast.success(`Playlist "${mood.name}" sélectionnée`);
+    }
+  };
+
+  const selectedMoodData = moodCategories.find(m => m.id === selectedMood);
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
-          <MusicIcon className="h-8 w-8 text-primary" />
-          Génération de Musique IA
-        </h1>
-        <p className="text-muted-foreground">
-          Créez de la musique personnalisée basée sur vos émotions et préférences
-        </p>
-      </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="text-center mb-8">
+          <div className="mx-auto p-4 bg-purple-100 dark:bg-purple-900/30 rounded-full w-fit mb-4">
+            <MusicIcon className="h-12 w-12 text-purple-600" />
+          </div>
+          <h1 className="text-4xl font-bold mb-4">Musicothérapie</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Musiques personnalisées selon votre état émotionnel pour optimiser votre bien-être
+          </p>
+          {isDemo && (
+            <Badge variant="secondary" className="mt-4">
+              Mode démo - Aperçu des fonctionnalités
+            </Badge>
+          )}
+        </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Configuration Panel */}
+      {/* Lecteur de musique */}
+      {currentTrack && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center">
+                  <MusicIcon className="h-8 w-8 text-white" />
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold">{currentTrack.title}</h3>
+                  <p className="text-muted-foreground">{currentTrack.artist}</p>
+                  
+                  <div className="flex items-center space-x-2 mt-3">
+                    <span className="text-sm">{formatTime(currentTime)}</span>
+                    <Progress 
+                      value={(currentTime / duration) * 100} 
+                      className="flex-1 h-2"
+                    />
+                    <span className="text-sm">{formatTime(duration)}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <Button variant="outline" size="icon">
+                    <SkipBack className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    onClick={togglePlayPause}
+                    size="icon"
+                    className="h-12 w-12"
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-6 w-6" />
+                    ) : (
+                      <Play className="h-6 w-6" />
+                    )}
+                  </Button>
+                  <Button variant="outline" size="icon">
+                    <SkipForward className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Volume2 className="h-4 w-4" />
+                  <Progress value={volume} className="w-20 h-2" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Sélection d'humeur */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5" />
-              Configuration
-            </CardTitle>
+            <CardTitle>Choisissez votre humeur</CardTitle>
+            <CardDescription>
+              Sélectionnez le type de musique adapté à votre état émotionnel
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="prompt">Description musicale</Label>
-              <Textarea
-                id="prompt"
-                placeholder="Décrivez le type de musique que vous souhaitez... (ex: 'Une mélodie douce et apaisante avec des sons de nature')"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                rows={3}
-                className="resize-none"
-              />
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {moodCategories.map((mood, index) => (
+                <motion.div
+                  key={mood.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <Button
+                    variant={selectedMood === mood.id ? "default" : "outline"}
+                    onClick={() => selectMood(mood.id)}
+                    className="h-auto flex flex-col items-center gap-3 p-6 w-full"
+                  >
+                    <div className={`p-3 rounded-full ${mood.color} text-white`}>
+                      <mood.icon className="h-6 w-6" />
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium">{mood.name}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {mood.description}
+                      </div>
+                    </div>
+                  </Button>
+                </motion.div>
+              ))}
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="mood">Humeur {mood && moodEmojis[mood as keyof typeof moodEmojis]}</Label>
-              <Select value={mood} onValueChange={setMood}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir une humeur" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="relaxing">😌 Relaxant</SelectItem>
-                  <SelectItem value="energetic">⚡ Énergique</SelectItem>
-                  <SelectItem value="peaceful">🕊️ Paisible</SelectItem>
-                  <SelectItem value="mysterious">🌙 Mystérieux</SelectItem>
-                  <SelectItem value="uplifting">☀️ Inspirant</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Durée: {duration[0]} secondes</Label>
-              <Slider
-                value={duration}
-                onValueChange={setDuration}
-                max={120}
-                min={10}
-                step={10}
-                className="w-full"
-              />
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>10s</span>
-                <span>120s</span>
-              </div>
-            </div>
-
-            <Button 
-              onClick={handleGenerate} 
-              disabled={isGenerating || !prompt.trim()}
-              className="w-full"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Génération en cours...
-                </>
-              ) : (
-                <>
-                  <Zap className="mr-2 h-4 w-4" />
-                  Générer la musique
-                </>
-              )}
-            </Button>
           </CardContent>
         </Card>
+      </motion.div>
 
-        {/* Results Panel */}
-        <Card>
+      {/* Liste des pistes */}
+      {selectedMoodData && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className={`p-2 rounded-full ${selectedMoodData.color} text-white`}>
+                  <selectedMoodData.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle>{selectedMoodData.name}</CardTitle>
+                  <CardDescription>{selectedMoodData.description}</CardDescription>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm">
+                  <Shuffle className="h-4 w-4 mr-2" />
+                  Aléatoire
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Repeat className="h-4 w-4 mr-2" />
+                  Répéter
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {selectedMoodData.tracks.map((track, index) => (
+                  <motion.div
+                    key={track.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className={`flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer ${
+                      currentTrack?.id === track.id ? 'bg-muted' : ''
+                    }`}
+                    onClick={() => playTrack(track)}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded flex items-center justify-center">
+                        {currentTrack?.id === track.id && isPlaying ? (
+                          <Pause className="h-4 w-4 text-white" />
+                        ) : (
+                          <Play className="h-4 w-4 text-white" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium">{track.title}</p>
+                        <p className="text-sm text-muted-foreground">{track.artist}</p>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {track.duration}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Bienfaits de la musicothérapie */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <Card className="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MusicIcon className="h-5 w-5" />
-              Résultat
+            <CardTitle className="flex items-center space-x-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              <span>Bienfaits de la musicothérapie</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {generatedMusic ? (
-              <div className="space-y-4">
-                <div className="p-4 bg-muted rounded-lg space-y-2">
-                  <h3 className="font-medium">Musique générée</h3>
-                  <p className="text-sm text-muted-foreground">{generatedMusic.prompt}</p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="bg-primary/10 text-primary px-2 py-1 rounded">
-                      {generatedMusic.mood}
-                    </span>
-                    <span>{generatedMusic.duration}s</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button onClick={togglePlayback} className="flex-1">
-                    {isPlaying ? (
-                      <>
-                        <Pause className="mr-2 h-4 w-4" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <Play className="mr-2 h-4 w-4" />
-                        Écouter
-                      </>
-                    )}
-                  </Button>
-                  <Button variant="outline" onClick={handleDownload}>
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>0:00</span>
-                    <span>{Math.floor(generatedMusic.duration / 60)}:{(generatedMusic.duration % 60).toString().padStart(2, '0')}</span>
-                  </div>
-                  <div className="w-full bg-secondary h-2 rounded-full">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-1000"
-                      style={{ width: isPlaying ? '100%' : '0%' }}
-                    />
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h4 className="font-medium">Effets sur le cerveau :</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Stimule la production d'endorphines</li>
+                  <li>• Améliore la concentration et la mémoire</li>
+                  <li>• Réduit le cortisol (hormone du stress)</li>
+                </ul>
               </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <MusicIcon className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                <p>Aucune musique générée</p>
-                <p className="text-sm">Configurez vos paramètres et cliquez sur "Générer"</p>
+              <div className="space-y-2">
+                <h4 className="font-medium">Bienfaits émotionnels :</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Régule l'humeur naturellement</li>
+                  <li>• Favorise la relaxation profonde</li>
+                  <li>• Améliore la qualité du sommeil</li>
+                </ul>
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Quick Presets */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Leaf className="h-5 w-5" />
-            Préréglages rapides
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { name: 'Méditation', prompt: 'Sons apaisants avec bols tibétains et nature', mood: 'peaceful', emoji: '🧘' },
-              { name: 'Concentration', prompt: 'Musique ambiante pour le travail et la concentration', mood: 'relaxing', emoji: '🎯' },
-              { name: 'Motivation', prompt: 'Rythmes énergiques et motivants', mood: 'energetic', emoji: '💪' }
-            ].map((preset) => (
-              <Button
-                key={preset.name}
-                variant="outline"
-                className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => {
-                  setPrompt(preset.prompt);
-                  setMood(preset.mood);
-                }}
-              >
-                <span className="text-2xl">{preset.emoji}</span>
-                <span className="font-medium">{preset.name}</span>
-                <span className="text-sm text-muted-foreground text-center">
-                  {preset.prompt.slice(0, 40)}...
-                </span>
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      </motion.div>
     </div>
   );
 };

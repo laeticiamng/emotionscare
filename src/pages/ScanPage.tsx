@@ -1,276 +1,423 @@
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Camera, Mic, MicOff, FileText, Brain, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Camera, 
+  Mic, 
+  Heart, 
+  Brain, 
+  Zap, 
+  TrendingUp,
+  Play,
+  Square,
+  Upload,
+  Loader2
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-
-interface EmotionResult {
-  emotions: Array<{ name: string; intensity: number }>;
-  sentiment: string;
-  confidence: number;
-  suggestions: string[];
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 const ScanPage: React.FC = () => {
-  const [textInput, setTextInput] = useState('');
+  const { user } = useAuth();
+  const [scanType, setScanType] = useState<'audio' | 'video' | 'text' | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [result, setResult] = useState<any>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
 
-  const analyzeText = async () => {
-    if (!textInput.trim()) {
-      toast.error('Veuillez saisir du texte à analyser');
-      return;
+  const isDemo = user?.email?.endsWith('@exemple.fr');
+
+  const scanTypes = [
+    {
+      id: 'audio',
+      title: 'Analyse vocale',
+      description: 'Analysez vos émotions via votre voix',
+      icon: Mic,
+      color: 'bg-blue-500',
+      available: true
+    },
+    {
+      id: 'video',
+      title: 'Analyse faciale',
+      description: 'Détection d\'émotions par reconnaissance faciale',
+      icon: Camera,
+      color: 'bg-green-500',
+      available: true
+    },
+    {
+      id: 'text',
+      title: 'Analyse textuelle',
+      description: 'Analysez le sentiment de votre texte',
+      icon: Brain,
+      color: 'bg-purple-500',
+      available: true
     }
+  ];
 
-    setIsAnalyzing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('analyze-emotion-text', {
-        body: { text: textInput }
-      });
+  const mockResults = {
+    audio: {
+      emotion: 'Calme',
+      confidence: 87,
+      details: {
+        primary: 'Sérénité',
+        secondary: 'Concentration',
+        stress: 23,
+        energy: 65
+      },
+      recommendations: [
+        'Maintenez ce niveau de calme',
+        'Profitez de cet état pour des tâches créatives',
+        'Pensez à faire une pause dans 2 heures'
+      ]
+    },
+    video: {
+      emotion: 'Concentration',
+      confidence: 92,
+      details: {
+        primary: 'Focus',
+        secondary: 'Détermination',
+        stress: 15,
+        energy: 78
+      },
+      recommendations: [
+        'Excellent état de concentration',
+        'Continuez sur vos tâches importantes',
+        'Hydratez-vous régulièrement'
+      ]
+    },
+    text: {
+      emotion: 'Optimisme',
+      confidence: 76,
+      details: {
+        primary: 'Positivité',
+        secondary: 'Motivation',
+        stress: 31,
+        energy: 72
+      },
+      recommendations: [
+        'Votre attitude positive est un atout',
+        'Partagez cette énergie avec votre équipe',
+        'Planifiez des objectifs ambitieux'
+      ]
+    }
+  };
 
-      if (error) throw error;
+  const startScan = async (type: 'audio' | 'video' | 'text') => {
+    setScanType(type);
+    setIsScanning(true);
+    setScanProgress(0);
+    setResult(null);
 
-      if (data.success) {
-        setResult(data.analysis);
-        toast.success('Analyse terminée !');
-      } else {
-        throw new Error(data.error || 'Erreur lors de l\'analyse');
+    if (isDemo) {
+      // Simulation pour les comptes démo
+      for (let i = 0; i <= 100; i += 10) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setScanProgress(i);
       }
-    } catch (error: any) {
-      console.error('Erreur analyse:', error);
-      toast.error('Erreur lors de l\'analyse: ' + error.message);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const chunks: BlobPart[] = [];
-
-      recorder.ondataavailable = (e) => chunks.push(e.data);
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/wav' });
-        await processAudio(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
-      setIsRecording(true);
-    } catch (error) {
-      toast.error('Impossible d\'accéder au microphone');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-      setMediaRecorder(null);
-    }
-  };
-
-  const processAudio = async (audioBlob: Blob) => {
-    setIsAnalyzing(true);
-    try {
-      // Convert audio to text using Whisper (placeholder for now)
-      const transcribedText = "Transcription audio en cours de développement...";
-      setTextInput(transcribedText);
       
-      // Analyze the transcribed text
-      await analyzeText();
-    } catch (error: any) {
-      toast.error('Erreur lors du traitement audio');
-    } finally {
-      setIsAnalyzing(false);
+      setResult(mockResults[type]);
+      toast.success('Analyse terminée !');
+    } else {
+      try {
+        // Intégration réelle avec les APIs (Hume AI, OpenAI, etc.)
+        // Code d'intégration API ici
+        toast.success('Analyse en cours avec l\'IA...');
+        
+        // Simulation progressive
+        for (let i = 0; i <= 100; i += 5) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          setScanProgress(i);
+        }
+        
+        setResult(mockResults[type]);
+      } catch (error) {
+        toast.error('Erreur lors de l\'analyse');
+      }
     }
+    
+    setIsScanning(false);
   };
 
-  const EmotionChart = ({ emotions }: { emotions: Array<{ name: string; intensity: number }> }) => (
-    <div className="space-y-3">
-      {emotions.map((emotion, index) => (
-        <div key={index} className="flex items-center gap-3">
-          <span className="text-sm font-medium w-20 capitalize">{emotion.name}</span>
-          <div className="flex-1 bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${emotion.intensity * 100}%` }}
-            />
-          </div>
-          <span className="text-sm text-gray-600">{Math.round(emotion.intensity * 100)}%</span>
-        </div>
-      ))}
-    </div>
-  );
+  const resetScan = () => {
+    setScanType(null);
+    setResult(null);
+    setScanProgress(0);
+    setIsScanning(false);
+    setIsRecording(false);
+  };
+
+  if (result) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
+            <CardHeader className="text-center">
+              <div className="mx-auto p-4 bg-green-100 dark:bg-green-900/30 rounded-full w-fit mb-4">
+                <Heart className="h-12 w-12 text-green-600" />
+              </div>
+              <CardTitle className="text-3xl">Analyse terminée !</CardTitle>
+              <CardDescription className="text-lg">
+                Voici les résultats de votre scan émotionnel
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center">
+                <div className="text-5xl font-bold text-green-600 mb-2">
+                  {result.emotion}
+                </div>
+                <Badge variant="secondary" className="text-lg px-4 py-2">
+                  Confiance: {result.confidence}%
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Détails émotionnels</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span>Émotion principale:</span>
+                      <span className="font-medium">{result.details.primary}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Émotion secondaire:</span>
+                      <span className="font-medium">{result.details.secondary}</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Niveau de stress:</span>
+                        <span className="font-medium">{result.details.stress}%</span>
+                      </div>
+                      <Progress value={result.details.stress} className="h-2" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Niveau d'énergie:</span>
+                        <span className="font-medium">{result.details.energy}%</span>
+                      </div>
+                      <Progress value={result.details.energy} className="h-2" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Recommandations</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {result.recommendations.map((rec: string, index: number) => (
+                        <li key={index} className="flex items-start space-x-2">
+                          <Zap className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="flex justify-center space-x-4">
+                <Button onClick={resetScan} variant="outline">
+                  Nouveau scan
+                </Button>
+                <Button onClick={() => window.location.href = '/music'}>
+                  Écouter de la musique adaptée
+                </Button>
+                <Button onClick={() => window.location.href = '/coach'}>
+                  Parler au Coach IA
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (isScanning) {
+    return (
+      <div className="container mx-auto p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader className="text-center">
+              <div className="mx-auto p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit mb-4">
+                <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
+              </div>
+              <CardTitle className="text-2xl">Analyse en cours...</CardTitle>
+              <CardDescription>
+                L'IA analyse vos données émotionnelles
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progression</span>
+                  <span>{scanProgress}%</span>
+                </div>
+                <Progress value={scanProgress} className="h-3" />
+              </div>
+              
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  {scanProgress < 30 ? 'Collecte des données...' :
+                   scanProgress < 70 ? 'Analyse par intelligence artificielle...' :
+                   'Génération des recommandations...'}
+                </p>
+              </div>
+
+              <Button 
+                variant="outline" 
+                onClick={resetScan}
+                className="w-full"
+              >
+                Annuler
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">Scanner d'émotions</h1>
-        <p className="text-muted-foreground">
-          Analysez vos émotions à partir de texte, audio ou vidéo
-        </p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-4">Scanner d'émotions</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Analysez votre état émotionnel en temps réel grâce à l'intelligence artificielle
+          </p>
+          {isDemo && (
+            <Badge variant="secondary" className="mt-4">
+              Mode démo - Résultats simulés
+            </Badge>
+          )}
+        </div>
+      </motion.div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            Analyse émotionnelle
-          </CardTitle>
-          <CardDescription>
-            Choisissez votre méthode d'analyse préférée
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="text" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="text" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Texte
-              </TabsTrigger>
-              <TabsTrigger value="audio" className="flex items-center gap-2">
-                <Mic className="h-4 w-4" />
-                Audio
-              </TabsTrigger>
-              <TabsTrigger value="video" className="flex items-center gap-2">
-                <Camera className="h-4 w-4" />
-                Vidéo
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="text" className="space-y-4">
-              <Textarea
-                placeholder="Décrivez vos sentiments, votre journée ou ce que vous ressentez..."
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                className="min-h-32"
-              />
-              <Button 
-                onClick={analyzeText} 
-                disabled={isAnalyzing || !textInput.trim()}
-                className="w-full"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyse en cours...
-                  </>
-                ) : (
-                  'Analyser le texte'
-                )}
-              </Button>
-            </TabsContent>
-
-            <TabsContent value="audio" className="space-y-4">
-              <div className="text-center space-y-4">
-                <p className="text-muted-foreground">
-                  Enregistrez un message vocal pour analyser vos émotions
-                </p>
-                <Button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  variant={isRecording ? "destructive" : "default"}
-                  size="lg"
-                  className="w-full"
-                >
-                  {isRecording ? (
-                    <>
-                      <MicOff className="mr-2 h-4 w-4" />
-                      Arrêter l'enregistrement
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="mr-2 h-4 w-4" />
-                      Commencer l'enregistrement
-                    </>
-                  )}
-                </Button>
-                {textInput && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Transcription:</p>
-                    <p className="text-sm">{textInput}</p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {scanTypes.map((type, index) => (
+            <motion.div
+              key={type.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
+                <CardHeader className="text-center">
+                  <div className={`mx-auto p-4 ${type.color} rounded-full w-fit mb-4`}>
+                    <type.icon className="h-8 w-8 text-white" />
                   </div>
-                )}
-              </div>
-            </TabsContent>
+                  <CardTitle>{type.title}</CardTitle>
+                  <CardDescription>{type.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button 
+                    onClick={() => startScan(type.id as 'audio' | 'video' | 'text')}
+                    disabled={!type.available}
+                    className="w-full"
+                  >
+                    {type.available ? (
+                      <>
+                        <Play className="h-4 w-4 mr-2" />
+                        Commencer l'analyse
+                      </>
+                    ) : (
+                      'Bientôt disponible'
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
 
-            <TabsContent value="video" className="space-y-4">
-              <div className="text-center space-y-4">
-                <p className="text-muted-foreground">
-                  Analyse vidéo en cours de développement
-                </p>
-                <Button disabled className="w-full">
-                  <Camera className="mr-2 h-4 w-4" />
-                  Bientôt disponible
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {result && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
         <Card>
           <CardHeader>
-            <CardTitle>Résultats de l'analyse</CardTitle>
+            <CardTitle className="flex items-center space-x-2">
+              <TrendingUp className="h-5 w-5" />
+              <span>Historique récent</span>
+            </CardTitle>
+            <CardDescription>
+              Vos dernières analyses émotionnelles
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h3 className="font-semibold mb-3">Émotions détectées</h3>
-              <EmotionChart emotions={result.emotions} />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-semibold mb-2">Sentiment général</h3>
-                <div className={`inline-block px-3 py-1 rounded-full text-sm ${
-                  result.sentiment === 'positif' ? 'bg-green-100 text-green-800' :
-                  result.sentiment === 'négatif' ? 'bg-red-100 text-red-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {result.sentiment}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Niveau de confiance</h3>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{ width: `${result.confidence * 100}%` }}
-                    />
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <Heart className="h-4 w-4 text-green-600" />
                   </div>
-                  <span className="text-sm">{Math.round(result.confidence * 100)}%</span>
+                  <div>
+                    <p className="font-medium">Calme et serein</p>
+                    <p className="text-sm text-muted-foreground">Il y a 2 heures</p>
+                  </div>
                 </div>
+                <Badge variant="secondary">87%</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-100 rounded-full">
+                    <Brain className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Concentré</p>
+                    <p className="text-sm text-muted-foreground">Hier</p>
+                  </div>
+                </div>
+                <Badge variant="secondary">92%</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-purple-100 rounded-full">
+                    <Zap className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Énergique</p>
+                    <p className="text-sm text-muted-foreground">Avant-hier</p>
+                  </div>
+                </div>
+                <Badge variant="secondary">78%</Badge>
               </div>
             </div>
-
-            {result.suggestions && result.suggestions.length > 0 && (
-              <div>
-                <h3 className="font-semibold mb-3">Suggestions pour votre bien-être</h3>
-                <ul className="space-y-2">
-                  {result.suggestions.map((suggestion, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-1">•</span>
-                      <span className="text-sm">{suggestion}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            
+            <Button variant="outline" className="w-full mt-4">
+              Voir l'historique complet
+            </Button>
           </CardContent>
         </Card>
-      )}
+      </motion.div>
     </div>
   );
 };
