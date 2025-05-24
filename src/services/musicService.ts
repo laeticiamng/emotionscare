@@ -1,30 +1,86 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { supabase } from '@/integrations/supabase/client';
 
-// Basic music service implementation
-export const fetchTracks = async (): Promise<MusicTrack[]> => {
-  // In a real app, this would call an API
-  return Promise.resolve([]);
-};
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  duration: number;
+  emotion?: string;
+  genre?: string;
+  mood?: string;
+}
 
-export const fetchPlaylists = async (): Promise<MusicPlaylist[]> => {
-  // In a real app, this would call an API
-  return Promise.resolve([]);
-};
+export class MusicService {
+  static async generateMusic(emotion: string, mood?: string): Promise<MusicTrack> {
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-music', {
+        body: { emotion, mood }
+      });
 
-export const fetchTracksByMood = async (mood: string): Promise<MusicTrack[]> => {
-  // In a real app, this would filter tracks by mood from an API
-  return Promise.resolve([]);
-};
+      if (error) throw error;
 
-export const fetchPlaylistsByMood = async (mood: string): Promise<MusicPlaylist[]> => {
-  // In a real app, this would filter playlists by mood from an API
-  return Promise.resolve([]);
-};
+      return {
+        id: data.id,
+        title: data.title,
+        artist: 'EmotionsCare AI',
+        url: data.audioUrl,
+        duration: data.duration || 120,
+        emotion,
+        mood
+      };
+    } catch (error) {
+      console.error('Erreur génération musique:', error);
+      throw new Error('Erreur lors de la génération musicale');
+    }
+  }
 
-export default {
-  fetchTracks,
-  fetchPlaylists,
-  fetchTracksByMood,
-  fetchPlaylistsByMood
-};
+  static async getRecommendedTracks(emotion: string): Promise<MusicTrack[]> {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-music-recommendations', {
+        body: { emotion }
+      });
+
+      if (error) throw error;
+
+      return data.tracks || [];
+    } catch (error) {
+      console.error('Erreur recommandations:', error);
+      return [];
+    }
+  }
+
+  static async saveFavorite(trackId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('music_favorites')
+        .insert({
+          track_id: trackId,
+          user_id: (await supabase.auth.getUser()).data.user?.id
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Erreur sauvegarde favori:', error);
+      throw new Error('Erreur lors de la sauvegarde');
+    }
+  }
+
+  static async getFavorites(): Promise<MusicTrack[]> {
+    try {
+      const { data, error } = await supabase
+        .from('music_favorites')
+        .select('track_id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+
+      if (error) throw error;
+
+      // En production, on récupérerait les détails des tracks
+      return [];
+    } catch (error) {
+      console.error('Erreur récupération favoris:', error);
+      return [];
+    }
+  }
+}

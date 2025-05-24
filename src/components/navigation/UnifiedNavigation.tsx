@@ -1,69 +1,72 @@
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Home, Scan, BookOpen, Music, Headphones, MessageSquare, 
-  Users, Calendar, Settings, Glasses, HeartHandshake, Trophy, 
-  Building, BarChart2, Brain, FileText
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import NavItemButton from './NavItemButton';
 import { b2cNavItems, b2bUserNavItems, b2bAdminNavItems } from './navConfig';
+import { cn } from '@/lib/utils';
 
 interface UnifiedNavigationProps {
   collapsed?: boolean;
   onItemClick?: () => void;
 }
 
-const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed = false, onItemClick }) => {
+const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ 
+  collapsed = false, 
+  onItemClick 
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const { userMode } = useUserMode();
-  
-  // Sélectionner les éléments de navigation en fonction du mode utilisateur
-  let navItems = userMode === 'b2b_admin' 
-    ? b2bAdminNavItems 
-    : userMode === 'b2b_user' 
-      ? b2bUserNavItems 
-      : b2cNavItems;
 
-  // Si aucun mode n'est détecté, afficher les éléments B2C par défaut
-  if (!userMode) {
-    navItems = b2cNavItems;
+  if (!isAuthenticated || !user) {
+    return null;
   }
 
-  // Fonction pour gérer l'absence de chemin pour certaines fonctionnalités
-  const handleNavigation = (path: string) => {
-    // Si l'élément n'a pas encore de page implémentée, afficher un message
-    if (path.includes('/coach') || path.includes('/journal') || path.includes('/audio') || 
-        path.includes('/music') || path.includes('/cocon') || path.includes('/preferences') ||
-        path.includes('/gamification')) {
-      
-      // Afficher un message indiquant que la fonctionnalité sera disponible prochainement
-      alert('Cette fonctionnalité sera disponible prochainement');
-      return;
-    }
-    
-    // Sinon, naviguer vers la page
-    navigate(path);
-    if (onItemClick) {
-      onItemClick();
+  const getNavItems = () => {
+    switch (userMode) {
+      case 'b2b_admin':
+        return b2bAdminNavItems;
+      case 'b2b_user':
+        return b2bUserNavItems;
+      default:
+        return b2cNavItems;
     }
   };
 
+  const navItems = getNavItems();
+
+  const handleItemClick = (href: string) => {
+    navigate(href);
+    onItemClick?.();
+  };
+
   return (
-    <nav className="space-y-2 py-4">
-      {navItems.map((item, index) => (
-        <NavItemButton
-          key={`${item.title}-${index}`}
-          label={item.title}
-          path={item.href}
-          icon={item.icon}
-          collapsed={collapsed}
-          onClick={() => handleNavigation(item.href)}
-          active={location.pathname === item.href || location.pathname.startsWith(item.href + '/')}
-        />
-      ))}
+    <nav className="space-y-2 px-3">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = location.pathname === item.href;
+        
+        return (
+          <Button
+            key={item.href}
+            variant={isActive ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start",
+              collapsed && "px-2",
+              isActive && "bg-secondary text-secondary-foreground"
+            )}
+            onClick={() => handleItemClick(item.href)}
+          >
+            <Icon className={cn("h-4 w-4", !collapsed && "mr-3")} />
+            {!collapsed && (
+              <span className="truncate">{item.title}</span>
+            )}
+          </Button>
+        );
+      })}
     </nav>
   );
 };

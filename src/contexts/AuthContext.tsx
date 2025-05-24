@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -33,25 +34,83 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session);
+        
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Create or update user profile
+          await createOrUpdateProfile(session.user);
+        }
+        
         setLoading(false);
       }
     );
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        
+        if (!mounted) return;
 
-    return () => subscription.unsubscribe();
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error in getInitialSession:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    getInitialSession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const createOrUpdateProfile = async (user: User) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.firstName 
+            ? `${user.user_metadata.firstName} ${user.user_metadata.lastName || ''}`.trim()
+            : user.user_metadata?.name || 'Utilisateur',
+          role: user.user_metadata?.role || 'b2c',
+          preferences: user.user_metadata?.preferences || {
+            theme: 'system',
+            language: 'fr',
+            notifications_enabled: true,
+            email_notifications: true
+          }
+        });
+
+      if (error) {
+        console.error('Error updating profile:', error);
+      }
+    } catch (error) {
+      console.error('Error in createOrUpdateProfile:', error);
+    }
+  };
 
   const signUp = async (email: string, password: string, userData?: any) => {
     try {
@@ -82,6 +141,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
       });
+
+      if (!error && data.user) {
+        toast.success('Compte créé avec succès ! Vérifiez votre email pour l\'activer.');
+      }
 
       return { user: data.user, error };
     } catch (error) {
@@ -115,6 +178,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password
       });
 
+      if (!error && data.user) {
+        toast.success('Connexion réussie !');
+      }
+
       return { user: data.user, error };
     } catch (error) {
       console.error('SignIn error:', error);
@@ -128,6 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!error) {
         setUser(null);
         setSession(null);
+        toast.success('Déconnexion réussie');
       }
       return { error };
     } catch (error) {
@@ -142,7 +210,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      
+      if (!error) {
+        toast.success('Email de réinitialisation envoyé !');
+      }
+      
       return { error };
     } catch (error) {
       console.error('Reset password error:', error);
@@ -165,6 +240,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.updateUser({
         data: userData
       });
+      
+      if (!error) {
+        // Also update the profiles table
+        await supabase
+          .from('profiles')
+          .update(userData)
+          .eq('id', user?.id);
+      }
+      
       return { error };
     } catch (error) {
       console.error('Update profile error:', error);
