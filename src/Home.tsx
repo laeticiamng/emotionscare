@@ -1,10 +1,11 @@
 
-import React, { useEffect } from 'react';
-import ImmersiveHome from './pages/ImmersiveHome';
+import React, { useEffect, Suspense } from 'react';
 import MusicDrawer from '@/components/music/player/MusicDrawer';
 import MiniPlayer from '@/components/music/player/MiniPlayer';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logModeSelection } from './utils/modeSelectionLogger';
+import { ImmersiveHome } from '@/utils/lazyRoutes';
+import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -19,7 +20,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="relative">
-      <ImmersiveHome />
+      <Suspense fallback={<ComponentLoadingFallback />}>
+        <ImmersiveHome />
+      </Suspense>
       
       {/* Mini Player fixe en bas à droite */}
       <MiniPlayer onExpand={() => {}} />

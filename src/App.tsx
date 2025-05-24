@@ -5,10 +5,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MusicProvider } from "@/contexts/MusicContext";
+import { Suspense } from "react";
 import Home from "./Home";
-import MeditationPage from "./pages/MeditationPage";
+import { PageLoadingFallback } from "@/components/ui/loading-fallback";
+import { MeditationPage } from "@/utils/lazyRoutes";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+    },
+  },
+});
 
 function App() {
   return (
@@ -18,10 +27,12 @@ function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/meditation" element={<MeditationPage />} />
-            </Routes>
+            <Suspense fallback={<PageLoadingFallback />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/meditation" element={<MeditationPage />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </MusicProvider>
       </TooltipProvider>

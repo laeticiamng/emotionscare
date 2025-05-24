@@ -35,7 +35,9 @@ export default defineConfig(({ mode }) => ({
           ],
           'charts': ['chart.js', 'react-chartjs-2', 'recharts'],
           'animations': ['framer-motion', 'lottie-react'],
-          'utils-heavy': ['three', 'canvas-confetti']
+          'utils-heavy': ['three', 'canvas-confetti'],
+          'meditation': ['./src/components/meditation/GuidedSessionList'],
+          'coach': ['./src/components/coach/EnhancedCoachAI', './src/components/coach/CoachChatInterface']
         }
       }
     },
@@ -43,11 +45,13 @@ export default defineConfig(({ mode }) => ({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
+        drop_console: mode === 'production',
         drop_debugger: true,
+        pure_funcs: mode === 'production' ? ['console.log', 'console.warn'] : [],
       },
     },
     chunkSizeWarningLimit: 1000,
+    sourcemap: mode === 'development',
   },
   optimizeDeps: {
     include: [
