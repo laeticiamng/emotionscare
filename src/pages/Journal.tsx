@@ -1,43 +1,40 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, Calendar, Sparkles, Loader2, Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Plus, Calendar, Heart, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 interface JournalEntry {
   id: string;
-  title: string;
   content: string;
-  mood: number;
-  emotions: string[];
-  date: Date;
+  date: string;
   ai_feedback?: string;
+  mood?: string;
+  tags?: string[];
 }
 
 const Journal: React.FC = () => {
-  const { user } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [newEntry, setNewEntry] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showNewEntry, setShowNewEntry] = useState(false);
-  const [newEntry, setNewEntry] = useState({
-    title: '',
-    content: '',
-    mood: 5
-  });
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedMoodFilter, setSelectedMoodFilter] = useState<number | null>(null);
+  const [selectedMood, setSelectedMood] = useState('');
+  const { user } = useAuth();
+
+  const moods = ['Joyeux', 'Calme', 'Stressé', 'Motivé', 'Fatigué', 'Créatif', 'Pensif'];
 
   useEffect(() => {
-    loadEntries();
-  }, []);
+    if (user) {
+      loadEntries();
+    }
+  }, [user]);
 
   const loadEntries = async () => {
     if (!user) return;
@@ -51,12 +48,7 @@ const Journal: React.FC = () => {
         .order('date', { ascending: false });
 
       if (error) throw error;
-
-      setEntries(data?.map(entry => ({
-        ...entry,
-        date: new Date(entry.date),
-        emotions: Array.isArray(entry.emotions) ? entry.emotions : []
-      })) || []);
+      setEntries(data || []);
     } catch (error) {
       console.error('Erreur chargement journal:', error);
       toast.error('Erreur lors du chargement du journal');
@@ -66,273 +58,215 @@ const Journal: React.FC = () => {
   };
 
   const saveEntry = async () => {
-    if (!user || !newEntry.content.trim()) {
-      toast.error('Veuillez écrire quelque chose');
+    if (!newEntry.trim() || !user) {
+      toast.error('Veuillez saisir du contenu');
       return;
     }
 
-    setIsLoading(true);
+    setIsAnalyzing(true);
     try {
+      const entryData = {
+        user_id: user.id,
+        content: newEntry,
+        date: new Date().toISOString()
+      };
+
       const { data, error } = await supabase
         .from('journal_entries')
-        .insert({
-          user_id: user.id,
-          title: newEntry.title || format(new Date(), 'dd MMMM yyyy', { locale: fr }),
-          content: newEntry.content,
-          mood: newEntry.mood,
-          emotions: [],
-          date: new Date().toISOString()
-        })
+        .insert([entryData])
         .select()
         .single();
 
       if (error) throw error;
 
-      // Obtenir un feedback IA
+      // Analyser avec l'IA
       try {
-        const { data: aiData } = await supabase.functions.invoke('journal-analysis', {
-          body: { content: newEntry.content }
+        const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-journal', {
+          body: { content: newEntry }
         });
 
-        if (aiData?.feedback) {
-          await supabase
+        if (!analysisError && analysisData) {
+          // Mettre à jour l'entrée avec l'analyse IA
+          const { error: updateError } = await supabase
             .from('journal_entries')
-            .update({ ai_feedback: aiData.feedback })
+            .update({ 
+              ai_feedback: analysisData.feedback,
+              mood: analysisData.mood 
+            })
             .eq('id', data.id);
-          
-          data.ai_feedback = aiData.feedback;
+
+          if (!updateError) {
+            data.ai_feedback = analysisData.feedback;
+            data.mood = analysisData.mood;
+          }
         }
-      } catch (aiError) {
-        console.error('Erreur analyse IA:', aiError);
-        // L'erreur IA ne doit pas empêcher la sauvegarde
+      } catch (analysisError) {
+        console.error('Erreur analyse IA:', analysisError);
       }
 
-      const entryToAdd: JournalEntry = {
-        ...data,
-        date: new Date(data.date),
-        emotions: []
-      };
-
-      setEntries(prev => [entryToAdd, ...prev]);
-      setNewEntry({ title: '', content: '', mood: 5 });
-      setShowNewEntry(false);
-      toast.success('Entrée sauvegardée !');
+      setEntries(prev => [data, ...prev]);
+      setNewEntry('');
+      toast.success('Entrée ajoutée avec succès !');
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
       toast.error('Erreur lors de la sauvegarde');
     } finally {
-      setIsLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
   const filteredEntries = entries.filter(entry => {
-    const matchesSearch = entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         entry.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesMood = selectedMoodFilter === null || Math.round(entry.mood) === selectedMoodFilter;
+    const matchesSearch = entry.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesMood = !selectedMood || entry.mood === selectedMood;
     return matchesSearch && matchesMood;
   });
 
-  const getMoodEmoji = (mood: number) => {
-    if (mood <= 2) return '😢';
-    if (mood <= 4) return '😐';
-    if (mood <= 6) return '🙂';
-    if (mood <= 8) return '😊';
-    return '😄';
-  };
-
-  const getMoodColor = (mood: number) => {
-    if (mood <= 2) return 'text-red-500';
-    if (mood <= 4) return 'text-orange-500';
-    if (mood <= 6) return 'text-yellow-500';
-    if (mood <= 8) return 'text-green-500';
-    return 'text-emerald-500';
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-green-500" />
-            <div>
-              <h1 className="text-3xl font-bold">Journal Émotionnel</h1>
-              <p className="text-muted-foreground">
-                Explorez vos pensées et émotions avec l'aide de l'IA
-              </p>
-            </div>
-          </div>
-          <Button onClick={() => setShowNewEntry(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nouvelle entrée
-          </Button>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+          <BookOpen className="h-8 w-8 text-amber-600" />
         </div>
-      </motion.div>
+        <div>
+          <h1 className="text-3xl font-bold">Mon Journal</h1>
+          <p className="text-muted-foreground">Exprimez vos pensées et recevez des insights IA</p>
+        </div>
+      </div>
 
       {/* Nouvelle entrée */}
-      {showNewEntry && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Nouvelle entrée de journal</CardTitle>
-              <CardDescription>
-                Exprimez vos pensées et ressentis d'aujourd'hui
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                placeholder="Titre (optionnel)"
-                value={newEntry.title}
-                onChange={(e) => setNewEntry(prev => ({ ...prev, title: e.target.value }))}
-              />
-              
-              <Textarea
-                placeholder="Comment vous sentez-vous ? Que s'est-il passé aujourd'hui ? Quelles sont vos réflexions ?"
-                value={newEntry.content}
-                onChange={(e) => setNewEntry(prev => ({ ...prev, content: e.target.value }))}
-                className="min-h-[150px]"
-              />
-              
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Humeur générale: {getMoodEmoji(newEntry.mood)} ({newEntry.mood}/10)
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={newEntry.mood}
-                  onChange={(e) => setNewEntry(prev => ({ ...prev, mood: parseInt(e.target.value) }))}
-                  className="w-full"
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Nouvelle entrée
+          </CardTitle>
+          <CardDescription>
+            Partagez vos pensées, sentiments ou expériences du jour
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            placeholder="Écrivez vos pensées ici... Comment vous sentez-vous aujourd'hui ? Qu'avez-vous vécu de marquant ?"
+            value={newEntry}
+            onChange={(e) => setNewEntry(e.target.value)}
+            className="min-h-[120px]"
+          />
+          <Button 
+            onClick={saveEntry} 
+            disabled={!newEntry.trim() || isAnalyzing}
+            className="w-full"
+          >
+            {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isAnalyzing ? 'Analyse en cours...' : 'Ajouter l\'entrée'}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Filtres */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher dans vos entrées..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
                 />
               </div>
-              
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setShowNewEntry(false)}>
-                  Annuler
-                </Button>
-                <Button onClick={saveEntry} disabled={isLoading}>
-                  Sauvegarder
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Filtres et recherche */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Rechercher dans vos entrées..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(mood => (
-                  <Button
-                    key={mood}
-                    size="sm"
-                    variant={selectedMoodFilter === mood ? 'default' : 'outline'}
-                    onClick={() => setSelectedMoodFilter(selectedMoodFilter === mood ? null : mood)}
-                  >
-                    {getMoodEmoji(mood)}
-                  </Button>
-                ))}
-              </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            <div className="flex flex-wrap gap-2">
+              <Badge
+                variant={selectedMood === '' ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => setSelectedMood('')}
+              >
+                Toutes
+              </Badge>
+              {moods.map((mood) => (
+                <Badge
+                  key={mood}
+                  variant={selectedMood === mood ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedMood(selectedMood === mood ? '' : mood)}
+                >
+                  {mood}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Liste des entrées */}
-      <div className="space-y-4">
-        {filteredEntries.map((entry, index) => (
-          <motion.div
-            key={entry.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-          >
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg">{entry.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      {format(entry.date, 'EEEE dd MMMM yyyy', { locale: fr })}
-                      <span className={`ml-2 ${getMoodColor(entry.mood)}`}>
-                        {getMoodEmoji(entry.mood)} {entry.mood}/10
-                      </span>
-                    </CardDescription>
+      {isLoading ? (
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="ml-2">Chargement de votre journal...</span>
+          </CardContent>
+        </Card>
+      ) : filteredEntries.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-8">
+            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">
+              {entries.length === 0 ? 'Votre journal est vide' : 'Aucune entrée trouvée'}
+            </h3>
+            <p className="text-muted-foreground">
+              {entries.length === 0 
+                ? 'Commencez par écrire votre première entrée ci-dessus'
+                : 'Essayez de modifier vos filtres de recherche'
+              }
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {filteredEntries.map((entry) => (
+            <Card key={entry.id}>
+              <CardContent className="pt-6">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span>{formatDate(entry.date)}</span>
+                    {entry.mood && (
+                      <Badge variant="secondary" className="text-xs">
+                        {entry.mood}
+                      </Badge>
+                    )}
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground whitespace-pre-wrap">
-                  {entry.content}
-                </p>
                 
+                <div className="prose prose-sm max-w-none mb-4">
+                  <p className="whitespace-pre-wrap text-foreground">{entry.content}</p>
+                </div>
+
                 {entry.ai_feedback && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <div className="bg-muted/50 p-4 rounded-lg border-l-4 border-primary">
                     <div className="flex items-center gap-2 mb-2">
-                      <Heart className="h-4 w-4 text-blue-500" />
-                      <span className="font-medium text-blue-700 dark:text-blue-300">
-                        Analyse de votre coach IA
-                      </span>
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Analyse IA</span>
                     </div>
-                    <p className="text-sm text-blue-600 dark:text-blue-400">
-                      {entry.ai_feedback}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{entry.ai_feedback}</p>
                   </div>
                 )}
               </CardContent>
             </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      {filteredEntries.length === 0 && !isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
-        >
-          <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-medium mb-2">Aucune entrée trouvée</h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm || selectedMoodFilter ? 
-              'Aucune entrée ne correspond à vos critères de recherche.' :
-              'Commencez votre journal émotionnel en écrivant votre première entrée.'
-            }
-          </p>
-          {!searchTerm && !selectedMoodFilter && (
-            <Button onClick={() => setShowNewEntry(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Écrire ma première entrée
-            </Button>
-          )}
-        </motion.div>
+          ))}
+        </div>
       )}
     </div>
   );

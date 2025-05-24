@@ -1,90 +1,205 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Heart, Send, Loader2, Bot, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Heart, Send, Loader2, Bot, User, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
-  content: string;
+  text: string;
+  sender: 'user' | 'ai';
   timestamp: Date;
 }
 
-const Coach: React.FC = () => {
-  const { user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: `Bonjour ${user?.user_metadata?.name || 'cher utilisateur'} ! Je suis votre coach émotionnel IA. Je suis là pour vous accompagner dans votre parcours de bien-être. Comment vous sentez-vous aujourd'hui ?`,
-      timestamp: new Date()
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+interface Conversation {
+  id: string;
+  title: string;
+  lastMessage: string;
+  updatedAt: Date;
+}
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+const Coach: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [coachingTopics, setCoachingTopics] = useState<string[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+
+  const quickTopics = [
+    'Gestion du stress',
+    'Confiance en soi',
+    'Motivation',
+    'Relations sociales',
+    'Équilibre vie-travail',
+    'Anxiété',
+    'Sommeil',
+    'Méditation'
+  ];
+
+  useEffect(() => {
+    if (user) {
+      loadConversations();
+      initializeWelcomeMessage();
+    }
+  }, [user]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const loadConversations = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      
+      setConversations(data?.map(conv => ({
+        id: conv.id,
+        title: conv.title,
+        lastMessage: conv.last_message || '',
+        updatedAt: new Date(conv.updated_at)
+      })) || []);
+    } catch (error) {
+      console.error('Erreur chargement conversations:', error);
+    }
+  };
+
+  const initializeWelcomeMessage = () => {
+    const welcomeMessage: Message = {
+      id: 'welcome',
+      text: '👋 Bonjour ! Je suis votre coach IA personnel. Je suis là pour vous accompagner dans votre bien-être émotionnel. Comment puis-je vous aider aujourd\'hui ?',
+      sender: 'ai',
+      timestamp: new Date()
+    };
+    setMessages([welcomeMessage]);
+  };
+
+  const startNewConversation = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: user.id,
+          title: 'Nouvelle conversation',
+          last_message: ''
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setCurrentConversationId(data.id);
+      initializeWelcomeMessage();
+      await loadConversations();
+    } catch (error) {
+      console.error('Erreur création conversation:', error);
+      toast.error('Erreur lors de la création de la conversation');
+    }
+  };
+
   const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+    if (!currentMessage.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputMessage,
+      id: `user-${Date.now()}`,
+      text: currentMessage,
+      sender: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    setCurrentMessage('');
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-coach', {
-        body: { 
-          message: inputMessage,
-          conversationHistory: messages.slice(-5) // Garder les 5 derniers messages pour le contexte
+      // Sauvegarder le message utilisateur
+      if (user && currentConversationId) {
+        await supabase.from('chat_messages').insert({
+          conversation_id: currentConversationId,
+          sender: 'user',
+          text: currentMessage,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Obtenir la réponse de l'IA
+      const { data, error } = await supabase.functions.invoke('ai-coach-chat', {
+        body: {
+          message: currentMessage,
+          conversationHistory: messages.slice(-5), // Derniers 5 messages pour le contexte
+          userId: user?.id
         }
       });
 
       if (error) throw error;
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.response,
+      const aiMessage: Message = {
+        id: `ai-${Date.now()}`,
+        text: data.response || 'Désolé, je n\'ai pas pu traiter votre demande.',
+        sender: 'ai',
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, aiMessage]);
+
+      // Sauvegarder la réponse IA
+      if (user && currentConversationId) {
+        await supabase.from('chat_messages').insert({
+          conversation_id: currentConversationId,
+          sender: 'ai',
+          text: aiMessage.text,
+          timestamp: new Date().toISOString()
+        });
+
+        // Mettre à jour la conversation
+        await supabase
+          .from('chat_conversations')
+          .update({
+            last_message: aiMessage.text.slice(0, 100),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentConversationId);
+      }
+
+      await loadConversations();
     } catch (error) {
-      console.error('Erreur coach IA:', error);
-      toast.error('Erreur lors de la communication avec le coach');
+      console.error('Erreur envoi message:', error);
+      toast.error('Erreur lors de l\'envoi du message');
       
-      // Message d'erreur de fallback
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Je suis désolé, je rencontre des difficultés techniques en ce moment. Pouvez-vous reformuler votre question ?',
+        id: `error-${Date.now()}`,
+        text: 'Désolé, une erreur est survenue. Pouvez-vous réessayer ?',
+        sender: 'ai',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleQuickTopic = (topic: string) => {
+    setCurrentMessage(`J'aimerais parler de ${topic.toLowerCase()}`);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -94,159 +209,164 @@ const Coach: React.FC = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <Heart className="h-8 w-8 text-red-500" />
-          <div>
-            <h1 className="text-3xl font-bold">Coach IA Émotionnel</h1>
-            <p className="text-muted-foreground">
-              Votre accompagnateur personnel pour le bien-être émotionnel
-            </p>
-          </div>
-        </div>
-      </motion.div>
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <Card className="h-[600px] flex flex-col">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
-              Conversation avec votre Coach
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="flex-1 flex flex-col">
-            {/* Zone de messages */}
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-              {messages.map((message) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+  return (
+    <div className="container mx-auto p-6 max-w-4xl">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
+          <Heart className="h-8 w-8 text-red-600" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold">Coach IA</h1>
+          <p className="text-muted-foreground">Votre accompagnement personnalisé pour le bien-être</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar avec conversations */}
+        <div className="lg:col-span-1 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Conversations</CardTitle>
+              <Button onClick={startNewConversation} className="w-full">
+                Nouvelle conversation
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {conversations.map((conv) => (
+                <div
+                  key={conv.id}
+                  className={`p-2 rounded cursor-pointer transition-colors ${
+                    currentConversationId === conv.id 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'hover:bg-muted'
+                  }`}
+                  onClick={() => setCurrentConversationId(conv.id)}
                 >
-                  <div className={`flex gap-2 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      message.role === 'user' 
-                        ? 'bg-blue-500' 
-                        : 'bg-red-500'
-                    }`}>
-                      {message.role === 'user' ? (
-                        <User className="h-4 w-4 text-white" />
-                      ) : (
-                        <Bot className="h-4 w-4 text-white" />
-                      )}
-                    </div>
-                    <div className={`p-3 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-blue-500 text-white'
+                  <div className="font-medium text-sm truncate">{conv.title}</div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {conv.lastMessage}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Sujets rapides */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Sujets populaires</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {quickTopics.map((topic) => (
+                  <Badge
+                    key={topic}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => handleQuickTopic(topic)}
+                  >
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Zone de chat principale */}
+        <div className="lg:col-span-3">
+          <Card className="h-[600px] flex flex-col">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Session de coaching
+              </CardTitle>
+              <CardDescription>
+                Partagez vos préoccupations et recevez des conseils personnalisés
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="flex-1 flex flex-col">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex items-start gap-3 ${
+                      message.sender === 'user' ? 'flex-row-reverse' : ''
+                    }`}
+                  >
+                    <div className={`p-2 rounded-full ${
+                      message.sender === 'user' 
+                        ? 'bg-primary text-primary-foreground' 
                         : 'bg-muted'
                     }`}>
-                      <p className="text-sm">{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.role === 'user' ? 'text-blue-100' : 'text-muted-foreground'
+                      {message.sender === 'user' ? (
+                        <User className="h-4 w-4" />
+                      ) : (
+                        <Bot className="h-4 w-4" />
+                      )}
+                    </div>
+                    
+                    <div className={`max-w-[80%] ${
+                      message.sender === 'user' ? 'text-right' : ''
+                    }`}>
+                      <div className={`p-3 rounded-lg ${
+                        message.sender === 'user'
+                          ? 'bg-primary text-primary-foreground ml-auto'
+                          : 'bg-muted'
                       }`}>
-                        {message.timestamp.toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-              
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-start"
-                >
-                  <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
-                      <Bot className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="bg-muted p-3 rounded-lg">
-                      <div className="flex items-center gap-1">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span className="text-sm">Le coach réfléchit...</span>
+                        <p className="whitespace-pre-wrap">{message.text}</p>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {formatTime(message.timestamp)}
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              )}
-              
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Zone de saisie */}
-            <div className="flex gap-2">
-              <Input
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Partagez vos émotions, posez vos questions..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button 
-                onClick={sendMessage} 
-                disabled={isLoading || !inputMessage.trim()}
-                size="icon"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
+                ))}
+                
+                {isLoading && (
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-full bg-muted">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div className="bg-muted p-3 rounded-lg">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                  </div>
                 )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+                
+                <div ref={messagesEndRef} />
+              </div>
 
-      {/* Suggestions rapides */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Suggestions de conversation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {[
-                "Comment puis-je gérer mon stress ?",
-                "J'ai des difficultés à dormir",
-                "Je me sens anxieux dernièrement",
-                "Comment améliorer ma confiance en moi ?",
-                "J'ai des problèmes relationnels",
-                "Comment être plus positif ?"
-              ].map((suggestion, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className="justify-start text-left h-auto p-3 whitespace-normal"
-                  onClick={() => setInputMessage(suggestion)}
+              {/* Zone de saisie */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Tapez votre message..."
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   disabled={isLoading}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={sendMessage} 
+                  disabled={!currentMessage.trim() || isLoading}
                 >
-                  {suggestion}
+                  <Send className="h-4 w-4" />
                 </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

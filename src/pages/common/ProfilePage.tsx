@@ -1,273 +1,287 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { User, Mail, Building, Save, Camera, Shield } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { User, Mail, Building, Save, Camera } from 'lucide-react';
-import { toast } from 'sonner';
-import LoadingAnimation from '@/components/ui/loading-animation';
 
 const ProfilePage: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
   const { userMode } = useUserMode();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+  const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState({
+    name: '',
     email: '',
-    company: ''
+    company: '',
+    department: '',
+    job_title: '',
+    avatar_url: ''
   });
 
   useEffect(() => {
     if (user) {
-      setFormData({
-        firstName: user.user_metadata?.firstName || user.user_metadata?.name?.split(' ')[0] || '',
-        lastName: user.user_metadata?.lastName || user.user_metadata?.name?.split(' ')[1] || '',
-        email: user.email || '',
-        company: user.user_metadata?.company || ''
-      });
+      loadProfile();
     }
-    setIsLoading(false);
   }, [user]);
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const loadProfile = async () => {
+    if (!user) return;
 
-  const handleSave = async () => {
-    setIsSaving(true);
     try {
-      // Dans un environnement réel, on appellerait updateUser avec les nouvelles données
-      // await updateUser({ ...formData });
-      toast.success('Profil mis à jour avec succès !');
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (data) {
+        setProfile({
+          name: data.name || '',
+          email: data.email || user.email || '',
+          company: data.company || '',
+          department: data.department || '',
+          job_title: data.job_title || '',
+          avatar_url: data.avatar_url || ''
+        });
+      } else {
+        // Créer un profil de base
+        setProfile(prev => ({
+          ...prev,
+          email: user.email || ''
+        }));
+      }
     } catch (error) {
-      toast.error('Erreur lors de la mise à jour du profil');
-    } finally {
-      setIsSaving(false);
+      console.error('Erreur chargement profil:', error);
+      toast.error('Erreur lors du chargement du profil');
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement de votre profil..." />
-      </div>
-    );
-  }
+  const saveProfile = async () => {
+    if (!user) return;
 
-  const isDemo = user?.email?.endsWith('@exemple.fr');
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          name: profile.name,
+          email: profile.email,
+          company: profile.company,
+          department: profile.department,
+          job_title: profile.job_title,
+          avatar_url: profile.avatar_url,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast.success('Profil mis à jour avec succès !');
+    } catch (error) {
+      console.error('Erreur sauvegarde profil:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getRoleBadge = () => {
+    const roleConfig = {
+      'b2c': { label: 'Particulier', color: 'bg-blue-100 text-blue-800' },
+      'b2b_user': { label: 'Collaborateur', color: 'bg-green-100 text-green-800' },
+      'b2b_admin': { label: 'Administrateur', color: 'bg-purple-100 text-purple-800' }
+    };
+
+    const config = roleConfig[userMode as keyof typeof roleConfig] || roleConfig['b2c'];
+    
+    return (
+      <Badge className={config.color}>
+        {config.label}
+      </Badge>
+    );
+  };
 
   return (
-    <div className="container mx-auto p-6 space-y-8 max-w-4xl">
-      {/* En-tête */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">Mon Profil</h1>
-          <p className="text-muted-foreground">
-            Gérez vos informations personnelles et préférences
-          </p>
+    <div className="container mx-auto p-6 max-w-2xl space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+          <User className="h-8 w-8 text-blue-600" />
         </div>
-      </motion.div>
+        <div>
+          <h1 className="text-3xl font-bold">Mon Profil</h1>
+          <p className="text-muted-foreground">Gérez vos informations personnelles</p>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Photo de profil */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Photo de profil</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <div className="mx-auto w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-4xl font-bold">
-                {formData.firstName && formData.lastName 
-                  ? `${formData.firstName[0]}${formData.lastName[0]}`
-                  : user?.email?.[0]?.toUpperCase() || 'U'
-                }
-              </div>
-              <Button variant="outline" size="sm" disabled={isDemo}>
-                <Camera className="h-4 w-4 mr-2" />
-                Changer la photo
-              </Button>
-              {isDemo && (
-                <p className="text-xs text-muted-foreground">
-                  Modification désactivée en mode démo
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Informations personnelles */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="lg:col-span-2"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Informations personnelles
-              </CardTitle>
+      {/* Informations de base */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Informations personnelles</CardTitle>
               <CardDescription>
-                Mettez à jour vos informations de profil
+                Vos données de profil et préférences
               </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    disabled={isDemo}
+            </div>
+            {getRoleBadge()}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Avatar */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+                {profile.avatar_url ? (
+                  <img 
+                    src={profile.avatar_url} 
+                    alt="Avatar" 
+                    className="w-full h-full rounded-full object-cover"
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    disabled={isDemo}
-                  />
-                </div>
+                ) : (
+                  <User className="h-8 w-8 text-muted-foreground" />
+                )}
               </div>
+              <Button
+                size="icon"
+                variant="outline"
+                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full"
+              >
+                <Camera className="h-4 w-4" />
+              </Button>
+            </div>
+            <div>
+              <h3 className="font-medium">{profile.name || 'Nom non défini'}</h3>
+              <p className="text-sm text-muted-foreground">{profile.email}</p>
+            </div>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="pl-10"
-                    disabled={true} // L'email ne peut généralement pas être modifié
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Contactez l'administrateur pour modifier votre adresse email
-                </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="name">Nom complet</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="name"
+                  placeholder="Votre nom complet"
+                  value={profile.name}
+                  onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                  className="pl-10"
+                />
               </div>
+            </div>
 
-              {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
-                <div className="space-y-2">
-                  <Label htmlFor="company">Entreprise</Label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={profile.email}
+                  onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
+                  className="pl-10"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Informations professionnelles pour B2B */}
+          {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
+            <>
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-3">Informations professionnelles</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="company">Entreprise</Label>
+                    <div className="relative">
+                      <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="company"
+                        placeholder="Nom de votre entreprise"
+                        value={profile.company}
+                        onChange={(e) => setProfile(prev => ({ ...prev, company: e.target.value }))}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="job_title">Poste</Label>
                     <Input
-                      id="company"
-                      value={formData.company}
-                      onChange={(e) => handleInputChange('company', e.target.value)}
-                      className="pl-10"
-                      disabled={isDemo}
+                      id="job_title"
+                      placeholder="Votre poste"
+                      value={profile.job_title}
+                      onChange={(e) => setProfile(prev => ({ ...prev, job_title: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Label htmlFor="department">Département</Label>
+                    <Input
+                      id="department"
+                      placeholder="Votre département"
+                      value={profile.department}
+                      onChange={(e) => setProfile(prev => ({ ...prev, department: e.target.value }))}
                     />
                   </div>
                 </div>
-              )}
+              </div>
+            </>
+          )}
 
-              <div className="pt-4">
-                <Button 
-                  onClick={handleSave} 
-                  disabled={isSaving || isDemo}
-                  className="w-full"
-                >
-                  {isSaving && <Save className="mr-2 h-4 w-4 animate-spin" />}
-                  Sauvegarder les modifications
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+          <Button onClick={saveProfile} disabled={isLoading} className="w-full">
+            <Save className="mr-2 h-4 w-4" />
+            {isLoading ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
+          </Button>
+        </CardContent>
+      </Card>
 
-      {/* Informations du compte */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Informations du compte</CardTitle>
-            <CardDescription>
-              Détails de votre compte EmotionsCare
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-sm font-medium">Type de compte</div>
-                <div className="text-sm text-muted-foreground">
-                  {userMode === 'b2c' ? 'Particulier' :
-                   userMode === 'b2b_user' ? 'Collaborateur B2B' :
-                   userMode === 'b2b_admin' ? 'Administrateur B2B' : 'Non défini'}
-                </div>
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-sm font-medium">Statut</div>
-                <div className="text-sm text-muted-foreground">
-                  {isDemo ? 'Compte démo' : 'Compte actif'}
-                </div>
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-sm font-medium">Membre depuis</div>
-                <div className="text-sm text-muted-foreground">
-                  {user?.created_at 
-                    ? new Date(user.created_at).toLocaleDateString('fr-FR')
-                    : 'Date inconnue'
-                  }
-                </div>
-              </div>
+      {/* Sécurité */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Sécurité
+          </CardTitle>
+          <CardDescription>
+            Gérez la sécurité de votre compte
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div>
+              <h4 className="font-medium">Mot de passe</h4>
+              <p className="text-sm text-muted-foreground">
+                Dernière modification il y a plus de 30 jours
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            <Button variant="outline">
+              Modifier
+            </Button>
+          </div>
 
-      {/* Zone dangereuse */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Card className="border-red-200">
-          <CardHeader>
-            <CardTitle className="text-red-600">Zone dangereuse</CardTitle>
-            <CardDescription>
-              Actions irréversibles sur votre compte
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center p-4 border border-red-200 rounded-lg">
-              <div>
-                <h4 className="font-medium text-red-600">Supprimer le compte</h4>
-                <p className="text-sm text-muted-foreground">
-                  Supprime définitivement votre compte et toutes vos données
-                </p>
-              </div>
-              <Button variant="destructive" disabled={isDemo}>
-                Supprimer le compte
-              </Button>
+          <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div>
+              <h4 className="font-medium">Authentification à deux facteurs</h4>
+              <p className="text-sm text-muted-foreground">
+                Sécurisez votre compte avec la 2FA
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            <Button variant="outline">
+              Configurer
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

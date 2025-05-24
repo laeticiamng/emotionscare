@@ -7,13 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Shield } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowLeft, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2BAdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
@@ -30,10 +29,10 @@ const B2BAdminLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast.error('Erreur de connexion: ' + error.message);
+        toast.error('Erreur: ' + error.message);
       } else {
         setUserMode('b2b_admin');
-        toast.success('Connexion administrateur réussie !');
+        toast.success('Connexion réussie !');
         navigate('/b2b/admin/dashboard');
       }
     } catch (error) {
@@ -44,13 +43,13 @@ const B2BAdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 dark:from-purple-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <Card className="w-full max-w-md border-slate-200">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center relative">
             <Button
               variant="ghost"
@@ -60,12 +59,12 @@ const B2BAdminLoginPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="mx-auto mb-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-full w-fit">
-              <Shield className="h-8 w-8 text-slate-700 dark:text-slate-300" />
+            <div className="mx-auto mb-4 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full w-fit">
+              <Building2 className="h-8 w-8 text-purple-500" />
             </div>
             <CardTitle className="text-2xl">Connexion Administrateur</CardTitle>
             <CardDescription>
-              Accès sécurisé à l'interface d'administration EmotionsCare
+              Accédez à l'interface d'administration EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -82,51 +81,48 @@ const B2BAdminLoginPage: React.FC = () => {
                     required
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Mot de passe administrateur"
+                    type="password"
+                    placeholder="Mot de passe"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pl-10"
                     required
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1 h-8 w-8"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
                 </div>
               </div>
               
-              <Button type="submit" className="w-full bg-slate-800 hover:bg-slate-700" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Accès administrateur
+                Se connecter
               </Button>
             </form>
             
-            <div className="space-y-4 mt-6">
+            <div className="mt-6 space-y-4">
               <div className="text-center">
                 <Link 
-                  to="/b2b/user/login" 
-                  className="text-sm text-muted-foreground hover:text-primary"
+                  to="/b2c/reset-password" 
+                  className="text-sm text-primary hover:underline"
                 >
-                  Accès collaborateur
+                  Mot de passe oublié ?
                 </Link>
               </div>
               
-              <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg">
-                <p className="text-xs text-muted-foreground text-center">
-                  ⚠️ Accès réservé aux administrateurs autorisés
-                </p>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Compte démo disponible
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-center text-xs text-muted-foreground">
+                <p>admin@exemple.fr / demo123</p>
               </div>
             </div>
           </CardContent>

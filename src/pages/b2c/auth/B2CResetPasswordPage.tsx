@@ -18,6 +18,7 @@ const B2CResetPasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!email) {
       toast.error('Veuillez saisir votre adresse email');
       return;
@@ -26,6 +27,7 @@ const B2CResetPasswordPage: React.FC = () => {
     setIsLoading(true);
     try {
       const { error } = await resetPassword(email);
+      
       if (error) {
         toast.error('Erreur: ' + error.message);
       } else {
@@ -39,8 +41,39 @@ const B2CResetPasswordPage: React.FC = () => {
     }
   };
 
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-full w-fit">
+                <Mail className="h-8 w-8 text-green-500" />
+              </div>
+              <CardTitle className="text-2xl">Email envoyé !</CardTitle>
+              <CardDescription>
+                Vérifiez votre boîte mail pour réinitialiser votre mot de passe
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button asChild className="w-full">
+                <Link to="/b2c/login">
+                  Retour à la connexion
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-red-900 dark:via-slate-800 dark:to-pink-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -56,57 +89,35 @@ const B2CResetPasswordPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="mx-auto mb-4 p-3 bg-red-100 dark:bg-red-900/30 rounded-full w-fit">
-              <Heart className="h-8 w-8 text-red-500" />
+            <div className="mx-auto mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
+              <Heart className="h-8 w-8 text-blue-500" />
             </div>
-            <CardTitle className="text-2xl">
-              {emailSent ? 'Email envoyé' : 'Mot de passe oublié ?'}
-            </CardTitle>
+            <CardTitle className="text-2xl">Mot de passe oublié</CardTitle>
             <CardDescription>
-              {emailSent 
-                ? 'Vérifiez votre boîte email pour réinitialiser votre mot de passe'
-                : 'Saisissez votre email pour recevoir un lien de réinitialisation'
-              }
+              Entrez votre email pour recevoir un lien de réinitialisation
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!emailSent ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Envoyer le lien de réinitialisation
-                </Button>
-              </form>
-            ) : (
-              <div className="text-center space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Un email a été envoyé à <strong>{email}</strong>
-                </p>
-                <Button
-                  onClick={() => setEmailSent(false)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Renvoyer l'email
-                </Button>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  required
+                />
               </div>
-            )}
+              
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Envoyer le lien
+              </Button>
+            </form>
             
-            <div className="text-center mt-6">
+            <div className="mt-6 text-center">
               <Link 
                 to="/b2c/login" 
                 className="text-sm text-primary hover:underline"

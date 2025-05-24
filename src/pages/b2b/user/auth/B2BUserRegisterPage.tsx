@@ -15,7 +15,6 @@ const B2BUserRegisterPage: React.FC = () => {
     name: '',
     email: '',
     company: '',
-    department: '',
     password: '',
     confirmPassword: ''
   });
@@ -24,21 +23,9 @@ const B2BUserRegisterPage: React.FC = () => {
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.password || !formData.company) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
     if (formData.password !== formData.confirmPassword) {
       toast.error('Les mots de passe ne correspondent pas');
       return;
@@ -54,7 +41,6 @@ const B2BUserRegisterPage: React.FC = () => {
       const { error } = await signUp(formData.email, formData.password, {
         name: formData.name,
         company: formData.company,
-        department: formData.department,
         role: 'b2b_user'
       });
       
@@ -62,11 +48,11 @@ const B2BUserRegisterPage: React.FC = () => {
         toast.error('Erreur: ' + error.message);
       } else {
         setUserMode('b2b_user');
-        toast.success('Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.');
+        toast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
         navigate('/b2b/user/dashboard');
       }
     } catch (error) {
-      toast.error('Erreur lors de la création du compte');
+      toast.error('Erreur lors de l\'inscription');
     } finally {
       setIsLoading(false);
     }
@@ -92,9 +78,9 @@ const B2BUserRegisterPage: React.FC = () => {
             <div className="mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-full w-fit">
               <Users className="h-8 w-8 text-green-500" />
             </div>
-            <CardTitle className="text-2xl">Rejoindre en tant que Collaborateur</CardTitle>
+            <CardTitle className="text-2xl">Créer un compte collaborateur</CardTitle>
             <CardDescription>
-              Créez votre compte collaborateur EmotionsCare
+              Rejoignez votre équipe sur EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -104,10 +90,9 @@ const B2BUserRegisterPage: React.FC = () => {
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    name="name"
-                    placeholder="Nom complet"
+                    placeholder="Votre nom complet"
                     value={formData.name}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="pl-10"
                     required
                   />
@@ -116,10 +101,9 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="email"
-                    name="email"
-                    placeholder="email@entreprise.com"
+                    placeholder="votre.email@entreprise.com"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className="pl-10"
                     required
                   />
@@ -128,33 +112,20 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    name="company"
-                    placeholder="Nom de l'entreprise"
+                    placeholder="Nom de votre entreprise"
                     value={formData.company}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, company: e.target.value})}
                     className="pl-10"
                     required
-                  />
-                </div>
-                <div className="relative">
-                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    name="department"
-                    placeholder="Département (optionnel)"
-                    value={formData.department}
-                    onChange={handleChange}
-                    className="pl-10"
                   />
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="password"
-                    name="password"
-                    placeholder="Mot de passe (min. 6 caractères)"
+                    placeholder="Mot de passe"
                     value={formData.password}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
                     className="pl-10"
                     required
                   />
@@ -163,10 +134,9 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="password"
-                    name="confirmPassword"
                     placeholder="Confirmer le mot de passe"
                     value={formData.confirmPassword}
-                    onChange={handleChange}
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                     className="pl-10"
                     required
                   />
@@ -175,7 +145,7 @@ const B2BUserRegisterPage: React.FC = () => {
               
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Créer mon compte collaborateur
+                Créer mon compte
               </Button>
             </form>
             

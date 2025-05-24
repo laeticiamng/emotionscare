@@ -1,323 +1,326 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
-  HelpCircle, Search, MessageCircle, BookOpen, 
-  Mail, Phone, Clock, Users, ChevronDown, ChevronRight 
+  HelpCircle, 
+  Search, 
+  ChevronDown, 
+  MessageSquare, 
+  Mail, 
+  Phone, 
+  BookOpen,
+  Brain,
+  Heart,
+  Music,
+  Users,
+  Send
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const HelpPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [contactForm, setContactForm] = useState({
     subject: '',
-    message: ''
+    message: '',
+    email: ''
   });
+  const [openFAQ, setOpenFAQ] = useState<string | null>(null);
 
-  const faqItems = [
+  const faqCategories = [
     {
-      question: 'Comment fonctionne le scanner d\'émotions ?',
-      answer: 'Notre scanner d\'émotions utilise l\'IA pour analyser vos textes, votre voix ou vos réactions. Il identifie les émotions dominantes et vous propose des recommandations personnalisées pour améliorer votre bien-être.'
-    },
-    {
-      question: 'Mes données sont-elles sécurisées ?',
-      answer: 'Absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations personnelles sans votre consentement explicite.'
-    },
-    {
-      question: 'Comment fonctionne l\'essai gratuit ?',
-      answer: 'L\'essai gratuit de 3 jours vous donne accès à toutes les fonctionnalités premium d\'EmotionsCare. Aucune carte de crédit n\'est requise pour commencer.'
-    },
-    {
-      question: 'Puis-je utiliser EmotionsCare sur mobile ?',
-      answer: 'Oui, EmotionsCare est optimisé pour tous les appareils. Vous pouvez accéder à toutes les fonctionnalités depuis votre smartphone, tablette ou ordinateur.'
-    },
-    {
-      question: 'Comment inviter mes collègues (compte B2B) ?',
-      answer: 'Les administrateurs peuvent inviter des collaborateurs depuis la section "Gestion des utilisateurs". Une invitation par email sera envoyée avec les instructions de connexion.'
-    }
-  ];
-
-  const contactChannels = [
-    {
-      icon: Mail,
-      title: 'Email',
-      description: 'Contactez-nous par email',
-      value: 'support@emotionscare.fr',
-      action: () => window.open('mailto:support@emotionscare.fr')
-    },
-    {
-      icon: MessageCircle,
-      title: 'Chat en direct',
-      description: 'Discutez avec notre équipe',
-      value: 'Disponible 9h-18h',
-      action: () => toast.info('Chat en direct bientôt disponible')
-    },
-    {
-      icon: Phone,
-      title: 'Téléphone',
-      description: 'Appelez notre support',
-      value: '+33 1 23 45 67 89',
-      action: () => window.open('tel:+33123456789')
-    },
-    {
+      id: 'getting-started',
+      title: 'Premiers pas',
       icon: BookOpen,
-      title: 'Documentation',
-      description: 'Consultez notre guide',
-      value: 'Guide complet',
-      action: () => toast.info('Documentation en ligne bientôt disponible')
+      questions: [
+        {
+          id: 'what-is-emotionscare',
+          question: 'Qu\'est-ce qu\'EmotionsCare ?',
+          answer: 'EmotionsCare est une plateforme de bien-être émotionnel alimentée par l\'IA qui vous aide à comprendre, analyser et améliorer votre état émotionnel grâce à des outils innovants comme le scanner d\'émotions, le coach IA, et la musique thérapeutique.'
+        },
+        {
+          id: 'how-to-start',
+          question: 'Comment commencer ?',
+          answer: 'Après votre inscription, suivez le processus d\'onboarding qui vous présente les différentes fonctionnalités. Commencez par scanner vos émotions pour établir une base, puis explorez le coach IA et les autres outils.'
+        },
+        {
+          id: 'free-trial',
+          question: 'Comment fonctionne la période d\'essai gratuite ?',
+          answer: 'Vous bénéficiez de 3 jours d\'accès complet à toutes les fonctionnalités premium. Aucune carte bancaire n\'est requise pour démarrer votre essai.'
+        }
+      ]
+    },
+    {
+      id: 'emotion-scanner',
+      title: 'Scanner d\'émotions',
+      icon: Brain,
+      questions: [
+        {
+          id: 'how-scanner-works',
+          question: 'Comment fonctionne le scanner d\'émotions ?',
+          answer: 'Le scanner analyse vos textes, émojis et bientôt votre voix pour identifier votre état émotionnel. Il utilise l\'IA avancée pour fournir des insights précis sur votre humeur et des recommandations personnalisées.'
+        },
+        {
+          id: 'accuracy',
+          question: 'Quelle est la précision des analyses ?',
+          answer: 'Nos analyses atteignent généralement 80-90% de précision. Plus vous utilisez l\'outil, plus il s\'améliore en apprenant vos patterns émotionnels.'
+        },
+        {
+          id: 'data-privacy',
+          question: 'Mes données émotionnelles sont-elles sécurisées ?',
+          answer: 'Oui, toutes vos données sont chiffrées et stockées de manière sécurisée. Nous ne partageons jamais vos informations personnelles avec des tiers.'
+        }
+      ]
+    },
+    {
+      id: 'ai-coach',
+      title: 'Coach IA',
+      icon: Heart,
+      questions: [
+        {
+          id: 'coach-capabilities',
+          question: 'Que peut faire le coach IA ?',
+          answer: 'Le coach IA peut vous aider avec la gestion du stress, l\'anxiété, la motivation, les relations, l\'équilibre vie-travail et bien plus. Il adapte ses conseils à votre situation personnelle.'
+        },
+        {
+          id: 'coach-vs-therapist',
+          question: 'Le coach IA remplace-t-il un thérapeute ?',
+          answer: 'Non, le coach IA est un outil de soutien et ne remplace pas un professionnel de la santé mentale. Pour des problèmes sérieux, consultez toujours un professionnel qualifié.'
+        }
+      ]
+    },
+    {
+      id: 'music-therapy',
+      title: 'Musique thérapeutique',
+      icon: Music,
+      questions: [
+        {
+          id: 'music-generation',
+          question: 'Comment la musique est-elle générée ?',
+          answer: 'Notre IA analyse votre état émotionnel et génère de la musique personnalisée adaptée à vos besoins. Vous pouvez spécifier l\'émotion souhaitée et le type de musique.'
+        },
+        {
+          id: 'music-formats',
+          question: 'Dans quels formats puis-je télécharger la musique ?',
+          answer: 'La musique générée est disponible en MP3 haute qualité. Vous pouvez l\'écouter en streaming ou la télécharger pour une utilisation hors ligne.'
+        }
+      ]
+    },
+    {
+      id: 'b2b',
+      title: 'Solutions entreprise',
+      icon: Users,
+      questions: [
+        {
+          id: 'b2b-features',
+          question: 'Quelles fonctionnalités sont disponibles pour les entreprises ?',
+          answer: 'Les entreprises bénéficient d\'analytics avancés, de tableaux de bord administrateur, de gestion d\'équipes, et de rapports sur le bien-être des collaborateurs.'
+        },
+        {
+          id: 'employee-privacy',
+          question: 'Comment la vie privée des employés est-elle protégée ?',
+          answer: 'Les données individuelles restent anonymisées pour les administrateurs. Seuls les trends globaux et statistiques agrégées sont visibles.'
+        }
+      ]
     }
   ];
 
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!contactForm.subject || !contactForm.message) {
+  const filteredFAQs = faqCategories.map(category => ({
+    ...category,
+    questions: category.questions.filter(
+      q => q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           q.answer.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  })).filter(category => category.questions.length > 0);
+
+  const sendMessage = async () => {
+    if (!contactForm.subject.trim() || !contactForm.message.trim()) {
       toast.error('Veuillez remplir tous les champs');
       return;
     }
-    
-    // Simuler l'envoi du message
-    toast.success('Message envoyé ! Nous vous répondrons dans les plus brefs délais.');
-    setContactForm({ subject: '', message: '' });
+
+    try {
+      // Simuler l'envoi du message
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Message envoyé ! Nous vous répondrons sous 24h.');
+      setContactForm({ subject: '', message: '', email: '' });
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi du message');
+    }
   };
 
-  const filteredFaq = faqItems.filter(item =>
-    item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.answer.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
-    <div className="container mx-auto p-6 space-y-8 max-w-6xl">
-      {/* En-tête */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
-            <HelpCircle className="h-8 w-8" />
-            Centre d'aide
-          </h1>
-          <p className="text-muted-foreground">
-            Trouvez des réponses à vos questions ou contactez notre équipe de support
-          </p>
+    <div className="container mx-auto p-6 max-w-4xl space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+          <HelpCircle className="h-8 w-8 text-green-600" />
         </div>
-      </motion.div>
+        <div>
+          <h1 className="text-3xl font-bold">Centre d'aide</h1>
+          <p className="text-muted-foreground">Trouvez rapidement les réponses à vos questions</p>
+        </div>
+      </div>
 
       {/* Recherche */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <Card>
-          <CardContent className="p-6">
-            <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher dans l'aide..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 text-base h-12"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher dans l'aide..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* FAQ */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="lg:col-span-2"
-        >
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-2xl font-bold">Questions fréquentes</h2>
+          
+          {filteredFAQs.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-8">
+                <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Aucun résultat trouvé</h3>
+                <p className="text-muted-foreground">
+                  Essayez d'autres termes de recherche ou contactez notre support
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredFAQs.map((category) => (
+              <Card key={category.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <category.icon className="h-5 w-5" />
+                    {category.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {category.questions.map((faq) => (
+                    <Collapsible
+                      key={faq.id}
+                      open={openFAQ === faq.id}
+                      onOpenChange={() => setOpenFAQ(openFAQ === faq.id ? null : faq.id)}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between p-3 h-auto text-left"
+                        >
+                          <span className="font-medium">{faq.question}</span>
+                          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="px-3 pb-3">
+                        <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+
+        {/* Contact et ressources */}
+        <div className="space-y-4">
+          {/* Contact rapide */}
           <Card>
             <CardHeader>
-              <CardTitle>Questions fréquentes</CardTitle>
+              <CardTitle>Besoin d'aide ?</CardTitle>
               <CardDescription>
-                Trouvez rapidement des réponses aux questions les plus courantes
+                Notre équipe est là pour vous aider
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {filteredFaq.map((faq, index) => (
-                  <div key={index} className="border rounded-lg">
-                    <button
-                      onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                      className="w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
-                    >
-                      <span className="font-medium">{faq.question}</span>
-                      {expandedFaq === index ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
-                    </button>
-                    {expandedFaq === index && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="px-4 pb-4"
-                      >
-                        <p className="text-muted-foreground">{faq.answer}</p>
-                      </motion.div>
-                    )}
-                  </div>
-                ))}
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3 p-3 border rounded-lg">
+                <Mail className="h-5 w-5 text-primary" />
+                <div>
+                  <div className="font-medium">Email</div>
+                  <div className="text-sm text-muted-foreground">support@emotionscare.fr</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 border rounded-lg">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                <div>
+                  <div className="font-medium">Chat en direct</div>
+                  <div className="text-sm text-muted-foreground">Disponible 9h-18h</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 border rounded-lg">
+                <Phone className="h-5 w-5 text-primary" />
+                <div>
+                  <div className="font-medium">Téléphone</div>
+                  <div className="text-sm text-muted-foreground">+33 1 23 45 67 89</div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
 
-        {/* Canaux de contact */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
+          {/* Formulaire de contact */}
           <Card>
             <CardHeader>
               <CardTitle>Nous contacter</CardTitle>
               <CardDescription>
-                Plusieurs moyens de nous joindre
+                Envoyez-nous un message
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {contactChannels.map((channel, index) => {
-                const Icon = channel.icon;
-                return (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    onClick={channel.action}
-                    className="w-full h-auto p-4 flex flex-col items-start gap-2"
-                  >
-                    <div className="flex items-center gap-2 w-full">
-                      <Icon className="h-5 w-5" />
-                      <span className="font-medium">{channel.title}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground text-left">
-                      {channel.description}
-                    </p>
-                    <p className="text-sm font-medium text-primary">
-                      {channel.value}
-                    </p>
-                  </Button>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Formulaire de contact */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              Envoyer un message
-            </CardTitle>
-            <CardDescription>
-              Décrivez votre problème ou votre question, nous vous répondrons rapidement
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="subject" className="text-sm font-medium">
-                    Sujet
-                  </label>
-                  <Input
-                    id="subject"
-                    placeholder="Décrivez brièvement votre demande"
-                    value={contactForm.subject}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Temps de réponse estimé
-                  </label>
-                  <p className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
-                    Sous 24h en jours ouvrés
-                  </p>
-                </div>
-              </div>
+              <Input
+                placeholder="Sujet de votre message"
+                value={contactForm.subject}
+                onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+              />
               
-              <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-medium">
-                  Message
-                </label>
-                <Textarea
-                  id="message"
-                  placeholder="Décrivez votre problème ou votre question en détail..."
-                  className="min-h-[120px]"
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                />
-              </div>
+              <Textarea
+                placeholder="Décrivez votre problème ou question..."
+                value={contactForm.message}
+                onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                className="min-h-[100px]"
+              />
               
-              <Button type="submit" className="w-full">
-                <MessageCircle className="h-4 w-4 mr-2" />
+              <Button onClick={sendMessage} className="w-full">
+                <Send className="mr-2 h-4 w-4" />
                 Envoyer le message
               </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
 
-      {/* Informations sur le support */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-      >
-        <Card className="bg-muted/50">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <Clock className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                <h3 className="font-medium mb-1">Horaires de support</h3>
-                <p className="text-sm text-muted-foreground">
-                  Lundi - Vendredi<br />
-                  9h00 - 18h00 (CET)
-                </p>
-              </div>
-              <div>
-                <Users className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                <h3 className="font-medium mb-1">Équipe dédiée</h3>
-                <p className="text-sm text-muted-foreground">
-                  Experts en bien-être<br />
-                  et support technique
-                </p>
-              </div>
-              <div>
-                <MessageCircle className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <h3 className="font-medium mb-1">Réponse rapide</h3>
-                <p className="text-sm text-muted-foreground">
-                  Réponse garantie<br />
-                  sous 24h ouvrées
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          {/* Ressources utiles */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Ressources utiles</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button variant="ghost" className="w-full justify-start">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Guide de démarrage
+              </Button>
+              
+              <Button variant="ghost" className="w-full justify-start">
+                <Heart className="mr-2 h-4 w-4" />
+                Conseils bien-être
+              </Button>
+              
+              <Button variant="ghost" className="w-full justify-start">
+                <Users className="mr-2 h-4 w-4" />
+                Communauté
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

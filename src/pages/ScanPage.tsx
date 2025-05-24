@@ -1,38 +1,84 @@
 
-import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Brain, Mic, MicOff, Loader2, Heart, Music } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Brain, Mic, Camera, Upload, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface EmotionResult {
+  emotion: string;
+  confidence: number;
+  intensity: number;
+  analysis: string;
+  recommendations: string[];
+}
 
 const ScanPage: React.FC = () => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [textInput, setTextInput] = useState('');
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [recordingError, setRecordingError] = useState('');
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [analysisHistory, setAnalysisHistory] = useState<EmotionResult[]>([]);
+  const { user } = useAuth();
 
-  const analyzeText = async () => {
-    if (!textInput.trim()) {
-      toast.error('Veuillez saisir du texte à analyser');
+  const emotions = [
+    '😊', '😢', '😡', '😰', '😴', '🤔', '😍', '🤗',
+    '😌', '😓', '😤', '🥺', '😆', '😔', '🙄', '😎'
+  ];
+
+  const handleEmojiClick = (emoji: string) => {
+    setSelectedEmojis(prev => 
+      prev.includes(emoji) 
+        ? prev.filter(e => e !== emoji)
+        : [...prev, emoji]
+    );
+  };
+
+  const analyzeEmotion = async () => {
+    if (!textInput.trim() && selectedEmojis.length === 0) {
+      toast.error('Veuillez saisir du texte ou sélectionner des émojis');
       return;
     }
 
     setIsAnalyzing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('emotion-analysis', {
-        body: { text: textInput, type: 'text' }
+      const { data, error } = await supabase.functions.invoke('analyze-emotion', {
+        body: {
+          text: textInput,
+          emojis: selectedEmojis,
+          userId: user?.id
+        }
       });
 
       if (error) throw error;
 
-      setAnalysisResult(data);
+      const emotionResult: EmotionResult = {
+        emotion: data.emotion || 'Neutre',
+        confidence: data.confidence || 0.8,
+        intensity: data.intensity || 5,
+        analysis: data.analysis || 'Analyse en cours...',
+        recommendations: data.recommendations || []
+      };
+
+      setResult(emotionResult);
+      setAnalysisHistory(prev => [emotionResult, ...prev.slice(0, 4)]);
+
+      // Sauvegarder dans la base de données
+      if (user) {
+        await supabase.from('emotions').insert({
+          user_id: user.id,
+          text: textInput,
+          emojis: selectedEmojis.join(''),
+          score: emotionResult.intensity,
+          ai_feedback: emotionResult.analysis,
+          date: new Date().toISOString()
+        });
+      }
+
       toast.success('Analyse émotionnelle terminée !');
     } catch (error) {
       console.error('Erreur analyse:', error);
@@ -42,254 +88,199 @@ const ScanPage: React.FC = () => {
     }
   };
 
-  const startRecording = async () => {
-    setRecordingError('');
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await analyzeAudio(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-      toast.info('Enregistrement en cours...');
-    } catch (error) {
-      console.error('Erreur microphone:', error);
-      setRecordingError('Impossible d\'accéder au microphone. Vérifiez vos permissions.');
-    }
+  const resetScan = () => {
+    setTextInput('');
+    setSelectedEmojis([]);
+    setResult(null);
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      setIsAnalyzing(true);
-    }
-  };
-
-  const analyzeAudio = async (audioBlob: Blob) => {
-    try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Audio = (reader.result as string).split(',')[1];
-        
-        const { data, error } = await supabase.functions.invoke('emotion-analysis', {
-          body: { audio: base64Audio, type: 'audio' }
-        });
-
-        if (error) throw error;
-
-        setAnalysisResult(data);
-        toast.success('Analyse vocale terminée !');
-      };
-      reader.readAsDataURL(audioBlob);
-    } catch (error) {
-      console.error('Erreur analyse audio:', error);
-      toast.error('Erreur lors de l\'analyse vocale');
-    } finally {
-      setIsAnalyzing(false);
-    }
+  const getEmotionColor = (emotion: string) => {
+    const colors: Record<string, string> = {
+      'Joyeux': 'bg-yellow-100 text-yellow-800 border-yellow-300',
+      'Triste': 'bg-blue-100 text-blue-800 border-blue-300',
+      'Colère': 'bg-red-100 text-red-800 border-red-300',
+      'Anxieux': 'bg-orange-100 text-orange-800 border-orange-300',
+      'Calme': 'bg-green-100 text-green-800 border-green-300',
+      'Neutre': 'bg-gray-100 text-gray-800 border-gray-300'
+    };
+    return colors[emotion] || colors['Neutre'];
   };
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <Brain className="h-8 w-8 text-blue-500" />
-          <div>
-            <h1 className="text-3xl font-bold">Scanner d'Émotions</h1>
-            <p className="text-muted-foreground">
-              Analysez vos émotions grâce à l'intelligence artificielle
-            </p>
-          </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+          <Brain className="h-8 w-8 text-blue-600" />
         </div>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Analyse par texte */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5" />
-                Analyse Textuelle
-              </CardTitle>
-              <CardDescription>
-                Décrivez vos émotions ou votre état d'esprit
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                placeholder="Comment vous sentez-vous ? Décrivez votre humeur, vos pensées..."
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                className="min-h-[120px]"
-              />
-              <Button 
-                onClick={analyzeText} 
-                disabled={isAnalyzing || !textInput.trim()}
-                className="w-full"
-              >
-                {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Analyser mes émotions
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Analyse vocale */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mic className="h-5 w-5" />
-                Analyse Vocale
-              </CardTitle>
-              <CardDescription>
-                Parlez pendant quelques secondes pour analyser votre voix
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recordingError && (
-                <Alert>
-                  <AlertDescription>{recordingError}</AlertDescription>
-                </Alert>
-              )}
-              
-              <div className="flex justify-center">
-                <Button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isAnalyzing}
-                  size="lg"
-                  className={`${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
-                >
-                  {isAnalyzing ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  ) : isRecording ? (
-                    <MicOff className="mr-2 h-5 w-5" />
-                  ) : (
-                    <Mic className="mr-2 h-5 w-5" />
-                  )}
-                  {isAnalyzing ? 'Analyse en cours...' : 
-                   isRecording ? 'Arrêter l\'enregistrement' : 
-                   'Commencer l\'enregistrement'}
-                </Button>
-              </div>
-              
-              {isRecording && (
-                <div className="text-center">
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
-                    className="inline-block w-4 h-4 bg-red-500 rounded-full"
-                  />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Enregistrement en cours...
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+        <div>
+          <h1 className="text-3xl font-bold">Scanner d'Émotions</h1>
+          <p className="text-muted-foreground">Analysez votre état émotionnel avec l'IA</p>
+        </div>
       </div>
 
+      {/* Interface de scan */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Exprimez vos émotions</CardTitle>
+          <CardDescription>
+            Décrivez comment vous vous sentez ou sélectionnez des émojis
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Comment vous sentez-vous ? Décrivez votre humeur...
+            </label>
+            <Textarea
+              placeholder="Ex: Je me sens un peu stressé aujourd'hui à cause du travail, mais aussi excité par mes projets..."
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Sélectionnez des émojis qui correspondent à votre humeur
+            </label>
+            <div className="grid grid-cols-8 gap-2">
+              {emotions.map((emoji) => (
+                <Button
+                  key={emoji}
+                  variant={selectedEmojis.includes(emoji) ? "default" : "outline"}
+                  className="text-2xl h-12 w-12 p-0"
+                  onClick={() => handleEmojiClick(emoji)}
+                >
+                  {emoji}
+                </Button>
+              ))}
+            </div>
+            {selectedEmojis.length > 0 && (
+              <div className="mt-2 flex gap-1">
+                <span className="text-sm text-muted-foreground">Sélectionnés:</span>
+                <span className="text-lg">{selectedEmojis.join(' ')}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <Button 
+              onClick={analyzeEmotion} 
+              disabled={isAnalyzing || (!textInput.trim() && selectedEmojis.length === 0)}
+              className="flex-1"
+            >
+              {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isAnalyzing ? 'Analyse en cours...' : 'Analyser mes émotions'}
+            </Button>
+            
+            <Button variant="outline" onClick={resetScan}>
+              Nouveau scan
+            </Button>
+          </div>
+
+          {/* Autres méthodes d'analyse */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t">
+            <Button variant="outline" className="flex items-center gap-2" disabled>
+              <Mic className="h-4 w-4" />
+              Analyse vocale
+              <Badge variant="secondary" className="text-xs">Bientôt</Badge>
+            </Button>
+            <Button variant="outline" className="flex items-center gap-2" disabled>
+              <Camera className="h-4 w-4" />
+              Analyse faciale
+              <Badge variant="secondary" className="text-xs">Bientôt</Badge>
+            </Button>
+            <Button variant="outline" className="flex items-center gap-2" disabled>
+              <Upload className="h-4 w-4" />
+              Import fichier
+              <Badge variant="secondary" className="text-xs">Bientôt</Badge>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Résultats de l'analyse */}
-      {analysisResult && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-red-500" />
-                Résultats de l'Analyse
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h3 className="font-medium mb-2">Émotions Détectées</h3>
-                  <div className="space-y-2">
-                    {analysisResult.emotions?.map((emotion: any, index: number) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <span className="capitalize">{emotion.name}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-500 h-2 rounded-full" 
-                              style={{ width: `${emotion.confidence * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            {Math.round(emotion.confidence * 100)}%
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+      {result && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              Résultats de l'analyse
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className={`inline-flex items-center px-3 py-1 rounded-full border ${getEmotionColor(result.emotion)}`}>
+                  <span className="font-medium">{result.emotion}</span>
                 </div>
-                
-                <div>
-                  <h3 className="font-medium mb-2">Recommandations</h3>
-                  <div className="space-y-2">
-                    {analysisResult.recommendations?.map((rec: string, index: number) => (
-                      <p key={index} className="text-sm text-muted-foreground">
-                        • {rec}
-                      </p>
-                    ))}
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground mt-1">Émotion principale</p>
               </div>
               
-              {analysisResult.summary && (
-                <div>
-                  <h3 className="font-medium mb-2">Résumé</h3>
-                  <p className="text-muted-foreground">{analysisResult.summary}</p>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {Math.round(result.confidence * 100)}%
                 </div>
-              )}
-              
-              <div className="flex gap-2 pt-4">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Music className="h-4 w-4" />
-                  Musique adaptée
-                </Button>
-                <Button variant="outline">
-                  Parler au coach
-                </Button>
-                <Button variant="outline">
-                  Noter dans le journal
-                </Button>
+                <p className="text-sm text-muted-foreground">Confiance</p>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {result.intensity}/10
+                </div>
+                <p className="text-sm text-muted-foreground">Intensité</p>
+              </div>
+            </div>
+
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium mb-2">Analyse détaillée</h4>
+              <p className="text-sm text-muted-foreground">{result.analysis}</p>
+            </div>
+
+            {result.recommendations.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-2">Recommandations</h4>
+                <ul className="space-y-1">
+                  {result.recommendations.map((rec, index) => (
+                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="text-primary">•</span>
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Historique des analyses */}
+      {analysisHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Historique récent</CardTitle>
+            <CardDescription>Vos dernières analyses émotionnelles</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {analysisHistory.map((analysis, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`px-2 py-1 rounded text-xs font-medium ${getEmotionColor(analysis.emotion)}`}>
+                      {analysis.emotion}
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      Intensité: {analysis.intensity}/10
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {Math.round(analysis.confidence * 100)}% de confiance
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
