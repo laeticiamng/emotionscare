@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
 import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
-import { ApiErrorHandler } from '@/utils/errorHandlers';
+import { useMusicCache } from '@/hooks/music/useMusicCache';
 
 interface AppError extends Error {
   code?: string;
@@ -49,27 +50,51 @@ const classifyError = (error: any): AppError => {
 };
 
 /**
- * Hook pour intégrer les émotions détectées avec les recommandations musicales
+ * Hook optimisé pour intégrer les émotions détectées avec les recommandations musicales
  */
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
   const music = useMusic();
+  const cache = useMusicCache();
 
-  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+  const activateMusicForEmotion = async (
+    params: EmotionMusicParams,
+    options: { useCache?: boolean } = {}
+  ): Promise<MusicPlaylist | null> => {
+    const { useCache = true } = options;
+    
     try {
       // Validation des paramètres d'entrée
       validateEmotionParams(params);
       
+      // Vérifier le cache d'abord si activé
+      if (useCache) {
+        const cachedPlaylist = cache.getFromCache(params);
+        if (cachedPlaylist) {
+          console.log('[Music Integration] Using cached playlist for:', params.emotion);
+          
+          toast({
+            title: "Musique activée",
+            description: `Playlist adaptée à votre état : ${params.emotion}`,
+          });
+          
+          return cachedPlaylist;
+        }
+      }
+      
       setIsLoading(true);
-      console.log('[Music Integration] Activation for emotion:', params);
+      console.log('[Music Integration] Loading playlist for emotion:', params);
 
       if (!music.loadPlaylistForEmotion) {
         throw new Error('Service musical non disponible');
       }
 
-      const result = await music.loadPlaylistForEmotion(params.emotion);
+      const result = await music.loadPlaylistForEmotion(params);
       
       if (result) {
+        // Ajouter au cache
+        cache.addToCache(params, result);
+        
         toast({
           title: "Musique activée",
           description: `Playlist adaptée à votre état : ${params.emotion}`,
@@ -107,9 +132,27 @@ export const useMusicEmotionIntegration = () => {
     return descriptions[emotion.toLowerCase()] || descriptions['default'];
   };
 
+  const preloadMusicForEmotion = async (params: EmotionMusicParams): Promise<void> => {
+    try {
+      // Précharger silencieusement sans toast
+      const cachedPlaylist = cache.getFromCache(params);
+      if (!cachedPlaylist && music.loadPlaylistForEmotion) {
+        const result = await music.loadPlaylistForEmotion(params);
+        if (result) {
+          cache.addToCache(params, result);
+        }
+      }
+    } catch (error) {
+      console.log('[Music Integration] Preload failed silently:', error);
+    }
+  };
+
   return {
     activateMusicForEmotion,
     getEmotionMusicDescription,
-    isLoading
+    preloadMusicForEmotion,
+    isLoading,
+    cacheStats: cache.getCacheStats(),
+    clearCache: cache.clearCache
   };
 };
