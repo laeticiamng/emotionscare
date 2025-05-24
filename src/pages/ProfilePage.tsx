@@ -1,347 +1,352 @@
 
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from '@/components/ui/form';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import Shell from '@/Shell';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Mail, Building2, Briefcase, Save, Loader2 } from 'lucide-react';
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  email: z.string().email('Email invalide').optional(),
-  phone: z.string().optional(),
-  job: z.string().optional(),
-  company: z.string().optional(),
-  bio: z.string().optional(),
-});
-
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, 'Veuillez entrer votre mot de passe actuel'),
-  newPassword: z.string().min(8, 'Le nouveau mot de passe doit contenir au moins 8 caractères'),
-  confirmPassword: z.string().min(8),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
-  path: ["confirmPassword"],
-});
-
-type ProfileFormValues = z.infer<typeof profileSchema>;
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+interface ProfileData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  company?: string;
+  position?: string;
+  bio?: string;
+  phone?: string;
+}
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  
-  const profileForm = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: '',
-      job: '',
-      company: '',
-      bio: '',
-    },
+  const { toast } = useToast();
+  const [profileData, setProfileData] = useState<ProfileData>({
+    first_name: '',
+    last_name: '',
+    email: '',
+    company: '',
+    position: '',
+    bio: '',
+    phone: ''
   });
-  
-  const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  });
-  
-  const onUpdateProfile = async (data: ProfileFormValues) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    loadProfile();
+  }, [user]);
+
+  const loadProfile = async () => {
+    setIsLoading(true);
     try {
-      setIsUpdating(true);
-      // Simuler une mise à jour
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Profil mis à jour avec succès');
+      if (user?.email?.endsWith('@exemple.fr')) {
+        // Données simulées pour les comptes démo
+        setProfileData({
+          first_name: user.user_metadata?.first_name || 'Démo',
+          last_name: user.user_metadata?.last_name || 'Utilisateur',
+          email: user.email,
+          company: 'Entreprise Demo',
+          position: 'Poste Demo',
+          bio: 'Ceci est un profil de démonstration pour tester les fonctionnalités de la plateforme.',
+          phone: '+33 1 23 45 67 89'
+        });
+      } else {
+        // Pour les vraits comptes, récupérer les données du profil
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user?.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+
+        setProfileData({
+          first_name: data?.name?.split(' ')[0] || user?.user_metadata?.first_name || '',
+          last_name: data?.name?.split(' ')[1] || user?.user_metadata?.last_name || '',
+          email: user?.email || '',
+          company: data?.company || '',
+          position: data?.job_title || '',
+          bio: data?.bio || '',
+          phone: data?.phone || ''
+        });
+      }
     } catch (error) {
-      console.error('Erreur de mise à jour:', error);
-      toast.error('Une erreur est survenue lors de la mise à jour du profil');
+      console.error('Erreur lors du chargement du profil:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger votre profil",
+        variant: "destructive"
+      });
     } finally {
-      setIsUpdating(false);
+      setIsLoading(false);
     }
   };
-  
-  const onChangePassword = async (data: PasswordFormValues) => {
+
+  const handleInputChange = (field: keyof ProfileData, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
     try {
-      setIsChangingPassword(true);
-      // Simuler un changement de mot de passe
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Mot de passe modifié avec succès');
-      passwordForm.reset();
+      if (user?.email?.endsWith('@exemple.fr')) {
+        // Simulation pour les comptes démo
+        setTimeout(() => {
+          toast({
+            title: "Profil mis à jour",
+            description: "Vos informations ont été enregistrées (simulation)",
+          });
+          setIsSaving(false);
+        }, 1000);
+        return;
+      }
+
+      // Pour les vrais comptes, sauvegarder en base de données
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user?.id,
+          name: `${profileData.first_name} ${profileData.last_name}`,
+          email: profileData.email,
+          company: profileData.company,
+          job_title: profileData.position,
+          bio: profileData.bio,
+          phone: profileData.phone,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été enregistrées avec succès",
+      });
     } catch (error) {
-      console.error('Erreur de changement de mot de passe:', error);
-      toast.error('Une erreur est survenue lors du changement de mot de passe');
+      console.error('Erreur lors de la sauvegarde:', error);
+      toast({
+        title: "Erreur de sauvegarde",
+        description: "Impossible de sauvegarder vos informations",
+        variant: "destructive"
+      });
     } finally {
-      setIsChangingPassword(false);
+      setIsSaving(false);
     }
   };
-  
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase();
-  };
-  
-  return (
-    <Shell>
-      <motion.div
-        className="container max-w-4xl py-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex flex-col md:flex-row gap-8 mb-8">
-          <div className="flex flex-col items-center">
-            <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
-              <AvatarImage src={user?.avatar} alt={user?.name} />
-              <AvatarFallback className="text-2xl">
-                {user?.name ? getInitials(user.name) : 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="mt-4 text-center">
-              <h2 className="text-xl font-bold">{user?.name}</h2>
-              <p className="text-muted-foreground">{user?.email}</p>
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-20 bg-gray-200 rounded"></div>
+              ))}
             </div>
-            <Button variant="outline" className="mt-4">
-              Modifier la photo
-            </Button>
-          </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2">Mon Profil</h1>
-            <p className="text-muted-foreground mb-6">
-              Gérez vos informations personnelles et paramètres de sécurité
-            </p>
-            
-            <Tabs defaultValue="account">
-              <TabsList className="mb-6">
-                <TabsTrigger value="account">Informations</TabsTrigger>
-                <TabsTrigger value="security">Sécurité</TabsTrigger>
-                <TabsTrigger value="preferences">Préférences</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="account" className="space-y-6">
-                <div className="bg-card border rounded-lg p-6">
-                  <h3 className="font-medium text-lg mb-4">Informations personnelles</h3>
-                  <Form {...profileForm}>
-                    <form onSubmit={profileForm.handleSubmit(onUpdateProfile)} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={profileForm.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nom complet</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Jean Dupont" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={profileForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input placeholder="jean.dupont@exemple.com" disabled {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={profileForm.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Téléphone</FormLabel>
-                              <FormControl>
-                                <Input placeholder="+33 6 XX XX XX XX" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={profileForm.control}
-                          name="job"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Poste</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Développeur" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={profileForm.control}
-                          name="company"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Entreprise</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Entreprise XYZ" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
-                      <Separator className="my-4" />
-                      
-                      <FormField
-                        control={profileForm.control}
-                        name="bio"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Bio</FormLabel>
-                            <FormControl>
-                              <textarea 
-                                className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                placeholder="Parlez-nous un peu de vous..."
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <div className="flex justify-end">
-                        <Button type="submit" disabled={isUpdating}>
-                          {isUpdating ? 'Mise à jour...' : 'Mettre à jour le profil'}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="security" className="space-y-6">
-                <div className="bg-card border rounded-lg p-6">
-                  <h3 className="font-medium text-lg mb-4">Modifier le mot de passe</h3>
-                  <Form {...passwordForm}>
-                    <form onSubmit={passwordForm.handleSubmit(onChangePassword)} className="space-y-4">
-                      <FormField
-                        control={passwordForm.control}
-                        name="currentPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Mot de passe actuel</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={passwordForm.control}
-                        name="newPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Nouveau mot de passe</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={passwordForm.control}
-                        name="confirmPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Confirmer le mot de passe</FormLabel>
-                            <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <div className="flex justify-end">
-                        <Button type="submit" disabled={isChangingPassword}>
-                          {isChangingPassword ? 'Modification...' : 'Modifier le mot de passe'}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </div>
-                
-                <div className="bg-card border rounded-lg p-6">
-                  <h3 className="font-medium text-lg mb-4">Sessions actives</h3>
-                  <div className="rounded-md border p-4 mb-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Session actuelle</p>
-                        <p className="text-sm text-muted-foreground">Dernière activité : il y a quelques minutes</p>
-                      </div>
-                      <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 text-xs rounded-full px-2 py-1">
-                        Actif
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button variant="outline" className="w-full">
-                    Déconnecter toutes les autres sessions
-                  </Button>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="preferences" className="space-y-6">
-                <div className="bg-card border rounded-lg p-6">
-                  <h3 className="font-medium text-lg mb-4">Préférences de notification</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Cette fonctionnalité sera bientôt disponible.
-                  </p>
-                  
-                  <Button variant="outline" disabled>
-                    Gérer les notifications
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <div className="h-48 bg-gray-200 rounded"></div>
           </div>
         </div>
-      </motion.div>
-    </Shell>
+      </div>
+    );
+  }
+
+  const isDemo = user?.email?.endsWith('@exemple.fr');
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Mon Profil</h1>
+        <p className="text-gray-600">
+          Gérez vos informations personnelles et professionnelles
+        </p>
+        {isDemo && (
+          <div className="mt-2 bg-orange-100 border border-orange-200 rounded-lg p-2">
+            <p className="text-sm text-orange-800">
+              🎯 Compte de démonstration - Modifications simulées
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <User className="h-5 w-5 mr-2" />
+                Informations personnelles
+              </CardTitle>
+              <CardDescription>
+                Mettez à jour vos informations de base
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Prénom</Label>
+                  <Input
+                    id="firstName"
+                    value={profileData.first_name}
+                    onChange={(e) => handleInputChange('first_name', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Nom</Label>
+                  <Input
+                    id="lastName"
+                    value={profileData.last_name}
+                    onChange={(e) => handleInputChange('last_name', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="pl-10"
+                    disabled
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input
+                  id="phone"
+                  value={profileData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  placeholder="+33 1 23 45 67 89"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Biographie</Label>
+                <Textarea
+                  id="bio"
+                  value={profileData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  placeholder="Parlez-nous un peu de vous..."
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {user?.user_metadata?.role?.startsWith('b2b') && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Building2 className="h-5 w-5 mr-2" />
+                  Informations professionnelles
+                </CardTitle>
+                <CardDescription>
+                  Détails concernant votre poste et votre entreprise
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="company">Entreprise</Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="company"
+                      value={profileData.company}
+                      onChange={(e) => handleInputChange('company', e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="position">Poste</Label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="position"
+                      value={profileData.position}
+                      onChange={(e) => handleInputChange('position', e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="mt-6">
+            <Button onClick={handleSave} disabled={isSaving} className="w-full">
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sauvegarde en cours...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Sauvegarder les modifications
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Résumé du compte</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User className="h-10 w-10 text-gray-400" />
+                </div>
+                <h3 className="font-semibold">
+                  {profileData.first_name} {profileData.last_name}
+                </h3>
+                <p className="text-sm text-gray-500">{profileData.email}</p>
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Type de compte:</span>
+                  <span className="font-medium">
+                    {user?.user_metadata?.role === 'b2c' ? 'Personnel' : 
+                     user?.user_metadata?.role === 'b2b_user' ? 'Collaborateur' : 'Administrateur'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Membre depuis:</span>
+                  <span className="font-medium">
+                    {new Date(user?.created_at || '').toLocaleDateString('fr-FR')}
+                  </span>
+                </div>
+                {profileData.company && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Entreprise:</span>
+                    <span className="font-medium">{profileData.company}</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 

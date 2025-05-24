@@ -1,7 +1,8 @@
-
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 // B2C Pages
 const B2CLoginPage = React.lazy(() => import('@/pages/b2c/auth/B2CLoginPage'));
@@ -31,16 +32,30 @@ const B2BAdminDashboardPage = React.lazy(() => import('@/pages/b2b/admin/dashboa
 const B2BAdminUsersPage = React.lazy(() => import('@/pages/b2b/admin/users/B2BAdminUsersPage'));
 const B2BAdminAnalyticsPage = React.lazy(() => import('@/pages/b2b/admin/analytics/B2BAdminAnalyticsPage'));
 
-// Role Selection
+// B2B Selection
 const B2BRoleSelectionPage = React.lazy(() => import('@/pages/b2b/selection/B2BRoleSelectionPage'));
 
-// Home Page
+// Shared Application Pages
+const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
+const Coach = React.lazy(() => import('@/pages/Coach'));
+const Music = React.lazy(() => import('@/pages/Music'));
+const Journal = React.lazy(() => import('@/pages/Journal'));
+
+// Other Pages
 const HomePage = React.lazy(() => import('@/pages/HomePage'));
+const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
+const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
+const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
+const HelpPage = React.lazy(() => import('@/pages/HelpPage'));
 
 const routes: RouteObject[] = [
   {
     path: '/',
     element: <HomePage />,
+  },
+  {
+    path: '/choose-mode',
+    element: <ChooseModePage />,
   },
   
   // B2C Routes
@@ -60,12 +75,26 @@ const routes: RouteObject[] = [
         element: <B2CResetPasswordPage />,
       },
       {
-        path: 'dashboard',
-        element: <B2CDashboardPage />,
+        path: 'onboarding',
+        element: (
+          <ProtectedRoute requiredRole="b2c">
+            <B2COnboardingPage />
+          </ProtectedRoute>
+        ),
       },
       {
-        path: 'onboarding',
-        element: <B2COnboardingPage />,
+        path: 'dashboard',
+        element: (
+          <ProtectedRoute requiredRole="b2c">
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <B2CDashboardPage />,
+          },
+        ],
       },
       {
         path: 'scan',
@@ -104,7 +133,17 @@ const routes: RouteObject[] = [
       },
       {
         path: 'dashboard',
-        element: <B2BUserDashboardPage />,
+        element: (
+          <ProtectedRoute requiredRole="b2b_user">
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <B2BUserDashboardPage />,
+          },
+        ],
       },
       {
         path: 'scan',
@@ -139,15 +178,45 @@ const routes: RouteObject[] = [
       },
       {
         path: 'dashboard',
-        element: <B2BAdminDashboardPage />,
+        element: (
+          <ProtectedRoute requiredRole="b2b_admin">
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <B2BAdminDashboardPage />,
+          },
+        ],
       },
       {
         path: 'users',
-        element: <B2BAdminUsersPage />,
+        element: (
+          <ProtectedRoute requiredRole="b2b_admin">
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <B2BAdminUsersPage />,
+          },
+        ],
       },
       {
         path: 'analytics',
-        element: <B2BAdminAnalyticsPage />,
+        element: (
+          <ProtectedRoute requiredRole="b2b_admin">
+            <MainLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <B2BAdminAnalyticsPage />,
+          },
+        ],
       },
     ],
   },
@@ -157,11 +226,111 @@ const routes: RouteObject[] = [
     path: '/b2b/selection',
     element: <B2BRoleSelectionPage />,
   },
+
+  // Protected Application Routes (available to all authenticated users)
+  {
+    path: '/scan',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <ScanPage />,
+      },
+    ],
+  },
+  {
+    path: '/coach',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Coach />,
+      },
+    ],
+  },
+  {
+    path: '/music',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Music />,
+      },
+    ],
+  },
+  {
+    path: '/journal',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Journal />,
+      },
+    ],
+  },
+  {
+    path: '/profile',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <ProfilePage />,
+      },
+    ],
+  },
+  {
+    path: '/settings',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <SettingsPage />,
+      },
+    ],
+  },
+  {
+    path: '/help',
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <HelpPage />,
+      },
+    ],
+  },
   
-  // Redirect unknown routes to home
+  // Redirect unknown routes to choose mode
   {
     path: '*',
-    element: <Navigate to="/" replace />,
+    element: <Navigate to="/choose-mode" replace />,
   },
 ];
 

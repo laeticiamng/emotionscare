@@ -9,11 +9,8 @@ interface ProtectedRouteProps {
   requiredRole?: string;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requiredRole 
-}) => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+  const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -25,35 +22,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    // Rediriger vers la page de connexion appropriée selon le chemin
-    const currentPath = location.pathname;
-    
-    if (currentPath.startsWith('/b2c/')) {
-      return <Navigate to="/b2c/login" state={{ from: location.pathname }} replace />;
-    } else if (currentPath.startsWith('/b2b/user/')) {
-      return <Navigate to="/b2b/user/login" state={{ from: location.pathname }} replace />;
-    } else if (currentPath.startsWith('/b2b/admin/')) {
-      return <Navigate to="/b2b/admin/login" state={{ from: location.pathname }} replace />;
+    // Rediriger vers la page de connexion appropriée selon le rôle requis
+    if (requiredRole === 'b2c') {
+      return <Navigate to="/b2c/login" state={{ from: location }} replace />;
+    } else if (requiredRole === 'b2b_user') {
+      return <Navigate to="/b2b/user/login" state={{ from: location }} replace />;
+    } else if (requiredRole === 'b2b_admin') {
+      return <Navigate to="/b2b/admin/login" state={{ from: location }} replace />;
+    } else {
+      return <Navigate to="/choose-mode" state={{ from: location }} replace />;
     }
-    
-    return <Navigate to="/choose-mode" state={{ from: location.pathname }} replace />;
   }
 
-  // Vérifier le rôle si requis
-  if (requiredRole && user) {
-    const userRole = user.user_metadata?.role || user.role;
-    if (userRole !== requiredRole) {
-      // Rediriger vers la page appropriée selon le rôle
-      if (userRole === 'b2c') {
-        return <Navigate to="/b2c/dashboard" replace />;
-      } else if (userRole === 'b2b_user') {
-        return <Navigate to="/b2b/user/dashboard" replace />;
-      } else if (userRole === 'b2b_admin') {
-        return <Navigate to="/b2b/admin/dashboard" replace />;
-      }
-      
-      return <Navigate to="/choose-mode" replace />;
-    }
+  // Vérifier le rôle si spécifié
+  if (requiredRole && user?.user_metadata?.role !== requiredRole) {
+    return <Navigate to="/choose-mode" replace />;
   }
 
   return <>{children}</>;
