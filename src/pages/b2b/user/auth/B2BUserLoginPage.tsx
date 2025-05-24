@@ -8,6 +8,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Mail, Lock, Loader2, Eye, EyeOff, Users } from 'lucide-react';
 import { toast } from 'sonner';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 const B2BUserLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const B2BUserLoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  const { setUserMode } = useUserMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,13 +30,36 @@ const B2BUserLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast.error('Email ou mot de passe incorrect');
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Email ou mot de passe incorrect');
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Veuillez confirmer votre email avant de vous connecter');
+        } else {
+          toast.error('Erreur de connexion : ' + error.message);
+        }
       } else {
+        setUserMode('b2b_user');
         toast.success('Connexion réussie !');
         navigate('/b2b/user/dashboard');
       }
     } catch (error) {
       toast.error('Erreur de connexion');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await signIn('collaborateur@exemple.fr', 'demo123');
+      if (!error) {
+        setUserMode('b2b_user');
+        toast.success('Connexion en mode démo !');
+        navigate('/b2b/user/dashboard');
+      }
+    } catch (error) {
+      toast.error('Compte de démo non disponible');
     } finally {
       setIsLoading(false);
     }
@@ -62,10 +87,10 @@ const B2BUserLoginPage: React.FC = () => {
               <Users className="h-8 w-8 text-blue-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
-              Espace Collaborateur
+              Connexion Collaborateur
             </CardTitle>
             <CardDescription>
-              Accédez à votre espace de bien-être professionnel
+              Accédez à votre espace bien-être en entreprise
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -76,7 +101,7 @@ const B2BUserLoginPage: React.FC = () => {
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <Input
                     type="email"
-                    placeholder="votre@entreprise.com"
+                    placeholder="prenom.nom@entreprise.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
@@ -111,7 +136,7 @@ const B2BUserLoginPage: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -124,14 +149,24 @@ const B2BUserLoginPage: React.FC = () => {
                 )}
               </Button>
 
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleDemoLogin}
+                disabled={isLoading}
+              >
+                Essayer en mode démo
+              </Button>
+
               <div className="text-center space-y-2">
-                <div className="text-sm text-slate-600">
-                  Pas encore de compte collaborateur ?{' '}
-                  <Link
-                    to="/b2b/user/register"
-                    className="text-blue-600 hover:underline font-medium"
+                <div className="text-sm text-slate-600 dark:text-slate-400">
+                  Pas encore de compte ?{' '}
+                  <Link 
+                    to="/b2b/user/register" 
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium"
                   >
-                    Demander un accès
+                    S'inscrire
                   </Link>
                 </div>
               </div>

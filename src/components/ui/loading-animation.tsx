@@ -18,9 +18,13 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
-      <Loader2 className={`${sizeClasses[size]} animate-spin text-primary`} />
-      <p className="text-muted-foreground animate-pulse">{text}</p>
+    <div className="flex flex-col items-center justify-center gap-3">
+      <Loader2 className={`${sizeClasses[size]} animate-spin text-blue-600`} />
+      {text && (
+        <p className="text-sm text-slate-600 dark:text-slate-400 animate-pulse">
+          {text}
+        </p>
+      )}
     </div>
   );
 };

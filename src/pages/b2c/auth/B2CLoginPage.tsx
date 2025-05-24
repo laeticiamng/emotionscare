@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Loader2, Eye, EyeOff, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 const B2CLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const B2CLoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  const { setUserMode } = useUserMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +30,15 @@ const B2CLoginPage: React.FC = () => {
     try {
       const { error } = await signIn(email, password);
       if (error) {
-        toast.error('Email ou mot de passe incorrect');
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Email ou mot de passe incorrect');
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Veuillez confirmer votre email avant de vous connecter');
+        } else {
+          toast.error('Erreur de connexion : ' + error.message);
+        }
       } else {
+        setUserMode('b2c');
         toast.success('Connexion réussie !');
         navigate('/b2c/dashboard');
       }
@@ -40,8 +49,24 @@ const B2CLoginPage: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await signIn('demo@exemple.fr', 'demo123');
+      if (!error) {
+        setUserMode('b2c');
+        toast.success('Connexion en mode démo !');
+        navigate('/b2c/dashboard');
+      }
+    } catch (error) {
+      toast.error('Compte de démo non disponible');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900/20 dark:via-slate-900 dark:to-blue-800/20 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -52,17 +77,20 @@ const B2CLoginPage: React.FC = () => {
           <CardHeader className="text-center space-y-4">
             <Button
               variant="ghost"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/choose-mode')}
               className="self-start"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Connexion Particulier
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto">
+              <User className="h-8 w-8 text-blue-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-300">
+              Espace Personnel
             </CardTitle>
             <CardDescription>
-              Accédez à votre espace bien-être personnel
+              Connectez-vous à votre compte EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -108,7 +136,7 @@ const B2CLoginPage: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -121,20 +149,30 @@ const B2CLoginPage: React.FC = () => {
                 )}
               </Button>
 
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleDemoLogin}
+                disabled={isLoading}
+              >
+                Essayer en mode démo
+              </Button>
+
               <div className="text-center space-y-2">
-                <Link
-                  to="/b2c/reset-password"
-                  className="text-sm text-blue-600 hover:underline"
+                <Link 
+                  to="/b2c/reset-password" 
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
                 >
                   Mot de passe oublié ?
                 </Link>
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-slate-600 dark:text-slate-400">
                   Pas encore de compte ?{' '}
-                  <Link
-                    to="/b2c/register"
-                    className="text-blue-600 hover:underline font-medium"
+                  <Link 
+                    to="/b2c/register" 
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium"
                   >
-                    Créer un compte
+                    S'inscrire
                   </Link>
                 </div>
               </div>

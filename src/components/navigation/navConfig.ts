@@ -1,143 +1,135 @@
 
 import { 
   Home, 
-  Activity, 
+  Scan, 
+  Brain, 
   Music, 
-  MessageCircle, 
-  Calendar,
-  Users,
-  BarChart2,
-  Settings,
-  UserCheck,
-  Building,
-  Trophy,
-  Target,
-  FileText,
-  Headphones,
-  Heart,
-  Glasses
+  BookOpen, 
+  BarChart3, 
+  Users, 
+  Settings, 
+  HelpCircle,
+  Shield,
+  UserCheck
 } from 'lucide-react';
 
-export const b2cNavItems = [
+export interface NavItem {
+  title: string;
+  href: string;
+  icon: any;
+  description?: string;
+}
+
+export const b2cNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
     href: '/b2c/dashboard',
-    icon: Home
+    icon: Home,
+    description: 'Vue d\'ensemble de votre bien-être'
   },
   {
-    title: 'Scanner émotionnel',
+    title: 'Scanner',
     href: '/scan',
-    icon: Activity
+    icon: Scan,
+    description: 'Analysez vos émotions'
   },
   {
-    title: 'Musique thérapeutique',
-    href: '/music',
-    icon: Music
-  },
-  {
-    title: 'Coach personnel',
+    title: 'Coach IA',
     href: '/coach',
-    icon: MessageCircle
+    icon: Brain,
+    description: 'Accompagnement personnalisé'
+  },
+  {
+    title: 'Musique',
+    href: '/music',
+    icon: Music,
+    description: 'Thérapie musicale'
   },
   {
     title: 'Journal',
     href: '/journal',
-    icon: FileText
-  },
-  {
-    title: 'Audio thérapie',
-    href: '/audio',
-    icon: Headphones
-  },
-  {
-    title: 'Cocon VR',
-    href: '/cocon',
-    icon: Glasses
-  },
-  {
-    title: 'Préférences',
-    href: '/preferences',
-    icon: Heart
+    icon: BookOpen,
+    description: 'Votre journal personnel'
   }
 ];
 
-export const b2bUserNavItems = [
+export const b2bUserNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
     href: '/b2b/user/dashboard',
-    icon: Home
+    icon: Home,
+    description: 'Vue d\'ensemble de votre bien-être'
   },
   {
-    title: 'Scanner émotionnel',
+    title: 'Scanner',
     href: '/scan',
-    icon: Activity
+    icon: Scan,
+    description: 'Analysez vos émotions'
   },
   {
-    title: 'Musique d\'équipe',
-    href: '/music',
-    icon: Music
-  },
-  {
-    title: 'Coach professionnel',
+    title: 'Coach IA',
     href: '/coach',
-    icon: MessageCircle
+    icon: Brain,
+    description: 'Accompagnement personnalisé'
   },
   {
-    title: 'Sessions d\'équipe',
-    href: '/sessions',
-    icon: Calendar
+    title: 'Musique',
+    href: '/music',
+    icon: Music,
+    description: 'Thérapie musicale'
   },
   {
-    title: 'Bien-être collectif',
-    href: '/team-wellness',
-    icon: Users
-  },
-  {
-    title: 'Gamification',
-    href: '/gamification',
-    icon: Trophy
+    title: 'Journal',
+    href: '/journal',
+    icon: BookOpen,
+    description: 'Votre journal personnel'
   }
 ];
 
-export const b2bAdminNavItems = [
+export const b2bAdminNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
     href: '/b2b/admin/dashboard',
-    icon: Home
+    icon: Home,
+    description: 'Vue d\'ensemble RH'
   },
   {
     title: 'Analytics',
     href: '/b2b/admin/analytics',
-    icon: BarChart2
+    icon: BarChart3,
+    description: 'Analyses détaillées'
   },
   {
-    title: 'Utilisateurs',
+    title: 'Équipes',
     href: '/b2b/admin/users',
-    icon: Users
-  },
-  {
-    title: 'Gestion équipes',
-    href: '/b2b/admin/teams',
-    icon: Building
+    icon: Users,
+    description: 'Gestion des utilisateurs'
   },
   {
     title: 'Rapports',
     href: '/b2b/admin/reports',
-    icon: FileText
+    icon: Shield,
+    description: 'Rapports RGPD'
+  }
+];
+
+export const commonNavItems: NavItem[] = [
+  {
+    title: 'Profil',
+    href: '/profile',
+    icon: UserCheck,
+    description: 'Votre profil'
   },
   {
-    title: 'Configuration',
-    href: '/b2b/admin/settings',
-    icon: Settings
+    title: 'Paramètres',
+    href: '/settings',
+    icon: Settings,
+    description: 'Configuration'
   },
   {
-    title: 'Invitations',
-    href: '/b2b/admin/invitations',
-    icon: UserCheck
-  },
-  {
-    title: 'Objectifs',
-    href: '/b2b/admin/goals',
-    icon: Target
+    title: 'Aide',
+    href: '/help',
+    icon: HelpCircle,
+    description: 'Support et aide'
   }
 ];
