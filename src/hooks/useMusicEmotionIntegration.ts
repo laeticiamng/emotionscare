@@ -1,180 +1,115 @@
-
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { EmotionResult } from '@/types/emotion';
+import { toast } from '@/hooks/use-toast';
+import { useMusic } from '@/hooks/useMusic';
+import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
+import { ApiErrorHandler } from '@/utils/errorHandlers';
 
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  tracks: Array<{
-    title: string;
-    artist: string;
-    duration: number;
-    url?: string;
-  }>;
-  coverUrl?: string;
+interface AppError extends Error {
+  code?: string;
+  status?: number;
+  details?: any;
 }
 
-export function useMusicEmotionIntegration() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+const validateEmotionParams = (params: EmotionMusicParams): boolean => {
+  if (!params || typeof params !== 'object') {
+    throw new Error('Paramètres invalides');
+  }
+  if (!params.emotion || typeof params.emotion !== 'string') {
+    throw new Error('Émotion manquante ou invalide');
+  }
+  if (params.intensity !== undefined && (typeof params.intensity !== 'number' || params.intensity < 0 || params.intensity > 1)) {
+    throw new Error('Intensité invalide (doit être entre 0 et 1)');
+  }
+  return true;
+};
 
-  const getMusicRecommendationForEmotion = async (emotionResult: EmotionResult): Promise<MusicPlaylist | null> => {
+const classifyError = (error: any): AppError => {
+  const appError: AppError = new Error();
+  
+  if (error?.status >= 500) {
+    appError.message = 'Service temporairement indisponible';
+    appError.code = 'SERVICE_ERROR';
+  } else if (error?.status === 404) {
+    appError.message = 'Fonctionnalité en développement';
+    appError.code = 'NOT_FOUND';
+  } else if (error?.status === 401) {
+    appError.message = 'Authentification requise';
+    appError.code = 'AUTH_ERROR';
+  } else if (error?.message?.includes('timeout')) {
+    appError.message = 'Délai de connexion dépassé';
+    appError.code = 'TIMEOUT';
+  } else {
+    appError.message = 'Erreur lors du chargement de la musique';
+    appError.code = 'UNKNOWN';
+  }
+  
+  appError.status = error?.status;
+  appError.details = error;
+  return appError;
+};
+
+/**
+ * Hook pour intégrer les émotions détectées avec les recommandations musicales
+ */
+export const useMusicEmotionIntegration = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const music = useMusic();
+
+  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
     try {
-      setIsLoading(true);
+      // Validation des paramètres d'entrée
+      validateEmotionParams(params);
       
-      const { data, error } = await supabase.functions.invoke('music-generation', {
-        body: { 
-          emotion: getEmotionFromScore(emotionResult.score),
-          score: emotionResult.score,
-          prompt: emotionResult.text || emotionResult.emojis
-        }
+      setIsLoading(true);
+      console.log('[Music Integration] Activation for emotion:', params);
+
+      if (!music.loadPlaylistForEmotion) {
+        throw new Error('Service musical non disponible');
+      }
+
+      const result = await music.loadPlaylistForEmotion(params.emotion);
+      
+      if (result) {
+        toast({
+          title: "Musique activée",
+          description: `Playlist adaptée à votre état : ${params.emotion}`,
+        });
+      }
+
+      return result || null;
+    } catch (error: any) {
+      console.error('[Music Integration] Error:', error);
+      const classifiedError = classifyError(error);
+      
+      toast({
+        title: "Erreur musique",
+        description: classifiedError.message,
+        variant: "destructive",
       });
       
-      if (error) throw error;
-      
-      // In a real application, this would return actual music URLs
-      // For now, we create a mock playlist based on the emotion
-      const mockPlaylist = createMockPlaylist(emotionResult.score);
-      setCurrentPlaylist(mockPlaylist);
-      
-      return mockPlaylist;
-    } catch (error) {
-      console.error('Error getting music recommendation:', error);
       return null;
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const playEmotion = async (emotion: string): Promise<MusicPlaylist | null> => {
-    try {
-      setIsLoading(true);
-      
-      // Generate a mock score based on the emotion
-      const mockScore = getMockScoreForEmotion(emotion);
-      
-      // Create a mock playlist
-      const mockPlaylist = createMockPlaylist(mockScore);
-      setCurrentPlaylist(mockPlaylist);
-      
-      return mockPlaylist;
-    } catch (error) {
-      console.error('Error playing emotion music:', error);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getEmotionFromScore = (score: number): string => {
-    if (score >= 80) return 'joy';
-    if (score >= 65) return 'happiness';
-    if (score >= 50) return 'contentment';
-    if (score >= 35) return 'melancholy';
-    return 'sadness';
-  };
-
-  const getMockScoreForEmotion = (emotion: string): number => {
-    const emotionMap: Record<string, number> = {
-      'joy': 85,
-      'happiness': 75,
-      'contentment': 60,
-      'melancholy': 40,
-      'sadness': 25,
-      'anger': 30,
-      'fear': 35,
-      'surprise': 60,
-      'disgust': 30,
-      'neutral': 50
-    };
-    
-    return emotionMap[emotion.toLowerCase()] || 50;
   };
 
   const getEmotionMusicDescription = (emotion: string): string => {
     const descriptions: Record<string, string> = {
-      'joy': 'Musique énergique et entraînante pour célébrer votre joie',
-      'happiness': 'Mélodies positives pour maintenir votre bonne humeur',
-      'contentment': 'Sons relaxants et mélodieux pour vous accompagner',
-      'melancholy': 'Compositions douces et réfléchies pour les moments nostalgiques',
-      'sadness': 'Musiques apaisantes pour vous réconforter et vous soutenir',
-      'anger': 'Rythmes pour canaliser et transformer votre énergie',
-      'fear': 'Sons calmes pour apaiser l'anxiété et retrouver la sérénité',
-      'surprise': 'Mélodies rafraîchissantes et légères pour accompagner ce moment',
-      'disgust': 'Musiques transformatives pour améliorer votre état d'esprit',
-      'neutral': 'Ambiances équilibrées pour accompagner votre journée'
+      'happy': 'Musiques énergiques pour amplifier votre joie',
+      'calm': 'Mélodies apaisantes pour maintenir votre sérénité',
+      'focused': 'Sons de concentration pour optimiser votre productivité',
+      'sad': 'Musiques réconfortantes pour vous accompagner',
+      'excited': 'Rythmes dynamiques pour accompagner votre énergie',
+      'relaxed': 'Ambiances douces pour prolonger votre détente',
+      'default': 'Musique personnalisée pour votre bien-être'
     };
-    
-    return descriptions[emotion.toLowerCase()] || 'Musique personnalisée adaptée à votre humeur';
-  };
 
-  const createMockPlaylist = (score: number): MusicPlaylist => {
-    const emotion = getEmotionFromScore(score);
-    
-    const playlistTemplates: Record<string, MusicPlaylist> = {
-      'joy': {
-        id: 'playlist-joy',
-        name: 'Énergie Positive',
-        tracks: [
-          { title: 'Happy Day', artist: 'Sunshine Band', duration: 210 },
-          { title: 'Celebration', artist: 'Joy Collective', duration: 187 },
-          { title: 'Dance of Life', artist: 'Rhythm Explorers', duration: 224 }
-        ],
-        coverUrl: 'https://images.unsplash.com/photo-1520338801623-6b88fe32e80a'
-      },
-      'happiness': {
-        id: 'playlist-happiness',
-        name: 'Rayons de soleil',
-        tracks: [
-          { title: 'Gentle Smile', artist: 'Happy Tones', duration: 195 },
-          { title: 'Summer Breeze', artist: 'Coastal Vibes', duration: 230 },
-          { title: 'Light Steps', artist: 'Morning Walk', duration: 212 }
-        ],
-        coverUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5'
-      },
-      'contentment': {
-        id: 'playlist-contentment',
-        name: 'Équilibre et harmonie',
-        tracks: [
-          { title: 'Peaceful Mind', artist: 'Balanced Soul', duration: 245 },
-          { title: 'Gentle Stream', artist: 'Nature Sounds', duration: 287 },
-          { title: 'Quiet Moments', artist: 'Tranquil Quartet', duration: 263 }
-        ],
-        coverUrl: 'https://images.unsplash.com/photo-1519834089823-af6afa22ec36'
-      },
-      'melancholy': {
-        id: 'playlist-melancholy',
-        name: 'Douce contemplation',
-        tracks: [
-          { title: 'Rainy Day', artist: 'Blue Notes', duration: 312 },
-          { title: 'Memories', artist: 'Nostalgic Piano', duration: 275 },
-          { title: 'Distant Shore', artist: 'Ocean Waves', duration: 298 }
-        ],
-        coverUrl: 'https://images.unsplash.com/photo-1604334223153-8923f4100f4e'
-      },
-      'sadness': {
-        id: 'playlist-sadness',
-        name: 'Réconfort émotionnel',
-        tracks: [
-          { title: 'Healing Touch', artist: 'Gentle Soul', duration: 328 },
-          { title: 'New Dawn', artist: 'Hope Ensemble', duration: 304 },
-          { title: 'Inner Light', artist: 'Soul Comfort', duration: 285 }
-        ],
-        coverUrl: 'https://images.unsplash.com/photo-1454618454636-a42c7330ecce'
-      }
-    };
-    
-    return playlistTemplates[emotion] || playlistTemplates['contentment'];
+    return descriptions[emotion.toLowerCase()] || descriptions['default'];
   };
 
   return {
-    isLoading,
-    currentPlaylist,
-    getMusicRecommendationForEmotion,
-    playEmotion,
-    getEmotionMusicDescription
+    activateMusicForEmotion,
+    getEmotionMusicDescription,
+    isLoading
   };
-}
-
-export default useMusicEmotionIntegration;
+};
