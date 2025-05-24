@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import TrackList from '../TrackList';
@@ -19,9 +20,12 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
   currentTrack,
   isPlaying
 }) => {
+  // Ensure playlists is always an array
+  const safePlaylists = Array.isArray(playlists) ? playlists : [];
+
   return (
     <div className="space-y-4">
-      {playlists.map((playlist) => (
+      {safePlaylists.map((playlist) => (
         <Card key={playlist.id} className="shadow-md">
           <CardHeader>
             <CardTitle className="text-lg font-semibold cursor-pointer hover:underline" onClick={() => onSelectPlaylist?.(playlist)}>
@@ -31,7 +35,7 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
           <CardContent className="p-0">
             <ScrollArea>
               <TrackList
-                tracks={playlist.tracks}
+                tracks={playlist.tracks || []}
                 currentTrack={currentTrack}
                 isPlaying={isPlaying}
                 onTrackSelect={onSelectTrack}
@@ -41,7 +45,7 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
         </Card>
       ))}
       
-      {playlists.length === 0 && (
+      {safePlaylists.length === 0 && (
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">Aucune playlist disponible</p>

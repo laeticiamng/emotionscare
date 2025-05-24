@@ -19,7 +19,9 @@ const VRHistoryList: React.FC<VRHistoryListProps> = ({
   className = "",
   limit
 }) => {
-  const displayTemplates = limit ? templates.slice(0, limit) : templates;
+  // Ensure templates is always an array
+  const safeTemplates = Array.isArray(templates) ? templates : [];
+  const displayTemplates = limit ? safeTemplates.slice(0, limit) : safeTemplates;
   
   return (
     <div className={`vr-history-list ${className}`}>

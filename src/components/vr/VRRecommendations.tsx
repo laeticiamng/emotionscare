@@ -10,19 +10,27 @@ export interface VRRecommendationsProps {
 }
 
 const VRRecommendations: React.FC<VRRecommendationsProps> = ({ 
-  templates, 
+  templates = [], 
   onSelect, 
   currentTemplateId, 
   showHeading = true 
 }) => {
+  // Ensure templates is always an array
+  const safeTemplates = Array.isArray(templates) ? templates : [];
+
   return (
     <div>
       {showHeading && <h2>VR Recommendations</h2>}
-      {templates.map(template => (
+      {safeTemplates.map(template => (
         <div key={template.id} onClick={() => onSelect(template)}>
           {template.title || template.name}
         </div>
       ))}
+      {safeTemplates.length === 0 && (
+        <div className="text-center py-4 text-muted-foreground">
+          Aucune recommandation disponible pour le moment
+        </div>
+      )}
     </div>
   );
 };

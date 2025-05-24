@@ -22,7 +22,13 @@ interface VRTemplateGridProps {
   onSelectTemplate: (template: VRSessionTemplate) => void;
 }
 
-export const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ templates, onSelectTemplate }) => {
+export const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ 
+  templates = [], 
+  onSelectTemplate 
+}) => {
+  // Ensure templates is always an array
+  const safeTemplates = Array.isArray(templates) ? templates : [];
+
   const formatDuration = (minutes: number) => {
     if (minutes < 60) {
       return `${minutes} min`;
@@ -34,7 +40,7 @@ export const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ templates, onSel
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {templates.map((template) => (
+      {safeTemplates.map((template) => (
         <Card key={template.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
           <div className="relative h-48 overflow-hidden">
             <img
@@ -61,14 +67,14 @@ export const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ templates, onSel
             </div>
             
             <div className="flex flex-wrap gap-1">
-              {template.tags.slice(0, 3).map((tag) => (
+              {(template.tags || []).slice(0, 3).map((tag) => (
                 <Badge key={tag} variant="outline" className="text-xs">
                   {tag}
                 </Badge>
               ))}
-              {template.tags.length > 3 && (
+              {(template.tags || []).length > 3 && (
                 <Badge variant="outline" className="text-xs">
-                  +{template.tags.length - 3}
+                  +{(template.tags || []).length - 3}
                 </Badge>
               )}
             </div>
@@ -84,6 +90,12 @@ export const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ templates, onSel
           </CardFooter>
         </Card>
       ))}
+      
+      {safeTemplates.length === 0 && (
+        <div className="col-span-full text-center py-8">
+          <p className="text-muted-foreground">Aucun template disponible</p>
+        </div>
+      )}
     </div>
   );
 };

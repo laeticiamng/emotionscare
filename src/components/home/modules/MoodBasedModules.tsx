@@ -3,25 +3,33 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import ModuleCard from '@/components/home/ModuleCard';
 
+interface Module {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  to: string;
+  statIcon: React.ReactNode;
+  statText: string;
+  statValue: string | number;
+  priority: number;
+}
+
 interface MoodBasedModulesProps {
-  modules: Array<{
-    title: string;
-    description: string;
-    icon: React.ReactNode;
-    to: string;
-    statIcon: React.ReactNode;
-    statText: string;
-    statValue: string | number;
-    priority: number;
-  }>;
+  modules: Module[];
   selectedMood: string | null;
 }
 
-const MoodBasedModules: React.FC<MoodBasedModulesProps> = ({ modules, selectedMood }) => {
+const MoodBasedModules: React.FC<MoodBasedModulesProps> = ({ 
+  modules = [], 
+  selectedMood 
+}) => {
+  // Ensure modules is always an array
+  const safeModules = Array.isArray(modules) ? modules : [];
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {modules.map((module, index) => (
+        {safeModules.map((module, index) => (
           <motion.div
             key={module.title}
             initial={{ opacity: 0, y: 20 }}
