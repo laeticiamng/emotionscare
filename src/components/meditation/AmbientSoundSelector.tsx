@@ -1,318 +1,248 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Play, Pause, Volume2, Mix, Waves, TreePine, Cloud, Coffee, Flame, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-interface AmbientSound {
-  id: string;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  category: 'Nature' | 'Urbain' | 'Mystique' | 'Relaxation';
-  color: string;
-  premium?: boolean;
-  // En production, ces seraient de vrais URLs audio
-  audioUrl: string;
-}
-
-const ambientSounds: AmbientSound[] = [
-  {
-    id: 'rain',
-    name: 'Pluie Douce',
-    description: 'Pluie légère sur les feuilles',
-    icon: <Cloud className="h-6 w-6" />,
-    category: 'Nature',
-    color: 'from-blue-400 to-blue-600',
-    audioUrl: '/sounds/rain.mp3'
-  },
-  {
-    id: 'ocean',
-    name: 'Vagues Océan',
-    description: 'Ressac apaisant de l\'océan',
-    icon: <Waves className="h-6 w-6" />,
-    category: 'Nature',
-    color: 'from-cyan-400 to-blue-500',
-    audioUrl: '/sounds/ocean.mp3'
-  },
-  {
-    id: 'forest',
-    name: 'Forêt Enchantée',
-    description: 'Chants d\'oiseaux et bruissement des feuilles',
-    icon: <TreePine className="h-6 w-6" />,
-    category: 'Nature',
-    color: 'from-green-400 to-green-600',
-    audioUrl: '/sounds/forest.mp3'
-  },
-  {
-    id: 'fireplace',
-    name: 'Feu de Cheminée',
-    description: 'Crépitement chaleureux du feu',
-    icon: <Flame className="h-6 w-6" />,
-    category: 'Relaxation',
-    color: 'from-orange-400 to-red-500',
-    audioUrl: '/sounds/fireplace.mp3',
-    premium: true
-  },
-  {
-    id: 'cafe',
-    name: 'Café Parisien',
-    description: 'Ambiance feutrée de café',
-    icon: <Coffee className="h-6 w-6" />,
-    category: 'Urbain',
-    color: 'from-amber-400 to-brown-500',
-    audioUrl: '/sounds/cafe.mp3'
-  },
-  {
-    id: 'mystical',
-    name: 'Bols Tibétains',
-    description: 'Sons méditatifs et mystiques',
-    icon: <Sparkles className="h-6 w-6" />,
-    category: 'Mystique',
-    color: 'from-purple-400 to-pink-500',
-    audioUrl: '/sounds/tibetan.mp3',
-    premium: true
-  }
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Play, 
+  Pause, 
+  Volume2, 
+  VolumeX, 
+  Waves, 
+  Wind, 
+  Zap, 
+  Mountain, 
+  TreePine, 
+  CloudRain,
+  Shuffle,
+  Heart,
+  Moon,
+  Sun
+} from 'lucide-react';
 
 const AmbientSoundSelector: React.FC = () => {
-  const [playingSounds, setPlayingSounds] = useState<Set<string>>(new Set());
+  const [activeCategory, setActiveCategory] = useState('nature');
+  const [playingSounds, setPlayingSounds] = useState<string[]>([]);
   const [volumes, setVolumes] = useState<Record<string, number>>({});
-  const [masterVolume, setMasterVolume] = useState(70);
-  const [mixMode, setMixMode] = useState(false);
-  const audioRefs = useRef<Record<string, HTMLAudioElement>>({});
+  const [globalVolume, setGlobalVolume] = useState(70);
 
-  // Initialiser les volumes
-  useEffect(() => {
-    const initialVolumes: Record<string, number> = {};
-    ambientSounds.forEach(sound => {
-      initialVolumes[sound.id] = 50;
-    });
-    setVolumes(initialVolumes);
-  }, []);
+  const soundCategories = {
+    nature: {
+      icon: <TreePine className="h-5 w-5" />,
+      title: 'Nature',
+      sounds: [
+        { id: 'rain', name: 'Pluie douce', icon: <CloudRain className="h-4 w-4" />, color: 'blue' },
+        { id: 'ocean', name: 'Vagues océan', icon: <Waves className="h-4 w-4" />, color: 'cyan' },
+        { id: 'forest', name: 'Forêt mystique', icon: <TreePine className="h-4 w-4" />, color: 'green' },
+        { id: 'wind', name: 'Vent léger', icon: <Wind className="h-4 w-4" />, color: 'gray' },
+        { id: 'thunder', name: 'Orage lointain', icon: <Zap className="h-4 w-4" />, color: 'purple' },
+        { id: 'birds', name: 'Chants d\'oiseaux', icon: <Mountain className="h-4 w-4" />, color: 'orange' }
+      ]
+    },
+    ambient: {
+      icon: <Moon className="h-5 w-5" />,
+      title: 'Ambiant',
+      sounds: [
+        { id: 'white-noise', name: 'Bruit blanc', icon: <Shuffle className="h-4 w-4" />, color: 'gray' },
+        { id: 'brown-noise', name: 'Bruit brun', icon: <Shuffle className="h-4 w-4" />, color: 'amber' },
+        { id: 'pink-noise', name: 'Bruit rose', icon: <Shuffle className="h-4 w-4" />, color: 'pink' },
+        { id: 'tibetan-bowls', name: 'Bols tibétains', icon: <Heart className="h-4 w-4" />, color: 'yellow' },
+        { id: 'crystal-singing', name: 'Cristaux chantants', icon: <Heart className="h-4 w-4" />, color: 'purple' },
+        { id: 'binaural-beats', name: 'Battements binauraux', icon: <Waves className="h-4 w-4" />, color: 'indigo' }
+      ]
+    },
+    focus: {
+      icon: <Sun className="h-5 w-5" />,
+      title: 'Concentration',
+      sounds: [
+        { id: 'cafe-ambience', name: 'Café parisien', icon: <Heart className="h-4 w-4" />, color: 'amber' },
+        { id: 'library', name: 'Bibliothèque', icon: <Heart className="h-4 w-4" />, color: 'gray' },
+        { id: 'fireplace', name: 'Cheminée crépitante', icon: <Zap className="h-4 w-4" />, color: 'orange' },
+        { id: 'clock-ticking', name: 'Tic-tac horloge', icon: <Heart className="h-4 w-4" />, color: 'gray' },
+        { id: 'keyboard-typing', name: 'Clavier mécanique', icon: <Heart className="h-4 w-4" />, color: 'blue' },
+        { id: 'vinyl-crackle', name: 'Crépitement vinyle', icon: <Heart className="h-4 w-4" />, color: 'amber' }
+      ]
+    }
+  };
 
-  // Créer les éléments audio
-  useEffect(() => {
-    ambientSounds.forEach(sound => {
-      if (!audioRefs.current[sound.id]) {
-        const audio = new Audio(sound.audioUrl);
-        audio.loop = true;
-        audio.volume = (volumes[sound.id] || 50) / 100 * (masterVolume / 100);
-        audioRefs.current[sound.id] = audio;
-      }
-    });
-
-    return () => {
-      Object.values(audioRefs.current).forEach(audio => {
-        audio.pause();
-        audio.src = '';
-      });
-    };
-  }, []);
-
-  // Mettre à jour le volume quand les sliders changent
-  useEffect(() => {
-    Object.entries(volumes).forEach(([soundId, volume]) => {
-      const audio = audioRefs.current[soundId];
-      if (audio) {
-        audio.volume = (volume / 100) * (masterVolume / 100);
-      }
-    });
-  }, [volumes, masterVolume]);
-
-  const toggleSound = async (soundId: string) => {
-    const audio = audioRefs.current[soundId];
-    if (!audio) return;
-
-    if (playingSounds.has(soundId)) {
-      // Arrêter le son
-      audio.pause();
-      setPlayingSounds(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(soundId);
-        return newSet;
-      });
+  const toggleSound = (soundId: string) => {
+    if (playingSounds.includes(soundId)) {
+      setPlayingSounds(prev => prev.filter(id => id !== soundId));
     } else {
-      // Si pas en mode mix, arrêter les autres sons
-      if (!mixMode) {
-        playingSounds.forEach(id => {
-          const otherAudio = audioRefs.current[id];
-          if (otherAudio) {
-            otherAudio.pause();
-          }
-        });
-        setPlayingSounds(new Set([soundId]));
-      } else {
-        setPlayingSounds(prev => new Set([...prev, soundId]));
-      }
-      
-      // Démarrer le nouveau son
-      try {
-        await audio.play();
-      } catch (error) {
-        console.error('Erreur lors de la lecture audio:', error);
+      setPlayingSounds(prev => [...prev, soundId]);
+      if (!volumes[soundId]) {
+        setVolumes(prev => ({ ...prev, [soundId]: 50 }));
       }
     }
   };
 
-  const stopAllSounds = () => {
-    playingSounds.forEach(soundId => {
-      const audio = audioRefs.current[soundId];
-      if (audio) {
-        audio.pause();
-      }
-    });
-    setPlayingSounds(new Set());
+  const updateVolume = (soundId: string, volume: number) => {
+    setVolumes(prev => ({ ...prev, [soundId]: volume }));
   };
 
-  const categories = Array.from(new Set(ambientSounds.map(s => s.category)));
+  const clearAllSounds = () => {
+    setPlayingSounds([]);
+  };
+
+  const getColorClasses = (color: string) => {
+    const colorMap: Record<string, string> = {
+      blue: 'bg-blue-500/20 text-blue-600 border-blue-200',
+      cyan: 'bg-cyan-500/20 text-cyan-600 border-cyan-200',
+      green: 'bg-green-500/20 text-green-600 border-green-200',
+      gray: 'bg-gray-500/20 text-gray-600 border-gray-200',
+      purple: 'bg-purple-500/20 text-purple-600 border-purple-200',
+      orange: 'bg-orange-500/20 text-orange-600 border-orange-200',
+      amber: 'bg-amber-500/20 text-amber-600 border-amber-200',
+      pink: 'bg-pink-500/20 text-pink-600 border-pink-200',
+      yellow: 'bg-yellow-500/20 text-yellow-600 border-yellow-200',
+      indigo: 'bg-indigo-500/20 text-indigo-600 border-indigo-200'
+    };
+    return colorMap[color] || colorMap.gray;
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Contrôles globaux */}
-      <Card>
-        <CardHeader>
+    <Card className="w-full">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Volume2 className="h-5 w-5" />
-            Contrôles Audio
+            <Waves className="h-5 w-5 text-blue-500" />
+            Ambiances Sonores
           </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>Volume Principal</Label>
-              <Slider
-                value={[masterVolume]}
-                onValueChange={(values) => setMasterVolume(values[0])}
-                max={100}
-                step={1}
-                className="w-full"
-              />
-              <span className="text-sm text-muted-foreground">{masterVolume}%</span>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="mix-mode"
-                checked={mixMode}
-                onCheckedChange={setMixMode}
-              />
-              <Label htmlFor="mix-mode" className="flex items-center gap-2">
-                <Mix className="h-4 w-4" />
-                Mode Mix
-              </Label>
-            </div>
-            
-            <Button
-              onClick={stopAllSounds}
-              variant="outline"
-              className="flex items-center gap-2"
-              disabled={playingSounds.size === 0}
-            >
-              <Pause className="h-4 w-4" />
-              Tout Arrêter
-            </Button>
+          <div className="flex items-center gap-4">
+            <Badge variant="secondary" className="flex items-center gap-1">
+              {playingSounds.length} actifs
+            </Badge>
+            {playingSounds.length > 0 && (
+              <Button variant="outline" size="sm" onClick={clearAllSounds}>
+                Tout arrêter
+              </Button>
+            )}
           </div>
-          
-          {mixMode && (
-            <div className="text-sm text-muted-foreground bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
-              Mode Mix activé : vous pouvez jouer plusieurs sons simultanément
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+        
+        {/* Volume Global */}
+        <div className="flex items-center gap-3 mt-4 p-3 bg-muted/50 rounded-lg">
+          <Volume2 className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium min-w-[100px]">Volume global</span>
+          <Slider
+            value={[globalVolume]}
+            onValueChange={(value) => setGlobalVolume(value[0])}
+            max={100}
+            step={1}
+            className="flex-1"
+          />
+          <span className="text-sm text-muted-foreground w-12">{globalVolume}%</span>
+        </div>
+      </CardHeader>
 
-      {/* Sons par catégorie */}
-      {categories.map(category => (
-        <Card key={category}>
-          <CardHeader>
-            <CardTitle className="text-lg">{category}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {ambientSounds
-                .filter(sound => sound.category === category)
-                .map((sound, index) => (
-                  <motion.div
-                    key={sound.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
+      <CardContent className="space-y-6">
+        <Tabs value={activeCategory} onValueChange={setActiveCategory}>
+          <TabsList className="grid w-full grid-cols-3">
+            {Object.entries(soundCategories).map(([key, category]) => (
+              <TabsTrigger key={key} value={key} className="flex items-center gap-2">
+                {category.icon}
+                <span className="hidden sm:inline">{category.title}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {Object.entries(soundCategories).map(([categoryKey, category]) => (
+            <TabsContent key={categoryKey} value={categoryKey} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {category.sounds.map((sound) => {
+                  const isPlaying = playingSounds.includes(sound.id);
+                  const volume = volumes[sound.id] || 50;
+                  
+                  return (
                     <Card 
-                      className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-                        playingSounds.has(sound.id) ? 'ring-2 ring-primary' : ''
+                      key={sound.id} 
+                      className={`transition-all duration-300 hover:shadow-lg ${
+                        isPlaying ? 'ring-2 ring-primary/50 shadow-lg' : ''
                       }`}
-                      onClick={() => toggleSound(sound.id)}
                     >
-                      <CardContent className="p-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className={`p-3 rounded-xl bg-gradient-to-br ${sound.color} text-white`}>
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className={`p-2 rounded-lg border ${getColorClasses(sound.color)}`}>
                               {sound.icon}
                             </div>
-                            {sound.premium && (
-                              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black">
-                                Premium
-                              </Badge>
+                            <span className="font-medium text-sm">{sound.name}</span>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant={isPlaying ? "default" : "outline"}
+                            onClick={() => toggleSound(sound.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            {isPlaying ? (
+                              <Pause className="h-3 w-3" />
+                            ) : (
+                              <Play className="h-3 w-3" />
                             )}
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-medium">{sound.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {sound.description}
-                            </p>
-                          </div>
-                          
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant={playingSounds.has(sound.id) ? "default" : "outline"}
-                              className="flex items-center gap-1"
-                            >
-                              {playingSounds.has(sound.id) ? (
-                                <Pause className="h-3 w-3" />
-                              ) : (
-                                <Play className="h-3 w-3" />
-                              )}
-                            </Button>
-                            
-                            {playingSounds.has(sound.id) && (
-                              <div className="flex-1 space-y-1">
-                                <Slider
-                                  value={[volumes[sound.id] || 50]}
-                                  onValueChange={(values) => {
-                                    setVolumes(prev => ({
-                                      ...prev,
-                                      [sound.id]: values[0]
-                                    }));
-                                  }}
-                                  max={100}
-                                  step={1}
-                                  className="w-full"
-                                />
-                                <span className="text-xs text-muted-foreground">
-                                  {volumes[sound.id] || 50}%
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                          </Button>
                         </div>
+                        
+                        {isPlaying && (
+                          <div className="flex items-center gap-2 animate-in slide-in-from-top-2 duration-300">
+                            <VolumeX className="h-3 w-3 text-muted-foreground" />
+                            <Slider
+                              value={[volume]}
+                              onValueChange={(value) => updateVolume(sound.id, value[0])}
+                              max={100}
+                              step={1}
+                              className="flex-1"
+                            />
+                            <Volume2 className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground w-8">{volume}%</span>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
-                  </motion.div>
-                ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+
+        {playingSounds.length > 0 && (
+          <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Waves className="h-4 w-4 text-primary" />
+                <span className="font-medium">Mix en cours</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {playingSounds.map((soundId) => {
+                  const sound = Object.values(soundCategories)
+                    .flatMap(cat => cat.sounds)
+                    .find(s => s.id === soundId);
+                  
+                  return sound ? (
+                    <Badge 
+                      key={soundId} 
+                      variant="secondary" 
+                      className="flex items-center gap-1"
+                    >
+                      {sound.icon}
+                      {sound.name}
+                      <button
+                        onClick={() => toggleSound(soundId)}
+                        className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                      >
+                        <VolumeX className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ) : null;
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
