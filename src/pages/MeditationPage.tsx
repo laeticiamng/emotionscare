@@ -1,34 +1,19 @@
 
-import React, { Suspense } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
-import { GuidedSessionList } from '@/utils/lazyRoutes';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const MeditationPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Méditation & Mindfulness</h1>
-        <p className="text-muted-foreground">
-          Découvrez nos sessions guidées pour améliorer votre bien-être mental
-        </p>
-      </div>
-
-      <Suspense fallback={<ComponentLoadingFallback />}>
-        <GuidedSessionList />
-      </Suspense>
-
-      <Card className="mt-8">
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6">Méditation</h1>
+      
+      <Card>
         <CardHeader>
-          <CardTitle>Conseils pour débuter</CardTitle>
+          <CardTitle>Séances de méditation</CardTitle>
+          <CardDescription>Découvrez nos séances guidées pour votre bien-être</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2 text-sm">
-            <li>• Commencez par des sessions courtes (5-10 minutes)</li>
-            <li>• Trouvez un endroit calme sans distractions</li>
-            <li>• Gardez une posture confortable mais droite</li>
-            <li>• Soyez patient avec vous-même</li>
-          </ul>
+          <p>Page de méditation en cours de développement...</p>
         </CardContent>
       </Card>
     </div>

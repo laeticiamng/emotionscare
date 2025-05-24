@@ -4,46 +4,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
-const ChooseModePage: React.FC = () => {
+const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="container mx-auto p-4 min-h-screen flex items-center justify-center">
       <div className="max-w-4xl w-full">
-        <h1 className="text-4xl font-bold text-center mb-8">Choisissez votre espace</h1>
+        <h1 className="text-4xl font-bold text-center mb-8">Solutions Entreprise</h1>
         
         <div className="grid md:grid-cols-2 gap-8">
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card>
             <CardHeader>
-              <CardTitle>Espace Particulier</CardTitle>
-              <CardDescription>
-                Accédez à votre espace personnel de bien-être émotionnel
-              </CardDescription>
+              <CardTitle>Espace Collaborateur</CardTitle>
+              <CardDescription>Accès pour les employés</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
-                onClick={() => navigate('/b2c/login')}
+                onClick={() => navigate('/b2b/user/login')}
                 className="w-full"
               >
-                Accéder à mon espace
+                Se connecter
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card>
             <CardHeader>
-              <CardTitle>Espace Entreprise</CardTitle>
-              <CardDescription>
-                Solutions de bien-être pour les organisations
-              </CardDescription>
+              <CardTitle>Espace Administration</CardTitle>
+              <CardDescription>Tableau de bord RH</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
-                onClick={() => navigate('/b2b/selection')}
+                onClick={() => navigate('/b2b/admin/login')}
                 variant="outline"
                 className="w-full"
               >
-                Découvrir nos solutions
+                Administration
               </Button>
             </CardContent>
           </Card>
@@ -53,4 +49,4 @@ const ChooseModePage: React.FC = () => {
   );
 };
 
-export default ChooseModePage;
+export default B2BSelectionPage;
