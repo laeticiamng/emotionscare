@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -12,7 +11,7 @@ const B2CDashboardPage = React.lazy(() => import('@/pages/b2c/dashboard/B2CDashb
 const B2COnboardingPage = React.lazy(() => import('@/pages/b2c/onboarding/B2COnboardingPage'));
 
 // B2B Pages
-const B2BRoleSelectionPage = React.lazy(() => import('@/pages/b2b/selection/B2BRoleSelectionPage'));
+const B2BSelectionPage = React.lazy(() => import('@/pages/auth/B2BSelectionPage'));
 
 // Other Pages
 const HomePage = React.lazy(() => import('@/pages/HomePage'));
@@ -75,7 +74,7 @@ const routes = [
     children: [
       {
         path: 'selection',
-        element: <B2BRoleSelectionPage />,
+        element: <B2BSelectionPage />,
       },
       // B2B User Routes
       {
@@ -174,7 +173,7 @@ const routes = [
     ],
   },
   
-  // Redirections pour les anciennes routes
+  // Redirections pour les routes obsolètes (à conserver temporairement)
   {
     path: '/login-collaborateur',
     element: <Navigate to="/b2b/user/login" replace />,

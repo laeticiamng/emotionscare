@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface User {
   id: string;
@@ -17,6 +18,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, metadata?: any) => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error?: any }>;
+  refreshToken: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,17 +36,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem('auth_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    // Gestion stricte de l'état d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('[Auth] State change:', event, session?.user?.id);
+        
+        if (session?.user) {
+          const mockUser: User = {
+            id: session.user.id,
+            email: session.user.email || '',
+            role: session.user.email?.includes('@admin') ? 'b2b_admin' : 
+                  session.user.email?.includes('@company') ? 'b2b_user' : 'b2c',
+            firstName: session.user.user_metadata?.first_name || 'John',
+            lastName: session.user.user_metadata?.last_name || 'Doe',
+          };
+          
+          setUser(mockUser);
+          localStorage.setItem('auth_user', JSON.stringify(mockUser));
+        } else {
+          setUser(null);
+          localStorage.removeItem('auth_user');
+        }
+        
+        setIsLoading(false);
+      }
+    );
+
+    // Vérifier la session existante
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const mockUser: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          role: session.user.email?.includes('@admin') ? 'b2b_admin' : 
+                session.user.email?.includes('@company') ? 'b2b_user' : 'b2c',
+          firstName: session.user.user_metadata?.first_name || 'John',
+          lastName: session.user.user_metadata?.last_name || 'Doe',
+        };
+        
+        setUser(mockUser);
+        localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Simulate authentication
+      // Simulation d'authentification en attendant la vraie validation JWT
       const mockUser: User = {
         id: '1',
         email,
@@ -65,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, metadata?: any) => {
     try {
-      // Simulate registration
+      // Simulation d'inscription
       const mockUser: User = {
         id: '1',
         email,
@@ -84,16 +125,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    setUser(null);
-    localStorage.removeItem('auth_user');
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      localStorage.removeItem('auth_user');
+    } catch (error) {
+      console.error('[Auth] Error during signout:', error);
+      // Force cleanup même en cas d'erreur
+      setUser(null);
+      localStorage.removeItem('auth_user');
+    }
   };
 
   const resetPassword = async (email: string) => {
     try {
-      // Simulate password reset
+      // Simulation de reset password
       return { error: null };
     } catch (error) {
       return { error };
+    }
+  };
+
+  const refreshToken = async () => {
+    try {
+      const { data, error } = await supabase.auth.refreshSession();
+      if (error) {
+        console.error('[Auth] Token refresh failed:', error);
+        await signOut();
+      }
+    } catch (error) {
+      console.error('[Auth] Token refresh error:', error);
+      await signOut();
     }
   };
 
@@ -105,6 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signOut,
     resetPassword,
+    refreshToken,
   };
 
   return (
