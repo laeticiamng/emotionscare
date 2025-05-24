@@ -1,166 +1,141 @@
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { OnboardingStep } from '@/types/onboarding';
-import { DEFAULT_ONBOARDING_STEPS, b2bAdminOnboardingSteps, b2bUserOnboardingSteps } from '@/data/onboardingSteps';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { UserRole } from '@/types/user';
+
+interface OnboardingStep {
+  id: string;
+  title: string;
+  content: React.ReactNode;
+  isComplete: boolean;
+}
 
 interface OnboardingContextType {
   steps: OnboardingStep[];
-  currentStepIndex: number;
-  isComplete: boolean;
+  currentStep: number;
+  loading: boolean;
+  emotion: string;
+  intensity: number;
   userResponses: Record<string, any>;
   nextStep: () => void;
   previousStep: () => void;
-  goToStep: (index: number) => void;
-  completeOnboarding: () => void;
-  updateResponse: (stepId: string, response: any) => void;
-  resetOnboarding: () => void;
-  currentStep: OnboardingStep | null;
+  handleResponse: (key: string, value: any) => void;
+  completeOnboarding: () => Promise<boolean>;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
-interface OnboardingProviderProps {
-  children: ReactNode;
-  steps?: OnboardingStep[];
-  initialStep?: number;
-  onComplete?: () => void;
-  userRole?: UserRole;
-}
+export const useOnboarding = () => {
+  const context = useContext(OnboardingContext);
+  if (!context) {
+    throw new Error('useOnboarding must be used within an OnboardingProvider');
+  }
+  return context;
+};
 
-export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
-  children,
-  steps,
-  initialStep = 0,
-  onComplete,
-  userRole = 'b2c'
-}) => {
-  // Determine steps based on user role if not explicitly provided
-  const getOnboardingSteps = (): OnboardingStep[] => {
-    if (steps) return steps;
-    
-    switch (userRole) {
-      case 'b2b_admin':
-        return b2bAdminOnboardingSteps;
-      case 'b2b_user':
-        return b2bUserOnboardingSteps;
-      default:
-        return DEFAULT_ONBOARDING_STEPS;
-    }
-  };
-
-  const [onboardingSteps] = useState<OnboardingStep[]>(getOnboardingSteps());
-  const [currentStepIndex, setCurrentStepIndex] = useState(initialStep);
-  const [isComplete, setIsComplete] = useState(false);
+export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [emotion, setEmotion] = useState('');
+  const [intensity, setIntensity] = useState(0);
   const [userResponses, setUserResponses] = useState<Record<string, any>>({});
+  
+  const { user } = useAuth();
   const { toast } = useToast();
 
-  const currentStep = onboardingSteps[currentStepIndex] || null;
+  const steps: OnboardingStep[] = [
+    {
+      id: 'welcome',
+      title: 'Bienvenue',
+      content: <div>Bienvenue dans votre parcours de bien-être</div>,
+      isComplete: false,
+    },
+    {
+      id: 'goals',
+      title: 'Vos objectifs',
+      content: <div>Définissez vos objectifs de bien-être</div>,
+      isComplete: false,
+    },
+    {
+      id: 'preferences',
+      title: 'Préférences',
+      content: <div>Configurez vos préférences</div>,
+      isComplete: false,
+    },
+  ];
 
   const nextStep = () => {
-    if (currentStepIndex < onboardingSteps.length - 1) {
-      setCurrentStepIndex(currentStepIndex + 1);
-      
-      // Afficher un toast d'encouragement pour certaines étapes
-      if ([1, 3, onboardingSteps.length - 2].includes(currentStepIndex + 1)) {
-        toast({
-          title: "Bonne progression !",
-          description: `Étape ${currentStepIndex + 2}/${onboardingSteps.length} - Continuez comme ça !`,
-          variant: "success",
-        });
-      }
-    } else {
-      completeOnboarding();
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
   const previousStep = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1);
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
-  const goToStep = (index: number) => {
-    if (index >= 0 && index < onboardingSteps.length) {
-      setCurrentStepIndex(index);
-    }
-  };
-
-  const completeOnboarding = () => {
-    setIsComplete(true);
-    
-    // Sauvegarder la complétion dans le localStorage
-    try {
-      localStorage.setItem('onboardingComplete', 'true');
-      localStorage.setItem('onboardingResponses', JSON.stringify(userResponses));
-    } catch (error) {
-      console.error('Error saving onboarding data:', error);
-    }
-    
-    toast({
-      title: "Formation complétée !",
-      description: "Félicitations ! Vous avez terminé la formation.",
-      variant: "success",
-    });
-    
-    if (onComplete) {
-      onComplete();
-    }
-  };
-
-  const updateResponse = (stepId: string, response: any) => {
+  const handleResponse = (key: string, value: any) => {
     setUserResponses(prev => ({
       ...prev,
-      [stepId]: response
+      [key]: value,
     }));
   };
 
-  const resetOnboarding = () => {
-    setCurrentStepIndex(0);
-    setIsComplete(false);
-    setUserResponses({});
+  const completeOnboarding = async (): Promise<boolean> => {
+    if (!user) return false;
     
-    // Effacer les données du localStorage
+    setLoading(true);
     try {
-      localStorage.removeItem('onboardingComplete');
-      localStorage.removeItem('onboardingResponses');
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          preferences: {
+            ...userResponses,
+            onboarding_completed: true,
+          }
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Onboarding terminé !",
+        description: "Votre profil a été configuré avec succès.",
+      });
+
+      return true;
     } catch (error) {
-      console.error('Error removing onboarding data:', error);
+      console.error('Erreur lors de la finalisation de l\'onboarding:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de finaliser l'onboarding",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLoading(false);
     }
-    
-    toast({
-      title: "Formation réinitialisée",
-      description: "Vous pouvez recommencer la formation depuis le début.",
-      variant: "info",
-    });
+  };
+
+  const value = {
+    steps,
+    currentStep,
+    loading,
+    emotion,
+    intensity,
+    userResponses,
+    nextStep,
+    previousStep,
+    handleResponse,
+    completeOnboarding,
   };
 
   return (
-    <OnboardingContext.Provider
-      value={{
-        steps: onboardingSteps,
-        currentStepIndex,
-        isComplete,
-        userResponses,
-        nextStep,
-        previousStep,
-        goToStep,
-        completeOnboarding,
-        updateResponse,
-        resetOnboarding,
-        currentStep
-      }}
-    >
+    <OnboardingContext.Provider value={value}>
       {children}
     </OnboardingContext.Provider>
   );
-};
-
-export const useOnboarding = (): OnboardingContextType => {
-  const context = useContext(OnboardingContext);
-  if (context === undefined) {
-    throw new Error('useOnboarding must be used within an OnboardingProvider');
-  }
-  return context;
 };

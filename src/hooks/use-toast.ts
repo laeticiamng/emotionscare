@@ -181,6 +181,7 @@ function useToast() {
 
   return {
     ...state,
+    toasts: state.toasts || [], // Ensure toasts is always an array
     toast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   }

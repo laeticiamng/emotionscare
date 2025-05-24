@@ -1,292 +1,355 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Confetti } from '@/components/ui/confetti';
+import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, Circle, Music, Target, Sparkles } from 'lucide-react';
 
-interface OnboardingStep {
-  id: string;
-  title: string;
-  description: string;
+interface OnboardingData {
+  goals: string[];
+  musicPreferences: {
+    genres: string[];
+    tempo: number;
+  };
+  notifications: boolean;
 }
 
-const steps: OnboardingStep[] = [
-  {
-    id: 'welcome',
-    title: 'Bienvenue sur EmotionsCare',
-    description: 'Nous allons vous guider pour personnaliser votre expérience.'
-  },
-  {
-    id: 'personalization',
-    title: 'Personnalisation',
-    description: 'Dites-nous en plus sur vos préférences.'
-  },
-  {
-    id: 'goals',
-    title: 'Vos objectifs',
-    description: 'Qu\'espérez-vous accomplir avec EmotionsCare ?'
-  },
-  {
-    id: 'complete',
-    title: 'C\'est prêt !',
-    description: 'Votre espace personnel est configuré.'
-  }
-];
-
 const B2COnboardingPage: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [mood, setMood] = useState<string>('balanced');
-  const [goal, setGoal] = useState<string>('stress');
-  const [reminderTime, setReminderTime] = useState<string>('09:00');
-  const [loading, setLoading] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-  
-  const navigate = useNavigate();
-  const { user, updateUser } = useAuth();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [onboardingData, setOnboardingData] = useState<OnboardingData>({
+    goals: [],
+    musicPreferences: {
+      genres: [],
+      tempo: 50,
+    },
+    notifications: true,
+  });
+
+  const { user } = useAuth();
   const { toast } = useToast();
-  
+  const navigate = useNavigate();
+
+  const totalSteps = 3;
+
+  const goals = [
+    { id: 'stress', label: 'Réduire le stress', icon: '🧘‍♀️' },
+    { id: 'sleep', label: 'Améliorer le sommeil', icon: '😴' },
+    { id: 'focus', label: 'Augmenter la concentration', icon: '🎯' },
+    { id: 'mood', label: 'Améliorer l\'humeur', icon: '😊' },
+    { id: 'anxiety', label: 'Gérer l\'anxiété', icon: '🌱' },
+    { id: 'productivity', label: 'Être plus productif', icon: '⚡' },
+  ];
+
+  const musicGenres = [
+    { id: 'ambient', label: 'Ambient' },
+    { id: 'classical', label: 'Classique' },
+    { id: 'nature', label: 'Sons de la nature' },
+    { id: 'meditation', label: 'Méditation' },
+    { id: 'electronic', label: 'Électronique douce' },
+    { id: 'acoustic', label: 'Acoustique' },
+  ];
+
+  const handleGoalToggle = (goalId: string) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goalId)
+        ? prev.goals.filter(id => id !== goalId)
+        : [...prev.goals, goalId]
+    }));
+  };
+
+  const handleGenreToggle = (genreId: string) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      musicPreferences: {
+        ...prev.musicPreferences,
+        genres: prev.musicPreferences.genres.includes(genreId)
+          ? prev.musicPreferences.genres.filter(id => id !== genreId)
+          : [...prev.musicPreferences.genres, genreId]
+      }
+    }));
+  };
+
+  const handleTempoChange = (value: number[]) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      musicPreferences: {
+        ...prev.musicPreferences,
+        tempo: value[0]
+      }
+    }));
+  };
+
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+    } else {
+      completeOnboarding();
     }
   };
-  
+
   const prevStep = () => {
-    if (currentStep > 0) {
+    if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
-  
+
   const completeOnboarding = async () => {
-    setLoading(true);
-    
+    if (!user) return;
+
+    setIsLoading(true);
     try {
-      if (user && updateUser) {
-        // Save user preferences
-        await updateUser({
-          ...user,
+      // Update user profile with onboarding data
+      const { error } = await supabase
+        .from('profiles')
+        .update({
           preferences: {
-            ...user.preferences,
-            onboarded: true,
-            mood,
-            goal,
-            reminderTime
+            ...onboardingData,
+            onboarding_completed: true,
           }
-        });
-      }
-      
-      setShowConfetti(true);
-      
-      // Small delay to show the completion page with confetti
-      setTimeout(() => {
-        toast({
-          title: "Configuration terminée",
-          description: "Votre espace personnel est prêt !",
-        });
-        navigate('/b2c/dashboard');
-      }, 3000);
-      
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Onboarding terminé !",
+        description: "Votre profil a été configuré avec succès.",
+      });
+
+      navigate('/b2c/dashboard');
     } catch (error) {
+      console.error('Erreur lors de la finalisation de l\'onboarding:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences. Veuillez réessayer.",
+        description: "Impossible de finaliser l'onboarding",
         variant: "destructive",
       });
-      setLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  const handleNext = () => {
-    if (currentStep === steps.length - 1) {
-      completeOnboarding();
-    } else {
-      nextStep();
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 1:
+        return true; // Welcome step
+      case 2:
+        return onboardingData.goals.length > 0;
+      case 3:
+        return onboardingData.musicPreferences.genres.length > 0;
+      default:
+        return false;
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      {showConfetti && <Confetti duration={3000} />}
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg"
-      >
-        {/* Progress bar */}
-        <div className="flex gap-2 mb-6 justify-center">
-          {steps.map((_, index) => (
-            <div
-              key={index}
-              className={`h-1.5 rounded-full transition-all ${
-                index <= currentStep ? 'bg-primary w-10' : 'bg-muted w-6'
-              }`}
-            ></div>
-          ))}
-        </div>
-        
-        <Card className="border-none shadow-xl">
-          <CardHeader className="pb-4 space-y-1">
-            <CardTitle className="text-2xl text-center">
-              {steps[currentStep].title}
-            </CardTitle>
-            <CardDescription className="text-center">
-              {steps[currentStep].description}
-            </CardDescription>
-          </CardHeader>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl mb-4">Configuration de votre profil</CardTitle>
           
-          <CardContent className="pb-6">
-            <AnimatePresence mode="wait">
+          {/* Progress Stepper */}
+          <div className="flex justify-center mb-6">
+            {Array.from({ length: totalSteps }, (_, i) => (
+              <div key={i} className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    i + 1 <= currentStep
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {i + 1 < currentStep ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    <span>{i + 1}</span>
+                  )}
+                </div>
+                {i < totalSteps - 1 && (
+                  <div
+                    className={`w-12 h-1 mx-2 ${
+                      i + 1 < currentStep ? 'bg-primary' : 'bg-muted'
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <AnimatePresence mode="wait">
+            {/* Step 1: Welcome */}
+            {currentStep === 1 && (
               <motion.div
-                key={currentStep}
+                key="step1"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="h-full"
+                className="text-center space-y-6"
               >
-                {currentStep === 0 && (
-                  <div className="space-y-6">
-                    <div className="flex justify-center">
-                      <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center">
-                        <motion.div
-                          animate={{ scale: [1, 1.1, 1] }}
-                          transition={{ repeat: Infinity, duration: 2 }}
-                        >
-                          <Check className="h-16 w-16 text-primary" />
-                        </motion.div>
-                      </div>
-                    </div>
-                    
-                    <p className="text-center">
-                      Nous sommes ravis de vous accueillir, <span className="font-semibold">{user?.name?.split(' ')[0]}</span>.
-                      <br />Quelques étapes rapides pour personnaliser votre expérience.
-                    </p>
-                  </div>
-                )}
-                
-                {currentStep === 1 && (
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <Label>Quelle est votre humeur habituelle ?</Label>
-                      <RadioGroup 
-                        value={mood} 
-                        onValueChange={setMood}
-                        className="grid grid-cols-1 gap-4"
-                      >
-                        {[
-                          { value: 'energetic', label: 'Énergique et dynamique' },
-                          { value: 'balanced', label: 'Équilibrée et stable' },
-                          { value: 'calm', label: 'Calme et posée' },
-                          { value: 'variable', label: 'Variable selon les jours' }
-                        ].map((item) => (
-                          <div key={item.value} className="flex items-center space-x-2">
-                            <RadioGroupItem value={item.value} id={item.value} />
-                            <Label htmlFor={item.value}>{item.label}</Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="reminderTime">À quelle heure préférez-vous recevoir des rappels ?</Label>
-                      <Input 
-                        type="time" 
-                        id="reminderTime" 
-                        value={reminderTime}
-                        onChange={(e) => setReminderTime(e.target.value)}
-                        className="mt-2"
-                      />
-                    </div>
-                  </div>
-                )}
-                
-                {currentStep === 2 && (
-                  <div className="space-y-6">
-                    <div>
-                      <Label>Quel est votre objectif principal ?</Label>
-                      <RadioGroup 
-                        value={goal} 
-                        onValueChange={setGoal}
-                        className="grid grid-cols-1 gap-4 mt-4"
-                      >
-                        {[
-                          { value: 'stress', label: 'Réduire le stress et l\'anxiété' },
-                          { value: 'sleep', label: 'Améliorer mon sommeil' },
-                          { value: 'focus', label: 'Augmenter ma concentration' },
-                          { value: 'balance', label: 'Trouver un meilleur équilibre émotionnel' },
-                          { value: 'happiness', label: 'Cultiver plus de joie au quotidien' }
-                        ].map((item) => (
-                          <div key={item.value} className="flex items-center space-x-2">
-                            <RadioGroupItem value={item.value} id={item.value} />
-                            <Label htmlFor={item.value}>{item.label}</Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </div>
-                  </div>
-                )}
-                
-                {currentStep === 3 && (
-                  <div className="space-y-6 text-center">
-                    <div className="flex justify-center">
-                      <div className="w-32 h-32 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1] }}
-                          transition={{ repeat: Infinity, duration: 2 }}
-                        >
-                          <Check className="h-16 w-16 text-green-500 dark:text-green-400" />
-                        </motion.div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-xl font-medium">Configuration terminée !</p>
-                      <p>
-                        Votre espace personnel est prêt. 
-                        <br />Nous avons personnalisé l'expérience selon vos préférences.
-                      </p>
-                    </div>
-                  </div>
-                )}
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                  <Sparkles className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold">Bienvenue sur EmotionsCare !</h3>
+                <p className="text-muted-foreground">
+                  Nous allons personnaliser votre expérience en quelques étapes simples.
+                  Cela ne prendra que 2 minutes.
+                </p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm text-green-800">
+                    ✨ Votre essai gratuit de 3 jours est déjà activé !
+                  </p>
+                </div>
               </motion.div>
-            </AnimatePresence>
-          </CardContent>
-          
-          <CardFooter className="flex justify-between pt-0">
-            <Button 
-              variant="outline" 
+            )}
+
+            {/* Step 2: Goals */}
+            {currentStep === 2 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <div className="text-center">
+                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <Target className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Vos objectifs</h3>
+                  <p className="text-muted-foreground">
+                    Quels sont vos principaux objectifs de bien-être ? (Sélectionnez-en au moins un)
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {goals.map((goal) => (
+                    <button
+                      key={goal.id}
+                      onClick={() => handleGoalToggle(goal.id)}
+                      className={`p-4 rounded-lg border-2 transition-all text-left ${
+                        onboardingData.goals.includes(goal.id)
+                          ? 'border-primary bg-primary/5'
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">{goal.icon}</span>
+                        <span className="font-medium">{goal.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 3: Music Preferences */}
+            {currentStep === 3 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <div className="text-center">
+                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <Music className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Préférences musicales</h3>
+                  <p className="text-muted-foreground">
+                    Aidez-nous à personnaliser votre musique de bien-être
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <Label className="text-base font-medium mb-3 block">
+                      Types de musique préférés
+                    </Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {musicGenres.map((genre) => (
+                        <button
+                          key={genre.id}
+                          onClick={() => handleGenreToggle(genre.id)}
+                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                            onboardingData.musicPreferences.genres.includes(genre.id)
+                              ? 'border-primary bg-primary/5'
+                              : 'border-muted hover:border-primary/50'
+                          }`}
+                        >
+                          <span className="font-medium">{genre.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-base font-medium mb-3 block">
+                      Tempo préféré: {onboardingData.musicPreferences.tempo < 30 ? 'Lent' : 
+                        onboardingData.musicPreferences.tempo < 70 ? 'Modéré' : 'Énergique'}
+                    </Label>
+                    <Slider
+                      value={[onboardingData.musicPreferences.tempo]}
+                      onValueChange={handleTempoChange}
+                      max={100}
+                      min={0}
+                      step={10}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                      <span>Relaxant</span>
+                      <span>Énergisant</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Navigation */}
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
               onClick={prevStep}
-              disabled={currentStep === 0 || loading}
+              disabled={currentStep === 1}
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>
             
-            <Button 
-              onClick={handleNext}
-              disabled={loading}
+            <Button
+              onClick={nextStep}
+              disabled={!canProceed() || isLoading}
             >
-              {currentStep === steps.length - 1 ? (
-                loading ? 'Finalisation...' : 'Terminer'
-              ) : (
+              {isLoading ? (
                 <>
-                  Suivant
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full"
+                  />
+                  Finalisation...
                 </>
+              ) : currentStep === totalSteps ? (
+                'Terminer'
+              ) : (
+                'Suivant'
               )}
             </Button>
-          </CardFooter>
-        </Card>
-      </motion.div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

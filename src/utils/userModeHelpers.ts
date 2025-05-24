@@ -1,21 +1,37 @@
 
-import { UserModeType } from '@/types/userMode';
+export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
 
-export function getUserModeDisplayName(userMode: UserModeType | null): string {
-  switch (userMode) {
+/**
+ * Normalize user role to user mode
+ */
+export function normalizeUserMode(role: string | undefined | null): UserMode {
+  if (!role) return 'b2c';
+  
+  switch (role.toLowerCase()) {
     case 'b2c':
-      return 'Particulier';
+    case 'personal':
+    case 'individual':
+      return 'b2c';
     case 'b2b_user':
-      return 'Collaborateur';
+    case 'b2b-user':
+    case 'collaborator':
+    case 'employee':
+      return 'b2b_user';
     case 'b2b_admin':
-      return 'Administrateur';
+    case 'b2b-admin':
+    case 'admin':
+    case 'administrator':
+      return 'b2b_admin';
     default:
-      return 'Non défini';
+      return 'b2c';
   }
 }
 
-export function getModeDashboardPath(userMode: UserModeType | null): string {
-  switch (userMode) {
+/**
+ * Get dashboard path for a specific user mode
+ */
+export function getModeDashboardPath(mode: UserMode): string {
+  switch (mode) {
     case 'b2c':
       return '/b2c/dashboard';
     case 'b2b_user':
@@ -23,12 +39,15 @@ export function getModeDashboardPath(userMode: UserModeType | null): string {
     case 'b2b_admin':
       return '/b2b/admin/dashboard';
     default:
-      return '/choose-mode';
+      return '/b2c/dashboard';
   }
 }
 
-export function getModeLoginPath(userMode: UserModeType | null): string {
-  switch (userMode) {
+/**
+ * Get login path for a specific user mode
+ */
+export function getModeLoginPath(mode: UserMode): string {
+  switch (mode) {
     case 'b2c':
       return '/b2c/login';
     case 'b2b_user':
@@ -36,51 +55,13 @@ export function getModeLoginPath(userMode: UserModeType | null): string {
     case 'b2b_admin':
       return '/b2b/admin/login';
     default:
-      return '/choose-mode';
+      return '/b2c/login';
   }
 }
 
-export function getUserModeColor(userMode: UserModeType | null): string {
-  switch (userMode) {
-    case 'b2c':
-      return 'bg-blue-100 text-blue-700';
-    case 'b2b_user':
-      return 'bg-green-100 text-green-700';
-    case 'b2b_admin':
-      return 'bg-purple-100 text-purple-700';
-    default:
-      return 'bg-gray-100 text-gray-700';
-  }
-}
-
-export function normalizeUserMode(role: string | undefined | null): UserModeType {
-  if (!role) return 'b2c';
-  
-  const normalizedRole = role.toLowerCase().trim();
-  
-  switch (normalizedRole) {
-    case 'b2c':
-    case 'particulier':
-    case 'individual':
-    case 'personal':
-      return 'b2c';
-      
-    case 'b2b_user':
-    case 'b2b-user':
-    case 'collaborateur':
-    case 'employee':
-    case 'user':
-      return 'b2b_user';
-      
-    case 'b2b_admin':
-    case 'b2b-admin':
-    case 'admin':
-    case 'administrator':
-    case 'administrateur':
-      return 'b2b_admin';
-      
-    default:
-      console.warn(`Unknown user role: ${role}, defaulting to b2c`);
-      return 'b2c';
-  }
+/**
+ * Check if a mode is valid
+ */
+export function isValidUserMode(mode: string): mode is UserMode {
+  return ['b2c', 'b2b_user', 'b2b_admin'].includes(mode);
 }

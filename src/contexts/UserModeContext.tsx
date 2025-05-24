@@ -1,46 +1,74 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserModeType, UserModeContextType } from '@/types/userMode';
+import { useAuth } from '@/contexts/AuthContext';
+
+export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
+
+interface UserModeContextType {
+  userMode: UserMode | null;
+  setUserMode: (mode: UserMode) => void;
+  isLoading: boolean;
+}
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 export const useUserMode = () => {
   const context = useContext(UserModeContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
   return context;
 };
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType | null>(null);
+  const [userMode, setUserModeState] = useState<UserMode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Load user mode from localStorage on initialization
-    const savedMode = localStorage.getItem('user-mode') as UserModeType | null;
-    if (savedMode && ['b2c', 'b2b_user', 'b2b_admin'].includes(savedMode)) {
-      setUserMode(savedMode);
+    if (isAuthenticated && user) {
+      // Get mode from user metadata or localStorage
+      const userRole = user.user_metadata?.role || user.role;
+      const savedMode = localStorage.getItem('user-mode') as UserMode;
+      
+      let mode: UserMode | null = null;
+      
+      if (userRole) {
+        switch (userRole) {
+          case 'b2c':
+            mode = 'b2c';
+            break;
+          case 'b2b_user':
+            mode = 'b2b_user';
+            break;
+          case 'b2b_admin':
+            mode = 'b2b_admin';
+            break;
+          default:
+            mode = savedMode || 'b2c';
+        }
+      } else if (savedMode) {
+        mode = savedMode;
+      }
+      
+      setUserModeState(mode);
+    } else if (!isAuthenticated) {
+      setUserModeState(null);
+      localStorage.removeItem('user-mode');
     }
+    
     setIsLoading(false);
-  }, []);
+  }, [user, isAuthenticated]);
 
-  const changeUserMode = (mode: UserModeType) => {
-    setUserMode(mode);
+  const setUserMode = (mode: UserMode) => {
+    setUserModeState(mode);
     localStorage.setItem('user-mode', mode);
-  };
-
-  const clearUserMode = () => {
-    setUserMode(null);
-    localStorage.removeItem('user-mode');
   };
 
   const value = {
     userMode,
-    setUserMode: changeUserMode,
+    setUserMode,
     isLoading,
-    changeUserMode,
-    clearUserMode
   };
 
   return (

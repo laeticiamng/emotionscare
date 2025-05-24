@@ -6,100 +6,91 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Heart, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Loader2, Heart, ArrowLeft } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+const registerSchema = z.object({
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  email: z.string().email('Email invalide').refine((email) => {
+    // Reject @example.fr emails in production
+    if (process.env.NODE_ENV === 'production' && email.endsWith('@example.fr')) {
+      return false;
+    }
+    return true;
+  }, 'Les adresses @example.fr ne sont pas autorisées'),
+  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+  confirmPassword: z.string(),
+  acceptTerms: z.boolean().refine(val => val === true, 'Vous devez accepter les conditions'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const B2CRegisterPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    acceptTerms: false
-  });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive"
-      });
-      return;
-    }
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      acceptTerms: false,
+    },
+  });
 
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Erreur",
-        description: "Les mots de passe ne correspondent pas",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast({
-        title: "Erreur",
-        description: "Le mot de passe doit contenir au moins 6 caractères",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!formData.acceptTerms) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez accepter les conditions d'utilisation",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
         options: {
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
+            name: data.name,
             role: 'b2c',
-            trial_end_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 jours
           },
-          emailRedirectTo: `${window.location.origin}/b2c/dashboard`
-        }
+        },
       });
 
       if (error) {
         toast({
           title: "Erreur d'inscription",
           description: error.message,
-          variant: "destructive"
+          variant: "destructive",
         });
         return;
       }
 
-      if (data.user) {
-        toast({
-          title: "Inscription réussie !",
-          description: "Vérifiez votre email pour confirmer votre compte. Vous bénéficiez de 3 jours gratuits !",
-        });
-        navigate('/b2c/onboarding');
-      }
+      toast({
+        title: "Inscription réussie !",
+        description: "Essai gratuit de 3 jours activé. Vérifiez votre email pour confirmer votre compte.",
+      });
+
+      navigate('/b2c/login');
     } catch (error) {
       toast({
         title: "Erreur",
         description: "Une erreur inattendue s'est produite",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -115,102 +106,110 @@ const B2CRegisterPage: React.FC = () => {
               <Heart className="h-8 w-8 text-blue-500 mr-2" />
               <span className="text-2xl font-bold">EmotionsCare</span>
             </div>
-            <CardTitle className="text-2xl">Inscription Personnel</CardTitle>
+            <CardTitle className="text-2xl">Créer un compte</CardTitle>
             <CardDescription>
-              Créez votre compte et bénéficiez de 3 jours gratuits
+              Rejoignez EmotionsCare et commencez votre parcours de bien-être
             </CardDescription>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <div className="flex items-center text-green-700">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                <span className="text-sm font-medium">3 jours d'essai gratuit inclus</span>
-              </div>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
+              <p className="text-sm text-green-800 font-medium">
+                ✨ Essai gratuit de 3 jours inclus
+              </p>
             </div>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom *</Label>
-                  <Input
-                    id="firstName"
-                    type="text"
-                    placeholder="Votre prénom"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom *</Label>
-                  <Input
-                    id="lastName"
-                    type="text"
-                    placeholder="Votre nom"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  required
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom complet</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Votre nom" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Minimum 6 caractères"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  required
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="votre@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe *</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirmez votre mot de passe"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  required
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Au moins 8 caractères" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={formData.acceptTerms}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, acceptTerms: checked as boolean }))}
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirmer le mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Répétez votre mot de passe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <Label htmlFor="terms" className="text-sm">
-                  J'accepte les conditions d'utilisation et la politique de confidentialité
-                </Label>
-              </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Créer mon compte
-              </Button>
-            </form>
+                <FormField
+                  control={form.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-sm">
+                          J'accepte les{' '}
+                          <Link to="/terms" className="text-blue-600 hover:underline">
+                            conditions d'utilisation
+                          </Link>{' '}
+                          et la{' '}
+                          <Link to="/privacy" className="text-blue-600 hover:underline">
+                            politique de confidentialité
+                          </Link>
+                        </FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-            <div className="mt-4 text-center">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Créer mon compte
+                </Button>
+              </form>
+            </Form>
+
+            <div className="mt-6 text-center space-y-2">
               <div className="text-sm text-gray-600">
                 Déjà un compte ?{' '}
                 <Link to="/b2c/login" className="text-blue-600 hover:underline">

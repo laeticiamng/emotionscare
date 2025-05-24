@@ -1,135 +1,158 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, ArrowLeft, Users } from 'lucide-react';
-import { toast } from 'sonner';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Users, ArrowLeft } from 'lucide-react';
 
 const B2BUserLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
-  const { setUserMode } = useUserMode();
+  const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!email || !password) {
-      toast.error('Veuillez remplir tous les champs');
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs",
+        variant: "destructive"
+      });
       return;
     }
 
     setIsLoading(true);
+
     try {
-      const { error } = await signIn(email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (error) {
-        toast.error('Erreur: ' + error.message);
-      } else {
-        setUserMode('b2b_user');
-        toast.success('Connexion réussie !');
+        toast({
+          title: "Erreur de connexion",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (data.user) {
+        // Verify user has correct role
+        const userRole = data.user.user_metadata?.role || data.user.role;
+        if (userRole !== 'b2b_user') {
+          await supabase.auth.signOut();
+          toast({
+            title: "Accès non autorisé",
+            description: "Ce compte n'a pas accès à l'espace collaborateur",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue dans votre espace collaborateur !",
+        });
         navigate('/b2b/user/dashboard');
       }
     } catch (error) {
-      toast.error('Erreur lors de la connexion');
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-green-900 dark:via-slate-800 dark:to-emerald-900 flex items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/b2b/selection')}
-              className="absolute left-4 top-4"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-full w-fit">
-              <Users className="h-8 w-8 text-green-500" />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card>
+          <CardHeader className="space-y-1 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Users className="h-8 w-8 text-green-600 mr-2" />
+              <span className="text-2xl font-bold">EmotionsCare</span>
             </div>
-            <CardTitle className="text-2xl">Connexion Collaborateur</CardTitle>
+            <CardTitle className="text-2xl">Espace Collaborateur</CardTitle>
             <CardDescription>
-              Accédez à votre espace collaborateur EmotionsCare
+              Connectez-vous à votre espace de bien-être professionnel
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="email"
-                    placeholder="votre.email@entreprise.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="password"
-                    placeholder="Mot de passe"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
+                <Label htmlFor="email">Email professionnel</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre@entreprise.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
               
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Votre mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-green-600 hover:bg-green-700" 
+                disabled={isLoading}
+              >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Se connecter
               </Button>
             </form>
-            
-            <div className="mt-6 space-y-4">
-              <div className="text-center">
-                <Link 
-                  to="/b2c/reset-password" 
-                  className="text-sm text-primary hover:underline"
-                >
-                  Mot de passe oublié ?
+
+            <div className="mt-4 text-center space-y-2">
+              <Link 
+                to="/b2b/user/reset-password" 
+                className="text-sm text-green-600 hover:underline"
+              >
+                Mot de passe oublié ?
+              </Link>
+              
+              <div className="text-sm text-gray-600">
+                Pas encore de compte professionnel ?{' '}
+                <Link to="/b2b/user/register" className="text-green-600 hover:underline">
+                  S'inscrire
                 </Link>
               </div>
-              
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Nouveau collaborateur ?
-                  </span>
-                </div>
-              </div>
-              
-              <Button variant="outline" className="w-full" asChild>
-                <Link to="/b2b/user/register">
-                  Créer un compte
-                </Link>
-              </Button>
+            </div>
+
+            <div className="mt-6 pt-4 border-t">
+              <Link 
+                to="/b2b/selection" 
+                className="flex items-center justify-center text-sm text-gray-600 hover:text-gray-800"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Retour à la sélection
+              </Link>
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 };
