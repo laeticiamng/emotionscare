@@ -38,6 +38,7 @@ import HelpPage from '@/pages/common/HelpPage';
 import ScanPage from '@/pages/ScanPage';
 import Coach from '@/pages/Coach';
 import Music from '@/pages/Music';
+import Journal from '@/pages/Journal';
 
 const routes: RouteObject[] = [
   {
@@ -137,7 +138,7 @@ const routes: RouteObject[] = [
               </AuthTransition>
           },
           
-          // Routes fonctionnelles
+          // Routes fonctionnelles accessibles à tous les utilisateurs connectés
           {
             path: 'scan',
             element: 
@@ -157,6 +158,13 @@ const routes: RouteObject[] = [
             element: 
               <AuthTransition>
                 <Music />
+              </AuthTransition>
+          },
+          {
+            path: 'journal',
+            element: 
+              <AuthTransition>
+                <Journal />
               </AuthTransition>
           },
           
