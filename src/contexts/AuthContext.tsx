@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export interface User {
   id: string;
@@ -36,23 +37,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Gestion stricte de l'état d'authentification
+    // Gestion de l'état d'authentification avec validation JWT stricte
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('[Auth] State change:', event, session?.user?.id);
         
-        if (session?.user) {
-          const mockUser: User = {
-            id: session.user.id,
-            email: session.user.email || '',
-            role: session.user.email?.includes('@admin') ? 'b2b_admin' : 
-                  session.user.email?.includes('@company') ? 'b2b_user' : 'b2c',
-            firstName: session.user.user_metadata?.first_name || 'John',
-            lastName: session.user.user_metadata?.last_name || 'Doe',
-          };
-          
-          setUser(mockUser);
-          localStorage.setItem('auth_user', JSON.stringify(mockUser));
+        if (session?.user && session.access_token) {
+          // Validation du token côté client
+          try {
+            const tokenPayload = JSON.parse(atob(session.access_token.split('.')[1]));
+            const isExpired = tokenPayload.exp * 1000 < Date.now();
+            
+            if (isExpired) {
+              console.warn('[Auth] Token expired, refreshing...');
+              await supabase.auth.refreshSession();
+              return;
+            }
+            
+            const mockUser: User = {
+              id: session.user.id,
+              email: session.user.email || '',
+              role: session.user.email?.includes('@admin') ? 'b2b_admin' : 
+                    session.user.email?.includes('@company') ? 'b2b_user' : 'b2c',
+              firstName: session.user.user_metadata?.first_name || 'John',
+              lastName: session.user.user_metadata?.last_name || 'Doe',
+            };
+            
+            setUser(mockUser);
+            localStorage.setItem('auth_user', JSON.stringify(mockUser));
+          } catch (error) {
+            console.error('[Auth] Token validation error:', error);
+            await signOut();
+          }
         } else {
           setUser(null);
           localStorage.removeItem('auth_user');
@@ -62,20 +78,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Vérifier la session existante
+    // Vérifier la session existante avec validation
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const mockUser: User = {
-          id: session.user.id,
-          email: session.user.email || '',
-          role: session.user.email?.includes('@admin') ? 'b2b_admin' : 
-                session.user.email?.includes('@company') ? 'b2b_user' : 'b2c',
-          firstName: session.user.user_metadata?.first_name || 'John',
-          lastName: session.user.user_metadata?.last_name || 'Doe',
-        };
-        
-        setUser(mockUser);
-        localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      if (session?.user && session.access_token) {
+        try {
+          const tokenPayload = JSON.parse(atob(session.access_token.split('.')[1]));
+          const isExpired = tokenPayload.exp * 1000 < Date.now();
+          
+          if (!isExpired) {
+            const mockUser: User = {
+              id: session.user.id,
+              email: session.user.email || '',
+              role: session.user.email?.includes('@admin') ? 'b2b_admin' : 
+                    session.user.email?.includes('@company') ? 'b2b_user' : 'b2c',
+              firstName: session.user.user_metadata?.first_name || 'John',
+              lastName: session.user.user_metadata?.last_name || 'Doe',
+            };
+            
+            setUser(mockUser);
+            localStorage.setItem('auth_user', JSON.stringify(mockUser));
+          } else {
+            console.warn('[Auth] Session token expired on load');
+          }
+        } catch (error) {
+          console.error('[Auth] Session validation error:', error);
+        }
       }
       setIsLoading(false);
     });
@@ -85,19 +112,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Simulation d'authentification en attendant la vraie validation JWT
-      const mockUser: User = {
-        id: '1',
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        role: email.includes('@admin') ? 'b2b_admin' : 
-              email.includes('@company') ? 'b2b_user' : 'b2c',
-        firstName: 'John',
-        lastName: 'Doe',
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
-      
+        password,
+      });
+
+      if (error) {
+        return { error };
+      }
+
       return { error: null };
     } catch (error) {
       return { error };
@@ -106,18 +129,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, metadata?: any) => {
     try {
-      // Simulation d'inscription
-      const mockUser: User = {
-        id: '1',
+      const { data, error } = await supabase.auth.signUp({
         email,
-        role: 'b2c',
-        firstName: metadata?.first_name,
-        lastName: metadata?.last_name,
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
-      
+        password,
+        options: {
+          data: metadata,
+        },
+      });
+
+      if (error) {
+        return { error };
+      }
+
       return { error: null };
     } catch (error) {
       return { error };
@@ -139,8 +162,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     try {
-      // Simulation de reset password
-      return { error: null };
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      return { error };
     } catch (error) {
       return { error };
     }
@@ -152,6 +175,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error('[Auth] Token refresh failed:', error);
         await signOut();
+        toast({
+          title: "Session expirée",
+          description: "Veuillez vous reconnecter.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('[Auth] Token refresh error:', error);
