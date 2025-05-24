@@ -4,34 +4,43 @@ import { toast } from '@/hooks/use-toast';
 
 /**
  * Intercepteur global pour la gestion des erreurs d'authentification
+ * Renforcé pour la conformité JWT stricte
  */
 export class AuthInterceptor {
   private static isRedirecting = false;
 
   /**
-   * Ajoute le token d'authentification aux headers
+   * Ajoute le token d'authentification aux headers avec vérification stricte
    */
   static async addAuthHeaders(headers: HeadersInit = {}): Promise<HeadersInit> {
     try {
       const { data: { session }, error } = await supabase.auth.getSession();
       
-      if (error || !session?.access_token) {
-        console.warn('[AuthInterceptor] No valid session found');
-        return headers;
+      if (error) {
+        console.error('[AuthInterceptor] Session error:', error);
+        throw new Error('Invalid session');
+      }
+
+      if (!session?.access_token) {
+        console.warn('[AuthInterceptor] No valid access token found');
+        throw new Error('No access token');
       }
 
       return {
         ...headers,
         'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
       };
     } catch (error) {
       console.error('[AuthInterceptor] Error getting session:', error);
-      return headers;
+      // En cas d'erreur de session, déclencher la déconnexion
+      await this.handle401Error();
+      throw error;
     }
   }
 
   /**
-   * Wrapper fetch sécurisé avec gestion automatique des erreurs 401
+   * Wrapper fetch sécurisé avec gestion automatique des erreurs
    */
   static async secureFetch(url: string, options: RequestInit = {}): Promise<Response | null> {
     try {
@@ -49,13 +58,19 @@ export class AuthInterceptor {
         return null;
       }
 
-      // Gérer les autres erreurs de serveur
+      // Gérer les erreurs de serveur avec toast approprié
       if (response.status >= 500) {
         toast({
           title: "Service indisponible",
           description: "Nos serveurs rencontrent des difficultés. Réessayez plus tard.",
           variant: "destructive",
         });
+        return null;
+      }
+
+      // Gérer les erreurs 404 analytics en silence
+      if (response.status === 404 && url.includes('analytics')) {
+        console.warn('[Analytics] Endpoint not available - feature in development');
         return null;
       }
 
@@ -72,7 +87,7 @@ export class AuthInterceptor {
   }
 
   /**
-   * Gestion centralisée des erreurs 401
+   * Gestion centralisée des erreurs 401 avec redirection intelligente
    */
   static async handle401Error(): Promise<void> {
     if (this.isRedirecting) {
@@ -94,9 +109,21 @@ export class AuthInterceptor {
         variant: "destructive",
       });
 
-      // Redirection vers la page de sélection de mode après un court délai
+      // Redirection intelligente selon la page actuelle
+      const currentPath = window.location.pathname;
+      let redirectPath = '/choose-mode';
+
+      if (currentPath.startsWith('/b2b/user')) {
+        redirectPath = '/b2b/user/login';
+      } else if (currentPath.startsWith('/b2b/admin')) {
+        redirectPath = '/b2b/admin/login';
+      } else if (currentPath.startsWith('/b2c')) {
+        redirectPath = '/b2c/login';
+      }
+
+      // Redirection après délai pour laisser le toast s'afficher
       setTimeout(() => {
-        window.location.href = '/choose-mode';
+        window.location.href = redirectPath;
       }, 2000);
 
     } catch (error) {
@@ -107,17 +134,17 @@ export class AuthInterceptor {
       // Reset du flag après délai
       setTimeout(() => {
         this.isRedirecting = false;
-      }, 3000);
+      }, 5000);
     }
   }
 
   /**
-   * Vérifie le statut de la session actuelle
+   * Vérifie le statut de la session actuelle avec token strict
    */
   static async checkSessionStatus(): Promise<boolean> {
     try {
       const { data: { session }, error } = await supabase.auth.getSession();
-      return !error && !!session?.access_token;
+      return !error && !!session?.access_token && session.expires_at ? session.expires_at > Date.now() / 1000 : false;
     } catch (error) {
       console.error('[AuthInterceptor] Error checking session:', error);
       return false;

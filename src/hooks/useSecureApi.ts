@@ -5,6 +5,7 @@ import { SecureAnalytics } from '@/utils/secureAnalytics';
 
 /**
  * Hook pour effectuer des appels API sécurisés
+ * Mis à jour pour conformité JWT stricte
  */
 export const useSecureApi = () => {
   
@@ -30,7 +31,7 @@ export const useSecureApi = () => {
   }, []);
 
   /**
-   * Vérification du statut de session
+   * Vérification du statut de session avec token strict
    */
   const checkSession = useCallback(async (): Promise<boolean> => {
     return AuthInterceptor.checkSessionStatus();

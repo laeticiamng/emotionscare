@@ -7,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
  */
 export class SecureAnalytics {
   private static baseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
+  private static timeout = 5000; // 5s timeout pour analytics
   
   /**
    * Envoie un événement analytics de manière sécurisée
@@ -18,6 +19,9 @@ export class SecureAnalytics {
     userId?: string;
   }): Promise<void> {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
       const response = await fetch(`${this.baseUrl}/analytics/event`, {
         method: 'POST',
         headers: {
@@ -27,7 +31,10 @@ export class SecureAnalytics {
           ...eventData,
           timestamp: new Date().toISOString(),
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (response.status >= 400) {
         if (response.status === 404) {
@@ -37,8 +44,12 @@ export class SecureAnalytics {
         }
       }
     } catch (error: any) {
-      // Analytics failures should never interrupt user experience
-      console.warn('[Analytics] Offline or unreachable - continuing silently', error.message);
+      if (error.name === 'AbortError') {
+        console.warn('[Analytics] Request timeout - continuing silently');
+      } else {
+        // Analytics failures should never interrupt user experience
+        console.warn('[Analytics] Offline or unreachable - continuing silently', error.message);
+      }
     }
   }
 

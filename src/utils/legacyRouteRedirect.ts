@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 /**
- * Gestion temporaire des redirections pour anciennes routes
- * À supprimer une fois que tous les liens externes sont mis à jour
+ * DÉPRÉCIÉ - Sera supprimé dans la prochaine version
+ * Redirection temporaire pour compatibilité pendant migration backend
  */
 
 const LEGACY_REDIRECTS = {
@@ -22,7 +22,7 @@ export const useLegacyRouteRedirect = () => {
     const redirectPath = LEGACY_REDIRECTS[currentPath as keyof typeof LEGACY_REDIRECTS];
     
     if (redirectPath) {
-      console.warn(`[LegacyRedirect] Redirecting from legacy route ${currentPath} to ${redirectPath}`);
+      console.warn(`[DEPRECATED] Legacy route ${currentPath} redirected to ${redirectPath}`);
       navigate(redirectPath, { replace: true });
     }
   }, [location.pathname, navigate]);
