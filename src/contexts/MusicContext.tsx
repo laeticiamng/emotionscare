@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect } from 'react';
 
 interface Track {
   id: string;
@@ -45,21 +45,96 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const updateTimeRef = useRef<number>();
 
-  const play = useCallback((track?: Track) => {
-    if (track) {
-      setCurrentTrack(track);
+  // Initialize audio element
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.preload = 'metadata';
+      
+      // Set up event listeners
+      const audio = audioRef.current;
+      
+      audio.addEventListener('loadstart', () => setIsLoading(true));
+      audio.addEventListener('canplay', () => setIsLoading(false));
+      audio.addEventListener('loadedmetadata', () => {
+        setDuration(audio.duration || 0);
+      });
+      
+      audio.addEventListener('timeupdate', () => {
+        setCurrentTime(audio.currentTime);
+      });
+      
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+        next();
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error('Audio error:', e);
+        setIsLoading(false);
+        setIsPlaying(false);
+      });
     }
-    setIsPlaying(true);
+    
+    return () => {
+      if (updateTimeRef.current) {
+        cancelAnimationFrame(updateTimeRef.current);
+      }
+    };
   }, []);
 
+  // Update audio volume when volume state changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  const play = useCallback((track?: Track) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (track && track !== currentTrack) {
+      setCurrentTrack(track);
+      audio.src = track.url;
+      audio.load();
+    }
+
+    if (currentTrack || track) {
+      setIsLoading(true);
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error playing audio:', error);
+          setIsLoading(false);
+          setIsPlaying(false);
+        });
+    }
+  }, [currentTrack]);
+
   const pause = useCallback(() => {
-    setIsPlaying(false);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      setIsPlaying(false);
+    }
   }, []);
 
   const stop = useCallback(() => {
-    setIsPlaying(false);
-    setCurrentTime(0);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
   }, []);
 
   const next = useCallback(() => {
@@ -70,10 +145,9 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     const nextTrack = playlist[nextIndex];
     
     if (nextTrack) {
-      setCurrentTrack(nextTrack);
-      setIsPlaying(true);
+      play(nextTrack);
     }
-  }, [playlist, currentTrack]);
+  }, [playlist, currentTrack, play]);
 
   const previous = useCallback(() => {
     if (playlist.length === 0 || !currentTrack) return;
@@ -83,17 +157,21 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     const prevTrack = playlist[prevIndex];
     
     if (prevTrack) {
-      setCurrentTrack(prevTrack);
-      setIsPlaying(true);
+      play(prevTrack);
     }
-  }, [playlist, currentTrack]);
+  }, [playlist, currentTrack, play]);
 
   const setVolume = useCallback((newVolume: number) => {
-    setVolumeState(Math.max(0, Math.min(1, newVolume)));
+    const clampedVolume = Math.max(0, Math.min(1, newVolume));
+    setVolumeState(clampedVolume);
   }, []);
 
   const seek = useCallback((time: number) => {
-    setCurrentTime(time);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = time;
+      setCurrentTime(time);
+    }
   }, []);
 
   const addToPlaylist = useCallback((track: Track) => {
@@ -111,8 +189,8 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const clearPlaylist = useCallback(() => {
     setPlaylistState([]);
     setCurrentTrack(null);
-    setIsPlaying(false);
-  }, []);
+    stop();
+  }, [stop]);
 
   const value: MusicContextType = {
     currentTrack,
@@ -150,5 +228,4 @@ export const useMusic = (): MusicContextType => {
   return context;
 };
 
-// Default export for compatibility
 export default MusicContext;
