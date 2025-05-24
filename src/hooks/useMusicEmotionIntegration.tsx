@@ -30,23 +30,21 @@ export const useMusicEmotionIntegration = () => {
    * Get a description for the recommended music for an emotion
    */
   const getEmotionMusicDescription = (emotion: string): string => {
-    switch (emotion.toLowerCase()) {
-      case 'happy':
-        return 'Des mélodies enjouées pour accompagner votre bonne humeur';
-      case 'calm':
-      case 'peaceful':
-        return 'Des sons apaisants pour maintenir votre état de sérénité';
-      case 'sad':
-        return 'Des compositions douces pour vous réconforter';
-      case 'angry':
-        return 'Des rythmes apaisants pour vous aider à retrouver le calme';
-      case 'anxious':
-        return 'Des mélodies relaxantes pour apaiser votre anxiété';
-      case 'energetic':
-        return 'Des rythmes dynamiques pour soutenir votre énergie';
-      default:
-        return 'Une playlist adaptée à votre état émotionnel actuel';
-    }
+    const descriptions: Record<string, string> = {
+      'happy': 'Des mélodies enjouées pour accompagner votre bonne humeur',
+      'calm': 'Des sons apaisants pour maintenir votre état de sérénité',
+      'peaceful': 'Des sons apaisants pour maintenir votre état de sérénité',
+      'sad': 'Des compositions douces pour vous réconforter',
+      'angry': 'Des rythmes apaisants pour vous aider à retrouver le calme',
+      'anxious': 'Des mélodies relaxantes pour apaiser votre anxiété',
+      'energetic': 'Des rythmes dynamiques pour soutenir votre énergie',
+      'neutral': 'Une playlist adaptée à votre état émotionnel actuel',
+      'fear': 'Sons calmes pour apaiser et retrouver la sérénité',
+      'surprise': 'Mélodies rafraîchissantes et légères pour accompagner ce moment',
+      'disgust': 'Musiques transformatives pour améliorer votre état d\'esprit'
+    };
+
+    return descriptions[emotion.toLowerCase()] || 'Une playlist adaptée à votre état émotionnel actuel';
   };
 
   /**
