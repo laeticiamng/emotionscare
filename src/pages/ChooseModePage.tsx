@@ -8,42 +8,41 @@ const ChooseModePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="container mx-auto p-4 min-h-screen flex items-center justify-center">
-      <div className="max-w-4xl w-full">
-        <h1 className="text-4xl font-bold text-center mb-8">Choisissez votre espace</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-4">Choisir votre mode</h1>
+          <p className="text-lg text-muted-foreground">Sélectionnez le mode qui vous correspond</p>
+        </div>
         
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="hover:shadow-lg transition-shadow">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle>Espace Particulier</CardTitle>
-              <CardDescription>
-                Accédez à votre espace personnel de bien-être émotionnel
-              </CardDescription>
+              <CardTitle>Mode Particulier (B2C)</CardTitle>
+              <CardDescription>Pour un usage personnel</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
+                className="w-full" 
                 onClick={() => navigate('/b2c/login')}
-                className="w-full"
               >
-                Accéder à mon espace
+                Accéder au mode particulier
               </Button>
             </CardContent>
           </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
+          
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
             <CardHeader>
-              <CardTitle>Espace Entreprise</CardTitle>
-              <CardDescription>
-                Solutions de bien-être pour les organisations
-              </CardDescription>
+              <CardTitle>Mode Entreprise (B2B)</CardTitle>
+              <CardDescription>Pour les organisations</CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
-                onClick={() => navigate('/b2b/selection')}
-                variant="outline"
+                variant="outline" 
                 className="w-full"
+                onClick={() => navigate('/b2b/selection')}
               >
-                Découvrir nos solutions
+                Accéder au mode entreprise
               </Button>
             </CardContent>
           </Card>

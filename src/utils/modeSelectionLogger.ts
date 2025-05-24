@@ -1,55 +1,26 @@
-import { supabase } from '@/integrations/supabase/client';
 
-interface ModeSelectionLog {
-  selection_type: string;
-  user_agent?: string;
-  timestamp?: string;
-  additional_data?: Record<string, any>;
-}
-
-export const logModeSelection = async (
-  selectionType: string,
-  additionalData?: Record<string, any>
-): Promise<void> => {
-  try {
-    const logData: ModeSelectionLog = {
-      selection_type: selectionType,
-      user_agent: navigator.userAgent,
-      timestamp: new Date().toISOString(),
-      additional_data: additionalData || {}
-    };
-
-    // Store in local storage for now (since we don't have a specific table for this)
-    const existingLogs = JSON.parse(localStorage.getItem('mode_selection_logs') || '[]');
-    existingLogs.push(logData);
-    
-    // Keep only the last 100 logs
-    if (existingLogs.length > 100) {
-      existingLogs.splice(0, existingLogs.length - 100);
+export const logModeSelection = (selectionType: string, additionalData?: any) => {
+  const logData = {
+    selection_type: selectionType,
+    user_agent: navigator.userAgent,
+    timestamp: new Date().toISOString(),
+    additional_data: additionalData || {}
+  };
+  
+  console.info('Mode selection logged:', logData);
+  
+  // En production, on pourrait envoyer ça à un service d'analytics
+  if (typeof window !== 'undefined' && 'localStorage' in window) {
+    try {
+      const existing = JSON.parse(localStorage.getItem('mode_selections') || '[]');
+      existing.push(logData);
+      // Garder seulement les 50 derniers logs
+      if (existing.length > 50) {
+        existing.splice(0, existing.length - 50);
+      }
+      localStorage.setItem('mode_selections', JSON.stringify(existing));
+    } catch (error) {
+      console.error('Failed to log mode selection:', error);
     }
-    
-    localStorage.setItem('mode_selection_logs', JSON.stringify(existingLogs));
-
-    console.log('Mode selection logged:', logData);
-  } catch (error) {
-    console.error('Error logging mode selection:', error);
-  }
-};
-
-export const getModeSelectionLogs = (): ModeSelectionLog[] => {
-  try {
-    return JSON.parse(localStorage.getItem('mode_selection_logs') || '[]');
-  } catch (error) {
-    console.error('Error retrieving mode selection logs:', error);
-    return [];
-  }
-};
-
-export const clearModeSelectionLogs = (): void => {
-  try {
-    localStorage.removeItem('mode_selection_logs');
-    console.log('Mode selection logs cleared');
-  } catch (error) {
-    console.error('Error clearing mode selection logs:', error);
   }
 };

@@ -1,38 +1,21 @@
 
-import { AudioTrack } from '@/types/audio';
+import { Track, MusicTrack } from '@/types/music';
 
-export const getTrackTitle = (track: AudioTrack | any): string => {
-  return track?.title || track?.name || 'Sans titre';
+export const getTrackTitle = (track: Track | MusicTrack): string => {
+  return track.title || 'Titre inconnu';
 };
 
-export const getTrackArtist = (track: AudioTrack | any): string => {
-  return track?.artist || track?.author || 'Artiste inconnu';
+export const getTrackArtist = (track: Track | MusicTrack): string => {
+  return track.artist || 'Artiste inconnu';
 };
 
-export const getTrackDuration = (track: AudioTrack | any): number => {
-  return track?.duration || 0;
+export const getTrackCover = (track: Track | MusicTrack): string | undefined => {
+  return track.artwork || undefined;
 };
 
-export const getTrackUrl = (track: AudioTrack | any): string => {
-  return track?.url || track?.audioUrl || '';
-};
-
-export const getTrackCover = (track: AudioTrack | any): string | undefined => {
-  return track?.coverUrl || track?.cover_url || track?.artworkUrl;
-};
-
-export const normalizeTrack = (track: any): AudioTrack => {
-  return {
-    id: track.id || `track-${Date.now()}`,
-    title: getTrackTitle(track),
-    artist: getTrackArtist(track),
-    duration: getTrackDuration(track),
-    url: getTrackUrl(track),
-    coverUrl: getTrackCover(track)
-  };
-};
-
-export const ensureArray = <T>(value: T | T[] | undefined): T[] => {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
+export const getTrackUrl = (track: Track | MusicTrack): string => {
+  if ('audioUrl' in track && track.audioUrl) {
+    return track.audioUrl;
+  }
+  return track.url;
 };

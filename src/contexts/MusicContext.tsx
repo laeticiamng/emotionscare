@@ -1,216 +1,121 @@
 
-import React, { createContext, useContext, useState, useCallback, ReactNode, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
+import { Track, MusicContextType } from '@/types/music';
 
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  artwork?: string;
-}
+const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
-interface MusicContextType {
-  currentTrack: Track | null;
-  isPlaying: boolean;
-  volume: number;
-  playlist: Track[];
-  currentTime: number;
-  duration: number;
-  isLoading: boolean;
-  play: (track?: Track) => void;
-  pause: () => void;
-  stop: () => void;
-  next: () => void;
-  previous: () => void;
-  setVolume: (volume: number) => void;
-  seek: (time: number) => void;
-  addToPlaylist: (track: Track) => void;
-  removeFromPlaylist: (trackId: string) => void;
-  setPlaylist: (tracks: Track[]) => void;
-  clearPlaylist: () => void;
-}
-
-export const MusicContext = createContext<MusicContextType | undefined>(undefined);
+export const useMusic = () => {
+  const context = useContext(MusicContext);
+  if (!context) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
+};
 
 interface MusicProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(0.7);
-  const [playlist, setPlaylistState] = useState<Track[]>([]);
+  const [volume, setVolume] = useState(0.7);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [playlist, setPlaylist] = useState<Track[]>([]);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const updateTimeRef = useRef<number>();
 
-  // Initialize audio element
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
-      audioRef.current.preload = 'metadata';
+      audioRef.current.volume = volume;
       
-      // Set up event listeners
-      const audio = audioRef.current;
-      
-      audio.addEventListener('loadstart', () => setIsLoading(true));
-      audio.addEventListener('canplay', () => setIsLoading(false));
-      audio.addEventListener('loadedmetadata', () => {
-        setDuration(audio.duration || 0);
+      audioRef.current.addEventListener('loadedmetadata', () => {
+        setDuration(audioRef.current?.duration || 0);
+        setIsLoading(false);
       });
       
-      audio.addEventListener('timeupdate', () => {
-        setCurrentTime(audio.currentTime);
+      audioRef.current.addEventListener('timeupdate', () => {
+        setCurrentTime(audioRef.current?.currentTime || 0);
       });
       
-      audio.addEventListener('ended', () => {
+      audioRef.current.addEventListener('ended', () => {
         setIsPlaying(false);
         next();
-      });
-      
-      audio.addEventListener('error', (e) => {
-        console.error('Audio error:', e);
-        setIsLoading(false);
-        setIsPlaying(false);
       });
     }
     
     return () => {
-      if (updateTimeRef.current) {
-        cancelAnimationFrame(updateTimeRef.current);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
       }
     };
   }, []);
 
-  // Update audio volume when volume state changes
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
 
-  const play = useCallback((track?: Track) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
+  const play = (track?: Track) => {
+    if (!audioRef.current) return;
+    
     if (track && track !== currentTrack) {
       setCurrentTrack(track);
-      audio.src = track.url;
-      audio.load();
-    }
-
-    if (currentTrack || track) {
       setIsLoading(true);
-      audio.play()
-        .then(() => {
-          setIsPlaying(true);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error playing audio:', error);
-          setIsLoading(false);
-          setIsPlaying(false);
-        });
+      audioRef.current.src = track.url;
+      audioRef.current.load();
     }
-  }, [currentTrack]);
+    
+    audioRef.current.play().then(() => {
+      setIsPlaying(true);
+    }).catch((error) => {
+      console.error('Error playing audio:', error);
+      setIsLoading(false);
+    });
+  };
 
-  const pause = useCallback(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
+  const pause = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
       setIsPlaying(false);
     }
-  }, []);
+  };
 
-  const stop = useCallback(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-      setIsPlaying(false);
-      setCurrentTime(0);
-    }
-  }, []);
-
-  const next = useCallback(() => {
+  const next = () => {
     if (playlist.length === 0 || !currentTrack) return;
     
     const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
     const nextIndex = (currentIndex + 1) % playlist.length;
-    const nextTrack = playlist[nextIndex];
-    
-    if (nextTrack) {
-      play(nextTrack);
-    }
-  }, [playlist, currentTrack, play]);
+    play(playlist[nextIndex]);
+  };
 
-  const previous = useCallback(() => {
+  const previous = () => {
     if (playlist.length === 0 || !currentTrack) return;
     
     const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
     const prevIndex = currentIndex === 0 ? playlist.length - 1 : currentIndex - 1;
-    const prevTrack = playlist[prevIndex];
-    
-    if (prevTrack) {
-      play(prevTrack);
-    }
-  }, [playlist, currentTrack, play]);
-
-  const setVolume = useCallback((newVolume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setVolumeState(clampedVolume);
-  }, []);
-
-  const seek = useCallback((time: number) => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.currentTime = time;
-      setCurrentTime(time);
-    }
-  }, []);
-
-  const addToPlaylist = useCallback((track: Track) => {
-    setPlaylistState(prev => [...prev, track]);
-  }, []);
-
-  const removeFromPlaylist = useCallback((trackId: string) => {
-    setPlaylistState(prev => prev.filter(track => track.id !== trackId));
-  }, []);
-
-  const setPlaylist = useCallback((tracks: Track[]) => {
-    setPlaylistState(tracks);
-  }, []);
-
-  const clearPlaylist = useCallback(() => {
-    setPlaylistState([]);
-    setCurrentTrack(null);
-    stop();
-  }, [stop]);
+    play(playlist[prevIndex]);
+  };
 
   const value: MusicContextType = {
     currentTrack,
     isPlaying,
     volume,
-    playlist,
     currentTime,
     duration,
     isLoading,
+    playlist,
     play,
     pause,
-    stop,
     next,
     previous,
     setVolume,
-    seek,
-    addToPlaylist,
-    removeFromPlaylist,
     setPlaylist,
-    clearPlaylist,
   };
 
   return (
@@ -220,12 +125,4 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   );
 };
 
-export const useMusic = (): MusicContextType => {
-  const context = useContext(MusicContext);
-  if (context === undefined) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  return context;
-};
-
-export default MusicContext;
+export { MusicContext };

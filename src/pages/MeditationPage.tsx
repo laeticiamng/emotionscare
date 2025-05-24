@@ -7,15 +7,17 @@ const MeditationPage: React.FC = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Méditation</h1>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Séances de méditation</CardTitle>
-          <CardDescription>Découvrez nos séances guidées pour votre bien-être</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Page de méditation en cours de développement...</p>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Sessions de méditation</CardTitle>
+            <CardDescription>Découvrez nos exercices de méditation guidée</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Contenu de méditation à venir...</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
