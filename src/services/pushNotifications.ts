@@ -1,62 +1,84 @@
 
+import { useCallback, useEffect, useState } from 'react';
+
 /**
  * Push Notifications Service
  */
 
-export interface NotificationConfig {
-  title: string;
-  body: string;
-  icon?: string;
-  badge?: string;
-  tag?: string;
-  requireInteraction?: boolean;
-  actions?: NotificationAction[];
-  data?: any;
+export interface PushNotificationConfig {
+  vapidKey?: string;
+  serviceWorkerPath?: string;
+  onNotificationClick?: (event: NotificationEvent) => void;
+  onNotificationClose?: (event: NotificationEvent) => void;
 }
 
-export interface PushSubscriptionData {
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
+export interface NotificationPermissionState {
+  permission: NotificationPermission;
+  supported: boolean;
+  subscribed: boolean;
 }
 
 class PushNotificationManager {
-  private vapidPublicKey = 'YOUR_VAPID_PUBLIC_KEY'; // À remplacer par votre clé VAPID
+  private registration: ServiceWorkerRegistration | null = null;
+  private subscription: PushSubscription | null = null;
+  private config: PushNotificationConfig;
 
-  async requestPermission(): Promise<NotificationPermission> {
-    if (!('Notification' in window)) {
-      throw new Error('Notifications not supported');
-    }
-
-    const permission = await Notification.requestPermission();
-    console.log('Notification permission:', permission);
-    return permission;
+  constructor(config: PushNotificationConfig = {}) {
+    this.config = {
+      vapidKey: config.vapidKey || process.env.VITE_VAPID_PUBLIC_KEY,
+      serviceWorkerPath: config.serviceWorkerPath || '/sw.js',
+      ...config
+    };
   }
 
-  async subscribe(): Promise<PushSubscriptionData | null> {
+  async initialize(): Promise<void> {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      throw new Error('Push messaging not supported');
+      console.warn('Push notifications not supported');
+      return;
     }
 
     try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.subscribe({
+      this.registration = await navigator.serviceWorker.register(
+        this.config.serviceWorkerPath!
+      );
+      console.log('Service Worker registered for push notifications');
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
+    }
+  }
+
+  async requestPermission(): Promise<NotificationPermission> {
+    if (!('Notification' in window)) {
+      console.warn('Notifications not supported');
+      return 'denied';
+    }
+
+    if (Notification.permission === 'granted') {
+      return 'granted';
+    }
+
+    if (Notification.permission === 'denied') {
+      return 'denied';
+    }
+
+    const permission = await Notification.requestPermission();
+    return permission;
+  }
+
+  async subscribe(): Promise<PushSubscription | null> {
+    if (!this.registration || !this.config.vapidKey) {
+      console.error('Service Worker not registered or VAPID key missing');
+      return null;
+    }
+
+    try {
+      this.subscription = await this.registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+        applicationServerKey: this.urlBase64ToUint8Array(this.config.vapidKey)
       });
 
-      const subscriptionData: PushSubscriptionData = {
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
-          auth: this.arrayBufferToBase64(subscription.getKey('auth')!)
-        }
-      };
-
-      console.log('Push subscription created:', subscriptionData);
-      return subscriptionData;
+      console.log('Push subscription successful');
+      return this.subscription;
     } catch (error) {
       console.error('Push subscription failed:', error);
       return null;
@@ -64,94 +86,52 @@ class PushNotificationManager {
   }
 
   async unsubscribe(): Promise<boolean> {
+    if (!this.subscription) {
+      return true;
+    }
+
     try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      
-      if (subscription) {
-        await subscription.unsubscribe();
-        console.log('Push subscription removed');
-        return true;
-      }
-      return false;
+      const result = await this.subscription.unsubscribe();
+      this.subscription = null;
+      console.log('Push unsubscription successful');
+      return result;
     } catch (error) {
-      console.error('Push unsubscribe failed:', error);
+      console.error('Push unsubscription failed:', error);
       return false;
     }
   }
 
   async getSubscription(): Promise<PushSubscription | null> {
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      return await registration.pushManager.getSubscription();
-    } catch (error) {
-      console.error('Failed to get push subscription:', error);
+    if (!this.registration) {
       return null;
     }
+
+    return await this.registration.pushManager.getSubscription();
   }
 
-  // Local notifications (pour les cas où push n'est pas disponible)
-  async showLocalNotification(config: NotificationConfig): Promise<void> {
-    if (Notification.permission !== 'granted') {
-      await this.requestPermission();
-    }
-
-    if (Notification.permission === 'granted') {
-      const notification = new Notification(config.title, {
-        body: config.body,
-        icon: config.icon || '/icons/icon-192x192.png',
-        badge: config.badge || '/icons/badge-72x72.png',
-        tag: config.tag || 'emotionscare',
-        requireInteraction: config.requireInteraction || false,
-        data: config.data || {}
-      });
-
-      notification.onclick = () => {
-        window.focus();
-        notification.close();
-        
-        if (config.data?.url) {
-          window.location.href = config.data.url;
-        }
-      };
-
-      // Auto close after 5 seconds if not requiring interaction
-      if (!config.requireInteraction) {
-        setTimeout(() => notification.close(), 5000);
+  async showNotification(
+    title: string,
+    options: NotificationOptions = {}
+  ): Promise<void> {
+    if (!this.registration) {
+      // Fallback to browser notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, options);
       }
+      return;
+    }
+
+    try {
+      await this.registration.showNotification(title, {
+        badge: '/icons/icon-96x96.png',
+        icon: '/icons/icon-192x192.png',
+        ...options
+      });
+    } catch (error) {
+      console.error('Failed to show notification:', error);
     }
   }
 
-  // Notifications prédéfinies pour l'app
-  async notifyEmotionScanReminder(): Promise<void> {
-    await this.showLocalNotification({
-      title: 'EmotionsCare',
-      body: 'N\'oubliez pas votre scan émotionnel quotidien 😊',
-      tag: 'emotion-reminder',
-      data: { url: '/scan' }
-    });
-  }
-
-  async notifyMusicRecommendation(mood: string): Promise<void> {
-    await this.showLocalNotification({
-      title: 'Nouvelle recommandation musicale',
-      body: `Musique adaptée à votre humeur ${mood} disponible`,
-      tag: 'music-recommendation',
-      data: { url: '/music' }
-    });
-  }
-
-  async notifyCoachMessage(): Promise<void> {
-    await this.showLocalNotification({
-      title: 'Message de votre coach',
-      body: 'Votre coach IA a de nouveaux conseils pour vous',
-      tag: 'coach-message',
-      requireInteraction: true,
-      data: { url: '/coach' }
-    });
-  }
-
-  // Helper methods
   private urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
@@ -167,72 +147,86 @@ class PushNotificationManager {
     return outputArray;
   }
 
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    const chars = Array.from(bytes, byte => String.fromCharCode(byte));
-    return btoa(chars.join(''));
+  getPermissionState(): NotificationPermissionState {
+    return {
+      permission: 'Notification' in window ? Notification.permission : 'denied',
+      supported: 'serviceWorker' in navigator && 'PushManager' in window,
+      subscribed: this.subscription !== null
+    };
   }
 }
 
+// Global instance
 export const pushNotificationManager = new PushNotificationManager();
 
-// Hook pour React
+/**
+ * React hook for push notifications
+ */
 export const usePushNotifications = () => {
-  const [permission, setPermission] = React.useState<NotificationPermission>('default');
-  const [isSubscribed, setIsSubscribed] = React.useState(false);
+  const [permissionState, setPermissionState] = useState<NotificationPermissionState>({
+    permission: 'default',
+    supported: false,
+    subscribed: false
+  });
 
-  React.useEffect(() => {
-    if ('Notification' in window) {
-      setPermission(Notification.permission);
-    }
-
-    checkSubscription();
+  const updatePermissionState = useCallback(() => {
+    setPermissionState(pushNotificationManager.getPermissionState());
   }, []);
 
-  const checkSubscription = async () => {
-    const subscription = await pushNotificationManager.getSubscription();
-    setIsSubscribed(!!subscription);
-  };
+  useEffect(() => {
+    updatePermissionState();
+    
+    // Initialize push notification manager
+    pushNotificationManager.initialize().then(() => {
+      updatePermissionState();
+    });
+  }, [updatePermissionState]);
 
-  const requestPermission = async () => {
-    const newPermission = await pushNotificationManager.requestPermission();
-    setPermission(newPermission);
-    return newPermission;
-  };
+  const requestPermission = useCallback(async (): Promise<NotificationPermission> => {
+    const permission = await pushNotificationManager.requestPermission();
+    updatePermissionState();
+    return permission;
+  }, [updatePermissionState]);
 
-  const subscribe = async () => {
-    try {
-      const subscription = await pushNotificationManager.subscribe();
-      if (subscription) {
-        setIsSubscribed(true);
-        // Ici vous pourriez envoyer la subscription à votre backend
-        console.log('Subscription ready to be sent to backend:', subscription);
-      }
-      return subscription;
-    } catch (error) {
-      console.error('Subscription failed:', error);
-      return null;
-    }
-  };
+  const subscribe = useCallback(async (): Promise<PushSubscription | null> => {
+    const subscription = await pushNotificationManager.subscribe();
+    updatePermissionState();
+    return subscription;
+  }, [updatePermissionState]);
 
-  const unsubscribe = async () => {
-    const success = await pushNotificationManager.unsubscribe();
-    if (success) {
-      setIsSubscribed(false);
-    }
-    return success;
-  };
+  const unsubscribe = useCallback(async (): Promise<boolean> => {
+    const result = await pushNotificationManager.unsubscribe();
+    updatePermissionState();
+    return result;
+  }, [updatePermissionState]);
+
+  const showNotification = useCallback(
+    async (title: string, options?: NotificationOptions): Promise<void> => {
+      await pushNotificationManager.showNotification(title, options);
+    },
+    []
+  );
 
   return {
-    permission,
-    isSubscribed,
+    permissionState,
     requestPermission,
     subscribe,
     unsubscribe,
-    showNotification: pushNotificationManager.showLocalNotification.bind(pushNotificationManager),
-    notifyEmotionScanReminder: pushNotificationManager.notifyEmotionScanReminder.bind(pushNotificationManager),
-    notifyMusicRecommendation: pushNotificationManager.notifyMusicRecommendation.bind(pushNotificationManager),
-    notifyCoachMessage: pushNotificationManager.notifyCoachMessage.bind(pushNotificationManager)
+    showNotification,
+    isSupported: permissionState.supported,
+    isSubscribed: permissionState.subscribed,
+    hasPermission: permissionState.permission === 'granted'
   };
 };
 
+// Utility functions for notification management
+export const sendNotification = async (
+  title: string,
+  options: NotificationOptions = {}
+): Promise<void> => {
+  await pushNotificationManager.showNotification(title, options);
+};
+
+export const initializePushNotifications = async (): Promise<void> => {
+  await pushNotificationManager.initialize();
+};
