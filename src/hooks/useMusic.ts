@@ -1,12 +1,11 @@
 
 import { useContext } from 'react';
 import { MusicContext } from '@/contexts/MusicContext';
-import { MusicContextType } from '@/types/music';
 
 /**
  * Hook to access the music context throughout the application
  */
-export const useMusic = (): MusicContextType => {
+export const useMusic = () => {
   const context = useContext(MusicContext);
   
   if (!context || Object.keys(context).length === 0) {
