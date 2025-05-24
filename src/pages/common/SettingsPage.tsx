@@ -2,312 +2,295 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Bell, Moon, Globe, Shield, Database, Mail } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Settings, User, Bell, Shield, Palette, Globe, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SettingsPage: React.FC = () => {
   const { user } = useAuth();
   const [settings, setSettings] = useState({
-    notifications: {
-      email: true,
-      push: true,
-      reminders: false,
-      weekly_report: true
-    },
-    privacy: {
-      data_sharing: false,
-      analytics: true,
-      marketing: false
-    },
-    preferences: {
-      theme: 'system',
-      language: 'fr',
-      timezone: 'Europe/Paris'
-    }
+    // Profile settings
+    name: user?.user_metadata?.name || '',
+    email: user?.email || '',
+    
+    // Notification settings
+    emailNotifications: true,
+    pushNotifications: true,
+    weeklyReport: true,
+    emotionAlerts: false,
+    
+    // Privacy settings
+    dataSharing: false,
+    analytics: true,
+    
+    // Appearance settings
+    theme: 'system',
+    language: 'fr',
+    
+    // Coach settings
+    coachPersonality: 'empathetic',
+    analysisDepth: 'detailed'
   });
 
-  const updateSetting = (category: string, key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category as keyof typeof prev],
-        [key]: value
-      }
-    }));
-    toast.success('Paramètre mis à jour');
-  };
+  const [isSaving, setIsSaving] = useState(false);
 
-  const exportData = () => {
-    toast.info('Export des données en cours...');
-    // Simulation de l'export
-    setTimeout(() => {
-      toast.success('Données exportées avec succès');
-    }, 2000);
-  };
-
-  const deleteAllData = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer toutes vos données ? Cette action est irréversible.')) {
-      toast.error('Suppression de toutes les données...');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Paramètres sauvegardés !');
+    } catch (error) {
+      toast.error('Erreur lors de la sauvegarde');
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const updateSetting = (key: string, value: any) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Paramètres</h1>
-          <p className="text-muted-foreground">
-            Gérez vos préférences et la confidentialité de votre compte
-          </p>
-        </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
+          <Settings className="h-8 w-8 text-gray-600" />
+          Paramètres
+        </h1>
+        <p className="text-muted-foreground">
+          Personnalisez votre expérience EmotionsCare
+        </p>
+      </div>
 
-        <div className="space-y-6">
-          {/* Notifications */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-              <CardDescription>
-                Choisissez comment vous souhaitez être notifié
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="email-notifications">Notifications par email</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recevez des emails pour les mises à jour importantes
-                  </p>
-                </div>
-                <Switch
-                  id="email-notifications"
-                  checked={settings.notifications.email}
-                  onCheckedChange={(checked) => updateSetting('notifications', 'email', checked)}
-                />
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Profile Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Profil
+            </CardTitle>
+            <CardDescription>
+              Informations personnelles et préférences de compte
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Nom complet</label>
+              <Input
+                value={settings.name}
+                onChange={(e) => updateSetting('name', e.target.value)}
+                placeholder="Votre nom complet"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">Email</label>
+              <Input
+                value={settings.email}
+                onChange={(e) => updateSetting('email', e.target.value)}
+                placeholder="votre.email@exemple.com"
+                type="email"
+              />
+            </div>
+
+            <Separator />
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Langue</label>
+              <Select value={settings.language} onValueChange={(value) => updateSetting('language', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Thème</label>
+              <Select value={settings.theme} onValueChange={(value) => updateSetting('theme', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Clair</SelectItem>
+                  <SelectItem value="dark">Sombre</SelectItem>
+                  <SelectItem value="system">Système</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Notification Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notifications
+            </CardTitle>
+            <CardDescription>
+              Gérez vos préférences de notification
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">Notifications par email</label>
+                <p className="text-xs text-muted-foreground">Recevez des updates par email</p>
               </div>
+              <Switch
+                checked={settings.emailNotifications}
+                onCheckedChange={(checked) => updateSetting('emailNotifications', checked)}
+              />
+            </div>
 
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="push-notifications">Notifications push</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Notifications dans le navigateur
-                  </p>
-                </div>
-                <Switch
-                  id="push-notifications"
-                  checked={settings.notifications.push}
-                  onCheckedChange={(checked) => updateSetting('notifications', 'push', checked)}
-                />
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">Notifications push</label>
+                <p className="text-xs text-muted-foreground">Notifications dans le navigateur</p>
               </div>
+              <Switch
+                checked={settings.pushNotifications}
+                onCheckedChange={(checked) => updateSetting('pushNotifications', checked)}
+              />
+            </div>
 
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="reminders">Rappels quotidiens</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Rappels pour compléter votre journal émotionnel
-                  </p>
-                </div>
-                <Switch
-                  id="reminders"
-                  checked={settings.notifications.reminders}
-                  onCheckedChange={(checked) => updateSetting('notifications', 'reminders', checked)}
-                />
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">Rapport hebdomadaire</label>
+                <p className="text-xs text-muted-foreground">Résumé de votre bien-être</p>
               </div>
+              <Switch
+                checked={settings.weeklyReport}
+                onCheckedChange={(checked) => updateSetting('weeklyReport', checked)}
+              />
+            </div>
 
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="weekly-report">Rapport hebdomadaire</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Résumé de votre bien-être chaque semaine
-                  </p>
-                </div>
-                <Switch
-                  id="weekly-report"
-                  checked={settings.notifications.weekly_report}
-                  onCheckedChange={(checked) => updateSetting('notifications', 'weekly_report', checked)}
-                />
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">Alertes émotionnelles</label>
+                <p className="text-xs text-muted-foreground">Suggestions basées sur votre humeur</p>
               </div>
-            </CardContent>
-          </Card>
+              <Switch
+                checked={settings.emotionAlerts}
+                onCheckedChange={(checked) => updateSetting('emotionAlerts', checked)}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Préférences */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Moon className="h-5 w-5" />
-                Préférences d'affichage
-              </CardTitle>
-              <CardDescription>
-                Personnalisez l'apparence de l'application
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Thème</Label>
-                <Select 
-                  value={settings.preferences.theme}
-                  onValueChange={(value) => updateSetting('preferences', 'theme', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Clair</SelectItem>
-                    <SelectItem value="dark">Sombre</SelectItem>
-                    <SelectItem value="system">Système</SelectItem>
-                  </SelectContent>
-                </Select>
+        {/* Privacy Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Confidentialité
+            </CardTitle>
+            <CardDescription>
+              Contrôlez vos données et votre confidentialité
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">Partage de données anonymes</label>
+                <p className="text-xs text-muted-foreground">Aidez à améliorer le service</p>
               </div>
+              <Switch
+                checked={settings.dataSharing}
+                onCheckedChange={(checked) => updateSetting('dataSharing', checked)}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="language">Langue</Label>
-                <Select 
-                  value={settings.preferences.language}
-                  onValueChange={(value) => updateSetting('preferences', 'language', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium">Analytics</label>
+                <p className="text-xs text-muted-foreground">Collecte de données d'utilisation</p>
               </div>
+              <Switch
+                checked={settings.analytics}
+                onCheckedChange={(checked) => updateSetting('analytics', checked)}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="timezone">Fuseau horaire</Label>
-                <Select 
-                  value={settings.preferences.timezone}
-                  onValueChange={(value) => updateSetting('preferences', 'timezone', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Europe/Paris">Europe/Paris</SelectItem>
-                    <SelectItem value="America/New_York">America/New_York</SelectItem>
-                    <SelectItem value="Asia/Tokyo">Asia/Tokyo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+            <Separator />
 
-          {/* Confidentialité */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Confidentialité et données
-              </CardTitle>
-              <CardDescription>
-                Contrôlez l'utilisation de vos données
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="data-sharing">Partage de données anonymisées</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Aidez-nous à améliorer l'application avec des données anonymes
-                  </p>
-                </div>
-                <Switch
-                  id="data-sharing"
-                  checked={settings.privacy.data_sharing}
-                  onCheckedChange={(checked) => updateSetting('privacy', 'data_sharing', checked)}
-                />
-              </div>
+            <div className="text-center space-y-2">
+              <Button variant="outline" size="sm">
+                Télécharger mes données
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Conformément au RGPD
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-              <Separator />
+        {/* Coach Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Coach IA
+            </CardTitle>
+            <CardDescription>
+              Personnalisez votre expérience avec le coach
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Personnalité du coach</label>
+              <Select value={settings.coachPersonality} onValueChange={(value) => updateSetting('coachPersonality', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="empathetic">Empathique</SelectItem>
+                  <SelectItem value="motivational">Motivant</SelectItem>
+                  <SelectItem value="analytical">Analytique</SelectItem>
+                  <SelectItem value="gentle">Doux</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="analytics">Analyses d'utilisation</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Collecte de données d'usage pour améliorer l'expérience
-                  </p>
-                </div>
-                <Switch
-                  id="analytics"
-                  checked={settings.privacy.analytics}
-                  onCheckedChange={(checked) => updateSetting('privacy', 'analytics', checked)}
-                />
-              </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Niveau d'analyse</label>
+              <Select value={settings.analysisDepth} onValueChange={(value) => updateSetting('analysisDepth', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="basic">Basique</SelectItem>
+                  <SelectItem value="detailed">Détaillée</SelectItem>
+                  <SelectItem value="comprehensive">Approfondie</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="marketing">Communications marketing</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recevoir des informations sur nos nouveautés
-                  </p>
-                </div>
-                <Switch
-                  id="marketing"
-                  checked={settings.privacy.marketing}
-                  onCheckedChange={(checked) => updateSetting('privacy', 'marketing', checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Gestion des données */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Gestion des données
-              </CardTitle>
-              <CardDescription>
-                Exportez ou supprimez vos données
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium">Exporter mes données</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Téléchargez toutes vos données au format JSON
-                  </p>
-                </div>
-                <Button variant="outline" onClick={exportData}>
-                  Exporter
-                </Button>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium text-red-600">Supprimer toutes mes données</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Action irréversible - supprime tout votre historique
-                  </p>
-                </div>
-                <Button variant="destructive" onClick={deleteAllData}>
-                  Supprimer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="flex justify-center">
+        <Button onClick={handleSave} disabled={isSaving} size="lg" className="px-8">
+          {isSaving ? (
+            <>Sauvegarde...</>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              Sauvegarder les modifications
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
