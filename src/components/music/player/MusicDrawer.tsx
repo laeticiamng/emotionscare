@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Music } from 'lucide-react';
 import SimpleMusicPlayer from './SimpleMusicPlayer';
 
-const MusicDrawer: React.FC = () => {
+interface MusicDrawerProps {
+  children?: React.ReactNode;
+}
+
+const MusicDrawer: React.FC<MusicDrawerProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -23,7 +27,7 @@ const MusicDrawer: React.FC = () => {
           <SheetTitle>Lecteur Musical</SheetTitle>
         </SheetHeader>
         <div className="mt-6">
-          <SimpleMusicPlayer />
+          {children || <SimpleMusicPlayer />}
         </div>
       </SheetContent>
     </Sheet>

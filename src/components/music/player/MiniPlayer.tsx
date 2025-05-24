@@ -1,63 +1,54 @@
 
-import React from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { Music, Play, Pause } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface MiniPlayerProps {
   onExpand: () => void;
-  className?: string;
 }
 
-const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand, className }) => {
-  const { currentTrack, isPlaying, play, pause } = useMusic();
+const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
-  const handlePlayPause = () => {
-    if (isPlaying) {
-      pause();
-    } else if (currentTrack) {
-      play(currentTrack);
-    }
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
   };
 
-  if (!currentTrack) {
-    return null;
-  }
+  if (!isVisible) return null;
 
   return (
-    <div className={cn(
-      "fixed bottom-4 right-4 bg-card border rounded-lg p-3 shadow-lg z-50",
-      "flex items-center gap-3 min-w-[200px]",
-      className
-    )}>
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={handlePlayPause}
-        className="h-8 w-8"
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 100 }}
+        className="fixed bottom-4 right-4 z-50"
       >
-        {isPlaying ? (
-          <Pause className="h-4 w-4" />
-        ) : (
-          <Play className="h-4 w-4" />
-        )}
-      </Button>
-      
-      <div className="flex-1 min-w-0" onClick={onExpand}>
-        <p className="text-sm font-medium truncate">{currentTrack.title}</p>
-        <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-      </div>
-      
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={onExpand}
-        className="h-6 w-6"
-      >
-        <Volume2 className="h-3 w-3" />
-      </Button>
-    </div>
+        <Card className="p-2 bg-background/80 backdrop-blur-sm shadow-lg">
+          <div className="flex items-center space-x-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={togglePlay}
+              className="h-8 w-8"
+            >
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={onExpand}
+              className="h-8 w-8"
+            >
+              <Music className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
