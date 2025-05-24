@@ -4,10 +4,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/toaster';
 
 // Pages publiques
-import LandingPage from '@/pages/LandingPage';
+import HomePage from '@/pages/HomePage';
 import ChooseModePage from '@/pages/ChooseModePage';
 import NotFoundPage from '@/pages/common/NotFoundPage';
 
@@ -27,9 +27,9 @@ import B2BAdminLoginPage from '@/pages/b2b/admin/auth/B2BAdminLoginPage';
 // Selection page
 import B2BSelectionPage from '@/pages/auth/B2BSelectionPage';
 
-// Protected pages
-import ProtectedLayout from '@/components/ProtectedLayout';
-import Shell from '@/Shell';
+// Protected routes wrapper
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { MainLayout } from '@/components/layout/MainLayout';
 
 // Dashboard pages
 import B2CDashboardPage from '@/pages/b2c/dashboard/B2CDashboardPage';
@@ -57,7 +57,7 @@ const App: React.FC = () => {
           <UserModeProvider>
             <Routes>
               {/* Pages publiques */}
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/choose-mode" element={<ChooseModePage />} />
               <Route path="/b2b/selection" element={<B2BSelectionPage />} />
               
@@ -75,33 +75,55 @@ const App: React.FC = () => {
               <Route path="/b2b/admin/login" element={<B2BAdminLoginPage />} />
               
               {/* Routes protégées */}
-              <Route path="/" element={<ProtectedLayout />}>
-                <Route path="" element={<Shell />}>
-                  {/* Dashboards */}
-                  <Route path="b2c/dashboard" element={<B2CDashboardPage />} />
-                  <Route path="b2b/user/dashboard" element={<B2BUserDashboardPage />} />
-                  <Route path="b2b/admin/dashboard" element={<B2BAdminDashboardPage />} />
-                  <Route path="b2b/admin/analytics" element={<B2BAdminAnalyticsPage />} />
-                  <Route path="b2b/admin/users" element={<B2BAdminUsersPage />} />
-                  
-                  {/* Features */}
-                  <Route path="scan" element={<ScanPage />} />
-                  <Route path="coach" element={<Coach />} />
-                  <Route path="music" element={<Music />} />
-                  <Route path="journal" element={<Journal />} />
-                  
-                  {/* Common */}
-                  <Route path="profile" element={<ProfilePage />} />
-                  <Route path="settings" element={<SettingsPage />} />
-                  <Route path="help" element={<HelpPage />} />
-                </Route>
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <MainLayout />
+                </ProtectedRoute>
+              }>
+                {/* Dashboards */}
+                <Route path="b2c/dashboard" element={
+                  <ProtectedRoute requiredRole="b2c">
+                    <B2CDashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="b2b/user/dashboard" element={
+                  <ProtectedRoute requiredRole="b2b_user">
+                    <B2BUserDashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="b2b/admin/dashboard" element={
+                  <ProtectedRoute requiredRole="b2b_admin">
+                    <B2BAdminDashboardPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="b2b/admin/analytics" element={
+                  <ProtectedRoute requiredRole="b2b_admin">
+                    <B2BAdminAnalyticsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="b2b/admin/users" element={
+                  <ProtectedRoute requiredRole="b2b_admin">
+                    <B2BAdminUsersPage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Features */}
+                <Route path="scan" element={<ScanPage />} />
+                <Route path="coach" element={<Coach />} />
+                <Route path="music" element={<Music />} />
+                <Route path="journal" element={<Journal />} />
+                
+                {/* Common */}
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="help" element={<HelpPage />} />
               </Route>
               
               {/* 404 */}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
             
-            <Toaster position="top-right" />
+            <Toaster />
           </UserModeProvider>
         </AuthProvider>
       </ThemeProvider>

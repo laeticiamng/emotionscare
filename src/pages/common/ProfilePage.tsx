@@ -4,284 +4,369 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { User, Mail, Building, Save, Camera, Shield } from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Save, User, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
+
+interface ProfileData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+  bio?: string;
+  location?: string;
+  company?: string;
+  position?: string;
+  avatar_url?: string;
+}
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const { userMode } = useUserMode();
-  const [isLoading, setIsLoading] = useState(false);
-  const [profile, setProfile] = useState({
-    name: '',
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profileData, setProfileData] = useState<ProfileData>({
+    first_name: '',
+    last_name: '',
     email: '',
+    phone: '',
+    bio: '',
+    location: '',
     company: '',
-    department: '',
-    job_title: '',
+    position: '',
     avatar_url: ''
   });
 
   useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
+    loadProfile();
   }, [user]);
 
   const loadProfile = async () => {
     if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-
-      if (data) {
-        setProfile({
-          name: data.name || '',
-          email: data.email || user.email || '',
-          company: data.company || '',
-          department: data.department || '',
-          job_title: data.job_title || '',
-          avatar_url: data.avatar_url || ''
-        });
-      } else {
-        // Créer un profil de base
-        setProfile(prev => ({
-          ...prev,
-          email: user.email || ''
-        }));
-      }
-    } catch (error) {
-      console.error('Erreur chargement profil:', error);
-      toast.error('Erreur lors du chargement du profil');
-    }
-  };
-
-  const saveProfile = async () => {
-    if (!user) return;
-
+    
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          name: profile.name,
-          email: profile.email,
-          company: profile.company,
-          department: profile.department,
-          job_title: profile.job_title,
-          avatar_url: profile.avatar_url,
-          updated_at: new Date().toISOString()
+      if (user.email?.endsWith('@exemple.fr')) {
+        // Données de démo
+        setProfileData({
+          first_name: user.user_metadata?.first_name || 'Utilisateur',
+          last_name: user.user_metadata?.last_name || 'Démo',
+          email: user.email,
+          phone: '+33 6 12 34 56 78',
+          bio: 'Compte de démonstration pour tester les fonctionnalités de la plateforme.',
+          location: 'Paris, France',
+          company: user.user_metadata?.company || 'Entreprise Démo',
+          position: user.user_metadata?.position || 'Poste de test',
+          avatar_url: ''
         });
+      } else {
+        // Charger les vraies données depuis Supabase
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-      if (error) throw error;
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
 
-      toast.success('Profil mis à jour avec succès !');
+        if (data) {
+          setProfileData({
+            first_name: data.first_name || user.user_metadata?.first_name || '',
+            last_name: data.last_name || user.user_metadata?.last_name || '',
+            email: user.email || '',
+            phone: data.phone || '',
+            bio: data.bio || '',
+            location: data.location || '',
+            company: data.company || user.user_metadata?.company || '',
+            position: data.position || user.user_metadata?.position || '',
+            avatar_url: data.avatar_url || ''
+          });
+        } else {
+          // Initialiser avec les données d'auth si aucun profil n'existe
+          setProfileData({
+            first_name: user.user_metadata?.first_name || '',
+            last_name: user.user_metadata?.last_name || '',
+            email: user.email || '',
+            phone: '',
+            bio: '',
+            location: '',
+            company: user.user_metadata?.company || '',
+            position: user.user_metadata?.position || '',
+            avatar_url: ''
+          });
+        }
+      }
     } catch (error) {
-      console.error('Erreur sauvegarde profil:', error);
-      toast.error('Erreur lors de la sauvegarde');
+      console.error('Erreur lors du chargement du profil:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger votre profil",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getRoleBadge = () => {
-    const roleConfig = {
-      'b2c': { label: 'Particulier', color: 'bg-blue-100 text-blue-800' },
-      'b2b_user': { label: 'Collaborateur', color: 'bg-green-100 text-green-800' },
-      'b2b_admin': { label: 'Administrateur', color: 'bg-purple-100 text-purple-800' }
-    };
+  const handleSave = async () => {
+    if (!user) return;
 
-    const config = roleConfig[userMode as keyof typeof roleConfig] || roleConfig['b2c'];
-    
-    return (
-      <Badge className={config.color}>
-        {config.label}
-      </Badge>
-    );
+    setIsSaving(true);
+    try {
+      if (user.email?.endsWith('@exemple.fr')) {
+        // Simulation pour les comptes démo
+        setTimeout(() => {
+          toast({
+            title: "Profil mis à jour",
+            description: "Vos informations ont été sauvegardées (démo)",
+          });
+          setIsSaving(false);
+        }, 1000);
+        return;
+      }
+
+      // Sauvegarder les vraies données
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          phone: profileData.phone,
+          bio: profileData.bio,
+          location: profileData.location,
+          company: profileData.company,
+          position: profileData.position,
+          avatar_url: profileData.avatar_url,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été sauvegardées avec succès",
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder votre profil",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  return (
-    <div className="container mx-auto p-6 max-w-2xl space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-          <User className="h-8 w-8 text-blue-600" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold">Mon Profil</h1>
-          <p className="text-muted-foreground">Gérez vos informations personnelles</p>
+  const handleInputChange = (field: keyof ProfileData, value: string) => {
+    setProfileData(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Informations de base */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Informations personnelles</CardTitle>
-              <CardDescription>
-                Vos données de profil et préférences
-              </CardDescription>
-            </div>
-            {getRoleBadge()}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Avatar */}
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-                {profile.avatar_url ? (
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Mon Profil</h1>
+          <p className="text-gray-600">
+            Gérez vos informations personnelles et préférences
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Photo de profil */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <User className="h-5 w-5 mr-2" />
+                Photo de profil
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
+                {profileData.avatar_url ? (
                   <img 
-                    src={profile.avatar_url} 
+                    src={profileData.avatar_url} 
                     alt="Avatar" 
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-32 h-32 rounded-full object-cover"
                   />
                 ) : (
-                  <User className="h-8 w-8 text-muted-foreground" />
+                  <User className="h-16 w-16 text-gray-400" />
                 )}
               </div>
-              <Button
-                size="icon"
-                variant="outline"
-                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full"
-              >
-                <Camera className="h-4 w-4" />
+              <Button variant="outline" disabled>
+                Changer la photo
+                <span className="text-xs ml-2">(Bientôt disponible)</span>
               </Button>
-            </div>
-            <div>
-              <h3 className="font-medium">{profile.name || 'Nom non défini'}</h3>
-              <p className="text-sm text-muted-foreground">{profile.email}</p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name">Nom complet</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="name"
-                  placeholder="Votre nom complet"
-                  value={profile.name}
-                  onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={profile.email}
-                  onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
-                  className="pl-10"
-                  disabled
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Informations professionnelles pour B2B */}
-          {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
-            <>
-              <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">Informations professionnelles</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="company">Entreprise</Label>
-                    <div className="relative">
-                      <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="company"
-                        placeholder="Nom de votre entreprise"
-                        value={profile.company}
-                        onChange={(e) => setProfile(prev => ({ ...prev, company: e.target.value }))}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="job_title">Poste</Label>
-                    <Input
-                      id="job_title"
-                      placeholder="Votre poste"
-                      value={profile.job_title}
-                      onChange={(e) => setProfile(prev => ({ ...prev, job_title: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <Label htmlFor="department">Département</Label>
-                    <Input
-                      id="department"
-                      placeholder="Votre département"
-                      value={profile.department}
-                      onChange={(e) => setProfile(prev => ({ ...prev, department: e.target.value }))}
-                    />
-                  </div>
+          {/* Informations personnelles */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Informations personnelles</CardTitle>
+              <CardDescription>
+                Mettez à jour vos informations de base
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Prénom</Label>
+                  <Input
+                    id="firstName"
+                    value={profileData.first_name}
+                    onChange={(e) => handleInputChange('first_name', e.target.value)}
+                    placeholder="Votre prénom"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Nom</Label>
+                  <Input
+                    id="lastName"
+                    value={profileData.last_name}
+                    onChange={(e) => handleInputChange('last_name', e.target.value)}
+                    placeholder="Votre nom"
+                  />
                 </div>
               </div>
-            </>
-          )}
 
-          <Button onClick={saveProfile} disabled={isLoading} className="w-full">
-            <Save className="mr-2 h-4 w-4" />
-            {isLoading ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileData.email}
+                    disabled
+                    className="pl-10 bg-gray-50"
+                    placeholder="votre@email.com"
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  L'email ne peut pas être modifié depuis ce profil
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={profileData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className="pl-10"
+                    placeholder="+33 6 12 34 56 78"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location">Localisation</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="location"
+                    value={profileData.location}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    className="pl-10"
+                    placeholder="Ville, Pays"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Biographie</Label>
+                <Textarea
+                  id="bio"
+                  value={profileData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  placeholder="Parlez-nous un peu de vous..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Informations professionnelles */}
+        {user?.user_metadata?.role?.startsWith('b2b') && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Briefcase className="h-5 w-5 mr-2" />
+                Informations professionnelles
+              </CardTitle>
+              <CardDescription>
+                Détails de votre activité professionnelle
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="company">Entreprise</Label>
+                  <Input
+                    id="company"
+                    value={profileData.company}
+                    onChange={(e) => handleInputChange('company', e.target.value)}
+                    placeholder="Nom de votre entreprise"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="position">Poste</Label>
+                  <Input
+                    id="position"
+                    value={profileData.position}
+                    onChange={(e) => handleInputChange('position', e.target.value)}
+                    placeholder="Votre fonction"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Actions */}
+        <div className="flex justify-end space-x-4">
+          <Button variant="outline" onClick={loadProfile}>
+            Annuler
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Sécurité */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Sécurité
-          </CardTitle>
-          <CardDescription>
-            Gérez la sécurité de votre compte
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Mot de passe</h4>
-              <p className="text-sm text-muted-foreground">
-                Dernière modification il y a plus de 30 jours
-              </p>
-            </div>
-            <Button variant="outline">
-              Modifier
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Authentification à deux facteurs</h4>
-              <p className="text-sm text-muted-foreground">
-                Sécurisez votre compte avec la 2FA
-              </p>
-            </div>
-            <Button variant="outline">
-              Configurer
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sauvegarde...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Enregistrer
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
