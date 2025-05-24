@@ -43,23 +43,10 @@ const B2CLoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = async () => {
+  const handleDemoLogin = () => {
     setEmail('demo@exemple.fr');
     setPassword('demo123');
-    
-    setIsLoading(true);
-    try {
-      // Simuler une connexion démo
-      setTimeout(() => {
-        setUserMode('b2c');
-        toast.success('Connexion démo réussie !');
-        navigate('/b2c/dashboard');
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
-      toast.error('Erreur lors de la connexion démo');
-      setIsLoading(false);
-    }
+    toast.info('Données de démonstration chargées');
   };
 
   return (
@@ -133,32 +120,13 @@ const B2CLoginPage: React.FC = () => {
             </form>
             
             <div className="space-y-4 mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Ou</span>
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleDemoLogin}
-                disabled={isLoading}
                 className="w-full"
               >
                 Essayer la démo
               </Button>
-              
-              <div className="text-center">
-                <Link 
-                  to="/b2c/reset-password" 
-                  className="text-sm text-primary hover:underline"
-                >
-                  Mot de passe oublié ?
-                </Link>
-              </div>
               
               <div className="text-center">
                 <span className="text-sm text-muted-foreground">Pas encore de compte ? </span>
@@ -167,6 +135,15 @@ const B2CLoginPage: React.FC = () => {
                   className="text-sm text-primary hover:underline"
                 >
                   S'inscrire
+                </Link>
+              </div>
+              
+              <div className="text-center">
+                <Link 
+                  to="/b2c/reset-password" 
+                  className="text-sm text-muted-foreground hover:text-primary"
+                >
+                  Mot de passe oublié ?
                 </Link>
               </div>
             </div>

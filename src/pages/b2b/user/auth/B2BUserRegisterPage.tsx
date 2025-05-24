@@ -7,17 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, User, Building } from 'lucide-react';
+import { User, Mail, Lock, Building, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
+    company: '',
+    jobTitle: '',
     password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    company: ''
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -26,9 +26,15 @@ const B2BUserRegisterPage: React.FC = () => {
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email || !formData.password || !formData.firstName || !formData.company) {
+    
+    if (!formData.name || !formData.email || !formData.company || !formData.password || !formData.confirmPassword) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -46,12 +52,12 @@ const B2BUserRegisterPage: React.FC = () => {
     setIsLoading(true);
     try {
       const { error } = await signUp(formData.email, formData.password, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        name: formData.name,
+        role: 'b2b_user',
         company: formData.company,
-        role: 'b2b_user'
+        job_title: formData.jobTitle
       });
-
+      
       if (error) {
         toast.error('Erreur lors de l\'inscription: ' + error.message);
       } else {
@@ -64,10 +70,6 @@ const B2BUserRegisterPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -92,31 +94,37 @@ const B2BUserRegisterPage: React.FC = () => {
             </div>
             <CardTitle className="text-2xl">Inscription Collaborateur</CardTitle>
             <CardDescription>
-              Rejoignez votre entreprise sur EmotionsCare
+              Créez votre compte collaborateur EmotionsCare
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="text"
-                      placeholder="Prénom"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
+              <div className="space-y-2">
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Nom"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    name="name"
+                    placeholder="Nom complet"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    name="email"
+                    placeholder="votre@entreprise.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                    required
                   />
                 </div>
               </div>
@@ -126,25 +134,26 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
+                    name="company"
                     placeholder="Nom de l'entreprise"
                     value={formData.company}
-                    onChange={(e) => handleInputChange('company', e.target.value)}
+                    onChange={handleInputChange}
                     className="pl-10"
                     required
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    type="email"
-                    placeholder="votre@entreprise.com"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    type="text"
+                    name="jobTitle"
+                    placeholder="Poste (optionnel)"
+                    value={formData.jobTitle}
+                    onChange={handleInputChange}
                     className="pl-10"
-                    required
                   />
                 </div>
               </div>
@@ -154,9 +163,10 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Mot de passe"
+                    name="password"
+                    placeholder="Mot de passe (min. 6 caractères)"
                     value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    onChange={handleInputChange}
                     className="pl-10 pr-10"
                     required
                   />
@@ -177,9 +187,10 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
                     placeholder="Confirmer le mot de passe"
                     value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    onChange={handleInputChange}
                     className="pl-10 pr-10"
                     required
                   />
@@ -197,7 +208,7 @@ const B2BUserRegisterPage: React.FC = () => {
               
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Créer mon compte
+                S'inscrire
               </Button>
             </form>
             
@@ -209,15 +220,6 @@ const B2BUserRegisterPage: React.FC = () => {
                   className="text-sm text-primary hover:underline"
                 >
                   Se connecter
-                </Link>
-              </div>
-              
-              <div className="text-center">
-                <Link 
-                  to="/b2b/admin/login" 
-                  className="text-sm text-muted-foreground hover:text-primary"
-                >
-                  Accès administrateur
                 </Link>
               </div>
             </div>

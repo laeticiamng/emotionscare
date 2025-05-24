@@ -1,23 +1,31 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
-import { Heart, Brain, Music, BookOpen, Zap, TrendingUp, Calendar, Target } from 'lucide-react';
-import LoadingAnimation from '@/components/ui/loading-animation';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Brain, 
+  Heart, 
+  Music, 
+  BookOpen, 
+  TrendingUp, 
+  Smile,
+  Calendar,
+  Award,
+  Target,
+  Users
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 const B2CDashboardPage: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    emotionScans: 12,
-    journalEntries: 8,
-    musicSessions: 15,
-    coachingSessions: 5
-  });
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [emotionalScore, setEmotionalScore] = useState(75);
+  const [weeklyGoal, setWeeklyGoal] = useState(5);
+  const [completedSessions, setCompletedSessions] = useState(3);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simuler le chargement des données
@@ -28,244 +36,194 @@ const B2CDashboardPage: React.FC = () => {
 
   const quickActions = [
     {
-      title: 'Scanner mes émotions',
-      description: 'Analysez votre état émotionnel actuel',
-      icon: Brain,
-      action: () => navigate('/scan'),
-      color: 'bg-blue-100 text-blue-600'
+      title: 'Scanner d\'émotions',
+      description: 'Analysez votre état émotionnel',
+      icon: <Brain className="h-6 w-6" />,
+      path: '/scan',
+      color: 'bg-blue-500'
     },
     {
       title: 'Coach IA',
-      description: 'Obtenez des conseils personnalisés',
-      icon: Heart,
-      action: () => navigate('/coach'),
-      color: 'bg-red-100 text-red-600'
+      description: 'Accompagnement personnalisé',
+      icon: <Heart className="h-6 w-6" />,
+      path: '/coach',
+      color: 'bg-red-500'
     },
     {
       title: 'Musique thérapeutique',
-      description: 'Écoutez de la musique adaptée',
-      icon: Music,
-      action: () => navigate('/music'),
-      color: 'bg-purple-100 text-purple-600'
+      description: 'Sons apaisants personnalisés',
+      icon: <Music className="h-6 w-6" />,
+      path: '/music',
+      color: 'bg-purple-500'
     },
     {
-      title: 'Mon journal',
-      description: 'Notez vos pensées et émotions',
-      icon: BookOpen,
-      action: () => navigate('/journal'),
-      color: 'bg-green-100 text-green-600'
+      title: 'Journal personnel',
+      description: 'Exprimez vos pensées',
+      icon: <BookOpen className="h-6 w-6" />,
+      path: '/journal',
+      color: 'bg-green-500'
     }
   ];
 
-  const recentActivities = [
-    { type: 'scan', message: 'Scan émotionnel terminé', time: '2h', mood: 'Calme' },
-    { type: 'journal', message: 'Nouvelle entrée journal', time: '1j', title: 'Réflexions du matin' },
-    { type: 'music', message: 'Session musique', time: '2j', duration: '15 min' },
-    { type: 'coaching', message: 'Session de coaching', time: '3j', topic: 'Gestion du stress' }
-  ];
+  const handleQuickAction = (path: string) => {
+    setIsLoading(true);
+    navigate(path);
+  };
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement de votre tableau de bord..." />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
+        <div className="container mx-auto space-y-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const isDemo = user?.email?.endsWith('@exemple.fr');
-  const isTrialActive = user?.trial_end && new Date(user.trial_end) > new Date();
-
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      {/* En-tête de bienvenue */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              Bonjour {user?.user_metadata?.firstName || user?.user_metadata?.name || 'Utilisateur'} ! 
-            </h1>
-            <p className="text-muted-foreground">
-              Comment vous sentez-vous aujourd'hui ?
-            </p>
-          </div>
-          {isDemo && (
-            <div className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm">
-              Mode Démo
-            </div>
-          )}
-          {isTrialActive && !isDemo && (
-            <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-              Essai gratuit actif
-            </div>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
+      <div className="container mx-auto space-y-6">
+        {/* En-tête de bienvenue */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Bonjour {user?.name || 'Utilisateur'} 👋
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Voici votre tableau de bord personnel EmotionsCare
+          </p>
         </div>
-      </motion.div>
 
-      {/* Actions rapides */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
-              Actions rapides
-            </CardTitle>
-            <CardDescription>
-              Commencez votre journée bien-être
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickActions.map((action, index) => {
-                const Icon = action.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <Button
-                      onClick={action.action}
-                      variant="outline"
-                      className="h-auto p-4 flex flex-col items-center gap-3 w-full"
-                    >
-                      <div className={`p-3 rounded-full ${action.color}`}>
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <div className="text-center">
-                        <h3 className="font-medium">{action.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {action.description}
-                        </p>
-                      </div>
-                    </Button>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Indicateurs clés */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Score émotionnel</CardTitle>
+              <Smile className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{emotionalScore}%</div>
+              <Progress value={emotionalScore} className="mt-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                +12% depuis la semaine dernière
+              </p>
+            </CardContent>
+          </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Statistiques */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Objectif hebdomadaire</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{completedSessions}/{weeklyGoal}</div>
+              <Progress value={(completedSessions / weeklyGoal) * 100} className="mt-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                Sessions de bien-être complétées
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Série de réussites</CardTitle>
+              <Award className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">7 jours</div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Votre plus longue série active
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Actions rapides */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action, index) => (
+              <Card 
+                key={index} 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => handleQuickAction(action.path)}
+              >
+                <CardHeader>
+                  <div className={`${action.color} w-12 h-12 rounded-full flex items-center justify-center text-white mb-2`}>
+                    {action.icon}
+                  </div>
+                  <CardTitle className="text-lg">{action.title}</CardTitle>
+                  <CardDescription>{action.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="ghost" className="w-full">
+                    Commencer →
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Activité récente */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Vos statistiques
+                Progression cette semaine
               </CardTitle>
-              <CardDescription>
-                Votre activité des 30 derniers jours
-              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{stats.emotionScans}</div>
-                  <div className="text-xs text-muted-foreground">Scans émotionnels</div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Scans émotionnels</span>
+                  <span className="text-sm font-medium">5 complétés</span>
                 </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{stats.journalEntries}</div>
-                  <div className="text-xs text-muted-foreground">Entrées journal</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Sessions de méditation</span>
+                  <span className="text-sm font-medium">3 complétées</span>
                 </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">{stats.musicSessions}</div>
-                  <div className="text-xs text-muted-foreground">Sessions musique</div>
-                </div>
-                <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">{stats.coachingSessions}</div>
-                  <div className="text-xs text-muted-foreground">Sessions coaching</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Entrées journal</span>
+                  <span className="text-sm font-medium">7 écrites</span>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
 
-        {/* Activités récentes */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Activités récentes
+                Prochaines sessions
               </CardTitle>
-              <CardDescription>
-                Vos dernières interactions
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentActivities.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">{activity.message}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {activity.mood || activity.title || activity.topic || `Durée: ${activity.duration}`}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground">{activity.time}</span>
-                  </div>
-                ))}
+                <div className="flex justify-between items-center p-2 bg-muted rounded">
+                  <span className="text-sm">Méditation guidée</span>
+                  <span className="text-xs text-muted-foreground">Aujourd'hui 18h</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-muted rounded">
+                  <span className="text-sm">Check-in émotionnel</span>
+                  <span className="text-xs text-muted-foreground">Demain 9h</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-muted rounded">
+                  <span className="text-sm">Session coaching</span>
+                  <span className="text-xs text-muted-foreground">Vendredi 14h</span>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
-
-      {/* Objectifs du jour */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Objectifs du jour
-            </CardTitle>
-            <CardDescription>
-              Progressez vers votre bien-être quotidien
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                <input type="checkbox" checked className="rounded" readOnly />
-                <span className="text-sm">Effectuer un scan émotionnel matinal</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <input type="checkbox" className="rounded" />
-                <span className="text-sm">Écrire dans mon journal (5 min)</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <input type="checkbox" className="rounded" />
-                <span className="text-sm">Session de musique thérapeutique (10 min)</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
     </div>
   );
 };

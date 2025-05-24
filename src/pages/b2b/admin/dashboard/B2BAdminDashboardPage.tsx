@@ -1,30 +1,33 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Shield, Users, BarChart3, TrendingUp, Calendar, 
-  UserCheck, AlertTriangle, Heart, Settings 
+  Users, 
+  TrendingUp, 
+  AlertTriangle, 
+  CheckCircle,
+  Calendar,
+  Building2,
+  BarChart3,
+  Settings,
+  Shield,
+  Activity
 } from 'lucide-react';
-import LoadingAnimation from '@/components/ui/loading-animation';
 
 const B2BAdminDashboardPage: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalUsers: 156,
-    activeUsers: 89,
-    weeklyEngagement: 72,
-    avgWellbeingScore: 7.2,
-    alertsCount: 3
-  });
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [companyWellness, setCompanyWellness] = useState(78);
+  const [activeUsers, setActiveUsers] = useState(145);
+  const [totalUsers, setTotalUsers] = useState(180);
+  const [alertsCount, setAlertsCount] = useState(3);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simuler le chargement des données
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -33,291 +36,214 @@ const B2BAdminDashboardPage: React.FC = () => {
   const adminActions = [
     {
       title: 'Gestion des utilisateurs',
-      description: 'Voir et gérer les comptes utilisateurs',
-      icon: Users,
-      action: () => navigate('/b2b/admin/users'),
-      color: 'bg-blue-100 text-blue-600'
+      description: 'Gérer les comptes et les permissions',
+      icon: <Users className="h-6 w-6" />,
+      path: '/b2b/admin/users',
+      color: 'bg-blue-500'
     },
     {
-      title: 'Analytics avancées',
-      description: 'Rapports détaillés et insights',
-      icon: BarChart3,
-      action: () => navigate('/b2b/admin/analytics'),
-      color: 'bg-green-100 text-green-600'
+      title: 'Analyses et rapports',
+      description: 'Voir les statistiques détaillées',
+      icon: <BarChart3 className="h-6 w-6" />,
+      path: '/b2b/admin/analytics',
+      color: 'bg-green-500'
     },
     {
-      title: 'Paramètres',
+      title: 'Paramètres système',
       description: 'Configuration de l\'organisation',
-      icon: Settings,
-      action: () => navigate('/settings'),
-      color: 'bg-purple-100 text-purple-600'
+      icon: <Settings className="h-6 w-6" />,
+      path: '/settings',
+      color: 'bg-purple-500'
     },
     {
-      title: 'Support',
-      description: 'Centre d\'aide et assistance',
-      icon: Heart,
-      action: () => navigate('/help'),
-      color: 'bg-red-100 text-red-600'
+      title: 'Gestion des équipes',
+      description: 'Organiser les groupes de travail',
+      icon: <Building2 className="h-6 w-6" />,
+      path: '/b2b/admin/teams',
+      color: 'bg-orange-500'
     }
   ];
 
-  const recentAlerts = [
-    { type: 'warning', message: 'Baisse d\'engagement équipe Marketing', time: '2h' },
-    { type: 'info', message: 'Nouveau pic d\'utilisation détecté', time: '1j' },
-    { type: 'success', message: 'Objectif bien-être atteint', time: '2j' }
-  ];
+  const handleAdminAction = (path: string) => {
+    setIsLoading(true);
+    navigate(path);
+  };
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement du tableau de bord administrateur..." />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 p-6">
+        <div className="container mx-auto space-y-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const isDemo = user?.email?.endsWith('@exemple.fr');
-
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      {/* En-tête administrateur */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <Shield className="h-8 w-8 text-slate-600" />
-              Administration EmotionsCare
-            </h1>
-            <p className="text-muted-foreground">
-              {user?.user_metadata?.company || 'Votre organisation'} • Tableau de bord administrateur
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 p-6">
+      <div className="container mx-auto space-y-6">
+        {/* En-tête administrateur */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-slate-700 dark:text-slate-300" />
+            <span className="text-sm text-muted-foreground">Administrateur B2B</span>
           </div>
-          {isDemo && (
-            <div className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm">
-              Mode Démo Admin
-            </div>
-          )}
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Tableau de bord administrateur
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Gérez votre organisation EmotionsCare
+          </p>
         </div>
-      </motion.div>
 
-      {/* Métriques principales */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Métriques clés */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalUsers}</div>
-              <div className="text-sm text-muted-foreground">Utilisateurs totaux</div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{activeUsers}/{totalUsers}</div>
+              <Progress value={(activeUsers / totalUsers) * 100} className="mt-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                {Math.round((activeUsers / totalUsers) * 100)}% d'engagement
+              </p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">{stats.activeUsers}</div>
-              <div className="text-sm text-muted-foreground">Actifs (7j)</div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Bien-être général</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{companyWellness}%</div>
+              <Progress value={companyWellness} className="mt-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                Score moyen de l'organisation
+              </p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600">{stats.weeklyEngagement}%</div>
-              <div className="text-sm text-muted-foreground">Engagement</div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Alertes</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">{alertsCount}</div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Nécessitent votre attention
+              </p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{stats.avgWellbeingScore}/10</div>
-              <div className="text-sm text-muted-foreground">Score bien-être</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-red-600">{stats.alertsCount}</div>
-              <div className="text-sm text-muted-foreground">Alertes actives</div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Sessions cette semaine</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">347</div>
+              <p className="text-xs text-green-600 mt-2">
+                +15% vs semaine précédente
+              </p>
             </CardContent>
           </Card>
         </div>
-      </motion.div>
 
-      {/* Actions administrateur */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Actions administrateur
-            </CardTitle>
-            <CardDescription>
-              Gérez votre organisation EmotionsCare
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {adminActions.map((action, index) => {
-                const Icon = action.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <Button
-                      onClick={action.action}
-                      variant="outline"
-                      className="h-auto p-4 flex flex-col items-center gap-3 w-full"
-                    >
-                      <div className={`p-3 rounded-full ${action.color}`}>
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <div className="text-center">
-                        <h3 className="font-medium">{action.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {action.description}
-                        </p>
-                      </div>
-                    </Button>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Actions administrateur */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Actions administrateur</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {adminActions.map((action, index) => (
+              <Card 
+                key={index} 
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => handleAdminAction(action.path)}
+              >
+                <CardHeader>
+                  <div className={`${action.color} w-12 h-12 rounded-full flex items-center justify-center text-white mb-2`}>
+                    {action.icon}
+                  </div>
+                  <CardTitle className="text-lg">{action.title}</CardTitle>
+                  <CardDescription>{action.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="ghost" className="w-full">
+                    Accéder →
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Aperçu des équipes */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
+        {/* Tableaux de bord et alertes */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Aperçu des équipes
+                <TrendingUp className="h-5 w-5" />
+                Tendances de l'organisation
               </CardTitle>
-              <CardDescription>
-                État du bien-être par département
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                  <div>
-                    <div className="font-medium">Marketing</div>
-                    <div className="text-sm text-muted-foreground">32 collaborateurs</div>
-                  </div>
-                  <div className="text-green-600 font-semibold">8.2/10</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Engagement utilisateur</span>
+                  <span className="text-sm font-medium text-green-600">+8%</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                  <div>
-                    <div className="font-medium">Développement</div>
-                    <div className="text-sm text-muted-foreground">28 collaborateurs</div>
-                  </div>
-                  <div className="text-blue-600 font-semibold">7.8/10</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Score de bien-être</span>
+                  <span className="text-sm font-medium text-green-600">+5%</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                  <div>
-                    <div className="font-medium">Commercial</div>
-                    <div className="text-sm text-muted-foreground">24 collaborateurs</div>
-                  </div>
-                  <div className="text-orange-600 font-semibold">6.9/10</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Sessions complétées</span>
+                  <span className="text-sm font-medium text-green-600">+15%</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                  <div>
-                    <div className="font-medium">Support</div>
-                    <div className="text-sm text-muted-foreground">18 collaborateurs</div>
-                  </div>
-                  <div className="text-purple-600 font-semibold">7.5/10</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Satisfaction</span>
+                  <span className="text-sm font-medium text-green-600">+3%</span>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
 
-        {/* Alertes et notifications */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5" />
                 Alertes et notifications
               </CardTitle>
-              <CardDescription>
-                Événements importants à surveiller
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentAlerts.map((alert, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${
-                        alert.type === 'warning' ? 'bg-orange-500' :
-                        alert.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
-                      }`}></div>
-                      <div>
-                        <p className="text-sm font-medium">{alert.message}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground">{alert.time}</span>
-                  </div>
-                ))}
+                <div className="flex justify-between items-center p-2 bg-orange-50 border-l-4 border-orange-500 rounded">
+                  <span className="text-sm">3 utilisateurs nécessitent un suivi</span>
+                  <Button variant="ghost" size="sm">Voir</Button>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-blue-50 border-l-4 border-blue-500 rounded">
+                  <span className="text-sm">Rapport mensuel disponible</span>
+                  <Button variant="ghost" size="sm">Voir</Button>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-green-50 border-l-4 border-green-500 rounded">
+                  <span className="text-sm">Nouvel utilisateur inscrit</span>
+                  <Button variant="ghost" size="sm">Voir</Button>
+                </div>
               </div>
-              <Button variant="outline" className="w-full mt-4">
-                Voir toutes les alertes
-              </Button>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
-
-      {/* Graphique d'activité rapide */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Tendances d'utilisation
-            </CardTitle>
-            <CardDescription>
-              Activité des 30 derniers jours
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-7 gap-2 h-32">
-              {Array.from({ length: 7 }, (_, i) => (
-                <div key={i} className="flex flex-col justify-end">
-                  <div 
-                    className="bg-primary rounded-sm mb-2"
-                    style={{ height: `${Math.random() * 80 + 20}%` }}
-                  ></div>
-                  <div className="text-xs text-center text-muted-foreground">
-                    {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'][i]}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
     </div>
   );
 };
