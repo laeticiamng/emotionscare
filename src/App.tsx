@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { MusicProvider } from "@/contexts/MusicContext";
 import { Suspense, useEffect } from "react";
 import Home from "./Home";
@@ -51,30 +52,32 @@ function App() {
       <EnhancedErrorBoundary level="critical" showDetails={true}>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
-            <MusicProvider>
-              <UXServicesInitializer />
-              <SkipToContent />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Suspense fallback={<PageLoadingFallback />}>
-                  <main id="main-content" tabIndex={-1}>
-                    <Routes>
-                      <Route path="/" element={
-                        <EnhancedErrorBoundary level="page">
-                          <Home />
-                        </EnhancedErrorBoundary>
-                      } />
-                      <Route path="/meditation" element={
-                        <EnhancedErrorBoundary level="page">
-                          <MeditationPage />
-                        </EnhancedErrorBoundary>
-                      } />
-                    </Routes>
-                  </main>
-                </Suspense>
-              </BrowserRouter>
-            </MusicProvider>
+            <AuthProvider>
+              <MusicProvider>
+                <UXServicesInitializer />
+                <SkipToContent />
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Suspense fallback={<PageLoadingFallback />}>
+                    <main id="main-content" tabIndex={-1}>
+                      <Routes>
+                        <Route path="/" element={
+                          <EnhancedErrorBoundary level="page">
+                            <Home />
+                          </EnhancedErrorBoundary>
+                        } />
+                        <Route path="/meditation" element={
+                          <EnhancedErrorBoundary level="page">
+                            <MeditationPage />
+                          </EnhancedErrorBoundary>
+                        } />
+                      </Routes>
+                    </main>
+                  </Suspense>
+                </BrowserRouter>
+              </MusicProvider>
+            </AuthProvider>
           </TooltipProvider>
         </QueryClientProvider>
       </EnhancedErrorBoundary>
@@ -83,4 +86,3 @@ function App() {
 }
 
 export default App;
-
