@@ -2,260 +2,242 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Heart, 
-  Brain, 
-  Music, 
-  Users, 
-  Target, 
-  CheckCircle2, 
-  ArrowRight, 
-  Sparkles 
-} from 'lucide-react';
+import { ArrowRight, User, Target, Heart, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
-const onboardingSteps = [
-  {
-    id: 'welcome',
-    title: 'Bienvenue sur EmotionsCare !',
-    description: 'Votre plateforme de bien-être émotionnel personnalisée',
-    icon: Heart,
-    content: (
-      <div className="space-y-4">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Heart className="h-10 w-10 text-blue-600" />
-          </div>
-          <p className="text-lg text-slate-700 dark:text-slate-300">
-            Découvrez comment l'IA peut vous aider à mieux comprendre et gérer vos émotions au quotidien.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <Brain className="h-6 w-6 text-blue-600 mb-2" />
-            <h4 className="font-medium">Analyse IA</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Scanner émotionnel intelligent
-            </p>
-          </div>
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <Music className="h-6 w-6 text-green-600 mb-2" />
-            <h4 className="font-medium">Musique adaptée</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Thérapie sonore personnalisée
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 'features',
-    title: 'Vos outils de bien-être',
-    description: 'Découvrez les fonctionnalités qui vous accompagneront',
-    icon: Sparkles,
-    content: (
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-            <Brain className="h-6 w-6 text-blue-600" />
-            <div>
-              <h4 className="font-medium">Scanner d'émotions</h4>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Analysez vos émotions par texte, audio ou emojis
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-            <Users className="h-6 w-6 text-green-600" />
-            <div>
-              <h4 className="font-medium">Coach IA personnel</h4>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Conseils adaptés à votre situation
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-            <Music className="h-6 w-6 text-purple-600" />
-            <div>
-              <h4 className="font-medium">Musique thérapeutique</h4>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Sons et mélodies pour votre bien-être
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 'trial',
-    title: 'Votre essai gratuit',
-    description: '3 jours pour découvrir toutes les fonctionnalités',
-    icon: Target,
-    content: (
-      <div className="space-y-4">
-        <div className="text-center">
-          <Badge className="mb-4 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-            3 jours gratuits
-          </Badge>
-          <p className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-4">
-            Profitez de toutes les fonctionnalités premium
-          </p>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm">Accès illimité au scanner d'émotions</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm">Coach IA personnel 24h/24</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm">Génération musicale illimitée</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <span className="text-sm">Journal personnel et analyses</span>
-          </div>
-        </div>
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
-            💡 <strong>Astuce :</strong> Commencez par faire un premier scan de vos émotions pour personnaliser votre expérience !
-          </p>
-        </div>
-      </div>
-    )
-  }
-];
+interface OnboardingData {
+  firstName: string;
+  lastName: string;
+  age: string;
+  goals: string;
+  concerns: string;
+  preferences: string[];
+}
 
 const B2COnboardingPage: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isCompleting, setIsCompleting] = useState(false);
+  const [step, setStep] = useState(1);
+  const [data, setData] = useState<OnboardingData>({
+    firstName: '',
+    lastName: '',
+    age: '',
+    goals: '',
+    concerns: '',
+    preferences: []
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const totalSteps = 4;
+
   const handleNext = () => {
-    if (currentStep < onboardingSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      completeOnboarding();
+    if (step < totalSteps) {
+      setStep(step + 1);
     }
   };
 
   const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (step > 1) {
+      setStep(step - 1);
     }
   };
 
-  const completeOnboarding = async () => {
-    setIsCompleting(true);
+  const handlePreferenceToggle = (preference: string) => {
+    setData(prev => ({
+      ...prev,
+      preferences: prev.preferences.includes(preference)
+        ? prev.preferences.filter(p => p !== preference)
+        : [...prev.preferences, preference]
+    }));
+  };
+
+  const handleComplete = async () => {
+    setIsLoading(true);
     try {
-      // Marquer l'onboarding comme terminé
-      // Ici on pourrait faire un appel API pour sauvegarder cette information
-      toast.success('Bienvenue dans EmotionsCare !');
-      navigate('/b2c/dashboard');
+      if (user) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            name: `${data.firstName} ${data.lastName}`,
+            preferences: {
+              age: data.age,
+              goals: data.goals,
+              concerns: data.concerns,
+              preferences: data.preferences,
+              onboarding_completed: true
+            }
+          })
+          .eq('id', user.id);
+
+        if (error) throw error;
+        
+        toast.success('Profil configuré avec succès !');
+        navigate('/b2c/dashboard');
+      }
     } catch (error) {
-      toast.error('Erreur lors de la finalisation');
+      toast.error('Erreur lors de la sauvegarde');
     } finally {
-      setIsCompleting(false);
+      setIsLoading(false);
     }
   };
 
-  const currentStepData = onboardingSteps[currentStep];
-  const Icon = currentStepData.icon;
+  const preferences = [
+    'Méditation', 'Relaxation', 'Exercices de respiration', 
+    'Musique thérapeutique', 'Journal personnel', 'Coaching IA',
+    'Analyses émotionnelles', 'Suivi de progression'
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-blue-900/20 dark:via-slate-900 dark:to-blue-800/20 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="w-full max-w-2xl"
       >
-        <Card className="shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-4">
-            <div className="flex justify-center space-x-2 mb-4">
-              {onboardingSteps.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index <= currentStep 
-                      ? 'bg-blue-600' 
-                      : 'bg-slate-300 dark:bg-slate-600'
-                  }`}
-                />
-              ))}
-            </div>
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto">
-              <Icon className="h-8 w-8 text-blue-600" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-blue-800 dark:text-blue-300">
-              {currentStepData.title}
-            </CardTitle>
-            <CardDescription className="text-lg">
-              {currentStepData.description}
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Configuration de votre profil</CardTitle>
+            <CardDescription>
+              Aidez-nous à personnaliser votre expérience EmotionsCare
             </CardDescription>
+            <Progress value={(step / totalSteps) * 100} className="mt-4" />
+            <p className="text-sm text-muted-foreground">Étape {step} sur {totalSteps}</p>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {currentStepData.content}
-            </motion.div>
+          <CardContent>
+            {step === 1 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <User className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-medium">Informations personnelles</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    placeholder="Prénom"
+                    value={data.firstName}
+                    onChange={(e) => setData(prev => ({ ...prev, firstName: e.target.value }))}
+                  />
+                  <Input
+                    placeholder="Nom"
+                    value={data.lastName}
+                    onChange={(e) => setData(prev => ({ ...prev, lastName: e.target.value }))}
+                  />
+                </div>
+                <Input
+                  type="number"
+                  placeholder="Âge"
+                  value={data.age}
+                  onChange={(e) => setData(prev => ({ ...prev, age: e.target.value }))}
+                />
+              </motion.div>
+            )}
 
-            <div className="flex justify-between">
+            {step === 2 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Target className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-medium">Vos objectifs</h3>
+                </div>
+                <Textarea
+                  placeholder="Quels sont vos objectifs de bien-être ? (ex: réduire le stress, améliorer l'humeur, mieux gérer les émotions...)"
+                  value={data.goals}
+                  onChange={(e) => setData(prev => ({ ...prev, goals: e.target.value }))}
+                  rows={4}
+                />
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Heart className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-medium">Préoccupations actuelles</h3>
+                </div>
+                <Textarea
+                  placeholder="Y a-t-il des préoccupations particulières que vous aimeriez aborder ? (optionnel)"
+                  value={data.concerns}
+                  onChange={(e) => setData(prev => ({ ...prev, concerns: e.target.value }))}
+                  rows={4}
+                />
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-4"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-lg font-medium">Fonctionnalités préférées</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Sélectionnez les fonctionnalités qui vous intéressent le plus :
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {preferences.map((preference) => (
+                    <Button
+                      key={preference}
+                      variant={data.preferences.includes(preference) ? "default" : "outline"}
+                      onClick={() => handlePreferenceToggle(preference)}
+                      className="text-left justify-start h-auto py-3"
+                    >
+                      {preference}
+                    </Button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            <div className="flex justify-between mt-8">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
-                disabled={currentStep === 0}
+                disabled={step === 1}
               >
                 Précédent
               </Button>
               
-              <Button
-                onClick={handleNext}
-                disabled={isCompleting}
-                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-              >
-                {isCompleting ? (
-                  'Finalisation...'
-                ) : currentStep === onboardingSteps.length - 1 ? (
-                  <>
-                    Commencer
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                ) : (
-                  <>
-                    Suivant
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {user && (
-              <div className="text-center">
+              {step < totalSteps ? (
                 <Button
-                  variant="ghost"
-                  onClick={() => navigate('/b2c/dashboard')}
-                  className="text-sm"
+                  onClick={handleNext}
+                  disabled={
+                    (step === 1 && (!data.firstName || !data.lastName)) ||
+                    (step === 2 && !data.goals)
+                  }
                 >
-                  Passer l'introduction
+                  Suivant
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </div>
-            )}
+              ) : (
+                <Button
+                  onClick={handleComplete}
+                  disabled={isLoading || data.preferences.length === 0}
+                >
+                  {isLoading ? 'Finalisation...' : 'Terminer'}
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       </motion.div>

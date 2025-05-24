@@ -1,9 +1,7 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,41 +10,72 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, CreditCard, LogOut, UserCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { useNavigate } from 'react-router-dom';
+import { User, Settings, HelpCircle, LogOut, Shield, Building } from 'lucide-react';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 
-export function UserNav() {
-  const { user, isAuthenticated, logout } = useAuth();
+const UserNav: React.FC = () => {
+  const { user, signOut, isAuthenticated } = useAuth();
   const { userMode } = useUserMode();
   const navigate = useNavigate();
-  
-  const handleLogout = async () => {
-    await logout();
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
     navigate('/');
   };
-  
-  if (!isAuthenticated) {
+
+  const getModeIcon = () => {
+    switch (userMode) {
+      case 'b2b_admin':
+        return <Shield className="h-4 w-4" />;
+      case 'b2b_user':
+        return <Building className="h-4 w-4" />;
+      default:
+        return <User className="h-4 w-4" />;
+    }
+  };
+
+  if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center space-x-2">
-        <Button variant="ghost" onClick={() => navigate('/choose-mode')}>
+      <div className="flex items-center gap-2">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/choose-mode')}
+        >
           Se connecter
         </Button>
-        <Button onClick={() => navigate('/choose-mode')}>
-          Commencer
+        <Button 
+          onClick={() => navigate('/choose-mode')}
+        >
+          S'inscrire
         </Button>
       </div>
     );
   }
-  
+
+  const displayName = user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
+  const userEmail = user.email || '';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={user?.user_metadata?.avatar_url} alt="Avatar" />
-            <AvatarFallback>
-              {user?.user_metadata?.name?.charAt(0)?.toUpperCase() || 'U'}
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.user_metadata?.avatar_url} alt={displayName} />
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              {getInitials(displayName)}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -54,44 +83,39 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {user?.user_metadata?.name || 'Utilisateur'}
-            </p>
+            <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user?.email}
+              {userEmail}
             </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {getUserModeDisplayName(userMode)}
-            </p>
+            <div className="flex items-center gap-2 mt-2">
+              {getModeIcon()}
+              <span className="text-xs text-muted-foreground">
+                {getUserModeDisplayName(userMode)}
+              </span>
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/profile" className="flex items-center">
-            <User className="mr-2 h-4 w-4" />
-            <span>Profil</span>
-          </Link>
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
+          <User className="mr-2 h-4 w-4" />
+          Profil
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/settings" className="flex items-center">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Paramètres</span>
-          </Link>
+        <DropdownMenuItem onClick={() => navigate('/settings')}>
+          <Settings className="mr-2 h-4 w-4" />
+          Paramètres
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/billing" className="flex items-center">
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Facturation</span>
-          </Link>
+        <DropdownMenuItem onClick={() => navigate('/help')}>
+          <HelpCircle className="mr-2 h-4 w-4" />
+          Aide
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Se déconnecter</span>
+          Déconnexion
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
 
 export default UserNav;
