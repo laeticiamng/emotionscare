@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { 
-  Music, Play, Pause, SkipForward, SkipBack, Volume2, 
+  Music as MusicIcon, Play, Pause, SkipForward, SkipBack, Volume2, 
   Heart, Shuffle, Repeat, Download, Share2 
 } from 'lucide-react';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -186,7 +186,7 @@ const Music: React.FC = () => {
       >
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
-            <Music className="h-8 w-8 text-purple-600" />
+            <MusicIcon className="h-8 w-8 text-purple-600" />
             Musique Thérapeutique
           </h1>
           <p className="text-muted-foreground">
@@ -245,7 +245,7 @@ const Music: React.FC = () => {
                   {/* Informations du track */}
                   <div className="text-center">
                     <div className="w-32 h-32 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                      <Music className="h-16 w-16 text-white" />
+                      <MusicIcon className="h-16 w-16 text-white" />
                     </div>
                     <h3 className="text-xl font-semibold">{currentTrack.title}</h3>
                     <p className="text-muted-foreground">{currentTrack.artist}</p>
@@ -266,35 +266,27 @@ const Music: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Contrôles */}
-                  <div className="flex items-center justify-center space-x-4">
-                    <Button variant="ghost" size="icon">
+                  {/* Contrôles de lecture */}
+                  <div className="flex items-center justify-center gap-4">
+                    <Button variant="outline" size="icon">
                       <Shuffle className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="outline" size="icon">
                       <SkipBack className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      onClick={handlePlayPause}
-                      size="icon"
-                      className="h-12 w-12"
-                    >
-                      {isPlaying ? (
-                        <Pause className="h-6 w-6" />
-                      ) : (
-                        <Play className="h-6 w-6" />
-                      )}
+                    <Button size="icon" onClick={handlePlayPause} className="h-12 w-12">
+                      {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="outline" size="icon">
                       <SkipForward className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="outline" size="icon">
                       <Repeat className="h-4 w-4" />
                     </Button>
                   </div>
 
-                  {/* Volume */}
-                  <div className="flex items-center space-x-3">
+                  {/* Contrôle du volume */}
+                  <div className="flex items-center gap-3">
                     <Volume2 className="h-4 w-4" />
                     <Slider
                       value={volume}
@@ -303,16 +295,14 @@ const Music: React.FC = () => {
                       step={1}
                       className="flex-1"
                     />
-                    <span className="text-sm text-muted-foreground w-8">
-                      {volume[0]}%
-                    </span>
+                    <span className="text-sm text-muted-foreground w-12">{volume[0]}%</span>
                   </div>
 
                   {/* Actions supplémentaires */}
-                  <div className="flex justify-center space-x-2">
+                  <div className="flex justify-center gap-2">
                     <Button variant="outline" size="sm">
                       <Heart className="h-4 w-4 mr-2" />
-                      Favori
+                      J'aime
                     </Button>
                     <Button variant="outline" size="sm">
                       <Download className="h-4 w-4 mr-2" />
@@ -325,29 +315,42 @@ const Music: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground">
-                  <Music className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p>Sélectionnez une piste pour commencer l'écoute</p>
+                <div className="text-center py-12">
+                  <MusicIcon className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">Sélectionnez une piste pour commencer</p>
                 </div>
               )}
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Playlist */}
+        {/* Playlist et actions */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
+          className="space-y-6"
         >
+          {/* Génération de musique */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Playlist {emotionCategories.find(e => e.id === selectedEmotion)?.label}</span>
-                <Button onClick={generateMusic} size="sm">
-                  Générer
-                </Button>
-              </CardTitle>
+              <CardTitle>Créer une composition</CardTitle>
+              <CardDescription>
+                Générez une musique personnalisée pour l'émotion "{selectedEmotion}"
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={generateMusic} className="w-full" disabled={isLoading}>
+                <MusicIcon className="h-4 w-4 mr-2" />
+                Générer une nouvelle composition
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Liste des pistes */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Playlist "{selectedEmotion}"</CardTitle>
               <CardDescription>
                 {currentTracks.length} piste{currentTracks.length > 1 ? 's' : ''} disponible{currentTracks.length > 1 ? 's' : ''}
               </CardDescription>
@@ -355,79 +358,36 @@ const Music: React.FC = () => {
             <CardContent>
               <div className="space-y-2">
                 {currentTracks.map((track) => (
-                  <motion.div
+                  <div
                     key={track.id}
-                    whileHover={{ scale: 1.02 }}
-                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                      currentTrack?.id === track.id 
-                        ? 'bg-primary/10 border-primary' 
-                        : 'hover:bg-muted/50'
+                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                      currentTrack?.id === track.id
+                        ? 'bg-primary text-primary-foreground'
+                        : 'hover:bg-muted'
                     }`}
                     onClick={() => handleTrackSelect(track)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{track.title}</h4>
-                        <p className="text-xs text-muted-foreground">{track.artist}</p>
+                      <div>
+                        <p className="font-medium text-sm">{track.title}</p>
+                        <p className="text-xs opacity-70">{track.artist}</p>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs opacity-70">
                           {formatTime(track.duration)}
                         </span>
                         {currentTrack?.id === track.id && isPlaying && (
-                          <div className="flex space-x-1 mt-1">
-                            <div className="w-1 h-3 bg-primary rounded-full animate-pulse"></div>
-                            <div className="w-1 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-1 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
+                          <div className="w-2 h-2 bg-current rounded-full animate-pulse" />
                         )}
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </CardContent>
           </Card>
         </motion.div>
       </div>
-
-      {/* Informations sur la musicothérapie */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Card className="bg-muted/50">
-          <CardHeader>
-            <CardTitle>🎵 Les bienfaits de la musicothérapie</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <Heart className="h-8 w-8 mx-auto mb-2 text-red-500" />
-                <h3 className="font-medium mb-1">Bien-être émotionnel</h3>
-                <p className="text-sm text-muted-foreground">
-                  La musique aide à réguler les émotions et réduire le stress
-                </p>
-              </div>
-              <div className="text-center">
-                <Music className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-                <h3 className="font-medium mb-1">Concentration</h3>
-                <p className="text-sm text-muted-foreground">
-                  Améliore la focus et la productivité cognitive
-                </p>
-              </div>
-              <div className="text-center">
-                <Volume2 className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-                <h3 className="font-medium mb-1">Relaxation</h3>
-                <p className="text-sm text-muted-foreground">
-                  Favorise la détente et améliore la qualité du sommeil
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
     </div>
   );
 };
