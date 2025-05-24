@@ -5,25 +5,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   HelpCircle, 
   Search, 
-  MessageCircle, 
-  Book, 
+  MessageSquare, 
+  Mail, 
+  Phone, 
+  Book,
   Video,
-  Mail,
-  Phone,
-  Clock,
-  ChevronDown,
-  ChevronUp,
-  Send
+  FileText,
+  Send,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const HelpPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
@@ -31,164 +29,137 @@ const HelpPage: React.FC = () => {
     message: ''
   });
 
-  const faqs = [
-    {
-      question: 'Comment fonctionne le scanner d\'émotions ?',
-      answer: 'Le scanner d\'émotions utilise l\'intelligence artificielle pour analyser votre voix, vos expressions faciales ou votre texte. L\'IA détecte les patterns émotionnels et vous fournit des insights personnalisés sur votre état émotionnel actuel.',
-      category: 'Fonctionnalités'
-    },
-    {
-      question: 'Mes données sont-elles sécurisées ?',
-      answer: 'Absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons strictement le RGPD et ne partageons jamais vos informations personnelles avec des tiers sans votre consentement explicite.',
-      category: 'Sécurité'
-    },
-    {
-      question: 'Comment puis-je annuler mon abonnement ?',
-      answer: 'Vous pouvez annuler votre abonnement à tout moment depuis la page Paramètres > Abonnement. L\'annulation prend effet à la fin de votre période de facturation actuelle.',
-      category: 'Facturation'
-    },
-    {
-      question: 'Le coach IA remplace-t-il un thérapeute ?',
-      answer: 'Non, le coach IA est un outil de soutien et ne remplace pas un professionnel de la santé mentale. En cas de détresse sévère, nous recommandons de consulter un psychologue ou psychiatre qualifié.',
-      category: 'Fonctionnalités'
-    },
-    {
-      question: 'Comment fonctionne la musicothérapie ?',
-      answer: 'Notre système analyse votre état émotionnel et sélectionne automatiquement des musiques adaptées. Les playlists sont créées par des musicothérapeutes professionnels et optimisées par IA selon vos préférences.',
-      category: 'Fonctionnalités'
-    },
-    {
-      question: 'Puis-je utiliser EmotionsCare hors ligne ?',
-      answer: 'Certaines fonctionnalités comme le journal personnel sont disponibles hors ligne. Cependant, l\'analyse IA et la musicothérapie nécessitent une connexion internet pour fonctionner optimalement.',
-      category: 'Technique'
-    }
-  ];
-
-  const resources = [
-    {
-      title: 'Guide de démarrage',
-      description: 'Découvrez toutes les fonctionnalités pas à pas',
-      icon: Book,
-      type: 'Guide',
-      action: () => toast.info('Guide en cours de préparation')
-    },
-    {
-      title: 'Tutoriels vidéo',
-      description: 'Apprenez en vidéo comment utiliser EmotionsCare',
-      icon: Video,
-      type: 'Vidéo',
-      action: () => toast.info('Tutoriels vidéo bientôt disponibles')
-    },
-    {
-      title: 'Communauté',
-      description: 'Échangez avec d\'autres utilisateurs',
-      icon: MessageCircle,
-      type: 'Forum',
-      action: () => toast.info('Forum communautaire en développement')
-    }
-  ];
-
-  const filteredFaqs = faqs.filter(faq =>
-    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactForm.name || !contactForm.email || !contactForm.message) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
-    try {
-      // Envoyer le message de contact
-      toast.success('Message envoyé ! Nous vous répondrons sous 24h.');
-      setContactForm({ name: '', email: '', subject: '', message: '' });
-    } catch (error) {
-      toast.error('Erreur lors de l\'envoi du message');
-    }
+    toast.success('Votre message a été envoyé. Nous vous répondrons dans les plus brefs délais.');
+    setContactForm({ name: '', email: '', subject: '', message: '' });
   };
 
+  const faqItems = [
+    {
+      question: "Comment commencer à utiliser EmotionsCare ?",
+      answer: "Après votre inscription, suivez le processus d'onboarding qui vous guidera dans la configuration de votre profil et la définition de vos objectifs de bien-être. Vous pourrez ensuite accéder à toutes les fonctionnalités depuis votre tableau de bord."
+    },
+    {
+      question: "Mes données sont-elles sécurisées ?",
+      answer: "Oui, nous prenons la sécurité très au sérieux. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations personnelles avec des tiers sans votre consentement explicite."
+    },
+    {
+      question: "Comment fonctionne l'analyse émotionnelle ?",
+      answer: "Notre IA utilise des technologies avancées de traitement du langage naturel et d'analyse vocale pour comprendre vos émotions à partir de vos textes, voix ou choix d'émojis. L'analyse est instantanée et vous donne un aperçu de votre état émotionnel actuel."
+    },
+    {
+      question: "Puis-je utiliser EmotionsCare hors ligne ?",
+      answer: "Certaines fonctionnalités de base sont disponibles hors ligne, comme la rédaction dans votre journal personnel. Cependant, l'analyse IA et la synchronisation nécessitent une connexion internet."
+    },
+    {
+      question: "Comment annuler mon abonnement ?",
+      answer: "Vous pouvez annuler votre abonnement à tout moment depuis les paramètres de votre compte. Votre accès restera actif jusqu'à la fin de votre période de facturation actuelle."
+    },
+    {
+      question: "Que faire si je rencontre un problème technique ?",
+      answer: "Contactez notre support technique via le formulaire ci-dessous ou par email. Décrivez le problème en détail et nous vous aiderons rapidement à le résoudre."
+    }
+  ];
+
+  const quickLinks = [
+    {
+      title: "Guide de démarrage",
+      description: "Apprenez les bases d'EmotionsCare",
+      icon: <Book className="h-6 w-6" />,
+      action: () => console.log('Guide')
+    },
+    {
+      title: "Tutoriels vidéo",
+      description: "Regardez nos guides en vidéo",
+      icon: <Video className="h-6 w-6" />,
+      action: () => console.log('Vidéos')
+    },
+    {
+      title: "Documentation API",
+      description: "Pour les développeurs",
+      icon: <FileText className="h-6 w-6" />,
+      action: () => console.log('API')
+    },
+    {
+      title: "Statut des services",
+      description: "Vérifiez l'état de nos services",
+      icon: <ExternalLink className="h-6 w-6" />,
+      action: () => console.log('Statut')
+    }
+  ];
+
+  const filteredFAQ = faqItems.filter(item =>
+    item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="text-center mb-8">
-          <div className="mx-auto p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit mb-4">
-            <HelpCircle className="h-12 w-12 text-blue-600" />
-          </div>
-          <h1 className="text-4xl font-bold mb-4">Centre d'aide</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Trouvez rapidement les réponses à vos questions et découvrez comment tirer le meilleur parti d'EmotionsCare
+        <div className="text-center">
+          <h1 className="text-3xl font-bold tracking-tight">Centre d'aide</h1>
+          <p className="text-muted-foreground mt-2">
+            Trouvez des réponses à vos questions ou contactez notre équipe
           </p>
         </div>
       </motion.div>
 
-      {/* Recherche */}
+      {/* Search */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="max-w-2xl mx-auto"
       >
-        <Card>
-          <CardContent className="p-6">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher dans l'aide..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 text-lg h-12"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher dans l'aide..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </motion.div>
 
-      {/* Ressources rapides */}
+      {/* Quick Links */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
       >
         <Card>
           <CardHeader>
-            <CardTitle>Ressources utiles</CardTitle>
+            <CardTitle>Liens rapides</CardTitle>
             <CardDescription>
-              Accédez rapidement aux guides et tutoriels
+              Accédez rapidement aux ressources les plus utiles
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {resources.map((resource, index) => (
-                <motion.div
-                  key={resource.title}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {quickLinks.map((link, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={link.action}
+                  className="h-auto flex flex-col items-center gap-3 p-6"
                 >
-                  <Button
-                    variant="outline"
-                    onClick={resource.action}
-                    className="h-auto flex flex-col items-center gap-3 p-6 w-full"
-                  >
-                    <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                      <resource.icon className="h-6 w-6 text-blue-600" />
+                  <div className="p-2 bg-primary/10 rounded-full text-primary">
+                    {link.icon}
+                  </div>
+                  <div className="text-center">
+                    <div className="font-medium">{link.title}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {link.description}
                     </div>
-                    <div className="text-center">
-                      <div className="font-medium">{resource.title}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {resource.description}
-                      </div>
-                      <Badge variant="secondary" className="mt-2 text-xs">
-                        {resource.type}
-                      </Badge>
-                    </div>
-                  </Button>
-                </motion.div>
+                  </div>
+                </Button>
               ))}
             </div>
           </CardContent>
@@ -198,134 +169,143 @@ const HelpPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* FAQ */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
           <Card>
             <CardHeader>
-              <CardTitle>Questions fréquentes</CardTitle>
+              <CardTitle className="flex items-center space-x-2">
+                <HelpCircle className="h-5 w-5" />
+                <span>Questions fréquentes</span>
+              </CardTitle>
               <CardDescription>
-                {filteredFaqs.length} question(s) trouvée(s)
+                {filteredFAQ.length} question{filteredFAQ.length > 1 ? 's' : ''} trouvée{filteredFAQ.length > 1 ? 's' : ''}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {filteredFaqs.map((faq, index) => (
-                <div key={index} className="border rounded-lg">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                    className="w-full justify-between p-4 h-auto text-left"
-                  >
-                    <div>
-                      <p className="font-medium">{faq.question}</p>
-                      <Badge variant="outline" className="mt-1 text-xs">
-                        {faq.category}
-                      </Badge>
-                    </div>
-                    {expandedFaq === index ? (
-                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                    )}
-                  </Button>
-                  {expandedFaq === index && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="px-4 pb-4"
-                    >
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </motion.div>
-                  )}
+            <CardContent>
+              <Accordion type="single" collapsible className="space-y-2">
+                {filteredFAQ.map((item, index) => (
+                  <AccordionItem key={index} value={`item-${index}`} className="border rounded-lg px-4">
+                    <AccordionTrigger className="text-left hover:no-underline">
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+              
+              {filteredFAQ.length === 0 && (
+                <div className="text-center py-8">
+                  <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Aucune question trouvée pour "{searchTerm}"
+                  </p>
                 </div>
-              ))}
+              )}
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Contact */}
+        {/* Contact Form */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card>
             <CardHeader>
-              <CardTitle>Nous contacter</CardTitle>
+              <CardTitle className="flex items-center space-x-2">
+                <MessageSquare className="h-5 w-5" />
+                <span>Nous contacter</span>
+              </CardTitle>
               <CardDescription>
-                Notre équipe est là pour vous aider
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-3">
-                <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                  <Mail className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <p className="font-medium text-sm">Email</p>
-                    <p className="text-xs text-muted-foreground">support@emotionscare.fr</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                  <Clock className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="font-medium text-sm">Horaires</p>
-                    <p className="text-xs text-muted-foreground">Lun-Ven: 9h-18h</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Envoyer un message</CardTitle>
-              <CardDescription>
-                Décrivez votre problème ou votre question
+                Vous ne trouvez pas votre réponse ? Envoyez-nous un message
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Nom</label>
+                    <Input
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Votre nom"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <Input
+                      type="email"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="votre@email.com"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Sujet</label>
                   <Input
-                    placeholder="Votre nom *"
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
-                  <Input
-                    type="email"
-                    placeholder="Votre email *"
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                    value={contactForm.subject}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                    placeholder="De quoi voulez-vous parler ?"
                     required
                   />
                 </div>
                 
-                <Input
-                  placeholder="Sujet"
-                  value={contactForm.subject}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
-                />
-                
-                <Textarea
-                  placeholder="Décrivez votre problème ou question *"
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                  rows={4}
-                  required
-                />
+                <div>
+                  <label className="block text-sm font-medium mb-2">Message</label>
+                  <Textarea
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                    placeholder="Décrivez votre question ou problème..."
+                    className="min-h-[100px]"
+                    required
+                  />
+                </div>
                 
                 <Button type="submit" className="w-full">
-                  <Send className="h-4 w-4 mr-2" />
+                  <Send className="mr-2 h-4 w-4" />
                   Envoyer le message
                 </Button>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* Contact Info */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Autres moyens de contact</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Email</p>
+                  <p className="text-sm text-muted-foreground">support@emotionscare.com</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">Téléphone</p>
+                  <p className="text-sm text-muted-foreground">+33 1 23 45 67 89</p>
+                  <p className="text-xs text-muted-foreground">Lun-Ven 9h-18h</p>
+                </div>
+              </div>
+              
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Temps de réponse moyen : <strong>2-4 heures</strong> en jours ouvrés
+                </p>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

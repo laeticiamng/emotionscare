@@ -1,150 +1,174 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { EmojiEmotionScannerProps } from '@/types/emotion';
+import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
+import { Smile, CheckCircle } from 'lucide-react';
 
-const emojis = [
-  { emoji: "😊", name: "Joie", value: 90 },
-  { emoji: "😌", name: "Sérénité", value: 75 },
-  { emoji: "😐", name: "Neutre", value: 50 },
-  { emoji: "😔", name: "Tristesse", value: 30 },
-  { emoji: "😢", name: "Peine", value: 20 },
-  { emoji: "😠", name: "Colère", value: 10 },
-  { emoji: "😰", name: "Anxiété", value: 25 },
-  { emoji: "😱", name: "Peur", value: 15 },
-  { emoji: "🤔", name: "Confusion", value: 40 },
-  { emoji: "🥱", name: "Fatigue", value: 35 }
-];
-
-const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
+const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
   onScanComplete,
   onCancel,
   isProcessing,
   setIsProcessing
 }) => {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  
-  const toggleEmoji = (emoji: string) => {
+
+  const emojiGroups = [
+    {
+      category: 'Bonheur',
+      emojis: ['😊', '😄', '😁', '🥰', '😍', '🤗', '😌', '🙂']
+    },
+    {
+      category: 'Tristesse',
+      emojis: ['😢', '😭', '😞', '😔', '😟', '😿', '💔', '😪']
+    },
+    {
+      category: 'Colère',
+      emojis: ['😠', '😡', '🤬', '😤', '🙄', '😒', '🔥', '💢']
+    },
+    {
+      category: 'Peur/Anxiété',
+      emojis: ['😰', '😨', '😱', '😬', '😓', '🥺', '😵‍💫', '🫨']
+    },
+    {
+      category: 'Surprise',
+      emojis: ['😲', '😯', '🤯', '😮', '🫢', '😦', '🙀', '✨']
+    },
+    {
+      category: 'Fatigue',
+      emojis: ['😴', '🥱', '😫', '😩', '🤤', '💤', '🫠', '😶‍🌫️']
+    }
+  ];
+
+  const handleEmojiSelect = (emoji: string) => {
     setSelectedEmojis(prev => {
       if (prev.includes(emoji)) {
         return prev.filter(e => e !== emoji);
-      } else if (prev.length < 3) {
+      } else {
         return [...prev, emoji];
       }
-      return prev;
     });
   };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (selectedEmojis.length === 0) {
-      setError("Veuillez sélectionner au moins un emoji.");
-      return;
-    }
-    
-    setError(null);
+
+  const analyzeEmojis = async () => {
+    if (selectedEmojis.length === 0) return;
+
     setIsProcessing(true);
-    
-    try {
-      // Simulation d'appel API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Calcul d'un score moyen basé sur les emojis sélectionnés
-      const selectedEmojisData = emojis.filter(item => selectedEmojis.includes(item.emoji));
-      const averageScore = selectedEmojisData.reduce((acc, item) => acc + item.value, 0) / selectedEmojisData.length;
-      
-      // Trouver l'emoji avec la plus grande valeur comme primaire
-      const primaryEmoji = selectedEmojisData.reduce(
-        (max, obj) => (obj.value > max.value ? obj : max),
-        selectedEmojisData[0]
-      );
-      
-      // Résultat simulé
-      const result = {
-        score: Math.round(averageScore),
-        primaryEmotion: primaryEmoji.name,
-        emotions: {
-          joie: Math.random(),
-          tristesse: Math.random(),
-          colère: Math.random(),
-          peur: Math.random(),
-          surprise: Math.random(),
-        }
+
+    // Simulate API call delay
+    setTimeout(() => {
+      // Mock emotion analysis based on selected emojis
+      const mockResult: EmotionResult = {
+        emotions: [
+          { name: 'Bien-être', intensity: 80 },
+          { name: 'Satisfaction', intensity: 75 },
+          { name: 'Équilibre', intensity: 85 }
+        ],
+        confidence: 91,
+        timestamp: new Date(),
+        recommendations: 'Vos émojis reflètent un état émotionnel positif. Profitez de ce moment !',
+        analysisType: 'emoji'
       };
-      
-      onScanComplete(result);
-    } catch (error) {
-      console.error('Error analyzing emojis:', error);
-      setError("Une erreur s'est produite lors de l'analyse. Veuillez réessayer.");
-    } finally {
+
+      onScanComplete(mockResult);
       setIsProcessing(false);
-    }
+    }, 1500);
   };
-  
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      
-      <div>
-        <p className="text-sm mb-2">
-          Sélectionnez jusqu'à 3 emojis qui correspondent le mieux à ce que vous ressentez actuellement.
-        </p>
-        
-        <div className="grid grid-cols-5 gap-2">
-          {emojis.map((item) => (
-            <div 
-              key={item.emoji}
-              className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer transition-all ${
-                selectedEmojis.includes(item.emoji) 
-                  ? 'bg-primary/20 shadow-sm border-primary/50 border' 
-                  : 'hover:bg-muted border border-transparent'
-              }`}
-              onClick={() => !isProcessing && toggleEmoji(item.emoji)}
-            >
-              <span className="text-3xl mb-1">{item.emoji}</span>
-              <span className="text-xs text-center">{item.name}</span>
-            </div>
-          ))}
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="mx-auto mb-4 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full w-fit">
+          <Smile className="h-8 w-8 text-purple-600" />
         </div>
-        
-        <p className="text-xs text-muted-foreground mt-2">
-          {selectedEmojis.length}/3 sélectionnés
+        <h3 className="text-xl font-semibold mb-2">Sélection d'émojis</h3>
+        <p className="text-muted-foreground">
+          Choisissez les émojis qui représentent le mieux vos émotions actuelles
         </p>
       </div>
-      
-      <div className="flex justify-end gap-2">
+
+      {/* Selected Emojis */}
+      {selectedEmojis.length > 0 && (
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground mb-2">Émojis sélectionnés :</p>
+          <div className="flex justify-center space-x-2 mb-4">
+            {selectedEmojis.map((emoji, index) => (
+              <span key={index} className="text-2xl">
+                {emoji}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Emoji Groups */}
+      <div className="space-y-4">
+        {emojiGroups.map((group, groupIndex) => (
+          <div key={groupIndex} className="space-y-2">
+            <h4 className="font-medium text-sm text-muted-foreground">
+              {group.category}
+            </h4>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+              {group.emojis.map((emoji, emojiIndex) => (
+                <Button
+                  key={emojiIndex}
+                  variant={selectedEmojis.includes(emoji) ? "default" : "outline"}
+                  onClick={() => handleEmojiSelect(emoji)}
+                  className="h-12 w-12 text-2xl p-0 relative"
+                  disabled={isProcessing}
+                >
+                  {emoji}
+                  {selectedEmojis.includes(emoji) && (
+                    <div className="absolute -top-1 -right-1 bg-primary rounded-full p-1">
+                      <CheckCircle className="h-3 w-3 text-primary-foreground" />
+                    </div>
+                  )}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex space-x-2">
         <Button 
-          type="button" 
+          onClick={onCancel} 
           variant="outline" 
-          onClick={onCancel}
           disabled={isProcessing}
+          className="flex-1"
         >
           Annuler
         </Button>
         <Button 
-          type="submit" 
+          onClick={analyzeEmojis}
           disabled={selectedEmojis.length === 0 || isProcessing}
+          className="flex-1"
         >
           {isProcessing ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               Analyse en cours...
             </>
           ) : (
-            'Analyser mes émotions'
+            <>
+              <Smile className="mr-2 h-4 w-4" />
+              Analyser ({selectedEmojis.length})
+            </>
           )}
         </Button>
       </div>
-    </form>
+
+      {/* Tips */}
+      <div className="bg-muted/50 p-4 rounded-lg">
+        <h4 className="font-medium mb-2">Comment bien utiliser cette analyse :</h4>
+        <ul className="text-sm text-muted-foreground space-y-1">
+          <li>• Sélectionnez plusieurs émojis pour plus de précision</li>
+          <li>• Choisissez des émotions de différentes catégories si nécessaire</li>
+          <li>• Fiez-vous à votre ressenti du moment présent</li>
+          <li>• N'hésitez pas à mélanger émotions positives et négatives</li>
+        </ul>
+      </div>
+    </div>
   );
 };
 

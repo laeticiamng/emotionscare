@@ -1,26 +1,22 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Mic, Square, Play, Pause } from 'lucide-react';
-import { AudioEmotionScannerProps } from '@/types/emotion';
+import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
+import { Mic, Square, Play, Pause } from 'lucide-react';
+import { toast } from 'sonner';
 
-const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
+const AudioEmotionScanner: React.FC<EmotionScannerProps> = ({
   onScanComplete,
   onCancel,
   isProcessing,
   setIsProcessing
 }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [audioData, setAudioData] = useState<Blob | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const startRecording = async () => {
     try {
@@ -32,31 +28,24 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
       
       const chunks: BlobPart[] = [];
       
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
         }
       };
       
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
-        setAudioBlob(blob);
-        stream.getTracks().forEach(track => track.stop());
+        const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+        setAudioData(audioBlob);
+        stopTimer();
       };
       
       mediaRecorder.start();
       setIsRecording(true);
-      setError(null);
-      setRecordingTime(0);
-      
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
+      startTimer();
       
     } catch (error) {
-      console.error('Error accessing microphone:', error);
-      setError("Impossible d'accéder au microphone. Vérifiez vos permissions.");
+      toast.error('Impossible d\'accéder au microphone');
     }
   };
 
@@ -65,82 +54,48 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
       }
     }
   };
 
-  const playRecording = () => {
-    if (audioBlob) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      
-      const audio = new Audio(URL.createObjectURL(audioBlob));
-      audioRef.current = audio;
-      
-      audio.onplay = () => setIsPlaying(true);
-      audio.onpause = () => setIsPlaying(false);
-      audio.onended = () => setIsPlaying(false);
-      
-      audio.play();
+  const startTimer = () => {
+    timerRef.current = setInterval(() => {
+      setRecordingTime(prev => prev + 1);
+    }, 1000);
+  };
+
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
   };
 
-  const pauseRecording = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
+  const analyzeAudio = async () => {
+    if (!audioData) return;
 
-  const handleSubmit = async () => {
-    if (!audioBlob) {
-      setError("Veuillez enregistrer un message audio.");
-      return;
-    }
-    
-    if (recordingTime < 3) {
-      setError("L'enregistrement doit durer au moins 3 secondes.");
-      return;
-    }
-    
-    setError(null);
     setIsProcessing(true);
-    
-    try {
-      // Simulation d'appel API
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Génération de résultat simulé basé sur la durée
-      const emotionScore = Math.min(Math.floor(50 + (recordingTime * 2) + Math.random() * 30), 100);
-      const primaryEmotion = emotionScore > 75 ? "Enthousiasme" : 
-                             emotionScore > 60 ? "Calme" : 
-                             emotionScore > 45 ? "Réflexion" : "Inquiétude";
-      
-      const result = {
-        score: emotionScore,
-        primaryEmotion,
-        audio: URL.createObjectURL(audioBlob),
-        emotions: {
-          joie: Math.random(),
-          tristesse: Math.random(),
-          colère: Math.random(),
-          peur: Math.random(),
-          surprise: Math.random(),
-        }
+
+    // Simulate API call delay
+    setTimeout(() => {
+      // Mock emotion analysis based on voice
+      const mockResult: EmotionResult = {
+        emotions: [
+          { name: 'Sérénité', intensity: 78 },
+          { name: 'Assurance', intensity: 72 },
+          { name: 'Énergie', intensity: 65 }
+        ],
+        confidence: 83,
+        timestamp: new Date(),
+        recommendations: 'Votre ton de voix indique un état d\'esprit équilibré. Excellente base pour la journée !',
+        analysisType: 'audio'
       };
-      
-      onScanComplete(result);
-    } catch (error) {
-      console.error('Error analyzing audio:', error);
-      setError("Une erreur s'est produite lors de l'analyse. Veuillez réessayer.");
-    } finally {
+
+      onScanComplete(mockResult);
       setIsProcessing(false);
-    }
+    }, 3000);
   };
 
   const formatTime = (seconds: number) => {
@@ -149,117 +104,122 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const resetRecording = () => {
+    setAudioData(null);
+    setRecordingTime(0);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      
-      <div className="text-center space-y-4">
-        <p className="text-sm text-muted-foreground">
-          Enregistrez un message vocal de 10 à 60 secondes décrivant comment vous vous sentez.
+      <div className="text-center">
+        <div className="mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-full w-fit">
+          <Mic className="h-8 w-8 text-green-600" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">Analyse vocale</h3>
+        <p className="text-muted-foreground">
+          Parlez pendant quelques secondes pour analyser votre état émotionnel
         </p>
-        
+      </div>
+
+      <div className="text-center space-y-4">
         {/* Recording Controls */}
-        <div className="bg-muted/30 rounded-lg p-6 space-y-4">
-          <div className="text-2xl font-mono">
-            {formatTime(recordingTime)}
-          </div>
-          
-          {!isRecording && !audioBlob && (
-            <Button 
+        <div className="flex justify-center">
+          {!isRecording && !audioData ? (
+            <Button
               onClick={startRecording}
-              className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600"
+              size="lg"
+              className="rounded-full w-20 h-20"
               disabled={isProcessing}
             >
               <Mic className="h-8 w-8" />
             </Button>
-          )}
-          
-          {isRecording && (
-            <Button 
+          ) : isRecording ? (
+            <Button
               onClick={stopRecording}
-              className="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700 animate-pulse"
+              size="lg"
+              variant="destructive"
+              className="rounded-full w-20 h-20"
             >
               <Square className="h-8 w-8" />
             </Button>
-          )}
-          
-          {audioBlob && !isRecording && (
-            <div className="space-y-3">
-              <div className="flex justify-center space-x-3">
-                {!isPlaying ? (
-                  <Button 
-                    onClick={playRecording}
-                    variant="outline"
-                    className="rounded-full"
-                  >
-                    <Play className="h-5 w-5" />
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={pauseRecording}
-                    variant="outline"
-                    className="rounded-full"
-                  >
-                    <Pause className="h-5 w-5" />
-                  </Button>
-                )}
-                <Button 
-                  onClick={() => {
-                    setAudioBlob(null);
-                    setRecordingTime(0);
-                    if (audioRef.current) {
-                      audioRef.current.pause();
-                      setIsPlaying(false);
-                    }
-                  }}
-                  variant="outline"
-                  disabled={isProcessing}
-                >
-                  Recommencer
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Durée: {formatTime(recordingTime)} - Cliquez sur lecture pour écouter
-              </p>
+          ) : (
+            <div className="flex space-x-4">
+              <Button
+                onClick={resetRecording}
+                variant="outline"
+                className="rounded-full w-16 h-16"
+              >
+                <Mic className="h-6 w-6" />
+              </Button>
             </div>
           )}
         </div>
-        
-        {/* Instructions */}
-        <div className="text-xs text-muted-foreground space-y-1">
-          <p>• Parlez clairement et naturellement</p>
-          <p>• Décrivez vos émotions et ressentis</p>
-          <p>• L'analyse se base sur votre ton et votre débit</p>
+
+        {/* Timer */}
+        {(isRecording || audioData) && (
+          <div className="text-2xl font-mono">
+            {formatTime(recordingTime)}
+          </div>
+        )}
+
+        {/* Status */}
+        <div className="text-sm text-muted-foreground">
+          {isRecording && (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span>Enregistrement en cours...</span>
+            </div>
+          )}
+          {audioData && !isRecording && (
+            <span>Enregistrement terminé • Prêt pour l'analyse</span>
+          )}
+          {!isRecording && !audioData && (
+            <span>Cliquez sur le microphone pour commencer</span>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex space-x-2">
+          <Button 
+            onClick={onCancel} 
+            variant="outline" 
+            disabled={isProcessing || isRecording}
+            className="flex-1"
+          >
+            Annuler
+          </Button>
+          <Button 
+            onClick={analyzeAudio}
+            disabled={!audioData || isProcessing || isRecording}
+            className="flex-1"
+          >
+            {isProcessing ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Analyse en cours...
+              </>
+            ) : (
+              <>
+                <Play className="mr-2 h-4 w-4" />
+                Analyser l'audio
+              </>
+            )}
+          </Button>
         </div>
       </div>
-      
-      <div className="flex justify-end gap-2">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onCancel}
-          disabled={isProcessing}
-        >
-          Annuler
-        </Button>
-        <Button 
-          onClick={handleSubmit} 
-          disabled={!audioBlob || isProcessing}
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse en cours...
-            </>
-          ) : (
-            'Analyser mon message'
-          )}
-        </Button>
+
+      {/* Tips */}
+      <div className="bg-muted/50 p-4 rounded-lg">
+        <h4 className="font-medium mb-2">Conseils pour une meilleure analyse :</h4>
+        <ul className="text-sm text-muted-foreground space-y-1">
+          <li>• Parlez dans un environnement calme</li>
+          <li>• Exprimez-vous naturellement</li>
+          <li>• Enregistrez au moins 10 secondes</li>
+          <li>• Décrivez comment vous vous sentez</li>
+        </ul>
       </div>
     </div>
   );

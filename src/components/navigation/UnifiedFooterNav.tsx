@@ -1,10 +1,14 @@
 
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  User, 
+  Settings, 
+  HelpCircle,
+  LogOut
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { commonNavItems } from './navConfig';
-import { cn } from '@/lib/utils';
 
 interface UnifiedFooterNavProps {
   collapsed?: boolean;
@@ -15,44 +19,72 @@ const UnifiedFooterNav: React.FC<UnifiedFooterNavProps> = ({
   collapsed = false, 
   onItemClick 
 }) => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
+  const { signOut } = useAuth();
 
-  if (!isAuthenticated || !user) {
-    return null;
-  }
+  const footerItems = [
+    {
+      title: 'Profil',
+      icon: <User className="h-4 w-4" />,
+      path: '/profile'
+    },
+    {
+      title: 'Paramètres',
+      icon: <Settings className="h-4 w-4" />,
+      path: '/settings'
+    },
+    {
+      title: 'Aide',
+      icon: <HelpCircle className="h-4 w-4" />,
+      path: '/help'
+    }
+  ];
 
-  const handleItemClick = (href: string) => {
-    navigate(href);
+  const handleNavigation = (path: string) => {
+    navigate(path);
     onItemClick?.();
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+      onItemClick?.();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
-    <nav className="space-y-2">
-      {commonNavItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.href;
-        
-        return (
-          <Button
-            key={item.href}
-            variant={isActive ? "secondary" : "ghost"}
-            className={cn(
-              "w-full justify-start",
-              collapsed && "px-2",
-              isActive && "bg-secondary text-secondary-foreground"
-            )}
-            onClick={() => handleItemClick(item.href)}
-          >
-            <Icon className={cn("h-4 w-4", !collapsed && "mr-3")} />
-            {!collapsed && (
-              <span className="truncate">{item.title}</span>
-            )}
-          </Button>
-        );
-      })}
-    </nav>
+    <div className="space-y-2">
+      {footerItems.map((item, index) => (
+        <Button
+          key={index}
+          variant={isActive(item.path) ? "default" : "ghost"}
+          onClick={() => handleNavigation(item.path)}
+          className={`w-full justify-start ${collapsed ? 'px-2' : 'px-3'}`}
+          size="sm"
+        >
+          {item.icon}
+          {!collapsed && <span className="ml-2">{item.title}</span>}
+        </Button>
+      ))}
+      
+      <Button
+        variant="ghost"
+        onClick={handleLogout}
+        className={`w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 ${collapsed ? 'px-2' : 'px-3'}`}
+        size="sm"
+      >
+        <LogOut className="h-4 w-4" />
+        {!collapsed && <span className="ml-2">Déconnexion</span>}
+      </Button>
+    </div>
   );
 };
 

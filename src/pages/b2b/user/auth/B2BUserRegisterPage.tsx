@@ -4,65 +4,87 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Building, User } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, User, Building } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    company: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    company: '',
+    department: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.company || !formData.password || !formData.confirmPassword) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast.error('Veuillez saisir votre nom');
+      return false;
     }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
+    if (!formData.email) {
+      toast.error('Veuillez saisir votre adresse email professionnelle');
+      return false;
     }
-
+    if (!formData.company.trim()) {
+      toast.error('Veuillez saisir le nom de votre entreprise');
+      return false;
+    }
     if (formData.password.length < 6) {
       toast.error('Le mot de passe doit contenir au moins 6 caractères');
-      return;
+      return false;
     }
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Les mots de passe ne correspondent pas');
+      return false;
+    }
+    if (!acceptTerms) {
+      toast.error('Veuillez accepter les conditions d\'utilisation');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     setIsLoading(true);
     try {
       const { error } = await signUp(formData.email, formData.password, {
         name: formData.name,
+        role: 'b2b_user',
         company: formData.company,
-        role: 'b2b_user'
+        department: formData.department
       });
-      
+
       if (error) {
-        toast.error('Erreur lors de l\'inscription: ' + error.message);
+        if (error.message.includes('already registered')) {
+          toast.error('Un compte existe déjà avec cette adresse email');
+        } else {
+          toast.error('Erreur lors de l\'inscription: ' + error.message);
+        }
       } else {
         setUserMode('b2b_user');
-        toast.success('Compte collaborateur créé avec succès ! Vérifiez votre email pour confirmer votre inscription.');
+        toast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
         navigate('/b2b/user/dashboard');
       }
     } catch (error) {
@@ -105,9 +127,9 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Input
                     type="text"
                     name="name"
-                    placeholder="Nom complet"
+                    placeholder="Votre nom complet"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
@@ -122,7 +144,7 @@ const B2BUserRegisterPage: React.FC = () => {
                     name="email"
                     placeholder="votre@entreprise.com"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
@@ -135,13 +157,23 @@ const B2BUserRegisterPage: React.FC = () => {
                   <Input
                     type="text"
                     name="company"
-                    placeholder="Nom de l'entreprise"
+                    placeholder="Nom de votre entreprise"
                     value={formData.company}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10"
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  name="department"
+                  placeholder="Département (optionnel)"
+                  value={formData.department}
+                  onChange={handleChange}
+                />
               </div>
               
               <div className="space-y-2">
@@ -152,7 +184,7 @@ const B2BUserRegisterPage: React.FC = () => {
                     name="password"
                     placeholder="Mot de passe (min. 6 caractères)"
                     value={formData.password}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10 pr-10"
                     required
                   />
@@ -176,7 +208,7 @@ const B2BUserRegisterPage: React.FC = () => {
                     name="confirmPassword"
                     placeholder="Confirmer le mot de passe"
                     value={formData.confirmPassword}
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     className="pl-10 pr-10"
                     required
                   />
@@ -190,6 +222,17 @@ const B2BUserRegisterPage: React.FC = () => {
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="terms" 
+                  checked={acceptTerms}
+                  onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                />
+                <label htmlFor="terms" className="text-sm text-muted-foreground">
+                  J'accepte les conditions d'utilisation de l'entreprise
+                </label>
               </div>
               
               <Button type="submit" className="w-full" disabled={isLoading}>
@@ -216,10 +259,6 @@ const B2BUserRegisterPage: React.FC = () => {
                 >
                   Accès administrateur
                 </Link>
-              </div>
-
-              <div className="text-xs text-muted-foreground text-center mt-4 p-3 bg-muted/50 rounded-lg">
-                En créant un compte, vous acceptez nos conditions d'utilisation et bénéficiez de 3 jours d'essai gratuit.
               </div>
             </div>
           </CardContent>

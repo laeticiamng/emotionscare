@@ -1,12 +1,20 @@
 
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { b2cNavItems, b2bUserNavItems, b2bAdminNavItems } from './navConfig';
-import { cn } from '@/lib/utils';
+import { 
+  LayoutDashboard, 
+  Brain, 
+  Heart, 
+  Music, 
+  BookOpen,
+  Users,
+  BarChart3,
+  Settings,
+  Target,
+  Calendar
+} from 'lucide-react';
 
 interface UnifiedNavigationProps {
   collapsed?: boolean;
@@ -17,64 +25,84 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
   collapsed = false, 
   onItemClick 
 }) => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
   const { userMode } = useUserMode();
 
-  if (!isAuthenticated || !user) {
-    return null;
-  }
+  const getNavigationItems = () => {
+    const commonItems = [
+      {
+        title: 'Tableau de bord',
+        icon: <LayoutDashboard className="h-4 w-4" />,
+        path: userMode === 'b2c' ? '/b2c/dashboard' : 
+              userMode === 'b2b_user' ? '/b2b/user/dashboard' : 
+              '/b2b/admin/dashboard'
+      },
+      {
+        title: 'Scanner émotions',
+        icon: <Brain className="h-4 w-4" />,
+        path: '/scan'
+      },
+      {
+        title: 'Coach IA',
+        icon: <Heart className="h-4 w-4" />,
+        path: '/coach'
+      },
+      {
+        title: 'Musique',
+        icon: <Music className="h-4 w-4" />,
+        path: '/music'
+      },
+      {
+        title: 'Journal',
+        icon: <BookOpen className="h-4 w-4" />,
+        path: '/journal'
+      }
+    ];
 
-  const getNavItems = () => {
-    switch (userMode) {
-      case 'b2b_admin':
-        return b2bAdminNavItems;
-      case 'b2b_user':
-        return b2bUserNavItems;
-      default:
-        return b2cNavItems;
+    // Add specific items based on user mode
+    if (userMode === 'b2b_admin') {
+      commonItems.push(
+        {
+          title: 'Analytiques',
+          icon: <BarChart3 className="h-4 w-4" />,
+          path: '/b2b/admin/analytics'
+        },
+        {
+          title: 'Utilisateurs',
+          icon: <Users className="h-4 w-4" />,
+          path: '/b2b/admin/users'
+        }
+      );
     }
+
+    return commonItems;
   };
 
-  const navItems = getNavItems();
+  const navigationItems = getNavigationItems();
 
-  const handleItemClick = (href: string) => {
-    navigate(href);
+  const handleNavigation = (path: string) => {
+    navigate(path);
     onItemClick?.();
   };
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
-    <nav className="space-y-2 px-3">
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.href;
-        
-        return (
-          <Button
-            key={item.href}
-            variant={isActive ? "secondary" : "ghost"}
-            className={cn(
-              "w-full justify-start",
-              collapsed && "px-2",
-              isActive && "bg-secondary text-secondary-foreground"
-            )}
-            onClick={() => handleItemClick(item.href)}
-          >
-            <Icon className={cn("h-4 w-4", !collapsed && "mr-3")} />
-            {!collapsed && (
-              <div className="flex items-center justify-between w-full">
-                <span className="truncate">{item.title}</span>
-                {item.badge && (
-                  <Badge variant="secondary" className="ml-2">
-                    {item.badge}
-                  </Badge>
-                )}
-              </div>
-            )}
-          </Button>
-        );
-      })}
+    <nav className="space-y-2 px-2">
+      {navigationItems.map((item, index) => (
+        <Button
+          key={index}
+          variant={isActive(item.path) ? "default" : "ghost"}
+          onClick={() => handleNavigation(item.path)}
+          className={`w-full justify-start ${collapsed ? 'px-2' : 'px-3'}`}
+        >
+          {item.icon}
+          {!collapsed && <span className="ml-2">{item.title}</span>}
+        </Button>
+      ))}
     </nav>
   );
 };

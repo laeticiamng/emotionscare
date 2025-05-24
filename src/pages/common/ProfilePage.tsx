@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -11,272 +13,348 @@ import {
   User, 
   Mail, 
   Building, 
-  Briefcase, 
-  Save, 
-  Camera,
-  Heart,
-  Trophy,
+  Phone, 
+  MapPin, 
   Calendar,
-  Settings
+  Edit,
+  Save,
+  Camera,
+  Shield,
+  Heart,
+  Award
 } from 'lucide-react';
+import { getUserModeDisplayName, getUserModeColor } from '@/utils/userModeHelpers';
 import { toast } from 'sonner';
-import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const { userMode } = useUserMode();
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
+  const [formData, setFormData] = useState({
     name: user?.user_metadata?.name || '',
     email: user?.email || '',
+    phone: user?.user_metadata?.phone || '',
+    location: user?.user_metadata?.location || '',
+    bio: user?.user_metadata?.bio || '',
     company: user?.user_metadata?.company || '',
-    jobTitle: user?.user_metadata?.job_title || '',
-    avatar: user?.user_metadata?.avatar_url || ''
+    department: user?.user_metadata?.department || ''
   });
 
-  const isDemo = user?.email?.endsWith('@exemple.fr');
-  const modeDisplay = getUserModeDisplayName(userMode);
+  const isDemoAccount = user?.email?.endsWith('@exemple.fr');
+  const userInitials = formData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const modeDisplayName = getUserModeDisplayName(userMode);
+  const modeColorClass = getUserModeColor(userMode);
 
-  const stats = {
-    scansCompleted: 47,
-    daysStreak: 12,
-    emotionalScore: 78,
-    joinDate: '15 janvier 2024'
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   const handleSave = async () => {
     try {
-      // Sauvegarder les modifications du profil
-      toast.success('Profil mis à jour avec succès !');
+      // Here you would typically update the user profile in Supabase
+      toast.success('Profil mis à jour avec succès');
       setIsEditing(false);
     } catch (error) {
       toast.error('Erreur lors de la mise à jour du profil');
     }
   };
 
-  const handleAvatarChange = () => {
-    toast.info('Fonctionnalité de changement d\'avatar bientôt disponible');
+  const handleCancel = () => {
+    setFormData({
+      name: user?.user_metadata?.name || '',
+      email: user?.email || '',
+      phone: user?.user_metadata?.phone || '',
+      location: user?.user_metadata?.location || '',
+      bio: user?.user_metadata?.bio || '',
+      company: user?.user_metadata?.company || '',
+      department: user?.user_metadata?.department || ''
+    });
+    setIsEditing(false);
   };
 
+  const stats = isDemoAccount ? [
+    { label: 'Sessions complétées', value: '47' },
+    { label: 'Jours consécutifs', value: '12' },
+    { label: 'Score bien-être', value: '85%' },
+    { label: 'Objectifs atteints', value: '8/10' }
+  ] : [
+    { label: 'Sessions complétées', value: '0' },
+    { label: 'Jours consécutifs', value: '0' },
+    { label: 'Score bien-être', value: '--' },
+    { label: 'Objectifs atteints', value: '0/10' }
+  ];
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Mon Profil</h1>
-          <p className="text-muted-foreground">
-            Gérez vos informations personnelles et vos préférences
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Mon Profil</h1>
+            <p className="text-muted-foreground mt-1">
+              Gérez vos informations personnelles et préférences
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Modifier
+              </Button>
+            ) : (
+              <div className="flex space-x-2">
+                <Button variant="outline" onClick={handleCancel}>
+                  Annuler
+                </Button>
+                <Button onClick={handleSave}>
+                  <Save className="mr-2 h-4 w-4" />
+                  Sauvegarder
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Informations principales */}
+        {/* Profile Card */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="lg:col-span-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="lg:col-span-1"
         >
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Informations personnelles</CardTitle>
-                  <CardDescription>
-                    Vos données de profil et préférences de compte
-                  </CardDescription>
-                </div>
-                <Button
-                  variant={isEditing ? "default" : "outline"}
-                  onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                >
-                  {isEditing ? (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Sauvegarder
-                    </>
-                  ) : (
-                    <>
-                      <Settings className="h-4 w-4 mr-2" />
-                      Modifier
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center space-x-6">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                    {profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
+            <CardHeader className="text-center">
+              <div className="relative mx-auto">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={user?.user_metadata?.avatar_url} />
+                  <AvatarFallback className="text-xl">
+                    {userInitials || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                {isEditing && (
                   <Button
                     size="icon"
                     variant="outline"
-                    className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full"
-                    onClick={handleAvatarChange}
+                    className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full"
                   >
                     <Camera className="h-4 w-4" />
                   </Button>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold">{profileData.name || 'Utilisateur'}</h2>
-                  <Badge variant="secondary" className="mt-1">
-                    {modeDisplay}
+                )}
+              </div>
+              <div className="mt-4">
+                <h3 className="text-xl font-bold">{formData.name || 'Utilisateur'}</h3>
+                <p className="text-muted-foreground">{formData.email}</p>
+                <div className="mt-2">
+                  <Badge className={modeColorClass}>
+                    {modeDisplayName}
                   </Badge>
-                  {isDemo && (
+                  {isDemoAccount && (
                     <Badge variant="outline" className="ml-2">
-                      Compte démo
+                      Démo
                     </Badge>
                   )}
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Nom complet</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      value={profileData.name}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                      disabled={!isEditing}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      value={profileData.email}
-                      disabled
-                      className="pl-10 bg-muted"
-                    />
-                  </div>
-                </div>
-
-                {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
-                  <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Entreprise</label>
-                      <div className="relative">
-                        <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          value={profileData.company}
-                          onChange={(e) => setProfileData(prev => ({ ...prev, company: e.target.value }))}
-                          disabled={!isEditing}
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Poste</label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          value={profileData.jobTitle}
-                          onChange={(e) => setProfileData(prev => ({ ...prev, jobTitle: e.target.value }))}
-                          disabled={!isEditing}
-                          className="pl-10"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-3 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span>{formData.email || 'Non renseigné'}</span>
               </div>
-
-              {isEditing && (
-                <div className="flex space-x-3 pt-4">
-                  <Button onClick={handleSave}>
-                    <Save className="h-4 w-4 mr-2" />
-                    Sauvegarder les modifications
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsEditing(false)}>
-                    Annuler
-                  </Button>
+              
+              {formData.phone && (
+                <div className="flex items-center space-x-3 text-sm">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span>{formData.phone}</span>
                 </div>
               )}
+              
+              {formData.location && (
+                <div className="flex items-center space-x-3 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{formData.location}</span>
+                </div>
+              )}
+              
+              {(formData.company || formData.department) && (
+                <div className="flex items-center space-x-3 text-sm">
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                  <span>
+                    {formData.company}
+                    {formData.department && ` - ${formData.department}`}
+                  </span>
+                </div>
+              )}
+              
+              <div className="flex items-center space-x-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>Membre depuis {new Date().getFullYear()}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Stats Card */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Award className="h-5 w-5" />
+                <span>Vos statistiques</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center p-3 border rounded-lg">
+                    <p className="text-lg font-bold">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Statistiques et activité */}
+        {/* Profile Form */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="lg:col-span-2"
         >
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Trophy className="h-5 w-5 text-yellow-500" />
-                <span>Mes statistiques</span>
+                <User className="h-5 w-5" />
+                <span>Informations personnelles</span>
               </CardTitle>
+              <CardDescription>
+                Mettez à jour vos informations personnelles et professionnelles
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center p-3 border rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{stats.emotionalScore}%</div>
-                <p className="text-sm text-muted-foreground">Score de bien-être</p>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Nom complet</label>
+                  <Input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    disabled={!isEditing}
+                    placeholder="Votre nom complet"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <Input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    disabled={true} // Email should not be editable
+                    placeholder="votre@email.com"
+                  />
+                </div>
               </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div className="text-center p-3 border rounded-lg">
-                  <div className="text-xl font-bold">{stats.scansCompleted}</div>
-                  <p className="text-xs text-muted-foreground">Scans réalisés</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Téléphone</label>
+                  <Input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    disabled={!isEditing}
+                    placeholder="+33 6 12 34 56 78"
+                  />
                 </div>
-                <div className="text-center p-3 border rounded-lg">
-                  <div className="text-xl font-bold">{stats.daysStreak}</div>
-                  <p className="text-xs text-muted-foreground">Jours consécutifs</p>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Localisation</label>
+                  <Input
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    disabled={!isEditing}
+                    placeholder="Paris, France"
+                  />
                 </div>
+              </div>
+
+              {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Entreprise</label>
+                    <Input
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      placeholder="Nom de l'entreprise"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Département</label>
+                    <Input
+                      name="department"
+                      value={formData.department}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      placeholder="Votre département"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Bio</label>
+                <Textarea
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  placeholder="Parlez-nous de vous..."
+                  className="min-h-[100px]"
+                />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Security Settings */}
+          <Card className="mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5 text-blue-500" />
-                <span>Informations compte</span>
+                <Shield className="h-5 w-5" />
+                <span>Sécurité</span>
               </CardTitle>
+              <CardDescription>
+                Gérez votre mot de passe et la sécurité de votre compte
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Membre depuis :</span>
-                <span className="text-sm font-medium">{stats.joinDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Type de compte :</span>
-                <Badge variant="outline">{modeDisplay}</Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Statut :</span>
-                <Badge variant="default" className="bg-green-500">
-                  Actif
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <Heart className="h-8 w-8 text-red-500" />
-                <div>
-                  <h4 className="font-medium">Continuez comme ça !</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Votre régularité améliore votre bien-être
-                  </p>
-                </div>
-              </div>
+            <CardContent className="space-y-4">
+              <Button variant="outline" className="w-full">
+                Changer le mot de passe
+              </Button>
+              
+              <Button variant="outline" className="w-full">
+                Télécharger mes données
+              </Button>
+              
+              <Button variant="destructive" className="w-full">
+                Supprimer mon compte
+              </Button>
             </CardContent>
           </Card>
         </motion.div>

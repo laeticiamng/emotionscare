@@ -4,10 +4,11 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, User } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, User, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthTransition from '@/components/auth/AuthTransition';
 
@@ -20,48 +21,65 @@ const B2CRegisterPage: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast.error('Veuillez saisir votre nom');
+      return false;
     }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
+    if (!formData.email) {
+      toast.error('Veuillez saisir votre adresse email');
+      return false;
     }
-
     if (formData.password.length < 6) {
       toast.error('Le mot de passe doit contenir au moins 6 caractères');
-      return;
+      return false;
     }
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Les mots de passe ne correspondent pas');
+      return false;
+    }
+    if (!acceptTerms) {
+      toast.error('Veuillez accepter les conditions d\'utilisation');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     setIsLoading(true);
     try {
       const { error } = await signUp(formData.email, formData.password, {
         name: formData.name,
-        role: 'b2c'
+        role: 'b2c',
+        trial_started_at: new Date().toISOString(),
+        trial_ends_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
       });
-      
+
       if (error) {
-        toast.error('Erreur lors de l\'inscription: ' + error.message);
+        if (error.message.includes('already registered')) {
+          toast.error('Un compte existe déjà avec cette adresse email');
+        } else {
+          toast.error('Erreur lors de l\'inscription: ' + error.message);
+        }
       } else {
         setUserMode('b2c');
-        toast.success('Compte créé avec succès ! Vérifiez votre email pour confirmer votre inscription.');
+        toast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
         navigate('/b2c/onboarding');
       }
     } catch (error) {
@@ -89,9 +107,12 @@ const B2CRegisterPage: React.FC = () => {
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
+              <div className="mx-auto mb-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
+                <Heart className="h-8 w-8 text-red-500" />
+              </div>
               <CardTitle className="text-2xl">Créer un compte</CardTitle>
               <CardDescription>
-                Rejoignez EmotionsCare et prenez soin de votre bien-être émotionnel
+                Rejoignez EmotionsCare et commencez votre parcours de bien-être
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -104,13 +125,13 @@ const B2CRegisterPage: React.FC = () => {
                       name="name"
                       placeholder="Votre nom complet"
                       value={formData.name}
-                      onChange={handleInputChange}
+                      onChange={handleChange}
                       className="pl-10"
                       required
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -119,7 +140,7 @@ const B2CRegisterPage: React.FC = () => {
                       name="email"
                       placeholder="votre@email.com"
                       value={formData.email}
-                      onChange={handleInputChange}
+                      onChange={handleChange}
                       className="pl-10"
                       required
                     />
@@ -134,7 +155,7 @@ const B2CRegisterPage: React.FC = () => {
                       name="password"
                       placeholder="Mot de passe (min. 6 caractères)"
                       value={formData.password}
-                      onChange={handleInputChange}
+                      onChange={handleChange}
                       className="pl-10 pr-10"
                       required
                     />
@@ -149,7 +170,7 @@ const B2CRegisterPage: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -158,7 +179,7 @@ const B2CRegisterPage: React.FC = () => {
                       name="confirmPassword"
                       placeholder="Confirmer le mot de passe"
                       value={formData.confirmPassword}
-                      onChange={handleInputChange}
+                      onChange={handleChange}
                       className="pl-10 pr-10"
                       required
                     />
@@ -172,6 +193,30 @@ const B2CRegisterPage: React.FC = () => {
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="terms" 
+                    checked={acceptTerms}
+                    onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                  />
+                  <label htmlFor="terms" className="text-sm text-muted-foreground">
+                    J'accepte les{' '}
+                    <Link to="/terms" className="text-primary hover:underline">
+                      conditions d'utilisation
+                    </Link>{' '}
+                    et la{' '}
+                    <Link to="/privacy" className="text-primary hover:underline">
+                      politique de confidentialité
+                    </Link>
+                  </label>
+                </div>
+
+                <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                  <p className="text-sm text-green-700 dark:text-green-300 text-center">
+                    🎉 <strong>3 jours d'essai gratuit</strong> sans engagement
+                  </p>
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
@@ -188,10 +233,6 @@ const B2CRegisterPage: React.FC = () => {
                 >
                   Se connecter
                 </Link>
-              </div>
-              
-              <div className="text-xs text-muted-foreground text-center mt-4 p-3 bg-muted/50 rounded-lg">
-                En créant un compte, vous acceptez nos conditions d'utilisation et bénéficiez de 3 jours d'essai gratuit.
               </div>
             </CardContent>
           </Card>
