@@ -2,13 +2,15 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, FileText, Download, Trash2, Bell, Settings } from 'lucide-react';
+import { Shield, FileText, Download, Trash2, Bell, Settings, History } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DataPrivacySettings from '@/components/preferences/DataPrivacySettings';
 import PrivacyAccessLogs from '@/components/privacy/PrivacyAccessLogs';
 import DataExportSection from '@/components/privacy/DataExportSection';
 import GdprRightsSection from '@/components/privacy/GdprRightsSection';
 import SecurityAlerts from '@/components/privacy/SecurityAlerts';
+import GdprActionsSection from '@/components/privacy/GdprActionsSection';
+import AuditLogViewer from '@/components/privacy/AuditLogViewer';
 
 const PrivacyDashboard: React.FC = () => {
   const containerVariants = {
@@ -45,7 +47,7 @@ const PrivacyDashboard: React.FC = () => {
       </motion.div>
 
       <Tabs defaultValue="settings" className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2">
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             <span className="hidden md:inline">Paramètres</span>
@@ -54,9 +56,13 @@ const PrivacyDashboard: React.FC = () => {
             <FileText className="h-4 w-4" />
             <span className="hidden md:inline">Mes droits</span>
           </TabsTrigger>
-          <TabsTrigger value="export" className="flex items-center gap-2">
+          <TabsTrigger value="actions" className="flex items-center gap-2">
             <Download className="h-4 w-4" />
-            <span className="hidden md:inline">Exporter</span>
+            <span className="hidden md:inline">Actions RGPD</span>
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            <span className="hidden md:inline">Audit</span>
           </TabsTrigger>
           <TabsTrigger value="logs" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
@@ -80,9 +86,15 @@ const PrivacyDashboard: React.FC = () => {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="export">
+        <TabsContent value="actions">
           <motion.div variants={itemVariants}>
-            <DataExportSection />
+            <GdprActionsSection />
+          </motion.div>
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <motion.div variants={itemVariants}>
+            <AuditLogViewer />
           </motion.div>
         </TabsContent>
 
