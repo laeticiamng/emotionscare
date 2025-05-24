@@ -10,17 +10,28 @@ import { Suspense, useEffect } from "react";
 import Home from "./Home";
 import { PageLoadingFallback } from "@/components/ui/loading-fallback";
 import { MeditationPage } from "@/utils/lazyRoutes";
-import EnhancedErrorBoundary from "@/components/ui/enhanced-error-boundary";
+import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBoundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import SecurityProvider from "@/components/security/SecurityProvider";
 import { initServiceWorker } from "@/services/serviceWorker";
 import { usePushNotifications } from "@/services/pushNotifications";
+
+// Initialiser la validation d'environnement
+import '@/lib/env-validation';
+import '@/lib/errorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: (failureCount, error) => {
+        // Ne pas retry sur les erreurs d'authentification
+        if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
+          return false;
+        }
+        return failureCount < 3;
+      },
     },
   },
 });
@@ -48,8 +59,8 @@ const UXServicesInitializer: React.FC = () => {
 
 function App() {
   return (
-    <SecurityProvider>
-      <EnhancedErrorBoundary level="critical" showDetails={true}>
+    <GlobalErrorBoundary>
+      <SecurityProvider>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <AuthProvider>
@@ -62,16 +73,8 @@ function App() {
                   <Suspense fallback={<PageLoadingFallback />}>
                     <main id="main-content" tabIndex={-1}>
                       <Routes>
-                        <Route path="/" element={
-                          <EnhancedErrorBoundary level="page">
-                            <Home />
-                          </EnhancedErrorBoundary>
-                        } />
-                        <Route path="/meditation" element={
-                          <EnhancedErrorBoundary level="page">
-                            <MeditationPage />
-                          </EnhancedErrorBoundary>
-                        } />
+                        <Route path="/" element={<Home />} />
+                        <Route path="/meditation" element={<MeditationPage />} />
                       </Routes>
                     </main>
                   </Suspense>
@@ -80,8 +83,8 @@ function App() {
             </AuthProvider>
           </TooltipProvider>
         </QueryClientProvider>
-      </EnhancedErrorBoundary>
-    </SecurityProvider>
+      </SecurityProvider>
+    </GlobalErrorBoundary>
   );
 }
 
