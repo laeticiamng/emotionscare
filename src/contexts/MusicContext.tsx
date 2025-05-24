@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface Track {
@@ -31,7 +30,7 @@ interface MusicContextType {
   clearPlaylist: () => void;
 }
 
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
+export const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 interface MusicProviderProps {
   children: ReactNode;
