@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MusicPlaylist, EmotionMusicParams, EmotionResult } from '@/types/music';
 import { useMusic } from '@/contexts/MusicContext';
@@ -38,9 +39,9 @@ export const useMusicEmotionIntegration = () => {
       'anxious': 'Des mélodies relaxantes pour apaiser votre anxiété',
       'energetic': 'Des rythmes dynamiques pour soutenir votre énergie',
       'neutral': 'Une playlist adaptée à votre état émotionnel actuel',
-      'fear': 'Sons calmes pour apaiser et retrouver la sérénité',
+      'fear': "Sons calmes pour apaiser et retrouver la sérénité",
       'surprise': 'Mélodies rafraîchissantes et légères pour accompagner ce moment',
-      'disgust': 'Musiques transformatives pour améliorer votre état d\'esprit'
+      'disgust': "Musiques transformatives pour améliorer votre état d'esprit"
     };
 
     return descriptions[emotion.toLowerCase()] || 'Une playlist adaptée à votre état émotionnel actuel';
