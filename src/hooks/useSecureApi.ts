@@ -1,11 +1,10 @@
 
 import { useCallback } from 'react';
-import { AuthInterceptor } from '@/utils/authInterceptor';
+import { GlobalInterceptor } from '@/utils/globalInterceptor';
 import { SecureAnalytics } from '@/utils/secureAnalytics';
 
 /**
- * Hook pour effectuer des appels API sécurisés
- * Mis à jour pour conformité JWT stricte
+ * Hook pour effectuer des appels API sécurisés avec gestion d'erreur globale
  */
 export const useSecureApi = () => {
   
@@ -16,7 +15,7 @@ export const useSecureApi = () => {
     url: string,
     options: RequestInit = {}
   ): Promise<Response | null> => {
-    return AuthInterceptor.secureFetch(url, options);
+    return GlobalInterceptor.secureFetch(url, options);
   }, []);
 
   /**
@@ -31,15 +30,23 @@ export const useSecureApi = () => {
   }, []);
 
   /**
-   * Vérification du statut de session avec token strict
+   * Vérification du statut de session
    */
   const checkSession = useCallback(async (): Promise<boolean> => {
-    return AuthInterceptor.checkSessionStatus();
+    return GlobalInterceptor.checkSessionStatus();
+  }, []);
+
+  /**
+   * Get analytics service status
+   */
+  const getAnalyticsStatus = useCallback(() => {
+    return SecureAnalytics.getStatus();
   }, []);
 
   return {
     secureCall,
     trackEvent,
     checkSession,
+    getAnalyticsStatus,
   };
 };

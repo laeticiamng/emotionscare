@@ -1,8 +1,9 @@
 
 import { toast } from '@/hooks/use-toast';
+import { GlobalInterceptor } from './globalInterceptor';
 
 /**
- * Utilitaires vocaux robustes avec gestion d'erreur complète
+ * Utilitaires vocaux ultra-robustes avec gestion d'erreur complète
  * Timeout strict et désactivation temporaire en cas d'erreur
  */
 export class RobustVoiceUtils {
@@ -53,30 +54,35 @@ export class RobustVoiceUtils {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
-      const response = await fetch('/api/voice-to-text', {
+      const response = await GlobalInterceptor.secureFetch('/api/voice-to-text', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ audio: audioData }),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
+      if (!response) {
+        // GlobalInterceptor a géré l'erreur
+        this.disableTemporarily(functionName);
+        return null;
+      }
+
       if (response.status >= 500) {
         throw new Error(`Voice service error: ${response.status}`);
       }
 
-      if (!response.ok) {
-        throw new Error(`Voice API returned ${response.status}`);
-      }
-
       const result = await response.json();
       return result.text || null;
+
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.error(`[Voice] ${functionName} timeout exceeded`);
+        toast({
+          title: "Timeout vocal",
+          description: "La transcription a pris trop de temps",
+          variant: "destructive",
+        });
       } else {
         console.error(`[Voice] ${functionName} error:`, error);
       }
@@ -100,30 +106,35 @@ export class RobustVoiceUtils {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
-      const response = await fetch('/api/text-to-voice', {
+      const response = await GlobalInterceptor.secureFetch('/api/text-to-voice', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ text, voice }),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
+      if (!response) {
+        // GlobalInterceptor a géré l'erreur
+        this.disableTemporarily(functionName);
+        return null;
+      }
+
       if (response.status >= 500) {
         throw new Error(`Voice service error: ${response.status}`);
       }
 
-      if (!response.ok) {
-        throw new Error(`Voice API returned ${response.status}`);
-      }
-
       const result = await response.json();
       return result.audioContent || null;
+
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.error(`[Voice] ${functionName} timeout exceeded`);
+        toast({
+          title: "Timeout vocal",
+          description: "La synthèse vocale a pris trop de temps",
+          variant: "destructive",
+        });
       } else {
         console.error(`[Voice] ${functionName} error:`, error);
       }
@@ -142,5 +153,29 @@ export class RobustVoiceUtils {
       return Math.ceil((disabledUntil - Date.now()) / 1000);
     }
     return 0;
+  }
+
+  /**
+   * Force la réactivation d'une fonction (pour debug)
+   */
+  static forceEnable(functionName: string): void {
+    delete this.disabledUntil[functionName];
+    console.info(`[Voice] ${functionName} forcefully enabled`);
+  }
+
+  /**
+   * Status de toutes les fonctions vocales
+   */
+  static getStatus(): { [key: string]: { disabled: boolean; timeRemaining: number } } {
+    return {
+      transcribeAudio: {
+        disabled: this.isDisabled('transcribeAudio'),
+        timeRemaining: this.getDisabledTimeRemaining('transcribeAudio')
+      },
+      synthesizeText: {
+        disabled: this.isDisabled('synthesizeText'),
+        timeRemaining: this.getDisabledTimeRemaining('synthesizeText')
+      }
+    };
   }
 }

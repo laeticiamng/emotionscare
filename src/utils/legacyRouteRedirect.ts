@@ -1,10 +1,11 @@
 
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getMigratedRoute } from './routeUtils';
 
 /**
- * DÉPRÉCIÉ - Sera supprimé dans la prochaine version
- * Redirection temporaire pour compatibilité pendant migration backend
+ * DÉPRÉCIÉ - Hook pour redirection automatique des routes legacy
+ * Sera supprimé une fois toutes les références nettoyées
  */
 
 const LEGACY_REDIRECTS = {
@@ -19,11 +20,22 @@ export const useLegacyRouteRedirect = () => {
 
   useEffect(() => {
     const currentPath = location.pathname;
-    const redirectPath = LEGACY_REDIRECTS[currentPath as keyof typeof LEGACY_REDIRECTS];
+    const migratedPath = getMigratedRoute(currentPath);
     
-    if (redirectPath) {
-      console.warn(`[DEPRECATED] Legacy route ${currentPath} redirected to ${redirectPath}`);
-      navigate(redirectPath, { replace: true });
+    // Si la route a été migrée, rediriger
+    if (migratedPath !== currentPath) {
+      console.warn(`[DEPRECATED] Legacy route ${currentPath} redirected to ${migratedPath}`);
+      console.warn('This redirect will be removed in the next version. Please update your navigation code.');
+      
+      navigate(migratedPath, { replace: true });
     }
   }, [location.pathname, navigate]);
+};
+
+/**
+ * @deprecated Use getMigratedRoute from routeUtils instead
+ */
+export const getLegacyRedirect = (path: string): string => {
+  console.warn('getLegacyRedirect is deprecated. Use getMigratedRoute from routeUtils instead.');
+  return getMigratedRoute(path);
 };

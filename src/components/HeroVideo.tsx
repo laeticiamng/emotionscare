@@ -8,6 +8,7 @@ interface HeroVideoProps {
 const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
   const [shouldShowVideo, setShouldShowVideo] = useState(true);
   const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     // Vérifier les préférences d'animation réduites
@@ -22,7 +23,12 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
     setVideoError(true);
   };
 
-  // Fallback vers l'image si vidéo désactivée ou en erreur
+  const handleVideoLoaded = () => {
+    console.info('[HeroVideo] Video loaded successfully');
+    setVideoLoaded(true);
+  };
+
+  // Fallback vers l'image si vidéo désactivée, en erreur, ou pas encore chargée
   if (!shouldShowVideo || videoError) {
     return (
       <img
@@ -30,28 +36,44 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
         alt="EmotionsCare - Plateforme de bien-être émotionnel"
         className={`w-full h-full object-cover ${className}`}
         loading="lazy"
+        onError={() => console.warn('[HeroVideo] Fallback image also failed to load')}
       />
     );
   }
 
   return (
-    <video
-      className={`w-full h-full object-cover ${className}`}
-      autoPlay
-      muted
-      loop
-      playsInline
-      onError={handleVideoError}
-      poster="/hero/hero-fallback.webp"
-    >
-      <source src="/hero/hero.webm" type="video/webm" />
-      {/* Fallback pour navigateurs non compatibles */}
-      <img
-        src="/hero/hero-fallback.webp"
-        alt="EmotionsCare - Plateforme de bien-être émotionnel"
-        className="w-full h-full object-cover"
-      />
-    </video>
+    <div className={`relative w-full h-full ${className}`}>
+      {/* Afficher l'image en fallback pendant le chargement */}
+      {!videoLoaded && (
+        <img
+          src="/hero/hero-fallback.webp"
+          alt="EmotionsCare - Plateforme de bien-être émotionnel"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+        />
+      )}
+      
+      <video
+        className={`w-full h-full object-cover ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+        autoPlay
+        muted
+        loop
+        playsInline
+        onError={handleVideoError}
+        onLoadedData={handleVideoLoaded}
+        poster="/hero/hero-fallback.webp"
+      >
+        <source src="/hero/hero.webm" type="video/webm" />
+        <source src="/hero/hero.mp4" type="video/mp4" />
+        
+        {/* Fallback pour navigateurs non compatibles */}
+        <img
+          src="/hero/hero-fallback.webp"
+          alt="EmotionsCare - Plateforme de bien-être émotionnel"
+          className="w-full h-full object-cover"
+        />
+      </video>
+    </div>
   );
 };
 

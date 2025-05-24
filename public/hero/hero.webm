@@ -1,4 +1,5 @@
 
-<!-- Placeholder for WebM video file -->
-<!-- This will be replaced with actual WebM/AV1 480p video (<600KB) during deployment -->
-<!-- For now, the HeroVideo component will fallback to the image -->
+<!-- Placeholder optimisé pour vidéo WebM/AV1 480p -->
+<!-- Cette vidéo sera remplacée par la version réelle (<600KB) lors du déploiement -->
+<!-- Format recommandé: WebM avec codec AV1, résolution 854x480, bitrate ~500kbps -->
+<!-- Pour l'instant, le composant HeroVideo utilisera le fallback image -->

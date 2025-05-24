@@ -1,28 +1,34 @@
 
-import { toast } from '@/hooks/use-toast';
+import { GlobalInterceptor } from './globalInterceptor';
 
 /**
- * Gestionnaire sécurisé pour les événements analytics
- * Assure un fonctionnement sans interruption même si l'endpoint n'existe pas
+ * Analytics sécurisées avec fallbacks robustes
+ * Ne bloque JAMAIS l'UI en cas d'erreur
  */
 export class SecureAnalytics {
   private static baseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
   private static timeout = 5000; // 5s timeout pour analytics
+  private static isOffline = false;
   
   /**
    * Envoie un événement analytics de manière sécurisée
-   * Ne bloque jamais l'UI en cas d'erreur
    */
   static async trackEvent(eventData: {
     event: string;
     data?: any;
     userId?: string;
   }): Promise<void> {
+    // Si offline détecté, ne pas essayer
+    if (this.isOffline) {
+      console.warn('[Analytics] Service offline - skipping event');
+      return;
+    }
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      const response = await fetch(`${this.baseUrl}/analytics/event`, {
+      const response = await GlobalInterceptor.secureFetch(`${this.baseUrl}/analytics/event`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,21 +42,37 @@ export class SecureAnalytics {
 
       clearTimeout(timeoutId);
 
-      if (response.status >= 400) {
-        if (response.status === 404) {
-          console.warn('[Analytics] Endpoint not yet available - feature in development');
-        } else {
-          console.warn(`[Analytics] Service returned ${response.status} - continuing silently`);
-        }
+      if (!response) {
+        // GlobalInterceptor a géré l'erreur
+        this.markAsOffline();
+        return;
       }
+
+      // Reset offline flag si succès
+      this.isOffline = false;
+
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        console.warn('[Analytics] Request timeout - continuing silently');
+        console.warn('[Analytics] Request timeout - marking as offline');
       } else {
-        // Analytics failures should never interrupt user experience
-        console.warn('[Analytics] Offline or unreachable - continuing silently', error.message);
+        console.warn('[Analytics] Error sending event:', error.message);
       }
+      
+      this.markAsOffline();
     }
+  }
+
+  /**
+   * Marque le service analytics comme offline temporairement
+   */
+  private static markAsOffline(): void {
+    this.isOffline = true;
+    
+    // Réessayer dans 30 secondes
+    setTimeout(() => {
+      this.isOffline = false;
+      console.info('[Analytics] Service back online - resuming tracking');
+    }, 30000);
   }
 
   /**
@@ -74,7 +96,14 @@ export class SecureAnalytics {
       userId,
     });
   }
+
+  /**
+   * Get service status
+   */
+  static getStatus(): { isOffline: boolean } {
+    return { isOffline: this.isOffline };
+  }
 }
 
-// Wrapper legacy pour compatibilité
+// Export legacy pour compatibilité
 export const postAnalyticsEvent = SecureAnalytics.trackEvent;

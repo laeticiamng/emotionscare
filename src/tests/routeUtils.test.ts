@@ -1,7 +1,13 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getLoginRoute, getDashboardRoute, isValidRoute, CURRENT_ROUTES } from '@/utils/routeUtils';
+import { 
+  getLoginRoute, 
+  getDashboardRoute, 
+  isValidRoute, 
+  CURRENT_ROUTES,
+  getMigratedRoute 
+} from '@/utils/routeUtils';
 
 test('getLoginRoute returns correct B2B user login path', () => {
   assert.equal(getLoginRoute('b2b_user'), '/b2b/user/login');
@@ -24,8 +30,11 @@ test('getDashboardRoute returns correct paths', () => {
 test('isValidRoute validates current routes only', () => {
   assert.equal(isValidRoute('/b2b/user/login'), true);
   assert.equal(isValidRoute('/choose-mode'), true);
-  assert.equal(isValidRoute('/login-collaborateur'), false); // Legacy route should be invalid
-  assert.equal(isValidRoute('/login-admin'), false); // Legacy route should be invalid
+  assert.equal(isValidRoute('/b2c/login'), true);
+  // Legacy routes should be invalid
+  assert.equal(isValidRoute('/login-collaborateur'), false);
+  assert.equal(isValidRoute('/login-admin'), false);
+  assert.equal(isValidRoute('/login'), false);
 });
 
 test('CURRENT_ROUTES contains no legacy paths', () => {
@@ -33,4 +42,19 @@ test('CURRENT_ROUTES contains no legacy paths', () => {
   assert.equal(routes.includes('/login-collaborateur' as any), false);
   assert.equal(routes.includes('/login-admin' as any), false);
   assert.equal(routes.includes('/login' as any), false);
+});
+
+test('getMigratedRoute maps legacy routes to new routes', () => {
+  assert.equal(getMigratedRoute('/login-collaborateur'), '/b2b/user/login');
+  assert.equal(getMigratedRoute('/login-admin'), '/b2b/admin/login');
+  assert.equal(getMigratedRoute('/login'), '/choose-mode');
+  // Non-legacy routes should return as-is
+  assert.equal(getMigratedRoute('/b2c/login'), '/b2c/login');
+});
+
+test('All routes in CURRENT_ROUTES are properly formatted', () => {
+  Object.values(CURRENT_ROUTES).forEach(route => {
+    assert.ok(route.startsWith('/'), `Route ${route} should start with /`);
+    assert.ok(!route.includes('//', ), `Route ${route} should not have double slashes`);
+  });
 });
