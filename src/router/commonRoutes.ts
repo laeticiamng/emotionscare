@@ -1,14 +1,19 @@
 
 import { RouteObject } from 'react-router-dom';
-import { ImmersiveHomeWrapper } from '@/utils/lazyRoutes';
+import ImmersiveHome from '@/pages/ImmersiveHome';
+import B2BSelectionPage from '@/pages/b2b/SelectionPage';
 
 export const commonRoutes: RouteObject[] = [
   {
     path: '/',
-    element: <ImmersiveHomeWrapper />,
+    element: <ImmersiveHome />,
+  },
+  {
+    path: '/b2b/selection',
+    element: <B2BSelectionPage />,
   },
   {
     path: '/choose-mode',
-    element: <ImmersiveHomeWrapper />,
+    element: <ImmersiveHome />,
   },
 ];

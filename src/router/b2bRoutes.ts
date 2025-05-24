@@ -3,7 +3,6 @@ import { RouteObject } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import {
-  B2BSelectionPage,
   B2BUserLoginPage,
   B2BUserRegisterPage,
   B2BUserDashboardPage,
@@ -18,10 +17,6 @@ export const b2bRoutes: RouteObject[] = [
   {
     path: '/b2b',
     children: [
-      {
-        path: 'selection',
-        element: <B2BSelectionPage />,
-      },
       // B2B User Routes
       {
         path: 'user',
