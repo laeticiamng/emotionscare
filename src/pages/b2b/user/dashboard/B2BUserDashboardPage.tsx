@@ -1,310 +1,359 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
-  Building, 
+  Building2, 
   Users, 
-  Heart, 
-  TrendingUp, 
-  Scan, 
-  Bot, 
+  Brain, 
   Music, 
-  BookOpen,
+  BookOpen, 
+  Scan, 
+  TrendingUp, 
   Calendar,
+  Award,
   Target,
-  Award
+  Smile,
+  Activity,
+  Plus,
+  Shield
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const B2BUserDashboardPage: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
-    emotionalScore: 72,
-    teamAverage: 68,
-    scansThisWeek: 3,
-    streakDays: 8,
-    teamRank: 3
+    totalScans: 0,
+    teamAverage: 0,
+    personalProgress: 0,
+    companyRanking: 0
   });
 
-  const isDemo = user?.email?.endsWith('@exemple.fr');
-  const company = user?.user_metadata?.company || 'Votre entreprise';
-  const jobTitle = user?.user_metadata?.job_title || 'Collaborateur';
+  useEffect(() => {
+    loadDashboardData();
+  }, [user]);
+
+  const loadDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setStats({
+        totalScans: 18,
+        teamAverage: 82,
+        personalProgress: 78,
+        companyRanking: 3
+      });
+    } catch (error) {
+      toast.error('Erreur lors du chargement des données');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const quickActions = [
     {
       title: 'Scanner mes émotions',
-      description: 'Analysez votre état émotionnel',
+      description: 'Analyser votre état émotionnel professionnel',
       icon: Scan,
-      color: 'bg-blue-500',
-      action: () => navigate('/scan')
+      action: () => navigate('/scan'),
+      color: 'bg-blue-500'
     },
     {
-      title: 'Coach IA personnel',
-      description: 'Conseils adaptés à votre rôle',
-      icon: Bot,
-      color: 'bg-green-500',
-      action: () => navigate('/coach')
+      title: 'Coach IA Professionnel',
+      description: 'Conseils pour la gestion du stress au travail',
+      icon: Brain,
+      action: () => navigate('/coach'),
+      color: 'bg-purple-500'
     },
     {
-      title: 'Musicothérapie',
-      description: 'Détente pendant les pauses',
+      title: 'Musique de focus',
+      description: 'Améliorer votre concentration',
       icon: Music,
-      color: 'bg-purple-500',
-      action: () => navigate('/music')
+      action: () => navigate('/music'),
+      color: 'bg-green-500'
     },
     {
       title: 'Journal professionnel',
-      description: 'Réflexions sur votre bien-être au travail',
+      description: 'Réflexions sur votre journée de travail',
       icon: BookOpen,
-      color: 'bg-orange-500',
-      action: () => navigate('/journal')
+      action: () => navigate('/journal'),
+      color: 'bg-orange-500'
     }
   ];
 
-  const teamInsights = [
-    {
-      title: 'Mon score vs équipe',
-      value: `${stats.emotionalScore}% / ${stats.teamAverage}%`,
-      description: 'Score personnel / Moyenne équipe',
-      icon: TrendingUp,
-      positive: stats.emotionalScore > stats.teamAverage
-    },
-    {
-      title: 'Classement équipe',
-      value: `${stats.teamRank}/12`,
-      description: 'Position dans l\'équipe',
-      icon: Award,
-      positive: stats.teamRank <= 5
-    },
-    {
-      title: 'Série active',
-      value: `${stats.streakDays} jours`,
-      description: 'Utilisation continue',
-      icon: Calendar,
-      positive: true
-    }
-  ];
+  const getDayMessage = () => {
+    const hour = new Date().getHours();
+    const name = user?.user_metadata?.name || 'Collaborateur';
+    const company = user?.user_metadata?.company || 'votre organisation';
+    
+    if (hour < 12) return `Bonjour ${name} !`;
+    if (hour < 18) return `Bon après-midi ${name} !`;
+    return `Bonsoir ${name} !`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement de votre espace collaborateur...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* En-tête collaborateur */}
+      {/* En-tête de bienvenue */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        className="text-center mb-8"
       >
-        <Card className="bg-gradient-to-r from-blue-50 to-slate-50 dark:from-blue-900/20 dark:to-slate-900/20">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <Building className="h-8 w-8 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">
-                    Bonjour {user?.user_metadata?.name} ! 👋
-                  </CardTitle>
-                  <CardDescription className="text-lg">
-                    {jobTitle} chez {company}
-                  </CardDescription>
-                  {isDemo && (
-                    <Badge variant="secondary" className="mt-2">
-                      Compte démo
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center space-x-2 justify-end">
-                  <Heart className="h-5 w-5 text-red-500" />
-                  <span className="text-2xl font-bold">{stats.emotionalScore}%</span>
-                </div>
-                <p className="text-sm text-muted-foreground">Score bien-être</p>
-                <Badge variant={stats.emotionalScore > stats.teamAverage ? "default" : "secondary"} className="mt-1">
-                  {stats.emotionalScore > stats.teamAverage ? 'Au-dessus' : 'En-dessous'} de la moyenne
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
+        <div className="flex items-center justify-center mb-4">
+          <Building2 className="h-8 w-8 text-primary mr-3" />
+          <Badge variant="secondary" className="text-sm">
+            Espace Collaborateur
+          </Badge>
+        </div>
+        <h1 className="text-3xl font-bold mb-2">{getDayMessage()}</h1>
+        <p className="text-muted-foreground">
+          Gérez votre bien-être au travail et contribuez à une meilleure ambiance d'équipe.
+        </p>
       </motion.div>
 
-      {/* Actions rapides */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
+      {/* Statistiques équipe/entreprise */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Outils de bien-être au travail</CardTitle>
-            <CardDescription>
-              Prenez soin de votre équilibre professionnel
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickActions.map((action, index) => (
-                <motion.div
-                  key={action.title}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                >
-                  <Button
-                    variant="outline"
-                    className="h-auto flex flex-col items-center gap-3 p-6 w-full hover:shadow-md transition-all"
-                    onClick={action.action}
-                  >
-                    <div className={`p-3 rounded-full ${action.color} text-white`}>
-                      <action.icon className="h-6 w-6" />
-                    </div>
-                    <div className="text-center">
-                      <div className="font-medium text-sm">{action.title}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {action.description}
-                      </div>
-                    </div>
-                  </Button>
-                </motion.div>
-              ))}
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Mes analyses</p>
+                <p className="text-2xl font-bold">{stats.totalScans}</p>
+              </div>
+              <Activity className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-      </motion.div>
 
-      {/* Comparaison équipe et insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Moyenne équipe</p>
+                <p className="text-2xl font-bold">{stats.teamAverage}%</p>
+              </div>
+              <Users className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Ma progression</p>
+                <p className="text-2xl font-bold">{stats.personalProgress}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Classement</p>
+                <p className="text-2xl font-bold">#{stats.companyRanking}</p>
+              </div>
+              <Award className="h-8 w-8 text-orange-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="actions" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="actions">Actions rapides</TabsTrigger>
+          <TabsTrigger value="team">Équipe</TabsTrigger>
+          <TabsTrigger value="progress">Progression</TabsTrigger>
+          <TabsTrigger value="company">Entreprise</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="actions" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {quickActions.map((action, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={action.action}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className={`p-3 rounded-lg ${action.color}`}>
+                        <action.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-1">{action.title}</h3>
+                        <p className="text-sm text-muted-foreground">{action.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="team" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Users className="h-5 w-5" />
-                <span>Performance équipe</span>
-              </CardTitle>
+              <CardTitle>Performance de l'équipe</CardTitle>
               <CardDescription>
-                Votre position dans l'équipe
+                Vue d'ensemble du bien-être de votre équipe
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {teamInsights.map((insight, index) => (
-                  <div key={insight.title} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-full ${
-                        insight.positive ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'
-                      }`}>
-                        <insight.icon className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{insight.title}</p>
-                        <p className="text-xs text-muted-foreground">{insight.description}</p>
-                      </div>
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">JD</span>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold">{insight.value}</p>
+                    <div>
+                      <p className="font-medium">Jean Dupont</p>
+                      <p className="text-sm text-muted-foreground">Chef d'équipe</p>
                     </div>
                   </div>
-                ))}
+                  <Badge variant="secondary">95% bien-être</Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">ML</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">Marie Leblanc</p>
+                      <p className="text-sm text-muted-foreground">Développeuse</p>
+                    </div>
+                  </div>
+                  <Badge variant="secondary">88% bien-être</Badge>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold">PD</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">Pierre Durand</p>
+                      <p className="text-sm text-muted-foreground">Designer</p>
+                    </div>
+                  </div>
+                  <Badge variant="secondary">76% bien-être</Badge>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </TabsContent>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
+        <TabsContent value="progress" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Activité récente</CardTitle>
+              <CardTitle>Votre progression mensuelle</CardTitle>
+              <CardDescription>
+                Évolution de votre bien-être au travail
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-full">
-                  <Scan className="h-4 w-4 text-blue-600" />
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Objectif mensuel</span>
+                  <Badge variant="secondary">{stats.personalProgress}% atteint</Badge>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Scan matinal</p>
-                  <p className="text-xs text-muted-foreground">Aujourd'hui 9h30</p>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-primary h-2 rounded-full transition-all" 
+                    style={{ width: `${stats.personalProgress}%` }}
+                  ></div>
                 </div>
-                <Badge variant="secondary">+5 pts</Badge>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-full">
-                  <Bot className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Conseil sur la gestion du stress</p>
-                  <p className="text-xs text-muted-foreground">Hier 15h20</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-full">
-                  <Music className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Pause musicale relaxante</p>
-                  <p className="text-xs text-muted-foreground">Hier 12h00</p>
+                <div className="grid grid-cols-3 gap-4 pt-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-blue-500">18</p>
+                    <p className="text-xs text-muted-foreground">Analyses</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-500">12</p>
+                    <p className="text-xs text-muted-foreground">Sessions coach</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-purple-500">8</p>
+                    <p className="text-xs text-muted-foreground">Entrées journal</p>
+                  </div>
                 </div>
               </div>
-
-              <Button variant="outline" size="sm" className="w-full mt-4">
-                Voir l'historique complet
-              </Button>
             </CardContent>
           </Card>
-        </motion.div>
-      </div>
+        </TabsContent>
 
-      {/* Encouragements et objectifs professionnels */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Target className="h-5 w-5 text-blue-600" />
-              <span>Objectif bien-être au travail</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <p className="text-muted-foreground">
-                Excellente progression ! Votre score de bien-être au travail est supérieur à la moyenne de l'équipe. 
-                Continuez à prendre soin de vous pour maintenir cette performance.
-              </p>
-              <div className="flex items-center space-x-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">+4%</p>
-                  <p className="text-xs text-muted-foreground">Cette semaine</p>
+        <TabsContent value="company" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance entreprise</CardTitle>
+              <CardDescription>
+                Vue d'ensemble du bien-être dans votre organisation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Shield className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="font-semibold">Niveau de bien-être global</p>
+                      <p className="text-sm text-muted-foreground">Moyenne de tous les collaborateurs</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-green-500">84%</p>
+                    <p className="text-xs text-muted-foreground">+5% ce mois</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">{stats.streakDays}</p>
-                  <p className="text-xs text-muted-foreground">Jours consécutifs</p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Participants actifs</p>
+                    <p className="text-xl font-bold">127/150</p>
+                  </div>
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Taux d'engagement</p>
+                    <p className="text-xl font-bold">85%</p>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <h4 className="font-semibold mb-2">🎯 Objectif du mois</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Atteindre 90% de bien-être global grâce aux initiatives de team building et aux sessions de méditation collectives.
+                  </p>
                 </div>
               </div>
-              <Button className="mt-4" onClick={() => navigate('/scan')}>
-                Faire mon check-in du jour
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

@@ -1,133 +1,194 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
+  Users, 
   UserPlus, 
   Search, 
-  Mail, 
+  Filter,
+  Mail,
   MoreVertical,
-  ArrowLeft,
-  Users,
-  Crown,
-  Heart,
-  TrendingUp,
-  TrendingDown
+  Edit,
+  Trash2,
+  Shield,
+  CheckCircle,
+  XCircle,
+  Clock
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 const B2BAdminUsersPage: React.FC = () => {
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteDepartment, setInviteDepartment] = useState('');
+  const [users, setUsers] = useState([]);
+  const [invitations, setInvitations] = useState([]);
 
-  const users = [
-    {
-      id: 1,
-      name: 'Marie Dubois',
-      email: 'marie.dubois@entreprise.com',
-      department: 'Marketing',
-      role: 'user',
-      score: 78,
-      trend: +5,
-      lastScan: '2h',
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'Jean Martin',
-      email: 'jean.martin@entreprise.com',
-      department: 'Développement',
-      role: 'user',
-      score: 82,
-      trend: +12,
-      lastScan: '4h',
-      status: 'active'
-    },
-    {
-      id: 3,
-      name: 'Sophie Leroy',
-      email: 'sophie.leroy@entreprise.com',
-      department: 'RH',
-      role: 'admin',
-      score: 85,
-      trend: +8,
-      lastScan: '1h',
-      status: 'active'
-    },
-    {
-      id: 4,
-      name: 'Pierre Durand',
-      email: 'pierre.durand@entreprise.com',
-      department: 'Commercial',
-      role: 'user',
-      score: 65,
-      trend: -3,
-      lastScan: '1j',
-      status: 'inactive'
-    },
-    {
-      id: 5,
-      name: 'Demo User',
-      email: 'demo@exemple.fr',
-      department: 'Test',
-      role: 'user',
-      score: 75,
-      trend: 0,
-      lastScan: '30min',
-      status: 'demo'
+  useEffect(() => {
+    loadUsersData();
+  }, []);
+
+  const loadUsersData = async () => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Données simulées
+      setUsers([
+        {
+          id: 1,
+          name: 'Jean Dupont',
+          email: 'j.dupont@entreprise.com',
+          department: 'Développement',
+          role: 'b2b_user',
+          status: 'active',
+          lastSeen: new Date(),
+          wellbeingScore: 88,
+          joinedAt: new Date(2024, 0, 15)
+        },
+        {
+          id: 2,
+          name: 'Marie Leblanc',
+          email: 'm.leblanc@entreprise.com',
+          department: 'Marketing',
+          role: 'b2b_user',
+          status: 'active',
+          lastSeen: new Date(Date.now() - 3600000),
+          wellbeingScore: 92,
+          joinedAt: new Date(2024, 1, 3)
+        },
+        {
+          id: 3,
+          name: 'Pierre Durand',
+          email: 'p.durand@entreprise.com',
+          department: 'Design',
+          role: 'b2b_admin',
+          status: 'inactive',
+          lastSeen: new Date(Date.now() - 86400000),
+          wellbeingScore: 76,
+          joinedAt: new Date(2023, 11, 20)
+        }
+      ]);
+
+      setInvitations([
+        {
+          id: 1,
+          email: 'nouveau@entreprise.com',
+          department: 'Ventes',
+          status: 'pending',
+          invitedAt: new Date(Date.now() - 172800000),
+          invitedBy: 'Admin'
+        },
+        {
+          id: 2,
+          email: 'stagiaire@entreprise.com',
+          department: 'Marketing',
+          status: 'accepted',
+          invitedAt: new Date(Date.now() - 604800000),
+          invitedBy: 'Admin'
+        }
+      ]);
+    } catch (error) {
+      toast.error('Erreur lors du chargement des utilisateurs');
+    } finally {
+      setIsLoading(false);
     }
-  ];
-
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  };
 
   const handleInviteUser = async () => {
-    if (!inviteEmail) {
-      toast.error('Veuillez saisir une adresse email');
+    if (!inviteEmail || !inviteDepartment) {
+      toast.error('Veuillez remplir tous les champs');
       return;
     }
 
     try {
-      // Simulation d'envoi d'invitation
-      toast.success(`Invitation envoyée à ${inviteEmail}`);
+      // Simuler l'envoi d'invitation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newInvitation = {
+        id: Date.now(),
+        email: inviteEmail,
+        department: inviteDepartment,
+        status: 'pending',
+        invitedAt: new Date(),
+        invitedBy: 'Admin'
+      };
+
+      setInvitations(prev => [newInvitation, ...prev]);
       setInviteEmail('');
-      setShowInviteForm(false);
+      setInviteDepartment('');
+      setIsInviteDialogOpen(false);
+      toast.success(`Invitation envoyée à ${inviteEmail}`);
     } catch (error) {
       toast.error('Erreur lors de l\'envoi de l\'invitation');
     }
   };
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'admin': return 'Administrateur';
-      case 'user': return 'Collaborateur';
-      default: return 'Utilisateur';
-    }
-  };
+  const departments = [
+    { value: 'all', label: 'Tous les départements' },
+    { value: 'dev', label: 'Développement' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'design', label: 'Design' },
+    { value: 'sales', label: 'Ventes' },
+    { value: 'hr', label: 'Ressources Humaines' }
+  ];
 
-  const getStatusColor = (status: string) => {
+  const statusOptions = [
+    { value: 'all', label: 'Tous les statuts' },
+    { value: 'active', label: 'Actif' },
+    { value: 'inactive', label: 'Inactif' },
+    { value: 'suspended', label: 'Suspendu' }
+  ];
+
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-red-100 text-red-800';
-      case 'demo': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active':
+        return <Badge variant="default" className="bg-green-500">Actif</Badge>;
+      case 'inactive':
+        return <Badge variant="secondary">Inactif</Badge>;
+      case 'suspended':
+        return <Badge variant="destructive">Suspendu</Badge>;
+      case 'pending':
+        return <Badge variant="outline">En attente</Badge>;
+      case 'accepted':
+        return <Badge variant="default" className="bg-green-500">Acceptée</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  const stats = {
-    total: users.length,
-    active: users.filter(u => u.status === 'active').length,
-    avgScore: Math.round(users.reduce((acc, u) => acc + u.score, 0) / users.length)
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'b2b_admin':
+        return <Badge variant="destructive">Administrateur</Badge>;
+      case 'b2b_user':
+        return <Badge variant="secondary">Collaborateur</Badge>;
+      default:
+        return <Badge variant="outline">{role}</Badge>;
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement des utilisateurs...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -135,216 +196,214 @@ const B2BAdminUsersPage: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/b2b/admin/dashboard')}
-            >
-              <ArrowLeft className="h-4 w-4" />
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Gestion des utilisateurs</h1>
+          <p className="text-muted-foreground">
+            Gérez les comptes et invitations de votre organisation
+          </p>
+        </div>
+        
+        <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Inviter un collaborateur
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold">Gestion des utilisateurs</h1>
-              <p className="text-muted-foreground">
-                Invitez et gérez les collaborateurs de votre organisation
-              </p>
-            </div>
-          </div>
-          <Button onClick={() => setShowInviteForm(true)}>
-            <UserPlus className="h-4 w-4 mr-2" />
-            Inviter un collaborateur
-          </Button>
-        </div>
-      </motion.div>
-
-      {/* Statistiques rapides */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                  <p className="text-sm text-muted-foreground">Total utilisateurs</p>
-                </div>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Inviter un nouveau collaborateur</DialogTitle>
+              <DialogDescription>
+                Envoyez une invitation par email pour rejoindre votre organisation
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Adresse email</label>
+                <Input
+                  type="email"
+                  placeholder="collaborateur@entreprise.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                />
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.active}</p>
-                  <p className="text-sm text-muted-foreground">Utilisateurs actifs</p>
-                </div>
+              <div>
+                <label className="text-sm font-medium">Département</label>
+                <Select value={inviteDepartment} onValueChange={setInviteDepartment}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un département" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dev">Développement</SelectItem>
+                    <SelectItem value="marketing">Marketing</SelectItem>
+                    <SelectItem value="design">Design</SelectItem>
+                    <SelectItem value="sales">Ventes</SelectItem>
+                    <SelectItem value="hr">Ressources Humaines</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-red-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.avgScore}%</p>
-                  <p className="text-sm text-muted-foreground">Score moyen</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </motion.div>
-
-      {/* Formulaire d'invitation */}
-      {showInviteForm && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Inviter un nouveau collaborateur</CardTitle>
-              <CardDescription>
-                Envoyez une invitation par email pour rejoindre la plateforme
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-4">
-                <div className="flex-1">
-                  <Input
-                    type="email"
-                    placeholder="email@entreprise.com"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                  />
-                </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>
+                  Annuler
+                </Button>
                 <Button onClick={handleInviteUser}>
                   <Mail className="h-4 w-4 mr-2" />
                   Envoyer l'invitation
                 </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowInviteForm(false)}
-                >
-                  Annuler
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Liste des utilisateurs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Collaborateurs ({filteredUsers.length})</CardTitle>
-                <CardDescription>
-                  Gérez les accès et suivez les performances
-                </CardDescription>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Rechercher un utilisateur..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64"
-                  />
-                </div>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredUsers.map((user, index) => (
-                <motion.div
-                  key={user.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-medium">
-                        {user.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <p className="font-medium">{user.name}</p>
-                        {user.role === 'admin' && (
-                          <Crown className="h-4 w-4 text-yellow-500" />
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {user.department}
-                        </Badge>
-                        <Badge className={`text-xs ${getStatusColor(user.status)}`}>
-                          {user.status === 'demo' ? 'Démo' : 
-                           user.status === 'active' ? 'Actif' : 'Inactif'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-6">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold">{user.score}%</p>
-                      <p className="text-xs text-muted-foreground">Score</p>
-                    </div>
-                    
-                    <div className="text-center">
-                      <div className={`flex items-center justify-center ${
-                        user.trend > 0 ? 'text-green-600' : 
-                        user.trend < 0 ? 'text-red-600' : 'text-gray-400'
-                      }`}>
-                        {user.trend > 0 ? <TrendingUp className="h-4 w-4" /> :
-                         user.trend < 0 ? <TrendingDown className="h-4 w-4" /> :
-                         <span className="h-4 w-4 flex items-center justify-center">→</span>}
-                        <span className="ml-1 text-sm font-medium">
-                          {user.trend > 0 ? '+' : ''}{user.trend}%
+          </DialogContent>
+        </Dialog>
+      </motion.div>
+
+      {/* Filtres */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un collaborateur..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <SelectTrigger className="w-[200px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.value} value={dept.value}>
+                    {dept.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((status) => (
+                  <SelectItem key={status.value} value={status.value}>
+                    {status.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="users" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="users">Utilisateurs actifs ({users.length})</TabsTrigger>
+          <TabsTrigger value="invitations">Invitations ({invitations.length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users" className="space-y-4">
+          <div className="grid gap-4">
+            {users.map((user: any) => (
+              <Card key={user.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                        <span className="text-white font-semibold">
+                          {user.name.split(' ').map((n: string) => n[0]).join('')}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground">Tendance</p>
+                      <div>
+                        <h3 className="font-semibold">{user.name}</h3>
+                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          {getRoleBadge(user.role)}
+                          {getStatusBadge(user.status)}
+                        </div>
+                      </div>
                     </div>
                     
-                    <div className="text-center">
-                      <p className="text-sm font-medium">{user.lastScan}</p>
-                      <p className="text-xs text-muted-foreground">Dernier scan</p>
+                    <div className="flex items-center space-x-6">
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Département</p>
+                        <p className="font-medium">{user.department}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Bien-être</p>
+                        <p className="font-medium">{user.wellbeingScore}%</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Dernière connexion</p>
+                        <p className="font-medium text-xs">
+                          {user.lastSeen.toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
                     </div>
-                    
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="invitations" className="space-y-4">
+          <div className="grid gap-4">
+            {invitations.map((invitation: any) => (
+              <Card key={invitation.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+                        <Mail className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{invitation.email}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Invité par {invitation.invitedBy} - {invitation.department}
+                        </p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          {getStatusBadge(invitation.status)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-6">
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Envoyée le</p>
+                        <p className="font-medium text-xs">
+                          {invitation.invitedAt.toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
+                        {invitation.status === 'pending' && (
+                          <>
+                            <Button size="sm" variant="outline">
+                              Renvoyer
+                            </Button>
+                            <Button size="sm" variant="destructive">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

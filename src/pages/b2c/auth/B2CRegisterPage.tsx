@@ -4,11 +4,10 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, User } from 'lucide-react';
 import { toast } from 'sonner';
 import AuthTransition from '@/components/auth/AuthTransition';
 
@@ -17,8 +16,7 @@ const B2CRegisterPage: React.FC = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    agreeTerms: false
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -27,14 +25,17 @@ const B2CRegisterPage: React.FC = () => {
   const { signUp } = useAuth();
   const { setUserMode } = useUserMode();
 
-  const handleChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.password) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       toast.error('Veuillez remplir tous les champs');
       return;
     }
@@ -49,28 +50,18 @@ const B2CRegisterPage: React.FC = () => {
       return;
     }
 
-    if (!formData.agreeTerms) {
-      toast.error('Veuillez accepter les conditions d\'utilisation');
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const isDemo = formData.email.endsWith('@exemple.fr');
-      const metadata = {
+      const { error } = await signUp(formData.email, formData.password, {
         name: formData.name,
-        role: 'b2c',
-        is_demo: isDemo,
-        trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
-      };
-
-      const { error } = await signUp(formData.email, formData.password, metadata);
+        role: 'b2c'
+      });
       
       if (error) {
         toast.error('Erreur lors de l\'inscription: ' + error.message);
       } else {
         setUserMode('b2c');
-        toast.success('Compte créé avec succès ! Vérifiez votre email.');
+        toast.success('Compte créé avec succès ! Vérifiez votre email pour confirmer votre inscription.');
         navigate('/b2c/onboarding');
       }
     } catch (error) {
@@ -100,7 +91,7 @@ const B2CRegisterPage: React.FC = () => {
               </Button>
               <CardTitle className="text-2xl">Créer un compte</CardTitle>
               <CardDescription>
-                Rejoignez EmotionsCare pour prendre soin de votre bien-être
+                Rejoignez EmotionsCare et prenez soin de votre bien-être émotionnel
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -110,32 +101,29 @@ const B2CRegisterPage: React.FC = () => {
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="text"
+                      name="name"
                       placeholder="Votre nom complet"
                       value={formData.name}
-                      onChange={(e) => handleChange('name', e.target.value)}
+                      onChange={handleInputChange}
                       className="pl-10"
                       required
                     />
                   </div>
                 </div>
-
+                
                 <div className="space-y-2">
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
+                      name="email"
                       placeholder="votre@email.com"
                       value={formData.email}
-                      onChange={(e) => handleChange('email', e.target.value)}
+                      onChange={handleInputChange}
                       className="pl-10"
                       required
                     />
                   </div>
-                  {formData.email.endsWith('@exemple.fr') && (
-                    <p className="text-xs text-amber-600">
-                      ⚠️ Compte démo - Données simulées
-                    </p>
-                  )}
                 </div>
                 
                 <div className="space-y-2">
@@ -143,9 +131,10 @@ const B2CRegisterPage: React.FC = () => {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Mot de passe (6 caractères min.)"
+                      name="password"
+                      placeholder="Mot de passe (min. 6 caractères)"
                       value={formData.password}
-                      onChange={(e) => handleChange('password', e.target.value)}
+                      onChange={handleInputChange}
                       className="pl-10 pr-10"
                       required
                     />
@@ -160,15 +149,16 @@ const B2CRegisterPage: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-
+                
                 <div className="space-y-2">
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
                       placeholder="Confirmer le mot de passe"
                       value={formData.confirmPassword}
-                      onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                      onChange={handleInputChange}
                       className="pl-10 pr-10"
                       required
                     />
@@ -183,27 +173,10 @@ const B2CRegisterPage: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={formData.agreeTerms}
-                    onCheckedChange={(checked) => handleChange('agreeTerms', checked as boolean)}
-                  />
-                  <label htmlFor="terms" className="text-sm text-muted-foreground">
-                    J'accepte les{' '}
-                    <Link to="/terms" className="text-primary hover:underline">
-                      conditions d'utilisation
-                    </Link>
-                    {' '}et la{' '}
-                    <Link to="/privacy" className="text-primary hover:underline">
-                      politique de confidentialité
-                    </Link>
-                  </label>
-                </div>
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Création du compte...' : 'Créer mon compte (3 jours gratuits)'}
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Créer mon compte
                 </Button>
               </form>
               
@@ -215,6 +188,10 @@ const B2CRegisterPage: React.FC = () => {
                 >
                   Se connecter
                 </Link>
+              </div>
+              
+              <div className="text-xs text-muted-foreground text-center mt-4 p-3 bg-muted/50 rounded-lg">
+                En créant un compte, vous acceptez nos conditions d'utilisation et bénéficiez de 3 jours d'essai gratuit.
               </div>
             </CardContent>
           </Card>

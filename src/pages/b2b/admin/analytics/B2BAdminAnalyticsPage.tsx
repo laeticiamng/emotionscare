@@ -1,58 +1,106 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DateRange } from 'react-day-picker';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { 
-  BarChart, 
-  LineChart, 
+  BarChart3, 
   TrendingUp, 
-  TrendingDown,
   Users, 
-  Heart, 
-  Calendar,
+  Calendar as CalendarIcon,
   Download,
   Filter,
-  ArrowLeft
+  Eye,
+  AlertCircle
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const B2BAdminAnalyticsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [timeframe, setTimeframe] = useState('week');
+  const [isLoading, setIsLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(2024, 0, 1),
+    to: new Date()
+  });
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [analyticsData, setAnalyticsData] = useState({
+    wellbeingTrends: [],
+    departmentStats: [],
+    userEngagement: [],
+    riskAnalysis: []
+  });
 
-  const analyticsData = {
-    overview: {
-      totalScans: 1247,
-      avgScore: 74.2,
-      participation: 86,
-      improvement: 12.5
-    },
-    departments: [
-      { name: 'Marketing', users: 23, avgScore: 78, trend: +5 },
-      { name: 'Développement', users: 31, avgScore: 72, trend: +8 },
-      { name: 'Commercial', users: 19, avgScore: 76, trend: -2 },
-      { name: 'RH', users: 12, avgScore: 81, trend: +15 },
-      { name: 'Support', users: 18, avgScore: 69, trend: +3 }
-    ],
-    weeklyTrends: [
-      { day: 'Lun', score: 72 },
-      { day: 'Mar', score: 74 },
-      { day: 'Mer', score: 71 },
-      { day: 'Jeu', score: 76 },
-      { day: 'Ven', score: 78 },
-      { day: 'Sam', score: 75 },
-      { day: 'Dim', score: 73 }
-    ]
+  useEffect(() => {
+    loadAnalyticsData();
+  }, [dateRange, selectedDepartment]);
+
+  const loadAnalyticsData = async () => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Données simulées pour la démonstration
+      setAnalyticsData({
+        wellbeingTrends: [
+          { month: 'Jan', score: 78 },
+          { month: 'Fév', score: 82 },
+          { month: 'Mar', score: 79 },
+          { month: 'Avr', score: 85 },
+          { month: 'Mai', score: 84 }
+        ],
+        departmentStats: [
+          { department: 'Développement', users: 45, avgScore: 88, trend: 'up' },
+          { department: 'Marketing', users: 32, avgScore: 82, trend: 'up' },
+          { department: 'Design', users: 18, avgScore: 85, trend: 'stable' },
+          { department: 'Ventes', users: 28, avgScore: 76, trend: 'down' },
+          { department: 'RH', users: 12, avgScore: 91, trend: 'up' }
+        ],
+        userEngagement: [
+          { metric: 'Connexions quotidiennes', value: 89, change: +12 },
+          { metric: 'Analyses complétées', value: 76, change: +8 },
+          { metric: 'Sessions coach utilisées', value: 45, change: +15 },
+          { metric: 'Entrées journal', value: 34, change: -2 }
+        ],
+        riskAnalysis: [
+          { category: 'Stress élevé', count: 8, percentage: 5.3 },
+          { category: 'Fatigue chronique', count: 12, percentage: 8.0 },
+          { category: 'Burnout potentiel', count: 3, percentage: 2.0 },
+          { category: 'Isolement social', count: 6, percentage: 4.0 }
+        ]
+      });
+    } catch (error) {
+      toast.error('Erreur lors du chargement des analytics');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const timeframeOptions = [
-    { value: 'week', label: 'Cette semaine' },
-    { value: 'month', label: 'Ce mois' },
-    { value: 'quarter', label: 'Ce trimestre' },
-    { value: 'year', label: 'Cette année' }
+  const departments = [
+    { value: 'all', label: 'Tous les départements' },
+    { value: 'dev', label: 'Développement' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'design', label: 'Design' },
+    { value: 'sales', label: 'Ventes' },
+    { value: 'hr', label: 'Ressources Humaines' }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement des analytics...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -60,243 +108,262 @@ const B2BAdminAnalyticsPage: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/b2b/admin/dashboard')}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold">Analytics Bien-être</h1>
-              <p className="text-muted-foreground">
-                Analyses détaillées du bien-être organisationnel
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
-              {timeframeOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={timeframe === option.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setTimeframe(option.value)}
-                >
-                  {option.label}
-                </Button>
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Analytics Avancées</h1>
+          <p className="text-muted-foreground">
+            Analyse détaillée du bien-être organisationnel
+          </p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-4 mt-4 md:mt-0">
+          {/* Sélecteur de département */}
+          <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+            <SelectTrigger className="w-[200px]">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {departments.map((dept) => (
+                <SelectItem key={dept.value} value={dept.value}>
+                  {dept.label}
+                </SelectItem>
               ))}
-            </div>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Exporter
-            </Button>
+            </SelectContent>
+          </Select>
+
+          {/* Sélecteur de date */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateRange?.from ? (
+                  dateRange.to ? (
+                    <>
+                      {format(dateRange.from, "LLL dd, y", { locale: fr })} -{" "}
+                      {format(dateRange.to, "LLL dd, y", { locale: fr })}
+                    </>
+                  ) : (
+                    format(dateRange.from, "LLL dd, y", { locale: fr })
+                  )
+                ) : (
+                  <span>Sélectionner une période</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={dateRange?.from}
+                selected={dateRange}
+                onSelect={setDateRange}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <Button>
+            <Download className="h-4 w-4 mr-2" />
+            Exporter
+          </Button>
+        </div>
+      </motion.div>
+
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="departments">Départements</TabsTrigger>
+          <TabsTrigger value="engagement">Engagement</TabsTrigger>
+          <TabsTrigger value="risks">Analyse des risques</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Score moyen</p>
+                    <p className="text-2xl font-bold">84%</p>
+                    <p className="text-xs text-green-500">+5% ce mois</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Participation</p>
+                    <p className="text-2xl font-bold">89%</p>
+                    <p className="text-xs text-green-500">+3% ce mois</p>
+                  </div>
+                  <Users className="h-8 w-8 text-blue-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Alertes actives</p>
+                    <p className="text-2xl font-bold">3</p>
+                    <p className="text-xs text-red-500">-2 cette semaine</p>
+                  </div>
+                  <AlertCircle className="h-8 w-8 text-red-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Satisfaction</p>
+                    <p className="text-2xl font-bold">4.6/5</p>
+                    <p className="text-xs text-green-500">+0.2 ce mois</p>
+                  </div>
+                  <BarChart3 className="h-8 w-8 text-purple-500" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </motion.div>
 
-      {/* Métriques globales */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium">Total des scans</CardTitle>
-                <BarChart className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analyticsData.overview.totalScans}</div>
-              <div className="flex items-center space-x-1 text-xs text-green-600">
-                <TrendingUp className="h-3 w-3" />
-                <span>+23% vs période précédente</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium">Score moyen</CardTitle>
-                <Heart className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analyticsData.overview.avgScore}%</div>
-              <div className="flex items-center space-x-1 text-xs text-green-600">
-                <TrendingUp className="h-3 w-3" />
-                <span>+{analyticsData.overview.improvement}% d'amélioration</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium">Participation</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analyticsData.overview.participation}%</div>
-              <div className="flex items-center space-x-1 text-xs text-green-600">
-                <TrendingUp className="h-3 w-3" />
-                <span>Excellent taux</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium">Tendance</CardTitle>
-                <LineChart className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">Positive</div>
-              <div className="flex items-center space-x-1 text-xs text-green-600">
-                <TrendingUp className="h-3 w-3" />
-                <span>Amélioration continue</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </motion.div>
-
-      {/* Graphiques et analyses */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Tendances par jour */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
           <Card>
             <CardHeader>
-              <CardTitle>Évolution hebdomadaire</CardTitle>
-              <CardDescription>
-                Score de bien-être moyen par jour
-              </CardDescription>
+              <CardTitle>Évolution du bien-être</CardTitle>
+              <CardDescription>Tendance sur les 5 derniers mois</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {analyticsData.weeklyTrends.map((day, index) => (
-                  <div key={day.day} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{day.day}</span>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-500 h-2 rounded-full" 
-                          style={{ width: `${day.score}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-bold w-8">{day.score}%</span>
+              <div className="h-64 flex items-end justify-between space-x-2 p-4">
+                {analyticsData.wellbeingTrends.map((data, index) => (
+                  <div key={index} className="flex flex-col items-center space-y-2">
+                    <div 
+                      className="bg-primary rounded-t min-w-[40px] flex items-end justify-center pb-2"
+                      style={{ height: `${(data.score / 100) * 200}px` }}
+                    >
+                      <span className="text-white text-sm font-semibold">{data.score}</span>
                     </div>
+                    <span className="text-sm text-muted-foreground">{data.month}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </TabsContent>
 
-        {/* Performance par département */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
+        <TabsContent value="departments" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Performance par département</CardTitle>
-              <CardDescription>
-                Scores et tendances par équipe
-              </CardDescription>
+              <CardDescription>Comparaison des scores de bien-être</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {analyticsData.departments.map((dept, index) => (
-                  <div key={dept.name} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{dept.name}</p>
-                      <p className="text-xs text-muted-foreground">{dept.users} collaborateurs</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold">{dept.avgScore}%</p>
-                      <div className={`flex items-center text-xs ${
-                        dept.trend > 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {dept.trend > 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                        {dept.trend > 0 ? '+' : ''}{dept.trend}%
+                {analyticsData.departmentStats.map((dept, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <div>
+                        <h4 className="font-medium">{dept.department}</h4>
+                        <p className="text-sm text-muted-foreground">{dept.users} collaborateurs</p>
                       </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="font-semibold">{dept.avgScore}%</p>
+                        <div className="flex items-center">
+                          {dept.trend === 'up' && <TrendingUp className="h-4 w-4 text-green-500" />}
+                          {dept.trend === 'down' && <TrendingUp className="h-4 w-4 text-red-500 rotate-180" />}
+                          {dept.trend === 'stable' && <div className="w-4 h-4 bg-gray-400 rounded-full" />}
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-4 w-4 mr-1" />
+                        Détails
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      </div>
+        </TabsContent>
 
-      {/* Insights et recommandations */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Insights et recommandations</CardTitle>
-            <CardDescription>
-              Analyses automatiques basées sur les données
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center space-x-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  <Badge variant="secondary" className="bg-green-100">Positif</Badge>
-                </div>
-                <h4 className="font-medium mb-1">Amélioration générale</h4>
-                <p className="text-sm text-muted-foreground">
-                  Le score moyen de l'équipe RH a augmenté de 15% cette semaine.
-                </p>
+        <TabsContent value="engagement" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Métriques d'engagement</CardTitle>
+              <CardDescription>Utilisation des fonctionnalités par les collaborateurs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {analyticsData.userEngagement.map((metric, index) => (
+                  <div key={index} className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">{metric.metric}</h4>
+                      <Badge variant={metric.change > 0 ? "default" : "destructive"}>
+                        {metric.change > 0 ? '+' : ''}{metric.change}%
+                      </Badge>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="flex-1 bg-muted rounded-full h-2 mr-4">
+                        <div 
+                          className="bg-primary h-2 rounded-full transition-all" 
+                          style={{ width: `${metric.value}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-semibold">{metric.value}%</span>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Users className="h-4 w-4 text-blue-600" />
-                  <Badge variant="secondary" className="bg-blue-100">Participation</Badge>
-                </div>
-                <h4 className="font-medium mb-1">Engagement élevé</h4>
-                <p className="text-sm text-muted-foreground">
-                  86% de participation, le plus haut taux depuis 3 mois.
-                </p>
+        <TabsContent value="risks" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Analyse des risques</CardTitle>
+              <CardDescription>Identification des situations nécessitant une attention</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {analyticsData.riskAnalysis.map((risk, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div>
+                        <h4 className="font-medium">{risk.category}</h4>
+                        <p className="text-sm text-muted-foreground">{risk.count} collaborateurs concernés</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">{risk.percentage}%</p>
+                      <p className="text-sm text-muted-foreground">de l'effectif</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <div className="flex items-center space-x-2 mb-2">
-                  <TrendingDown className="h-4 w-4 text-orange-600" />
-                  <Badge variant="secondary" className="bg-orange-100">Attention</Badge>
-                </div>
-                <h4 className="font-medium mb-1">Équipe commerciale</h4>
-                <p className="text-sm text-muted-foreground">
-                  Légère baisse de 2% - pourrait nécessiter un accompagnement.
-                </p>
+              
+              <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <h4 className="font-semibold mb-2">💡 Recommandations</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Organiser des sessions de gestion du stress pour les équipes à risque</li>
+                  <li>• Mettre en place des pauses régulières pour lutter contre la fatigue</li>
+                  <li>• Encourager les activités sociales pour réduire l'isolement</li>
+                  <li>• Surveiller de près les collaborateurs à risque de burnout</li>
+                </ul>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
