@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Music, Scan, Brain, VrHeadset, Users, Settings, Trophy } from 'lucide-react';
+import { Heart, Music, Scan, Brain, Headphones, Users, Settings, Trophy } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -41,7 +41,7 @@ const DashboardPage: React.FC = () => {
     {
       title: 'Réalité Virtuelle',
       description: 'Expériences immersives',
-      icon: VrHeadset,
+      icon: Headphones,
       path: '/b2c/vr',
       color: 'from-red-500 to-rose-500'
     },

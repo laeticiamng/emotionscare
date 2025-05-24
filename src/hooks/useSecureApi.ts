@@ -1,44 +1,44 @@
 
-import { useState } from 'react';
-import { secureApiClient } from '@/lib/security/apiClient';
+import { useCallback } from 'react';
+import { AuthInterceptor } from '@/utils/authInterceptor';
+import { SecureAnalytics } from '@/utils/secureAnalytics';
 
 /**
- * Hook pour utiliser l'API sécurisée
+ * Hook pour effectuer des appels API sécurisés
  */
 export const useSecureApi = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
+  /**
+   * Appel API sécurisé avec gestion d'erreur automatique
+   */
+  const secureCall = useCallback(async (
+    url: string,
+    options: RequestInit = {}
+  ): Promise<Response | null> => {
+    return AuthInterceptor.secureFetch(url, options);
+  }, []);
 
-  const executeRequest = async <T>(
-    request: () => Promise<T>
-  ): Promise<T | null> => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const result = await request();
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-      setError(errorMessage);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  /**
+   * Appel analytics sécurisé (ne bloque jamais l'UI)
+   */
+  const trackEvent = useCallback(async (
+    event: string,
+    data?: any,
+    userId?: string
+  ): Promise<void> => {
+    await SecureAnalytics.trackEvent({ event, data, userId });
+  }, []);
 
-  const analyzeEmotion = (text: string) => {
-    return executeRequest(() => secureApiClient.analyzeEmotion(text));
-  };
-
-  const sendInvitation = (email: string, role: string, organizationId?: string) => {
-    return executeRequest(() => secureApiClient.sendInvitation(email, role, organizationId));
-  };
+  /**
+   * Vérification du statut de session
+   */
+  const checkSession = useCallback(async (): Promise<boolean> => {
+    return AuthInterceptor.checkSessionStatus();
+  }, []);
 
   return {
-    isLoading,
-    error,
-    analyzeEmotion,
-    sendInvitation,
+    secureCall,
+    trackEvent,
+    checkSession,
   };
 };
