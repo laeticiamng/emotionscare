@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 
@@ -8,51 +8,55 @@ interface WelcomeMessageProps {
 }
 
 const welcomeMessages = [
-  "Prenez un moment pour vous reconnecter à vos émotions",
-  "Explorez votre bien-être émotionnel en toute sérénité",
-  "Découvrez une méthode scientifique pour comprendre vos émotions",
-  "Un espace premium pour votre équilibre émotionnel",
-  "Votre parcours vers la sérénité commence ici"
+  "Analysez vos émotions en temps réel avec l'IA",
+  "Découvrez votre coach personnel intelligent",
+  "Explorez la thérapie musicale adaptative",
+  "Transformez votre bien-être émotionnel",
+  "Rejoignez une communauté bienveillante"
 ];
 
 export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({ className = "" }) => {
   const { currentHour } = useTimeOfDay();
-  const [message, setMessage] = useState("");
   
   const [text] = useTypewriter({
     words: [getTimeBasedGreeting(currentHour), ...welcomeMessages],
     loop: 1,
-    delaySpeed: 2000,
-    deleteSpeed: 40,
-    typeSpeed: 40,
+    delaySpeed: 3000,
+    deleteSpeed: 50,
+    typeSpeed: 60,
   });
 
   return (
     <motion.div 
       className={`text-center ${className}`}
-      initial={{ opacity: 0.5 }}
+      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.8, delay: 0.4 }}
     >
-      <span className="block min-h-[4rem]">
-        {text}<Cursor cursorColor="var(--primary)" />
-      </span>
+      <div className="min-h-[3rem] flex items-center justify-center">
+        <motion.span 
+          className="text-lg md:text-xl font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          {text}
+          <Cursor cursorStyle="✨" />
+        </motion.span>
+      </div>
     </motion.div>
   );
 };
 
-// Helper to get time-based greetings
 function getTimeBasedGreeting(hour: number): string {
   if (hour >= 5 && hour < 12) {
-    return "Bonjour et bienvenue sur votre espace bien-être";
+    return "Bonjour ! Commencez votre journée en beauté";
   } else if (hour >= 12 && hour < 18) {
-    return "Bon après-midi et bienvenue sur votre espace bien-être";
+    return "Bon après-midi ! Prenez soin de vous";
   } else {
-    return "Bonsoir et bienvenue sur votre espace bien-être";
+    return "Bonsoir ! Un moment pour vous ressourcer";
   }
 }
 
-// Hook to get current time of day
 function useTimeOfDay() {
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   

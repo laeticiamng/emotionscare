@@ -10,7 +10,6 @@ interface AnimatedBackgroundProps {
 const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ mood, timeOfDay = 'morning' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Effect for drawing the background animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -18,7 +17,6 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ mood, timeOfDay
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Set canvas dimensions
     const setCanvasDimensions = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -27,106 +25,121 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ mood, timeOfDay
     setCanvasDimensions();
     window.addEventListener('resize', setCanvasDimensions);
     
-    // Get colors based on mood and time of day
     const getColors = () => {
       if (mood === 'calm') {
-        return ['rgba(191, 219, 254, 0.3)', 'rgba(147, 197, 253, 0.3)', 'rgba(96, 165, 250, 0.2)'];
+        return ['rgba(59, 130, 246, 0.1)', 'rgba(147, 197, 253, 0.15)', 'rgba(96, 165, 250, 0.1)'];
       } else if (mood === 'energetic') {
-        return ['rgba(254, 215, 170, 0.3)', 'rgba(253, 186, 116, 0.3)', 'rgba(251, 146, 60, 0.2)'];
-      } else if (mood === 'creative') {
-        return ['rgba(216, 180, 254, 0.3)', 'rgba(196, 181, 253, 0.3)', 'rgba(167, 139, 250, 0.2)'];
+        return ['rgba(251, 146, 60, 0.1)', 'rgba(253, 186, 116, 0.15)', 'rgba(254, 215, 170, 0.1)'];
       } else {
-        // Default based on time of day
-        switch(timeOfDay) {
-          case 'morning':
-            return ['rgba(254, 249, 195, 0.3)', 'rgba(253, 224, 71, 0.2)', 'rgba(250, 204, 21, 0.1)'];
-          case 'afternoon':
-            return ['rgba(191, 219, 254, 0.3)', 'rgba(147, 197, 253, 0.2)', 'rgba(96, 165, 250, 0.1)'];
-          case 'evening':
-            return ['rgba(165, 180, 252, 0.3)', 'rgba(129, 140, 248, 0.2)', 'rgba(99, 102, 241, 0.1)'];
-          default:
-            return ['rgba(191, 219, 254, 0.3)', 'rgba(147, 197, 253, 0.2)', 'rgba(96, 165, 250, 0.1)'];
-        }
+        return ['rgba(139, 92, 246, 0.1)', 'rgba(196, 181, 253, 0.15)', 'rgba(167, 139, 250, 0.1)'];
       }
     };
     
     const colors = getColors();
     
-    // Create particles
-    class Particle {
+    class FloatingOrb {
       x: number;
       y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
+      radius: number;
+      vx: number;
+      vy: number;
       color: string;
+      opacity: number;
       
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 15 + 5;
-        this.speedX = Math.random() * 3 - 1.5;
-        this.speedY = Math.random() * 3 - 1.5;
+        this.radius = Math.random() * 60 + 20;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
         this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.opacity = Math.random() * 0.5 + 0.1;
       }
       
       update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
+        this.x += this.vx;
+        this.y += this.vy;
         
-        if (this.x > canvas.width) this.x = 0;
-        else if (this.x < 0) this.x = canvas.width;
-        
-        if (this.y > canvas.height) this.y = 0;
-        else if (this.y < 0) this.y = canvas.height;
+        if (this.x < -this.radius) this.x = canvas.width + this.radius;
+        if (this.x > canvas.width + this.radius) this.x = -this.radius;
+        if (this.y < -this.radius) this.y = canvas.height + this.radius;
+        if (this.y > canvas.height + this.radius) this.y = -this.radius;
       }
       
       draw() {
+        const gradient = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, this.radius
+        );
+        gradient.addColorStop(0, this.color);
+        gradient.addColorStop(1, 'transparent');
+        
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
+        ctx.globalAlpha = 1;
       }
     }
     
-    // Create particle array
-    const particleCount = 20;
-    const particles: Particle[] = [];
-    
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
+    const orbs: FloatingOrb[] = [];
+    for (let i = 0; i < 8; i++) {
+      orbs.push(new FloatingOrb());
     }
     
-    // Animation loop
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw and update each particle
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-      }
+      orbs.forEach(orb => {
+        orb.update();
+        orb.draw();
+      });
       
       requestAnimationFrame(animate);
     };
     
     animate();
     
-    // Cleanup
     return () => {
       window.removeEventListener('resize', setCanvasDimensions);
     };
   }, [mood, timeOfDay]);
   
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      className="absolute inset-0 -z-10 overflow-hidden"
-    >
-      <canvas ref={canvasRef} className="absolute inset-0" />
-    </motion.div>
+    <>
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 -z-10" 
+        style={{ filter: 'blur(0.5px)' }}
+      />
+      
+      {/* Floating elements */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-64 h-64 rounded-full opacity-20"
+            style={{
+              background: `linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1))`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              x: [0, 30, 0],
+              y: [0, -30, 0],
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 10 + Math.random() * 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 2,
+            }}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
