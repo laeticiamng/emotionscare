@@ -2,84 +2,71 @@
 #!/usr/bin/env node
 
 /**
- * Complete reset and installation script
- * Cleans everything and starts fresh
+ * Script de reset complet et installation propre
  */
 
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔄 Starting complete reset and installation...');
+console.log('🔄 Reset complet et installation propre...');
 
-// Step 1: Clean up existing installations
-console.log('🧹 Cleaning up existing files...');
+// Nettoyer complètement
 try {
+  console.log('🧹 Suppression des fichiers...');
   if (fs.existsSync('node_modules')) {
-    console.log('  - Removing node_modules...');
-    if (process.platform === 'win32') {
-      execSync('rmdir /s /q node_modules', { stdio: 'inherit' });
-    } else {
-      execSync('rm -rf node_modules', { stdio: 'inherit' });
-    }
+    execSync('rm -rf node_modules', { stdio: 'inherit' });
   }
-  
   if (fs.existsSync('package-lock.json')) {
-    console.log('  - Removing package-lock.json...');
     fs.unlinkSync('package-lock.json');
   }
-  
   if (fs.existsSync('bun.lockb')) {
-    console.log('  - Removing bun.lockb...');
     fs.unlinkSync('bun.lockb');
   }
 } catch (error) {
-  console.log('⚠️ Some cleanup failed, continuing anyway...');
+  console.log('⚠️ Erreur de nettoyage, continuons...');
 }
 
-// Step 2: Set environment variables
-console.log('⚙️ Setting up environment...');
+// Variables d'environnement optimisées
 process.env.CYPRESS_INSTALL_BINARY = '0';
 process.env.HUSKY_SKIP_INSTALL = '1';
 process.env.PUPPETEER_SKIP_DOWNLOAD = '1';
 process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 
-// Step 3: Create optimized .npmrc
-console.log('📝 Creating optimized .npmrc...');
-const npmrcContent = `
+// .npmrc optimisé
+const npmrc = `
 cypress_install_binary=0
 husky_skip_install=1
 puppeteer_skip_download=1
 prefer-offline=true
 fund=false
 audit=false
+loglevel=error
+progress=false
 legacy-peer-deps=true
 network-timeout=60000
+fetch-retry-mintimeout=10000
+fetch-retry-maxtimeout=30000
 fetch-retries=3
 `;
 
-fs.writeFileSync('.npmrc', npmrcContent.trim());
+fs.writeFileSync('.npmrc', npmrc.trim());
 
-// Step 4: Clear npm cache
-console.log('🗑️ Clearing npm cache...');
 try {
-  execSync('npm cache clean --force', { stdio: 'inherit' });
-} catch (error) {
-  console.log('⚠️ Cache clean failed, continuing...');
-}
-
-// Step 5: Install dependencies
-console.log('📦 Installing dependencies with npm...');
-try {
+  console.log('📦 Installation npm avec timeout court...');
   execSync('npm install --prefer-offline --no-audit --no-fund --legacy-peer-deps', {
     stdio: 'inherit',
-    timeout: 300000 // 5 minutes
+    timeout: 120000, // 2 minutes max
+    env: { ...process.env }
   });
   
-  console.log('✅ Installation completed successfully!');
-  console.log('🚀 You can now run: npm run dev');
+  console.log('✅ Reset et installation réussis !');
+  console.log('🚀 Vous pouvez maintenant lancer: npm run dev');
+  
 } catch (error) {
-  console.error('❌ Installation failed:', error.message);
-  console.log('\n💡 Try running: node scripts/emergency-install.js');
-  process.exit(1);
+  console.error('❌ Installation échouée:', error.message);
+  console.log('\n💡 Solutions alternatives:');
+  console.log('1. Vérifiez votre connexion internet');
+  console.log('2. Essayez: yarn install');
+  console.log('3. Contactez le support si le problème persiste');
 }
