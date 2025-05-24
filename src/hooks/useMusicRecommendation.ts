@@ -1,104 +1,139 @@
 
-import { useState } from 'react';
-import { useMusic } from '@/contexts';
+import { useState, useEffect, useCallback } from 'react';
+import { useMusic } from '@/hooks/useMusic';
+import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
-export function useMusicRecommendation() {
-  const { 
-    loadPlaylistForEmotion, 
-    playTrack,
-    currentTrack, 
-    playlist,
-    setOpenDrawer 
-  } = useMusic();
+export const EMOTION_TO_MUSIC: Record<string, string> = {
+  joy: 'upbeat',
+  happy: 'upbeat',
+  calm: 'ambient',
+  relaxed: 'ambient',
+  anxious: 'calming',
+  stressed: 'calming',
+  sad: 'gentle',
+  melancholic: 'gentle',
+  energetic: 'dance',
+  excited: 'dance',
+  neutral: 'focus',
+};
+
+export interface UseMusicRecommendationOptions {
+  autoActivate?: boolean;
+  defaultEmotion?: string;
+  intensity?: number;
+}
+
+export function useMusicRecommendation(options: UseMusicRecommendationOptions = {}) {
+  const { autoActivate = false, defaultEmotion, intensity = 0.5 } = options;
+  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(defaultEmotion || null);
+  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
+  const { loadPlaylistForEmotion, playTrack } = useMusic();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-
-  const getRecommendationForEmotion = async (emotion: string, intensity?: number) => {
-    setLoading(true);
-    try {
-      // Vérifions si loadPlaylistForEmotion existe et l'utilisons
-      if (typeof loadPlaylistForEmotion === 'function') {
-        const result = await loadPlaylistForEmotion({ emotion, intensity });
-        setLoading(false);
-        return result;
-      } else {
-        console.warn('loadPlaylistForEmotion n\'est pas disponible');
-        setLoading(false);
-        return null;
-      }
-    } catch (error) {
-      console.error('Error getting music recommendation:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de récupérer les recommandations musicales',
-        variant: 'destructive',
-      });
-      setLoading(false);
-      return null;
+  
+  useEffect(() => {
+    if (autoActivate && currentEmotion) {
+      loadRecommendations(currentEmotion);
     }
-  };
-
-  const playEmotionMusic = async (emotion: string, intensity?: number) => {
-    setLoading(true);
+  }, [currentEmotion, autoActivate]);
+  
+  const loadRecommendations = useCallback(async (emotion: string) => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      // Vérifions si loadPlaylistForEmotion existe et l'utilisons
-      if (typeof loadPlaylistForEmotion === 'function') {
-        const params = { emotion, intensity: intensity || 0.5 };
-        const recommendedPlaylist = await loadPlaylistForEmotion(params);
+      const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
+      const params: EmotionMusicParams = { 
+        emotion: musicType,
+        intensity 
+      };
+      
+      if (loadPlaylistForEmotion) {
+        const result = await loadPlaylistForEmotion(params);
         
-        // Check if recommendedPlaylist is available and has tracks
-        if (recommendedPlaylist && Array.isArray(recommendedPlaylist.tracks) && recommendedPlaylist.tracks.length > 0) {
-          // Si playTrack est disponible, jouons la première piste
-          if (typeof playTrack === 'function') {
-            playTrack(recommendedPlaylist.tracks[0]);
-          }
+        if (result && result.tracks) {
+          const tracksWithRequiredProps = result.tracks.map(track => ({
+            ...track,
+            url: track.url || track.audioUrl || '',
+            duration: track.duration || 0
+          }));
           
-          // Si setOpenDrawer est disponible, ouvrons le drawer
-          if (typeof setOpenDrawer === 'function') {
-            setOpenDrawer(true);
-          }
-          
-          toast({
-            title: 'Musique activée',
-            description: `Lecture d'une playlist adaptée à votre émotion: ${emotion}`,
-            variant: 'default',
-          });
-          
-          setLoading(false);
-          return true;
+          setRecommendedTracks(tracksWithRequiredProps);
+          setPlaylist(result);
         } else {
-          toast({
-            title: 'Aucune musique disponible',
-            description: `Aucune piste disponible pour l'émotion: ${emotion}`,
-            variant: 'warning',
-          });
-          setLoading(false);
-          return false;
+          setRecommendedTracks([]);
+          setPlaylist(null);
         }
-      } else {
-        console.warn('loadPlaylistForEmotion n\'est pas disponible');
-        setLoading(false);
-        return false;
       }
-    } catch (error) {
-      console.error('Error playing emotion music:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de jouer la musique',
-        variant: 'destructive',
-      });
-      setLoading(false);
-      return false;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error loading music recommendations';
+      setError(new Error(errorMessage));
+      console.error('Error loading music recommendations:', err);
+      setRecommendedTracks([]);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
+  }, [loadPlaylistForEmotion, intensity]);
+  
+  const updateEmotion = useCallback(async (emotion: string, activate = false) => {
+    setCurrentEmotion(emotion);
+    if (activate) {
+      return await loadRecommendations(emotion);
+    }
+    return null;
+  }, [loadRecommendations]);
+  
+  const playRecommendedTrack = useCallback((track: MusicTrack) => {
+    if (track && playTrack) {
+      playTrack({
+        ...track,
+        url: track.url || track.audioUrl || '',
+        duration: track.duration || 0
+      });
+      
+      toast({
+        title: "Lecture en cours",
+        description: `${track.title} - ${track.artist}`,
+        duration: 2000
+      });
+    }
+  }, [playTrack, toast]);
+  
+  const playFirstRecommendation = useCallback(() => {
+    if (recommendedTracks.length > 0) {
+      playRecommendedTrack(recommendedTracks[0]);
+      return true;
+    }
+    return false;
+  }, [recommendedTracks, playRecommendedTrack]);
+  
+  const handlePlayMusic = useCallback(async (emotion: string) => {
+    await updateEmotion(emotion, true);
+    return playFirstRecommendation();
+  }, [updateEmotion, playFirstRecommendation]);
+  
   return {
-    getRecommendationForEmotion,
-    playEmotionMusic,
-    currentPlaylist: playlist,
-    isLoading: loading
+    // État
+    recommendedTracks,
+    currentEmotion,
+    playlist,
+    isLoading,
+    error,
+    tracks: playlist ? playlist.tracks : [],
+    
+    // Actions
+    updateEmotion,
+    loadRecommendations,
+    playRecommendedTrack,
+    playFirstRecommendation,
+    handlePlayMusic,
+    
+    // Constantes
+    EMOTION_TO_MUSIC
   };
 }
 

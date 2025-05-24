@@ -1,10 +1,41 @@
 
-// Réexporter les types audio comme types musique pour compatibilité
-export type {
-  AudioTrack as MusicTrack,
-  AudioPlaylist as MusicPlaylist
-} from './audio';
+// Types unifiés pour l'audio et la musique
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  album?: string;
+  genre?: string;
+  year?: number;
+  duration: number;
+  url: string;
+  audioUrl?: string;
+  coverUrl?: string;
+  artworkUrl?: string;
+  cover?: string;
+  description?: string;
+  summary?: string;
+  category?: string;
+  mood?: string;
+  emotion?: string;
+  tags?: string[];
+  source?: string;
+}
 
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  title?: string;
+  tracks: MusicTrack[];
+  description?: string;
+  thumbnailUrl?: string;
+  coverUrl?: string;
+  category?: string;
+  emotion?: string;
+  mood?: string;
+}
+
+// Types pour les paramètres émotionnels
 export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
@@ -22,12 +53,13 @@ export interface MusicGenerationResult {
   status: 'generated' | 'processing' | 'error';
 }
 
+// Interface principale du contexte musical
 export interface MusicContextType {
-  currentTrack?: AudioTrack | null;
+  currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
-  playlist?: AudioPlaylist | null;
-  tracks?: AudioTrack[];
-  playTrack?: (track: AudioTrack) => void;
+  playlist?: MusicPlaylist | null;
+  tracks?: MusicTrack[];
+  playTrack?: (track: MusicTrack) => void;
   pauseTrack?: () => void;
   resumeTrack?: () => void;
   nextTrack?: () => void;
@@ -39,15 +71,19 @@ export interface MusicContextType {
   duration?: number;
   currentTime?: number;
   progress?: number;
-  playlists?: AudioPlaylist[];
-  loadPlaylist?: (id: string) => void | Promise<AudioPlaylist | null>;
-  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<AudioPlaylist | null>;
+  playlists?: MusicPlaylist[];
+  loadPlaylist?: (id: string) => void | Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
   setOpenDrawer?: (open: boolean) => void;
   isOpenDrawer?: boolean;
-  play?: (track?: AudioTrack) => void;
+  play?: (track?: MusicTrack) => void;
   pause?: () => void;
   resume?: () => void;
   togglePlay?: () => void;
   next?: () => void;
   previous?: () => void;
 }
+
+// Réexporter pour compatibilité descendante
+export type AudioTrack = MusicTrack;
+export type AudioPlaylist = MusicPlaylist;

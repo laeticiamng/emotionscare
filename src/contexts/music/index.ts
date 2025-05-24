@@ -1,4 +1,4 @@
 
-export { useMusic, MusicProvider } from '../MusicContext';
-export { MusicContext } from '../MusicContext';
+// Réexporter depuis le contexte principal pour maintenir la compatibilité
+export { useMusic, MusicProvider, MusicContext } from '../MusicContext';
 export default useMusic;
