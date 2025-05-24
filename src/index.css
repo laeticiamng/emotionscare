@@ -76,11 +76,6 @@
     --background-rgb: 15, 23, 42;
     --muted-rgb: 30, 41, 59;
   }
-
-  /* Mobile-first responsive breakpoints */
-  @screen xs {
-    /* Extra small devices (phones, 475px and up) */
-  }
 }
 
 @layer base {

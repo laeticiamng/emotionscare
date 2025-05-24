@@ -3,10 +3,11 @@
 module.exports = {
   darkMode: ["class"],
   content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
   ],
   theme: {
     container: {
@@ -17,6 +18,19 @@ module.exports = {
       },
     },
     extend: {
+      screens: {
+        'xs': '475px',
+        'xxs': '320px',
+      },
+      fontSize: {
+        'xxs': ['0.625rem', { lineHeight: '0.75rem' }],
+      },
+      spacing: {
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-left': 'env(safe-area-inset-left)',
+        'safe-right': 'env(safe-area-inset-right)',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -88,7 +102,15 @@ module.exports = {
         "slide-down": {
           "0%": { transform: "translateY(-10px)", opacity: 0 },
           "100%": { transform: "translateY(0)", opacity: 1 }
-        }
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        pulse: {
+          "0%, 100%": { opacity: 1, transform: "scale(1)" },
+          "50%": { opacity: 0.7, transform: "scale(0.95)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -97,9 +119,21 @@ module.exports = {
         "waveform": "waveform 1.2s infinite ease-in-out",
         "pulse-subtle": "pulse-subtle 2s infinite ease-in-out",
         "slide-up": "slide-up 0.2s ease-out",
-        "slide-down": "slide-down 0.2s ease-out"
+        "slide-down": "slide-down 0.2s ease-out",
+        "float": "float 6s ease-in-out infinite",
+        "pulse": "pulse 4s ease-in-out infinite",
+      },
+      boxShadow: {
+        'premium-light': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'premium-dark': '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+        'premium-pastel': '0 10px 25px -5px rgba(100, 125, 211, 0.2), 0 10px 10px -5px rgba(100, 125, 211, 0.1)',
+      },
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate")
+  ],
 }
