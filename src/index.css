@@ -76,14 +76,46 @@
     --background-rgb: 15, 23, 42;
     --muted-rgb: 30, 41, 59;
   }
+
+  /* Mobile-first responsive breakpoints */
+  @screen xs {
+    /* Extra small devices (phones, 475px and up) */
+  }
 }
 
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
+  
+  html {
+    overflow-x: hidden;
+    font-size: 16px;
+  }
+  
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+
+  /* Prevent horizontal overflow globally */
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Text overflow prevention */
+  .text-safe {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
   }
 }
 
@@ -91,5 +123,62 @@
 @layer base {
   :focus-visible {
     @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+}
+
+/* Mobile text scaling improvements */
+@layer utilities {
+  .text-responsive {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
+  }
+
+  /* Extra small breakpoint for very small phones */
+  @media (max-width: 374px) {
+    .text-xs { font-size: 0.65rem; }
+    .text-sm { font-size: 0.75rem; }
+    .text-base { font-size: 0.8rem; }
+    .text-lg { font-size: 0.9rem; }
+    .text-xl { font-size: 1rem; }
+  }
+
+  /* Small phones */
+  @media (min-width: 375px) and (max-width: 479px) {
+    .text-xs { font-size: 0.7rem; }
+    .text-sm { font-size: 0.8rem; }
+    .text-base { font-size: 0.85rem; }
+    .text-lg { font-size: 0.95rem; }
+    .text-xl { font-size: 1.1rem; }
+  }
+
+  /* Container adjustments for very small screens */
+  @media (max-width: 374px) {
+    .container-mobile {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+  }
+}
+
+/* Enhanced mobile styles for buttons and interactive elements */
+@layer components {
+  .btn-mobile-safe {
+    min-height: 44px; /* iOS minimum touch target */
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  @media (max-width: 479px) {
+    .btn-mobile-safe {
+      min-height: 40px;
+      padding: 0.625rem 0.75rem;
+      font-size: 0.8rem;
+    }
   }
 }

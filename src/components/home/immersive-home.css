@@ -23,14 +23,30 @@
   line-height: 1.1;
   word-break: keep-all;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Responsive font sizes for mobile */
-@media (max-width: 640px) {
+@media (max-width: 480px) {
   .immersive-title {
-    font-size: clamp(1.5rem, 8vw, 2.5rem) !important;
+    font-size: clamp(1.2rem, 6vw, 1.8rem) !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 0.5rem;
+    white-space: normal;
+    word-break: break-word;
+    hyphens: auto;
+    padding: 0 0.5rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+  .immersive-title {
+    font-size: clamp(1.5rem, 7vw, 2.2rem) !important;
     letter-spacing: 0.01em;
     margin-bottom: 1rem;
+    padding: 0 1rem;
   }
 }
 
@@ -58,6 +74,10 @@
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.2s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .premium-button:hover {
@@ -70,7 +90,17 @@
 }
 
 /* Media queries for responsive design */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+  .premium-button {
+    font-size: 0.8rem;
+    padding: 0.75rem 1rem;
+    white-space: normal;
+    line-height: 1.2;
+    min-height: 2.5rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
   .premium-button {
     font-size: 0.9rem;
     padding: 0.875rem 1.5rem;
@@ -80,6 +110,7 @@
 /* Background gradient for the page */
 .immersive-bg {
   background: linear-gradient(120deg, #e7ebf8 0%, #f7f9fc 100%);
+  overflow-x: hidden;
 }
 
 /* Dark mode support */
@@ -92,5 +123,29 @@
   
   .immersive-bg {
     background: linear-gradient(120deg, #0f1729 0%, #1a2033 100%);
+  }
+}
+
+/* Prevent text overflow globally */
+.text-responsive {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+/* Container responsive */
+.container-mobile {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (max-width: 480px) {
+  .container-mobile {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }

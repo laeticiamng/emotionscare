@@ -33,9 +33,14 @@ export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({ className = "" }
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.4 }}
     >
-      <div className="min-h-[4rem] sm:min-h-[3rem] flex items-center justify-center px-4">
+      <div className="min-h-[3rem] xs:min-h-[3.5rem] sm:min-h-[4rem] flex items-center justify-center px-2 sm:px-4">
         <motion.span 
-          className="text-base sm:text-lg md:text-xl font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center leading-relaxed"
+          className="text-responsive text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center leading-relaxed max-w-full overflow-hidden"
+          style={{ 
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            hyphens: 'auto'
+          }}
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
