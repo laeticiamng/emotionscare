@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,8 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EmotionsCare | ResiMax™</title>
     <meta name="description" content="Plateforme de bien-être émotionnel en entreprise" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="EmotionsCare" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+    
     <!-- Inter font (SF Pro alternative) -->
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    
     <!-- Font feature settings for premium typography -->
     <style>
       :root {
@@ -17,7 +32,32 @@
       @supports (font-variation-settings: normal) {
         :root { font-family: 'Inter var', sans-serif; }
       }
+      
+      /* Fix pour supprimer les éléments dupliqués */
+      header:nth-of-type(2),
+      .header-duplicate,
+      footer:nth-of-type(2),
+      .footer-duplicate {
+        display: none !important;
+      }
+      
+      /* Optimisations pour les animations fluides */
+      * {
+        scroll-behavior: smooth;
+      }
+      
+      /* Respect des préférences d'animation réduites */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
+    
     <!-- Preload critical resources -->
     <link rel="preconnect" href="https://rsms.me">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,5 +67,61 @@
     <!-- Required Lovable script tag for new features -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Script pour supprimer les doublons -->
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        // Supprimer les en-têtes et pieds de page dupliqués
+        const headers = document.querySelectorAll('header');
+        if (headers.length > 1) {
+          for (let i = 1; i < headers.length; i++) {
+            headers[i].remove();
+          }
+        }
+        
+        const navBars = document.querySelectorAll('nav.fixed');
+        if (navBars.length > 1) {
+          for (let i = 1; i < navBars.length; i++) {
+            navBars[i].remove();
+          }
+        }
+        
+        const footers = document.querySelectorAll('footer');
+        if (footers.length > 1) {
+          for (let i = 1; i < footers.length; i++) {
+            footers[i].remove();
+          }
+        }
+        
+        // Script amélioré pour les doublons internes
+        const internalHeaders = document.querySelectorAll('#root .internal-header, #root nav.fixed');
+        if (internalHeaders.length > 1) {
+          Array.from(internalHeaders).slice(1).forEach(el => el.remove());
+        }
+        
+        const internalFooters = document.querySelectorAll('#root .internal-footer, #root footer');
+        if (internalFooters.length > 1) {
+          Array.from(internalFooters).slice(1).forEach(el => el.remove());
+        }
+        
+        console.log('Vérification et suppression des éléments dupliqués effectuées');
+      });
+      
+      // Script supplémentaire après chargement complet de la page
+      window.addEventListener('load', () => {
+        // Seconde vérification après chargement complet
+        setTimeout(() => {
+          // Re-vérifier les doublons qui pourraient être injectés au scroll
+          const navBars = document.querySelectorAll('nav.fixed');
+          if (navBars.length > 1) {
+            for (let i = 1; i < navBars.length; i++) {
+              navBars[i].remove();
+            }
+          }
+          
+          console.log('Seconde vérification effectuée');
+        }, 1000);
+      });
+    </script>
   </body>
 </html>

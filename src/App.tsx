@@ -5,13 +5,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MusicProvider } from "@/contexts/MusicContext";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import Home from "./Home";
 import { PageLoadingFallback } from "@/components/ui/loading-fallback";
 import { MeditationPage } from "@/utils/lazyRoutes";
 import EnhancedErrorBoundary from "@/components/ui/enhanced-error-boundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import SecurityProvider from "@/components/security/SecurityProvider";
+import { initServiceWorker } from "@/services/serviceWorker";
+import { usePushNotifications } from "@/services/pushNotifications";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +24,27 @@ const queryClient = new QueryClient({
   },
 });
 
+// Composant pour initialiser les services UX
+const UXServicesInitializer: React.FC = () => {
+  const { requestPermission } = usePushNotifications();
+
+  useEffect(() => {
+    // Initialiser le service worker
+    initServiceWorker().catch(console.error);
+
+    // Demander les permissions de notification après un délai
+    const timer = setTimeout(() => {
+      if ('Notification' in window && Notification.permission === 'default') {
+        requestPermission().catch(console.error);
+      }
+    }, 5000); // Délai de 5 secondes pour ne pas être intrusif
+
+    return () => clearTimeout(timer);
+  }, [requestPermission]);
+
+  return null;
+};
+
 function App() {
   return (
     <SecurityProvider>
@@ -29,6 +52,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <MusicProvider>
+              <UXServicesInitializer />
               <SkipToContent />
               <Toaster />
               <Sonner />
@@ -59,3 +83,4 @@ function App() {
 }
 
 export default App;
+
