@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 interface AppProvidersProps {
@@ -9,11 +8,9 @@ interface AppProvidersProps {
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        {children}
-      </AuthProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      {children}
+    </AuthProvider>
   );
 };
 
