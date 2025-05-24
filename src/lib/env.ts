@@ -3,51 +3,30 @@
  * Centralized environment variables management
  */
 
-// Supabase configuration
-export const SUPABASE_URL = 
-  import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 
-  import.meta.env.VITE_SUPABASE_URL || 
-  'https://placeholder-supabase-url.supabase.co';
-
-export const SUPABASE_ANON_KEY = 
-  import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 
-  import.meta.env.VITE_SUPABASE_ANON_KEY || 
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder-key-for-development';
+// Supabase configuration - using actual project values
+export const SUPABASE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
 
 // API URLs
 export const API_URL = 
-  import.meta.env.NEXT_PUBLIC_API_URL || 
   import.meta.env.VITE_PUBLIC_API_URL || 
   'https://api.example.com';
 
 export const WEB_URL = 
-  import.meta.env.NEXT_PUBLIC_WEB_URL || 
   import.meta.env.VITE_PUBLIC_WEB_URL || 
   'http://localhost:3000';
 
 // Environment
 export const APP_ENV = 
-  import.meta.env.NEXT_PUBLIC_APP_ENV || 
   import.meta.env.MODE || 
   'development';
 
-// OpenAI and other API keys
-export const OPENAI_API_KEY = 
-  import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY || 
-  import.meta.env.VITE_OPENAI_API_KEY || 
-  '';
+// API keys - these will be empty in frontend and should be used in edge functions
+export const OPENAI_API_KEY = '';
+export const HUME_API_KEY = '';
+export const MUSICGEN_API_KEY = '';
 
-export const HUME_API_KEY = 
-  import.meta.env.NEXT_PUBLIC_HUME_API_KEY || 
-  import.meta.env.VITE_HUME_API_KEY || 
-  '';
-
-export const MUSICGEN_API_KEY = 
-  import.meta.env.NEXT_PUBLIC_MUSICGEN_API_KEY || 
-  import.meta.env.VITE_MUSICGEN_API_KEY || 
-  '';
-
-// Firebase configuration
+// Firebase configuration - optional for this project
 export const FIREBASE_CONFIG = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
@@ -61,19 +40,8 @@ export const FIREBASE_CONFIG = {
 // Check if essential environment variables are set in development mode
 export const checkEnvVars = () => {
   if (APP_ENV === 'development') {
-    const requiredVars: Record<string, string> = {
-      'SUPABASE_URL': SUPABASE_URL,
-      'SUPABASE_ANON_KEY': SUPABASE_ANON_KEY,
-      'API_URL': API_URL
-    };
-
-    const missingVars = Object.entries(requiredVars)
-      .filter(([_, value]) => value === '' || value.includes('placeholder'))
-      .map(([key]) => key);
-
-    if (missingVars.length > 0) {
-      console.warn(`Environment variables missing or using placeholder values: ${missingVars.join(', ')}`);
-    }
+    console.log('✅ Supabase configured with project values');
+    console.log('📍 Project URL:', SUPABASE_URL);
   }
 };
 
