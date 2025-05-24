@@ -1,106 +1,135 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Heart, Brain, Music, MessageSquare, Calendar, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Brain, Heart, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-const B2CDashboardPage: React.FC = () => {
+const DashboardPage: React.FC = () => {
+  const modules = [
+    { icon: <Brain className="h-6 w-6" />, title: "Scanner d'émotions", description: "Analysez votre état émotionnel", color: "text-blue-500" },
+    { icon: <MessageSquare className="h-6 w-6" />, title: "Coach IA", description: "Accompagnement personnalisé", color: "text-green-500" },
+    { icon: <Music className="h-6 w-6" />, title: "Musique thérapeutique", description: "Sons adaptés à votre humeur", color: "text-purple-500" },
+    { icon: <Calendar className="h-6 w-6" />, title: "Journal émotionnel", description: "Suivez votre évolution", color: "text-orange-500" }
+  ];
+
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Tableau de Bord</h1>
-        <p className="text-muted-foreground">Bienvenue sur votre espace personnel</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Scan Émotionnel</CardTitle>
-            <Brain className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Démarrer un scan
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Musicothérapie</CardTitle>
-            <Music className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Écouter
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Coach IA</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Discuter
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Communauté</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Explorer
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Votre humeur aujourd'hui</CardTitle>
-            <CardDescription>Suivez votre évolution émotionnelle</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Aucune donnée aujourd'hui</p>
-              <Button className="mt-4">Faire un scan émotionnel</Button>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 p-6">
+      <div className="container mx-auto max-w-6xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-3">
+                <Heart className="h-8 w-8 text-pink-500" />
+                Tableau de bord personnel
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
+                Bienvenue dans votre espace de bien-être émotionnel
+              </p>
             </div>
-          </CardContent>
-        </Card>
+            <Badge variant="secondary" className="px-3 py-1">
+              Version Démo
+            </Badge>
+          </div>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Activités recommandées</CardTitle>
-            <CardDescription>Basées sur votre profil émotionnel</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span>Méditation guidée</span>
-                <Button size="sm" variant="outline">Commencer</Button>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span>Playlist relaxante</span>
-                <Button size="sm" variant="outline">Écouter</Button>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span>Exercice de respiration</span>
-                <Button size="sm" variant="outline">Pratiquer</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100">Humeur du jour</p>
+                    <p className="text-2xl font-bold">Positive</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-blue-100" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-300">Sessions cette semaine</p>
+                    <p className="text-2xl font-bold">7</p>
+                  </div>
+                  <Calendar className="h-8 w-8 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-300">Progression</p>
+                    <p className="text-2xl font-bold">85%</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-purple-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <h2 className="text-2xl font-bold mb-6">Vos modules</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {modules.map((module, index) => (
+              <motion.div
+                key={module.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardHeader>
+                    <div className={`${module.color} mb-2`}>
+                      {module.icon}
+                    </div>
+                    <CardTitle className="text-lg">{module.title}</CardTitle>
+                    <CardDescription>{module.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Accéder
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
 };
 
-export default B2CDashboardPage;
+export default DashboardPage;

@@ -1,304 +1,250 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, Brain, Music, Headphones, MessageSquare, Sparkles, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Users, Clock, Zap, ArrowRight, Brain, Building2, ChevronDown } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import PhilosophySection from '@/components/home/PhilosophySection';
+import { useAuth } from '@/contexts/AuthContext';
+import { CURRENT_ROUTES } from '@/utils/routeUtils';
+import { DEFAULT_GREETINGS, TimeOfDay } from '@/constants/defaults';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
-  const [activePhilosophy, setActivePhilosophy] = useState<number | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  const { user } = useAuth();
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [greeting, setGreeting] = useState('');
 
-  const philosophyPillars = [
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now);
+      
+      const hour = now.getHours();
+      let timeOfDay: TimeOfDay;
+      
+      if (hour < 12) timeOfDay = TimeOfDay.MORNING;
+      else if (hour < 17) timeOfDay = TimeOfDay.AFTERNOON;
+      else if (hour < 22) timeOfDay = TimeOfDay.EVENING;
+      else timeOfDay = TimeOfDay.NIGHT;
+      
+      setGreeting(DEFAULT_GREETINGS[timeOfDay]);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const features = [
     {
-      icon: Heart,
-      title: "La parenthèse personnelle",
-      description: "Chaque individu mérite un moment de pause, un espace sacré pour se reconnecter à soi-même.",
-      color: "text-pink-500",
-      bgColor: "bg-pink-50 dark:bg-pink-950"
+      icon: <Brain className="h-8 w-8 text-blue-500" />,
+      title: "Scanner d'émotions IA",
+      description: "Analysez vos émotions en temps réel avec notre technologie avancée",
+      color: "bg-blue-50 dark:bg-blue-950/20"
     },
     {
-      icon: Users,
-      title: "L'énergie partagée",
-      description: "Dans le collectif naît une force nouvelle, une synergie qui élève chacun vers le meilleur de lui-même.",
-      color: "text-purple-500",
-      bgColor: "bg-purple-50 dark:bg-purple-950"
+      icon: <MessageSquare className="h-8 w-8 text-green-500" />,
+      title: "Coach émotionnel",
+      description: "Bénéficiez d'un accompagnement personnalisé 24h/24",
+      color: "bg-green-50 dark:bg-green-950/20"
     },
     {
-      icon: Clock,
-      title: "Le temps comme luxe",
-      description: "Redéfinir le temps non comme une contrainte mais comme un cadeau précieux à s'offrir.",
-      color: "text-blue-500",
-      bgColor: "bg-blue-50 dark:bg-blue-950"
+      icon: <Music className="h-8 w-8 text-purple-500" />,
+      title: "Musique thérapeutique",
+      description: "Découvrez des compositions adaptées à votre humeur",
+      color: "bg-purple-50 dark:bg-purple-950/20"
     },
     {
-      icon: Zap,
-      title: "L'essentiel révélé",
-      description: "Dans le partage d'énergie positive, l'essentiel émerge naturellement, authentiquement.",
-      color: "text-amber-500",
-      bgColor: "bg-amber-50 dark:bg-amber-950"
+      icon: <Headphones className="h-8 w-8 text-orange-500" />,
+      title: "Expériences VR",
+      description: "Immergez-vous dans des environnements relaxants",
+      color: "bg-orange-50 dark:bg-orange-950/20"
     }
   ];
 
+  const stats = [
+    { value: "50K+", label: "Utilisateurs actifs" },
+    { value: "95%", label: "Satisfaction" },
+    { value: "24/7", label: "Disponibilité" },
+    { value: "12", label: "Langues supportées" }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* Hero Section avec philosophie */}
-      <section className="relative py-20 px-6 text-center overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden px-4 py-16 sm:py-24">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-6xl mx-auto"
+          className="mx-auto max-w-7xl text-center"
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <Badge variant="secondary" className="mb-6 px-4 py-2">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Powered by AI
+          </Badge>
+          
+          <h1 className="mb-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               EmotionsCare
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-8 max-w-4xl mx-auto leading-relaxed">
-            Offrir à chacun une parenthèse, à chaque équipe une énergie partagée.
-            Ici, le temps redevient un luxe accessible, et l'essentiel se retrouve dans l'énergie partagée.
+          <p className="mb-4 text-lg text-gray-600 dark:text-gray-300">
+            {greeting}
+          </p>
+          
+          <p className="mx-auto mb-12 max-w-3xl text-xl text-gray-600 dark:text-gray-300 sm:text-2xl">
+            Votre plateforme de bien-être émotionnel alimentée par l'intelligence artificielle. 
+            Découvrez un nouveau niveau de compréhension de vos émotions.
           </p>
 
-          <Button
-            onClick={() => setShowDetails(!showDetails)}
-            variant="outline"
-            className="mb-12 border-2 hover:bg-primary/5"
-          >
-            Découvrir notre philosophie
-            <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
-          </Button>
+          {/* Action Buttons */}
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button
+              onClick={() => navigate(CURRENT_ROUTES.B2C_LOGIN)}
+              size="lg"
+              className="group bg-gradient-to-r from-pink-500 to-rose-500 px-8 py-4 text-lg font-semibold text-white hover:from-pink-600 hover:to-rose-600"
+            >
+              <Heart className="mr-2 h-5 w-5" />
+              Espace Personnel
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+            
+            <Button
+              onClick={() => navigate(CURRENT_ROUTES.B2B_SELECTION)}
+              variant="outline"
+              size="lg"
+              className="group border-2 px-8 py-4 text-lg font-semibold"
+            >
+              <Brain className="mr-2 h-5 w-5" />
+              Espace Entreprise
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </div>
         </motion.div>
 
-        {/* Parcours interactif de la philosophie */}
-        <AnimatePresence>
-          {showDetails && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="max-w-6xl mx-auto mb-16"
-            >
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {philosophyPillars.map((pillar, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    onHoverStart={() => setActivePhilosophy(index)}
-                    onHoverEnd={() => setActivePhilosophy(null)}
-                    className="cursor-pointer"
-                  >
-                    <Card className={`h-full transition-all duration-300 ${
-                      activePhilosophy === index 
-                        ? 'shadow-lg scale-105 border-primary' 
-                        : 'shadow-md hover:shadow-lg'
-                    }`}>
-                      <CardHeader className="text-center">
-                        <div className={`mx-auto p-4 rounded-full ${pillar.bgColor} mb-4`}>
-                          <pillar.icon className={`h-8 w-8 ${pillar.color}`} />
-                        </div>
-                        <CardTitle className="text-lg">{pillar.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                          {pillar.description}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Floating Elements */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <motion.div
+            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -right-32 -top-32 h-64 w-64 rounded-full bg-gradient-to-r from-blue-400/20 to-purple-400/20"
+          />
+          <motion.div
+            animate={{ rotate: -360, scale: [1, 1.2, 1] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-gradient-to-r from-pink-400/20 to-orange-400/20"
+          />
+        </div>
       </section>
 
-      {/* Sections séparées Particuliers et Entreprises */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
+      {/* Features Section */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-7xl">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="mb-16 text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Votre parcours de <span className="text-primary">bien-être</span>
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              Une approche révolutionnaire du bien-être
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-              Que vous soyez un particulier en quête d'équilibre ou une entreprise 
-              soucieuse du bien-être de ses équipes, nous avons la solution adaptée.
+            <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+              Découvrez nos outils innovants conçus pour vous accompagner dans votre parcours émotionnel
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Section Particuliers */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <Card className="h-full shadow-xl border-2 hover:shadow-2xl transition-all duration-300 group">
-                <CardHeader className="text-center bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950">
-                  <div className="mx-auto p-6 rounded-full bg-white/80 dark:bg-slate-800/80 mb-4 group-hover:scale-110 transition-transform">
-                    <Heart className="h-12 w-12 text-pink-500" />
-                  </div>
-                  <CardTitle className="text-3xl font-bold">Espace Personnel</CardTitle>
-                  <CardDescription className="text-lg mt-2">
-                    Votre parenthèse quotidienne pour retrouver l'équilibre
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-8">
-                  <div className="space-y-6 mb-8">
-                    <div className="flex items-start gap-3">
-                      <Brain className="h-6 w-6 text-pink-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Scanner d'émotions IA</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Analysez votre état émotionnel avec notre technologie avancée
-                        </p>
-                      </div>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="group h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className={`mb-4 inline-flex h-16 w-16 items-center justify-center rounded-xl ${feature.color}`}>
+                      {feature.icon}
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Users className="h-6 w-6 text-pink-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Coach personnel IA</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Accompagnement personnalisé adapté à votre situation
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-6 w-6 text-pink-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Musicothérapie adaptive</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Sons apaisants personnalisés selon votre humeur
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={() => navigate('/b2c/login')}
-                    className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 rounded-full font-semibold"
-                    size="lg"
-                  >
-                    Commencer mon parcours
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Section Entreprises */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <Card className="h-full shadow-xl border-2 hover:shadow-2xl transition-all duration-300 group">
-                <CardHeader className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-                  <div className="mx-auto p-6 rounded-full bg-white/80 dark:bg-slate-800/80 mb-4 group-hover:scale-110 transition-transform">
-                    <Building2 className="h-12 w-12 text-blue-500" />
-                  </div>
-                  <CardTitle className="text-3xl font-bold">Espace Entreprise</CardTitle>
-                  <CardDescription className="text-lg mt-2">
-                    L'énergie partagée au service de vos équipes
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-8">
-                  <div className="space-y-6 mb-8">
-                    <div className="flex items-start gap-3">
-                      <Users className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Cocon social sécurisé</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Espace bienveillant pour le partage et l'entraide
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Défis d'équipe</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Challenges collaboratifs pour renforcer la cohésion
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Analytics RH</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                          Tableaux de bord pour optimiser le bien-être collectif
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={() => navigate('/b2b/selection')}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-full font-semibold"
-                    size="lg"
-                  >
-                    Découvrir nos solutions
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
+                    <h3 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Section philosophie détaillée */}
-      <PhilosophySection />
+      {/* Stats Section */}
+      <section className="bg-gray-50 dark:bg-gray-800/50 px-4 py-16">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {stats.map((stat, index) => (
+              <div key={stat.label} className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="mb-2 text-4xl font-bold text-blue-600 dark:text-blue-400"
+                >
+                  {stat.value}
+                </motion.div>
+                <div className="text-gray-600 dark:text-gray-300">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-      {/* Call to Action final */}
-      <section className="py-20 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto text-center"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Prêt à transformer votre rapport au bien-être ?
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Rejoignez des milliers d'utilisateurs qui ont déjà fait le choix d'EmotionsCare
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => navigate('/b2c/login')}
-              size="lg"
-              variant="secondary"
-              className="bg-white text-purple-600 hover:bg-gray-100"
-            >
-              Commencer gratuitement
-            </Button>
-            <Button 
-              onClick={() => navigate('/b2b/selection')}
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white/10"
-            >
-              Solutions entreprise
-            </Button>
-          </div>
-        </motion.div>
+      {/* CTA Section */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="mb-6 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              Prêt à transformer votre bien-être émotionnel ?
+            </h2>
+            <p className="mb-8 text-lg text-gray-600 dark:text-gray-300">
+              Rejoignez des milliers d'utilisateurs qui ont déjà découvert une nouvelle façon de comprendre et gérer leurs émotions.
+            </p>
+            
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button
+                onClick={() => navigate('/philosophy')}
+                variant="outline"
+                size="lg"
+                className="group"
+              >
+                <Star className="mr-2 h-5 w-5" />
+                Découvrir notre philosophie
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       </section>
     </div>
   );
