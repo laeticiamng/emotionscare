@@ -1,102 +1,63 @@
 
 {
-  "name": "EmotionsCare - Plateforme de bien-être émotionnel",
+  "name": "EmotionsCare - Bien-être émotionnel",
   "short_name": "EmotionsCare",
-  "description": "Votre plateforme de bien-être émotionnel powered by AI",
+  "description": "Plateforme complète de bien-être émotionnel avec IA et coaching personnalisé",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#667eea",
-  "orientation": "portrait",
   "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "categories": ["health", "lifestyle", "productivity"],
   "lang": "fr",
-  "categories": ["health", "wellness", "productivity"],
+  "dir": "ltr",
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
-      "src": "/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png"
+      "src": "/icon-512.png",
+      "sizes": "512x512", 
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
     },
     {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/screenshot-desktop.png", 
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ],
   "shortcuts": [
     {
-      "name": "Scan émotionnel",
-      "short_name": "Scan",
-      "description": "Effectuer un scan émotionnel rapide",
-      "url": "/scan",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Musique thérapeutique",
-      "short_name": "Musique",
-      "description": "Accéder à la musicothérapie",
-      "url": "/music",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "name": "Dashboard",
+      "short_name": "Dashboard", 
+      "description": "Accéder au tableau de bord",
+      "url": "/b2c/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Coach IA",
       "short_name": "Coach",
-      "description": "Discuter avec votre coach IA",
-      "url": "/coach",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "description": "Parler avec le coach IA",
+      "url": "/b2c/dashboard?tab=coach",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
-  "related_applications": [],
   "prefer_related_applications": false,
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop-1.png",
-      "type": "image/png",
-      "sizes": "1280x720",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/mobile-1.png",
-      "type": "image/png",
-      "sizes": "360x640",
-      "form_factor": "narrow"
-    }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+emotionscare",
-      "url": "/?handler=%s"
-    }
-  ]
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
-

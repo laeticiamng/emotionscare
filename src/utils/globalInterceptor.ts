@@ -1,190 +1,155 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { getLoginRoute } from './routeUtils';
 
 /**
- * Intercepteur global unifié pour la gestion des erreurs d'authentification et API
- * Remplace l'ancien AuthInterceptor pour éviter la duplication
+ * Intercepteur global consolidé pour la gestion des requêtes API
+ * Version production avec sécurité renforcée
  */
 export class GlobalInterceptor {
-  private static isRedirecting = false;
+  private static readonly BASE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co';
+  private static readonly TOKEN_KEY = 'sb-yaincoxihiqdksxgrsrk-auth-token';
+  private static retryCount = new Map<string, number>();
+  private static readonly MAX_RETRIES = 3;
 
   /**
-   * Ajoute les headers d'authentification à une requête avec vérification stricte
-   */
-  static async addAuthHeaders(headers: HeadersInit = {}): Promise<HeadersInit> {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('[GlobalInterceptor] Session error:', error);
-        throw new Error('Invalid session');
-      }
-
-      if (!session?.access_token) {
-        console.warn('[GlobalInterceptor] No valid access token found');
-        throw new Error('No access token');
-      }
-
-      return {
-        ...headers,
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-      };
-    } catch (error) {
-      console.error('[GlobalInterceptor] Error getting session:', error);
-      // En cas d'erreur de session, déclencher la déconnexion
-      await this.handle401Error();
-      throw error;
-    }
-  }
-
-  /**
-   * Fetch sécurisé avec gestion automatique des erreurs et retry logic
+   * Effectue un appel API sécurisé avec retry automatique
    */
   static async secureFetch(url: string, options: RequestInit = {}): Promise<Response | null> {
+    const requestKey = `${url}-${JSON.stringify(options)}`;
+    
     try {
-      // Ajouter les headers d'authentification si nécessaire
-      const headers = await this.addAuthHeaders(options.headers);
+      const token = this.getStoredToken();
+      const secureHeaders = this.buildSecureHeaders(token, options.headers);
       
       const response = await fetch(url, {
         ...options,
-        headers,
+        headers: secureHeaders,
       });
 
-      // Gestion des erreurs d'authentification avec retry
       if (response.status === 401) {
-        console.log('[GlobalInterceptor] Token might be expired, trying to refresh...');
-        
-        // Essayer de rafraîchir le token une fois
-        const { data: { session: newSession } } = await supabase.auth.getSession();
-        if (newSession?.access_token) {
-          const retryResponse = await fetch(url, {
-            ...options,
-            headers: {
-              ...headers,
-              'Authorization': `Bearer ${newSession.access_token}`,
-            },
-          });
-          
-          if (retryResponse.status === 401) {
-            await this.handle401Error();
-            return null;
-          }
-          
-          return retryResponse;
-        } else {
-          await this.handle401Error();
-          return null;
-        }
+        return this.handle401WithRetry(url, options, requestKey);
       }
 
-      // Gestion des erreurs serveur
-      if (response.status >= 500) {
-        this.handleServerError(response.status, url);
-        return null;
-      }
-
-      // Gestion silencieuse des erreurs analytics
-      if (response.status === 404 && url.includes('analytics')) {
-        console.warn('[Analytics] Endpoint not available - feature in development');
-        return null;
-      }
-
+      // Reset retry count on success
+      this.retryCount.delete(requestKey);
+      
       return response;
     } catch (error: any) {
-      this.handleNetworkError(error, url);
+      console.error('[GlobalInterceptor] Request failed:', error);
       return null;
     }
   }
 
   /**
-   * Gestion centralisée des erreurs 401 avec redirection intelligente
+   * Gère les erreurs 401 avec retry automatique
+   */
+  private static async handle401WithRetry(
+    url: string, 
+    options: RequestInit, 
+    requestKey: string
+  ): Promise<Response | null> {
+    const currentRetries = this.retryCount.get(requestKey) || 0;
+    
+    if (currentRetries >= this.MAX_RETRIES) {
+      await this.handle401Error();
+      return null;
+    }
+
+    // Increment retry count
+    this.retryCount.set(requestKey, currentRetries + 1);
+    
+    // Clear current session
+    this.clearSession();
+    
+    // Wait before retry
+    await new Promise(resolve => setTimeout(resolve, 1000 * (currentRetries + 1)));
+    
+    // Retry with fresh token
+    return this.secureFetch(url, options);
+  }
+
+  /**
+   * Construit les headers sécurisés
+   */
+  private static buildSecureHeaders(token: string | null, customHeaders?: HeadersInit): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      ...customHeaders,
+    };
+
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+  }
+
+  /**
+   * Récupère le token stocké de manière sécurisée
+   */
+  private static getStoredToken(): string | null {
+    try {
+      const stored = localStorage.getItem(this.TOKEN_KEY);
+      if (!stored) return null;
+      
+      const session = JSON.parse(stored);
+      return session?.access_token || null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Gère les erreurs 401 (token expiré)
    */
   static async handle401Error(): Promise<void> {
-    if (this.isRedirecting) {
-      return; // Éviter les redirections multiples
-    }
-
-    this.isRedirecting = true;
-
-    try {
-      console.warn('[GlobalInterceptor] Session expired, logging out user');
-      
-      await supabase.auth.signOut();
-      
-      toast({
-        title: "Session expirée",
-        description: "Veuillez vous reconnecter pour continuer.",
-        variant: "destructive",
-      });
-
-      // Redirection intelligente selon la page actuelle
-      const currentPath = window.location.pathname;
-      let redirectPath = '/choose-mode';
-
-      if (currentPath.startsWith('/b2b/user')) {
-        redirectPath = getLoginRoute('b2b_user');
-      } else if (currentPath.startsWith('/b2b/admin')) {
-        redirectPath = getLoginRoute('b2b_admin');
-      } else if (currentPath.startsWith('/b2c')) {
-        redirectPath = getLoginRoute('b2c');
-      }
-
-      setTimeout(() => {
-        window.location.href = redirectPath;
-      }, 2000);
-
-    } catch (error) {
-      console.error('[GlobalInterceptor] Error during logout:', error);
+    console.warn('[GlobalInterceptor] Token expired, clearing session');
+    
+    this.clearSession();
+    
+    // Rediriger vers la page de connexion
+    if (typeof window !== 'undefined') {
       window.location.href = '/choose-mode';
-    } finally {
-      setTimeout(() => {
-        this.isRedirecting = false;
-      }, 5000);
     }
   }
 
   /**
-   * Gestion des erreurs serveur (5xx)
+   * Vide la session de manière sécurisée
    */
-  static handleServerError(status: number, url: string): void {
-    console.error(`[GlobalInterceptor] Server error ${status} on ${url}`);
-    
-    toast({
-      title: "Service indisponible",
-      description: "Nos serveurs rencontrent des difficultés. Réessayez plus tard.",
-      variant: "destructive",
-    });
-  }
-
-  /**
-   * Gestion des erreurs réseau
-   */
-  static handleNetworkError(error: any, url: string): void {
-    console.error(`[GlobalInterceptor] Network error on ${url}:`, error);
-    
-    // Ne pas afficher de toast pour les erreurs analytics
-    if (!url.includes('analytics')) {
-      toast({
-        title: "Erreur réseau",
-        description: "Vérifiez votre connexion internet et réessayez.",
-        variant: "destructive",
-      });
+  private static clearSession(): void {
+    try {
+      localStorage.removeItem(this.TOKEN_KEY);
+      
+      // Clear all retry counts
+      this.retryCount.clear();
+    } catch (error) {
+      console.error('[GlobalInterceptor] Error clearing session:', error);
     }
   }
 
   /**
-   * Vérifie le statut de la session actuelle avec token strict
+   * Vérifie le statut de la session
    */
   static async checkSessionStatus(): Promise<boolean> {
+    const token = this.getStoredToken();
+    if (!token) return false;
+
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      return !error && !!session?.access_token && 
-             session.expires_at ? session.expires_at > Date.now() / 1000 : false;
-    } catch (error) {
-      console.error('[GlobalInterceptor] Error checking session:', error);
+      const stored = localStorage.getItem(this.TOKEN_KEY);
+      if (!stored) return false;
+      
+      const session = JSON.parse(stored);
+      const expiresAt = session?.expires_at;
+      
+      if (!expiresAt) return false;
+      
+      // Check if token expires in next 5 minutes
+      const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
+      return expiresAt * 1000 > fiveMinutesFromNow;
+    } catch {
       return false;
     }
   }
