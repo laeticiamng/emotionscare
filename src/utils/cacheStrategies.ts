@@ -3,146 +3,193 @@
  * Stratégies de cache avancées pour optimiser les performances
  */
 
-interface CacheConfig {
-  ttl: number; // Time to live en millisecondes
-  maxSize: number; // Taille max du cache
-  strategy: 'lru' | 'fifo' | 'lfu'; // Stratégie d'éviction
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  ttl: number;
+  accessCount: number;
+  lastAccessed: number;
 }
 
-class AdvancedCache<T> {
-  private cache = new Map<string, { data: T; timestamp: number; accessCount: number }>();
-  private accessOrder: string[] = [];
-  private config: CacheConfig;
+interface CacheStats {
+  hits: number;
+  misses: number;
+  size: number;
+  hitRate: number;
+}
 
-  constructor(config: CacheConfig) {
-    this.config = config;
+/**
+ * Cache LRU (Least Recently Used) avec TTL
+ */
+export class LRUCache<T> {
+  private cache = new Map<string, CacheEntry<T>>();
+  private maxSize: number;
+  private defaultTTL: number;
+  private stats: CacheStats = { hits: 0, misses: 0, size: 0, hitRate: 0 };
+
+  constructor(maxSize = 100, defaultTTL = 5 * 60 * 1000) {
+    this.maxSize = maxSize;
+    this.defaultTTL = defaultTTL;
   }
 
-  set(key: string, data: T): void {
+  set(key: string, data: T, customTTL?: number): void {
     const now = Date.now();
-    
-    // Nettoyer le cache si nécessaire
-    this.cleanup();
-    
-    // Ajouter la nouvelle entrée
-    this.cache.set(key, { data, timestamp: now, accessCount: 1 });
-    this.updateAccessOrder(key);
-    
-    // Éviction si dépassement de taille
-    while (this.cache.size > this.config.maxSize) {
-      this.evict();
+    const ttl = customTTL || this.defaultTTL;
+
+    // Supprimer l'entrée existante pour la réinsérer en fin
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
     }
+
+    // Éviction LRU si le cache est plein
+    if (this.cache.size >= this.maxSize) {
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+
+    this.cache.set(key, {
+      data,
+      timestamp: now,
+      ttl,
+      accessCount: 0,
+      lastAccessed: now
+    });
+
+    this.updateStats();
   }
 
   get(key: string): T | null {
     const entry = this.cache.get(key);
-    
-    if (!entry) return null;
-    
-    // Vérifier TTL
-    if (Date.now() - entry.timestamp > this.config.ttl) {
-      this.cache.delete(key);
+    const now = Date.now();
+
+    if (!entry) {
+      this.stats.misses++;
+      this.updateHitRate();
       return null;
     }
-    
+
+    // Vérifier l'expiration
+    if (now - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      this.stats.misses++;
+      this.updateHitRate();
+      return null;
+    }
+
     // Mettre à jour les statistiques d'accès
     entry.accessCount++;
-    this.updateAccessOrder(key);
-    
+    entry.lastAccessed = now;
+
+    // Réorganiser pour LRU (supprimer et réinsérer)
+    this.cache.delete(key);
+    this.cache.set(key, entry);
+
+    this.stats.hits++;
+    this.updateHitRate();
     return entry.data;
   }
 
-  private cleanup(): void {
-    const now = Date.now();
-    for (const [key, entry] of this.cache.entries()) {
-      if (now - entry.timestamp > this.config.ttl) {
-        this.cache.delete(key);
-        this.removeFromAccessOrder(key);
-      }
-    }
+  has(key: string): boolean {
+    return this.get(key) !== null;
   }
 
-  private evict(): void {
-    let keyToEvict: string;
-    
-    switch (this.config.strategy) {
-      case 'lru':
-        keyToEvict = this.accessOrder[0];
-        break;
-      case 'lfu':
-        keyToEvict = Array.from(this.cache.entries())
-          .sort(([,a], [,b]) => a.accessCount - b.accessCount)[0][0];
-        break;
-      case 'fifo':
-      default:
-        keyToEvict = this.cache.keys().next().value;
-        break;
-    }
-    
-    this.cache.delete(keyToEvict);
-    this.removeFromAccessOrder(keyToEvict);
-  }
-
-  private updateAccessOrder(key: string): void {
-    this.removeFromAccessOrder(key);
-    this.accessOrder.push(key);
-  }
-
-  private removeFromAccessOrder(key: string): void {
-    const index = this.accessOrder.indexOf(key);
-    if (index > -1) {
-      this.accessOrder.splice(index, 1);
-    }
+  delete(key: string): boolean {
+    const result = this.cache.delete(key);
+    this.updateStats();
+    return result;
   }
 
   clear(): void {
     this.cache.clear();
-    this.accessOrder = [];
+    this.stats = { hits: 0, misses: 0, size: 0, hitRate: 0 };
   }
 
-  size(): number {
-    return this.cache.size;
+  getStats(): CacheStats {
+    return { ...this.stats };
+  }
+
+  private updateStats(): void {
+    this.stats.size = this.cache.size;
+  }
+
+  private updateHitRate(): void {
+    const total = this.stats.hits + this.stats.misses;
+    this.stats.hitRate = total > 0 ? this.stats.hits / total : 0;
+  }
+
+  // Nettoyage automatique des entrées expirées
+  cleanup(): void {
+    const now = Date.now();
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        this.cache.delete(key);
+      }
+    }
+    this.updateStats();
   }
 }
 
-// Instances de cache spécialisées
-export const apiCache = new AdvancedCache({
-  ttl: 5 * 60 * 1000, // 5 minutes
-  maxSize: 100,
-  strategy: 'lru'
-});
+/**
+ * Cache global pour l'application
+ */
+export const apiCache = new LRUCache<any>(200, 5 * 60 * 1000); // 200 entrées, 5 min TTL
 
-export const imageCache = new AdvancedCache({
-  ttl: 30 * 60 * 1000, // 30 minutes
-  maxSize: 50,
-  strategy: 'lfu'
-});
+/**
+ * Cache pour les images avec TTL plus long
+ */
+export const imageCache = new LRUCache<string>(50, 30 * 60 * 1000); // 50 images, 30 min TTL
 
-export const userDataCache = new AdvancedCache({
-  ttl: 15 * 60 * 1000, // 15 minutes
-  maxSize: 20,
-  strategy: 'lru'
-});
+/**
+ * Cache pour les données utilisateur
+ */
+export const userCache = new LRUCache<any>(100, 10 * 60 * 1000); // 100 utilisateurs, 10 min TTL
 
-// Utilitaires de cache pour les hooks
-export const withCache = <T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  cache: AdvancedCache<any>,
-  keyGenerator: (...args: Parameters<T>) => string
-): T => {
-  return (async (...args: Parameters<T>) => {
-    const key = keyGenerator(...args);
+/**
+ * Wrapper pour cache avec fallback
+ */
+export function withCache<T>(
+  fetchFn: () => Promise<T>,
+  cache: LRUCache<T>,
+  keyGenerator: () => string,
+  ttl?: number
+) {
+  return async (): Promise<T> => {
+    const key = keyGenerator();
     
-    // Vérifier le cache
+    // Tenter de récupérer du cache
     const cached = cache.get(key);
-    if (cached) {
+    if (cached !== null) {
       return cached;
     }
-    
-    // Exécuter la fonction et mettre en cache
-    const result = await fn(...args);
-    cache.set(key, result);
-    
-    return result;
-  }) as T;
-};
+
+    // Fetcher et mettre en cache
+    try {
+      const data = await fetchFn();
+      cache.set(key, data, ttl);
+      return data;
+    } catch (error) {
+      // En cas d'erreur, ne pas mettre en cache
+      throw error;
+    }
+  };
+}
+
+/**
+ * Nettoyage automatique des caches
+ */
+setInterval(() => {
+  apiCache.cleanup();
+  imageCache.cleanup();
+  userCache.cleanup();
+}, 2 * 60 * 1000); // Nettoyage toutes les 2 minutes
+
+/**
+ * Statistiques des caches (développement)
+ */
+if (import.meta.env.DEV) {
+  (window as any).getCacheStats = () => ({
+    api: apiCache.getStats(),
+    image: imageCache.getStats(),
+    user: userCache.getStats()
+  });
+}
