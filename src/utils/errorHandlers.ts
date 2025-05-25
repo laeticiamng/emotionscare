@@ -1,5 +1,6 @@
 
 import { toast } from '@/hooks/use-toast';
+import { GlobalInterceptor } from './globalInterceptor';
 
 /**
  * Gestionnaire d'erreurs global pour les requêtes API
@@ -60,7 +61,7 @@ export class ApiErrorHandler {
         variant: "destructive",
       });
     } else if (error?.status === 401) {
-      // Géré par le AuthErrorHandler
+      // Géré par le GlobalInterceptor
       return;
     } else {
       toast({
@@ -85,6 +86,7 @@ export class ApiErrorHandler {
 
 /**
  * Gestionnaire spécialisé pour les erreurs d'authentification
+ * Utilise maintenant GlobalInterceptor exclusivement
  */
 export class AuthErrorHandler {
   
@@ -92,23 +94,6 @@ export class AuthErrorHandler {
    * Gère les erreurs 401 (token expiré ou invalide)
    */
   static async handle401Error(navigate: (path: string) => void): Promise<void> {
-    console.warn('[Auth] Token expired or invalid, logging out user');
-    
-    try {
-      // Importer supabase de manière dynamique pour éviter les dépendances circulaires
-      const { supabase } = await import('@/integrations/supabase/client');
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('[Auth] Error during signout:', error);
-    }
-
-    toast({
-      title: "Session expirée",
-      description: "Veuillez vous reconnecter.",
-      variant: "destructive",
-    });
-
-    // Rediriger vers la page de login appropriée
-    navigate('/choose-mode');
+    await GlobalInterceptor.handle401Error();
   }
 }

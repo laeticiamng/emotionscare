@@ -1,10 +1,10 @@
 
 /**
- * Utilitaires pour la gestion des routes - VERSION NETTOYÉE
- * TOUTES les routes legacy ont été supprimées
+ * Utilitaires pour la gestion des routes - VERSION FINALE NETTOYÉE
+ * TOUTES les routes legacy ont été définitivement supprimées
  */
 
-// Routes actuelles uniquement (plus de legacy)
+// Routes actuelles uniquement
 export const CURRENT_ROUTES = {
   // Routes communes
   HOME: '/',
@@ -73,21 +73,4 @@ export function getContextualRedirect(userRole?: string): string {
   }
   
   return getDashboardRoute(userRole as any);
-}
-
-/**
- * Migration des anciennes routes vers les nouvelles
- * TEMPORAIRE - sera supprimé après migration complète
- */
-export const ROUTE_MIGRATION_MAP = {
-  '/login-collaborateur': CURRENT_ROUTES.B2B_USER_LOGIN,
-  '/login-admin': CURRENT_ROUTES.B2B_ADMIN_LOGIN,
-  '/login': CURRENT_ROUTES.CHOOSE_MODE,
-} as const;
-
-/**
- * Obtient la nouvelle route pour une ancienne route
- */
-export function getMigratedRoute(legacyPath: string): string {
-  return ROUTE_MIGRATION_MAP[legacyPath as keyof typeof ROUTE_MIGRATION_MAP] || legacyPath;
 }

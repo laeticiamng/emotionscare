@@ -1,14 +1,13 @@
 
 import { useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { GlobalInterceptor } from '@/utils/globalInterceptor';
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler';
-import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Hook pour effectuer des appels API sécurisés avec gestion du token
+ * Utilise uniquement GlobalInterceptor (AuthInterceptor supprimé)
  */
 export const useSecureApiCall = () => {
-  const { refreshToken } = useAuth();
   const { handleError } = useApiErrorHandler();
 
   const secureCall = useCallback(async (
@@ -17,53 +16,11 @@ export const useSecureApiCall = () => {
     context?: string
   ): Promise<Response | null> => {
     try {
-      // Récupérer le token d'accès
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const response = await GlobalInterceptor.secureFetch(url, options);
       
-      if (error || !session?.access_token) {
-        console.warn('[SecureAPI] No valid session found');
-        await handleError({ status: 401 }, context);
+      if (!response) {
+        await handleError({ status: 500 }, context);
         return null;
-      }
-
-      // Ajouter le token d'autorisation
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-        ...options.headers,
-      };
-
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
-
-      // Gérer l'expiration du token
-      if (response.status === 401) {
-        console.log('[SecureAPI] Token might be expired, trying to refresh...');
-        await refreshToken();
-        
-        // Retry with refreshed token
-        const { data: { session: newSession } } = await supabase.auth.getSession();
-        if (newSession?.access_token) {
-          const retryResponse = await fetch(url, {
-            ...options,
-            headers: {
-              ...headers,
-              'Authorization': `Bearer ${newSession.access_token}`,
-            },
-          });
-          
-          if (retryResponse.status === 401) {
-            await handleError({ status: 401 }, context);
-            return null;
-          }
-          
-          return retryResponse;
-        } else {
-          await handleError({ status: 401 }, context);
-          return null;
-        }
       }
 
       if (!response.ok) {
@@ -76,7 +33,7 @@ export const useSecureApiCall = () => {
       await handleError(error, context);
       return null;
     }
-  }, [refreshToken, handleError]);
+  }, [handleError]);
 
   return { secureCall };
 };

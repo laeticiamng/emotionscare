@@ -6,7 +6,7 @@ import {
   getDashboardRoute, 
   isValidRoute, 
   CURRENT_ROUTES,
-  getMigratedRoute 
+  getContextualRedirect 
 } from '@/utils/routeUtils';
 
 test('getLoginRoute returns correct B2B user login path', () => {
@@ -44,17 +44,16 @@ test('CURRENT_ROUTES contains no legacy paths', () => {
   assert.equal(routes.includes('/login' as any), false);
 });
 
-test('getMigratedRoute maps legacy routes to new routes', () => {
-  assert.equal(getMigratedRoute('/login-collaborateur'), '/b2b/user/login');
-  assert.equal(getMigratedRoute('/login-admin'), '/b2b/admin/login');
-  assert.equal(getMigratedRoute('/login'), '/choose-mode');
-  // Non-legacy routes should return as-is
-  assert.equal(getMigratedRoute('/b2c/login'), '/b2c/login');
+test('getContextualRedirect works correctly', () => {
+  assert.equal(getContextualRedirect(), '/choose-mode');
+  assert.equal(getContextualRedirect('b2c'), '/b2c/dashboard');
+  assert.equal(getContextualRedirect('b2b_user'), '/b2b/user/dashboard');
+  assert.equal(getContextualRedirect('b2b_admin'), '/b2b/admin/dashboard');
 });
 
 test('All routes in CURRENT_ROUTES are properly formatted', () => {
   Object.values(CURRENT_ROUTES).forEach(route => {
     assert.ok(route.startsWith('/'), `Route ${route} should start with /`);
-    assert.ok(!route.includes('//', ), `Route ${route} should not have double slashes`);
+    assert.ok(!route.includes('//'), `Route ${route} should not have double slashes`);
   });
 });
