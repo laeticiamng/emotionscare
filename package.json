@@ -3,31 +3,27 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "preinstall": "node scripts/skip-heavy.js",
-    "postinstall": "node scripts/install-heavy.js",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "tsc": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "test:edge": "vitest --environment edge-runtime",
-    "test:db": "vitest run src/tests/db --passWithNoTests",
-
-
-    "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
-    "lint": "eslint .",
-    "build:dev": "vite build --mode development",
-    "type-check": "tsc --noEmit",
-    "back:audit": "node --loader ts-node/esm scripts/full-back-audit.ts",
-    "dev:api": "node --loader ts-node/esm services/journal/index.ts",
-    "test:api": "vitest run --config vitest.api.config.ts"
-
-    ,"db:migrate": "flyway -configFiles database/flyway.conf migrate"
-    ,"db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'"
-    ,"test:db": "vitest run --config vitest.db.config.ts",
-    "db:migrate": "node scripts/run-migrations.cjs",
-  },
+"scripts": {
+  "preinstall": "node scripts/skip-heavy.js",
+  "postinstall": "node scripts/install-heavy.js",
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "tsc": "tsc --noEmit",
+  "test": "vitest run --passWithNoTests",
+  "test:edge": "vitest --environment edge-runtime",
+  "test:db": "vitest run src/tests/db --passWithNoTests",
+  "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
+  "lint": "eslint .",
+  "build:dev": "vite build --mode development",
+  "type-check": "tsc --noEmit",
+  "back:audit": "node --loader ts-node/esm scripts/full-back-audit.ts",
+  "dev:api": "node --loader ts-node/esm services/journal/index.ts",
+  "test:api": "vitest run --config vitest.api.config.ts",
+  "db:migrate": "node scripts/run-migrations.cjs",
+  "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
+  "test:db:config": "vitest run --config vitest.db.config.ts"
+}
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "^3.19.1",
