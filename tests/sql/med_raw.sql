@@ -17,6 +17,7 @@ SELECT is(
 INSERT INTO glow_mug
   (user_id_hash, hr_pre, hr_post, calm_score, mood_emoji)
 VALUES ('hashM', 70, 64, 3, '\xF0\x9F\x99\x82');
+VALUES ('hashM', 70, 64, 3, '🙂');
 
 SELECT is(
   (SELECT sms1 FROM glow_mug WHERE user_id_hash='hashM'), 4,

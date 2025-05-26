@@ -1,5 +1,6 @@
 import { beforeAll, it, expect } from 'vitest';
 import db from '@/tests/helpers/db';
+import db from '../../database/tests/db/helpers/db';
 
 beforeAll(async () => {
   await db.clear('flow_walk');

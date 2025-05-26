@@ -123,6 +123,8 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD: "1"
         run: node scripts/emergency-install.js
         timeout-minutes: 10
+      - name: Refresh VR metrics before API tests
+        run: psql "$DATABASE_URL" -c 'CALL public.refresh_metrics_vr();'
       - name: Run API tests
         run: npm run test:api
       - name: Database migrations

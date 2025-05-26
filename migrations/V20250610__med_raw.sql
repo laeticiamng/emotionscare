@@ -4,6 +4,12 @@
 CREATE TABLE IF NOT EXISTS public.flow_walk (
   id              uuid PRIMARY KEY       DEFAULT gen_random_uuid(),
   user_id_hash    text        NOT NULL,          -- argon2id(jwt.sub+pepper)
+-- MED raw tables for Flow Walk & Glow Mug
+
+-- ───────────── 1-A  FLOW_WALK ─────────────────────────────
+CREATE TABLE IF NOT EXISTS public.flow_walk (
+  id              uuid PRIMARY KEY       DEFAULT gen_random_uuid(),
+  user_id_hash    text        NOT NULL,
   ts              timestamptz NOT NULL DEFAULT now(),
   steps           int         NOT NULL,
   cadence_spm     int,
