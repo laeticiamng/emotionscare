@@ -1,3 +1,9 @@
+-- MED raw tables and triggers
+
+-- 1-A  FLOW_WALK
+CREATE TABLE IF NOT EXISTS public.flow_walk (
+  id              uuid PRIMARY KEY       DEFAULT gen_random_uuid(),
+  user_id_hash    text        NOT NULL,          -- argon2id(jwt.sub+pepper)
 -- MED raw tables for Flow Walk & Glow Mug
 
 -- ───────────── 1-A  FLOW_WALK ─────────────────────────────
@@ -18,7 +24,7 @@ CREATE TABLE IF NOT EXISTS public.flow_walk (
 CREATE INDEX IF NOT EXISTS idx_flow_user_ts
     ON flow_walk(user_id_hash, ts DESC);
 
--- ───────────── 1-B  GLOW_MUG ─────────────────────────────
+-- 1-B  GLOW_MUG
 CREATE TABLE IF NOT EXISTS public.glow_mug (
   id              uuid PRIMARY KEY       DEFAULT gen_random_uuid(),
   user_id_hash    text        NOT NULL,
@@ -32,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.glow_mug (
 );
 CREATE INDEX idx_mug_user_ts ON glow_mug(user_id_hash, ts DESC);
 
--- ───────────── 1-C  RLS ───────────────────────────────────
+-- 1-C  RLS
 ALTER TABLE flow_walk ENABLE ROW LEVEL SECURITY;
 ALTER TABLE glow_mug  ENABLE ROW LEVEL SECURITY;
 
@@ -46,7 +52,7 @@ CREATE POLICY p_mug_rw
   USING (user_id_hash = current_setting('request.jwt.claim.user_hash', true))
   WITH CHECK (user_id_hash = current_setting('request.jwt.claim.user_hash', true));
 
--- ───────────── 1-D  TRIGGERS ─────────────────────────────
+-- 1-D  TRIGGERS
 /* Flow-Walk : coherence_pct, rmssd_delta, mvpa_min */
 CREATE OR REPLACE FUNCTION public.calc_flow_walk() RETURNS trigger AS $$
 BEGIN
@@ -80,3 +86,4 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_mug_metrics
 BEFORE INSERT ON glow_mug
 FOR EACH ROW EXECUTE FUNCTION public.calc_glow_mug();
+
