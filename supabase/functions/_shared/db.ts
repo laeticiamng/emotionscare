@@ -1,3 +1,14 @@
+export default {
+  selectFrom() {
+    return {
+      selectAll() { return this; },
+      where() { return this; },
+      unionAll() { return this; },
+      execute: async () => []
+    };
+  },
+  raw(v: string) { return v; }
+};
 import { Kysely, PostgresDialect } from 'https://esm.sh/kysely@0.26.4';
 import { Pool } from 'https://deno.land/x/postgres@v0.17.0/mod.ts';
 
