@@ -12,7 +12,7 @@ export default defineConfig({
     include: [],
     exclude: ['src/e2e/**/*'],
     coverage: {
-      provider: 'c8',
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',
