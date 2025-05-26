@@ -1,6 +1,5 @@
 
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -38,16 +37,6 @@ const DEMO_ACCOUNTS = {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  
-  // Use a ref to track if navigate is available
-  const navigateRef = React.useRef<ReturnType<typeof useNavigate> | null>(null);
-  
-  try {
-    navigateRef.current = useNavigate();
-  } catch (error) {
-    // Navigate not available yet, will be set later
-    console.log('Navigate not available in AuthProvider');
-  }
 
   React.useEffect(() => {
     // Vérifier s'il y a un utilisateur stocké dans localStorage
@@ -81,16 +70,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(mockUser);
         localStorage.setItem('user', JSON.stringify(mockUser));
         
-        // Redirection automatique vers le bon dashboard
-        const dashboardRoutes = {
-          'b2c': '/b2c/dashboard',
-          'b2b_user': '/b2b/user/dashboard',
-          'b2b_admin': '/b2b/admin/dashboard'
-        };
-        
-        if (navigateRef.current) {
-          navigateRef.current(dashboardRoutes[mockUser.role]);
-        }
+        // Redirection sera gérée par le composant de login
+        console.log('Login successful for user:', mockUser.role);
       } else {
         throw new Error('Email ou mot de passe incorrect');
       }
@@ -114,17 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      // Redirection automatique vers le bon dashboard
-      const dashboardRoutes = {
-        'b2c': '/b2c/dashboard',
-        'b2b_user': '/b2b/user/dashboard',
-        'b2b_admin': '/b2b/admin/dashboard'
-      };
-      
-      if (navigateRef.current) {
-        navigateRef.current(dashboardRoutes[mockUser.role]);
-      }
+      console.log('Registration successful for user:', mockUser.role);
     } catch (error) {
       console.error('Register error:', error);
       throw error;
@@ -136,9 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    if (navigateRef.current) {
-      navigateRef.current('/');
-    }
+    console.log('User logged out');
   };
 
   const value: AuthContextType = {

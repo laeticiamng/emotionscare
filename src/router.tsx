@@ -26,7 +26,7 @@ const withSuspense = (Component: React.ComponentType) => {
   );
 };
 
-export const routes = [
+export const router = createBrowserRouter([
   {
     path: '/',
     element: withSuspense(Home)(),
@@ -91,6 +91,4 @@ export const routes = [
       </ProtectedRoute>
     ),
   },
-];
-
-export const router = createBrowserRouter(routes);
+]);
