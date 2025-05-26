@@ -5,27 +5,15 @@ import App from './App.tsx';
 import './index.css';
 import './styles/accessibility.css';
 import { validateStartup } from './utils/startupCheck';
-import { initProductionSecurity, initBuildOptimizations, applyCSP, applySecurityMeta } from './utils/productionSecurity';
+
+// Ensure React is available globally for proper hook functionality
+if (typeof window !== 'undefined') {
+  (window as any).React = React;
+}
 
 // Startup validation
 if (!validateStartup()) {
   console.error('❌ Startup validation failed - some dependencies may be missing');
-}
-
-// Initialisation des optimisations de sécurité en production
-if (import.meta.env.PROD) {
-  Promise.all([
-    initProductionSecurity(),
-    initBuildOptimizations()
-  ]).then(() => {
-    console.log('🛡️ Production security and optimizations initialized');
-  }).catch((error) => {
-    console.error('❌ Failed to initialize production features:', error);
-  });
-
-  // Application des headers de sécurité
-  applyCSP();
-  applySecurityMeta();
 }
 
 // Configuration des erreurs globales
