@@ -40,6 +40,7 @@ describe('GET /me/breath/weekly', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(Array.isArray(data)).toBe(true);
+    expect(data[0]).toHaveProperty('glowScore');
   });
 });
 
@@ -63,5 +64,6 @@ describe('GET /org/:orgId/breath/weekly', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data[0]).toHaveProperty('members');
+    expect(data[0]).toHaveProperty('org_glow');
   });
 });
