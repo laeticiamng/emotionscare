@@ -1,8 +1,8 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import * as React from 'react';
 import { ThemeContextType, ThemeName, FontSize, FontFamily } from '@/types/theme';
 
-const ThemeContext = createContext<ThemeContextType>({
+const ThemeContext = React.createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
   toggleTheme: () => {},
@@ -33,14 +33,14 @@ export function ThemeProvider({
   defaultFontFamily?: FontFamily;
   defaultReduceMotion?: boolean;
 }) {
-  const [theme, setTheme] = useState<ThemeName>(defaultTheme);
-  const [systemTheme, setSystemTheme] = useState<ThemeName>('light');
-  const [fontSize, setFontSize] = useState<FontSize>(defaultFontSize);
-  const [fontFamily, setFontFamily] = useState<FontFamily>(defaultFontFamily);
-  const [reduceMotion, setReduceMotion] = useState<boolean>(defaultReduceMotion);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [theme, setTheme] = React.useState<ThemeName>(defaultTheme);
+  const [systemTheme, setSystemTheme] = React.useState<ThemeName>('light');
+  const [fontSize, setFontSize] = React.useState<FontSize>(defaultFontSize);
+  const [fontFamily, setFontFamily] = React.useState<FontFamily>(defaultFontFamily);
+  const [reduceMotion, setReduceMotion] = React.useState<boolean>(defaultReduceMotion);
+  const [soundEnabled, setSoundEnabled] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement;
     
     // Apply theme
@@ -69,7 +69,7 @@ export function ThemeProvider({
   }, [theme, fontSize, fontFamily, reduceMotion]);
 
   // Listen for system theme changes
-  useEffect(() => {
+  React.useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
     const handleChange = () => {
@@ -120,7 +120,7 @@ export function ThemeProvider({
 }
 
 export const useTheme = () => {
-  const context = useContext(ThemeContext);
+  const context = React.useContext(ThemeContext);
   
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
