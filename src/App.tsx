@@ -4,13 +4,16 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
+import { ToastProvider } from '@/hooks/use-toast';
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 
