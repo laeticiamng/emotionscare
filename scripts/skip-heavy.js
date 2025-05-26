@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 const { readFileSync, writeFileSync } = require("fs");
 
 if (process.env.SKIP_HEAVY === "true") {
