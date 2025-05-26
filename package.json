@@ -12,6 +12,7 @@
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
+    "lint": "eslint .",
     "build:dev": "vite build --mode development",
     "type-check": "tsc --noEmit",
     "back:audit": "node --loader ts-node/esm scripts/full-back-audit.ts"
@@ -158,5 +159,12 @@
     "cypress": "^13.5.0",
     "playwright": "^1.41.0",
     "puppeteer": "^22.10.0"
+  },
+  "vitest": {
+    "coverage": {
+      "lines": 90,
+      "functions": 90,
+      "branches": 85
+    }
   }
 }

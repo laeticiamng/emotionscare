@@ -1,59 +1,65 @@
-
 name: CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [feat/dashboard-widgets]
+  pull_request:
+
+env:
+  SKIP_HEAVY: "true"
+  NODE_VERSION: "20"
+
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  build-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
-          node-version: 22
-          cache: 'npm'
-          
-      - name: Configure npm registry
-        run: npm config set registry https://registry.npmmirror.com
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup optimal caching
-        uses: actions/cache@v3
+      # 1. install offline-friendly
+      - run: |
+          npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
+
+      # 2. lint + types
+      - run: npm run lint
+      - run: npm run tsc -- --noEmit
+
+      # 3. unit + db tests
+      - run: npm run test:db --if-present
+      - run: npm run test -- --coverage --environment=jsdom
+
+      # 4. upload coverage
+      - uses: actions/upload-artifact@v4
         with:
-          path: |
-            **/node_modules
-            ~/.npm
-            ~/.bun
-            ~/.cache/Cypress
-            ~/.cache/ms-playwright
-            ~/.cache/puppeteer
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
-          restore-keys: |
-            ${{ runner.os }}-modules-
-            
-      - name: Optimize npm environment  
-        run: |
-          npm config set cache-min 9999999
-          echo "CYPRESS_INSTALL_BINARY=0" >> $GITHUB_ENV
-          echo "CYPRESS_SKIP_BINARY_INSTALL=1" >> $GITHUB_ENV
-          echo "HUSKY_SKIP_INSTALL=1" >> $GITHUB_ENV
-          echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
-          echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
+          name: coverage
+          path: coverage
 
-      - name: Fast install
-        env:
-          CYPRESS_INSTALL_BINARY: "0"
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-          PUPPETEER_SKIP_DOWNLOAD: "1"
-        run: node scripts/emergency-install.js
-        timeout-minutes: 10
+      # 5. security audit
+      - run: npm audit --omit dev || true
+      - run: npx owasp-depcheck --failOnCritical
 
-      - name: Build
-        run: npm run build
+  e2e-web:
+    runs-on: ubuntu-22.04
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run start &
+      - run: npm run test:e2e:web
 
-      - name: Download heavy binaries
-        run: SKIP_HEAVY=true node scripts/install-heavy.js
-
-      - name: Run tests
-        run: npm run test -- --environment=jsdom
-        timeout-minutes: 5
+  e2e-mobile:
+    runs-on: macos-13
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run test:e2e:mobile
