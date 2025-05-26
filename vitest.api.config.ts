@@ -7,7 +7,8 @@ export default defineConfig({
       'services/journal/tests/**/*.ts',
       'services/scan/tests/**/*.ts',
       'services/gam/tests/**/*.ts',
-      'services/vr/tests/**/*.ts'
+      'services/vr/tests/**/*.ts',
+      'services/breath/tests/**/*.ts'
     ]
   }
 });

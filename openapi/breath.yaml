@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Breath API
+  version: 1.0.0
+paths:
+  /me/breath/weekly:
+    get:
+      summary: KPIs breath hebdo (utilisateur)
+      responses:
+        '200':
+          description: Weekly breath metrics
+  /org/{orgId}/breath/weekly:
+    get:
+      summary: KPIs breath hebdo (organisation)
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Weekly breath org metrics
