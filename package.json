@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "test:edge": "vitest --environment edge-runtime",
     "test:db": "vitest run src/tests/db --passWithNoTests",
 
 
@@ -166,8 +167,9 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.19",
-    "kysely": "^0.27.3",
-    "pg": "^8.11.5"
+    "edge-test-kit": "^0.7.2",
+    "kysely": "^0.26.4",
+    "pg": "^8.11.3"
   },
   "optionalDependencies": {
     "cypress": "^13.5.0",
