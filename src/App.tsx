@@ -7,13 +7,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { MusicProvider } from "@/contexts/MusicContext";
 import { UserModeProvider } from "@/contexts/UserModeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { Suspense } from "react";
 import AppRouter from "./AppRouter";
 import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBoundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import SecurityProvider from "@/components/security/SecurityProvider";
 import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
-import AppProviders from "@/providers/AppProviders";
 
 // Initialiser la validation d'environnement
 import '@/lib/env-validation';
@@ -36,6 +36,8 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  console.log('[App] Rendering...');
+  
   return (
     <React.StrictMode>
       <GlobalErrorBoundary>
@@ -43,7 +45,7 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider delayDuration={150}>
               <BrowserRouter>
-                <AppProviders>
+                <AuthProvider>
                   <UserModeProvider>
                     <MusicProvider>
                       <SkipToContent />
@@ -53,7 +55,7 @@ function App() {
                       <AppRouter />
                     </MusicProvider>
                   </UserModeProvider>
-                </AppProviders>
+                </AuthProvider>
               </BrowserRouter>
             </TooltipProvider>
           </QueryClientProvider>
