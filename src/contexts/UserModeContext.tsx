@@ -1,38 +1,45 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { UserRole } from '@/types/user';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { UserModeType } from '@/utils/userModeHelpers';
 
 interface UserModeContextType {
-  userMode: UserRole;
-  setUserMode: (mode: UserRole) => void;
-  changeUserMode: (mode: UserRole) => void;
+  userMode: UserModeType | null;
+  setUserMode: (mode: UserModeType) => void;
   isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserRole>('b2c');
-  const [isLoading, setIsLoading] = useState(false);
+interface UserModeProviderProps {
+  children: ReactNode;
+}
 
-  const changeUserMode = (mode: UserRole) => {
-    setIsLoading(true);
-    setUserMode(mode);
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserModeState] = useState<UserModeType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Récupérer le mode utilisateur depuis le localStorage
+    const storedMode = localStorage.getItem('userMode') as UserModeType;
+    if (storedMode) {
+      setUserModeState(storedMode);
+    }
+    setIsLoading(false);
+  }, []);
+
+  const setUserMode = (mode: UserModeType) => {
+    setUserModeState(mode);
     localStorage.setItem('userMode', mode);
-    setTimeout(() => setIsLoading(false), 500);
-  };
-
-  const value: UserModeContextType = {
-    userMode,
-    setUserMode,
-    changeUserMode,
-    isLoading,
-    setIsLoading
   };
 
   return (
-    <UserModeContext.Provider value={value}>
+    <UserModeContext.Provider
+      value={{
+        userMode,
+        setUserMode,
+        isLoading
+      }}
+    >
       {children}
     </UserModeContext.Provider>
   );
@@ -40,7 +47,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export const useUserMode = () => {
   const context = useContext(UserModeContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
   return context;

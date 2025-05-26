@@ -1,14 +1,27 @@
 
 export interface VRSessionTemplate {
   id: string;
-  name: string;
   title: string;
+  name?: string;
   description: string;
-  duration: number;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  thumbnail?: string;
-  preview?: string;
+  duration: number | string;
+  difficulty: 'Débutant' | 'Intermédiaire' | 'Avancé';
+  category: 'meditation' | 'relaxation' | 'focus' | 'therapy';
+  environment: string;
+  thumbnailUrl?: string;
+  tags?: string[];
+  emotionTarget?: string;
+  lastUsed?: string;
+}
+
+export interface VRSession {
+  id: string;
+  templateId: string;
+  startTime: string;
+  endTime?: string;
+  completed: boolean;
+  heartRate?: number;
+  emotionalState?: string;
 }
 
 export interface VRTemplateDetailProps {
@@ -16,14 +29,4 @@ export interface VRTemplateDetailProps {
   onStart: (template: VRSessionTemplate) => void;
   onBack: () => void;
   heartRate?: number;
-}
-
-export interface VRSession {
-  id: string;
-  templateId: string;
-  userId: string;
-  startTime: Date;
-  endTime?: Date;
-  duration?: number;
-  completed: boolean;
 }

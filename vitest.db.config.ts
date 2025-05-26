@@ -8,5 +8,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['database/tests/**/*.ts']
+
   }
 });

@@ -1,54 +1,49 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { ThemeName, FontSize, FontFamily } from '@/types/theme';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ThemeName } from '@/types/theme';
 
 interface ThemeContextType {
   theme: ThemeName;
   setTheme: (theme: ThemeName) => void;
   toggleTheme: () => void;
-  isDark: boolean;
-  isDarkMode: boolean;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
-  systemTheme: ThemeName;
-  reduceMotion: boolean;
-  setReduceMotion: (reduce: boolean) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | null>(null);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<ThemeName>('system');
-  const [fontSize, setFontSize] = useState<FontSize>('md');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('sans');
-  const [reduceMotion, setReduceMotion] = useState(false);
+interface ThemeProviderProps {
+  children: ReactNode;
+}
 
-  const isDark = theme === 'dark';
-  const systemTheme = theme === 'system' ? 'light' : theme;
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const [theme, setThemeState] = useState<ThemeName>('light');
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme') as ThemeName;
+    if (storedTheme) {
+      setThemeState(storedTheme);
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setThemeState(prefersDark ? 'dark' : 'light');
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+  }, [theme]);
+
+  const setTheme = (newTheme: ThemeName) => {
+    setThemeState(newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
-  const value: ThemeContextType = {
-    theme,
-    setTheme,
-    toggleTheme,
-    isDark,
-    isDarkMode: isDark,
-    fontSize,
-    setFontSize,
-    fontFamily,
-    setFontFamily,
-    systemTheme,
-    reduceMotion,
-    setReduceMotion
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
   };
 
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -56,7 +51,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;

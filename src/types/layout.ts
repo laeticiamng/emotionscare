@@ -1,20 +1,16 @@
 
-import React from 'react';
-
-export interface LayoutProps {
-  children: React.ReactNode;
-  className?: string;
+export interface LayoutContextType {
+  sidebarCollapsed: boolean;
+  toggleSidebar: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  theme: string;
+  setTheme: (theme: string) => void;
+  fullscreen: boolean;
+  setFullscreen: (fullscreen: boolean) => void;
 }
 
 export interface LayoutProviderProps {
   children: React.ReactNode;
-  defaultLayout?: 'default' | 'narrow' | 'wide';
 }
-
-export type LayoutContextType = {
-  layout: 'default' | 'narrow' | 'wide';
-  setLayout: (layout: 'default' | 'narrow' | 'wide') => void;
-  isMobile: boolean;
-  isTablet: boolean;
-  isDesktop: boolean;
-};

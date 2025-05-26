@@ -1,39 +1,43 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage } from '@/types/chat';
+
+export interface ChatMessage {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  timestamp: Date;
+}
 
 export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = useCallback(async (content: string, sender: 'user' | 'assistant' = 'user') => {
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
+  const sendMessage = useCallback(async (content: string) => {
+    const userMessage: ChatMessage = {
+      id: Math.random().toString(36).substr(2, 9),
       content,
-      sender,
-      timestamp: new Date().toISOString()
+      role: 'user',
+      timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
 
-    if (sender === 'user') {
-      setIsProcessing(true);
+    try {
+      // Simulation réponse IA
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulation d'une réponse
-      setTimeout(() => {
-        const response: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          content: 'Merci pour votre message. Comment puis-je vous aider ?',
-          sender: 'assistant',
-          timestamp: new Date().toISOString()
-        };
-        
-        setMessages(prev => [...prev, response]);
-        setIsProcessing(false);
-      }, 1000);
-    }
+      const assistantMessage: ChatMessage = {
+        id: Math.random().toString(36).substr(2, 9),
+        content: 'Merci pour votre message. Comment puis-je vous aider aujourd\'hui ?',
+        role: 'assistant',
+        timestamp: new Date()
+      };
 
-    return newMessage;
+      setMessages(prev => [...prev, assistantMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const clearMessages = useCallback(() => {
@@ -44,6 +48,6 @@ export const useChat = () => {
     messages,
     sendMessage,
     clearMessages,
-    isProcessing
+    isLoading
   };
 };
