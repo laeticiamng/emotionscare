@@ -1,49 +1,74 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 const B2CDashboard: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Tableau de bord B2C</h1>
-          <Button onClick={signOut} variant="outline">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Tableau de bord B2C
+            </h1>
+            <p className="text-gray-600">
+              Bienvenue {user?.name || user?.email}
+            </p>
+          </div>
+          <Button onClick={logout} variant="outline">
             Déconnexion
           </Button>
-        </header>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Bienvenue {user?.name}</CardTitle>
+              <CardTitle>Glow Breath</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Votre espace personnel EmotionsCare</p>
+              <p className="text-gray-600 mb-4">
+                Suivez votre souffle et votre flow
+              </p>
+              <Button 
+                onClick={() => navigate('/glow-breath')}
+                className="w-full"
+              >
+                Voir mes stats
+              </Button>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Analyse émotionnelle</CardTitle>
+              <CardTitle>Journal</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Effectuez une nouvelle analyse de votre état émotionnel</p>
-              <Button className="mt-4">Commencer l'analyse</Button>
+              <p className="text-gray-600 mb-4">
+                Écrivez vos pensées quotidiennes
+              </p>
+              <Button variant="outline" className="w-full">
+                Ouvrir le journal
+              </Button>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Musique thérapeutique</CardTitle>
+              <CardTitle>Scan émotionnel</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Découvrez des playlists adaptées à votre humeur</p>
-              <Button className="mt-4">Explorer la musique</Button>
+              <p className="text-gray-600 mb-4">
+                Analysez votre état émotionnel
+              </p>
+              <Button variant="outline" className="w-full">
+                Commencer un scan
+              </Button>
             </CardContent>
           </Card>
         </div>

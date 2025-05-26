@@ -1,5 +1,6 @@
 
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -27,16 +28,25 @@ export const useAuth = () => {
   return context;
 };
 
+// Comptes démo prédéfinis
+const DEMO_ACCOUNTS = {
+  'b2c@exemple.fr': { password: 'b2c', role: 'b2c' as const },
+  'user@exemple.fr': { password: 'user', role: 'b2b_user' as const },
+  'admin@exemple.fr': { password: 'admin', role: 'b2b_admin' as const },
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     // Vérifier s'il y a un utilisateur stocké dans localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('user');
@@ -48,16 +58,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulation d'une connexion - en production, ceci ferait appel à une API
-      const mockUser: User = {
-        id: '1',
-        email,
-        role: 'b2c',
-        name: email.split('@')[0]
-      };
+      // Vérifier les comptes démo
+      const demoAccount = DEMO_ACCOUNTS[email as keyof typeof DEMO_ACCOUNTS];
       
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      if (demoAccount && demoAccount.password === password) {
+        const mockUser: User = {
+          id: Date.now().toString(),
+          email,
+          role: demoAccount.role,
+          name: email.split('@')[0]
+        };
+        
+        setUser(mockUser);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        
+        // Redirection automatique vers le bon dashboard
+        const dashboardRoutes = {
+          'b2c': '/b2c/dashboard',
+          'b2b_user': '/b2b/user/dashboard',
+          'b2b_admin': '/b2b/admin/dashboard'
+        };
+        
+        navigate(dashboardRoutes[mockUser.role]);
+      } else {
+        throw new Error('Email ou mot de passe incorrect');
+      }
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -69,7 +94,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (email: string, password: string, role: string) => {
     setIsLoading(true);
     try {
-      // Simulation d'une inscription - en production, ceci ferait appel à une API
       const mockUser: User = {
         id: Date.now().toString(),
         email,
@@ -79,6 +103,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
+      
+      // Redirection automatique vers le bon dashboard
+      const dashboardRoutes = {
+        'b2c': '/b2c/dashboard',
+        'b2b_user': '/b2b/user/dashboard',
+        'b2b_admin': '/b2b/admin/dashboard'
+      };
+      
+      navigate(dashboardRoutes[mockUser.role]);
     } catch (error) {
       console.error('Register error:', error);
       throw error;
@@ -90,6 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    navigate('/');
   };
 
   const value: AuthContextType = {

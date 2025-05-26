@@ -2,6 +2,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { LoadingIllustration } from '@/components/ui/loading-illustration';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,9 +10,17 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
-  if (!user) {
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingIllustration />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
     return <Navigate to="/choose-mode" replace />;
   }
 

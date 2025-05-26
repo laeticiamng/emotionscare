@@ -16,13 +16,7 @@ const B2BUserRegisterPage = React.lazy(() => import('./pages/auth/B2BUserRegiste
 const B2BUserDashboard = React.lazy(() => import('./pages/b2b/user/B2BUserDashboard'));
 const B2BAdminLoginPage = React.lazy(() => import('./pages/auth/B2BAdminLoginPage'));
 const B2BAdminDashboard = React.lazy(() => import('./pages/b2b/admin/B2BAdminDashboard'));
-const AuditPage = React.lazy(() => import('./pages/audit/AuditPage'));
-const BreathUserPage = React.lazy(() => import('./pages/BreathUserPage'));
-const BreathOrgPage = React.lazy(() => import('./pages/BreathOrgPage'));
-
-// Layout Components
-const B2CLayout = React.lazy(() => import('./layouts/B2CLayout'));
-const B2BLayout = React.lazy(() => import('./layouts/B2BLayout'));
+const GlowBreathPage = React.lazy(() => import('./pages/GlowBreathPage'));
 
 const withSuspense = (Component: React.ComponentType) => {
   return (props: any) => (
@@ -42,85 +36,60 @@ export const routes = [
     element: withSuspense(ChooseModePage)(),
   },
   {
-    path: '/audit',
-    element: withSuspense(AuditPage)(),
-  },
-  {
     path: '/b2b/selection',
     element: withSuspense(B2BSelectionPage)(),
   },
-  // B2C Routes
   {
-    path: '/b2c',
+    path: '/b2c/login',
+    element: withSuspense(B2CLoginPage)(),
+  },
+  {
+    path: '/b2c/register',
+    element: withSuspense(B2CRegisterPage)(),
+  },
+  {
+    path: '/b2c/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CLayout)()}
+        {withSuspense(B2CDashboard)()}
       </ProtectedRoute>
     ),
-    children: [
-      {
-        path: 'login',
-        element: withSuspense(B2CLoginPage)(),
-      },
-      {
-        path: 'register',
-        element: withSuspense(B2CRegisterPage)(),
-      },
-      {
-        path: 'dashboard',
-        element: withSuspense(B2CDashboard)(),
-      },
-      {
-        path: 'dashboard/breath',
-        element: withSuspense(BreathUserPage)(),
-      },
-    ],
   },
-  // B2B User Routes
   {
-    path: '/b2b/user',
+    path: '/b2b/user/login',
+    element: withSuspense(B2BUserLoginPage)(),
+  },
+  {
+    path: '/b2b/user/register',
+    element: withSuspense(B2BUserRegisterPage)(),
+  },
+  {
+    path: '/b2b/user/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2b_user">
-        {withSuspense(B2BLayout)()}
+        {withSuspense(B2BUserDashboard)()}
       </ProtectedRoute>
     ),
-    children: [
-      {
-        path: 'login',
-        element: withSuspense(B2BUserLoginPage)(),
-      },
-      {
-        path: 'register',
-        element: withSuspense(B2BUserRegisterPage)(),
-      },
-      {
-        path: 'dashboard',
-        element: withSuspense(B2BUserDashboard)(),
-      },
-    ],
   },
-  // B2B Admin Routes
   {
-    path: '/b2b/admin',
+    path: '/b2b/admin/login',
+    element: withSuspense(B2BAdminLoginPage)(),
+  },
+  {
+    path: '/b2b/admin/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2b_admin">
-        {withSuspense(B2BLayout)()}
+        {withSuspense(B2BAdminDashboard)()}
       </ProtectedRoute>
     ),
-    children: [
-      {
-        path: 'login',
-        element: withSuspense(B2BAdminLoginPage)(),
-      },
-      {
-        path: 'dashboard',
-        element: withSuspense(B2BAdminDashboard)(),
-      },
-      {
-        path: 'breath',
-        element: withSuspense(BreathOrgPage)(),
-      },
-    ],
+  },
+  {
+    path: '/glow-breath',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(GlowBreathPage)()}
+      </ProtectedRoute>
+    ),
   },
 ];
 
