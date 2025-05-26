@@ -1,5 +1,6 @@
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fastForwardTimers } from "@/tests/__mocks__/timers";
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
 import { mockResponse } from '@/tests/utils';
 
@@ -16,14 +17,12 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 vi.setConfig({ testTimeout: 15000 });
 
 describe('GlobalInterceptor', () => {
+  beforeAll(() => fastForwardTimers());
+  afterAll(() => vi.useRealTimers());
+
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   describe('secureFetch', () => {
@@ -59,9 +58,7 @@ describe('GlobalInterceptor', () => {
         mockResponse({ ok: false, status: 401, json: { message: 'unauthorized' } })
       );
 
-      const resultPromise = GlobalInterceptor.secureFetch('/test', {});
-      await vi.runAllTimersAsync();
-      const result = await resultPromise;
+      const result = await GlobalInterceptor.secureFetch('/test', {});
 
       expect(result).toBeNull();
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('sb-yaincoxihiqdksxgrsrk-auth-token');
@@ -79,9 +76,7 @@ describe('GlobalInterceptor', () => {
         )
         .mockResolvedValueOnce(mockResponse({ status: 200, json: {} }));
 
-      const resultPromise = GlobalInterceptor.secureFetch('/test', {});
-      await vi.runAllTimersAsync();
-      const result = await resultPromise;
+      const result = await GlobalInterceptor.secureFetch('/test', {});
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
       expect(result).toBeTruthy();
