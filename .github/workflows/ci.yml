@@ -40,8 +40,12 @@ jobs:
           echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
           echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: bash scripts/setup.sh
+      - name: Fast install
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+        run: node scripts/emergency-install.js
         timeout-minutes: 10
 
       - name: Build
