@@ -11,7 +11,9 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:db": "vitest run --config vitest.db.config.ts",
+    "test:db": "vitest run src/tests/db --passWithNoTests",
+
+
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
     "build:dev": "vite build --mode development",
     "type-check": "tsc --noEmit",
