@@ -1,4 +1,18 @@
 
+import { ChatMessage } from './chat';
+
+export interface CoachCharacterProps {
+  mood?: string;
+  size?: 'sm' | 'md' | 'lg';
+  animated?: boolean;
+  className?: string;
+}
+
+export interface CoachMessageProps {
+  message: ChatMessage;
+  isLast?: boolean;
+}
+
 export interface CoachChatProps {
   initialMessage?: string;
   showCharacter?: boolean;
@@ -10,14 +24,4 @@ export interface CoachChatProps {
   embedded?: boolean;
 }
 
-export interface CoachCharacterProps {
-  size?: 'sm' | 'md' | 'lg';
-  animated?: boolean;
-  className?: string;
-}
-
-export interface CoachMessageProps {
-  message: any;
-  isLast?: boolean;
-  className?: string;
-}
+export { ChatMessage, ChatConversation, ChatResponse } from './chat';

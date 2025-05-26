@@ -6,50 +6,46 @@ export const useCoachChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const addMessage = useCallback((content: string, sender: 'user' | 'assistant') => {
-    const newMessage: ChatMessage = {
+  const sendMessage = useCallback(async (content: string): Promise<string | undefined> => {
+    const userMessage: ChatMessage = {
       id: Date.now().toString(),
       content,
-      sender,
-      timestamp: new Date().toISOString(),
+      sender: 'user',
+      timestamp: new Date().toISOString()
     };
-    
-    setMessages(prev => [...prev, newMessage]);
-    return newMessage;
-  }, []);
 
-  const sendMessage = useCallback(async (content: string): Promise<string | undefined> => {
-    if (!content.trim()) return;
-
-    // Add user message
-    addMessage(content, 'user');
+    setMessages(prev => [...prev, userMessage]);
     setIsProcessing(true);
 
     try {
-      // Simulate API call
+      // Simulate AI response
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const response = `Merci pour votre message: "${content}". Comment puis-je vous aider davantage ?`;
-      addMessage(response, 'assistant');
-      
-      return response;
+      const aiResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: 'Merci pour votre message. Comment puis-je vous aider aujourd\'hui ?',
+        sender: 'assistant',
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, aiResponse]);
+      return aiResponse.content;
     } catch (error) {
       console.error('Error sending message:', error);
-      addMessage('Désolé, une erreur est survenue. Veuillez réessayer.', 'assistant');
+      return undefined;
     } finally {
       setIsProcessing(false);
     }
-  }, [addMessage]);
+  }, []);
 
-  const clearMessages = useCallback(() => {
-    setMessages([]);
+  const addMessage = useCallback((message: ChatMessage) => {
+    setMessages(prev => [...prev, message]);
   }, []);
 
   return {
     messages,
     sendMessage,
-    addMessage,
-    clearMessages,
-    isProcessing
+    isProcessing,
+    addMessage
   };
 };

@@ -8,10 +8,10 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, userData?: Partial<User>) => Promise<void>;
+  register: (email: string, password: string, userData?: any) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -21,16 +21,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Simulate auth check
     const checkAuth = async () => {
       try {
-        // Mock user for development
-        const mockUser: User = {
-          id: '1',
-          email: 'user@example.com',
-          role: 'b2c',
-          name: 'Test User',
-        };
-        setUser(mockUser);
+        // Check for stored user data
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        console.error('Auth check error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -42,14 +39,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock login
+      // Simulate login
       const mockUser: User = {
         id: '1',
         email,
         role: 'b2c',
-        name: 'Test User',
+        name: email.split('@')[0]
       };
       setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -57,19 +58,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     setUser(null);
+    localStorage.removeItem('user');
   };
 
-  const register = async (email: string, password: string, userData?: Partial<User>) => {
+  const register = async (email: string, password: string, userData?: any) => {
     setIsLoading(true);
     try {
-      // Mock registration
+      // Simulate registration
       const mockUser: User = {
         id: '1',
         email,
         role: 'b2c',
-        name: userData?.name || 'New User',
+        name: userData?.name || email.split('@')[0]
       };
       setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading,
     login,
     logout,
-    register,
+    register
   };
 
   return (

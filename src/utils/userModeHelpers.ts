@@ -14,6 +14,10 @@ export const getUserModeDisplayName = (mode: UserRole): string => {
   }
 };
 
+export const getUserModeLabel = (mode: UserRole): string => {
+  return getUserModeDisplayName(mode);
+};
+
 export const getModePermissions = (mode: UserRole) => {
   return {
     canAccessAdmin: mode === 'b2b_admin',
@@ -33,5 +37,17 @@ export const getRoutePath = (mode: UserRole, path: string): string => {
     case 'b2c':
     default:
       return `/b2c/${path}`;
+  }
+};
+
+export const getModeDashboardPath = (mode: UserRole): string => {
+  switch (mode) {
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    case 'b2c':
+    default:
+      return '/b2c/dashboard';
   }
 };

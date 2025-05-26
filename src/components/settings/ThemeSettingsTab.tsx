@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThemeName } from '@/types/theme';
 
@@ -13,47 +13,64 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   currentTheme,
   onThemeChange
 }) => {
-  const themes: { value: ThemeName; label: string; description: string }[] = [
+  const themes: { name: ThemeName; label: string; description: string }[] = [
     {
-      value: 'light',
+      name: 'light',
       label: 'Clair',
-      description: 'Thème clair classique'
+      description: 'Thème clair pour une utilisation en journée'
     },
     {
-      value: 'dark',
+      name: 'dark',
       label: 'Sombre',
-      description: 'Thème sombre pour les yeux'
+      description: 'Thème sombre pour réduire la fatigue oculaire'
     },
     {
-      value: 'system',
+      name: 'system',
       label: 'Système',
-      description: 'Suit les préférences du système'
-    },
-    {
-      value: 'pastel',
-      label: 'Pastel',
-      description: 'Couleurs douces et apaisantes'
+      description: 'Suit automatiquement les préférences de votre système'
     }
   ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Préférences de thème</CardTitle>
+        <CardTitle>Apparence</CardTitle>
+        <CardDescription>
+          Personnalisez l'apparence de l'application selon vos préférences
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {themes.map((theme) => (
-            <Button
-              key={theme.value}
-              variant={currentTheme === theme.value ? 'default' : 'outline'}
-              onClick={() => onThemeChange(theme.value)}
-              className="h-auto p-4 flex flex-col items-start"
+            <Card 
+              key={theme.name}
+              className={`cursor-pointer transition-colors ${
+                currentTheme === theme.name 
+                  ? 'ring-2 ring-primary' 
+                  : 'hover:bg-muted/50'
+              }`}
+              onClick={() => onThemeChange(theme.name)}
             >
-              <div className="font-medium">{theme.label}</div>
-              <div className="text-sm text-muted-foreground">{theme.description}</div>
-            </Button>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">{theme.label}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-xs text-muted-foreground">
+                  {theme.description}
+                </p>
+              </CardContent>
+            </Card>
           ))}
+        </div>
+        
+        <div className="pt-4">
+          <Button
+            variant="outline"
+            onClick={() => onThemeChange('system')}
+            className="w-full"
+          >
+            Réinitialiser aux paramètres système
+          </Button>
         </div>
       </CardContent>
     </Card>

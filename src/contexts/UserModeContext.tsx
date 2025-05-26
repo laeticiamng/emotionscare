@@ -3,23 +3,32 @@ import React, { createContext, useContext, useState } from 'react';
 import { UserRole } from '@/types/user';
 
 interface UserModeContextType {
-  currentMode: UserRole;
-  userMode: UserRole; // Alias pour compatibilité
-  setCurrentMode: (mode: UserRole) => void;
+  userMode: UserRole;
+  setUserMode: (mode: UserRole) => void;
+  changeUserMode: (mode: UserRole) => void;
   isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentMode, setCurrentMode] = useState<UserRole>('b2c');
+  const [userMode, setUserMode] = useState<UserRole>('b2c');
   const [isLoading, setIsLoading] = useState(false);
 
+  const changeUserMode = (mode: UserRole) => {
+    setIsLoading(true);
+    setUserMode(mode);
+    localStorage.setItem('userMode', mode);
+    setTimeout(() => setIsLoading(false), 500);
+  };
+
   const value: UserModeContextType = {
-    currentMode,
-    userMode: currentMode, // Alias pour compatibilité
-    setCurrentMode,
-    isLoading
+    userMode,
+    setUserMode,
+    changeUserMode,
+    isLoading,
+    setIsLoading
   };
 
   return (
