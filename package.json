@@ -13,7 +13,7 @@
     "test": "vitest run --passWithNoTests",
     "test:ui": "vitest run src/pages/settings/SilkPage.test.tsx",
     "test:edge": "vitest --environment edge-runtime",
-    "test:db": "vitest run tests/db/**/*.test.ts",
+    "test:db": "pgtap-run -q tests/sql/**/*.sql",
     "flyway:migrate": "flyway -locations=filesystem:./migrations migrate",
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
     "lint": "eslint .",
@@ -170,7 +170,10 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "edge-test-kit": "^0.7.2",
+    "pgtap-run": "^1.2.1",
+    "supabase-edge-functions-test": "^0.3.0"
   },
   "optionalDependencies": {
     "cypress": "^13.5.0",

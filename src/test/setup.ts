@@ -64,3 +64,22 @@ HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
   rect: vi.fn(),
   clip: vi.fn(),
 });
+
+// Mock fetch
+global.fetch = vi.fn();
+
+// Mock crypto.subtle
+Object.defineProperty(globalThis, 'crypto', {
+  value: {
+    subtle: {
+      digest: vi.fn(async () => new ArrayBuffer(0)),
+    },
+  },
+});
+
+// Mock navigator.share
+Object.defineProperty(globalThis, 'navigator', {
+  value: {
+    share: vi.fn(),
+  },
+});
