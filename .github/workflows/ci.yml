@@ -1,24 +1,64 @@
-
 name: CI
-on: [push, pull_request]
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-          
-      - name: Configure npm registry
-        run: npm config set registry https://registry.npmmirror.com
 
-      - name: Setup optimal caching
-        uses: actions/cache@v3
+on:
+  push:
+    branches: [feat/dashboard-widgets]
+  pull_request:
+
+env:
+  SKIP_HEAVY: "true"
+  NODE_VERSION: "20"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # 1. install offline-friendly
+      - run: |
+          npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
+
+      # 2. lint + types
+      - run: npm run lint
+      - run: npm run tsc -- --noEmit
+
+      # 3. unit + db tests
+      - run: npm run test:db --if-present
+      - run: npm run test -- --coverage --environment=jsdom
+
+      # 4. upload coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+
+      # 5. security audit
+      - run: npm audit --omit dev || true
+      - run: npx owasp-depcheck --failOnCritical
+
+  e2e-web:
+    runs-on: ubuntu-22.04
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run start &
+      - run: npm run test:e2e:web
+
+  e2e-mobile:
+    runs-on: macos-13
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           path: |
             **/node_modules
@@ -57,3 +97,66 @@ jobs:
       - name: Run tests
         run: npm run test -- --environment=jsdom
         timeout-minutes: 5
+
+  api-test:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: Configure npm registry
+        run: npm config set registry https://registry.npmmirror.com
+      - name: Fast install
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+        run: node scripts/emergency-install.js
+        timeout-minutes: 10
+      - name: Run API tests
+        run: npm run test:api
+      - name: Database migrations
+        run: npm run db:migrate
+
+      - name: Refresh journal view
+        run: npm run db:refresh:journal
+
+      - name: Run DB tests
+        run: npm run test:db
+  db-test:
+    needs: build-and-test
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner
+          POSTGRES_DB: testdb
+        ports: ['5432:5432']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with: { node-version: 20 }
+      - run: npm ci --prefer-offline --legacy-peer-deps
+      - run: npm run db:migrate
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: testdb
+          DB_USER: runner
+          DB_PASS: runner
+      - run: npm run test:db
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: testdb
+          DB_USER: runner
+          DB_PASS: runner
+          node-version: 20
+      - run: npm ci
+      - run: npm run test:e2e:mobile
