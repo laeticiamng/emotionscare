@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { EmotionResult } from '@/types/emotions';
-import { Loader2, Mic, Type, Image } from 'lucide-react';
+import { useEmotionScan } from '@/hooks/useEmotionScan';
+import { Mic, Camera, Type, X } from 'lucide-react';
 
 interface EmotionScanFormProps {
   onComplete: (result: EmotionResult) => void;
@@ -12,111 +13,90 @@ interface EmotionScanFormProps {
 }
 
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete, onClose }) => {
-  const [inputText, setInputText] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [text, setText] = useState('');
   const [scanType, setScanType] = useState<'text' | 'voice' | 'image'>('text');
+  const { scanEmotion, isScanning } = useEmotionScan();
 
-  const handleAnalyze = async () => {
-    if (!inputText.trim()) return;
-
-    setIsAnalyzing(true);
-    
+  const handleScan = async () => {
     try {
-      // Simulation d'analyse
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockResult: EmotionResult = {
-        id: Math.random().toString(36),
-        userId: 'current-user',
-        timestamp: new Date(),
-        overallMood: 'positive',
-        emotions: [
-          { emotion: 'joie', confidence: 0.8, intensity: 0.7 },
-          { emotion: 'sérénité', confidence: 0.6, intensity: 0.5 }
-        ],
-        dominantEmotion: 'joie',
-        confidence: 0.8,
-        source: scanType,
-        recommendations: ['Continuer sur cette lancée positive'],
-        metadata: {
-          inputLength: inputText.length,
-          processingTime: 2000
-        }
-      };
-      
-      onComplete(mockResult);
-      onClose();
+      const result = await scanEmotion({
+        text: scanType === 'text' ? text : undefined,
+        type: scanType
+      });
+      onComplete(result);
     } catch (error) {
-      console.error('Erreur analyse:', error);
-    } finally {
-      setIsAnalyzing(false);
+      console.error('Scan failed:', error);
     }
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span>Analyse Émotionnelle</span>
-          {scanType === 'text' && <Type className="w-5 h-5" />}
-          {scanType === 'voice' && <Mic className="w-5 h-5" />}
-          {scanType === 'image' && <Image className="w-5 h-5" />}
+        <CardTitle className="flex items-center justify-between">
+          Analyse émotionnelle
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <Button
             variant={scanType === 'text' ? 'default' : 'outline'}
-            size="sm"
             onClick={() => setScanType('text')}
+            size="sm"
           >
-            <Type className="w-4 h-4 mr-2" />
+            <Type className="mr-2 h-4 w-4" />
             Texte
           </Button>
           <Button
             variant={scanType === 'voice' ? 'default' : 'outline'}
-            size="sm"
             onClick={() => setScanType('voice')}
+            size="sm"
           >
-            <Mic className="w-4 h-4 mr-2" />
-            Vocal
+            <Mic className="mr-2 h-4 w-4" />
+            Audio
           </Button>
           <Button
             variant={scanType === 'image' ? 'default' : 'outline'}
-            size="sm"
             onClick={() => setScanType('image')}
+            size="sm"
           >
-            <Image className="w-4 h-4 mr-2" />
+            <Camera className="mr-2 h-4 w-4" />
             Image
           </Button>
         </div>
 
-        <Textarea
-          placeholder="Décrivez comment vous vous sentez..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          rows={4}
-          disabled={isAnalyzing}
-        />
+        {scanType === 'text' && (
+          <Textarea
+            placeholder="Décrivez comment vous vous sentez..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={4}
+          />
+        )}
 
-        <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={onClose} disabled={isAnalyzing}>
-            Annuler
-          </Button>
-          <Button 
-            onClick={handleAnalyze} 
-            disabled={!inputText.trim() || isAnalyzing}
-          >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyse...
-              </>
-            ) : (
-              'Analyser'
-            )}
-          </Button>
-        </div>
+        {scanType === 'voice' && (
+          <div className="p-8 border-2 border-dashed rounded-lg text-center">
+            <Mic className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p>Cliquez pour commencer l'enregistrement audio</p>
+          </div>
+        )}
+
+        {scanType === 'image' && (
+          <div className="p-8 border-2 border-dashed rounded-lg text-center">
+            <Camera className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p>Prenez une photo ou sélectionnez une image</p>
+          </div>
+        )}
+
+        <Button 
+          onClick={handleScan} 
+          disabled={isScanning || (scanType === 'text' && !text.trim())}
+          className="w-full"
+        >
+          {isScanning ? 'Analyse en cours...' : 'Analyser'}
+        </Button>
       </CardContent>
     </Card>
   );

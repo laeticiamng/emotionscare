@@ -1,108 +1,104 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity, TrendingUp, Users, Shield } from 'lucide-react';
+import { Heart, Brain, Activity, TrendingUp } from 'lucide-react';
+import { UserRole } from '@/types/user';
 
 interface GlobalOverviewTabProps {
   className?: string;
-  userRole?: string;
+  userRole?: UserRole;
 }
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRole }) => {
-  const isB2BUser = userRole === 'b2b_user';
-  
+  const stats = [
+    {
+      title: 'Bien-être général',
+      value: '85%',
+      icon: Heart,
+      trend: '+5%',
+      color: 'text-green-500'
+    },
+    {
+      title: 'Niveau de stress',
+      value: 'Faible',
+      icon: Brain,
+      trend: '-12%',
+      color: 'text-blue-500'
+    },
+    {
+      title: 'Activité quotidienne',
+      value: '7/10',
+      icon: Activity,
+      trend: '+2%',
+      color: 'text-purple-500'
+    },
+    {
+      title: 'Progression',
+      value: '92%',
+      icon: TrendingUp,
+      trend: '+8%',
+      color: 'text-orange-500'
+    }
+  ];
+
   return (
     <div className={className}>
-      <h2 className="text-xl font-semibold mb-4">
-        {isB2BUser ? 'Ma vue d\'ensemble' : 'Vue globale'}
-      </h2>
-      
-      {isB2BUser ? (
-        // Vue limitée pour les collaborateurs - uniquement données personnelles
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium flex items-center">
-                <Activity className="mr-2 h-5 w-5 text-primary" />
-                Mon activité
-              </CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat, index) => (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">78%</p>
-              <p className="text-sm text-muted-foreground">Score de bien-être personnel</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium flex items-center">
-                <TrendingUp className="mr-2 h-5 w-5 text-green-500" />
-                Ma progression
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">+5%</p>
-              <p className="text-sm text-muted-foreground">Amélioration cette semaine</p>
-            </CardContent>
-          </Card>
-
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Shield className="mr-2 h-5 w-5 text-blue-500" />
-                Confidentialité
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Vos données personnelles sont protégées et ne sont jamais partagées individuellement. 
-                Seules des statistiques anonymisées et agrégées sont utilisées pour améliorer le bien-être collectif.
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-500">{stat.trend}</span> par rapport à la semaine dernière
               </p>
             </CardContent>
           </Card>
-        </div>
-      ) : (
-        // Vue complète pour les autres rôles
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium flex items-center">
-                <Users className="mr-2 h-5 w-5 text-primary" />
-                Membres actifs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">24/32</p>
-              <p className="text-sm text-muted-foreground">Utilisateurs actifs cette semaine</p>
-            </CardContent>
-          </Card>
+        ))}
+      </div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium flex items-center">
-                <Activity className="mr-2 h-5 w-5 text-primary" />
-                Activité récente
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">78%</p>
-              <p className="text-sm text-muted-foreground">Score moyen d'engagement</p>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Aperçu de la semaine</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Analyses émotionnelles</span>
+                <span className="font-medium">12</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Sessions VR</span>
+                <span className="font-medium">5</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Écoute musicale</span>
+                <span className="font-medium">8h 30min</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium flex items-center">
-                <TrendingUp className="mr-2 h-5 w-5 text-green-500" />
-                Progression globale
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">+12%</p>
-              <p className="text-sm text-muted-foreground">Amélioration du bien-être général</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recommandations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                <p className="text-sm">Prenez une pause VR de 10 minutes pour réduire le stress</p>
+              </div>
+              <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+                <p className="text-sm">Votre bien-être s'améliore ! Continuez vos bonnes habitudes</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

@@ -1,10 +1,11 @@
 
 export interface ChatMessage {
   id: string;
-  content: string;
-  sender: 'user' | 'coach';
+  text: string;
+  sender: 'user' | 'coach' | 'ai';
   timestamp: Date;
-  type?: 'text' | 'suggestion' | 'recommendation';
+  type?: 'text' | 'image' | 'audio';
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
@@ -13,33 +14,20 @@ export interface ChatConversation {
   messages: ChatMessage[];
   createdAt: Date;
   updatedAt: Date;
+  userId: string;
+  isActive?: boolean;
 }
 
 export interface ChatResponse {
   message: string;
+  confidence?: number;
   suggestions?: string[];
-  recommendations?: any[];
+  emotion?: string;
 }
 
-export interface CoachCharacterProps {
-  size?: 'sm' | 'md' | 'lg';
-  animated?: boolean;
-  className?: string;
-}
-
-export interface CoachMessageProps {
-  message: ChatMessage;
-  isLast?: boolean;
-  className?: string;
-}
-
-export interface CoachChatProps {
-  initialMessage?: string;
-  showCharacter?: boolean;
-  characterSize?: 'sm' | 'md' | 'lg';
-  className?: string;
-  showControls?: boolean;
-  showHeader?: boolean;
-  showInput?: boolean;
-  embedded?: boolean;
+export interface CoachPersonality {
+  name: string;
+  avatar: string;
+  style: 'supportive' | 'motivational' | 'analytical' | 'empathetic';
+  specialties: string[];
 }

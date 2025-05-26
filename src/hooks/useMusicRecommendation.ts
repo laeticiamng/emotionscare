@@ -1,62 +1,37 @@
 
-import { useState, useEffect } from 'react';
-import { useMusicEmotionIntegration } from './useMusicEmotionIntegration';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { useState } from 'react';
+import { MusicTrack } from '@/types/music';
 
-interface UseMusicRecommendationOptions {
-  autoActivate?: boolean;
-  defaultEmotion?: string;
-  intensity?: number;
-}
-
-export const useMusicRecommendation = (options: UseMusicRecommendationOptions = {}) => {
-  const { autoActivate = false, defaultEmotion, intensity = 0.5 } = options;
-  const [currentEmotion, setCurrentEmotion] = useState<string | null>(defaultEmotion || null);
-  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+const useMusicRecommendation = () => {
+  const [recommendations, setRecommendations] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
-  useEffect(() => {
-    if (autoActivate && currentEmotion) {
-      loadMusicForEmotion(currentEmotion);
-    }
-  }, [currentEmotion, autoActivate]);
-
-  const loadMusicForEmotion = async (emotion: string) => {
-    if (!emotion) return null;
-    
+  const getRecommendations = async (emotion?: string): Promise<MusicTrack[]> => {
     setIsLoading(true);
-    try {
-      const params: EmotionMusicParams = {
-        emotion,
-        intensity
-      };
-      
-      const result = await activateMusicForEmotion(params);
-      if (result !== null) {
-        setPlaylist(result);
+    
+    // Simulation
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const mockRecommendations: MusicTrack[] = [
+      {
+        id: '1',
+        title: 'Relaxing Ambient',
+        artist: 'Nature Sounds',
+        url: '/audio/ambient.mp3',
+        duration: 300,
+        emotion: emotion || 'calm'
       }
-      return result;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateEmotion = async (emotion: string, activate = false) => {
-    setCurrentEmotion(emotion);
-    if (activate) {
-      return await loadMusicForEmotion(emotion);
-    }
-    return null;
+    ];
+    
+    setRecommendations(mockRecommendations);
+    setIsLoading(false);
+    return mockRecommendations;
   };
 
   return {
-    currentEmotion,
-    playlist,
+    recommendations,
     isLoading,
-    updateEmotion,
-    loadMusicForEmotion,
-    tracks: playlist ? playlist.tracks : [],
+    getRecommendations
   };
 };
 

@@ -1,98 +1,99 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, LineChart, PieChart, Shield } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface AnalyticsTabProps {
   className?: string;
   personalOnly?: boolean;
 }
 
-const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly = false }) => {
+const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) => {
+  const recentAnalyses = [
+    {
+      date: '2024-01-15',
+      emotion: 'Positif',
+      score: 8.5,
+      type: 'Texte'
+    },
+    {
+      date: '2024-01-14',
+      emotion: 'Calme',
+      score: 7.2,
+      type: 'Audio'
+    },
+    {
+      date: '2024-01-13',
+      emotion: 'Énergique',
+      score: 9.1,
+      type: 'Image'
+    }
+  ];
+
+  const getEmotionColor = (emotion: string) => {
+    switch (emotion.toLowerCase()) {
+      case 'positif':
+      case 'énergique':
+        return 'bg-green-100 text-green-800';
+      case 'calme':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className={className}>
-      <h2 className="text-xl font-semibold mb-4">
-        {personalOnly ? 'Mes analyses personnelles' : 'Analyses et statistiques'}
-      </h2>
-      
-      {personalOnly ? (
-        // Vue limitée pour les collaborateurs B2B
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart className="mr-2 h-5 w-5" />
-                Mon évolution émotionnelle
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Graphique de votre évolution personnelle</p>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Analyses récentes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentAnalyses.map((analysis, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge className={getEmotionColor(analysis.emotion)}>
+                        {analysis.emotion}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">{analysis.type}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{analysis.date}</p>
+                  </div>
+                  <div className="text-lg font-semibold">
+                    {analysis.score}/10
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <PieChart className="mr-2 h-5 w-5" />
-                Répartition de mes émotions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Analyse de vos émotions personnelles</p>
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendances émotionnelles</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="h-48 flex items-center justify-center bg-muted rounded-lg">
+                <p className="text-muted-foreground">Graphique des tendances</p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Shield className="mr-2 h-5 w-5 text-blue-500" />
-                Protection des données
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Ces analyses ne concernent que vos données personnelles. 
-                Aucune information individuelle n'est accessible aux administrateurs RH.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        // Vue complète pour les autres rôles
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart className="mr-2 h-5 w-5" />
-                Tendances générales
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Graphiques analytiques en développement...</p>
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-green-500">↑ 15%</div>
+                  <p className="text-sm text-muted-foreground">Humeur positive</p>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-500">↓ 8%</div>
+                  <p className="text-sm text-muted-foreground">Niveau de stress</p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <LineChart className="mr-2 h-5 w-5" />
-                Évolution temporelle
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Évolution des métriques dans le temps</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

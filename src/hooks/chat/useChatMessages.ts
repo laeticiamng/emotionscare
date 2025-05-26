@@ -4,15 +4,10 @@ import { ChatMessage } from '@/types/chat';
 
 export const useChatMessages = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const addMessage = useCallback((message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
-    const newMessage: ChatMessage = {
-      ...message,
-      id: Date.now().toString(),
-      timestamp: new Date(),
-    };
-    setMessages(prev => [...prev, newMessage]);
-    return newMessage;
+  const addMessage = useCallback((message: ChatMessage) => {
+    setMessages(prev => [...prev, message]);
   }, []);
 
   const clearMessages = useCallback(() => {
@@ -23,6 +18,7 @@ export const useChatMessages = () => {
     messages,
     addMessage,
     clearMessages,
-    setMessages,
+    isLoading,
+    setIsLoading
   };
 };

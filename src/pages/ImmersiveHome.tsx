@@ -1,128 +1,146 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart, ArrowRight, Brain, Music, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Brain, Heart, Users, ArrowRight, Play } from 'lucide-react';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
 
   const features = [
     {
-      icon: <Brain className="h-8 w-8 text-blue-500" />,
-      title: "Scanner émotionnel",
-      description: "Analysez vos émotions en temps réel"
+      icon: Brain,
+      title: 'Analyse émotionnelle IA',
+      description: 'Comprenez vos émotions grâce à notre technologie avancée',
+      gradient: 'from-blue-500 to-indigo-600'
     },
     {
-      icon: <Heart className="h-8 w-8 text-red-500" />,
-      title: "Coach IA",
-      description: "Un accompagnement personnalisé"
+      icon: Heart,
+      title: 'Musique thérapeutique',
+      description: 'Playlists personnalisées adaptées à votre état émotionnel',
+      gradient: 'from-pink-500 to-rose-600'
     },
     {
-      icon: <Music className="h-8 w-8 text-purple-500" />,
-      title: "Musicothérapie",
-      description: "Musique adaptée à votre état émotionnel"
-    },
-    {
-      icon: <Users className="h-8 w-8 text-green-500" />,
-      title: "Communauté",
-      description: "Partagez avec d'autres utilisateurs"
+      icon: Users,
+      title: 'Accompagnement coach',
+      description: 'Support personnalisé avec notre IA bienveillante',
+      gradient: 'from-emerald-500 to-teal-600'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <div className="flex justify-center mb-6">
-            <Heart className="h-16 w-16 text-red-500" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
+        <div className="relative container mx-auto px-4 py-24 text-center">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <h1 className="text-6xl md:text-7xl font-bold text-slate-900 dark:text-white">
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                EmotionsCare
+              </span>
+            </h1>
+            <p className="text-2xl md:text-3xl text-slate-600 dark:text-slate-300 font-light">
+              Votre plateforme de bien-être émotionnel
+              <span className="block text-lg mt-2 opacity-75">powered by AI</span>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg"
+                onClick={() => navigate('/choose-mode')}
+              >
+                <Play className="mr-2 h-5 w-5" />
+                Commencer maintenant
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-2 px-8 py-4 text-lg"
+                onClick={() => navigate('/b2b/selection')}
+              >
+                Espace Entreprise
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </div>
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            EmotionsCare
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-            Votre plateforme de bien-être émotionnel alimentée par l'intelligence artificielle. 
-            Découvrez un nouveau niveau de conscience émotionnelle.
-          </p>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-white/50 dark:bg-slate-800/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Découvrez nos fonctionnalités
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Une approche complète du bien-être émotionnel, alimentée par l'intelligence artificielle
+            </p>
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => navigate('/b2c/login')}
-              size="lg"
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-            >
-              Accès Personnel
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button 
-              onClick={() => navigate('/b2b/selection')}
-              variant="outline" 
-              size="lg"
-            >
-              Accès Entreprise
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon;
+              return (
+                <Card 
+                  key={index} 
+                  className="relative overflow-hidden hover:shadow-xl transition-all duration-500 transform hover:scale-105 group"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                  
+                  <CardHeader className="text-center space-y-4">
+                    <div className={`mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${feature.gradient} flex items-center justify-center`}>
+                      <IconComponent className="h-8 w-8 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <p className="text-slate-600 dark:text-slate-300 text-center">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-        </motion.div>
+        </div>
+      </section>
 
-        {/* Features */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
-        >
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
-            >
-              <Card className="text-center h-full hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex justify-center mb-4">{feature.icon}</div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Navigation Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-center"
-        >
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="ghost" onClick={() => navigate('/about')}>
-              À propos
-            </Button>
-            <Button variant="ghost" onClick={() => navigate('/philosophy')}>
-              Notre philosophie
-            </Button>
-            <Button variant="ghost" onClick={() => navigate('/contact')}>
-              Contact
-            </Button>
-            <Button variant="ghost" onClick={() => navigate('/faq')}>
-              FAQ
-            </Button>
+      {/* CTA Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-4 text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-white max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Prêt à prendre soin de votre bien-être émotionnel ?
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Rejoignez des milliers d'utilisateurs qui font confiance à EmotionsCare
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-blue-600 hover:bg-slate-50 px-8 py-4"
+                onClick={() => navigate('/choose-mode')}
+              >
+                Commencer gratuitement
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4"
+                onClick={() => navigate('/b2b/selection')}
+              >
+                Solutions Entreprise
+              </Button>
+            </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 };

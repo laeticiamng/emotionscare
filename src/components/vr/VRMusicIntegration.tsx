@@ -1,9 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
-import { VRSessionTemplate } from '@/types/vr';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Pause } from 'lucide-react';
+import { VRSessionTemplate } from '@/types/vr';
+import { Music, Volume2, VolumeX } from 'lucide-react';
 
 interface VRMusicIntegrationProps {
   template: VRSessionTemplate;
@@ -16,87 +16,94 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
   emotionTarget,
   onMusicReady
 }) => {
+  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMusicLoaded, setIsMusicLoaded] = useState(false);
-  const { getMusicRecommendationForEmotion, playEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
-  
-  const recommendedMood = template.recommendedMood || emotionTarget || 'calm';
-  
+  const [volume, setVolume] = useState(0.7);
+
   useEffect(() => {
-    // Auto-play background music if available
-    if (recommendedMood && !isMusicLoaded) {
-      loadMusicForEmotion();
+    if (isMusicEnabled && onMusicReady) {
+      onMusicReady();
     }
-  }, [recommendedMood]);
-  
-  const loadMusicForEmotion = async () => {
-    try {
-      if (playEmotion) {
-        const result = await playEmotion(recommendedMood);
-        if (result !== null) {
-          setIsPlaying(true);
-          setIsMusicLoaded(true);
-          
-          if (onMusicReady) {
-            onMusicReady();
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error loading VR music:', error);
-    }
-  };
-  
+  }, [isMusicEnabled, onMusicReady]);
+
   const toggleMusic = () => {
-    if (isPlaying) {
-      // Logic to pause music would go here
-      setIsPlaying(false);
+    setIsMusicEnabled(!isMusicEnabled);
+    if (!isMusicEnabled) {
+      setIsPlaying(true);
     } else {
-      loadMusicForEmotion();
+      setIsPlaying(false);
     }
   };
-  
+
+  const togglePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const adjustVolume = (newVolume: number) => {
+    setVolume(Math.max(0, Math.min(1, newVolume)));
+  };
+
   return (
-    <div className="bg-card rounded-lg p-4 space-y-4">
-      <h3 className="text-lg font-medium">Ambiance sonore</h3>
-      <p className="text-sm text-muted-foreground">{getEmotionMusicDescription(recommendedMood)}</p>
-      
-      <div className="flex justify-between items-center">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleMusic}
-          className="flex items-center gap-2"
-        >
-          {isPlaying ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>Pause</span>
-            </>
-          ) : (
-            <>
-              <Music className="h-4 w-4" />
-              <span>Écouter</span>
-            </>
-          )}
-        </Button>
-        
-        {isPlaying && (
-          <div className="flex space-x-1">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 h-4 bg-primary animate-pulse"
-                style={{
-                  animationDelay: `${i * 0.15}s`,
-                  animationDuration: '0.8s'
-                }}
-              />
-            ))}
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Music className="h-5 w-5" />
+          Ambiance musicale
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            Musique adaptée à l'environnement
+          </span>
+          <Button
+            variant={isMusicEnabled ? "default" : "outline"}
+            size="sm"
+            onClick={toggleMusic}
+          >
+            {isMusicEnabled ? "Activée" : "Désactivée"}
+          </Button>
+        </div>
+
+        {isMusicEnabled && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={togglePlayPause}
+              >
+                {isPlaying ? "Pause" : "Play"}
+              </Button>
+              
+              <div className="flex items-center gap-2 flex-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => adjustVolume(volume === 0 ? 0.7 : 0)}
+                >
+                  {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                </Button>
+                
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={(e) => adjustVolume(parseFloat(e.target.value))}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              Musique recommandée pour: {emotionTarget || template.category}
+            </div>
           </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,42 +1,33 @@
 
 import { useState } from 'react';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { MusicTrack } from '@/types/music';
 
 export const useMusicEmotionIntegration = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
-    setIsLoading(true);
-    try {
-      // Simulation d'une playlist basée sur l'émotion
-      const mockPlaylist: MusicPlaylist = {
+  const generateMusicForEmotion = async (emotion: string): Promise<MusicTrack[]> => {
+    setIsGenerating(true);
+    
+    // Simulation de génération
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const mockTracks: MusicTrack[] = [
+      {
         id: Date.now().toString(),
-        name: `Playlist ${params.emotion}`,
-        emotion: params.emotion,
-        tracks: [
-          {
-            id: '1',
-            title: `Musique pour ${params.emotion}`,
-            artist: 'Artiste Thérapeutique',
-            url: '/sounds/ambient-calm.mp3',
-            duration: 180,
-            cover: '/images/music-placeholder.jpg'
-          }
-        ],
-        description: `Playlist personnalisée pour l'émotion: ${params.emotion}`
-      };
-      
-      return mockPlaylist;
-    } catch (error) {
-      console.error('Erreur lors de l\'activation de la musique:', error);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+        title: `Musique pour ${emotion}`,
+        artist: 'IA Composer',
+        url: '/audio/generated.mp3',
+        duration: 240,
+        emotion: emotion.toLowerCase()
+      }
+    ];
+    
+    setIsGenerating(false);
+    return mockTracks;
   };
 
   return {
-    activateMusicForEmotion,
-    isLoading
+    isGenerating,
+    generateMusicForEmotion
   };
 };
