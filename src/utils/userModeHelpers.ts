@@ -1,27 +1,37 @@
 
-import { UserRole } from './roleUtils';
+import { UserRole } from '@/types/user';
 
-export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
-
-export const normalizeUserMode = (role: string | UserRole): UserMode => {
-  switch (role) {
-    case 'b2b_user':
-    case 'b2b_admin':
-      return role;
+export const getUserModeDisplayName = (mode: UserRole): string => {
+  switch (mode) {
     case 'b2c':
+      return 'Particulier';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'Administrateur RH';
     default:
-      return 'b2c';
+      return 'Utilisateur';
   }
 };
 
-export const getModeDashboardPath = (mode: UserMode): string => {
+export const getModePermissions = (mode: UserRole) => {
+  return {
+    canAccessAdmin: mode === 'b2b_admin',
+    canAccessB2B: mode === 'b2b_user' || mode === 'b2b_admin',
+    canAccessB2C: mode === 'b2c',
+    canManageUsers: mode === 'b2b_admin',
+    canViewAnalytics: mode === 'b2b_admin',
+  };
+};
+
+export const getRoutePath = (mode: UserRole, path: string): string => {
   switch (mode) {
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return `/b2b/user/${path}`;
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return `/b2b/admin/${path}`;
     case 'b2c':
     default:
-      return '/b2c/dashboard';
+      return `/b2c/${path}`;
   }
 };

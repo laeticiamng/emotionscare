@@ -4,25 +4,31 @@ import { ChatMessage } from '@/types/chat';
 
 export const useChatMessages = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const addMessage = useCallback((message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
-    const newMessage: ChatMessage = {
-      ...message,
-      id: Date.now().toString(),
-      timestamp: new Date(),
-    };
-    setMessages(prev => [...prev, newMessage]);
-    return newMessage;
+  const addMessage = useCallback((message: ChatMessage) => {
+    setMessages(prev => [...prev, message]);
   }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
 
+  const updateMessage = useCallback((messageId: string, updates: Partial<ChatMessage>) => {
+    setMessages(prev => 
+      prev.map(msg => 
+        msg.id === messageId ? { ...msg, ...updates } : msg
+      )
+    );
+  }, []);
+
   return {
     messages,
+    setMessages,
     addMessage,
     clearMessages,
-    setMessages,
+    updateMessage,
+    isLoading,
+    setIsLoading
   };
 };

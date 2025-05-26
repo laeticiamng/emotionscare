@@ -1,91 +1,35 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { SegmentOption, SegmentDimension, SegmentContextType } from '@/types/segment';
+import React, { createContext, useContext, useState } from 'react';
+
+interface SegmentContextType {
+  currentSegment: string;
+  setCurrentSegment: (segment: string) => void;
+  segments: string[];
+}
 
 const SegmentContext = createContext<SegmentContextType | undefined>(undefined);
 
-export const useSegment = () => {
-  const context = useContext(SegmentContext);
-  if (context === undefined) {
-    throw new Error('useSegment must be used within a SegmentProvider');
-  }
-  return context;
-};
+export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentSegment, setCurrentSegment] = useState('all');
+  const segments = ['all', 'active', 'inactive', 'new'];
 
-interface SegmentProviderProps {
-  children: ReactNode;
-}
-
-export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) => {
-  const [segments] = useState<string[]>(['Marketing', 'Design', 'Technique', 'Support', 'RH', 'Finance']);
-  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
-  const [segment, setSegment] = useState<string>('all');
-  const [selectedDimension, setSelectedDimension] = useState<SegmentDimension | null>(null);
-  const [selectedOption, setSelectedOption] = useState<SegmentOption | null>(null);
-  const [dimensions] = useState<SegmentDimension[]>([
-    {
-      id: 'Department',
-      key: 'Department',
-      name: 'Département',
-      label: 'Département',
-      options: [
-        { id: 'all', key: 'all', label: 'Tous', value: 'all' },
-        { id: 'marketing', key: 'marketing', label: 'Marketing', value: 'marketing' },
-        { id: 'design', key: 'design', label: 'Design', value: 'design' },
-        { id: 'tech', key: 'tech', label: 'Technique', value: 'tech' },
-        { id: 'support', key: 'support', label: 'Support', value: 'support' },
-        { id: 'hr', key: 'hr', label: 'RH', value: 'hr' },
-        { id: 'finance', key: 'finance', label: 'Finance', value: 'finance' },
-      ]
-    },
-    {
-      id: 'Role',
-      key: 'Role',
-      name: 'Rôle',
-      label: 'Rôle',
-      options: [
-        { id: 'all', key: 'all', label: 'Tous', value: 'all' },
-        { id: 'manager', key: 'manager', label: 'Manager', value: 'manager' },
-        { id: 'employee', key: 'employee', label: 'Employé', value: 'employee' },
-        { id: 'intern', key: 'intern', label: 'Stagiaire', value: 'intern' },
-      ]
-    },
-    {
-      id: 'Location',
-      key: 'Location',
-      name: 'Localisation',
-      label: 'Localisation',
-      options: [
-        { id: 'all', key: 'all', label: 'Tous', value: 'all' },
-        { id: 'paris', key: 'paris', label: 'Paris', value: 'paris' },
-        { id: 'lyon', key: 'lyon', label: 'Lyon', value: 'lyon' },
-        { id: 'marseille', key: 'marseille', label: 'Marseille', value: 'marseille' },
-        { id: 'remote', key: 'remote', label: 'Télétravail', value: 'remote' },
-      ]
-    }
-  ]);
-  const [activeDimension, setActiveDimension] = useState<string>('Department');
-  const [activeOption, setActiveOption] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const value: SegmentContextType = {
+    currentSegment,
+    setCurrentSegment,
+    segments,
+  };
 
   return (
-    <SegmentContext.Provider value={{ 
-      dimensions,
-      selectedDimension,
-      selectedOption,
-      setSelectedDimension,
-      setSelectedOption,
-      // Additional props
-      segments, 
-      selectedSegment, 
-      setSelectedSegment,
-      segment,
-      setSegment,
-      isLoading,
-      activeDimension,
-      activeOption
-    }}>
+    <SegmentContext.Provider value={value}>
       {children}
     </SegmentContext.Provider>
   );
+};
+
+export const useSegment = () => {
+  const context = useContext(SegmentContext);
+  if (!context) {
+    throw new Error('useSegment must be used within a SegmentProvider');
+  }
+  return context;
 };

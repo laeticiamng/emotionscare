@@ -1,13 +1,12 @@
 
 import { RouteObject } from 'react-router-dom';
+import React from 'react';
+
+const Home = React.lazy(() => import('../Home'));
 
 export const commonRoutes: RouteObject[] = [
   {
-    path: '/help',
-    element: <div>Aide</div>,
-  },
-  {
-    path: '/settings',
-    element: <div>Paramètres</div>,
+    path: '/',
+    element: React.createElement(Home),
   },
 ];

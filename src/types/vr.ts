@@ -1,19 +1,41 @@
 
 export interface VRSessionTemplate {
   id: string;
-  title: string;
+  name?: string;
+  title?: string;
   description: string;
-  duration: string | number;
-  environment?: string;
-  recommendedMood?: string;
-  thumbnailUrl?: string;
+  duration: number;
+  environment: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  category: string;
+  tags: string[];
+  imageUrl?: string;
+  videoUrl?: string;
+  backgroundMusic?: string;
+  instructions?: string[];
+  lastUsed?: string;
+  isActive?: boolean;
 }
 
 export interface VRSession {
   id: string;
   templateId: string;
+  userId: string;
   startTime: string;
   endTime?: string;
-  completed: boolean;
-  progress?: number;
+  duration?: number;
+  status: 'active' | 'paused' | 'completed' | 'cancelled';
+  progress: number;
+  settings: {
+    musicEnabled: boolean;
+    backgroundMusic?: string;
+    volume: number;
+  };
+}
+
+export interface VRTemplateDetailProps {
+  template: VRSessionTemplate;
+  onStart: (template: VRSessionTemplate) => void;
+  onBack: () => void;
+  heartRate?: number;
 }

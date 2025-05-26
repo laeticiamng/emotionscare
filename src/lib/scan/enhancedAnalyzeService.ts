@@ -1,99 +1,44 @@
 
-import { EmotionResult } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
+import { EmotionResult, EmotionScanParams } from '@/types/emotions';
 
-/**
- * Service for enhanced emotion analysis
- */
-class EnhancedAnalyzeService {
-  /**
-   * Analyzes text to determine emotional content
-   * @param text The text to analyze
-   * @returns Emotion analysis result
-   */
-  async analyzeTextEmotion(text: string): Promise<EmotionResult> {
-    // In a real implementation, this would call an AI API
-    // This is a mock implementation for demonstration
-    
-    // Mock emotional analysis - would be replaced with real API call
-    const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'calm'];
-    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-    const randomScore = Math.random() * 0.5 + 0.5; // Score between 0.5 and 1.0
-    
-    console.log(`Analyzing text: "${text}" with mock result: ${randomEmotion}`);
-    
-    // Return a consistent format for the emotion result
-    return {
-      id: uuidv4(),
-      date: new Date().toISOString(),
-      emotion: randomEmotion,
-      primaryEmotion: randomEmotion,
-      confidence: randomScore,
-      score: randomScore,
-      text: text
-    };
-  }
+export const analyzeEmotion = async (params: EmotionScanParams): Promise<EmotionResult> => {
+  // Simulate processing time
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  // Mock emotion analysis result
+  const mockResult: EmotionResult = {
+    id: Date.now().toString(),
+    userId: 'current-user',
+    timestamp: new Date(),
+    overallMood: 'positive',
+    emotions: [
+      { emotion: 'joie', confidence: 0.8, intensity: 0.7 },
+      { emotion: 'sérénité', confidence: 0.6, intensity: 0.5 },
+      { emotion: 'confiance', confidence: 0.7, intensity: 0.6 },
+    ],
+    dominantEmotion: 'joie',
+    confidence: 0.8,
+    source: params.type,
+    recommendations: [
+      'Votre état émotionnel est très positif',
+      'Continuez vos bonnes habitudes',
+      'Pensez à partager cette énergie positive',
+    ],
+    metadata: {
+      inputLength: params.text?.length || 0,
+      processingTime: 1500,
+      analysisMethod: 'enhanced_ml',
+    },
+  };
+
+  return mockResult;
+};
+
+export const analyzeSentiment = async (text: string): Promise<{ sentiment: string; confidence: number }> => {
+  await new Promise(resolve => setTimeout(resolve, 800));
   
-  /**
-   * Analyzes audio to determine emotional content
-   * @param audioBlob Audio data to analyze
-   * @returns Emotion analysis result
-   */
-  async analyzeVoiceEmotion(audioBlob: Blob): Promise<EmotionResult> {
-    // In real implementation, this would send the audio to an emotion analysis API
-    // For demonstration, we'll return a mock result
-    
-    const emotions = ['calm', 'joy', 'excitement', 'neutrality', 'interest'];
-    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-    const randomScore = Math.random() * 0.5 + 0.5; // Score between 0.5 and 1.0
-    
-    console.log(`Analyzing audio file of size ${audioBlob.size} bytes with mock result: ${randomEmotion}`);
-    
-    return {
-      id: uuidv4(),
-      date: new Date().toISOString(),
-      emotion: randomEmotion,
-      primaryEmotion: randomEmotion,
-      confidence: randomScore,
-      score: randomScore,
-      text: "Audio emotion analysis"
-    };
-  }
-  
-  /**
-   * Analyzes facial expressions to determine emotional content
-   * @param imageBlob Image data to analyze
-   * @returns Emotion analysis result
-   */
-  async analyzeFacialEmotion(imageBlob: Blob): Promise<EmotionResult> {
-    // In real implementation, this would send the image to a facial emotion analysis API
-    // For demonstration, we'll return a mock result
-    
-    const emotions = ['neutral', 'happy', 'surprise', 'calm', 'engaged'];
-    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-    const randomScore = Math.random() * 0.5 + 0.5; // Score between 0.5 and 1.0
-    
-    console.log(`Analyzing image file of size ${imageBlob.size} bytes with mock result: ${randomEmotion}`);
-    
-    return {
-      id: uuidv4(),
-      date: new Date().toISOString(),
-      emotion: randomEmotion,
-      primaryEmotion: randomEmotion,
-      confidence: randomScore,
-      score: randomScore,
-      text: "Facial emotion analysis"
-    };
-  }
-
-  /**
-   * Generic method to analyze emotion from any text input
-   * This is for backward compatibility with code that expects this method
-   */
-  async analyzeEmotion(text: string): Promise<EmotionResult> {
-    return this.analyzeTextEmotion(text);
-  }
-}
-
-// Export a singleton instance
-export const enhancedAnalyzeService = new EnhancedAnalyzeService();
+  return {
+    sentiment: 'positive',
+    confidence: 0.85,
+  };
+};

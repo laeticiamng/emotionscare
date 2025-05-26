@@ -2,44 +2,46 @@
 export interface ChatMessage {
   id: string;
   content: string;
-  sender: 'user' | 'coach';
-  timestamp: Date;
-  type?: 'text' | 'suggestion' | 'recommendation';
+  text?: string; // For backward compatibility
+  sender: 'user' | 'assistant' | 'system';
+  timestamp: string;
+  conversationId?: string;
+  conversation_id?: string; // For backward compatibility
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
   messages: ChatMessage[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+  userId?: string;
 }
 
 export interface ChatResponse {
-  message: string;
-  suggestions?: string[];
-  recommendations?: any[];
-}
-
-export interface CoachCharacterProps {
-  size?: 'sm' | 'md' | 'lg';
-  animated?: boolean;
-  className?: string;
-}
-
-export interface CoachMessageProps {
   message: ChatMessage;
-  isLast?: boolean;
-  className?: string;
+  conversationId: string;
 }
 
-export interface CoachChatProps {
-  initialMessage?: string;
-  showCharacter?: boolean;
-  characterSize?: 'sm' | 'md' | 'lg';
-  className?: string;
-  showControls?: boolean;
-  showHeader?: boolean;
-  showInput?: boolean;
-  embedded?: boolean;
+export interface UseChatOptions {
+  initialMessages?: ChatMessage[];
+  onError?: (error: Error) => void;
+  onResponse?: (message: ChatMessage) => void;
+  conversationId?: string;
+  initialConversationId?: string;
+}
+
+export interface ChatHookResult {
+  messages: ChatMessage[];
+  input: string;
+  setInput: (input: string) => void;
+  isLoading: boolean;
+  error: Error | null;
+  sendMessage: (message: string) => Promise<void>;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  addMessage: (content: string, sender: 'user' | 'assistant' | 'system') => ChatMessage;
+  clearMessages: () => void;
+  isTyping?: boolean;
 }
