@@ -10,7 +10,20 @@ env:
   NODE_VERSION: "20"
 
 jobs:
+  pnpm-install:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Validate JSON
+        run: find . -name '*.json' -print0 | xargs -0 jq empty
+      - run: npm install -g pnpm
+      - run: pnpm install --frozen-lockfile
+
   build-test:
+    needs: pnpm-install
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     steps:

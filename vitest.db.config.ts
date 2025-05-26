@@ -9,7 +9,4 @@ export default defineConfig({
     environment: 'node',
     include: ['database/tests/**/*.{test,spec}.ts'],
   },
-    include: ['database/tests/**/*.ts']
-
-  }
 });
