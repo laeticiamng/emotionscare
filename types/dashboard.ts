@@ -1,4 +1,5 @@
-import { ReactNode } from 'react';
+
+import { type ReactNode } from 'react';
 
 export type KpiCardStatus = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 

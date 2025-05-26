@@ -1,99 +1,94 @@
 
 import { toast } from '@/hooks/use-toast';
-import { GlobalInterceptor } from './globalInterceptor';
 
-/**
- * Gestionnaire d'erreurs global pour les requêtes API
- */
 export class ApiErrorHandler {
-  
-  /**
-   * Gère les erreurs d'analytics (endpoint temporairement absent)
-   */
-  static handleAnalyticsError(error: any, context?: string): void {
-    console.warn(`[Analytics Error] ${context || 'Unknown context'}:`, error);
+  static handleAuthError(error: any, context: string) {
+    console.error(`Auth Error in ${context}:`, error);
     
-    if (error?.status >= 400) {
-      console.warn(`Analytics endpoint returned ${error.status}. Feature will be available in next release.`);
-    }
-    
-    // Ne pas montrer de toast pour éviter de polluer l'UX
-    // L'analytics est non-critique pour l'utilisateur
-  }
-
-  /**
-   * Gère les erreurs des fonctions vocales (en maintenance)
-   */
-  static handleVoiceError(error: any, context?: string): void {
-    console.error(`[Voice Error] ${context || 'Unknown context'}:`, error);
-    
-    if (error?.status >= 500) {
+    if (error.message?.includes('Invalid login credentials')) {
       toast({
-        title: "Fonction vocale temporairement indisponible",
-        description: "Nos services vocaux sont en maintenance. Réessayez dans quelques minutes.",
+        title: "Erreur de connexion",
+        description: "Email ou mot de passe incorrect",
+        variant: "destructive",
+      });
+    } else if (error.message?.includes('Email already registered')) {
+      toast({
+        title: "Compte existant",
+        description: "Un compte existe déjà avec cet email",
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Erreur de traitement vocal",
-        description: "Impossible de traiter votre demande vocale pour le moment.",
+        title: "Erreur d'authentification",
+        description: "Une erreur est survenue lors de l'authentification",
         variant: "destructive",
       });
     }
   }
 
-  /**
-   * Gère les erreurs génériques (500, 404, etc.)
-   */
-  static handleGenericError(error: any, context?: string): void {
-    console.error(`[API Error] ${context || 'Unknown context'}:`, error);
+  static handleApiError(error: any, context: string) {
+    console.error(`API Error in ${context}:`, error);
     
-    if (error?.status === 500) {
+    if (error.status === 403) {
       toast({
-        title: "Service indisponible",
-        description: "Nos serveurs rencontrent des difficultés. Réessayez plus tard.",
+        title: "Accès refusé",
+        description: "Vous n'avez pas les permissions nécessaires",
         variant: "destructive",
       });
-    } else if (error?.status === 404) {
+    } else if (error.status === 429) {
       toast({
-        title: "Fonction en maintenance",
-        description: "Cette fonctionnalité est temporairement indisponible.",
+        title: "Limite dépassée",
+        description: "Trop de requêtes, veuillez patienter",
         variant: "destructive",
       });
-    } else if (error?.status === 401) {
-      // Géré par le GlobalInterceptor
-      return;
+    } else if (error.status >= 500) {
+      toast({
+        title: "Erreur serveur",
+        description: "Le service est temporairement indisponible",
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: "Erreur inattendue",
-        description: "Une erreur s'est produite. Veuillez réessayer.",
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
         variant: "destructive",
       });
     }
   }
 
-  /**
-   * Timeout pour les fonctions vocales (15s max)
-   */
-  static createVoiceTimeout(timeoutMs: number = 15000): Promise<never> {
-    return new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error('Voice request timeout'));
-      }, timeoutMs);
+  static handleAnalyticsError(error: any, context: string) {
+    // Analytics errors should be silent but logged
+    console.warn(`Analytics Error in ${context}:`, error);
+  }
+
+  static handleNetworkError(error: any, context: string) {
+    console.error(`Network Error in ${context}:`, error);
+    
+    toast({
+      title: "Problème de connexion",
+      description: "Vérifiez votre connexion internet",
+      variant: "destructive",
     });
   }
 }
 
-/**
- * Gestionnaire spécialisé pour les erreurs d'authentification
- * Utilise maintenant GlobalInterceptor exclusivement
- */
-export class AuthErrorHandler {
-  
-  /**
-   * Gère les erreurs 401 (token expiré ou invalide)
-   */
-  static async handle401Error(navigate: (path: string) => void): Promise<void> {
-    await GlobalInterceptor.handle401Error();
+export class ValidationError extends Error {
+  constructor(message: string, public field?: string) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
+export class AuthenticationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthenticationError';
+  }
+}
+
+export class AuthorizationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthorizationError';
   }
 }

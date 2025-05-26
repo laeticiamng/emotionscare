@@ -1,63 +1,43 @@
 
-export type NotificationType =
-  | 'system'
-  | 'emotion'
-  | 'coach'
-  | 'journal'
-  | 'community'
-  | 'achievement'
-  | 'badge'
-  | 'challenge'
-  | 'reminder'
-  | 'info'
-  | 'warning'
-  | 'error'
-  | 'success'
-  | 'streak'
-  | 'urgent';
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'security' | 'system';
 
-export type NotificationFilter =
-  | 'all'
-  | 'unread'
-  | 'read'
-  | NotificationType;
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Notification {
   id: string;
   type: NotificationType;
+  priority: NotificationPriority;
   title: string;
   message: string;
-  /**
-   * Optional rich content field used by some hooks
-   */
-  content?: string;
-  /**
-   * Date of creation. Some parts of the code still reference `date`
-   * instead of `timestamp` or `createdAt`.
-   */
-  date?: string;
-  /**
-   * Creation timestamp. Accepts both string and Date for flexibility.
-   */
-  timestamp: string | Date;
-  /**
-   * Indicates whether the notification has been read. `isRead` is kept for
-   * backward compatibility with some hooks.
-   */
+  timestamp: string;
   read: boolean;
-  isRead?: boolean;
-  /**
-   * Optional navigation link associated with the notification.
-   */
-  linkTo?: string;
-  action?: {
-    label: string;
-    url: string;
+  userId?: string;
+  actionUrl?: string;
+  actionText?: string;
+  metadata?: Record<string, any>;
+  expiresAt?: string;
+}
+
+export interface NotificationSettings {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+  types: {
+    security: boolean;
+    system: boolean;
+    social: boolean;
+    achievements: boolean;
+    reminders: boolean;
   };
-  icon?: string;
-  imageUrl?: string;
-  priority?: 'low' | 'normal' | 'high' | 'urgent';
-  source?: 'system' | 'user' | 'application';
-  created_at?: string;
-  createdAt?: string;
+}
+
+export interface NotificationContextType {
+  notifications: Notification[];
+  unreadCount: number;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
+  removeNotification: (id: string) => void;
+  settings: NotificationSettings;
+  updateSettings: (settings: Partial<NotificationSettings>) => void;
 }

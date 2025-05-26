@@ -1,129 +1,73 @@
-import { useEffect, useRef, useCallback } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
+import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 
 interface PerformanceMetrics {
   renderTime: number;
-  componentName: string;
-  timestamp: number;
+  memoryUsage?: number;
+  componentMounts: number;
+  rerenders: number;
 }
 
 export const usePerformanceMonitor = (componentName: string) => {
-  const startTime = useRef<number>(Date.now());
-  const metrics = useRef<PerformanceMetrics[]>([]);
-
-  const measureRender = useCallback(() => {
-    const renderTime = Date.now() - startTime.current;
-    const metric: PerformanceMetrics = {
-      renderTime,
-      componentName,
-      timestamp: Date.now()
-    };
-    
-    metrics.current.push(metric);
-    
-    // Log slow renders in development
-    if (import.meta.env.DEV && renderTime > 100) {
-      console.warn(`🐌 Slow render detected: ${componentName} took ${renderTime}ms`);
-    }
-    
-    // Keep only last 50 metrics
-    if (metrics.current.length > 50) {
-      metrics.current = metrics.current.slice(-50);
-    }
-  }, [componentName]);
+  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
+  const mountTime = useRef<number>(Date.now());
+  const renderCount = useRef<number>(0);
+  const mountCount = useRef<number>(0);
 
   useEffect(() => {
-    startTime.current = Date.now();
-  });
-
-  useEffect(() => {
-    measureRender();
-  });
-
-  const getMetrics = useCallback(() => {
-    return metrics.current.filter(m => m.componentName === componentName);
-  }, [componentName]);
-
-  const getAverageRenderTime = useCallback(() => {
-    const componentMetrics = getMetrics();
-    if (componentMetrics.length === 0) return 0;
-    
-    const total = componentMetrics.reduce((sum, metric) => sum + metric.renderTime, 0);
-    return total / componentMetrics.length;
-  }, [getMetrics]);
-
-  return {
-    getMetrics,
-    getAverageRenderTime,
-    measureRender
-  };
-};
-
-export const useWebVitals = () => {
-  useEffect(() => {
-    if ('web-vitals' in window) return;
-
-    const measureCLS = () => {
-      let clsValue = 0;
-      let clsEntries: any[] = [];
-
-      const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            const firstSessionEntry = clsEntries[0];
-            const lastSessionEntry = clsEntries[clsEntries.length - 1];
-
-            if (!firstSessionEntry || 
-                (entry.startTime - lastSessionEntry.startTime < 1000 &&
-                 entry.startTime - firstSessionEntry.startTime < 5000)) {
-              clsEntries.push(entry);
-              clsValue += (entry as any).value;
-            } else {
-              clsEntries = [entry];
-              clsValue = (entry as any).value;
-            }
-          }
-        }
-        
-        if (import.meta.env.DEV) {
-          console.log('CLS:', clsValue);
-        }
-      });
-
-      observer.observe({ entryTypes: ['layout-shift'] });
-      return observer;
-    };
-
-    const measureLCP = () => {
-      const observer = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        
-        if (import.meta.env.DEV) {
-          console.log('LCP:', lastEntry.startTime);
-        }
-      });
-
-      observer.observe({ entryTypes: ['largest-contentful-paint'] });
-      return observer;
-    };
-
-    const measureFID = () => {
-      const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (import.meta.env.DEV) {
-            console.log('FID:', (entry as any).processingStart - entry.startTime);
-          }
-        }
-      });
-
-      observer.observe({ entryTypes: ['first-input'] });
-      return observer;
-    };
-
-    const observers = [measureCLS(), measureLCP(), measureFID()];
+    mountCount.current += 1;
+    const startTime = performance.now();
 
     return () => {
-      observers.forEach(observer => observer?.disconnect());
+      const endTime = performance.now();
+      const renderTime = endTime - startTime;
+      
+      performanceMonitor.recordMetric(`${componentName}-render`, renderTime);
+      
+      setMetrics({
+        renderTime,
+        memoryUsage: (performance as any).memory?.usedJSHeapSize,
+        componentMounts: mountCount.current,
+        rerenders: renderCount.current
+      });
     };
+  }, [componentName]);
+
+  useEffect(() => {
+    renderCount.current += 1;
+  });
+
+  return metrics;
+};
+
+export const useProductionMonitoring = () => {
+  const [isMonitoring, setIsMonitoring] = useState(false);
+
+  useEffect(() => {
+    if (import.meta.env.PROD) {
+      setIsMonitoring(true);
+      
+      // Monitor critical performance metrics
+      const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          if (entry.entryType === 'largest-contentful-paint') {
+            performanceMonitor.recordMetric('LCP', entry.startTime);
+          }
+          if (entry.entryType === 'first-input') {
+            performanceMonitor.recordMetric('FID', entry.processingStart - entry.startTime);
+          }
+        });
+      });
+
+      observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] });
+
+      return () => {
+        observer.disconnect();
+        setIsMonitoring(false);
+      };
+    }
   }, []);
+
+  return { isMonitoring };
 };
