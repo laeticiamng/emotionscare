@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => ({
           ui: ['@radix-ui/react-toast', '@radix-ui/react-dialog'],
           icons: ['lucide-react'],
           animations: ['framer-motion'],
+          'glow-breath': ['./src/pages/GlowBreathPage'],
         },
       },
     },

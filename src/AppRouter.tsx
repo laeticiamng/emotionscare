@@ -13,6 +13,7 @@ const GlowMugStart = React.lazy(() => import('./pages/GlowMugStart'));
 const GlowMugLive = React.lazy(() => import('./pages/GlowMugLive'));
 const GlowMugSummary = React.lazy(() => import('./pages/GlowMugSummary'));
 const SilkPage = React.lazy(() => import('./pages/settings/SilkPage'));
+const GlowBreathPage = React.lazy(() => import('./pages/GlowBreathPage'));
 
 const AppRouter: React.FC = () => {
   console.log('AppRouter rendering with React:', !!React);
@@ -29,6 +30,9 @@ const AppRouter: React.FC = () => {
         <Route path="/breath/glowmug/live" element={<GlowMugLive />} />
         <Route path="/breath/glowmug/summary" element={<GlowMugSummary />} />
         <Route path="/settings/wallpapers" element={<SilkPage />} />
+        <Route path="/glow-breath" element={<GlowBreathPage />} />
+        <Route path="/flow-field-walk" element={<FlowWalkStart />} />
+        <Route path="/glow-pulse-mug" element={<GlowMugStart />} />
         <Route path="/*" element={<Home />} />
       </Routes>
     </React.Suspense>
