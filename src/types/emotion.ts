@@ -1,20 +1,17 @@
 
-export interface Emotion {
-  name: string;
-  intensity: number;
-}
-
 export interface EmotionResult {
-  emotions: Emotion[];
-  confidence: number;
-  timestamp: Date;
-  recommendations?: string;
-  analysisType: 'text' | 'audio' | 'emoji';
+  emotion: string;
+  confidence?: number;
+  intensity?: number;
+  timestamp?: Date;
+  metadata?: Record<string, any>;
 }
 
-export interface EmotionScannerProps {
-  onScanComplete: (result: EmotionResult) => void;
-  onCancel: () => void;
-  isProcessing: boolean;
-  setIsProcessing: (processing: boolean) => void;
+export interface EmotionData {
+  id: string;
+  emotion: string;
+  intensity: number;
+  timestamp: Date;
+  triggers?: string[];
+  notes?: string;
 }

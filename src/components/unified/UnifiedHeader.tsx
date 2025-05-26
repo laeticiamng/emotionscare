@@ -1,100 +1,40 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Menu, Heart, LogOut, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { getUserModeDisplayName } from '@/utils/userModeHelpers';
+import { Menu } from 'lucide-react';
+import AuthButton from '@/components/auth/AuthButton';
 
 interface UnifiedHeaderProps {
   onMenuClick?: () => void;
+  onMenuToggle?: () => void;
 }
 
-const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuClick }) => {
-  const { user, signOut } = useAuth();
-  const { userMode } = useUserMode();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
-  const isDemo = user?.email?.endsWith('@exemple.fr');
-  const modeDisplay = getUserModeDisplayName(userMode);
-
+const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ 
+  onMenuClick, 
+  onMenuToggle 
+}) => {
+  const handleMenuClick = onMenuClick || onMenuToggle;
+  
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onMenuClick}
-            className="md:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <a className="mr-6 flex items-center space-x-2" href="/">
-            <Heart className="h-6 w-6 text-red-500" />
-            <span className="hidden font-bold sm:inline-block">
-              EmotionsCare
-            </span>
-          </a>
-        </div>
-
         <Button
           variant="ghost"
           size="icon"
-          onClick={onMenuClick}
-          className="mr-2 md:hidden"
+          className="md:hidden"
+          onClick={handleMenuClick}
         >
           <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle menu</span>
         </Button>
-
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none" />
+        
+        <div className="flex flex-1 items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-lg font-semibold">EmotionsCare</h1>
+          </div>
           
           <nav className="flex items-center space-x-2">
-            {user && (
-              <div className="flex items-center space-x-3">
-                <div className="hidden md:block text-right">
-                  <p className="text-sm font-medium">{user.user_metadata?.name || 'Utilisateur'}</p>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {modeDisplay}
-                    </Badge>
-                    {isDemo && (
-                      <Badge variant="outline" className="text-xs">
-                        Démo
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate('/profile')}
-                >
-                  <User className="h-4 w-4" />
-                </Button>
-                
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
+            <AuthButton variant="ghost" />
           </nav>
         </div>
       </div>

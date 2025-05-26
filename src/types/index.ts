@@ -1,4 +1,3 @@
-
 export interface Emotion {
   id: string;
   name: string;
@@ -26,3 +25,10 @@ export interface Toast {
   description?: string;
   variant?: 'default' | 'destructive';
 }
+
+// Export des nouveaux types
+export * from './emotion';
+export * from './music';
+
+// Type pour les résultats d'émotion (alias pour compatibilité)
+export type { EmotionResult } from './emotion';

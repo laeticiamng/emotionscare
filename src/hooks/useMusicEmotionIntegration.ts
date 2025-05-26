@@ -1,75 +1,42 @@
 
-import { useState, useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useState } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { useToast } from '@/hooks/use-toast';
 
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { loadPlaylistForEmotion, setPlaylist, play } = useMusic();
-  const { toast } = useToast();
 
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
-    if (!loadPlaylistForEmotion) {
-      console.error('loadPlaylistForEmotion not available');
-      return null;
-    }
-
+  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
     try {
-      const playlist = await loadPlaylistForEmotion(params);
-      if (playlist && playlist.tracks.length > 0) {
-        // Jouer automatiquement le premier morceau
-        play(playlist.tracks[0]);
-        toast({
-          title: "Musique activée",
-          description: `Playlist "${playlist.name}" chargée pour ${params.emotion}`,
-        });
-      }
-      return playlist;
+      // Simulation d'une playlist basée sur l'émotion
+      const mockPlaylist: MusicPlaylist = {
+        id: Date.now().toString(),
+        name: `Playlist ${params.emotion}`,
+        emotion: params.emotion,
+        tracks: [
+          {
+            id: '1',
+            title: `Musique pour ${params.emotion}`,
+            artist: 'Artiste Thérapeutique',
+            url: '/sounds/ambient-calm.mp3',
+            duration: 180,
+            cover: '/images/music-placeholder.jpg'
+          }
+        ],
+        description: `Playlist personnalisée pour l'émotion: ${params.emotion}`
+      };
+      
+      return mockPlaylist;
     } catch (error) {
-      console.error('Error activating music for emotion:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger la musique pour cette émotion",
-        variant: "destructive",
-      });
+      console.error('Erreur lors de l\'activation de la musique:', error);
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, [loadPlaylistForEmotion, play, toast]);
-
-  const getMusicRecommendationForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
-    return await activateMusicForEmotion({ emotion });
-  }, [activateMusicForEmotion]);
-
-  const playEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
-    return await activateMusicForEmotion({ emotion });
-  }, [activateMusicForEmotion]);
-
-  const getEmotionMusicDescription = useCallback((emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      calm: "Musique apaisante pour la relaxation",
-      happy: "Mélodies joyeuses pour booster l'humeur",
-      focused: "Sons ambiants pour la concentration",
-      energetic: "Musique dynamique pour l'énergie",
-      sad: "Musique douce pour accompagner la mélancolie",
-      stressed: "Sons relaxants pour réduire le stress",
-      angry: "Musique apaisante pour calmer la colère",
-      neutral: "Musique d'ambiance générale",
-    };
-
-    return descriptions[emotion.toLowerCase()] || "Musique adaptée à votre humeur";
-  }, []);
+  };
 
   return {
     activateMusicForEmotion,
-    getMusicRecommendationForEmotion,
-    playEmotion,
-    getEmotionMusicDescription,
-    isLoading,
+    isLoading
   };
 };
-
-export default useMusicEmotionIntegration;

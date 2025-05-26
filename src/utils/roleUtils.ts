@@ -1,5 +1,5 @@
 
-import { UserRole } from '@/types/user';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export const getRoleName = (role: UserRole): string => {
   switch (role) {
@@ -15,9 +15,5 @@ export const getRoleName = (role: UserRole): string => {
 };
 
 export const isAdminRole = (role: string): boolean => {
-  return role === 'b2b_admin' || role === 'admin';
-};
-
-export const isB2BRole = (role: string): boolean => {
-  return role === 'b2b_user' || role === 'b2b_admin';
+  return role === 'b2b_admin';
 };

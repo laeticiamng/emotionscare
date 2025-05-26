@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useRef, ReactNode } from 'react';
 
 interface MusicTrack {
@@ -160,3 +159,11 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 };
 
 export { MusicContext };
+
+export const useMusic = () => {
+  const context = React.useContext(MusicContext);
+  if (context === undefined) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
+};
