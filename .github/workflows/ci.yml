@@ -165,6 +165,10 @@ jobs:
         run: npm run db:refresh:gam
         env:
           DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
+      - name: Refresh breath metrics
+        run: npm run db:refresh:breath
+        env:
+          DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
       - name: SQL unit tests
         run: npm run test:sql
         env:
