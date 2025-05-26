@@ -1,9 +1,11 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './styles/accessibility.css';
 import { validateStartup } from './utils/startupCheck';
+import { initProductionSecurity, initBuildOptimizations, applyCSP, applySecurityMeta } from './utils/productionSecurity';
 
 // Startup validation
 if (!validateStartup()) {
