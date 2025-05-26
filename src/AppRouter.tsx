@@ -7,11 +7,12 @@ import { LoadingIllustration } from '@/components/ui/loading-illustration';
 const Home = React.lazy(() => import('./Home'));
 
 const AppRouter: React.FC = () => {
-  console.log('AppRouter component rendering');
+  console.log('AppRouter rendering with React:', !!React);
   
   return (
     <Suspense fallback={<LoadingIllustration />}>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/*" element={<Home />} />
       </Routes>
     </Suspense>

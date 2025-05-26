@@ -3,13 +3,7 @@ import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
-
 import { cn } from "@/lib/utils"
-
-// Validate React hooks availability
-if (!React || !React.forwardRef || !React.useState) {
-  console.error('React hooks not available in toast component');
-}
 
 const ToastProvider = ToastPrimitives.Provider
 

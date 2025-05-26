@@ -1,25 +1,25 @@
 
-import React from "react";
+import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { MusicProvider } from "@/contexts/MusicContext";
 import { UserModeProvider } from "@/contexts/UserModeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { Suspense } from "react";
 import AppRouter from "./AppRouter";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import EnhancedErrorBoundary from "@/components/ui/enhanced-error-boundary";
-
-// Import toast components separately to control initialization
 import { ToastProvider, ToastViewport } from "@/components/ui/toast";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 
-// Initialize validation files
-import '@/lib/env-validation';
-import '@/lib/errorBoundary';
+// Validate React before creating QueryClient
+console.log('App: React validation:', {
+  React: !!React,
+  useState: !!React.useState,
+  useEffect: !!React.useEffect,
+  Suspense: !!Suspense
+});
 
-// Validate React availability before creating QueryClient
 if (!React || !React.useState) {
   throw new Error('React hooks not available in App component');
 }
@@ -27,8 +27,8 @@ if (!React || !React.useState) {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: (failureCount, error) => {
         if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
           return false;
@@ -40,11 +40,7 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  console.log('App component rendering with React hooks available:', {
-    useState: !!React.useState,
-    useEffect: !!React.useEffect,
-    useContext: !!React.useContext
-  });
+  console.log('App component rendering successfully');
   
   return (
     <EnhancedErrorBoundary level="critical" showDetails={true}>
@@ -64,8 +60,8 @@ function App() {
                       <AppRouter />
                     </Suspense>
                     <ToastViewport />
+                    <Toaster />
                   </ToastProvider>
-                  <Sonner />
                 </MusicProvider>
               </UserModeProvider>
             </AuthProvider>
