@@ -57,3 +57,25 @@ jobs:
       - name: Run tests
         run: npm run test -- --environment=jsdom
         timeout-minutes: 5
+
+  api-test:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+      - name: Configure npm registry
+        run: npm config set registry https://registry.npmmirror.com
+      - name: Fast install
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+        run: node scripts/emergency-install.js
+        timeout-minutes: 10
+      - name: Run API tests
+        run: npm run test:api
