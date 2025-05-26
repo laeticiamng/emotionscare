@@ -24,6 +24,7 @@
     "db:migrate": "flyway -locations=filesystem:./migrations migrate",
     "db:refresh:scan": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_scan();'",
     "db:refresh:gam": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_gam();'",
+    "db:refresh:vr": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_vr();'",
     "db:migrate": "supabase db push",
     "test:sql": "pgtap-run tests/sql/**/*.sql --dsn $DATABASE_URL",
     "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
