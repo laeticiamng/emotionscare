@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ThemeContextType, ThemeName, FontSize, FontFamily } from '@/types/theme';
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -15,6 +15,8 @@ const ThemeContext = createContext<ThemeContextType>({
   systemTheme: 'light',
   reduceMotion: false,
   setReduceMotion: () => {},
+  soundEnabled: false,
+  setSoundEnabled: () => {}
 });
 
 export function ThemeProvider({
@@ -36,6 +38,7 @@ export function ThemeProvider({
   const [fontSize, setFontSize] = useState<FontSize>(defaultFontSize);
   const [fontFamily, setFontFamily] = useState<FontFamily>(defaultFontFamily);
   const [reduceMotion, setReduceMotion] = useState<boolean>(defaultReduceMotion);
+  const [soundEnabled, setSoundEnabled] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -105,6 +108,8 @@ export function ThemeProvider({
     systemTheme,
     reduceMotion,
     setReduceMotion,
+    soundEnabled,
+    setSoundEnabled,
   };
 
   return (

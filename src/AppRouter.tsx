@@ -1,5 +1,5 @@
 
-import React, { Suspense } from 'react';
+import * as React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { LoadingIllustration } from '@/components/ui/loading-illustration';
 
@@ -10,12 +10,12 @@ const AppRouter: React.FC = () => {
   console.log('AppRouter rendering with React:', !!React);
   
   return (
-    <Suspense fallback={<LoadingIllustration />}>
+    <React.Suspense fallback={<LoadingIllustration />}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/*" element={<Home />} />
       </Routes>
-    </Suspense>
+    </React.Suspense>
   );
 };
 

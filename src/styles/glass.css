@@ -22,6 +22,19 @@
     @apply bg-blue-50/70 backdrop-blur-sm border border-blue-100/30 shadow-sm;
   }
 
+  /* Background glass variants */
+  .bg-glass-dark {
+    @apply bg-black/20 backdrop-blur-md;
+  }
+
+  .bg-glass-light {
+    @apply bg-white/80 backdrop-blur-md;
+  }
+
+  .bg-glass-pastel {
+    @apply bg-blue-50/70 backdrop-blur-sm;
+  }
+
   /* Premium card styles */
   .card-premium {
     @apply rounded-xl overflow-hidden transition-all duration-300;
