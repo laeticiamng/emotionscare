@@ -41,7 +41,7 @@ function App() {
   
   return (
     <GlobalErrorBoundary>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
         <SecurityProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider delayDuration={150}>

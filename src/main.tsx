@@ -20,12 +20,10 @@ if (import.meta.env.PROD) {
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 
 root.render(
-  <React.StrictMode>
-    <EnhancedErrorBoundary>
-      <CacheProvider>
-        <ResourcePreloader />
-        <App />
-      </CacheProvider>
-    </EnhancedErrorBoundary>
-  </React.StrictMode>
+  <EnhancedErrorBoundary>
+    <CacheProvider>
+      <ResourcePreloader />
+      <App />
+    </CacheProvider>
+  </EnhancedErrorBoundary>
 );

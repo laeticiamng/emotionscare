@@ -167,7 +167,16 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  // Add error handling for React hooks
+  // Ensure React is available before using hooks
+  if (typeof React === 'undefined' || !React) {
+    console.error('React is not available when useToast is called');
+    return {
+      toasts: [],
+      toast: () => ({ id: '', dismiss: () => {}, update: () => {} }),
+      dismiss: () => {},
+    }
+  }
+
   try {
     const [state, setState] = React.useState<State>(memoryState)
 
@@ -183,13 +192,12 @@ function useToast() {
 
     return {
       ...state,
-      toasts: state.toasts || [], // Ensure toasts is always an array
+      toasts: state.toasts || [],
       toast,
       dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
     }
   } catch (error) {
     console.error('useToast hook error:', error);
-    // Return a fallback object to prevent complete app crash
     return {
       toasts: [],
       toast: () => ({ id: '', dismiss: () => {}, update: () => {} }),
