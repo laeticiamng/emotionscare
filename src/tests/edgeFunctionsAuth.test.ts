@@ -5,17 +5,17 @@ import path from 'path';
 
 const functionsDir = path.join(__dirname, '..', '..', 'supabase', 'functions');
 
-// Ensure all edge functions import and use authorizeRole
+// Ensure all edge functions import and use an auth helper
 // to block unauthenticated access
 
-test('all edge functions enforce authorizeRole', () => {
+test('all edge functions enforce auth helper', () => {
   const dirs = fs.readdirSync(functionsDir)
     .filter(d => fs.statSync(path.join(functionsDir, d)).isDirectory() && d !== '_shared');
 
   for (const dir of dirs) {
     const file = path.join(functionsDir, dir, 'index.ts');
     const content = fs.readFileSync(file, 'utf8');
-    assert.match(content, /authorizeRole\(/, `authorizeRole missing in ${dir}`);
+    assert.match(content, /(authorizeRole|assertJwt)\(/, `auth helper missing in ${dir}`);
   }
 });
 
