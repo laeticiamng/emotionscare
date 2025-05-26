@@ -1,8 +1,8 @@
 
-import React, { useEffect } from 'react';
+import { useEffect, ReactNode } from 'react';
 
 interface SecurityProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
