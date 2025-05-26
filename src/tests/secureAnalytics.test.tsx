@@ -20,7 +20,7 @@ describe('SecureAnalytics', () => {
 
   describe('trackEvent', () => {
     it('should track event successfully', async () => {
-      const response = mockResponse({ ok: true }, { status: 200 });
+      const response = mockResponse({ ok: true, status: 200 });
       vi.mocked(GlobalInterceptor.secureFetch).mockResolvedValue(response as any);
 
       await SecureAnalytics.trackEvent({
@@ -79,7 +79,7 @@ describe('SecureAnalytics', () => {
   describe('trackPageView', () => {
     it('should track page view with correct format', async () => {
       vi.mocked(GlobalInterceptor.secureFetch).mockResolvedValue(
-        mockResponse({}, { status: 200 }) as any
+        mockResponse({ status: 200 }) as any
       );
 
       await SecureAnalytics.trackPageView('dashboard', 'user123');
