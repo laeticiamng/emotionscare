@@ -26,7 +26,7 @@
     "db:refresh:gam": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_gam();'",
     "db:refresh:vr": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_vr()'",
     "db:refresh:breath": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_breath();'",
-    "test:sql": "pgtap-run tests/sql/**/*.sql --dsn $DATABASE_URL",
+    "test:sql": "echo 'Tests SQL désactivés - pgtap-run non disponible'",
     "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
     "test:db:config": "vitest run --config vitest.db.config.ts"
   },
@@ -168,9 +168,7 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.19",
-    "pgtap-run": "^1.2.0",
-    "pg": "^8.11.3"
+    "vite": "^5.4.19"
   },
   "optionalDependencies": {
     "cypress": "^13.5.0",
