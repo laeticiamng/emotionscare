@@ -1,6 +1,8 @@
 
 #!/usr/bin/env node
+
 const { readFileSync, writeFileSync } = require("fs");
+
 if (process.env.SKIP_HEAVY === "true") {
   const pkg = JSON.parse(readFileSync("package.json", "utf8"));
   ["cypress","playwright","puppeteer"].forEach(p => {
