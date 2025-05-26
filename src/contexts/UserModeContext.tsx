@@ -1,11 +1,10 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { UserModeType } from '@/utils/userModeHelpers';
 
 interface UserModeContextType {
-  userMode: UserMode;
-  setUserMode: (mode: UserMode) => void;
+  userMode: UserModeType | null;
+  setUserMode: (mode: UserModeType) => void;
   isLoading: boolean;
 }
 
@@ -16,17 +15,31 @@ interface UserModeProviderProps {
 }
 
 export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>('b2c');
-  const [isLoading] = useState(false);
+  const [userMode, setUserModeState] = useState<UserModeType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const value: UserModeContextType = {
-    userMode,
-    setUserMode,
-    isLoading
+  useEffect(() => {
+    // Récupérer le mode utilisateur depuis le localStorage
+    const storedMode = localStorage.getItem('userMode') as UserModeType;
+    if (storedMode) {
+      setUserModeState(storedMode);
+    }
+    setIsLoading(false);
+  }, []);
+
+  const setUserMode = (mode: UserModeType) => {
+    setUserModeState(mode);
+    localStorage.setItem('userMode', mode);
   };
 
   return (
-    <UserModeContext.Provider value={value}>
+    <UserModeContext.Provider
+      value={{
+        userMode,
+        setUserMode,
+        isLoading
+      }}
+    >
       {children}
     </UserModeContext.Provider>
   );

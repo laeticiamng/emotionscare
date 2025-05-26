@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 
 const B2CRegister: React.FC = () => {
@@ -18,7 +19,7 @@ const B2CRegister: React.FC = () => {
     setIsLoading(true);
     
     try {
-      await signUp(email, password, { name });
+      await signUp(email, password, { name, role: 'b2c' });
       navigate('/b2c/dashboard');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -37,14 +38,13 @@ const B2CRegister: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium mb-1">
-                Nom
+                Nom complet
               </label>
-              <input
+              <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md"
                 required
               />
             </div>
@@ -53,12 +53,11 @@ const B2CRegister: React.FC = () => {
               <label htmlFor="email" className="block text-sm font-medium mb-1">
                 Email
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md"
                 required
               />
             </div>
@@ -67,19 +66,28 @@ const B2CRegister: React.FC = () => {
               <label htmlFor="password" className="block text-sm font-medium mb-1">
                 Mot de passe
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md"
                 required
               />
             </div>
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Inscription...' : 'S\'inscrire'}
+              {isLoading ? 'Inscription...' : "S'inscrire"}
             </Button>
+            
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                onClick={() => navigate('/b2c/login')}
+              >
+                Déjà un compte ? Se connecter
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

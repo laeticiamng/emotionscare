@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 
 const B2BAdminLogin: React.FC = () => {
@@ -38,12 +39,11 @@ const B2BAdminLogin: React.FC = () => {
               <label htmlFor="email" className="block text-sm font-medium mb-1">
                 Email administrateur
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md"
                 required
               />
             </div>
@@ -52,12 +52,11 @@ const B2BAdminLogin: React.FC = () => {
               <label htmlFor="password" className="block text-sm font-medium mb-1">
                 Mot de passe
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md"
                 required
               />
             </div>

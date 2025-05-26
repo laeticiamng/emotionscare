@@ -1,26 +1,26 @@
 
-export interface EmotionData {
-  emotion: string;
-  confidence: number;
+export interface Emotion {
+  id: string;
+  name: string;
+  category: 'positive' | 'negative' | 'neutral';
   intensity: number;
+  confidence?: number;
 }
 
-export interface EmotionScanOptions {
-  text?: string;
-  type: 'text' | 'voice' | 'image';
-  imageFile?: File;
-  audioBlob?: Blob;
-}
-
-export interface EmotionResult {
+export interface EmotionAnalysis {
   id: string;
   userId: string;
   timestamp: Date;
-  overallMood: string;
-  emotions: EmotionData[];
+  emotions: Emotion[];
   dominantEmotion: string;
+  overallMood: string;
   confidence: number;
   source: 'text' | 'voice' | 'image';
-  recommendations: string[];
-  metadata?: Record<string, any>;
+  rawData?: any;
+}
+
+export interface EmotionTrend {
+  date: string;
+  averageMood: number;
+  emotionDistribution: Record<string, number>;
 }

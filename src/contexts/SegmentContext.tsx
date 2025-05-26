@@ -1,10 +1,9 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface SegmentContextType {
-  selectedSegment: string;
-  setSelectedSegment: (segment: string) => void;
-  segments: string[];
+  track: (event: string, properties?: Record<string, any>) => void;
+  identify: (userId: string, traits?: Record<string, any>) => void;
 }
 
 const SegmentContext = createContext<SegmentContextType | undefined>(undefined);
@@ -14,17 +13,16 @@ interface SegmentProviderProps {
 }
 
 export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) => {
-  const [selectedSegment, setSelectedSegment] = useState('all');
-  const segments = ['all', 'hr', 'management', 'employees'];
+  const track = (event: string, properties?: Record<string, any>) => {
+    console.log('Segment track:', event, properties);
+  };
 
-  const value: SegmentContextType = {
-    selectedSegment,
-    setSelectedSegment,
-    segments
+  const identify = (userId: string, traits?: Record<string, any>) => {
+    console.log('Segment identify:', userId, traits);
   };
 
   return (
-    <SegmentContext.Provider value={value}>
+    <SegmentContext.Provider value={{ track, identify }}>
       {children}
     </SegmentContext.Provider>
   );
