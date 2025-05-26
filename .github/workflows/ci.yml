@@ -51,6 +51,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: DB migrate
+        run: npm run db:migrate
+
+      - name: Tests DB
+        run: npm run test:db
+
       - name: Download heavy binaries
         run: SKIP_HEAVY=true node scripts/install-heavy.js
 
