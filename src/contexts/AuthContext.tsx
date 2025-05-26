@@ -1,11 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-// Ensure React is available before creating context
-if (!React) {
-  console.error('[AuthContext] React not available at import time');
-}
-
 interface User {
   id: string;
   email: string;
@@ -23,19 +18,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  // Ensure React hooks are available
-  if (!React || !React.useContext) {
-    console.error('[useAuth] React hooks not available');
-    return {
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-      login: async () => {},
-      logout: () => {},
-    };
-  }
-
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
@@ -47,12 +30,6 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  // Ensure React hooks are available
-  if (!React || !React.useState || !React.useEffect) {
-    console.error('[AuthProvider] React hooks not available');
-    return <>{children}</>;
-  }
-
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

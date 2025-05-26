@@ -11,14 +11,6 @@ import {
 import { useToast } from "@/hooks/use-toast"
 
 export function Toaster() {
-  console.log('[Toaster] Rendering with React:', !!React);
-  
-  // Ensure React is available
-  if (!React || !React.createElement) {
-    console.error('[Toaster] React not available');
-    return null;
-  }
-
   const { toasts } = useToast()
 
   return (

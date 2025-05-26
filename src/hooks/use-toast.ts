@@ -5,11 +5,6 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-// Ensure React is available
-if (!React) {
-  console.error('[useToast] React is not available at import time');
-}
-
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
 
@@ -172,18 +167,6 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  console.log('[useToast] Hook called, React available:', !!React);
-  
-  // Ensure React and hooks are available
-  if (!React || !React.useState || !React.useEffect) {
-    console.error('[useToast] React hooks not available');
-    return {
-      toasts: [],
-      toast: () => ({ id: '', dismiss: () => {}, update: () => {} }),
-      dismiss: () => {},
-    }
-  }
-
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {

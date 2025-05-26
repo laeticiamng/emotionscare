@@ -1,11 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-// Ensure React is available
-if (!React) {
-  console.error('[ThemeProvider] React not available at import time');
-}
-
 type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
@@ -16,15 +11,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const useTheme = () => {
-  if (!React || !React.useContext) {
-    console.error('[useTheme] React hooks not available');
-    return {
-      theme: 'light' as Theme,
-      setTheme: () => {},
-    };
-  }
-
-  const context = React.useContext(ThemeContext);
+  const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
@@ -42,11 +29,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   defaultTheme = 'system',
   storageKey = 'ui-theme'
 }) => {
-  if (!React || !React.useState || !React.useEffect) {
-    console.error('[ThemeProvider] React hooks not available');
-    return <>{children}</>;
-  }
-
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
   useEffect(() => {

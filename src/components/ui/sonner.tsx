@@ -5,14 +5,6 @@ import { Toaster as Sonner } from "sonner"
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  console.log('[Sonner] Rendering with React:', !!React);
-  
-  // Ensure React is available
-  if (!React || !React.createElement) {
-    console.error('[Sonner] React not available');
-    return null;
-  }
-
   return (
     <Sonner
       theme="system"
