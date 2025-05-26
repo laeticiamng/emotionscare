@@ -1,38 +1,22 @@
 
-/**
- * Startup validation utility
- * Checks if all required dependencies are available
- */
-
-export const validateStartup = () => {
-  const requiredGlobals = ['React', 'ReactDOM'];
-  const missing: string[] = [];
-
-  // Check if React is available
+export function validateStartup(): boolean {
   try {
-    if (typeof window !== 'undefined') {
-      // Browser environment checks
-      if (!window.React && typeof React === 'undefined') {
-        missing.push('React');
-      }
+    // Check if React is available
+    if (typeof React === 'undefined') {
+      console.error('React is not available');
+      return false;
     }
-  } catch (error) {
-    console.warn('Startup check: React validation failed', error);
-  }
 
-  if (missing.length > 0) {
-    console.error('Missing required dependencies:', missing);
+    // Check if required DOM elements exist
+    if (typeof document === 'undefined' || !document.getElementById('root')) {
+      console.error('Root element not found');
+      return false;
+    }
+
+    console.log('✅ Startup validation passed');
+    return true;
+  } catch (error) {
+    console.error('Startup validation error:', error);
     return false;
   }
-
-  console.log('✅ Startup validation passed');
-  return true;
-};
-
-export const logDependencyStatus = () => {
-  console.log('📦 Dependency Status Check:', {
-    react: typeof React !== 'undefined',
-    reactDOM: typeof ReactDOM !== 'undefined',
-    timestamp: new Date().toISOString()
-  });
-};
+}
