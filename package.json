@@ -137,7 +137,7 @@
     "zod": "^3.23.8",
     "zustand": "^5.0.5",
     "pg": "^8.11.3",
-    "kysely": "^0.27.2"
+    "kysely": "^0.27.2",
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
