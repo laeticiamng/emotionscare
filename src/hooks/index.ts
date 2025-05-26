@@ -28,6 +28,8 @@ export { default as useMusicRecommendation } from './useMusicRecommendation';
 
 // Emotion hooks
 export { useEmotionScan } from './useEmotionScan';
+export { useWeeklyScan } from './useWeeklyScan';
+export { useOrgScan } from './useOrgScan';
 
 // Theme hook
 export { useTheme } from './use-theme';
