@@ -32,23 +32,26 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
   // Version avec tooltip lorsque la barre latérale est réduite
   if (collapsed) {
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={isActive(path) ? "secondary" : "ghost"}
-            size="icon"
-            className="w-full h-10 my-1"
-            onClick={handleNavigation}
-            aria-current={isActive(path) ? "page" : undefined}
-          >
-            <Icon className="h-5 w-5" />
-            <span className="sr-only">{label}</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" className="z-50">
-          {label}
-        </TooltipContent>
-      </Tooltip>
+      <div className="w-full">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isActive(path) ? "secondary" : "ghost"}
+              size="icon"
+              className="w-full h-10 my-1"
+              onClick={handleNavigation}
+              aria-current={isActive(path) ? "page" : undefined}
+              aria-label={label}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="sr-only">{label}</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="z-50">
+            <p>{label}</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
     );
   }
 

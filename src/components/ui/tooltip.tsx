@@ -26,15 +26,19 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-// Composant wrapper pour s'assurer qu'un TooltipProvider est toujours présent
+// Safe wrapper component that handles provider errors gracefully
 const SafeTooltip = ({ children, ...props }: React.ComponentProps<typeof Tooltip>) => {
-  return (
-    <TooltipProvider delayDuration={150}>
+  try {
+    return (
       <Tooltip {...props}>
         {children}
       </Tooltip>
-    </TooltipProvider>
-  )
+    )
+  } catch (error) {
+    // Fallback to rendering children without tooltip if provider fails
+    console.warn('Tooltip provider error, rendering without tooltip:', error);
+    return <>{children}</>;
+  }
 }
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, SafeTooltip }
