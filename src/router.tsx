@@ -17,6 +17,8 @@ const B2BUserDashboard = React.lazy(() => import('./pages/b2b/user/B2BUserDashbo
 const B2BAdminLoginPage = React.lazy(() => import('./pages/auth/B2BAdminLoginPage'));
 const B2BAdminDashboard = React.lazy(() => import('./pages/b2b/admin/B2BAdminDashboard'));
 const AuditPage = React.lazy(() => import('./pages/audit/AuditPage'));
+const BreathUserPage = React.lazy(() => import('./pages/BreathUserPage'));
+const BreathOrgPage = React.lazy(() => import('./pages/BreathOrgPage'));
 
 // Layout Components
 const B2CLayout = React.lazy(() => import('./layouts/B2CLayout'));
@@ -68,6 +70,10 @@ export const routes = [
         path: 'dashboard',
         element: withSuspense(B2CDashboard)(),
       },
+      {
+        path: 'dashboard/breath',
+        element: withSuspense(BreathUserPage)(),
+      },
     ],
   },
   // B2B User Routes
@@ -109,6 +115,10 @@ export const routes = [
       {
         path: 'dashboard',
         element: withSuspense(B2BAdminDashboard)(),
+      },
+      {
+        path: 'breath',
+        element: withSuspense(BreathOrgPage)(),
       },
     ],
   },

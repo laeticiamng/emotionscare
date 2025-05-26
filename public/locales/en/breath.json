@@ -1,0 +1,9 @@
+{
+  "title": "Breath Dashboard",
+  "hrvStress": "HRV-Stress Index",
+  "coherence": "Coherence",
+  "mvpa": "Active Minutes",
+  "relax": "Relaxation",
+  "mindfulness": "Mindfulness",
+  "mood": "Mood"
+}
