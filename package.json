@@ -25,7 +25,7 @@
 
     ,"db:migrate": "flyway -configFiles database/flyway.conf migrate"
     ,"db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'"
-    ,"test:db": "vitest run --config vitest.db.config.ts"
+    ,"test:db": "vitest run --config vitest.db.config.ts",
     "db:migrate": "node scripts/run-migrations.cjs",
   },
   "dependencies": {
