@@ -25,8 +25,13 @@ interface UserModeProviderProps {
 export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
   const [userMode, setUserMode] = useState<UserMode>(null);
 
+  const value: UserModeContextType = {
+    userMode,
+    setUserMode
+  };
+
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode }}>
+    <UserModeContext.Provider value={value}>
       {children}
     </UserModeContext.Provider>
   );
