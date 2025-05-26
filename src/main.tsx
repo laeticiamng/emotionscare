@@ -1,13 +1,14 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './styles/accessibility.css';
-import { initProductionSecurity } from '@/lib/security/productionSecurity';
-import { initBuildOptimizations } from '@/utils/buildOptimization';
-import { applyCSP } from '@/lib/security/csp';
-import { applySecurityMeta } from '@/lib/security/headers';
+import { validateStartup } from './utils/startupCheck';
+
+// Startup validation
+if (!validateStartup()) {
+  console.error('❌ Startup validation failed - some dependencies may be missing');
+}
 
 // Initialisation des optimisations de sécurité en production
 if (import.meta.env.PROD) {
