@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from 'react';
 import { UserModeType } from '@/utils/userModeHelpers';
 
 interface UserModeContextType {
@@ -8,17 +8,17 @@ interface UserModeContextType {
   isLoading: boolean;
 }
 
-const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
+const UserModeContext = React.createContext<UserModeContextType | undefined>(undefined);
 
 interface UserModeProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserModeType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [userMode, setUserModeState] = React.useState<UserModeType | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Récupérer le mode utilisateur depuis le localStorage
     const storedMode = localStorage.getItem('userMode') as UserModeType;
     if (storedMode) {
@@ -46,7 +46,7 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
 };
 
 export const useUserMode = () => {
-  const context = useContext(UserModeContext);
+  const context = React.useContext(UserModeContext);
   if (context === undefined) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
