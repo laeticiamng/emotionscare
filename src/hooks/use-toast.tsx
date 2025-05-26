@@ -1,56 +1,74 @@
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import * as React from "react";
 
-interface Toast {
+export interface ToastProps {
   id: string;
-  title?: string;
-  description?: string;
-  variant?: 'default' | 'destructive';
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
   duration?: number;
+  open?: boolean;
 }
 
 interface ToastContextType {
-  toasts: Toast[];
-  toast: (props: Omit<Toast, 'id'>) => void;
+  toasts: ToastProps[];
+  toast: (props: Omit<ToastProps, 'id'>) => string;
   dismiss: (id: string) => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
-  const toast = useCallback((props: Omit<Toast, 'id'>) => {
-    const id = Date.now().toString();
-    const newToast = { ...props, id };
-    
-    setToasts(prev => [...prev, newToast]);
-    
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, props.duration || 5000);
+  const toast = React.useCallback((props: Omit<ToastProps, 'id'>) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    const newToast: ToastProps = {
+      ...props,
+      id,
+      duration: props.duration ?? 5000,
+    };
+
+    setToasts((prev) => [...prev, newToast]);
+
+    if (newToast.duration && newToast.duration > 0) {
+      setTimeout(() => {
+        dismiss(id);
+      }, newToast.duration);
+    }
+
+    return id;
   }, []);
 
-  const dismiss = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+  const dismiss = React.useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
+
+  const value = React.useMemo(() => ({
+    toasts,
+    toast,
+    dismiss,
+  }), [toasts, toast, dismiss]);
 
   return (
-    <ToastContext.Provider value={{ toasts, toast, dismiss }}>
+    <ToastContext.Provider value={value}>
       {children}
     </ToastContext.Provider>
   );
 };
 
 export const useToast = () => {
-  const context = useContext(ToastContext);
+  const context = React.useContext(ToastContext);
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
 };
 
-export const toast = (props: Omit<Toast, 'id'>) => {
-  // This is a standalone function for convenience
-  console.log('Toast:', props);
+// Convenience function for direct toast calls
+export const toast = (props: Omit<ToastProps, 'id'>) => {
+  // This will only work if ToastProvider is mounted
+  const toastEvent = new CustomEvent('toast', { detail: props });
+  window.dispatchEvent(toastEvent);
 };
