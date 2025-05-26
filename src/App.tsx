@@ -12,8 +12,6 @@ import { Suspense } from "react";
 import AppRouter from "./AppRouter";
 import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBoundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
-import SecurityProvider from "@/components/security/SecurityProvider";
-import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
 // Initialiser la validation d'environnement
@@ -42,25 +40,24 @@ function App() {
   return (
     <GlobalErrorBoundary>
       <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-        <SecurityProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider delayDuration={150}>
-              <BrowserRouter>
-                <AuthProvider>
-                  <UserModeProvider>
-                    <MusicProvider>
-                      <SkipToContent />
-                      <Toaster />
-                      <Sonner />
-                      <PerformanceMonitor enabled={process.env.NODE_ENV === 'development'} />
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider delayDuration={150}>
+            <BrowserRouter>
+              <AuthProvider>
+                <UserModeProvider>
+                  <MusicProvider>
+                    <SkipToContent />
+                    <Toaster />
+                    <Sonner />
+                    <Suspense fallback={<div>Loading...</div>}>
                       <AppRouter />
-                    </MusicProvider>
-                  </UserModeProvider>
-                </AuthProvider>
-              </BrowserRouter>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </SecurityProvider>
+                    </Suspense>
+                  </MusicProvider>
+                </UserModeProvider>
+              </AuthProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
       </ThemeProvider>
     </GlobalErrorBoundary>
   );
