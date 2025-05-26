@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Scan API
+  version: 1.0.0
+paths:
+  /me/scan/weekly:
+    get:
+      summary: Get weekly scan KPIs
+      responses:
+        '200':
+          description: Weekly metrics
+  /org/{orgId}/scan/weekly:
+    get:
+      summary: Get org weekly scan KPIs
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Weekly org metrics
