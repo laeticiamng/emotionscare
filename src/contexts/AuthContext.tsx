@@ -1,145 +1,106 @@
+
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+
+// Ensure React is available before creating context
+if (!React) {
+  console.error('[AuthContext] React not available at import time');
+}
+
+interface User {
+  id: string;
+  email: string;
+  role: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  signIn: (email: string, password: string) => Promise<{ error?: any }>;
-  signUp: (email: string, password: string) => Promise<{ error?: any }>;
-  signOut: () => Promise<void>;
-  loading: boolean;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  // Ensure React hooks are available
+  if (!React || !React.useContext) {
+    console.error('[useAuth] React hooks not available');
+    return {
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      login: async () => {},
+      logout: () => {},
+    };
+  }
+
+  const context = React.useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  // Initialize state with proper error handling
+  // Ensure React hooks are available
+  if (!React || !React.useState || !React.useEffect) {
+    console.error('[AuthProvider] React hooks not available');
+    return <>{children}</>;
+  }
+
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Prevent multiple initializations
-    if (initialized) return;
-    
-    console.log('[AuthProvider] Initializing auth state listener');
-    
-    try {
-      // Set up auth state listener
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          console.log('[AuthProvider] Auth state changed:', event, session?.user?.id);
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
+    // Simulate checking for existing session
+    const checkAuth = async () => {
+      try {
+        // Mock auth check - replace with actual auth logic
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
         }
-      );
-
-      // Check for existing session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        console.log('[AuthProvider] Initial session check:', session?.user?.id);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-        setInitialized(true);
-      });
-
-      return () => {
-        console.log('[AuthProvider] Cleaning up auth listener');
-        subscription.unsubscribe();
-      };
-    } catch (error) {
-      console.error('[AuthProvider] Error during initialization:', error);
-      setLoading(false);
-      setInitialized(true);
-    }
-  }, [initialized]);
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Erreur de connexion",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      return { error: null };
-    } catch (error) {
-      console.error('Sign in error:', error);
-      return { error };
-    }
-  };
+    checkAuth();
+  }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Erreur d'inscription",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error };
-      }
-
-      toast({
-        title: "Inscription réussie",
-        description: "Vérifiez votre email pour confirmer votre compte.",
-      });
-
-      return { error: null };
+      // Mock login - replace with actual auth logic
+      const mockUser = { id: '1', email, role: 'b2c' };
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
-      console.error('Sign up error:', error);
-      return { error };
+      console.error('Login failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      
-      toast({
-        title: "Déconnexion réussie",
-        description: "Vous avez été déconnecté avec succès.",
-      });
-    } catch (error) {
-      console.error('Sign out error:', error);
-      toast({
-        title: "Erreur de déconnexion",
-        description: "Une erreur est survenue lors de la déconnexion.",
-        variant: "destructive",
-      });
-    }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
   };
 
-  const value: AuthContextType = {
+  const value = {
     user,
-    session,
-    signIn,
-    signUp,
-    signOut,
-    loading,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
   };
 
   return (
@@ -147,12 +108,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

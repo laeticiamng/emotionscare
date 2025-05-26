@@ -7,15 +7,10 @@ import './index.css';
 console.log('[Main] React version:', React.version);
 console.log('[Main] Starting app initialization...');
 
-// Ensure React is available globally before any rendering
-if (typeof window !== 'undefined') {
-  (window as any).React = React;
-}
-
-// Wait for DOM to be ready
+// Wait for DOM to be ready and ensure React is properly initialized
 const initializeApp = async () => {
-  // Ensure React is properly initialized
-  if (!React || !React.createElement) {
+  // Double-check React is available
+  if (!React || !React.createElement || !React.StrictMode) {
     console.error('[Main] React not properly loaded');
     return;
   }
@@ -39,11 +34,11 @@ const initializeApp = async () => {
   console.log('[Main] Creating React root...');
   const root = ReactDOM.createRoot(rootElement);
   
-  console.log('[Main] Rendering App...');
+  console.log('[Main] Rendering App with React:', !!React);
   root.render(
-    React.createElement(React.StrictMode, {}, 
-      React.createElement(App)
-    )
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
   );
 };
 

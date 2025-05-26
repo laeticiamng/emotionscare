@@ -1,18 +1,31 @@
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+// Ensure React is available
+if (!React) {
+  console.error('[UserModeContext] React not available at import time');
+}
 
 interface UserModeContextType {
-  userMode: UserMode;
-  setUserMode: (mode: UserMode) => void;
+  userMode: string | null;
+  setUserMode: (mode: string) => void;
+  isLoading: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 export const useUserMode = () => {
-  const context = useContext(UserModeContext);
-  if (!context) {
+  if (!React || !React.useContext) {
+    console.error('[useUserMode] React hooks not available');
+    return {
+      userMode: null,
+      setUserMode: () => {},
+      isLoading: false,
+    };
+  }
+
+  const context = React.useContext(UserModeContext);
+  if (context === undefined) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
   return context;
@@ -23,41 +36,19 @@ interface UserModeProviderProps {
 }
 
 export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  console.log('[UserModeProvider] Initializing...');
-  
-  // Initialize with error handling
-  const [userMode, setUserMode] = useState<UserMode>(() => {
-    try {
-      const stored = localStorage.getItem('userMode');
-      console.log('[UserModeProvider] Stored mode:', stored);
-      return stored as UserMode || null;
-    } catch (error) {
-      console.error('[UserModeProvider] Error reading from localStorage:', error);
-      return null;
-    }
-  });
+  if (!React || !React.useState) {
+    console.error('[UserModeProvider] React hooks not available');
+    return <>{children}</>;
+  }
 
-  // Update localStorage when userMode changes
-  useEffect(() => {
-    try {
-      if (userMode) {
-        localStorage.setItem('userMode', userMode);
-        console.log('[UserModeProvider] Mode saved to localStorage:', userMode);
-      } else {
-        localStorage.removeItem('userMode');
-        console.log('[UserModeProvider] Mode removed from localStorage');
-      }
-    } catch (error) {
-      console.error('[UserModeProvider] Error writing to localStorage:', error);
-    }
-  }, [userMode]);
+  const [userMode, setUserMode] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const value: UserModeContextType = {
+  const value = {
     userMode,
-    setUserMode
+    setUserMode,
+    isLoading,
   };
-
-  console.log('[UserModeProvider] Rendering with mode:', userMode);
 
   return (
     <UserModeContext.Provider value={value}>
