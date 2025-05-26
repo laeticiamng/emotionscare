@@ -319,6 +319,16 @@ suivants sont disponibles :
 
 Les mocks du dossier `src/mocks` respectent désormais strictement ces
 définitions pour éviter les erreurs de typage lors du build.
+## Développement des fonctions Edge
+Pour tester localement les nouvelles fonctions, utilisez le serveur Supabase:
+
+```bash
+supabase start
+supabase functions serve --env-file supabase/.env
+```
+
+Les routes sont disponibles sur `http://localhost:54321/functions/v1`.
+
 
 ## Documentation technique
 
