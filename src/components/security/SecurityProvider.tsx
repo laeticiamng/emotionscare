@@ -1,5 +1,5 @@
 
-import React, { useEffect, createContext, useContext } from 'react';
+import React, { useEffect, createContext, useContext, useState } from 'react';
 
 interface SecurityContextType {
   isSecure: boolean;
@@ -21,7 +21,7 @@ interface SecurityProviderProps {
 }
 
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const [isSecure, setIsSecure] = React.useState(true);
+  const [isSecure, setIsSecure] = useState(true);
 
   useEffect(() => {
     // Vérifications de sécurité de base
@@ -30,6 +30,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       if (import.meta.env.PROD && window.location.protocol !== 'https:') {
         console.warn('🔒 Site non sécurisé en production');
         setIsSecure(false);
+        return;
       }
       
       // Autres vérifications de sécurité
