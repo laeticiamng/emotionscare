@@ -2,30 +2,39 @@
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-
-// Ensure React is fully available before importing App
-console.log('Main.tsx - React check:', {
-  React: !!React,
-  useState: !!React?.useState,
-  useContext: !!React?.useContext,
-  StrictMode: !!StrictMode
-});
-
-// Make React globally available
-if (typeof window !== 'undefined') {
-  (window as any).React = React;
-}
-
-// Import App after React is confirmed to be available
 import App from './App';
 
+// Diagnostics de démarrage
+console.log('EmotionsCare - Initialisation:', {
+  React: !!React,
+  hooks: { 
+    useState: !!React.useState, 
+    useContext: !!React.useContext,
+    useEffect: !!React.useEffect
+  },
+  StrictMode: !!StrictMode,
+  timestamp: new Date().toISOString()
+});
+
+// Ensure React is globally available for compatibility
+if (typeof window !== 'undefined') {
+  (window as any).React = React;
+  console.log('React défini globalement pour compatibilité');
+}
+
 const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Root element not found');
+if (!rootElement) {
+  throw new Error('Élément root introuvable - Vérifiez index.html');
+}
 
-console.log('Creating React root...');
+console.log('Création du root React...');
 
-createRoot(rootElement).render(
+const root = createRoot(rootElement);
+
+root.render(
   <StrictMode>
     <App />
   </StrictMode>
 );
+
+console.log('Application EmotionsCare démarrée avec succès');

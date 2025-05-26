@@ -1,9 +1,9 @@
 
 /**
- * Service de gestion d'erreur globale centralisé
+ * Service global de gestion d'erreurs pour la production
  */
 
-export interface ErrorReport {
+interface ErrorReport {
   message: string;
   stack?: string;
   context?: string;
@@ -13,77 +13,69 @@ export interface ErrorReport {
 }
 
 class GlobalErrorService {
-  private errorQueue: ErrorReport[] = [];
-  private maxErrors = 50;
-
-  reportError(error: Error, context?: string): void {
-    const errorReport: ErrorReport = {
+  private errors: ErrorReport[] = [];
+  
+  /**
+   * Signaler une erreur
+   */
+  reportError(error: Error, context?: string) {
+    const report: ErrorReport = {
       message: error.message,
       stack: error.stack,
       context,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      url: window.location.href,
+      url: window.location.href
     };
-
-    this.errorQueue.push(errorReport);
     
-    // Garder seulement les dernières erreurs
-    if (this.errorQueue.length > this.maxErrors) {
-      this.errorQueue.shift();
-    }
-
-    // Log en console pour le développement
-    console.error('[GlobalError]', errorReport);
-
+    this.errors.push(report);
+    console.error('Erreur capturée:', report);
+    
     // En production, envoyer à un service de monitoring
     if (import.meta.env.PROD) {
-      this.sendToMonitoring(errorReport);
+      this.sendToMonitoring(report);
     }
   }
-
-  private async sendToMonitoring(errorReport: ErrorReport): Promise<void> {
-    try {
-      // Ici on pourrait envoyer à Sentry, LogRocket, etc.
-      // Pour l'instant, on stocke localement
-      const existingErrors = JSON.parse(localStorage.getItem('error_reports') || '[]');
-      existingErrors.push(errorReport);
-      
-      // Garder seulement les 20 dernières erreurs
-      if (existingErrors.length > 20) {
-        existingErrors.splice(0, existingErrors.length - 20);
-      }
-      
-      localStorage.setItem('error_reports', JSON.stringify(existingErrors));
-    } catch (storageError) {
-      console.error('Failed to store error report:', storageError);
-    }
+  
+  private sendToMonitoring(report: ErrorReport) {
+    // Intégration future avec Sentry ou autre service
+    console.log('Envoi vers monitoring:', report);
   }
-
-  getErrorHistory(): ErrorReport[] {
-    return [...this.errorQueue];
+  
+  /**
+   * Obtenir les erreurs récentes
+   */
+  getRecentErrors(limit = 10) {
+    return this.errors.slice(-limit);
   }
-
-  clearErrors(): void {
-    this.errorQueue = [];
-    localStorage.removeItem('error_reports');
+  
+  /**
+   * Nettoyer les anciennnes erreurs
+   */
+  clearOldErrors() {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    this.errors = this.errors.filter(
+      error => new Date(error.timestamp) > oneHourAgo
+    );
   }
 }
 
 export const globalErrorService = new GlobalErrorService();
 
-// Handler global pour les erreurs non capturées
+// Capturer les erreurs non gérées
 window.addEventListener('error', (event) => {
   globalErrorService.reportError(
     new Error(event.message),
-    `Uncaught error at ${event.filename}:${event.lineno}:${event.colno}`
+    `Erreur globale: ${event.filename}:${event.lineno}`
   );
 });
 
-// Handler pour les promesses rejetées
+// Capturer les promesses rejetées
 window.addEventListener('unhandledrejection', (event) => {
   globalErrorService.reportError(
-    new Error(event.reason?.message || 'Unhandled promise rejection'),
-    'Unhandled promise rejection'
+    new Error(event.reason?.message || 'Promise rejetée'),
+    'Promise non gérée'
   );
 });
+
+console.log('Service global d\'erreurs initialisé');
