@@ -45,41 +45,27 @@ function App() {
     return React.createElement('div', {}, 'Loading...');
   }
   
-  return React.createElement(
-    ThemeProvider,
-    { defaultTheme: "system", storageKey: "ui-theme" },
-    React.createElement(
-      QueryClientProvider,
-      { client: queryClient },
-      React.createElement(
-        TooltipProvider,
-        { delayDuration: 150 },
-        React.createElement(
-          BrowserRouter,
-          {},
-          React.createElement(
-            AuthProvider,
-            {},
-            React.createElement(
-              UserModeProvider,
-              {},
-              React.createElement(
-                MusicProvider,
-                {},
-                React.createElement(SkipToContent),
-                React.createElement(Toaster),
-                React.createElement(Sonner),
-                React.createElement(
-                  Suspense,
-                  { fallback: React.createElement('div', {}, 'Loading...') },
-                  React.createElement(AppRouter)
-                )
-              )
-            )
-          )
-        )
-      )
-    )
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider delayDuration={150}>
+          <BrowserRouter>
+            <AuthProvider>
+              <UserModeProvider>
+                <MusicProvider>
+                  <SkipToContent />
+                  <Toaster />
+                  <Sonner />
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <AppRouter />
+                  </Suspense>
+                </MusicProvider>
+              </UserModeProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

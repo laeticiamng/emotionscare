@@ -36,8 +36,15 @@ const initializeApp = async () => {
     return;
   }
 
+  console.log('[Main] Creating React root...');
   const root = ReactDOM.createRoot(rootElement);
-  root.render(React.createElement(App));
+  
+  console.log('[Main] Rendering App...');
+  root.render(
+    React.createElement(React.StrictMode, {}, 
+      React.createElement(App)
+    )
+  );
 };
 
 // Initialize the app

@@ -21,23 +21,21 @@ export function Toaster() {
 
   const { toasts } = useToast()
 
-  return React.createElement(
-    ToastProvider,
-    {},
-    ...(toasts || []).map(function ({ id, title, description, action, ...props }) {
-      return React.createElement(
-        Toast,
-        { key: id, ...props },
-        React.createElement(
-          'div',
-          { className: "grid gap-1" },
-          title && React.createElement(ToastTitle, {}, title),
-          description && React.createElement(ToastDescription, {}, description)
-        ),
-        action,
-        React.createElement(ToastClose)
-      )
-    }),
-    React.createElement(ToastViewport)
+  return (
+    <ToastProvider>
+      {(toasts || []).map(function ({ id, title, description, action, ...props }) {
+        return (
+          <Toast key={id} {...props}>
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && <ToastDescription>{description}</ToastDescription>}
+            </div>
+            {action}
+            <ToastClose />
+          </Toast>
+        )
+      })}
+      <ToastViewport />
+    </ToastProvider>
   )
 }
