@@ -29,7 +29,8 @@
     "db:refresh:breath": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_breath();'",
     "test:sql": "echo 'Tests SQL désactivés - pgtap-run non disponible'",
     "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
-    "test:db:config": "vitest run --config vitest.db.config.ts"
+    "test:db:config": "vitest run --config vitest.db.config.ts",
+    "emergency-fix": "node emergency-bun-fix.js"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
@@ -83,7 +84,6 @@
     "@types/uuid": "^10.0.0",
     "@vercel/analytics": "^1.5.0",
     "@vitejs/plugin-react": "^4.5.0",
-    "@vitest/coverage-v8": "^3.1.4",
     "axe-core": "^4.10.3",
     "canvas-confetti": "^1.9.2",
     "chart.js": "^4.4.9",
