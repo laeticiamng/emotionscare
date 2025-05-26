@@ -17,14 +17,22 @@ export const renderHookWithMusicProvider = <T,>(callback: () => T) =>
     wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>,
   });
 
-export const mockResponse = (
-  body: unknown,
-  init: Partial<Response> & { status: number } = { status: 200 }
-): Response =>
-  new Response(JSON.stringify(body), {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init.headers || {}),
-    },
-  });
+export function mockResponse({
+  ok = true,
+  status = 200,
+  json = {},
+  text = '',
+}: {
+  ok?: boolean;
+  status?: number;
+  json?: any;
+  text?: string;
+}) {
+  return {
+    ok,
+    status,
+    json: vi.fn().mockResolvedValue(json),
+    text: vi.fn().mockResolvedValue(text),
+    headers: new Headers(),
+  } as unknown as Response;
+}

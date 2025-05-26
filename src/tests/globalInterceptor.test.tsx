@@ -12,9 +12,7 @@ const localStorageMock = {
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Mock de fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// fetch sera mocké dans chaque test
 vi.setConfig({ testTimeout: 15000 });
 
 describe('GlobalInterceptor', () => {
@@ -35,13 +33,13 @@ describe('GlobalInterceptor', () => {
         access_token: mockToken
       }));
 
-      mockFetch.mockResolvedValueOnce(
-        mockResponse({ data: 'test' }, { status: 200 })
+      global.fetch = vi.fn().mockResolvedValueOnce(
+        mockResponse({ status: 200, json: { data: 'test' } })
       );
 
       await GlobalInterceptor.secureFetch('/test', {});
 
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(global.fetch).toHaveBeenCalledWith(
         '/test',
         expect.objectContaining({
           headers: expect.objectContaining({
@@ -57,12 +55,23 @@ describe('GlobalInterceptor', () => {
         access_token: 'expired-token'
       }));
 
-      mockFetch
-        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
-        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
-        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
-        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
-        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }));
+      global.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(
+          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
+        )
+        .mockResolvedValueOnce(
+          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
+        )
+        .mockResolvedValueOnce(
+          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
+        )
+        .mockResolvedValueOnce(
+          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
+        )
+        .mockResolvedValueOnce(
+          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
+        );
 
       const resultPromise = GlobalInterceptor.secureFetch('/test', {});
       await vi.runAllTimersAsync();
@@ -77,15 +86,18 @@ describe('GlobalInterceptor', () => {
         .mockReturnValueOnce(JSON.stringify({ access_token: 'old-token' }))
         .mockReturnValueOnce(JSON.stringify({ access_token: 'new-token' }));
 
-      mockFetch
-        .mockResolvedValueOnce(mockResponse({}, { status: 401 }))
-        .mockResolvedValueOnce(mockResponse({}, { status: 200 }));
+      global.fetch = vi
+        .fn()
+        .mockResolvedValueOnce(
+          mockResponse({ ok: false, status: 401, json: {} })
+        )
+        .mockResolvedValueOnce(mockResponse({ status: 200, json: {} }));
 
       const resultPromise = GlobalInterceptor.secureFetch('/test', {});
       await vi.runAllTimersAsync();
       const result = await resultPromise;
 
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
       expect(result).toBeTruthy();
     });
   });
