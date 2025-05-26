@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "test:db": "vitest run --config vitest.db.config.ts",
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
     "build:dev": "vite build --mode development",
     "type-check": "tsc --noEmit",
@@ -152,7 +153,9 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "kysely": "^0.27.3",
+    "pg": "^8.11.5"
   },
   "optionalDependencies": {
     "cypress": "^13.5.0",
