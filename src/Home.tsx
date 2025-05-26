@@ -1,68 +1,92 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import HeroSection from './components/home/HeroSection';
+import ActionButtons from './components/home/ActionButtons';
+import WelcomeHero from './components/home/WelcomeHero';
+import CallToAction from './components/home/CallToAction';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { Brain, Heart, Users } from 'lucide-react';
 
 const Home: React.FC = () => {
-  console.log('Home component rendering successfully');
+  const navigate = useNavigate();
+
+  const ctaButtons = [
+    {
+      label: 'b2c',
+      link: '/b2c/login',
+      text: 'Espace Personnel',
+      variant: 'default' as const,
+      icon: true
+    },
+    {
+      label: 'b2b',
+      link: '/b2b/selection',
+      text: 'Espace Entreprise',
+      variant: 'outline' as const,
+      icon: true
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background">
+      <HeroSection />
+      
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
-              EmotionsCare
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Votre plateforme de bien-être émotionnel pour une vie plus équilibrée
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg">
-              Commencer votre parcours
-            </button>
-            <button className="border border-gray-300 hover:border-gray-400 text-gray-700 dark:text-gray-200 dark:border-gray-600 px-8 py-3 rounded-lg font-medium transition-colors">
-              En savoir plus
-            </button>
-          </div>
+        <WelcomeHero 
+          title="Bienvenue sur EmotionsCare"
+          subtitle="Votre plateforme de bien-être émotionnel alimentée par l'IA"
+          ctaButtons={ctaButtons}
+        />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Scan Émotionnel
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Analysez vos émotions en temps réel avec notre IA avancée
-              </p>
-            </div>
+        <div className="grid md:grid-cols-2 gap-8 mt-16">
+          <CallToAction type="personal" />
+          <CallToAction type="business" />
+        </div>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl">🎵</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Musicothérapie
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Découvrez des playlists personnalisées selon votre humeur
-              </p>
-            </div>
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold text-center mb-12">Nos fonctionnalités</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card>
+              <CardHeader>
+                <Brain className="h-12 w-12 text-blue-600 mb-4" />
+                <CardTitle>Analyse émotionnelle IA</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Analysez vos émotions avec notre IA avancée pour mieux comprendre votre état mental.
+                </p>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl">🤖</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Coach IA
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Bénéficiez de conseils personnalisés de notre coach virtuel
-              </p>
-            </div>
+            <Card>
+              <CardHeader>
+                <Heart className="h-12 w-12 text-red-600 mb-4" />
+                <CardTitle>Musique thérapeutique</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Découvrez des playlists personnalisées adaptées à votre humeur et vos besoins.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <Users className="h-12 w-12 text-green-600 mb-4" />
+                <CardTitle>Accompagnement coach</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Bénéficiez d'un accompagnement personnalisé avec notre coach IA bienveillant.
+                </p>
+              </CardContent>
+            </Card>
           </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <ActionButtons />
         </div>
       </div>
     </div>

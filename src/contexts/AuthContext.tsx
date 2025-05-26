@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/types/user';
 
 interface AuthContextType {
@@ -8,40 +8,55 @@ interface AuthContextType {
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  signUp: (email: string, password: string, userData?: any) => Promise<void>;
+  signUp: (email: string, password: string, userData?: Partial<User>) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  signIn: async () => {},
-  signOut: async () => {},
-  signUp: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate checking for existing session
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    // Simuler la vérification de l'authentification
+    const checkAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate sign in
+      // Simuler une connexion
       const mockUser: User = {
         id: '1',
         email,
+        name: email.split('@')[0],
         role: 'b2c',
-        name: 'User Test'
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
+      
       setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Sign in error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -49,24 +64,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     setUser(null);
+    localStorage.removeItem('user');
   };
 
-  const signUp = async (email: string, password: string, userData?: any) => {
-    await signIn(email, password);
+  const signUp = async (email: string, password: string, userData?: Partial<User>) => {
+    setIsLoading(true);
+    try {
+      // Simuler une inscription
+      const mockUser: User = {
+        id: Math.random().toString(36).substr(2, 9),
+        email,
+        name: userData?.name || email.split('@')[0],
+        role: userData?.role || 'b2c',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Sign up error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      signIn,
-      signOut,
-      signUp
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        signIn,
+        signOut,
+        signUp
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

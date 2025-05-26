@@ -2,17 +2,16 @@
 import { RouteObject } from 'react-router-dom';
 import React from 'react';
 
-const B2BLayout = React.lazy(() => import('../layouts/B2BLayout'));
+const B2BSelectionPage = React.lazy(() => import('../pages/B2BSelectionPage'));
+const B2BAdminLogin = React.lazy(() => import('../pages/b2b/B2BAdminLogin'));
 
 export const b2bRoutes: RouteObject[] = [
   {
-    path: '/b2b',
-    element: React.createElement(B2BLayout),
-    children: [
-      {
-        path: 'dashboard',
-        element: React.createElement('div', {}, 'B2B Dashboard')
-      }
-    ]
-  }
+    path: '/b2b/selection',
+    element: React.createElement(B2BSelectionPage),
+  },
+  {
+    path: '/b2b/admin/login',
+    element: React.createElement(B2BAdminLogin),
+  },
 ];

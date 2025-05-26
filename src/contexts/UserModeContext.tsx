@@ -1,26 +1,54 @@
 
-import React, { createContext, useContext, useState } from 'react';
-
-type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { UserModeType } from '@/utils/userModeHelpers';
 
 interface UserModeContextType {
-  userMode: UserMode;
-  setUserMode: (mode: UserMode) => void;
+  userMode: UserModeType | null;
+  setUserMode: (mode: UserModeType) => void;
+  isLoading: boolean;
 }
 
-const UserModeContext = createContext<UserModeContextType>({
-  userMode: 'b2c',
-  setUserMode: () => {},
-});
+const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>('b2c');
+interface UserModeProviderProps {
+  children: ReactNode;
+}
+
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserModeState] = useState<UserModeType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Récupérer le mode utilisateur depuis le localStorage
+    const storedMode = localStorage.getItem('userMode') as UserModeType;
+    if (storedMode) {
+      setUserModeState(storedMode);
+    }
+    setIsLoading(false);
+  }, []);
+
+  const setUserMode = (mode: UserModeType) => {
+    setUserModeState(mode);
+    localStorage.setItem('userMode', mode);
+  };
 
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode }}>
+    <UserModeContext.Provider
+      value={{
+        userMode,
+        setUserMode,
+        isLoading
+      }}
+    >
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => useContext(UserModeContext);
+export const useUserMode = () => {
+  const context = useContext(UserModeContext);
+  if (context === undefined) {
+    throw new Error('useUserMode must be used within a UserModeProvider');
+  }
+  return context;
+};

@@ -6,6 +6,12 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 
 ### Ajouté
 - metrics_weekly_journal materialized view + pg_cron job.
+## [1.1.12] - 2025-06-02
+
+### Ajouté
+- Tables `journal_voice` et `journal_text` avec triggers et politiques RLS.
+- Tests base de données et nouveau job CI `db-test`.
+- Diagramme `docs/journal-schema.md` décrivant le schéma.
 
 ## [1.1.11] - 2025-05-29
 

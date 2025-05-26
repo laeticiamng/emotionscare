@@ -1,35 +1,29 @@
 
-import { UserRole } from '@/types/user';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { normalizeUserMode, getModeDashboardPath, getUserModeDisplayName } from '@/utils/userModeHelpers';
 
 const useUserModeHelpers = () => {
-  const { currentMode } = useUserMode();
+  const { userMode, setUserMode } = useUserMode();
 
-  const getFormattedPath = (path: string): string => {
-    switch (currentMode) {
-      case 'b2b_user':
-        return `/b2b/user/${path}`;
-      case 'b2b_admin':
-        return `/b2b/admin/${path}`;
-      case 'b2c':
-      default:
-        return `/b2c/${path}`;
-    }
+  const switchToMode = (mode: string) => {
+    const normalizedMode = normalizeUserMode(mode);
+    setUserMode(normalizedMode);
   };
 
-  const isB2BMode = (): boolean => {
-    return currentMode === 'b2b_user' || currentMode === 'b2b_admin';
+  const getDashboardPath = () => {
+    return getModeDashboardPath(userMode);
   };
 
-  const isAdminMode = (): boolean => {
-    return currentMode === 'b2b_admin';
+  const getDisplayName = () => {
+    return getUserModeDisplayName(userMode);
   };
 
   return {
-    getFormattedPath,
-    isB2BMode,
-    isAdminMode,
-    currentMode
+    userMode,
+    switchToMode,
+    getDashboardPath,
+    getDisplayName,
+    setUserMode
   };
 };
 

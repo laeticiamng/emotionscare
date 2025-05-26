@@ -16,53 +16,89 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
   emotionTarget,
   onMusicReady
 }) => {
-  const [musicEnabled, setMusicEnabled] = useState(false);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
 
   useEffect(() => {
-    if (musicEnabled && onMusicReady) {
+    if (isMusicEnabled && onMusicReady) {
       onMusicReady();
     }
-  }, [musicEnabled, onMusicReady]);
+  }, [isMusicEnabled, onMusicReady]);
+
+  const toggleMusic = () => {
+    setIsMusicEnabled(!isMusicEnabled);
+    if (!isMusicEnabled) {
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(false);
+    }
+  };
+
+  const togglePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const adjustVolume = (newVolume: number) => {
+    setVolume(Math.max(0, Math.min(1, newVolume)));
+  };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Music className="h-5 w-5" />
-          Musique d'ambiance
+          Ambiance musicale
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm">Activer la musique</span>
+          <span className="text-sm text-muted-foreground">
+            Musique adaptée à l'environnement
+          </span>
           <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setMusicEnabled(!musicEnabled)}
+            variant={isMusicEnabled ? "default" : "outline"}
+            size="sm"
+            onClick={toggleMusic}
           >
-            {musicEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            {isMusicEnabled ? "Activée" : "Désactivée"}
           </Button>
         </div>
 
-        {musicEnabled && (
+        {isMusicEnabled && (
           <div className="space-y-3">
-            <div>
-              <label className="text-sm font-medium">Volume</label>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="w-full mt-1"
-              />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={togglePlayPause}
+              >
+                {isPlaying ? "Pause" : "Play"}
+              </Button>
+              
+              <div className="flex items-center gap-2 flex-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => adjustVolume(volume === 0 ? 0.7 : 0)}
+                >
+                  {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                </Button>
+                
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={(e) => adjustVolume(parseFloat(e.target.value))}
+                  className="flex-1"
+                />
+              </div>
             </div>
 
-            <div className="text-sm text-muted-foreground">
-              <p>Musique adaptée pour: {emotionTarget}</p>
-              <p>Environnement: {template.environment}</p>
+            <div className="text-xs text-muted-foreground">
+              Musique recommandée pour: {emotionTarget || template.category}
             </div>
           </div>
         )}

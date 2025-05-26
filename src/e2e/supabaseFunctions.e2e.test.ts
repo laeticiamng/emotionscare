@@ -15,6 +15,11 @@ const functions: FnCheck[] = [
   { file: 'coach-ai/index.ts', roles: ['b2c', 'b2b_user', 'b2b_admin', 'admin'] },
   { file: 'monitor-api-usage/index.ts', roles: ['admin'] },
   { file: 'team-management/index.ts', roles: ['b2b_admin', 'admin'] },
+  { file: 'micro-breaks/index.ts', roles: ['b2c', 'b2b_user'] },
+  { file: 'bubble-sessions/index.ts', roles: ['b2c', 'b2b_user'] },
+  { file: 'silk-wallpaper/index.ts', roles: ['b2c', 'b2b_user'] },
+  { file: 'me-metrics/index.ts', roles: ['b2c', 'b2b_user'] },
+  { file: 'rh-metrics/index.ts', roles: ['rh_manager'] },
 ];
 
 for (const fn of functions) {
