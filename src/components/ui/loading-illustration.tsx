@@ -4,26 +4,30 @@ import { motion } from 'framer-motion';
 
 export const LoadingIllustration: React.FC = () => {
   return (
-    <div className="flex items-center justify-center h-screen w-full bg-background">
-      <motion.div
-        className="flex flex-col items-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-background">
+      <div className="text-center">
         <motion.div
-          className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full mb-4"
+          className="w-16 h-16 mx-auto mb-4 border-4 border-primary border-t-transparent rounded-full"
           animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         />
         <motion.p
-          className="text-lg text-muted-foreground"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="text-lg font-medium text-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
         >
-          Chargement...
+          Chargement d'EmotionsCare...
         </motion.p>
-      </motion.div>
+        <motion.p
+          className="text-sm text-muted-foreground mt-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          Préparation de votre expérience personnalisée
+        </motion.p>
+      </div>
     </div>
   );
 };

@@ -4,8 +4,13 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 
-// Diagnostics de démarrage
-console.log('EmotionsCare - Initialisation:', {
+// Ensure React is available immediately
+if (typeof window !== 'undefined') {
+  (window as any).React = React;
+}
+
+// Add console logging for debugging
+console.log('EmotionsCare - React initialization check:', {
   React: !!React,
   hooks: { 
     useState: !!React.useState, 
@@ -16,25 +21,25 @@ console.log('EmotionsCare - Initialisation:', {
   timestamp: new Date().toISOString()
 });
 
-// Ensure React is globally available for compatibility
-if (typeof window !== 'undefined') {
-  (window as any).React = React;
-  console.log('React défini globalement pour compatibilité');
-}
-
 const rootElement = document.getElementById('root');
 if (!rootElement) {
-  throw new Error('Élément root introuvable - Vérifiez index.html');
+  throw new Error('Root element not found - Check index.html');
 }
 
-console.log('Création du root React...');
+console.log('Creating React root...');
 
 const root = createRoot(rootElement);
 
-root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
-
-console.log('Application EmotionsCare démarrée avec succès');
+// Add error boundary for initialization
+try {
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+  console.log('EmotionsCare application started successfully');
+} catch (error) {
+  console.error('Failed to render application:', error);
+  // Fallback render without StrictMode
+  root.render(<App />);
+}

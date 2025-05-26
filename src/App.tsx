@@ -13,7 +13,7 @@ import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import EnhancedErrorBoundary from "@/components/ui/enhanced-error-boundary";
 
-// Initialiser la validation d'environnement
+// Initialize validation files
 import '@/lib/env-validation';
 import '@/lib/errorBoundary';
 
@@ -23,7 +23,6 @@ const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
       retry: (failureCount, error) => {
-        // Ne pas retry sur les erreurs d'authentification
         if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
           return false;
         }
