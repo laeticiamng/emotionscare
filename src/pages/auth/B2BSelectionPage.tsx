@@ -1,90 +1,91 @@
 
-import * as React from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Users, Shield, ArrowLeft } from 'lucide-react';
 
 const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSelection = (type: 'user' | 'admin') => {
-    if (type === 'user') {
-      navigate('/b2b/user/login');
-    } else {
-      navigate('/b2b/admin/login');
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl"
-      >
-        <Card>
-          <CardHeader className="text-center relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/choose-mode')}
-              className="absolute left-4 top-4"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <CardTitle className="text-3xl font-bold">Accès Entreprise</CardTitle>
-            <CardDescription className="text-lg mt-2">
-              Choisissez votre type d'accès à la plateforme
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Button
-                onClick={() => handleSelection('user')}
-                variant="outline"
-                className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all w-full"
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/choose-mode')}
+          className="mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Retour
+        </Button>
+
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Espace Entreprise
+          </h1>
+          <p className="text-lg text-gray-600">
+            Choisissez votre profil d'accès
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Collaborateur */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 text-blue-600" />
+              </div>
+              <CardTitle className="text-xl">Collaborateur</CardTitle>
+              <CardDescription>
+                Accédez à votre espace personnel au sein de l'entreprise
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li>• Tableau de bord personnel</li>
+                <li>• Activités bien-être</li>
+                <li>• Suivi de progression</li>
+                <li>• Outils de méditation</li>
+              </ul>
+              <Button 
+                onClick={() => navigate('/b2b/user/login')}
+                className="w-full"
               >
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-medium mb-2">Collaborateur</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Accès collaborateur avec fonctionnalités de bien-être personnel et d'équipe
-                  </p>
-                </div>
+                Se connecter en tant que collaborateur
               </Button>
-            </motion.div>
-            
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <Button
-                onClick={() => handleSelection('admin')}
+            </CardContent>
+          </Card>
+
+          {/* Administrateur */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                <Shield className="w-8 h-8 text-purple-600" />
+              </div>
+              <CardTitle className="text-xl">Administration</CardTitle>
+              <CardDescription>
+                Gérez et supervisez le bien-être de vos équipes
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li>• Tableau de bord global</li>
+                <li>• Analytics d'équipe</li>
+                <li>• Gestion des utilisateurs</li>
+                <li>• Rapports détaillés</li>
+              </ul>
+              <Button 
+                onClick={() => navigate('/b2b/admin/login')}
+                className="w-full"
                 variant="outline"
-                className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all w-full"
               >
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Building2 className="h-8 w-8 text-primary" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-medium mb-2">Administrateur</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Gestion complète de l'entreprise avec analytics et administration
-                  </p>
-                </div>
+                Se connecter en tant qu'admin
               </Button>
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
