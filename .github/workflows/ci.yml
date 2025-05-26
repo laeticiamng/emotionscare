@@ -57,3 +57,34 @@ jobs:
       - name: Run tests
         run: npm run test -- --environment=jsdom
         timeout-minutes: 5
+
+  db-test:
+    needs: build-and-test
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner
+          POSTGRES_DB: testdb
+        ports: ['5432:5432']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with: { node-version: 20 }
+      - run: npm ci --prefer-offline --legacy-peer-deps
+      - run: npm run db:migrate
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: testdb
+          DB_USER: runner
+          DB_PASS: runner
+      - run: npm run test:db
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: testdb
+          DB_USER: runner
+          DB_PASS: runner
