@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: Account RGPD API
+  version: 1.0.0
+paths:
+  /user/export:
+    post:
+      summary: Crée un export_job
+      responses:
+        '202':
+          description: Export job created
+  /user/export/{jobId}:
+    get:
+      summary: Détail job export
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job info
+  /user/delete:
+    post:
+      summary: Démarre compte à rebours
+      responses:
+        '204':
+          description: Deletion scheduled
+  /user/delete/status:
+    get:
+      summary: Statut de suppression
+      responses:
+        '200':
+          description: Status info
