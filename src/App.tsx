@@ -5,7 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { MusicProvider } from "@/contexts/MusicContext";
 import { UserModeProvider } from "@/contexts/UserModeContext";
 import { Suspense } from "react";
@@ -14,6 +13,7 @@ import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBound
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import SecurityProvider from "@/components/security/SecurityProvider";
 import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
+import AppProviders from "@/providers/AppProviders";
 
 // Initialiser la validation d'environnement
 import '@/lib/env-validation';
@@ -43,7 +43,7 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider delayDuration={150}>
               <BrowserRouter>
-                <AuthProvider>
+                <AppProviders>
                   <UserModeProvider>
                     <MusicProvider>
                       <SkipToContent />
@@ -53,7 +53,7 @@ function App() {
                       <AppRouter />
                     </MusicProvider>
                   </UserModeProvider>
-                </AuthProvider>
+                </AppProviders>
               </BrowserRouter>
             </TooltipProvider>
           </QueryClientProvider>

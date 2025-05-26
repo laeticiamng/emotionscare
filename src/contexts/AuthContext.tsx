@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,29 +19,48 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  // Initialize state with proper error handling
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+    // Prevent multiple initializations
+    if (initialized) return;
+    
+    console.log('[AuthProvider] Initializing auth state listener');
+    
+    try {
+      // Set up auth state listener
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          console.log('[AuthProvider] Auth state changed:', event, session?.user?.id);
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      );
+
+      // Check for existing session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        console.log('[AuthProvider] Initial session check:', session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-      }
-    );
+        setInitialized(true);
+      });
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      return () => {
+        console.log('[AuthProvider] Cleaning up auth listener');
+        subscription.unsubscribe();
+      };
+    } catch (error) {
+      console.error('[AuthProvider] Error during initialization:', error);
       setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+      setInitialized(true);
+    }
+  }, [initialized]);
 
   const signIn = async (email: string, password: string) => {
     try {
