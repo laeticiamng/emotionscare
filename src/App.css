@@ -43,11 +43,11 @@ html, body, #root {
   }
 
   .theme-dark .premium-card {
-    @apply backdrop-blur-lg bg-glass-dark shadow-lg border-gray-800;
+    @apply backdrop-blur-lg bg-gray-900/70 shadow-lg border-gray-800;
   }
 
   .theme-pastel .premium-card {
-    @apply glass-pastel shadow-md border border-blue-100;
+    @apply bg-blue-50/80 shadow-md border border-blue-100;
   }
 
   /* Button enhancements */
