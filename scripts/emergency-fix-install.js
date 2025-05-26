@@ -186,3 +186,4 @@ runInstallation()
     console.log('4. Contactez le support si le problème persiste');
     process.exit(1);
   });
+node scripts/emergency-fix-install.js
