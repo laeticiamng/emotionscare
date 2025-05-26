@@ -1,6 +1,21 @@
 
-import { renderHookWithMusicProvider } from '@/tests/utils';
+import { renderHookWithMusicProvider, renderHook } from '@/tests/utils';
 import { useMusic } from '../useMusic';
+import { vi } from 'vitest';
+
+const mockAudio = {
+  play: vi.fn().mockResolvedValue(undefined),
+  pause: vi.fn(),
+  load: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  volume: 0.7,
+};
+
+Object.defineProperty(window, 'Audio', {
+  writable: true,
+  value: vi.fn().mockImplementation(() => mockAudio),
+});
 
 describe('useMusic', () => {
   test('should initialize with default values', () => {

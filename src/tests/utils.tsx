@@ -8,6 +8,7 @@ import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { ThemeProvider } from '@/components/theme-provider';
 import { renderHook, RenderHookOptions } from '@testing-library/react';
+import { vi } from 'vitest';
 
 // Create a custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
@@ -42,12 +43,15 @@ const customRender = (
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
 // Create hook render utilities
-export const renderHookWithMusicProvider = <T,>(
+export function renderHookWithMusicProvider<T>(
   callback: () => T,
   options?: Omit<RenderHookOptions<T>, 'wrapper'>
-) => {
-  return renderHook(callback, { wrapper: AllTheProviders, ...options });
-};
+) {
+  return renderHook(callback, {
+    wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>,
+    ...options,
+  });
+}
 
 export const renderHookWithAuthProvider = <T,>(
   callback: () => T,
@@ -59,3 +63,11 @@ export const renderHookWithAuthProvider = <T,>(
 // Re-export everything
 export * from '@testing-library/react';
 export { customRender as render };
+
+export function mockResponse({ ok = true, status = 200, json }: { ok?: boolean; status?: number; json?: any }) {
+  return {
+    ok,
+    status,
+    json: vi.fn().mockResolvedValue(json),
+  } as any;
+}
