@@ -8,8 +8,16 @@ export interface SidebarContextType {
 export interface SidebarItem {
   id: string;
   title: string;
-  url: string;
-  icon?: React.ComponentType;
-  badge?: string | number;
+  icon?: React.ComponentType<any>;
+  path?: string;
   children?: SidebarItem[];
+  badge?: string | number;
+  isActive?: boolean;
+}
+
+export interface SidebarProps {
+  items: SidebarItem[];
+  collapsed?: boolean;
+  onToggle?: () => void;
+  variant?: 'default' | 'minimal' | 'compact';
 }
