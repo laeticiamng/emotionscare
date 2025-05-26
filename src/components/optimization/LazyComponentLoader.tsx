@@ -1,5 +1,5 @@
 
-import React, { Suspense, lazy, ComponentType } from 'react';
+import React, { Suspense, lazy, ComponentType, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface LazyComponentLoaderProps {
@@ -65,7 +65,7 @@ export const useLazyComponent = <T extends ComponentType<any>>(
 
 // Composant pour le preload des ressources critiques
 export const ResourcePreloader: React.FC = () => {
-  React.useEffect(() => {
+  useEffect(() => {
     // Preload des fonts critiques
     const preloadFont = (url: string) => {
       const link = document.createElement('link');
