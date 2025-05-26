@@ -18,6 +18,9 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import '@/lib/env-validation';
 import '@/lib/errorBoundary';
 
+console.log('[App] React object:', React);
+console.log('[App] React version:', React?.version);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -36,6 +39,12 @@ const queryClient = new QueryClient({
 
 function App() {
   console.log('[App] Rendering...');
+  
+  // Ensure React is available before rendering
+  if (!React) {
+    console.error('[App] React is not available!');
+    return <div>Loading...</div>;
+  }
   
   return (
     <GlobalErrorBoundary>
