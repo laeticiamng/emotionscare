@@ -23,3 +23,16 @@ export const getModeDashboardPath = (mode: UserRole): string => {
       return '/b2c/dashboard';
   }
 };
+
+export const getUserModeDisplayName = (mode: UserRole): string => {
+  switch (mode) {
+    case 'b2c':
+      return 'Personnel';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'Administrateur';
+    default:
+      return 'Personnel';
+  }
+};

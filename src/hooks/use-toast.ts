@@ -1,29 +1,40 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
-interface ToastOptions {
+interface Toast {
+  id: string;
   title?: string;
   description?: string;
   variant?: 'default' | 'destructive';
-  duration?: number;
 }
 
-export const useToast = () => {
-  const [toasts, setToasts] = useState<any[]>([]);
+const toasts: Toast[] = [];
 
-  const toast = useCallback((options: ToastOptions) => {
-    const id = Date.now().toString();
-    const newToast = { id, ...options };
+export function useToast() {
+  const [, setCounter] = useState(0);
+
+  const toast = (toast: Omit<Toast, 'id'>) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    toasts.push({ id, ...toast });
+    setCounter(c => c + 1);
     
-    setToasts(prev => [...prev, newToast]);
-    
-    // Auto remove after duration
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, options.duration || 3000);
-  }, []);
+      const index = toasts.findIndex(t => t.id === id);
+      if (index > -1) {
+        toasts.splice(index, 1);
+        setCounter(c => c + 1);
+      }
+    }, 5000);
+  };
 
   return { toast, toasts };
+}
+
+export const toast = (options: { title?: string; description?: string }) => {
+  console.log('Toast:', options.title || options.description);
 };
 
-export { useToast as toast };
+export const error = (message: string) => toast({ title: 'Erreur', description: message });
+export const success = (message: string) => toast({ title: 'Succès', description: message });
+export const warning = (message: string) => toast({ title: 'Attention', description: message });
+export const info = (message: string) => toast({ title: 'Information', description: message });

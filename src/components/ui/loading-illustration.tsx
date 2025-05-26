@@ -1,21 +1,28 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingIllustrationProps {
-  className?: string;
+  text?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export const LoadingIllustration: React.FC<LoadingIllustrationProps> = ({ className }) => {
+const LoadingIllustration: React.FC<LoadingIllustrationProps> = ({ 
+  text = 'Chargement...', 
+  size = 'md' 
+}) => {
+  const sizeClasses = {
+    sm: 'h-6 w-6',
+    md: 'h-8 w-8', 
+    lg: 'h-12 w-12'
+  };
+
   return (
-    <div className={cn("flex items-center justify-center min-h-screen", className)}>
-      <div className="text-center">
-        <div className="animate-pulse">
-          <div className="mx-auto h-12 w-12 rounded-full bg-primary/20"></div>
-        </div>
-        <p className="mt-4 text-lg font-medium">EmotionsCare</p>
-        <p className="text-sm text-muted-foreground">Chargement en cours...</p>
-      </div>
+    <div className="flex flex-col items-center justify-center space-y-4 p-8">
+      <Loader2 className={`animate-spin text-primary ${sizeClasses[size]}`} />
+      <p className="text-muted-foreground text-sm">{text}</p>
     </div>
   );
 };
+
+export { LoadingIllustration };

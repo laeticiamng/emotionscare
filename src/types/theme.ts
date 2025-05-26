@@ -1,14 +1,13 @@
 
 export type ThemeName = 'light' | 'dark' | 'system';
-export type FontSize = 'sm' | 'md' | 'lg';
-export type FontFamily = 'sans' | 'serif' | 'mono';
 
-export interface Theme {
+export interface ThemeSettings {
   name: ThemeName;
-  colors: {
-    primary: string;
-    secondary: string;
-    background: string;
-    foreground: string;
-  };
+  label: string;
+  description: string;
+}
+
+export interface ThemeContextType {
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
 }

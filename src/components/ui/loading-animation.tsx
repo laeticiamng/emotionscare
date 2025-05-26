@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingAnimationProps {
   text?: string;
@@ -8,13 +8,13 @@ interface LoadingAnimationProps {
 }
 
 const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
-  text = "Chargement...", 
-  className 
+  text = 'Chargement...', 
+  className = ''
 }) => {
   return (
-    <div className={cn("flex flex-col items-center justify-center p-8", className)}>
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      {text && <p className="mt-4 text-sm text-muted-foreground">{text}</p>}
+    <div className={`flex flex-col items-center justify-center space-y-2 ${className}`}>
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="text-sm text-muted-foreground">{text}</p>
     </div>
   );
 };

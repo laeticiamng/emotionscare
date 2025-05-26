@@ -1,25 +1,24 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { ChatMessage } from '@/types/chat';
 
 export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const sendMessage = useCallback(async (content: string, sender: 'user' | 'assistant' = 'user') => {
-    const newMessage: ChatMessage = {
+  const sendMessage = async (content: string, sender: ChatMessage['sender'] = 'user') => {
+    const message: ChatMessage = {
       id: Date.now().toString(),
       content,
       sender,
       timestamp: new Date().toISOString()
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages(prev => [...prev, message]);
 
     if (sender === 'user') {
-      setIsProcessing(true);
+      setIsTyping(true);
       
-      // Simulation d'une réponse
       setTimeout(() => {
         const response: ChatMessage = {
           id: (Date.now() + 1).toString(),
@@ -29,21 +28,19 @@ export const useChat = () => {
         };
         
         setMessages(prev => [...prev, response]);
-        setIsProcessing(false);
+        setIsTyping(false);
       }, 1000);
     }
+  };
 
-    return newMessage;
-  }, []);
-
-  const clearMessages = useCallback(() => {
+  const clearMessages = () => {
     setMessages([]);
-  }, []);
+  };
 
   return {
     messages,
+    isTyping,
     sendMessage,
-    clearMessages,
-    isProcessing
+    clearMessages
   };
 };

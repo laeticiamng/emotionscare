@@ -1,14 +1,18 @@
 
 import { MusicTrack } from '@/types/music';
 
-export const ensureArray = <T>(value: T | T[]): T[] => {
-  return Array.isArray(value) ? value : [value];
+export const getTrackTitle = (track: MusicTrack): string => {
+  return track.title || 'Titre inconnu';
 };
 
-export const validateMusicTrack = (track: any): track is MusicTrack => {
-  return track && 
-         typeof track.id === 'string' &&
-         typeof track.title === 'string' &&
-         typeof track.url === 'string' &&
-         typeof track.duration === 'number';
+export const getTrackArtist = (track: MusicTrack): string => {
+  return track.artist || 'Artiste inconnu';
+};
+
+export const getTrackCover = (track: MusicTrack): string | undefined => {
+  return track.coverUrl;
+};
+
+export const getTrackDuration = (track: MusicTrack): number => {
+  return track.duration || 0;
 };
