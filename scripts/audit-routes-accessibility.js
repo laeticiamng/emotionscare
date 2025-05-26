@@ -2,274 +2,274 @@
 #!/usr/bin/env node
 
 /**
- * Audit spécifique des routes et de leur accessibilité
+ * Audit d'accessibilité des routes - Identifie les routes non accessibles
  */
 
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Audit des routes et accessibilité...');
+console.log('🔍 Démarrage de l\'audit d\'accessibilité des routes...\n');
 
-// Analyser les types de navigation
-function analyzeNavigationTypes() {
-  const navTypes = {
-    routes: [],
-    protectedRoutes: [],
-    publicRoutes: [],
-    redirects: []
-  };
+function getAllFiles(dirPath, arrayOfFiles = [], extension = '.tsx') {
+  if (!fs.existsSync(dirPath)) {
+    return arrayOfFiles;
+  }
   
-  try {
-    // Analyser src/types/navigation.ts
-    if (fs.existsSync('src/types/navigation.ts')) {
-      const content = fs.readFileSync('src/types/navigation.ts', 'utf8');
-      
-      // Extraire les routes définies
-      const routeMatches = content.match(/'([^']+)':\s*'([^']+)'/g);
-      if (routeMatches) {
-        routeMatches.forEach(match => {
-          const [, key, path] = match.match(/'([^']+)':\s*'([^']+)'/);
-          navTypes.routes.push({ key, path, source: 'navigation.ts' });
-        });
+  const files = fs.readdirSync(dirPath);
+  
+  files.forEach(file => {
+    const fullPath = path.join(dirPath, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      if (!file.includes('node_modules') && !file.includes('.git')) {
+        arrayOfFiles = getAllFiles(fullPath, arrayOfFiles, extension);
       }
+    } else if (file.endsWith(extension)) {
+      arrayOfFiles.push(fullPath);
     }
-    
-    // Analyser src/utils/routeUtils.ts
-    if (fs.existsSync('src/utils/routeUtils.ts')) {
-      const content = fs.readFileSync('src/utils/routeUtils.ts', 'utf8');
-      
-      const routeMatches = content.match(/([A-Z_]+):\s*'([^']+)'/g);
-      if (routeMatches) {
-        routeMatches.forEach(match => {
-          const [, key, path] = match.match(/([A-Z_]+):\s*'([^']+)'/);
-          navTypes.routes.push({ key, path, source: 'routeUtils.ts' });
-        });
-      }
-    }
-  } catch (error) {
-    console.warn('Erreur analyse types navigation:', error.message);
-  }
+  });
   
-  return navTypes;
+  return arrayOfFiles;
 }
 
-// Analyser les composants de route protégée
-function analyzeProtectedRoutes() {
-  const protectedRoutes = [];
-  
-  try {
-    const routerFiles = [
-      'src/router.tsx',
-      'src/router/index.tsx',
-      'src/AppRouter.tsx'
-    ];
-    
-    routerFiles.forEach(file => {
-      if (fs.existsSync(file)) {
-        const content = fs.readFileSync(file, 'utf8');
-        
-        // Chercher ProtectedRoute
-        const protectedMatches = content.match(/<ProtectedRoute[^>]*>/g);
-        if (protectedMatches) {
-          protectedMatches.forEach(match => {
-            const pathMatch = content.match(new RegExp(`${match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^<]*path=['"\`]([^'"\`]+)['"\`]`));
-            if (pathMatch) {
-              protectedRoutes.push({
-                path: pathMatch[1],
-                component: match,
-                file
-              });
-            }
-          });
-        }
-      }
-    });
-  } catch (error) {
-    console.warn('Erreur analyse routes protégées:', error.message);
-  }
-  
-  return protectedRoutes;
-}
+const results = {
+  definedRoutes: [],
+  navigationLinks: [],
+  inaccessibleRoutes: [],
+  orphanedPages: [],
+  protectedRoutes: [],
+  publicRoutes: []
+};
 
-// Analyser les redirections
-function analyzeRedirects() {
-  const redirects = [];
-  
-  try {
-    const files = [
-      'src/components/auth/AuthFlow.tsx',
-      'src/components/auth/AuthTransition.tsx',
-      'src/utils/routeUtils.ts'
-    ];
-    
-    files.forEach(file => {
-      if (fs.existsSync(file)) {
-        const content = fs.readFileSync(file, 'utf8');
-        
-        // Chercher Navigate et redirections
-        const navigateMatches = content.match(/<Navigate[^>]*to=['"]([^'"]+)['"]/g);
-        if (navigateMatches) {
-          navigateMatches.forEach(match => {
-            const path = match.match(/to=['"]([^'"]+)['"]/)[1];
-            redirects.push({
-              from: 'auto-redirect',
-              to: path,
-              file,
-              context: match
-            });
-          });
-        }
-        
-        // Chercher navigate() calls
-        const functionNavigates = content.match(/navigate\(['"]([^'"]+)['"]\)/g);
-        if (functionNavigates) {
-          functionNavigates.forEach(match => {
-            const path = match.match(/navigate\(['"]([^'"]+)['"]\)/)[1];
-            redirects.push({
-              from: 'function-call',
-              to: path,
-              file,
-              context: match
-            });
-          });
-        }
-      }
-    });
-  } catch (error) {
-    console.warn('Erreur analyse redirections:', error.message);
-  }
-  
-  return redirects;
-}
+// 1. Extraire toutes les routes définies
+console.log('🛣️ Analyse des routes définies...');
+const routerFiles = getAllFiles('./src', [], '.tsx').filter(f => 
+  f.includes('router') || f.includes('Router') || f.includes('routes')
+);
 
-// Analyser l'accessibilité depuis l'UI
-function analyzeUIAccessibility() {
-  const uiAccess = {
-    buttons: [],
-    links: [],
-    menus: []
-  };
-  
+routerFiles.forEach(file => {
   try {
-    // Analyser les composants de navigation
-    const navDirs = [
-      'src/components/navigation',
-      'src/components/layout',
-      'src/components/ui/sidebar'
+    const content = fs.readFileSync(file, 'utf8');
+    
+    // Extraire les routes avec différents patterns
+    const routePatterns = [
+      /path:\s*['"`]([^'"`]+)['"`]/g,
+      /\{\s*path:\s*['"`]([^'"`]+)['"`]/g,
+      /<Route[^>]+path=['"`]([^'"`]+)['"`]/g
     ];
     
-    navDirs.forEach(dir => {
-      if (fs.existsSync(dir)) {
-        const files = fs.readdirSync(dir)
-          .filter(f => f.endsWith('.tsx') || f.endsWith('.ts'))
-          .map(f => path.join(dir, f));
-        
-        files.forEach(file => {
-          try {
-            const content = fs.readFileSync(file, 'utf8');
-            
-            // Chercher les boutons avec navigation
-            const buttonMatches = content.match(/<Button[^>]*onClick[^>]*>/g);
-            if (buttonMatches) {
-              buttonMatches.forEach(match => {
-                uiAccess.buttons.push({
-                  component: match,
-                  file,
-                  type: 'button'
-                });
-              });
-            }
-            
-            // Chercher les liens
-            const linkMatches = content.match(/<Link[^>]*to=['"]([^'"]+)['"]/g);
-            if (linkMatches) {
-              linkMatches.forEach(match => {
-                const path = match.match(/to=['"]([^'"]+)['"]/)[1];
-                uiAccess.links.push({
-                  path,
-                  component: match,
-                  file,
-                  type: 'link'
-                });
-              });
-            }
-          } catch (error) {
-            console.warn(`Erreur lecture ${file}:`, error.message);
+    routePatterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const routePath = match[1];
+        if (routePath && !results.definedRoutes.some(r => r.path === routePath)) {
+          // Déterminer si la route est protégée
+          const isProtected = content.includes('ProtectedRoute') && 
+                             content.substring(match.index - 200, match.index + 200).includes('ProtectedRoute');
+          
+          results.definedRoutes.push({
+            path: routePath,
+            file: path.relative('.', file),
+            protected: isProtected
+          });
+          
+          if (isProtected) {
+            results.protectedRoutes.push(routePath);
+          } else {
+            results.publicRoutes.push(routePath);
           }
-        });
+        }
       }
     });
   } catch (error) {
-    console.warn('Erreur analyse UI accessibility:', error.message);
+    console.warn(`⚠️ Erreur lors de la lecture de ${file}: ${error.message}`);
   }
-  
-  return uiAccess;
-}
+});
 
-// Exécuter l'audit des routes
-async function runRoutesAudit() {
-  const results = {
-    timestamp: new Date().toISOString(),
-    navigationTypes: analyzeNavigationTypes(),
-    protectedRoutes: analyzeProtectedRoutes(),
-    redirects: analyzeRedirects(),
-    uiAccessibility: analyzeUIAccessibility(),
-    analysis: {}
-  };
-  
-  // Analyser les problèmes d'accessibilité
-  const allDefinedPaths = results.navigationTypes.routes.map(r => r.path);
-  const accessiblePaths = results.uiAccessibility.links.map(l => l.path);
-  const protectedPaths = results.protectedRoutes.map(r => r.path);
-  
-  results.analysis = {
-    inaccessibleRoutes: allDefinedPaths.filter(path =>
-      !accessiblePaths.includes(path) && 
-      !results.redirects.some(r => r.to === path)
-    ),
-    orphanedProtectedRoutes: protectedPaths.filter(path =>
-      !accessiblePaths.includes(path)
-    ),
-    deadEndRedirects: results.redirects.filter(redirect =>
-      !allDefinedPaths.includes(redirect.to)
-    ),
-    unprotectedSensitiveRoutes: allDefinedPaths.filter(path =>
-      (path.includes('admin') || path.includes('dashboard')) &&
-      !protectedPaths.includes(path)
-    )
-  };
-  
-  // Sauvegarder le rapport
-  if (!fs.existsSync('reports')) {
-    fs.mkdirSync('reports');
+// 2. Extraire tous les liens de navigation
+console.log('🧭 Analyse des liens de navigation...');
+const allFiles = getAllFiles('./src');
+
+allFiles.forEach(file => {
+  try {
+    const content = fs.readFileSync(file, 'utf8');
+    
+    // Chercher les liens de navigation
+    const linkPatterns = [
+      /to=['"`]([^'"`]+)['"`]/g,          // React Router Link
+      /href=['"`]([^'"`]+)['"`]/g,        // Liens HTML
+      /navigate\(['"`]([^'"`]+)['"`]/g,   // useNavigate
+      /push\(['"`]([^'"`]+)['"`]/g        // Router push
+    ];
+    
+    linkPatterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(content)) !== null) {
+        const linkPath = match[1];
+        if (linkPath && linkPath.startsWith('/') && !linkPath.startsWith('//')) {
+          if (!results.navigationLinks.some(l => l.path === linkPath)) {
+            results.navigationLinks.push({
+              path: linkPath,
+              file: path.relative('.', file),
+              type: pattern.source.includes('to=') ? 'Link' : 
+                    pattern.source.includes('href=') ? 'href' :
+                    pattern.source.includes('navigate') ? 'navigate' : 'push'
+            });
+          }
+        }
+      }
+    });
+  } catch (error) {
+    // Ignorer les erreurs de lecture
   }
-  
-  fs.writeFileSync(
-    'reports/routes-accessibility.json',
-    JSON.stringify(results, null, 2)
+});
+
+// 3. Identifier les routes inaccessibles
+console.log('🚫 Identification des routes inaccessibles...');
+results.definedRoutes.forEach(route => {
+  const hasNavigation = results.navigationLinks.some(link => 
+    link.path === route.path || 
+    link.path.startsWith(route.path.replace('/*', '')) ||
+    route.path.startsWith(link.path)
   );
   
-  // Afficher le résumé
-  console.log('\n📊 Résultats de l\'audit des routes:');
-  console.log(`🛣️ Routes définies: ${results.navigationTypes.routes.length}`);
-  console.log(`🔒 Routes protégées: ${results.protectedRoutes.length}`);
-  console.log(`↩️ Redirections: ${results.redirects.length}`);
-  console.log(`🔗 Liens UI: ${results.uiAccessibility.links.length}`);
-  console.log(`🔘 Boutons UI: ${results.uiAccessibility.buttons.length}`);
+  if (!hasNavigation && route.path !== '/' && route.path !== '*' && !route.path.includes(':')) {
+    results.inaccessibleRoutes.push({
+      ...route,
+      reason: 'Aucun lien de navigation trouvé'
+    });
+  }
+});
+
+// 4. Identifier les pages orphelines
+console.log('📄 Identification des pages orphelines...');
+const pageFiles = getAllFiles('./src/pages');
+
+pageFiles.forEach(file => {
+  const fileName = path.basename(file, '.tsx');
+  const relativePath = path.relative('./src', file);
   
-  console.log('\n⚠️ Problèmes d\'accessibilité:');
-  console.log(`🔸 Routes inaccessibles: ${results.analysis.inaccessibleRoutes.length}`);
-  console.log(`🔸 Routes protégées orphelines: ${results.analysis.orphanedProtectedRoutes.length}`);
-  console.log(`🔸 Redirections cassées: ${results.analysis.deadEndRedirects.length}`);
-  console.log(`🔸 Routes sensibles non protégées: ${results.analysis.unprotectedSensitiveRoutes.length}`);
+  // Vérifier si la page est référencée dans les routes
+  const isRouted = results.definedRoutes.some(route => {
+    const routerContent = routerFiles.map(f => {
+      try {
+        return fs.readFileSync(f, 'utf8');
+      } catch {
+        return '';
+      }
+    }).join('\n');
+    
+    return routerContent.includes(fileName) || routerContent.includes(relativePath);
+  });
   
-  console.log('\n📄 Rapport détaillé sauvegardé: reports/routes-accessibility.json');
-  
-  return results;
+  if (!isRouted) {
+    results.orphanedPages.push({
+      file: relativePath,
+      page: fileName,
+      reason: 'Page non référencée dans le routeur'
+    });
+  }
+});
+
+// 5. Analyser l'accessibilité par rôle
+console.log('👤 Analyse de l\'accessibilité par rôle...');
+const roleBasedAccess = {
+  public: results.publicRoutes,
+  authenticated: results.protectedRoutes,
+  b2c: results.definedRoutes.filter(r => r.path.includes('/b2c')).map(r => r.path),
+  b2b_user: results.definedRoutes.filter(r => r.path.includes('/b2b/user')).map(r => r.path),
+  b2b_admin: results.definedRoutes.filter(r => r.path.includes('/b2b/admin')).map(r => r.path)
+};
+
+// Créer le rapport
+const reportDir = './reports/routes-accessibility';
+if (!fs.existsSync(reportDir)) {
+  fs.mkdirSync(reportDir, { recursive: true });
 }
 
-if (require.main === module) {
-  runRoutesAudit().catch(console.error);
-}
+// Rapport JSON détaillé
+const detailedResults = {
+  ...results,
+  roleBasedAccess,
+  summary: {
+    totalRoutes: results.definedRoutes.length,
+    accessibleRoutes: results.definedRoutes.length - results.inaccessibleRoutes.length,
+    inaccessibleRoutes: results.inaccessibleRoutes.length,
+    orphanedPages: results.orphanedPages.length,
+    navigationLinks: results.navigationLinks.length
+  }
+};
 
-module.exports = { runRoutesAudit };
+fs.writeFileSync(
+  path.join(reportDir, 'routes-accessibility.json'),
+  JSON.stringify(detailedResults, null, 2)
+);
+
+// Rapport Markdown
+const markdownReport = `
+# Audit d'Accessibilité des Routes
+
+## 📊 Résumé
+
+- **Routes totales**: ${results.definedRoutes.length}
+- **Routes accessibles**: ${results.definedRoutes.length - results.inaccessibleRoutes.length}
+- **Routes inaccessibles**: ${results.inaccessibleRoutes.length}
+- **Pages orphelines**: ${results.orphanedPages.length}
+- **Liens de navigation**: ${results.navigationLinks.length}
+
+## 🛣️ Routes Définies
+
+### Routes Publiques (${results.publicRoutes.length})
+${results.publicRoutes.map(route => `- \`${route}\``).join('\n') || 'Aucune route publique'}
+
+### Routes Protégées (${results.protectedRoutes.length})
+${results.protectedRoutes.map(route => `- \`${route}\``).join('\n') || 'Aucune route protégée'}
+
+## 🚫 Routes Inaccessibles (${results.inaccessibleRoutes.length})
+
+${results.inaccessibleRoutes.length === 0 ? 'Toutes les routes sont accessibles via navigation.' :
+results.inaccessibleRoutes.map(route => 
+  `- **\`${route.path}\`** (${route.file}) - ${route.reason}`
+).join('\n')}
+
+## 📄 Pages Orphelines (${results.orphanedPages.length})
+
+${results.orphanedPages.length === 0 ? 'Aucune page orpheline détectée.' :
+results.orphanedPages.map(page => 
+  `- **${page.page}** (\`${page.file}\`) - ${page.reason}`
+).join('\n')}
+
+## 👤 Accessibilité par Rôle
+
+### Public (${roleBasedAccess.public.length} routes)
+${roleBasedAccess.public.map(route => `- \`${route}\``).join('\n') || 'Aucune route publique'}
+
+### B2C (${roleBasedAccess.b2c.length} routes)
+${roleBasedAccess.b2c.map(route => `- \`${route}\``).join('\n') || 'Aucune route B2C'}
+
+### B2B Utilisateur (${roleBasedAccess.b2b_user.length} routes)
+${roleBasedAccess.b2b_user.map(route => `- \`${route}\``).join('\n') || 'Aucune route B2B utilisateur'}
+
+### B2B Admin (${roleBasedAccess.b2b_admin.length} routes)
+${roleBasedAccess.b2b_admin.map(route => `- \`${route}\``).join('\n') || 'Aucune route B2B admin'}
+
+## 🔧 Recommandations
+
+1. **Ajouter navigation** pour les routes inaccessibles importantes
+2. **Supprimer ou intégrer** les pages orphelines
+3. **Vérifier la logique** des routes protégées
+4. **Améliorer l'UX** en ajoutant des liens vers toutes les fonctionnalités
+
+---
+*Audit généré le ${new Date().toLocaleString('fr-FR')}*
+`;
+
+fs.writeFileSync(
+  path.join(reportDir, 'routes-accessibility.md'),
+  markdownReport
+);
+
+console.log('✅ Audit d\'accessibilité des routes terminé');
+console.log(`📁 Rapports générés dans: ${reportDir}`);
+console.log(`🛣️ ${results.definedRoutes.length} routes analysées`);
+console.log(`🚫 ${results.inaccessibleRoutes.length} routes inaccessibles`);
+console.log(`📄 ${results.orphanedPages.length} pages orphelines\n`);

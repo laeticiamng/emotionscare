@@ -2,197 +2,183 @@
 #!/usr/bin/env node
 
 /**
- * Script principal pour exécuter tous les audits
+ * Script principal pour lancer l'audit complet
  */
 
-const { runAudit } = require('./audit-accessibility');
-const { runBackendAudit } = require('./audit-backend-frontend-gap');
-const { runRoutesAudit } = require('./audit-routes-accessibility');
+const { execSync } = require('child_process');
 const fs = require('fs');
+const path = require('path');
 
-console.log('🔍 AUDIT COMPLET - Démarrage...\n');
+console.log('🚀 Démarrage de l\'audit complet EmotionsCare...\n');
+console.log('=' .repeat(60));
+console.log('📋 AUDIT COMPLET - BACKEND vs FRONTEND');
+console.log('=' .repeat(60));
 
-async function runCompleteAudit() {
-  const startTime = Date.now();
-  const results = {
+// S'assurer que le dossier reports existe
+const reportsDir = './reports';
+if (!fs.existsSync(reportsDir)) {
+  fs.mkdirSync(reportsDir, { recursive: true });
+}
+
+try {
+  // 1. Audit d'accessibilité
+  console.log('\n1️⃣ AUDIT D\'ACCESSIBILITÉ FRONTEND');
+  console.log('-'.repeat(40));
+  execSync('node scripts/audit-accessibility.js', { stdio: 'inherit' });
+
+  // 2. Audit Backend-Frontend Gap
+  console.log('\n2️⃣ AUDIT BACKEND-FRONTEND GAP');
+  console.log('-'.repeat(40));
+  execSync('node scripts/audit-backend-frontend-gap.js', { stdio: 'inherit' });
+
+  // 3. Audit des routes
+  console.log('\n3️⃣ AUDIT ACCESSIBILITÉ DES ROUTES');
+  console.log('-'.repeat(40));
+  execSync('node scripts/audit-routes-accessibility.js', { stdio: 'inherit' });
+
+  // 4. Générer un rapport consolidé
+  console.log('\n4️⃣ GÉNÉRATION DU RAPPORT CONSOLIDÉ');
+  console.log('-'.repeat(40));
+  
+  const consolidatedReport = {
     timestamp: new Date().toISOString(),
-    audits: {},
-    summary: {},
-    recommendations: []
+    audits: {}
   };
-  
-  try {
-    // Audit 1: Accessibilité des pages et composants
-    console.log('1️⃣ Audit d\'accessibilité...');
-    results.audits.accessibility = await runAudit();
-    
-    console.log('\n2️⃣ Audit Backend-Frontend Gap...');
-    results.audits.backendGap = await runBackendAudit();
-    
-    console.log('\n3️⃣ Audit des routes...');
-    results.audits.routes = await runRoutesAudit();
-    
-    // Générer le résumé global
-    results.summary = {
-      totalIssues: 
-        (results.audits.accessibility?.analysis?.orphanedPages?.length || 0) +
-        (results.audits.accessibility?.analysis?.unreachableRoutes?.length || 0) +
-        (results.audits.accessibility?.analysis?.brokenLinks?.length || 0) +
-        (results.audits.backendGap?.gaps?.unusedBackendServices?.length || 0) +
-        (results.audits.backendGap?.gaps?.missingBackendEndpoints?.length || 0) +
-        (results.audits.routes?.analysis?.inaccessibleRoutes?.length || 0) +
-        (results.audits.routes?.analysis?.orphanedProtectedRoutes?.length || 0),
-      
-      criticalIssues: [
-        ...(results.audits.routes?.analysis?.unprotectedSensitiveRoutes || []),
-        ...(results.audits.routes?.analysis?.deadEndRedirects || []),
-        ...(results.audits.backendGap?.gaps?.untestedServices || [])
-      ],
-      
-      categories: {
-        accessibility: {
-          orphanedPages: results.audits.accessibility?.analysis?.orphanedPages?.length || 0,
-          unreachableRoutes: results.audits.accessibility?.analysis?.unreachableRoutes?.length || 0,
-          brokenLinks: results.audits.accessibility?.analysis?.brokenLinks?.length || 0
-        },
-        backend: {
-          unusedServices: results.audits.backendGap?.gaps?.unusedBackendServices?.length || 0,
-          missingEndpoints: results.audits.backendGap?.gaps?.missingBackendEndpoints?.length || 0,
-          unusedTables: results.audits.backendGap?.gaps?.unusedTables?.length || 0
-        },
-        security: {
-          unprotectedRoutes: results.audits.routes?.analysis?.unprotectedSensitiveRoutes?.length || 0,
-          untestedServices: results.audits.backendGap?.gaps?.untestedServices?.length || 0
+
+  // Charger tous les rapports JSON
+  const reportDirs = [
+    './reports/accessibility',
+    './reports/backend-frontend-gap', 
+    './reports/routes-accessibility'
+  ];
+
+  reportDirs.forEach(dir => {
+    if (fs.existsSync(dir)) {
+      const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+      files.forEach(file => {
+        const reportName = path.basename(file, '.json');
+        try {
+          const reportContent = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
+          consolidatedReport.audits[reportName] = reportContent;
+        } catch (error) {
+          console.warn(`⚠️ Erreur lors du chargement de ${file}: ${error.message}`);
         }
-      }
-    };
-    
-    // Générer les recommandations
-    results.recommendations = generateRecommendations(results);
-    
-    // Sauvegarder le rapport complet
-    if (!fs.existsSync('reports')) {
-      fs.mkdirSync('reports');
+      });
     }
-    
-    fs.writeFileSync(
-      'reports/complete-audit-report.json',
-      JSON.stringify(results, null, 2)
-    );
-    
-    // Générer un rapport markdown lisible
-    generateMarkdownReport(results);
-    
-    const endTime = Date.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-    
-    console.log('\n🎉 AUDIT COMPLET TERMINÉ');
-    console.log(`⏱️ Durée: ${duration}s`);
-    console.log(`📊 Issues totales trouvées: ${results.summary.totalIssues}`);
-    console.log(`🚨 Issues critiques: ${results.summary.criticalIssues.length}`);
-    console.log('\n📄 Rapports générés:');
-    console.log('  - reports/complete-audit-report.json');
-    console.log('  - reports/audit-summary.md');
-    console.log('  - reports/accessibility-audit.json');
-    console.log('  - reports/backend-frontend-gap.json');
-    console.log('  - reports/routes-accessibility.json');
-    
-  } catch (error) {
-    console.error('❌ Erreur durant l\'audit:', error);
-    throw error;
-  }
+  });
+
+  // Sauvegarder le rapport consolidé
+  fs.writeFileSync(
+    path.join(reportsDir, 'complete-audit-report.json'),
+    JSON.stringify(consolidatedReport, null, 2)
+  );
+
+  // Générer un résumé exécutif
+  const executiveSummary = generateExecutiveSummary(consolidatedReport);
+  fs.writeFileSync(
+    path.join(reportsDir, 'EXECUTIVE_SUMMARY.md'),
+    executiveSummary
+  );
+
+  console.log('\n' + '='.repeat(60));
+  console.log('✅ AUDIT COMPLET TERMINÉ AVEC SUCCÈS');
+  console.log('='.repeat(60));
+  console.log(`📁 Rapports disponibles dans: ${reportsDir}/`);
+  console.log('📊 Rapports générés:');
+  console.log('   - complete-audit-report.json (données complètes)');
+  console.log('   - EXECUTIVE_SUMMARY.md (résumé exécutif)');
+  console.log('   - accessibility/ (audit accessibilité)');
+  console.log('   - backend-frontend-gap/ (audit gap backend)');
+  console.log('   - routes-accessibility/ (audit routes)');
+  
+} catch (error) {
+  console.error('\n❌ Erreur lors de l\'audit:', error.message);
+  process.exit(1);
 }
 
-function generateRecommendations(results) {
-  const recommendations = [];
-  
-  // Recommandations de sécurité
-  if (results.summary.categories.security.unprotectedRoutes > 0) {
-    recommendations.push({
-      priority: 'CRITICAL',
-      category: 'Security',
-      title: 'Routes sensibles non protégées',
-      description: 'Des routes admin/dashboard ne sont pas protégées par ProtectedRoute',
-      action: 'Ajouter ProtectedRoute avec les rôles appropriés'
-    });
-  }
-  
-  // Recommandations d'accessibilité
-  if (results.summary.categories.accessibility.orphanedPages > 0) {
-    recommendations.push({
-      priority: 'HIGH',
-      category: 'Accessibility',
-      title: 'Pages orphelines détectées',
-      description: 'Des pages existent mais ne sont accessibles via aucun lien',
-      action: 'Ajouter des liens de navigation ou supprimer les pages inutiles'
-    });
-  }
-  
-  // Recommandations backend
-  if (results.summary.categories.backend.unusedServices > 0) {
-    recommendations.push({
-      priority: 'MEDIUM',
-      category: 'Backend',
-      title: 'Services backend inutilisés',
-      description: 'Des services backend ne sont pas utilisés par le frontend',
-      action: 'Connecter au frontend ou supprimer si obsolètes'
-    });
-  }
-  
-  return recommendations;
-}
+function generateExecutiveSummary(report) {
+  const accessibilityData = report.audits['accessibility-audit'] || {};
+  const backendGapData = report.audits['backend-frontend-gap'] || {};
+  const routesData = report.audits['routes-accessibility'] || {};
 
-function generateMarkdownReport(results) {
-  const markdown = `# Rapport d'Audit Complet - EmotionsCare
+  return `
+# 📊 RÉSUMÉ EXÉCUTIF - AUDIT EMOTIONICARE
 
-**Date:** ${new Date(results.timestamp).toLocaleString('fr-FR')}
+*Généré le ${new Date().toLocaleString('fr-FR')}*
 
-## 📊 Résumé Exécutif
+## 🎯 Vue d'ensemble
 
-- **Issues totales:** ${results.summary.totalIssues}
-- **Issues critiques:** ${results.summary.criticalIssues.length}
+Cet audit complet identifie tous les éléments backend non accessibles côté utilisateur, les pages sans navigation, et les gaps entre le backend et le frontend.
 
-### Répartition par Catégorie
+## 📈 Métriques Clés
 
-#### 🔗 Accessibilité
-- Pages orphelines: ${results.summary.categories.accessibility.orphanedPages}
-- Routes inaccessibles: ${results.summary.categories.accessibility.unreachableRoutes}
-- Liens cassés: ${results.summary.categories.accessibility.brokenLinks}
+### 🎨 Frontend - Accessibilité
+- **Composants orphelins**: ${accessibilityData.orphanedComponents?.length || 0}
+- **Pages inutilisées**: ${accessibilityData.unusedPages?.length || 0}
+- **Routes sans navigation**: ${accessibilityData.missingNavigation?.length || 0}
 
-#### 🔧 Backend
-- Services inutilisés: ${results.summary.categories.backend.unusedServices}
-- Endpoints manquants: ${results.summary.categories.backend.missingEndpoints}
-- Tables non utilisées: ${results.summary.categories.backend.unusedTables}
+### 🔌 Backend - Gap Frontend
+- **Fonctions Edge inutilisées**: ${backendGapData.unusedEdgeFunctions?.length || 0}
+- **Services non connectés**: ${backendGapData.unusedBackendServices?.length || 0}
+- **Scripts orphelins**: ${backendGapData.deadEndpoints?.length || 0}
 
-#### 🔒 Sécurité
-- Routes non protégées: ${results.summary.categories.security.unprotectedRoutes}
-- Services non testés: ${results.summary.categories.security.untestedServices}
+### 🛣️ Routes - Accessibilité
+- **Routes totales**: ${routesData.summary?.totalRoutes || 0}
+- **Routes inaccessibles**: ${routesData.summary?.inaccessibleRoutes || 0}
+- **Pages orphelines**: ${routesData.summary?.orphanedPages || 0}
 
-## 🚨 Recommandations Prioritaires
+## 🚨 Points Critiques
 
-${results.recommendations.map(rec => `
-### ${rec.priority} - ${rec.title}
-**Catégorie:** ${rec.category}
-**Description:** ${rec.description}
-**Action:** ${rec.action}
-`).join('\n')}
+${generateCriticalPoints(accessibilityData, backendGapData, routesData)}
+
+## 🔧 Actions Prioritaires
+
+1. **Nettoyage immédiat**
+   - Supprimer les composants et pages orphelins
+   - Connecter les fonctions Edge importantes au frontend
+   - Ajouter navigation pour les routes critiques
+
+2. **Optimisation backend**
+   - Évaluer l'utilité des fonctions Edge non utilisées
+   - Documenter ou supprimer les services déconnectés
+   - Nettoyer les scripts orphelins
+
+3. **Amélioration UX**
+   - Ajouter liens de navigation manquants
+   - Simplifier l'architecture des routes
+   - Améliorer la découvrabilité des fonctionnalités
 
 ## 📁 Rapports Détaillés
 
-- \`accessibility-audit.json\` - Analyse complète de l'accessibilité
-- \`backend-frontend-gap.json\` - Gap entre backend et frontend
-- \`routes-accessibility.json\` - Analyse des routes et navigation
-- \`complete-audit-report.json\` - Rapport complet au format JSON
+- **Accessibilité**: \`reports/accessibility/accessibility-audit.md\`
+- **Backend Gap**: \`reports/backend-frontend-gap/backend-frontend-gap.md\`
+- **Routes**: \`reports/routes-accessibility/routes-accessibility.md\`
+- **Données JSON**: \`reports/complete-audit-report.json\`
 
 ---
-*Audit généré automatiquement par le système d'audit EmotionsCare*
+
+*Pour plus de détails, consultez les rapports individuels dans le dossier reports/*
 `;
-
-  fs.writeFileSync('reports/audit-summary.md', markdown);
 }
 
-if (require.main === module) {
-  runCompleteAudit().catch(console.error);
+function generateCriticalPoints(accessibility, backendGap, routes) {
+  const points = [];
+  
+  if (accessibility.orphanedComponents?.length > 3) {
+    points.push(`❗ **${accessibility.orphanedComponents.length} composants orphelins** - Potentiel code mort`);
+  }
+  
+  if (backendGap.unusedEdgeFunctions?.length > 0) {
+    points.push(`❗ **${backendGap.unusedEdgeFunctions.length} fonctions Edge inutilisées** - Ressources backend gaspillées`);
+  }
+  
+  if (routes.summary?.inaccessibleRoutes > 2) {
+    points.push(`❗ **${routes.summary.inaccessibleRoutes} routes inaccessibles** - Fonctionnalités cachées aux utilisateurs`);
+  }
+  
+  if (accessibility.unusedPages?.length > 0) {
+    points.push(`⚠️ **${accessibility.unusedPages.length} pages non utilisées** - Code potentiellement obsolète`);
+  }
+  
+  return points.length > 0 ? points.join('\n') : '✅ Aucun point critique majeur détecté';
 }
-
-module.exports = { runCompleteAudit };

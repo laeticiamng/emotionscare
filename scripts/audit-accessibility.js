@@ -2,225 +2,211 @@
 #!/usr/bin/env node
 
 /**
- * Audit complet de l'accessibilité des pages et composants
+ * Audit d'accessibilité - Identifie les éléments non accessibles côté utilisateur
  */
 
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Audit d\'accessibilité - Pages et composants...');
+console.log('🔍 Démarrage de l\'audit d\'accessibilité...\n');
 
-// Fonction pour analyser récursivement les fichiers
-function analyzeDirectory(dir, extensions = ['.tsx', '.ts', '.jsx', '.js']) {
-  const results = [];
+// Fonction pour parcourir récursivement les fichiers
+function getAllFiles(dirPath, arrayOfFiles = [], extension = '.tsx') {
+  const files = fs.readdirSync(dirPath);
   
-  function scanDir(currentDir) {
-    try {
-      const items = fs.readdirSync(currentDir);
-      
-      for (const item of items) {
-        const fullPath = path.join(currentDir, item);
-        const stat = fs.statSync(fullPath);
-        
-        if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
-          scanDir(fullPath);
-        } else if (stat.isFile() && extensions.some(ext => item.endsWith(ext))) {
-          results.push(fullPath);
-        }
+  files.forEach(file => {
+    const fullPath = path.join(dirPath, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      if (!file.includes('node_modules') && !file.includes('.git')) {
+        arrayOfFiles = getAllFiles(fullPath, arrayOfFiles, extension);
       }
-    } catch (error) {
-      console.warn(`Impossible de lire le dossier: ${currentDir}`);
-    }
-  }
-  
-  scanDir(dir);
-  return results;
-}
-
-// Analyser les routes définies
-function analyzeRoutes() {
-  const routes = [];
-  const routeFiles = [
-    'src/router.tsx',
-    'src/router/index.tsx',
-    'src/AppRouter.tsx',
-    'src/App.tsx'
-  ];
-  
-  for (const file of routeFiles) {
-    if (fs.existsSync(file)) {
-      try {
-        const content = fs.readFileSync(file, 'utf8');
-        
-        // Extraire les routes avec regex
-        const pathMatches = content.match(/path=['"`]([^'"`]+)['"`]/g);
-        if (pathMatches) {
-          pathMatches.forEach(match => {
-            const path = match.match(/path=['"`]([^'"`]+)['"`]/)[1];
-            routes.push({
-              path,
-              file,
-              defined: true
-            });
-          });
-        }
-      } catch (error) {
-        console.warn(`Erreur lors de l'analyse de ${file}:`, error.message);
-      }
-    }
-  }
-  
-  return routes;
-}
-
-// Analyser les pages dans src/pages
-function analyzePages() {
-  const pages = [];
-  const pagesDir = 'src/pages';
-  
-  if (fs.existsSync(pagesDir)) {
-    const pageFiles = analyzeDirectory(pagesDir);
-    
-    pageFiles.forEach(file => {
-      const relativePath = path.relative('src/pages', file);
-      const pageName = relativePath.replace(/\.(tsx|ts|jsx|js)$/, '');
-      
-      pages.push({
-        file,
-        pageName,
-        relativePath
-      });
-    });
-  }
-  
-  return pages;
-}
-
-// Analyser les composants
-function analyzeComponents() {
-  const components = [];
-  const componentsDir = 'src/components';
-  
-  if (fs.existsSync(componentsDir)) {
-    const componentFiles = analyzeDirectory(componentsDir);
-    
-    componentFiles.forEach(file => {
-      try {
-        const content = fs.readFileSync(file, 'utf8');
-        const isExported = content.includes('export') && (
-          content.includes('export default') || 
-          content.includes('export const') ||
-          content.includes('export function')
-        );
-        
-        components.push({
-          file,
-          isExported,
-          hasJSX: content.includes('jsx') || content.includes('<') || content.includes('React')
-        });
-      } catch (error) {
-        components.push({
-          file,
-          isExported: false,
-          hasJSX: false,
-          error: error.message
-        });
-      }
-    });
-  }
-  
-  return components;
-}
-
-// Analyser les liens de navigation
-function analyzeNavigation() {
-  const navFiles = analyzeDirectory('src/components/navigation');
-  const links = [];
-  
-  navFiles.forEach(file => {
-    try {
-      const content = fs.readFileSync(file, 'utf8');
-      
-      // Chercher les liens avec to, href, navigate
-      const linkMatches = content.match(/(to|href|navigate\()=['"`]([^'"`]+)['"`]/g);
-      if (linkMatches) {
-        linkMatches.forEach(match => {
-          const link = match.match(/(to|href|navigate\()=['"`]([^'"`]+)['"`]/)[2];
-          links.push({
-            link,
-            file,
-            context: match
-          });
-        });
-      }
-    } catch (error) {
-      console.warn(`Erreur navigation ${file}:`, error.message);
+    } else if (file.endsWith(extension)) {
+      arrayOfFiles.push(fullPath);
     }
   });
   
-  return links;
+  return arrayOfFiles;
 }
 
-// Exécuter l'audit
-async function runAudit() {
-  const results = {
-    timestamp: new Date().toISOString(),
-    routes: analyzeRoutes(),
-    pages: analyzePages(),
-    components: analyzeComponents(),
-    navigation: analyzeNavigation(),
-    analysis: {}
-  };
+// Fonction pour extraire les imports et exports
+function analyzeFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const imports = [];
+    const exports = [];
+    
+    // Extraire les imports
+    const importRegex = /import\s+.*?\s+from\s+['"`]([^'"`]+)['"`]/g;
+    let match;
+    while ((match = importRegex.exec(content)) !== null) {
+      imports.push(match[1]);
+    }
+    
+    // Extraire les exports
+    const exportRegex = /export\s+(default\s+)?(\w+|{[^}]+})/g;
+    while ((match = exportRegex.exec(content)) !== null) {
+      exports.push(match[0]);
+    }
+    
+    return { imports, exports, content };
+  } catch (error) {
+    return { imports: [], exports: [], content: '', error: error.message };
+  }
+}
+
+// Analyser les composants
+const componentFiles = getAllFiles('./src/components');
+const pageFiles = getAllFiles('./src/pages');
+const allTsxFiles = [...componentFiles, ...pageFiles];
+
+console.log(`📊 Analyse de ${allTsxFiles.length} fichiers...\n`);
+
+const results = {
+  orphanedComponents: [],
+  unusedPages: [],
+  missingNavigation: [],
+  deadFiles: [],
+  inaccessibleElements: []
+};
+
+// Analyser chaque fichier
+const fileAnalysis = {};
+allTsxFiles.forEach(file => {
+  fileAnalysis[file] = analyzeFile(file);
+});
+
+// Identifier les composants orphelins
+componentFiles.forEach(file => {
+  const fileName = path.basename(file, '.tsx');
+  const relativePath = path.relative('./src', file);
   
-  // Analyser les problèmes
-  const definedPaths = results.routes.map(r => r.path);
-  const navigationLinks = results.navigation.map(n => n.link);
-  
-  results.analysis = {
-    orphanedPages: results.pages.filter(page => 
-      !definedPaths.some(path => path.includes(page.pageName))
-    ),
-    unreachableRoutes: results.routes.filter(route =>
-      !navigationLinks.some(link => link === route.path)
-    ),
-    brokenLinks: navigationLinks.filter(link =>
-      !definedPaths.includes(link) && !link.startsWith('http') && !link.startsWith('#')
-    ),
-    unusedComponents: results.components.filter(comp =>
-      comp.isExported && comp.hasJSX && !comp.file.includes('test') && !comp.file.includes('story')
-    )
-  };
-  
-  // Sauvegarder le rapport
-  if (!fs.existsSync('reports')) {
-    fs.mkdirSync('reports');
+  // Vérifier si le composant est importé quelque part
+  let isImported = false;
+  for (const [otherFile, analysis] of Object.entries(fileAnalysis)) {
+    if (otherFile !== file) {
+      const importPaths = analysis.imports.filter(imp => 
+        imp.includes(fileName) || imp.includes(relativePath.replace('.tsx', ''))
+      );
+      if (importPaths.length > 0) {
+        isImported = true;
+        break;
+      }
+    }
   }
   
-  fs.writeFileSync(
-    'reports/accessibility-audit.json',
-    JSON.stringify(results, null, 2)
-  );
+  if (!isImported) {
+    results.orphanedComponents.push({
+      file: relativePath,
+      component: fileName
+    });
+  }
+});
+
+// Identifier les pages inutilisées (non référencées dans les routes)
+const routerFiles = getAllFiles('./src', [], '.tsx').filter(f => 
+  f.includes('router') || f.includes('Router') || f.includes('App.tsx')
+);
+
+let routerContent = '';
+routerFiles.forEach(file => {
+  routerContent += fs.readFileSync(file, 'utf8');
+});
+
+pageFiles.forEach(file => {
+  const fileName = path.basename(file, '.tsx');
+  const relativePath = path.relative('./src', file);
   
-  // Afficher le résumé
-  console.log('\n📊 Résultats de l\'audit d\'accessibilité:');
-  console.log(`✅ Routes définies: ${results.routes.length}`);
-  console.log(`📄 Pages trouvées: ${results.pages.length}`);
-  console.log(`🧩 Composants trouvés: ${results.components.length}`);
-  console.log(`🔗 Liens de navigation: ${results.navigation.length}`);
-  
-  console.log('\n⚠️ Problèmes identifiés:');
-  console.log(`🔸 Pages orphelines: ${results.analysis.orphanedPages.length}`);
-  console.log(`🔸 Routes inaccessibles: ${results.analysis.unreachableRoutes.length}`);
-  console.log(`🔸 Liens cassés: ${results.analysis.brokenLinks.length}`);
-  console.log(`🔸 Composants potentiellement inutilisés: ${results.analysis.unusedComponents.length}`);
-  
-  console.log('\n📄 Rapport détaillé sauvegardé: reports/accessibility-audit.json');
-  
-  return results;
+  // Vérifier si la page est référencée dans le routeur
+  if (!routerContent.includes(fileName) && !routerContent.includes(relativePath)) {
+    results.unusedPages.push({
+      file: relativePath,
+      page: fileName
+    });
+  }
+});
+
+// Vérifier les éléments sans navigation
+const navigationFiles = getAllFiles('./src/components', [], '.tsx').filter(f => 
+  f.includes('Nav') || f.includes('Menu') || f.includes('Header') || f.includes('Sidebar')
+);
+
+let navigationContent = '';
+navigationFiles.forEach(file => {
+  navigationContent += fs.readFileSync(file, 'utf8');
+});
+
+// Analyser les routes définies mais sans liens de navigation
+const routeRegex = /path:\s*['"`]([^'"`]+)['"`]/g;
+const definedRoutes = [];
+let match;
+while ((match = routeRegex.exec(routerContent)) !== null) {
+  definedRoutes.push(match[1]);
 }
 
-if (require.main === module) {
-  runAudit().catch(console.error);
+definedRoutes.forEach(route => {
+  if (!navigationContent.includes(route) && route !== '/' && route !== '*') {
+    results.missingNavigation.push({
+      route: route,
+      accessible: false,
+      reason: 'Aucun lien de navigation trouvé'
+    });
+  }
+});
+
+// Créer le rapport
+const reportDir = './reports/accessibility';
+if (!fs.existsSync(reportDir)) {
+  fs.mkdirSync(reportDir, { recursive: true });
 }
 
-module.exports = { runAudit };
+// Rapport JSON détaillé
+fs.writeFileSync(
+  path.join(reportDir, 'accessibility-audit.json'),
+  JSON.stringify(results, null, 2)
+);
+
+// Rapport Markdown lisible
+const markdownReport = `
+# Audit d'Accessibilité Frontend
+
+## 📊 Résumé
+
+- **Composants orphelins**: ${results.orphanedComponents.length}
+- **Pages inutilisées**: ${results.unusedPages.length}
+- **Routes sans navigation**: ${results.missingNavigation.length}
+
+## 🚫 Composants Orphelins
+
+${results.orphanedComponents.length === 0 ? 'Aucun composant orphelin détecté.' : 
+results.orphanedComponents.map(comp => `- \`${comp.file}\` - ${comp.component}`).join('\n')}
+
+## 📄 Pages Inutilisées
+
+${results.unusedPages.length === 0 ? 'Aucune page inutilisée détectée.' :
+results.unusedPages.map(page => `- \`${page.file}\` - ${page.page}`).join('\n')}
+
+## 🧭 Routes Sans Navigation
+
+${results.missingNavigation.length === 0 ? 'Toutes les routes ont une navigation.' :
+results.missingNavigation.map(route => `- \`${route.route}\` - ${route.reason}`).join('\n')}
+
+## 🔧 Recommandations
+
+1. **Nettoyer les composants orphelins** - Supprimer ou intégrer les composants non utilisés
+2. **Connecter les pages isolées** - Ajouter des liens de navigation vers les pages accessibles
+3. **Audit des routes** - Vérifier que toutes les routes importantes sont accessibles via l'interface
+
+---
+*Audit généré le ${new Date().toLocaleString('fr-FR')}*
+`;
+
+fs.writeFileSync(
+  path.join(reportDir, 'accessibility-audit.md'),
+  markdownReport
+);
+
+console.log('✅ Audit d\'accessibilité terminé');
+console.log(`📁 Rapports générés dans: ${reportDir}`);
+console.log(`📊 ${results.orphanedComponents.length} composants orphelins`);
+console.log(`📄 ${results.unusedPages.length} pages inutilisées`);
+console.log(`🧭 ${results.missingNavigation.length} routes sans navigation\n`);

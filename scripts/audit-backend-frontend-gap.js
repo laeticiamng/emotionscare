@@ -2,231 +2,243 @@
 #!/usr/bin/env node
 
 /**
- * Audit des éléments backend non connectés au frontend
+ * Audit Backend-Frontend Gap - Identifie les éléments backend non connectés au frontend
  */
 
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Audit Backend-Frontend Gap...');
+console.log('🔍 Démarrage de l\'audit Backend-Frontend Gap...\n');
 
-// Analyser les services backend
-function analyzeBackendServices() {
-  const services = [];
-  const servicesDir = 'services';
-  
-  if (fs.existsSync(servicesDir)) {
-    const serviceDirs = fs.readdirSync(servicesDir).filter(item => {
-      return fs.statSync(path.join(servicesDir, item)).isDirectory();
-    });
-    
-    serviceDirs.forEach(serviceDir => {
-      const servicePath = path.join(servicesDir, serviceDir);
-      const service = {
-        name: serviceDir,
-        path: servicePath,
-        handlers: [],
-        endpoints: [],
-        tests: []
-      };
-      
-      // Analyser les handlers
-      const handlersDir = path.join(servicePath, 'handlers');
-      if (fs.existsSync(handlersDir)) {
-        const handlers = fs.readdirSync(handlersDir).filter(f => f.endsWith('.ts'));
-        service.handlers = handlers.map(h => ({
-          name: h,
-          path: path.join(handlersDir, h)
-        }));
-      }
-      
-      // Analyser index.ts pour les endpoints
-      const indexPath = path.join(servicePath, 'index.ts');
-      if (fs.existsSync(indexPath)) {
-        try {
-          const content = fs.readFileSync(indexPath, 'utf8');
-          const routes = content.match(/app\.(get|post|put|delete|patch)\(['"`]([^'"`]+)['"`]/g);
-          if (routes) {
-            service.endpoints = routes.map(route => {
-              const match = route.match(/app\.(get|post|put|delete|patch)\(['"`]([^'"`]+)['"`]/);
-              return {
-                method: match[1].toUpperCase(),
-                path: match[2],
-                fullRoute: route
-              };
-            });
-          }
-        } catch (error) {
-          console.warn(`Erreur lecture ${indexPath}:`, error.message);
-        }
-      }
-      
-      // Analyser les tests
-      const testsDir = path.join(servicePath, 'tests');
-      if (fs.existsSync(testsDir)) {
-        const tests = fs.readdirSync(testsDir).filter(f => f.endsWith('.test.ts'));
-        service.tests = tests;
-      }
-      
-      services.push(service);
-    });
+// Fonction pour parcourir récursivement les fichiers
+function getAllFiles(dirPath, arrayOfFiles = [], extensions = ['.ts', '.tsx', '.js']) {
+  if (!fs.existsSync(dirPath)) {
+    return arrayOfFiles;
   }
   
-  return services;
-}
-
-// Analyser les appels API frontend
-function analyzeFrontendAPICalls() {
-  const apiCalls = [];
+  const files = fs.readdirSync(dirPath);
   
-  function scanForAPICalls(dir) {
-    try {
-      const items = fs.readdirSync(dir);
-      
-      for (const item of items) {
-        const fullPath = path.join(dir, item);
-        const stat = fs.statSync(fullPath);
-        
-        if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
-          scanForAPICalls(fullPath);
-        } else if (stat.isFile() && (item.endsWith('.tsx') || item.endsWith('.ts'))) {
-          try {
-            const content = fs.readFileSync(fullPath, 'utf8');
-            
-            // Chercher fetch, axios, supabase calls
-            const fetchMatches = content.match(/fetch\(['"`]([^'"`]+)['"`]/g);
-            const axiosMatches = content.match(/(axios\.(get|post|put|delete|patch)\(['"`]([^'"`]+)['"`]|axios\(['"`]([^'"`]+)['"`])/g);
-            const supabaseMatches = content.match(/supabase\.from\(['"`]([^'"`]+)['"`]/g);
-            
-            if (fetchMatches) {
-              fetchMatches.forEach(match => {
-                const url = match.match(/fetch\(['"`]([^'"`]+)['"`]/)[1];
-                apiCalls.push({ type: 'fetch', url, file: fullPath });
-              });
-            }
-            
-            if (axiosMatches) {
-              axiosMatches.forEach(match => {
-                const url = match.includes('axios(') 
-                  ? match.match(/axios\(['"`]([^'"`]+)['"`]/)[1]
-                  : match.match(/axios\.(get|post|put|delete|patch)\(['"`]([^'"`]+)['"`]/)[2];
-                apiCalls.push({ type: 'axios', url, file: fullPath });
-              });
-            }
-            
-            if (supabaseMatches) {
-              supabaseMatches.forEach(match => {
-                const table = match.match(/supabase\.from\(['"`]([^'"`]+)['"`]/)[1];
-                apiCalls.push({ type: 'supabase', table, file: fullPath });
-              });
-            }
-          } catch (error) {
-            console.warn(`Erreur lecture ${fullPath}:`, error.message);
-          }
-        }
+  files.forEach(file => {
+    const fullPath = path.join(dirPath, file);
+    if (fs.statSync(fullPath).isDirectory()) {
+      if (!file.includes('node_modules') && !file.includes('.git')) {
+        arrayOfFiles = getAllFiles(fullPath, arrayOfFiles, extensions);
       }
-    } catch (error) {
-      console.warn(`Impossible de lire le dossier: ${dir}`);
-    }
-  }
-  
-  scanForAPICalls('src');
-  return apiCalls;
-}
-
-// Analyser les migrations DB
-function analyzeDatabaseMigrations() {
-  const migrations = [];
-  const migrationsDirs = ['migrations', 'database/sql'];
-  
-  migrationsDirs.forEach(dir => {
-    if (fs.existsSync(dir)) {
-      const files = fs.readdirSync(dir).filter(f => f.endsWith('.sql'));
-      files.forEach(file => {
-        const content = fs.readFileSync(path.join(dir, file), 'utf8');
-        
-        // Extraire les noms de tables
-        const tableMatches = content.match(/CREATE TABLE\s+(\w+)/gi);
-        if (tableMatches) {
-          tableMatches.forEach(match => {
-            const tableName = match.match(/CREATE TABLE\s+(\w+)/i)[1];
-            migrations.push({
-              file,
-              tableName,
-              type: 'CREATE_TABLE'
-            });
-          });
-        }
-      });
+    } else if (extensions.some(ext => file.endsWith(ext))) {
+      arrayOfFiles.push(fullPath);
     }
   });
   
-  return migrations;
+  return arrayOfFiles;
 }
 
-// Exécuter l'audit
-async function runBackendAudit() {
-  const results = {
-    timestamp: new Date().toISOString(),
-    backendServices: analyzeBackendServices(),
-    frontendAPICalls: analyzeFrontendAPICalls(),
-    databaseMigrations: analyzeDatabaseMigrations(),
-    gaps: {}
-  };
-  
-  // Identifier les gaps
-  const frontendEndpoints = results.frontendAPICalls.map(call => call.url || call.table);
-  const backendEndpoints = results.backendServices.flatMap(service => 
-    service.endpoints.map(ep => ep.path)
-  );
-  
-  results.gaps = {
-    unusedBackendServices: results.backendServices.filter(service =>
-      service.endpoints.length > 0 && 
-      !service.endpoints.some(ep => frontendEndpoints.some(fe => fe.includes(ep.path)))
-    ),
-    missingBackendEndpoints: frontendEndpoints.filter(fe =>
-      !backendEndpoints.some(be => fe.includes(be)) && 
-      !fe.startsWith('http') && 
-      fe !== 'undefined'
-    ),
-    unusedTables: results.databaseMigrations.filter(migration =>
-      !results.frontendAPICalls.some(call => call.table === migration.tableName)
-    ),
-    untestedServices: results.backendServices.filter(service => 
-      service.handlers.length > 0 && service.tests.length === 0
-    )
-  };
-  
-  // Sauvegarder le rapport
-  if (!fs.existsSync('reports')) {
-    fs.mkdirSync('reports');
+const results = {
+  unusedEdgeFunctions: [],
+  unusedSupabaseFunctions: [],
+  unusedBackendServices: [],
+  missingFrontendIntegration: [],
+  deadEndpoints: []
+};
+
+// 1. Analyser les fonctions Edge Supabase
+console.log('📡 Analyse des fonctions Edge Supabase...');
+const edgeFunctionsPath = './supabase/functions';
+if (fs.existsSync(edgeFunctionsPath)) {
+  const edgeFunctions = fs.readdirSync(edgeFunctionsPath).filter(dir => {
+    const fullPath = path.join(edgeFunctionsPath, dir);
+    return fs.statSync(fullPath).isDirectory() && !dir.startsWith('_');
+  });
+
+  // Analyser le code frontend pour voir quelles fonctions sont appelées
+  const frontendFiles = getAllFiles('./src');
+  let frontendContent = '';
+  frontendFiles.forEach(file => {
+    try {
+      frontendContent += fs.readFileSync(file, 'utf8');
+    } catch (error) {
+      // Ignorer les erreurs de lecture
+    }
+  });
+
+  edgeFunctions.forEach(funcName => {
+    // Vérifier si la fonction est appelée dans le frontend
+    const isUsed = frontendContent.includes(funcName) || 
+                   frontendContent.includes(`functions/${funcName}`) ||
+                   frontendContent.includes(`'${funcName}'`) ||
+                   frontendContent.includes(`"${funcName}"`);
+    
+    if (!isUsed) {
+      const funcPath = path.join(edgeFunctionsPath, funcName);
+      const indexFile = path.join(funcPath, 'index.ts');
+      
+      let description = 'Fonction Edge non utilisée';
+      if (fs.existsSync(indexFile)) {
+        try {
+          const content = fs.readFileSync(indexFile, 'utf8');
+          // Extraire la première ligne de commentaire comme description
+          const commentMatch = content.match(/\/\*\*([\s\S]*?)\*\//);
+          if (commentMatch) {
+            description = commentMatch[1].replace(/\*/g, '').trim().split('\n')[0].trim();
+          }
+        } catch (error) {
+          // Ignorer
+        }
+      }
+      
+      results.unusedEdgeFunctions.push({
+        name: funcName,
+        path: `supabase/functions/${funcName}`,
+        description
+      });
+    }
+  });
+}
+
+// 2. Analyser les services backend
+console.log('🔧 Analyse des services backend...');
+const servicesPath = './services';
+if (fs.existsSync(servicesPath)) {
+  const services = fs.readdirSync(servicesPath).filter(dir => {
+    const fullPath = path.join(servicesPath, dir);
+    return fs.statSync(fullPath).isDirectory();
+  });
+
+  const frontendFiles = getAllFiles('./src');
+  let frontendContent = '';
+  frontendFiles.forEach(file => {
+    try {
+      frontendContent += fs.readFileSync(file, 'utf8');
+    } catch (error) {
+      // Ignorer
+    }
+  });
+
+  services.forEach(serviceName => {
+    const isUsed = frontendContent.includes(serviceName);
+    
+    if (!isUsed) {
+      results.unusedBackendServices.push({
+        name: serviceName,
+        path: `services/${serviceName}`,
+        type: 'Service backend'
+      });
+    }
+  });
+}
+
+// 3. Analyser les endpoints API manqués
+console.log('🌐 Analyse des endpoints API...');
+const frontendFiles = getAllFiles('./src');
+const apiCalls = new Set();
+
+frontendFiles.forEach(file => {
+  try {
+    const content = fs.readFileSync(file, 'utf8');
+    
+    // Chercher les appels fetch, axios, etc.
+    const fetchRegex = /fetch\s*\(\s*['"`]([^'"`]+)['"`]/g;
+    const axiosRegex = /axios\.(get|post|put|delete)\s*\(\s*['"`]([^'"`]+)['"`]/g;
+    const supabaseRegex = /supabase\.functions\.invoke\s*\(\s*['"`]([^'"`]+)['"`]/g;
+    
+    let match;
+    while ((match = fetchRegex.exec(content)) !== null) {
+      apiCalls.add(match[1]);
+    }
+    while ((match = axiosRegex.exec(content)) !== null) {
+      apiCalls.add(match[2]);
+    }
+    while ((match = supabaseRegex.exec(content)) !== null) {
+      apiCalls.add(match[1]);
+    }
+  } catch (error) {
+    // Ignorer
   }
+});
+
+// 4. Identifier les fonctions de base de données non utilisées
+console.log('🗄️ Analyse des fonctions de base de données...');
+// Cette partie nécessiterait une connexion à la base de données pour être complète
+// Nous nous contenterons d'identifier les fonctions définies dans les migrations
+
+// 5. Analyser les scripts et utilitaires
+console.log('📜 Analyse des scripts et utilitaires...');
+const scriptsPath = './scripts';
+if (fs.existsSync(scriptsPath)) {
+  const scriptFiles = getAllFiles(scriptsPath, [], ['.js', '.ts']);
+  const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+  const packageScripts = Object.keys(packageJson.scripts || {});
   
-  fs.writeFileSync(
-    'reports/backend-frontend-gap.json',
-    JSON.stringify(results, null, 2)
-  );
-  
-  // Afficher le résumé
-  console.log('\n📊 Résultats de l\'audit Backend-Frontend:');
-  console.log(`🔧 Services backend: ${results.backendServices.length}`);
-  console.log(`📡 Appels API frontend: ${results.frontendAPICalls.length}`);
-  console.log(`🗄️ Tables de migration: ${results.databaseMigrations.length}`);
-  
-  console.log('\n⚠️ Gaps identifiés:');
-  console.log(`🔸 Services backend inutilisés: ${results.gaps.unusedBackendServices.length}`);
-  console.log(`🔸 Endpoints manquants: ${results.gaps.missingBackendEndpoints.length}`);
-  console.log(`🔸 Tables non utilisées: ${results.gaps.unusedTables.length}`);
-  console.log(`🔸 Services non testés: ${results.gaps.untestedServices.length}`);
-  
-  console.log('\n📄 Rapport détaillé sauvegardé: reports/backend-frontend-gap.json');
-  
-  return results;
+  scriptFiles.forEach(scriptFile => {
+    const scriptName = path.basename(scriptFile, path.extname(scriptFile));
+    const isUsedInPackage = packageScripts.some(script => 
+      packageJson.scripts[script].includes(scriptName)
+    );
+    
+    if (!isUsedInPackage && !scriptName.includes('audit')) {
+      results.deadEndpoints.push({
+        name: scriptName,
+        path: path.relative('.', scriptFile),
+        type: 'Script non référencé'
+      });
+    }
+  });
 }
 
-if (require.main === module) {
-  runBackendAudit().catch(console.error);
+// Créer le rapport
+const reportDir = './reports/backend-frontend-gap';
+if (!fs.existsSync(reportDir)) {
+  fs.mkdirSync(reportDir, { recursive: true });
 }
 
-module.exports = { runBackendAudit };
+// Rapport JSON détaillé
+fs.writeFileSync(
+  path.join(reportDir, 'backend-frontend-gap.json'),
+  JSON.stringify(results, null, 2)
+);
+
+// Rapport Markdown
+const markdownReport = `
+# Audit Backend-Frontend Gap
+
+## 📊 Résumé
+
+- **Fonctions Edge inutilisées**: ${results.unusedEdgeFunctions.length}
+- **Services backend non connectés**: ${results.unusedBackendServices.length}
+- **Scripts orphelins**: ${results.deadEndpoints.length}
+
+## 🔌 Fonctions Edge Supabase Non Utilisées
+
+${results.unusedEdgeFunctions.length === 0 ? 'Toutes les fonctions Edge sont utilisées.' :
+results.unusedEdgeFunctions.map(func => `- **${func.name}** (\`${func.path}\`) - ${func.description}`).join('\n')}
+
+## 🔧 Services Backend Non Connectés
+
+${results.unusedBackendServices.length === 0 ? 'Tous les services sont connectés.' :
+results.unusedBackendServices.map(service => `- **${service.name}** (\`${service.path}\`) - ${service.type}`).join('\n')}
+
+## 📜 Scripts et Endpoints Orphelins
+
+${results.deadEndpoints.length === 0 ? 'Aucun script orphelin détecté.' :
+results.deadEndpoints.map(endpoint => `- **${endpoint.name}** (\`${endpoint.path}\`) - ${endpoint.type}`).join('\n')}
+
+## 🔧 Actions Recommandées
+
+1. **Intégrer les fonctions Edge** - Connecter les fonctions utiles au frontend ou les supprimer
+2. **Nettoyer les services** - Supprimer les services non utilisés ou les intégrer
+3. **Optimiser les scripts** - Supprimer ou référencer les scripts orphelins
+4. **Documentation** - Documenter les endpoints disponibles mais non utilisés
+
+---
+*Audit généré le ${new Date().toLocaleString('fr-FR')}*
+`;
+
+fs.writeFileSync(
+  path.join(reportDir, 'backend-frontend-gap.md'),
+  markdownReport
+);
+
+console.log('✅ Audit Backend-Frontend Gap terminé');
+console.log(`📁 Rapports générés dans: ${reportDir}`);
+console.log(`🔌 ${results.unusedEdgeFunctions.length} fonctions Edge inutilisées`);
+console.log(`🔧 ${results.unusedBackendServices.length} services non connectés`);
+console.log(`📜 ${results.deadEndpoints.length} scripts orphelins\n`);
