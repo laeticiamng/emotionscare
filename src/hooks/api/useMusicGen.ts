@@ -1,58 +1,42 @@
 
 import { useState } from 'react';
 import { MusicTrack } from '@/types/music';
-import { useMusic } from '@/hooks/useMusic';
 
-export function useMusicGen() {
+const useMusicGen = () => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
-  const { playTrack } = useMusic();
+  const [error, setError] = useState<string | null>(null);
 
-  const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
+  const generateMusic = async (prompt: string): Promise<MusicTrack> => {
     setIsGenerating(true);
-    
+    setError(null);
+
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulation de génération musicale
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Mock generated track
-      const newTrack: MusicTrack = {
-        id: `gen-${Date.now()}`,
-        title: `Generated from: ${prompt.slice(0, 20)}...`,
-        artist: 'AI Composer',
+      const generatedTrack: MusicTrack = {
+        id: Date.now().toString(),
+        title: `Musique générée: ${prompt}`,
+        artist: 'IA Composer',
+        url: '/audio/generated.mp3',
         duration: 180,
-        audioUrl: '/audio/generated-audio.mp3',
-        url: '/audio/generated-audio.mp3',
-        coverUrl: '/images/ai-generated-music.jpg',
-        // Additional required properties
-        album: 'AI Generated',
-        year: new Date().getFullYear(),
-        genre: 'Electronic',
+        emotion: 'calm'
       };
-      
-      setGeneratedTrack(newTrack);
-      return newTrack;
-    } catch (error) {
-      console.error('Error generating music:', error);
-      return null;
+
+      return generatedTrack;
+    } catch (err) {
+      setError('Erreur lors de la génération musicale');
+      throw err;
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const playGeneratedMusic = (track?: MusicTrack | null) => {
-    const trackToPlay = track || generatedTrack;
-    if (trackToPlay && playTrack) {
-      playTrack(trackToPlay);
-    }
-  };
-
   return {
     generateMusic,
-    playGeneratedMusic,
-    generatedTrack,
-    isGenerating
+    isGenerating,
+    error
   };
-}
+};
 
 export default useMusicGen;

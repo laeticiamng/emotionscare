@@ -1,27 +1,37 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface SegmentContextType {
-  selectedSegment: string;
-  setSelectedSegment: (segment: string) => void;
-  segments: string[];
+  track: (event: string, properties?: Record<string, any>) => void;
+  identify: (userId: string, traits?: Record<string, any>) => void;
 }
 
-const SegmentContext = createContext<SegmentContextType>({
-  selectedSegment: 'all',
-  setSelectedSegment: () => {},
-  segments: ['all', 'hr', 'management', 'employees'],
-});
+const SegmentContext = createContext<SegmentContextType | undefined>(undefined);
 
-export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedSegment, setSelectedSegment] = useState('all');
-  const segments = ['all', 'hr', 'management', 'employees'];
+interface SegmentProviderProps {
+  children: ReactNode;
+}
+
+export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) => {
+  const track = (event: string, properties?: Record<string, any>) => {
+    console.log('Segment track:', event, properties);
+  };
+
+  const identify = (userId: string, traits?: Record<string, any>) => {
+    console.log('Segment identify:', userId, traits);
+  };
 
   return (
-    <SegmentContext.Provider value={{ selectedSegment, setSelectedSegment, segments }}>
+    <SegmentContext.Provider value={{ track, identify }}>
       {children}
     </SegmentContext.Provider>
   );
 };
 
-export const useSegment = () => useContext(SegmentContext);
+export const useSegment = () => {
+  const context = useContext(SegmentContext);
+  if (context === undefined) {
+    throw new Error('useSegment must be used within a SegmentProvider');
+  }
+  return context;
+};

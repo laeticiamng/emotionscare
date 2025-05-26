@@ -4,13 +4,22 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
+import './utils/duplicateRemover';
 
 console.log('=== MAIN.TSX INITIALIZATION ===');
 console.log('✅ React hooks validation passed');
+console.log('React version:', React.version);
 console.log('Creating React root...');
-console.log('Rendering EmotionsCare app...');
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+const root = ReactDOM.createRoot(rootElement);
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <App />

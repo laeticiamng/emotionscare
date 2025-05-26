@@ -1,34 +1,27 @@
 
 import { useState, useCallback } from 'react';
-import { EmotionResult, EmotionScanOptions } from '@/types/emotions';
+import { EmotionResult } from '@/types';
 
 export const useEmotionScan = () => {
   const [isScanning, setIsScanning] = useState(false);
-  const [results, setResults] = useState<EmotionResult[]>([]);
+  const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
 
-  const scanEmotion = useCallback(async (options: EmotionScanOptions): Promise<EmotionResult> => {
+  const scanEmotion = useCallback(async (type: 'text' | 'voice' | 'image', data: any): Promise<EmotionResult> => {
     setIsScanning(true);
     
     try {
-      // Simulate emotion scanning
+      // Simulation d'analyse émotionnelle
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const result: EmotionResult = {
-        id: Date.now().toString(),
-        userId: 'user-1',
+        id: Math.random().toString(36).substr(2, 9),
+        emotion: 'happy',
+        confidence: 0.85,
         timestamp: new Date(),
-        overallMood: 'positive',
-        emotions: [
-          { emotion: 'happy', confidence: 0.8, intensity: 0.7 },
-          { emotion: 'calm', confidence: 0.6, intensity: 0.5 }
-        ],
-        dominantEmotion: 'happy',
-        confidence: 0.8,
-        source: options.type,
-        recommendations: ['Continuez à maintenir cette énergie positive']
+        details: { type, data }
       };
       
-      setResults(prev => [...prev, result]);
+      setLastResult(result);
       return result;
     } finally {
       setIsScanning(false);
@@ -38,6 +31,6 @@ export const useEmotionScan = () => {
   return {
     scanEmotion,
     isScanning,
-    results
+    lastResult
   };
 };

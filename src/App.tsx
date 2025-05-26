@@ -1,6 +1,5 @@
 
-import React from 'react';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import AppRouter from './AppRouter';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';

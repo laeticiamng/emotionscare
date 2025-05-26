@@ -11,12 +11,21 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "test:db": "vitest run src/tests/db --passWithNoTests",
+
+
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
+    "lint": "eslint .",
     "build:dev": "vite build --mode development",
     "type-check": "tsc --noEmit",
     "back:audit": "node --loader ts-node/esm scripts/full-back-audit.ts",
     "dev:api": "node --loader ts-node/esm services/journal/index.ts",
     "test:api": "vitest run --config vitest.api.config.ts"
+
+    ,"db:migrate": "flyway -configFiles database/flyway.conf migrate"
+    ,"db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'"
+    ,"test:db": "vitest run --config vitest.db.config.ts"
+    "db:migrate": "node scripts/run-migrations.cjs",
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
@@ -86,7 +95,7 @@
     "eslint-config-prettier": "^10.1.5",
     "file-saver": "^2.0.5",
     "firebase": "^11.7.3",
-    "framer-motion": "^12.13.0",
+    "framer-motion": "^12.14.0",
     "glob": "^11.0.2",
     "hume": "^0.11.0",
     "i18next": "^25.2.1",
@@ -129,7 +138,9 @@
     "vitest": "^3.1.4",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "pg": "^8.11.3",
+    "kysely": "^0.27.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
@@ -154,11 +165,20 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "kysely": "^0.27.3",
+    "pg": "^8.11.5"
   },
   "optionalDependencies": {
     "cypress": "^13.5.0",
     "playwright": "^1.41.0",
     "puppeteer": "^22.10.0"
+  },
+  "vitest": {
+    "coverage": {
+      "lines": 90,
+      "functions": 90,
+      "branches": 85
+    }
   }
 }

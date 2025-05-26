@@ -5,24 +5,23 @@ export interface VRSessionTemplate {
   name?: string;
   description: string;
   duration: number | string;
-  difficulty: 'facile' | 'moyen' | 'difficile';
-  category: string;
-  environment?: string;
-  emotionTarget?: string;
+  difficulty: 'Débutant' | 'Intermédiaire' | 'Avancé';
+  category: 'meditation' | 'relaxation' | 'focus' | 'therapy';
+  environment: string;
   thumbnailUrl?: string;
   tags?: string[];
-  lastUsed?: Date;
+  emotionTarget?: string;
+  lastUsed?: string;
 }
 
 export interface VRSession {
   id: string;
   templateId: string;
-  userId: string;
-  startTime: Date;
-  endTime?: Date;
-  duration?: number;
+  startTime: string;
+  endTime?: string;
   completed: boolean;
-  metadata?: Record<string, any>;
+  heartRate?: number;
+  emotionalState?: string;
 }
 
 export interface VRTemplateDetailProps {

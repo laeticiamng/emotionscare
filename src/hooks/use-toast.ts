@@ -1,29 +1,38 @@
 
 import { useState, useCallback } from 'react';
 
-interface ToastOptions {
+export interface Toast {
+  id: string;
   title?: string;
   description?: string;
-  variant?: 'default' | 'destructive';
+  variant?: 'default' | 'destructive' | 'success';
   duration?: number;
 }
 
 export const useToast = () => {
-  const [toasts, setToasts] = useState<any[]>([]);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const toast = useCallback((options: ToastOptions) => {
-    const id = Date.now().toString();
-    const newToast = { id, ...options };
+  const toast = useCallback(({ title, description, variant = 'default', duration = 5000 }: Omit<Toast, 'id'>) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    const newToast: Toast = { id, title, description, variant, duration };
     
     setToasts(prev => [...prev, newToast]);
     
-    // Auto remove after duration
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, options.duration || 3000);
+    if (duration > 0) {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, duration);
+    }
+    
+    return {
+      id,
+      dismiss: () => setToasts(prev => prev.filter(t => t.id !== id))
+    };
   }, []);
 
-  return { toast, toasts };
-};
+  const dismiss = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
 
-export { useToast as toast };
+  return { toast, dismiss, toasts };
+};

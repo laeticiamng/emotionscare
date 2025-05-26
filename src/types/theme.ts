@@ -1,14 +1,19 @@
 
 export type ThemeName = 'light' | 'dark' | 'system';
-export type FontSize = 'sm' | 'md' | 'lg';
-export type FontFamily = 'sans' | 'serif' | 'mono';
 
-export interface Theme {
+export interface ThemeConfig {
   name: ThemeName;
+  displayName: string;
   colors: {
     primary: string;
     secondary: string;
     background: string;
     foreground: string;
   };
+}
+
+export interface ThemePreferences {
+  theme: ThemeName;
+  autoSwitch: boolean;
+  followSystem: boolean;
 }
