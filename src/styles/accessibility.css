@@ -1,122 +1,47 @@
 
-/* Styles d'accessibilité pour une conformité WCAG AAA */
+/* Styles d'accessibilité pour EmotionsCare */
 
-/* Contraste élevé */
-.high-contrast {
-  --background: 255 255 255;
-  --foreground: 0 0 0;
-  --primary: 0 0 255;
-  --secondary: 128 128 128;
-  --muted: 240 240 240;
-  --border: 0 0 0;
-}
-
-.dark.high-contrast {
-  --background: 0 0 0;
-  --foreground: 255 255 255;
-  --primary: 100 149 237;
-  --secondary: 169 169 169;
-  --muted: 32 32 32;
-  --border: 255 255 255;
-}
-
-/* Mouvement réduit */
-.reduce-motion *,
-.reduce-motion *::before,
-.reduce-motion *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  scroll-behavior: auto !important;
-}
-
-/* Navigation clavier améliorée */
-.keyboard-navigation *:focus {
-  outline: 2px solid hsl(var(--primary)) !important;
-  outline-offset: 2px !important;
+/* Focus visible amélioré */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
   border-radius: 4px;
 }
 
-.keyboard-navigation button:focus,
-.keyboard-navigation a:focus,
-.keyboard-navigation input:focus,
-.keyboard-navigation select:focus,
-.keyboard-navigation textarea:focus {
-  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary)) !important;
-}
-
-/* Taille de texte agrandie */
-.large-text {
-  font-size: 120% !important;
-}
-
-/* Amélioration des contrastes pour les éléments interactifs */
-@media (prefers-contrast: high) {
-  .btn-primary {
-    background-color: #000080 !important;
-    color: #ffffff !important;
-    border: 2px solid #000000 !important;
-  }
-  
-  .btn-secondary {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    border: 2px solid #000000 !important;
+/* Respect des préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Support pour les lecteurs d'écran */
+/* Amélioration du contraste pour le mode sombre */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: 210 40% 98%;
+    --muted-foreground: 215 20.2% 65.1%;
+  }
+}
+
+/* Texte pour lecteurs d'écran uniquement */
 .sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Focus visible amélioré */
-.focus-visible:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-}
-
-/* Amélioration de la lisibilité */
-@media (prefers-reduced-motion: no-preference) {
-  .smooth-scroll {
-    scroll-behavior: smooth;
-  }
-}
-
-/* Indicateur de chargement accessible */
-.loading-indicator {
-  animation: spin 1s linear infinite;
-}
-
-.loading-indicator[aria-hidden="true"] {
-  display: none;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Amélioration des formulaires */
-.form-field-error {
-  color: #dc2626;
-  font-weight: 500;
-}
-
-.form-field-error::before {
-  content: "⚠ ";
-  font-weight: bold;
-}
-
-/* Navigation skip links */
+/* Focus skip link */
 .skip-link {
   position: absolute;
   top: -40px;
@@ -125,34 +50,28 @@
   color: hsl(var(--primary-foreground));
   padding: 8px;
   text-decoration: none;
-  border-radius: 0 0 4px 4px;
-  z-index: 9999;
+  border-radius: 4px;
+  z-index: 1000;
 }
 
 .skip-link:focus {
-  top: 0;
+  top: 6px;
 }
 
-/* Amélioration des tableaux */
-.accessible-table th {
-  background-color: hsl(var(--muted));
-  font-weight: bold;
-  text-align: left;
+/* Amélioration des formulaires */
+input:invalid {
+  border-color: hsl(var(--destructive));
 }
 
-.accessible-table tr:nth-child(even) {
-  background-color: hsl(var(--muted) / 0.5);
+input:valid {
+  border-color: hsl(var(--success, 142 76% 36%));
 }
 
-/* Support pour les préférences de couleur */
-@media (prefers-color-scheme: dark) {
-  .auto-dark {
-    color-scheme: dark;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  .auto-light {
-    color-scheme: light;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 20%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
   }
 }
