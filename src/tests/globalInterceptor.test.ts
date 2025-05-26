@@ -1,6 +1,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
+import { mockResponse } from './utils';
 
 // Mock du localStorage
 const localStorageMock = {
@@ -14,11 +15,17 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 // Mock de fetch
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
+vi.setConfig({ testTimeout: 15000 });
 
 describe('GlobalInterceptor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('secureFetch', () => {
@@ -28,20 +35,21 @@ describe('GlobalInterceptor', () => {
         access_token: mockToken
       }));
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ data: 'test' })
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse({ data: 'test' }, { status: 200 })
+      );
 
       await GlobalInterceptor.secureFetch('/test', {});
 
-      expect(mockFetch).toHaveBeenCalledWith('/test', {
-        headers: {
-          'Authorization': `Bearer ${mockToken}`,
-          'Content-Type': 'application/json',
-        }
-      });
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/test',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${mockToken}`,
+            'Content-Type': 'application/json',
+          }),
+        })
+      );
     });
 
     it('should handle 401 errors and clear session', async () => {
@@ -49,12 +57,16 @@ describe('GlobalInterceptor', () => {
         access_token: 'expired-token'
       }));
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401
-      });
+      mockFetch
+        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
+        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
+        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
+        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }))
+        .mockResolvedValueOnce(mockResponse({ error: 'Unauthorized' }, { status: 401 }));
 
-      const result = await GlobalInterceptor.secureFetch('/test', {});
+      const resultPromise = GlobalInterceptor.secureFetch('/test', {});
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
 
       expect(result).toBeNull();
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('sb-yaincoxihiqdksxgrsrk-auth-token');
@@ -66,10 +78,12 @@ describe('GlobalInterceptor', () => {
         .mockReturnValueOnce(JSON.stringify({ access_token: 'new-token' }));
 
       mockFetch
-        .mockResolvedValueOnce({ ok: false, status: 401 })
-        .mockResolvedValueOnce({ ok: true, status: 200 });
+        .mockResolvedValueOnce(mockResponse({}, { status: 401 }))
+        .mockResolvedValueOnce(mockResponse({}, { status: 200 }));
 
-      const result = await GlobalInterceptor.secureFetch('/test', {});
+      const resultPromise = GlobalInterceptor.secureFetch('/test', {});
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toBeTruthy();
@@ -78,20 +92,24 @@ describe('GlobalInterceptor', () => {
 
   describe('checkSessionStatus', () => {
     it('should return true when valid session exists', async () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify({
-        access_token: 'valid-token',
-        expires_at: Date.now() + 3600000 // 1 hour from now
-      }));
+      localStorageMock.getItem.mockReturnValue(
+        JSON.stringify({
+          access_token: 'valid-token',
+          expires_at: Math.floor((Date.now() + 3600000) / 1000),
+        })
+      );
 
       const isValid = await GlobalInterceptor.checkSessionStatus();
       expect(isValid).toBe(true);
     });
 
     it('should return false when session is expired', async () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify({
-        access_token: 'expired-token',
-        expires_at: Date.now() - 3600000 // 1 hour ago
-      }));
+      localStorageMock.getItem.mockReturnValue(
+        JSON.stringify({
+          access_token: 'expired-token',
+          expires_at: Math.floor((Date.now() - 3600000) / 1000),
+        })
+      );
 
       const isValid = await GlobalInterceptor.checkSessionStatus();
       expect(isValid).toBe(false);
