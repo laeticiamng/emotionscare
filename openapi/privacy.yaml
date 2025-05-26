@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+  title: Glow Privacy API
+  version: 1.0.0
+paths:
+  /user/privacy:
+    get:
+      summary: Récupère les préférences Glow Privacy
+      responses:
+        '200':
+          description: Objet préférences
+    put:
+      summary: Met à jour les préférences Glow Privacy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cam:    { type: boolean }
+                mic:    { type: boolean }
+                hr:     { type: boolean }
+                gps:    { type: boolean }
+                social: { type: boolean }
+                nft:    { type: boolean }
+      responses:
+        '204':
+          description: Preferences updated

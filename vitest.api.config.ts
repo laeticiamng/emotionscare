@@ -10,6 +10,7 @@ export default defineConfig({
       'services/vr/tests/**/*.ts',
       'services/breath/tests/**/*.ts',
       'services/account/tests/**/*.ts'
+      'services/privacy/tests/**/*.ts'
     ]
   }
 });

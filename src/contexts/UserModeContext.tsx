@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { UserModeType } from '@/utils/userModeHelpers';
 
 interface UserModeContextType {
@@ -11,7 +11,7 @@ interface UserModeContextType {
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 interface UserModeProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
