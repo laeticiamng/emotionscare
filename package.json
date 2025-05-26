@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "test:ui": "vitest run src/pages/settings/SilkPage.test.tsx",
     "test:edge": "vitest --environment edge-runtime",
     "test:db": "vitest run tests/db/**/*.test.ts",
     "flyway:migrate": "flyway -locations=filesystem:./migrations migrate",
