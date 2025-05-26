@@ -4,25 +4,17 @@ import { cn } from '@/lib/utils';
 
 interface LoadingAnimationProps {
   text?: string;
-  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
-  text = 'Chargement...',
-  size = 'md',
-  className
+const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
+  text = "Chargement...", 
+  className 
 }) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
-  };
-
   return (
-    <div className={cn('flex flex-col items-center justify-center space-y-4', className)}>
-      <div className={cn('animate-spin rounded-full border-2 border-primary border-t-transparent', sizeClasses[size])} />
-      {text && <p className="text-sm text-muted-foreground">{text}</p>}
+    <div className={cn("flex flex-col items-center justify-center p-8", className)}>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      {text && <p className="mt-4 text-sm text-muted-foreground">{text}</p>}
     </div>
   );
 };

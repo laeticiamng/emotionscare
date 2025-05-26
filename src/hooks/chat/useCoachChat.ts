@@ -6,7 +6,7 @@ export const useCoachChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const sendMessage = useCallback(async (content: string): Promise<string | undefined> => {
+  const sendMessage = useCallback(async (content: string): Promise<string> => {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       content,
@@ -21,18 +21,15 @@ export const useCoachChat = () => {
       // Simulate AI response
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const aiResponse: ChatMessage = {
+      const coachResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         content: 'Merci pour votre message. Comment puis-je vous aider aujourd\'hui ?',
-        sender: 'assistant',
+        sender: 'coach',
         timestamp: new Date().toISOString()
       };
-
-      setMessages(prev => [...prev, aiResponse]);
-      return aiResponse.content;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      return undefined;
+      
+      setMessages(prev => [...prev, coachResponse]);
+      return coachResponse.content;
     } finally {
       setIsProcessing(false);
     }
@@ -45,7 +42,7 @@ export const useCoachChat = () => {
   return {
     messages,
     sendMessage,
-    isProcessing,
-    addMessage
+    addMessage,
+    isProcessing
   };
 };

@@ -6,12 +6,9 @@ export const ensureArray = <T>(value: T | T[]): T[] => {
 };
 
 export const validateMusicTrack = (track: any): track is MusicTrack => {
-  return (
-    track &&
-    typeof track.id === 'string' &&
-    typeof track.title === 'string' &&
-    typeof track.artist === 'string' &&
-    typeof track.url === 'string' &&
-    typeof track.duration === 'number'
-  );
+  return track && 
+         typeof track.id === 'string' &&
+         typeof track.title === 'string' &&
+         typeof track.url === 'string' &&
+         typeof track.duration === 'number';
 };

@@ -13,10 +13,18 @@ export const useConversations = () => {
     setLoading(true);
     try {
       // Simulate loading conversations
-      const mockConversations: ChatConversation[] = [];
+      const mockConversations: ChatConversation[] = [
+        {
+          id: '1',
+          title: 'Conversation avec Coach',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          messages: []
+        }
+      ];
       setConversations(mockConversations);
     } catch (err) {
-      setError('Failed to load conversations');
+      setError('Erreur lors du chargement des conversations');
     } finally {
       setLoading(false);
     }
@@ -31,16 +39,14 @@ export const useConversations = () => {
     const newConversation: ChatConversation = {
       id: Date.now().toString(),
       title,
-      messages: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      messages: []
     };
     
-    setConversations(prev => [newConversation, ...prev]);
+    setConversations(prev => [...prev, newConversation]);
     setCurrentConversation(newConversation);
     setMessages([]);
-    
-    return newConversation;
   }, []);
 
   return {

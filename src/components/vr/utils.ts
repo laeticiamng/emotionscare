@@ -1,13 +1,10 @@
 
-export const durationToNumber = (duration: string | number): number => {
+export const durationToNumber = (duration: number | string): number => {
   if (typeof duration === 'number') return duration;
-  
-  // Parse duration string like "10min" or "5" to number
-  const match = duration.match(/(\d+)/);
-  return match ? parseInt(match[1]) : 10;
+  return parseInt(duration) || 0;
 };
 
-export const formatDuration = (duration: string | number): string => {
+export const formatDuration = (duration: number | string): string => {
   const minutes = durationToNumber(duration);
   return `${minutes} min`;
 };
