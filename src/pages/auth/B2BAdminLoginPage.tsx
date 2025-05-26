@@ -1,21 +1,21 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
+import { Shield, ArrowLeft } from 'lucide-react';
 
 const B2BAdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,98 +23,87 @@ const B2BAdminLoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-    } catch (error) {
-      toast.error('Erreur de connexion', {
-        description: error instanceof Error ? error.message : 'Identifiants incorrects'
+      
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue dans l'espace d'administration !",
+      });
+      
+      // Redirection vers le dashboard B2B Admin
+      navigate('/b2b/admin/dashboard');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "Erreur de connexion",
+        description: error.message || "Identifiants incorrects",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fillDemoCredentials = () => {
-    setEmail('admin@exemple.fr');
-    setPassword('admin');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/b2b/selection')}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
-        </Button>
-
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Connexion Administrateur</CardTitle>
-            <CardDescription>
-              Accédez à votre interface d'administration
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email administrateur</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@entreprise.com"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Connexion...' : 'Se connecter'}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={fillDemoCredentials}
-              >
-                Utiliser le compte démo admin
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Accès sécurisé réservé aux administrateurs
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+            <Shield className="h-6 w-6 text-white" />
+          </div>
+          <CardTitle className="text-2xl">Administration RH</CardTitle>
+          <CardDescription>
+            Accès réservé aux administrateurs
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email administrateur</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@entreprise.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Connexion..." : "Se connecter"}
+            </Button>
+          </form>
+          
+          <div className="mt-6 text-center">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => navigate('/b2b/selection')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour à la sélection
+            </Button>
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-xs text-blue-700 text-center">
+              <strong>Compte de démonstration :</strong><br />
+              Email: admin@exemple.fr<br />
+              Mot de passe: admin
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

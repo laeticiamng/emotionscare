@@ -1,139 +1,165 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Activity, User, Settings, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, Brain, Music, MessageSquare, FileText, Settings, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const B2CDashboard: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/choose-mode');
+  };
+
+  const dashboardItems = [
+    {
+      title: 'Scanner Émotions',
+      description: 'Analysez votre état émotionnel',
+      icon: Brain,
+      href: '/scan',
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Coach IA',
+      description: 'Votre assistant personnel',
+      icon: MessageSquare,
+      href: '/coach',
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Musicothérapie',
+      description: 'Musiques personnalisées',
+      icon: Music,
+      href: '/music',
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Journal Personnel',
+      description: 'Votre journal intime',
+      icon: FileText,
+      href: '/journal',
+      color: 'bg-orange-500'
+    },
+    {
+      title: 'Objectifs',
+      description: 'Vos objectifs bien-être',
+      icon: Target,
+      href: '/goals',
+      color: 'bg-red-500'
+    },
+    {
+      title: 'Réalité Virtuelle',
+      description: 'Expériences immersives',
+      icon: Heart,
+      href: '/vr',
+      color: 'bg-teal-500'
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Bonjour {user?.name || user?.email} 👋
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Heart className="h-8 w-8 text-pink-600" />
+              Votre Espace Bien-être
             </h1>
-            <p className="text-gray-600">Bienvenue sur votre espace bien-être personnel</p>
+            <p className="text-gray-600 mt-2">
+              Bienvenue, {user?.name || user?.email} - Prenez soin de vous
+            </p>
           </div>
-          <Button variant="outline" onClick={logout}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Déconnexion
-          </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate('/settings')}>
+              <Settings className="h-4 w-4 mr-2" />
+              Paramètres
+            </Button>
+            <Button variant="destructive" onClick={handleLogout}>
+              Déconnexion
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Séances aujourd'hui</CardTitle>
-              <Activity className="w-4 h-4 text-muted-foreground" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Humeur du jour
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-muted-foreground">+2 par rapport à hier</p>
+              <div className="text-2xl font-bold text-green-600">😊 Positive</div>
+              <p className="text-xs text-gray-500">Amélioration de 15%</p>
             </CardContent>
           </Card>
-
+          
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Score bien-être</CardTitle>
-              <Heart className="w-4 h-4 text-muted-foreground" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Série actuelle
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">85%</div>
-              <p className="text-xs text-muted-foreground">+5% cette semaine</p>
+              <div className="text-2xl font-bold">7 jours</div>
+              <p className="text-xs text-gray-500">Votre meilleur score !</p>
             </CardContent>
           </Card>
-
+          
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Temps actif</CardTitle>
-              <User className="w-4 h-4 text-muted-foreground" />
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Temps aujourd'hui
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">2h 30m</div>
-              <p className="text-xs text-muted-foreground">Objectif: 3h</p>
+              <div className="text-2xl font-bold">32 min</div>
+              <p className="text-xs text-gray-500">Objectif: 30 min ✅</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Niveau de stress
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">Faible</div>
+              <p className="text-xs text-gray-500">-20% cette semaine</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Main Content */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Activités recommandées</CardTitle>
-              <CardDescription>
-                Basées sur votre profil et vos objectifs
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Méditation guidée</h3>
-                  <p className="text-sm text-gray-600">15 minutes de relaxation</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-lg">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Exercices de respiration</h3>
-                  <p className="text-sm text-gray-600">Techniques de cohérence cardiaque</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Votre progression</CardTitle>
-              <CardDescription>
-                Évolution de vos métriques cette semaine
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Méditation</span>
-                    <span>75%</span>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {dashboardItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Card key={index} className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className={`w-12 h-12 rounded-lg ${item.color} flex items-center justify-center mb-3`}>
+                    <Icon className="h-6 w-6 text-white" />
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Exercices</span>
-                    <span>60%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-green-600 h-2 rounded-full" style={{ width: '60%' }}></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Journal</span>
-                    <span>90%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-purple-600 h-2 rounded-full" style={{ width: '90%' }}></div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                  <CardTitle className="text-lg">{item.title}</CardTitle>
+                  <CardDescription>{item.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => navigate(item.href)}
+                  >
+                    Accéder
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

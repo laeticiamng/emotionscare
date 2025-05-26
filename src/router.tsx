@@ -32,59 +32,63 @@ export const router = createBrowserRouter([
     element: withSuspense(Home)(),
   },
   {
-    path: 'choose-mode',
+    path: '/choose-mode',
     element: withSuspense(ChooseModePage)(),
   },
   {
-    path: 'b2b/selection',
+    path: '/b2b/selection',
     element: withSuspense(B2BSelectionPage)(),
   },
+  // Routes B2C
   {
-    path: 'b2c/login',
+    path: '/b2c/login',
     element: withSuspense(B2CLoginPage)(),
   },
   {
-    path: 'b2c/register',
+    path: '/b2c/register',
     element: withSuspense(B2CRegisterPage)(),
   },
   {
-    path: 'b2c/dashboard',
+    path: '/b2c/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2c">
         {withSuspense(B2CDashboard)()}
       </ProtectedRoute>
     ),
   },
+  // Routes B2B User
   {
-    path: 'b2b/user/login',
+    path: '/b2b/user/login',
     element: withSuspense(B2BUserLoginPage)(),
   },
   {
-    path: 'b2b/user/register',
+    path: '/b2b/user/register',
     element: withSuspense(B2BUserRegisterPage)(),
   },
   {
-    path: 'b2b/user/dashboard',
+    path: '/b2b/user/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2b_user">
         {withSuspense(B2BUserDashboard)()}
       </ProtectedRoute>
     ),
   },
+  // Routes B2B Admin
   {
-    path: 'b2b/admin/login',
+    path: '/b2b/admin/login',
     element: withSuspense(B2BAdminLoginPage)(),
   },
   {
-    path: 'b2b/admin/dashboard',
+    path: '/b2b/admin/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2b_admin">
         {withSuspense(B2BAdminDashboard)()}
       </ProtectedRoute>
     ),
   },
+  // Route protégée générale
   {
-    path: 'glow-breath',
+    path: '/glow-breath',
     element: (
       <ProtectedRoute>
         {withSuspense(GlowBreathPage)()}
