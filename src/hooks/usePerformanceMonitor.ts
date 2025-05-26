@@ -1,51 +1,129 @@
-
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface PerformanceMetrics {
-  loadTime: number;
   renderTime: number;
-  memoryUsage?: number;
-  isSlowNetwork: boolean;
+  componentName: string;
+  timestamp: number;
 }
 
-/**
- * Hook pour monitorer les performances de l'application
- */
-export const usePerformanceMonitor = (componentName?: string) => {
-  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
-  const renderStartTime = useRef<number>(performance.now());
-  const mountTime = useRef<number>(performance.now());
+export const usePerformanceMonitor = (componentName: string) => {
+  const startTime = useRef<number>(Date.now());
+  const metrics = useRef<PerformanceMetrics[]>([]);
 
-  useEffect(() => {
-    const renderEndTime = performance.now();
-    const renderTime = renderEndTime - renderStartTime.current;
-    
-    // Détecter les connexions lentes
-    const connection = (navigator as any).connection;
-    const isSlowNetwork = connection ? 
-      connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g' : 
-      false;
-
-    // Mesurer l'utilisation mémoire (si disponible)
-    const memoryUsage = (performance as any).memory?.usedJSHeapSize;
-    
-    // Temps de chargement depuis la navigation
-    const loadTime = performance.now() - mountTime.current;
-
-    const newMetrics: PerformanceMetrics = {
-      loadTime,
+  const measureRender = useCallback(() => {
+    const renderTime = Date.now() - startTime.current;
+    const metric: PerformanceMetrics = {
       renderTime,
-      memoryUsage,
-      isSlowNetwork
+      componentName,
+      timestamp: Date.now()
     };
-
-    setMetrics(newMetrics);
-
-    // Log pour le monitoring
-    if (componentName && (renderTime > 100 || loadTime > 1000)) {
-      console.warn(`Performance warning for ${componentName}:`, newMetrics);
+    
+    metrics.current.push(metric);
+    
+    // Log slow renders in development
+    if (import.meta.env.DEV && renderTime > 100) {
+      console.warn(`🐌 Slow render detected: ${componentName} took ${renderTime}ms`);
+    }
+    
+    // Keep only last 50 metrics
+    if (metrics.current.length > 50) {
+      metrics.current = metrics.current.slice(-50);
     }
   }, [componentName]);
 
-  return metrics;
+  useEffect(() => {
+    startTime.current = Date.now();
+  });
+
+  useEffect(() => {
+    measureRender();
+  });
+
+  const getMetrics = useCallback(() => {
+    return metrics.current.filter(m => m.componentName === componentName);
+  }, [componentName]);
+
+  const getAverageRenderTime = useCallback(() => {
+    const componentMetrics = getMetrics();
+    if (componentMetrics.length === 0) return 0;
+    
+    const total = componentMetrics.reduce((sum, metric) => sum + metric.renderTime, 0);
+    return total / componentMetrics.length;
+  }, [getMetrics]);
+
+  return {
+    getMetrics,
+    getAverageRenderTime,
+    measureRender
+  };
+};
+
+export const useWebVitals = () => {
+  useEffect(() => {
+    if ('web-vitals' in window) return;
+
+    const measureCLS = () => {
+      let clsValue = 0;
+      let clsEntries: any[] = [];
+
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!(entry as any).hadRecentInput) {
+            const firstSessionEntry = clsEntries[0];
+            const lastSessionEntry = clsEntries[clsEntries.length - 1];
+
+            if (!firstSessionEntry || 
+                (entry.startTime - lastSessionEntry.startTime < 1000 &&
+                 entry.startTime - firstSessionEntry.startTime < 5000)) {
+              clsEntries.push(entry);
+              clsValue += (entry as any).value;
+            } else {
+              clsEntries = [entry];
+              clsValue = (entry as any).value;
+            }
+          }
+        }
+        
+        if (import.meta.env.DEV) {
+          console.log('CLS:', clsValue);
+        }
+      });
+
+      observer.observe({ entryTypes: ['layout-shift'] });
+      return observer;
+    };
+
+    const measureLCP = () => {
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        
+        if (import.meta.env.DEV) {
+          console.log('LCP:', lastEntry.startTime);
+        }
+      });
+
+      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+      return observer;
+    };
+
+    const measureFID = () => {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (import.meta.env.DEV) {
+            console.log('FID:', (entry as any).processingStart - entry.startTime);
+          }
+        }
+      });
+
+      observer.observe({ entryTypes: ['first-input'] });
+      return observer;
+    };
+
+    const observers = [measureCLS(), measureLCP(), measureFID()];
+
+    return () => {
+      observers.forEach(observer => observer?.disconnect());
+    };
+  }, []);
 };
