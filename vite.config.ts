@@ -68,7 +68,12 @@ export default defineConfig(({ mode }) => ({
           'heavy-features': ['three', 'canvas-confetti', 'framer-motion'],
           
           // Authentication
-          'auth': ['firebase'],
+          'auth': [
+            'firebase/app',
+            'firebase/auth',
+            'firebase/firestore',
+            'firebase/storage'
+          ],
           
           // Music features
           'music': ['hume'],
