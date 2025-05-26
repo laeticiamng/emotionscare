@@ -18,6 +18,14 @@ const B2BAdminLoginPage = React.lazy(() => import('./pages/auth/B2BAdminLoginPag
 const B2BAdminDashboard = React.lazy(() => import('./pages/b2b/admin/B2BAdminDashboard'));
 const GlowBreathPage = React.lazy(() => import('./pages/GlowBreathPage'));
 
+// Pages supplémentaires
+const B2CJournal = React.lazy(() => import('./pages/b2c/B2CJournal'));
+const B2CScan = React.lazy(() => import('./pages/b2c/B2CScan'));
+const B2CMusic = React.lazy(() => import('./pages/b2c/B2CMusic'));
+const B2CCoach = React.lazy(() => import('./pages/b2c/B2CCoach'));
+const B2CVR = React.lazy(() => import('./pages/b2c/B2CVR'));
+const B2CSettings = React.lazy(() => import('./pages/b2c/B2CSettings'));
+
 const withSuspense = (Component: React.ComponentType) => {
   return (props: any) => (
     <React.Suspense fallback={<LoadingIllustration />}>
@@ -53,6 +61,54 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute requiredRole="b2c">
         {withSuspense(B2CDashboard)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/journal',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(B2CJournal)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/scan',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(B2CScan)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/music',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(B2CMusic)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/coach',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(B2CCoach)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/vr',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(B2CVR)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/settings',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(B2CSettings)()}
       </ProtectedRoute>
     ),
   },
