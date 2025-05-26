@@ -6,6 +6,11 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+// Validate React hooks availability
+if (!React || !React.forwardRef || !React.useState) {
+  console.error('React hooks not available in toast component');
+}
+
 const ToastProvider = ToastPrimitives.Provider
 
 const ToastViewport = React.forwardRef<

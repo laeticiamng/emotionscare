@@ -1,7 +1,5 @@
 
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { MusicProvider } from "@/contexts/MusicContext";
@@ -13,9 +11,18 @@ import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import EnhancedErrorBoundary from "@/components/ui/enhanced-error-boundary";
 
+// Import toast components separately to control initialization
+import { ToastProvider, ToastViewport } from "@/components/ui/toast";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+
 // Initialize validation files
 import '@/lib/env-validation';
 import '@/lib/errorBoundary';
+
+// Validate React availability before creating QueryClient
+if (!React || !React.useState) {
+  throw new Error('React hooks not available in App component');
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,7 +40,11 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  console.log('App component rendering with full architecture');
+  console.log('App component rendering with React hooks available:', {
+    useState: !!React.useState,
+    useEffect: !!React.useEffect,
+    useContext: !!React.useContext
+  });
   
   return (
     <EnhancedErrorBoundary level="critical" showDetails={true}>
@@ -43,16 +54,18 @@ function App() {
             <AuthProvider>
               <UserModeProvider>
                 <MusicProvider>
-                  <SkipToContent />
-                  <Toaster />
+                  <ToastProvider>
+                    <SkipToContent />
+                    <Suspense fallback={
+                      <div className="flex h-screen items-center justify-center">
+                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }>
+                      <AppRouter />
+                    </Suspense>
+                    <ToastViewport />
+                  </ToastProvider>
                   <Sonner />
-                  <Suspense fallback={
-                    <div className="flex h-screen items-center justify-center">
-                      <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  }>
-                    <AppRouter />
-                  </Suspense>
                 </MusicProvider>
               </UserModeProvider>
             </AuthProvider>
