@@ -1,40 +1,38 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-interface Toast {
+export interface Toast {
   id: string;
   title?: string;
   description?: string;
-  variant?: 'default' | 'destructive';
+  variant?: 'default' | 'destructive' | 'success';
+  duration?: number;
 }
 
-const toasts: Toast[] = [];
+export const useToast = () => {
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-export function useToast() {
-  const [, setCounter] = useState(0);
-
-  const toast = (toast: Omit<Toast, 'id'>) => {
+  const toast = useCallback(({ title, description, variant = 'default', duration = 5000 }: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
-    toasts.push({ id, ...toast });
-    setCounter(c => c + 1);
+    const newToast: Toast = { id, title, description, variant, duration };
     
-    setTimeout(() => {
-      const index = toasts.findIndex(t => t.id === id);
-      if (index > -1) {
-        toasts.splice(index, 1);
-        setCounter(c => c + 1);
-      }
-    }, 5000);
-  };
+    setToasts(prev => [...prev, newToast]);
+    
+    if (duration > 0) {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, duration);
+    }
+    
+    return {
+      id,
+      dismiss: () => setToasts(prev => prev.filter(t => t.id !== id))
+    };
+  }, []);
 
-  return { toast, toasts };
-}
+  const dismiss = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
 
-export const toast = (options: { title?: string; description?: string }) => {
-  console.log('Toast:', options.title || options.description);
+  return { toast, dismiss, toasts };
 };
-
-export const error = (message: string) => toast({ title: 'Erreur', description: message });
-export const success = (message: string) => toast({ title: 'Succès', description: message });
-export const warning = (message: string) => toast({ title: 'Attention', description: message });
-export const info = (message: string) => toast({ title: 'Information', description: message });

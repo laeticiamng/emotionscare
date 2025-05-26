@@ -1,37 +1,40 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage, ChatConversation } from '@/types/chat';
+
+export interface ChatMessage {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  timestamp: Date;
+}
 
 export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
 
-  const sendMessage = useCallback(async (text: string): Promise<ChatMessage> => {
-    setIsLoading(true);
-
+  const sendMessage = useCallback(async (content: string) => {
     const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      text,
-      sender: 'user',
+      id: Math.random().toString(36).substr(2, 9),
+      content,
+      role: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
 
     try {
-      // Simulate AI response
+      // Simulation réponse IA
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const aiResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: `Je comprends votre message : "${text}". Comment puis-je vous aider davantage ?`,
-        sender: 'coach',
+      const assistantMessage: ChatMessage = {
+        id: Math.random().toString(36).substr(2, 9),
+        content: 'Merci pour votre message. Comment puis-je vous aider aujourd\'hui ?',
+        role: 'assistant',
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, aiResponse]);
-      return aiResponse;
+      setMessages(prev => [...prev, assistantMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -43,10 +46,8 @@ export const useChat = () => {
 
   return {
     messages,
-    isLoading,
     sendMessage,
     clearMessages,
-    currentConversation,
-    setCurrentConversation
+    isLoading
   };
 };

@@ -1,118 +1,118 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Building2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { User, Users, Shield, ArrowRight } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { UserModeType } from '@/types/userMode';
 
 const ChooseModePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { setUserMode } = useUserMode();
+
+  const modes = [
+    {
+      type: 'b2c' as UserModeType,
+      title: 'Particulier',
+      description: 'Accès personnel complet aux fonctionnalités de bien-être émotionnel',
+      icon: User,
+      features: ['Analyse émotionnelle IA', 'Musique thérapeutique', 'Coach personnel', 'Suivi privé'],
+      loginPath: '/b2c/login',
+      gradient: 'from-pink-500 to-purple-600'
+    },
+    {
+      type: 'b2b_user' as UserModeType,
+      title: 'Collaborateur',
+      description: 'Espace dédié aux employés avec suivi équipe et bien-être professionnel',
+      icon: Users,
+      features: ['Bien-être au travail', 'Suivi équipe', 'Ressources RH', 'Support collaboratif'],
+      loginPath: '/b2b/user/login',
+      gradient: 'from-blue-500 to-cyan-600'
+    },
+    {
+      type: 'b2b_admin' as UserModeType,
+      title: 'Administrateur RH',
+      description: 'Tableau de bord complet pour la gestion du bien-être en entreprise',
+      icon: Shield,
+      features: ['Analytics équipe', 'Gestion utilisateurs', 'Rapports détaillés', 'Administration'],
+      loginPath: '/b2b/admin/login',
+      gradient: 'from-emerald-500 to-teal-600'
+    }
+  ];
+
+  const handleModeSelect = (mode: UserModeType, loginPath: string) => {
+    setUserMode(mode);
+    navigate(loginPath);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="container max-w-4xl mx-auto p-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Choisissez votre expérience</h1>
-          <p className="text-xl text-muted-foreground">
-            EmotionsCare s'adapte à vos besoins, que vous soyez un particulier ou une entreprise
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
+      <div className="max-w-6xl w-full space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
+            Choisissez votre mode d'accès
+          </h1>
+          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            Sélectionnez le type d'utilisation qui correspond le mieux à vos besoins
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
-                <User className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Particulier</CardTitle>
-              <CardDescription className="text-base">
-                Votre bien-être émotionnel personnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Scan émotionnel personnalisé
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Coach IA personnel
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Musicothérapie adaptative
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Journal émotionnel
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Communauté de soutien
-                </li>
-              </ul>
-              <div className="space-y-2 pt-4">
-                <Link to="/b2c/login">
-                  <Button className="w-full" size="lg">
-                    Se connecter
+        <div className="grid md:grid-cols-3 gap-6">
+          {modes.map((mode) => {
+            const IconComponent = mode.icon;
+            return (
+              <Card 
+                key={mode.type} 
+                className="relative overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer group"
+                onClick={() => handleModeSelect(mode.type, mode.loginPath)}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${mode.gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                
+                <CardHeader className="text-center space-y-4">
+                  <div className={`mx-auto w-16 h-16 rounded-full bg-gradient-to-br ${mode.gradient} flex items-center justify-center`}>
+                    <IconComponent className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-2xl">{mode.title}</CardTitle>
+                  <CardDescription className="text-base">
+                    {mode.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="space-y-6">
+                  <ul className="space-y-2">
+                    {mode.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                        <div className="h-1.5 w-1.5 bg-slate-400 rounded-full mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Button 
+                    className={`w-full bg-gradient-to-br ${mode.gradient} hover:opacity-90 text-white`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleModeSelect(mode.type, mode.loginPath);
+                    }}
+                  >
+                    Accéder en tant que {mode.title}
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                </Link>
-                <Link to="/b2c/register">
-                  <Button variant="outline" className="w-full" size="lg">
-                    Créer un compte
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
-                <Building2 className="h-8 w-8 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Entreprise</CardTitle>
-              <CardDescription className="text-base">
-                Solutions pour le bien-être en entreprise
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Tableau de bord RH avancé
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Gestion des équipes
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Analytics du bien-être
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Défis collaboratifs
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Cocon social sécurisé
-                </li>
-              </ul>
-              <div className="pt-4">
-                <Link to="/b2b/selection">
-                  <Button className="w-full" size="lg">
-                    Accéder aux solutions entreprise
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        <div className="text-center mt-8">
-          <Link to="/" className="text-muted-foreground hover:underline">
+        <div className="text-center">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="text-slate-600 dark:text-slate-300"
+          >
             ← Retour à l'accueil
-          </Link>
+          </Button>
         </div>
       </div>
     </div>

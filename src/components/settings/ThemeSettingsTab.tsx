@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Sun, Moon, Monitor } from 'lucide-react';
 import { ThemeName } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
@@ -9,41 +10,62 @@ interface ThemeSettingsTabProps {
   onThemeChange: (theme: ThemeName) => void;
 }
 
-const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({ currentTheme, onThemeChange }) => {
-  const themes: { name: ThemeName; label: string; description: string }[] = [
-    { name: 'light', label: 'Clair', description: 'Interface claire et lumineuse' },
-    { name: 'dark', label: 'Sombre', description: 'Interface sombre pour les yeux' },
-    { name: 'system', label: 'Système', description: 'Suit les préférences du système' }
+const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
+  currentTheme,
+  onThemeChange
+}) => {
+  const themes = [
+    {
+      name: 'light' as ThemeName,
+      label: 'Clair',
+      description: 'Thème clair pour une utilisation en journée',
+      icon: Sun
+    },
+    {
+      name: 'dark' as ThemeName,
+      label: 'Sombre',
+      description: 'Thème sombre pour réduire la fatigue oculaire',
+      icon: Moon
+    },
+    {
+      name: 'system' as ThemeName,
+      label: 'Système',
+      description: 'Suit les préférences de votre système',
+      icon: Monitor
+    }
   ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Thème de l'application</CardTitle>
+        <CardTitle>Apparence</CardTitle>
+        <CardDescription>
+          Choisissez le thème qui vous convient le mieux
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {themes.map((theme) => (
-            <div
-              key={theme.name}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                currentTheme === theme.name ? 'border-primary bg-primary/5' : 'border-border'
-              }`}
-              onClick={() => onThemeChange(theme.name)}
-            >
-              <h3 className="font-medium">{theme.label}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{theme.description}</p>
-            </div>
-          ))}
-        </div>
-        
-        <div className="pt-4">
-          <Button 
-            onClick={() => onThemeChange(currentTheme)}
-            variant="outline"
-          >
-            Appliquer le thème
-          </Button>
+        <div className="grid grid-cols-3 gap-4">
+          {themes.map((theme) => {
+            const IconComponent = theme.icon;
+            const isActive = currentTheme === theme.name;
+            
+            return (
+              <Button
+                key={theme.name}
+                variant={isActive ? 'default' : 'outline'}
+                className="h-auto p-4 flex flex-col items-center space-y-2"
+                onClick={() => onThemeChange(theme.name)}
+              >
+                <IconComponent className="h-6 w-6" />
+                <div className="text-center">
+                  <div className="font-medium">{theme.label}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {theme.description}
+                  </div>
+                </div>
+              </Button>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

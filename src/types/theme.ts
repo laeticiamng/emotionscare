@@ -1,13 +1,19 @@
 
 export type ThemeName = 'light' | 'dark' | 'system';
 
-export interface ThemeSettings {
+export interface ThemeConfig {
   name: ThemeName;
-  label: string;
-  description: string;
+  displayName: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    background: string;
+    foreground: string;
+  };
 }
 
-export interface ThemeContextType {
+export interface ThemePreferences {
   theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
+  autoSwitch: boolean;
+  followSystem: boolean;
 }
