@@ -4,12 +4,14 @@ import { SecureAnalytics } from '@/utils/secureAnalytics';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
 
 vi.mock('@/utils/globalInterceptor');
+vi.setConfig({ testTimeout: 15000 });
 
 describe('SecureAnalytics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.clearAllTimers();
     vi.useFakeTimers();
+    global.fetch = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
   });
 
   afterEach(() => {

@@ -1,5 +1,6 @@
 
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
+import { renderHookWithMusicProvider } from '../../tests/utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useMusicRecommendation } from '@/hooks/useMusicRecommendation';
 import { useMusic } from '@/hooks/useMusic';
@@ -44,7 +45,7 @@ describe('useMusicRecommendation', () => {
 
       mockLoadPlaylistForEmotion.mockResolvedValue(mockPlaylist);
 
-      const { result } = renderHook(() => 
+      const { result } = renderHookWithMusicProvider(() =>
         useMusicRecommendation({ autoActivate: false })
       );
 
@@ -63,7 +64,7 @@ describe('useMusicRecommendation', () => {
       const errorMessage = 'Erreur de réseau';
       mockLoadPlaylistForEmotion.mockRejectedValue(new Error(errorMessage));
 
-      const { result } = renderHook(() => 
+      const { result } = renderHookWithMusicProvider(() =>
         useMusicRecommendation({ autoActivate: false })
       );
 
@@ -89,10 +90,10 @@ describe('useMusicRecommendation', () => {
 
       mockLoadPlaylistForEmotion.mockResolvedValue(mockPlaylist);
 
-      renderHook(() => 
-        useMusicRecommendation({ 
-          autoActivate: true, 
-          defaultEmotion: 'calm' 
+      renderHookWithMusicProvider(() =>
+        useMusicRecommendation({
+          autoActivate: true,
+          defaultEmotion: 'calm'
         })
       );
 
@@ -115,7 +116,7 @@ describe('useMusicRecommendation', () => {
         duration: 240
       };
 
-      const { result } = renderHook(() => 
+      const { result } = renderHookWithMusicProvider(() =>
         useMusicRecommendation({ autoActivate: false })
       );
 
@@ -142,7 +143,7 @@ describe('useMusicRecommendation', () => {
 
       mockLoadPlaylistForEmotion.mockResolvedValue(mockPlaylist);
 
-      const { result } = renderHook(() => 
+      const { result } = renderHookWithMusicProvider(() =>
         useMusicRecommendation({ autoActivate: false })
       );
 
@@ -161,7 +162,7 @@ describe('useMusicRecommendation', () => {
 
   describe('Mapping des émotions', () => {
     it('devrait mapper correctement les émotions vers les types musicaux', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHookWithMusicProvider(() =>
         useMusicRecommendation({ autoActivate: false })
       );
 

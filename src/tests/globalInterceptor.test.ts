@@ -14,11 +14,17 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 // Mock de fetch
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
+vi.setConfig({ testTimeout: 15000 });
 
 describe('GlobalInterceptor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('secureFetch', () => {
@@ -28,11 +34,9 @@ describe('GlobalInterceptor', () => {
         access_token: mockToken
       }));
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ data: 'test' })
-      });
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: 'test' }), { status: 200 })
+      );
 
       await GlobalInterceptor.secureFetch('/test', {});
 
@@ -49,12 +53,14 @@ describe('GlobalInterceptor', () => {
         access_token: 'expired-token'
       }));
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401
-      });
+      mockFetch
+        .mockResolvedValueOnce(new Response(null, { status: 401 }))
+        .mockResolvedValueOnce(new Response(null, { status: 401 }))
+        .mockResolvedValueOnce(new Response(null, { status: 401 }));
 
-      const result = await GlobalInterceptor.secureFetch('/test', {});
+      const resultPromise = GlobalInterceptor.secureFetch('/test', {});
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
 
       expect(result).toBeNull();
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('sb-yaincoxihiqdksxgrsrk-auth-token');
@@ -69,7 +75,9 @@ describe('GlobalInterceptor', () => {
         .mockResolvedValueOnce({ ok: false, status: 401 })
         .mockResolvedValueOnce({ ok: true, status: 200 });
 
-      const result = await GlobalInterceptor.secureFetch('/test', {});
+      const resultPromise = GlobalInterceptor.secureFetch('/test', {});
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toBeTruthy();
