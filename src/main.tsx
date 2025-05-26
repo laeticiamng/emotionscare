@@ -1,19 +1,28 @@
 
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
 import './index.css';
 
-// Ensure React is available globally and properly initialized
+// Ensure React is fully available before importing App
+console.log('Main.tsx - React check:', {
+  React: !!React,
+  useState: !!React?.useState,
+  useContext: !!React?.useContext,
+  StrictMode: !!StrictMode
+});
+
+// Make React globally available
 if (typeof window !== 'undefined') {
   (window as any).React = React;
 }
 
-// Ensure React hooks are available
-console.log('React hooks check:', { useState: React.useState, useContext: React.useContext });
+// Import App after React is confirmed to be available
+import App from './App';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
+
+console.log('Creating React root...');
 
 createRoot(rootElement).render(
   <StrictMode>

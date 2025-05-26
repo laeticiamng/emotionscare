@@ -1,59 +1,25 @@
 
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
-import { MusicProvider } from "@/contexts/MusicContext";
-import { UserModeProvider } from "@/contexts/UserModeContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { Suspense } from "react";
-import AppRouter from "./AppRouter";
-import { SkipToContent } from "@/components/accessibility/SkipToContent";
-import { ThemeProvider } from "@/providers/ThemeProvider";
-
-// Initialiser la validation d'environnement
-import '@/lib/env-validation';
-import '@/lib/errorBoundary';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: (failureCount, error) => {
-        // Ne pas retry sur les erreurs d'authentification
-        if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
-          return false;
-        }
-        return failureCount < 3;
-      },
-    },
-  },
-});
 
 function App() {
-  console.log('App component rendering');
+  console.log('App rendering, React available:', !!React);
+  console.log('React hooks available:', { 
+    useState: !!React.useState, 
+    useContext: !!React.useContext 
+  });
   
   return (
-    <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <UserModeProvider>
-              <MusicProvider>
-                <SkipToContent />
-                <Toaster />
-                <Sonner />
-                <Suspense fallback={<div>Loading...</div>}>
-                  <AppRouter />
-                </Suspense>
-              </MusicProvider>
-            </UserModeProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <div className="min-h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">EmotionsCare</h1>
+          <p className="text-muted-foreground">Application is loading...</p>
+          <div className="mt-4 text-sm text-gray-500">
+            React Status: {React ? 'Available' : 'Not Available'}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
