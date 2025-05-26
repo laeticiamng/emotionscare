@@ -1,62 +1,54 @@
-import React, { createContext, useContext, useState } from 'react';
-import { useAuth } from './AuthContext';
-import {
-  OptimizationEvent,
-  OptimizationSuggestion,
-  logEvent,
-  generateOptimizationSuggestions
-} from '@/services/optimizationService';
+
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+interface OptimizationData {
+  performanceScore: number;
+  suggestions: string[];
+  lastUpdated: Date;
+}
 
 interface OptimizationContextType {
-  suggestions: OptimizationSuggestion[];
-  isLoading: boolean;
-  error: string | null;
-  logEvent: (event: OptimizationEvent) => Promise<void>;
-  generateSuggestions: () => Promise<void>;
+  optimizationData: OptimizationData | null;
+  updateOptimization: (data: OptimizationData) => void;
+  isOptimizing: boolean;
 }
 
 const OptimizationContext = createContext<OptimizationContextType | undefined>(undefined);
 
-export const OptimizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  const [suggestions, setSuggestions] = useState<OptimizationSuggestion[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface OptimizationProviderProps {
+  children: ReactNode;
+}
 
-  const handleLogEvent = async (event: OptimizationEvent) => {
-    try {
-      await logEvent(event);
-    } catch (e) {
-      console.error('Failed to log event', e);
-    }
+export const OptimizationProvider: React.FC<OptimizationProviderProps> = ({ children }) => {
+  const [optimizationData, setOptimizationData] = useState<OptimizationData | null>(null);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+
+  const updateOptimization = (data: OptimizationData) => {
+    setIsOptimizing(true);
+    // Simuler un processus d'optimisation
+    setTimeout(() => {
+      setOptimizationData(data);
+      setIsOptimizing(false);
+    }, 1000);
   };
 
-  const generateSuggestions = async () => {
-    if (!user) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await generateOptimizationSuggestions(user.id);
-      setSuggestions(result);
-    } catch (e) {
-      console.error('Failed to generate suggestions', e);
-      setError('Erreur lors de la génération des suggestions');
-    } finally {
-      setIsLoading(false);
-    }
+  const value: OptimizationContextType = {
+    optimizationData,
+    updateOptimization,
+    isOptimizing,
   };
 
   return (
-    <OptimizationContext.Provider
-      value={{ suggestions, isLoading, error, logEvent: handleLogEvent, generateSuggestions }}
-    >
+    <OptimizationContext.Provider value={value}>
       {children}
     </OptimizationContext.Provider>
   );
 };
 
 export const useOptimization = () => {
-  const ctx = useContext(OptimizationContext);
-  if (!ctx) throw new Error('useOptimization must be used within an OptimizationProvider');
-  return ctx;
+  const context = useContext(OptimizationContext);
+  if (context === undefined) {
+    throw new Error('useOptimization must be used within an OptimizationProvider');
+  }
+  return context;
 };

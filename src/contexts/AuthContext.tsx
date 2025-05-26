@@ -1,10 +1,12 @@
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   id: string;
   email: string;
-  role: string;
+  name?: string;
+  role: 'b2c' | 'b2b_admin' | 'b2b_user';
+  avatar_url?: string;
 }
 
 interface AuthContextType {
@@ -12,18 +14,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, userData?: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -33,17 +28,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isAuthenticated = !!user;
+
+  // Simuler la vérification de l'état d'authentification
   useEffect(() => {
-    // Simulate checking for existing session
     const checkAuth = async () => {
       try {
-        // Mock auth check - replace with actual auth logic
+        // Simuler une vérification d'authentification
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
           setUser(JSON.parse(savedUser));
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        console.error('Erreur lors de la vérification d\'authentification:', error);
       } finally {
         setIsLoading(false);
       }
@@ -55,29 +52,62 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Mock login - replace with actual auth logic
-      const mockUser = { id: '1', email, role: 'b2c' };
+      // Simuler une connexion
+      const mockUser: User = {
+        id: '1',
+        email,
+        name: email.split('@')[0],
+        role: 'b2c',
+      };
+      
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Erreur de connexion:', error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      setUser(null);
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error('Erreur de déconnexion:', error);
+      throw error;
+    }
   };
 
-  const value = {
+  const register = async (email: string, password: string, userData?: Partial<User>) => {
+    setIsLoading(true);
+    try {
+      // Simuler une inscription
+      const mockUser: User = {
+        id: Date.now().toString(),
+        email,
+        name: userData?.name || email.split('@')[0],
+        role: userData?.role || 'b2c',
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Erreur d\'inscription:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated,
     isLoading,
     login,
     logout,
+    register,
   };
 
   return (
@@ -86,3 +116,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export { AuthContext };
