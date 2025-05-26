@@ -98,6 +98,14 @@ jobs:
         run: npm run test -- --environment=jsdom
         timeout-minutes: 5
 
+      - name: Database migrations
+        run: npm run db:migrate
+
+      - name: Refresh journal view
+        run: npm run db:refresh:journal
+
+      - name: Run DB tests
+        run: npm run test:db
   db-test:
     needs: build-and-test
     runs-on: ubuntu-22.04

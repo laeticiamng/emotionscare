@@ -2,6 +2,10 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.12] - 2025-06-03
+
+### Ajouté
+- metrics_weekly_journal materialized view + pg_cron job.
 ## [1.1.12] - 2025-06-02
 
 ### Ajouté

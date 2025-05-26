@@ -7,6 +7,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    include: ['database/tests/**/*.{test,spec}.ts'],
+  },
     include: ['database/tests/**/*.ts']
 
   }
