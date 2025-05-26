@@ -2,49 +2,60 @@
 import * as React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import AppErrorBoundary from '@/components/ErrorBoundary/AppErrorBoundary';
+import { UserModeProvider } from '@/contexts/UserModeContext';
 import { Toaster } from '@/components/ui/toaster';
 import AppRouter from './AppRouter';
-import './App.css';
+import SecurityProvider from '@/components/security/SecurityProvider';
+import { performanceMonitor } from '@/lib/performance/performanceMonitor';
+import './styles/accessibility.css';
 
-// Create a client
+// Initialize performance monitoring
+if (import.meta.env.PROD) {
+  performanceMonitor.recordMetric('app-init', performance.now());
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: (failureCount, error) => {
-        // Don't retry on 4xx errors
-        if (error instanceof Error && 'status' in error) {
-          const status = (error as any).status;
-          if (status >= 400 && status < 500) {
-            return false;
-          }
-        }
-        return failureCount < 3;
-      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
     },
   },
 });
 
-function App() {
+const App: React.FC = () => {
+  React.useEffect(() => {
+    // Enregistrer le temps de chargement complet de l'app
+    if (import.meta.env.PROD) {
+      const loadTime = performance.now();
+      performanceMonitor.recordMetric('app-loaded', loadTime);
+      console.log(`🚀 App loaded in ${loadTime.toFixed(2)}ms`);
+    }
+  }, []);
+
   return (
-    <AppErrorBoundary level="critical">
-      <ThemeProvider defaultTheme="system" storageKey="emotionscare-ui-theme">
-        <QueryClientProvider client={queryClient}>
+    <SecurityProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
           <Router>
             <AuthProvider>
-              <AppErrorBoundary level="page">
+              <UserModeProvider>
                 <AppRouter />
                 <Toaster />
-              </AppErrorBoundary>
+              </UserModeProvider>
             </AuthProvider>
           </Router>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </AppErrorBoundary>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SecurityProvider>
   );
-}
+};
 
 export default App;
