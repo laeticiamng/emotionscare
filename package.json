@@ -148,10 +148,10 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.21",
     "@types/react": "^18.3.22",
-      "@types/react": "^18.2.0",
-"@types/react-dom": "^18.2.0",
-"typescript": "^5.0.0",
-"vite": "^4.5.0"
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "vite": "^4.5.0"
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.21",
