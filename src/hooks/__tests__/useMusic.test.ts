@@ -1,20 +1,14 @@
 
-import { renderHook } from '@testing-library/react';
+import { renderHookWithMusicProvider } from '@/tests/utils';
 import { useMusic } from '../useMusic';
-import { MusicProvider } from '@/contexts/MusicContext';
-import React from 'react';
-
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <MusicProvider>{children}</MusicProvider>
-);
 
 describe('useMusic', () => {
   test('should initialize with default values', () => {
-    const { result } = renderHook(() => useMusic(), { wrapper });
+    const { result } = renderHookWithMusicProvider(() => useMusic());
     
     expect(result.current.isPlaying).toBe(false);
     expect(result.current.currentTrack).toBeNull();
-    expect(result.current.volume).toBe(1);
+    expect(result.current.volume).toBe(0.7);
   });
 
   test('should throw error when used outside MusicProvider', () => {
