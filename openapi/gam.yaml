@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Gamification API
+  version: 1.0.0
+paths:
+  /me/gam/weekly:
+    get:
+      summary: KPIs gamification hebdo (utilisateur)
+      responses:
+        '200':
+          description: Weekly gamification metrics
+  /org/{orgId}/gam/weekly:
+    get:
+      summary: KPIs gamification hebdo (organisation)
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Weekly gamification org metrics

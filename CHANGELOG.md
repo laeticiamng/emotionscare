@@ -2,6 +2,12 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+
+## [1.1.13] - 2025-06-04
+
+### Ajouté
+- Endpoints KPIs gamification hebdomadaires (/me/gam/weekly et /org/:orgId/gam/weekly)
+
 ## [1.1.12] - 2025-06-03
 
 ### Ajouté
