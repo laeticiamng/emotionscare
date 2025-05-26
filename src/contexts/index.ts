@@ -1,15 +1,11 @@
+
+import React from 'react';
+
 // Re-export all contexts
 export { AuthProvider, useAuth } from './AuthContext';
-export { ThemeContext, ThemeProvider, useTheme } from './ThemeContext';
-export { UserPreferencesContext, UserPreferencesProvider, useUserPreferences } from './UserPreferencesContext';
+export { ThemeProvider, useTheme } from '@/providers/ThemeProvider';
 export { UserModeProvider, useUserMode } from './UserModeContext';
 export { MusicProvider, useMusic } from './MusicContext';
-export { SidebarProvider, useSidebar } from './SidebarContext';
-export { SupportProvider, useSupport } from './SupportContext';
-export { OnboardingProvider, useOnboarding } from './OnboardingContext';
-
-// Add missing context exports
-export { ThemeProvider } from '@/providers/ThemeProvider';
 
 // Create missing contexts placeholders
 export const ThemeContext = React.createContext(null);
@@ -25,6 +21,6 @@ export const SupportProvider = ({ children }: { children: React.ReactNode }) => 
 export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
 
 export const useUserPreferences = () => ({});
-export const useSidebar = () => ({});
+export const useSidebar = () => ({ collapsed: false, toggleCollapsed: () => {}, setCollapsed: () => {} });
 export const useSupport = () => ({});
 export const useOnboarding = () => ({});

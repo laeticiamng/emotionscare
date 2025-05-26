@@ -1,46 +1,23 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+import React, { createContext, useContext, useState } from 'react';
+import { UserRole } from '@/utils/roleUtils';
 
 interface UserModeContextType {
-  userMode: UserModeType;
-  setUserMode: (mode: UserModeType) => void;
+  currentMode: UserRole;
+  setCurrentMode: (mode: UserRole) => void;
   isLoading: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-interface UserModeProviderProps {
-  children: ReactNode;
-}
-
-export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserModeType>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Charger le mode utilisateur depuis le localStorage
-  useEffect(() => {
-    const savedMode = localStorage.getItem('userMode') as UserModeType;
-    if (savedMode) {
-      setUserModeState(savedMode);
-    }
-    setIsLoading(false);
-  }, []);
-
-  const setUserMode = (mode: UserModeType) => {
-    setUserModeState(mode);
-    if (mode) {
-      localStorage.setItem('userMode', mode);
-    } else {
-      localStorage.removeItem('userMode');
-    }
-  };
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentMode, setCurrentMode] = useState<UserRole>('b2c');
+  const [isLoading, setIsLoading] = useState(false);
 
   const value: UserModeContextType = {
-    userMode,
-    setUserMode,
-    isLoading,
+    currentMode,
+    setCurrentMode,
+    isLoading
   };
 
   return (
@@ -52,10 +29,8 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
 
 export const useUserMode = () => {
   const context = useContext(UserModeContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
   return context;
 };
-
-export { UserModeContext };

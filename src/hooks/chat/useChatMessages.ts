@@ -1,89 +1,28 @@
-import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+
+import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 
-export interface UseChatMessagesProps {
-  conversationId?: string;
-  initialMessages?: ChatMessage[];
-}
+export const useChatMessages = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-export const useChatMessages = ({ conversationId, initialMessages = [] }: UseChatMessagesProps) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [loading, setLoading] = useState(false);
+  const addMessage = useCallback((message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
+    const newMessage: ChatMessage = {
+      ...message,
+      id: Date.now().toString(),
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, newMessage]);
+    return newMessage;
+  }, []);
 
-  const addUserMessage = (text: string) => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      conversationId: conversationId || '',
-      text, // Keep for backward compatibility
-      content: text,
-      sender: 'user',
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    return newMessage;
-  };
-  
-  const addAssistantMessage = (text: string) => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      conversationId: conversationId || '',
-      text, // Keep for backward compatibility
-      content: text,
-      sender: 'assistant',
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    return newMessage;
-  };
-  
-  const addSystemMessage = (text: string) => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      conversationId: conversationId || '',
-      text, // Keep for backward compatibility
-      content: text,
-      sender: 'system',
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    return newMessage;
-  };
-  
-  const updateMessage = (id: string, text: string) => {
-    setMessages(prevMessages =>
-      prevMessages.map(message =>
-        message.id === id ? { ...message, text, content: text } : message
-      )
-    );
-  };
-  
-  const removeMessage = (id: string) => {
-    setMessages(prevMessages => prevMessages.filter(message => message.id !== id));
-  };
-  
-  // Update messages when conversationId changes
-  useEffect(() => {
-    if (conversationId) {
-      // In a real application, fetch messages from an API
-      // Here we can simply reset or keep the current state
-      // based on the requirement
-    }
-  }, [conversationId]);
-  
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, []);
+
   return {
     messages,
-    loading,
-    addUserMessage,
-    addAssistantMessage,
-    addSystemMessage,
-    updateMessage,
-    removeMessage,
-    setMessages
+    addMessage,
+    clearMessages,
+    setMessages,
   };
 };
-
-export default useChatMessages;
