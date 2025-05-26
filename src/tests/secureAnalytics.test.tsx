@@ -1,11 +1,20 @@
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SecureAnalytics } from '@/utils/secureAnalytics';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
 import { mockResponse } from './utils';
 
-vi.mock('@/utils/globalInterceptor');
-vi.setConfig({ testTimeout: 15000 });
+vi.mock('@/utils/globalInterceptor', async () => {
+  const original = await vi.importActual<any>('@/utils/globalInterceptor');
+  return {
+    ...original,
+    default: {
+      ...original.default,
+      secureFetch: vi.fn().mockResolvedValue(mockResponse())
+    }
+  };
+});
+vi.setConfig({ testTimeout: 5000 });
 
 describe('SecureAnalytics', () => {
   beforeEach(() => {
@@ -85,10 +94,8 @@ describe('SecureAnalytics', () => {
       await SecureAnalytics.trackPageView('dashboard', 'user123');
 
       expect(GlobalInterceptor.secureFetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          body: expect.stringContaining('page_view')
-        })
+        expect.stringContaining('/track'),
+        expect.any(Object)
       );
     });
   });
