@@ -40,7 +40,7 @@ function App() {
     <GlobalErrorBoundary>
       <SecurityProvider>
         <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
+          <TooltipProvider delayDuration={150}>
             <BrowserRouter>
               <AuthProvider>
                 <UserModeProvider>

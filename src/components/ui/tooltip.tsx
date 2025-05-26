@@ -26,4 +26,15 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+// Composant wrapper pour s'assurer qu'un TooltipProvider est toujours présent
+const SafeTooltip = ({ children, ...props }: React.ComponentProps<typeof Tooltip>) => {
+  return (
+    <TooltipProvider delayDuration={150}>
+      <Tooltip {...props}>
+        {children}
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, SafeTooltip }
