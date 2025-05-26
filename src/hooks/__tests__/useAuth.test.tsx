@@ -4,9 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <AuthProvider>{children}</AuthProvider>
-);
+const wrapper = ({ children }: { children: React.ReactNode }) => {
+  return <AuthProvider>{children}</AuthProvider>;
+};
 
 describe('useAuth', () => {
   test('should initialize with unauthenticated state', () => {
@@ -20,6 +20,6 @@ describe('useAuth', () => {
   test('should throw error when used outside AuthProvider', () => {
     expect(() => {
       renderHook(() => useAuth());
-    }).toThrow();
+    }).toThrow('useAuth must be used within an AuthProvider');
   });
 });

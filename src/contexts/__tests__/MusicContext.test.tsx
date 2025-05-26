@@ -1,14 +1,16 @@
 
 import React from 'react';
-import { render, renderHook, act, waitFor } from '@testing-library/react';
+import { render, act, waitFor, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MusicProvider, useMusic } from '@/contexts/MusicContext';
+import { renderHookWithMusicProvider } from '@/tests/utils';
 import { AudioTrack } from '@/types/audio';
 
 // Mock Audio API
 const mockAudio = {
   play: vi.fn().mockResolvedValue(undefined),
   pause: vi.fn(),
+  load: vi.fn(),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   currentTime: 0,
@@ -50,9 +52,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait fournir le contexte musical', () => {
-    const { result } = renderHook(() => useMusic(), {
-      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>
-    });
+    const { result } = renderHookWithMusicProvider(() => useMusic());
 
     expect(result.current).toBeDefined();
     expect(result.current.isPlaying).toBe(false);
@@ -61,9 +61,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait jouer une piste', async () => {
-    const { result } = renderHook(() => useMusic(), {
-      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>
-    });
+    const { result } = renderHookWithMusicProvider(() => useMusic());
 
     await act(async () => {
       result.current.play(mockTrack);
@@ -77,9 +75,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait mettre en pause la lecture', async () => {
-    const { result } = renderHook(() => useMusic(), {
-      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>
-    });
+    const { result } = renderHookWithMusicProvider(() => useMusic());
 
     await act(async () => {
       result.current.play(mockTrack);
@@ -101,9 +97,7 @@ describe('MusicContext', () => {
       { id: 'track-2', title: 'Track 2', artist: 'Artist 2', duration: 200, url: 'track2.mp3' }
     ];
 
-    const { result } = renderHook(() => useMusic(), {
-      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>
-    });
+    const { result } = renderHookWithMusicProvider(() => useMusic());
 
     act(() => {
       result.current.setPlaylist(playlist);
@@ -123,9 +117,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait gérer le contrôle du volume', () => {
-    const { result } = renderHook(() => useMusic(), {
-      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>
-    });
+    const { result } = renderHookWithMusicProvider(() => useMusic());
 
     act(() => {
       result.current.setVolume(0.5);
@@ -135,15 +127,15 @@ describe('MusicContext', () => {
     expect(mockAudio.volume).toBe(0.5);
   });
 
-  it('devrait générer de la musique émotionnelle', async () => {
-    const { result } = renderHook(() => useMusic(), {
-      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>
-    });
+  it('devrait charger une playlist pour une émotion', async () => {
+    const { result } = renderHookWithMusicProvider(() => useMusic());
 
     await act(async () => {
-      const tracks = await result.current.generateEmotionalMusic('calm');
-      expect(tracks).toHaveLength(2);
-      expect(tracks[0].emotion).toBe('calm');
+      const playlist = await result.current.loadPlaylistForEmotion({
+        emotion: 'calm',
+        intensity: 0.5,
+      });
+      expect(playlist?.tracks.every(t => t.emotion === 'calm')).toBe(true);
     });
   });
 
