@@ -1,0 +1,13 @@
+## Correctifs suggérés
+- [health] fetch failed
+- [version] fetch failed
+- [metrics] fetch failed
+- [signup] fetch failed
+- [login] fetch failed
+- [refresh] fetch failed
+- [protected] fetch failed
+- [users] fetch failed
+- [sessions] fetch failed
+- [analytics] fetch failed
+- [music] fetch failed
+- [secureFetch] fetch failed

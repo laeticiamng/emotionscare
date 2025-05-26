@@ -1,0 +1,74 @@
+[
+  {
+    "name": "health",
+    "url": "http://localhost:3000/health",
+    "timeMs": 47.27972399999999,
+    "error": "fetch failed"
+  },
+  {
+    "name": "version",
+    "url": "http://localhost:3000/version",
+    "timeMs": 1.835461000000123,
+    "error": "fetch failed"
+  },
+  {
+    "name": "metrics",
+    "url": "http://localhost:3000/metrics",
+    "timeMs": 1.5065830000000915,
+    "error": "fetch failed"
+  },
+  {
+    "name": "signup",
+    "url": "http://localhost:3000/auth/signup",
+    "timeMs": 1.6915070000000014,
+    "error": "fetch failed"
+  },
+  {
+    "name": "login",
+    "url": "http://localhost:3000/auth/login",
+    "timeMs": 1.0487009999999373,
+    "error": "fetch failed"
+  },
+  {
+    "name": "refresh",
+    "url": "http://localhost:3000/auth/refresh-token",
+    "timeMs": 1.1179019999999582,
+    "error": "fetch failed"
+  },
+  {
+    "name": "protected",
+    "url": "http://localhost:3000/auth/protected",
+    "timeMs": 1.2132929999997941,
+    "error": "fetch failed"
+  },
+  {
+    "name": "users",
+    "url": "http://localhost:3000/api/users",
+    "timeMs": 1.1702609999999822,
+    "error": "fetch failed"
+  },
+  {
+    "name": "sessions",
+    "url": "http://localhost:3000/api/sessions",
+    "timeMs": 1.8971950000000106,
+    "error": "fetch failed"
+  },
+  {
+    "name": "analytics",
+    "url": "http://localhost:3000/api/analytics",
+    "timeMs": 1.1332270000000335,
+    "error": "fetch failed"
+  },
+  {
+    "name": "music",
+    "url": "http://localhost:3000/api/music-recommendations",
+    "timeMs": 0.8529510000000755,
+    "error": "fetch failed"
+  },
+  {
+    "name": "secureFetch",
+    "url": "http://localhost:3000/api/secureFetch",
+    "timeMs": 0.8216230000000451,
+    "error": "fetch failed"
+  }
+]
