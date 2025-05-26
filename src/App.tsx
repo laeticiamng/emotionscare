@@ -37,27 +37,29 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <GlobalErrorBoundary>
-      <SecurityProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider delayDuration={150}>
-            <BrowserRouter>
-              <AuthProvider>
-                <UserModeProvider>
-                  <MusicProvider>
-                    <SkipToContent />
-                    <Toaster />
-                    <Sonner />
-                    <PerformanceMonitor enabled={process.env.NODE_ENV === 'development'} />
-                    <AppRouter />
-                  </MusicProvider>
-                </UserModeProvider>
-              </AuthProvider>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </SecurityProvider>
-    </GlobalErrorBoundary>
+    <React.StrictMode>
+      <GlobalErrorBoundary>
+        <SecurityProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider delayDuration={150}>
+              <BrowserRouter>
+                <AuthProvider>
+                  <UserModeProvider>
+                    <MusicProvider>
+                      <SkipToContent />
+                      <Toaster />
+                      <Sonner />
+                      <PerformanceMonitor enabled={process.env.NODE_ENV === 'development'} />
+                      <AppRouter />
+                    </MusicProvider>
+                  </UserModeProvider>
+                </AuthProvider>
+              </BrowserRouter>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </SecurityProvider>
+      </GlobalErrorBoundary>
+    </React.StrictMode>
   );
 }
 
