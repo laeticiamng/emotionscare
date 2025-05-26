@@ -21,7 +21,8 @@
     "back:audit": "node --loader ts-node/esm scripts/full-back-audit.ts",
     "dev:api": "node --loader ts-node/esm services/journal/index.ts",
     "test:api": "vitest run --config vitest.api.config.ts",
-    "db:migrate": "node scripts/run-migrations.cjs",
+    "db:migrate": "flyway -locations=filesystem:./migrations migrate",
+    "db:refresh:scan": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_scan();'",
     "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
     "test:db:config": "vitest run --config vitest.db.config.ts"
   },
