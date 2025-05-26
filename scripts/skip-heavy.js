@@ -1,7 +1,7 @@
 
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync } from 'fs';
+const { readFileSync, writeFileSync } = require('fs');
 
 if (process.env.SKIP_HEAVY === 'true') {
   const pkg = JSON.parse(readFileSync('package.json', 'utf8'));

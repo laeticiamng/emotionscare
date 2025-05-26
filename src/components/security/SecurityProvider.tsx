@@ -1,5 +1,5 @@
 
-import { useEffect, ReactNode } from 'react';
+import React, { useEffect, ReactNode } from 'react';
 
 interface SecurityProviderProps {
   children: ReactNode;
