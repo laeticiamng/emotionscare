@@ -1,5 +1,7 @@
+
 #!/usr/bin/env node
-const fs = require('fs');
+import fs from 'fs';
+
 if (process.env.SKIP_HEAVY === 'true') {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   ['cypress', 'playwright', 'puppeteer'].forEach(p => {
