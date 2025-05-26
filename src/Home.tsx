@@ -1,94 +1,139 @@
 
-import React from 'react';
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Users, Building2, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import HeroSection from './components/home/HeroSection';
-import ActionButtons from './components/home/ActionButtons';
-import WelcomeHero from './components/home/WelcomeHero';
-import CallToAction from './components/home/CallToAction';
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
-import { Brain, Heart, Users } from 'lucide-react';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
-  const ctaButtons = [
-    {
-      label: 'b2c',
-      link: '/b2c/login',
-      text: 'Espace Personnel',
-      variant: 'default' as const,
-      icon: true
-    },
-    {
-      label: 'b2b',
-      link: '/b2b/selection',
-      text: 'Espace Entreprise',
-      variant: 'outline' as const,
-      icon: true
+  const handleModeSelection = (mode: 'b2c' | 'b2b') => {
+    if (mode === 'b2c') {
+      navigate('/b2c/login');
+    } else {
+      navigate('/b2b/selection');
     }
-  ];
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <HeroSection />
-      
-      <div className="container mx-auto px-4 py-16">
-        <WelcomeHero 
-          title="Bienvenue sur EmotionsCare"
-          subtitle="Votre plateforme de bien-être émotionnel alimentée par l'IA"
-          ctaButtons={ctaButtons}
-        />
-
-        <div className="grid md:grid-cols-2 gap-8 mt-16">
-          <CallToAction type="personal" />
-          <CallToAction type="business" />
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-4xl"
+      >
+        <div className="text-center mb-12">
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center justify-center mb-6"
+          >
+            <Heart className="h-12 w-12 text-primary mr-4" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              EmotionsCare
+            </h1>
+          </motion.div>
+          <p className="text-xl text-muted-foreground mb-8">
+            Votre plateforme de bien-être émotionnel
+          </p>
         </div>
 
-        <div className="mt-20">
-          <h2 className="text-3xl font-bold text-center mb-12">Nos fonctionnalités</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card>
-              <CardHeader>
-                <Brain className="h-12 w-12 text-blue-600 mb-4" />
-                <CardTitle>Analyse émotionnelle IA</CardTitle>
+        <div className="grid md:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer border-2 hover:border-primary/50">
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Users className="h-16 w-16 text-blue-500" />
+                </div>
+                <CardTitle className="text-2xl">Particulier</CardTitle>
+                <CardDescription className="text-base">
+                  Prenez soin de votre bien-être émotionnel personnel
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Analysez vos émotions avec notre IA avancée pour mieux comprendre votre état mental.
-                </p>
+              <CardContent className="pt-0">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Suivi émotionnel personnel
+                  </li>
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Coach IA personnalisé
+                  </li>
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Thérapie musicale
+                  </li>
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Journal émotionnel
+                  </li>
+                </ul>
+                <Button 
+                  onClick={() => handleModeSelection('b2c')}
+                  className="w-full group-hover:bg-primary/90"
+                >
+                  Commencer
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <Heart className="h-12 w-12 text-red-600 mb-4" />
-                <CardTitle>Musique thérapeutique</CardTitle>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer border-2 hover:border-primary/50">
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Building2 className="h-16 w-16 text-green-500" />
+                </div>
+                <CardTitle className="text-2xl">Entreprise</CardTitle>
+                <CardDescription className="text-base">
+                  Améliorez le bien-être de vos équipes
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Découvrez des playlists personnalisées adaptées à votre humeur et vos besoins.
-                </p>
+              <CardContent className="pt-0">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Dashboard RH complet
+                  </li>
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Analytics équipe
+                  </li>
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Gestion des collaborateurs
+                  </li>
+                  <li className="flex items-center text-sm text-muted-foreground">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                    Rapports de bien-être
+                  </li>
+                </ul>
+                <Button 
+                  onClick={() => handleModeSelection('b2b')}
+                  className="w-full group-hover:bg-primary/90"
+                >
+                  Découvrir
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <Users className="h-12 w-12 text-green-600 mb-4" />
-                <CardTitle>Accompagnement coach</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Bénéficiez d'un accompagnement personnalisé avec notre coach IA bienveillant.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          </motion.div>
         </div>
-
-        <div className="mt-16 text-center">
-          <ActionButtons />
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
