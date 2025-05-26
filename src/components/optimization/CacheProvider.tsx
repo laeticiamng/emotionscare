@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useCallback, useRef, useEffect, useState } from 'react';
 
 interface CacheItem<T> {
   data: T;
@@ -72,7 +72,7 @@ export const CacheProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   // Nettoyage automatique toutes les 5 minutes
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
       for (const [key, item] of cache.current.entries()) {
@@ -115,9 +115,9 @@ export const useCachedQuery = <T,>(
   ttl?: number
 ) => {
   const cache = useCache();
-  const [data, setData] = React.useState<T | null>(null);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const execute = useCallback(async () => {
     // Vérifier le cache d'abord
@@ -143,7 +143,7 @@ export const useCachedQuery = <T,>(
     }
   }, [key, queryFn, cache, ttl]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     execute();
   }, [execute]);
 
