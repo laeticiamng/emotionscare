@@ -1,69 +1,121 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const Home: React.FC = () => {
   console.log('Home component rendering successfully');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
-              EmotionsCare
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Votre plateforme de bien-être émotionnel pour une vie plus équilibrée
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg">
-              Commencer votre parcours
-            </button>
-            <button className="border border-gray-300 hover:border-gray-400 text-gray-700 dark:text-gray-200 dark:border-gray-600 px-8 py-3 rounded-lg font-medium transition-colors">
-              En savoir plus
-            </button>
-          </div>
+        <header className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+            EmotionsCare
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Votre plateforme de bien-être émotionnel avec intelligence artificielle
+          </p>
+        </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl">🎯</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-xl text-blue-600">
+                Particuliers (B2C)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Analyse personnalisée de vos émotions avec recommandations musicales thérapeutiques
+              </p>
+              <div className="space-y-2">
+                <Link to="/b2c/login">
+                  <Button className="w-full" variant="default">
+                    Se connecter
+                  </Button>
+                </Link>
+                <Link to="/b2c/register">
+                  <Button className="w-full" variant="outline">
+                    S'inscrire
+                  </Button>
+                </Link>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Scan Émotionnel
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Analysez vos émotions en temps réel avec notre IA avancée
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-xl text-green-600">
+                Collaborateurs
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Outils de bien-être au travail et suivi de votre santé émotionnelle
+              </p>
+              <Link to="/b2b/user/login">
+                <Button className="w-full" variant="default">
+                  Accès Collaborateur
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-xl text-purple-600">
+                Administrateurs RH
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">
+                Tableau de bord pour suivre le bien-être de vos équipes
+              </p>
+              <Link to="/b2b/admin/login">
+                <Button className="w-full" variant="default">
+                  Accès Administrateur
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+
+        <section className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            Fonctionnalités principales
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🧠</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Analyse IA</h3>
+              <p className="text-gray-600">
+                Intelligence artificielle avancée pour analyser vos émotions
               </p>
             </div>
-
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
+            <div>
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎵</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Musicothérapie
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Découvrez des playlists personnalisées selon votre humeur
+              <h3 className="text-xl font-semibold mb-2">Musicothérapie</h3>
+              <p className="text-gray-600">
+                Playlists personnalisées basées sur votre état émotionnel
               </p>
             </div>
-
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <span className="text-2xl">🤖</span>
+            <div>
+              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">📊</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Coach IA
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Bénéficiez de conseils personnalisés de notre coach virtuel
+              <h3 className="text-xl font-semibold mb-2">Suivi RH</h3>
+              <p className="text-gray-600">
+                Tableaux de bord pour le bien-être organisationnel
               </p>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

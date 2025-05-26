@@ -2,34 +2,41 @@
 import { useState } from 'react';
 import { MusicTrack } from '@/types/music';
 
-export const useMusicGen = () => {
+const useMusicGen = () => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const generateMusic = async (emotion: string, duration = 120): Promise<MusicTrack> => {
+  const generateMusic = async (prompt: string): Promise<MusicTrack> => {
     setIsGenerating(true);
-    
-    // Simulation de génération IA
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const track: MusicTrack = {
-      id: Date.now().toString(),
-      title: `Musique ${emotion} générée`,
-      artist: 'IA Music Generator',
-      url: '/audio/generated-music.mp3',
-      duration,
-      emotion: emotion.toLowerCase(),
-      coverUrl: '/images/ai-generated-cover.jpg'
-    };
-    
-    setGeneratedTrack(track);
-    setIsGenerating(false);
-    return track;
+    setError(null);
+
+    try {
+      // Simulation de génération musicale
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const generatedTrack: MusicTrack = {
+        id: Date.now().toString(),
+        title: `Musique générée: ${prompt}`,
+        artist: 'IA Composer',
+        url: '/audio/generated.mp3',
+        duration: 180,
+        emotion: 'calm'
+      };
+
+      return generatedTrack;
+    } catch (err) {
+      setError('Erreur lors de la génération musicale');
+      throw err;
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return {
+    generateMusic,
     isGenerating,
-    generatedTrack,
-    generateMusic
+    error
   };
 };
+
+export default useMusicGen;

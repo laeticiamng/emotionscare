@@ -1,9 +1,10 @@
 
 export interface ChatMessage {
   id: string;
-  content: string;
-  sender: 'user' | 'assistant' | 'coach' | 'system';
-  timestamp: string;
+  text: string;
+  sender: 'user' | 'coach' | 'ai';
+  timestamp: Date;
+  type?: 'text' | 'image' | 'audio';
   metadata?: Record<string, any>;
 }
 
@@ -13,15 +14,20 @@ export interface ChatConversation {
   messages: ChatMessage[];
   createdAt: Date;
   updatedAt: Date;
+  userId: string;
+  isActive?: boolean;
 }
 
-export interface ChatContextType {
-  messages: ChatMessage[];
-  conversations: ChatConversation[];
-  currentConversation: ChatConversation | null;
-  isTyping: boolean;
-  sendMessage: (content: string, sender?: ChatMessage['sender']) => Promise<void>;
-  clearMessages: () => void;
-  startNewConversation: (title?: string) => string;
-  setActiveConversation: (id: string) => void;
+export interface ChatResponse {
+  message: string;
+  confidence?: number;
+  suggestions?: string[];
+  emotion?: string;
+}
+
+export interface CoachPersonality {
+  name: string;
+  avatar: string;
+  style: 'supportive' | 'motivational' | 'analytical' | 'empathetic';
+  specialties: string[];
 }

@@ -2,23 +2,45 @@
 export interface MusicTrack {
   id: string;
   title: string;
-  artist?: string;
+  artist: string;
   url: string;
   duration: number;
-  emotion?: string;
   coverUrl?: string;
+  emotion?: string;
+  genre?: string;
+  mood?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
+  description?: string;
   tracks: MusicTrack[];
-  createdAt: Date;
-  updatedAt: Date;
+  tags?: string[];
+  creator?: string;
+  coverUrl?: string;
 }
 
 export interface EmotionMusicParams {
   emotion: string;
-  intensity?: number;
+  intensity: number;
+  genre?: string;
   duration?: number;
+}
+
+export interface MusicPlayerState {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  isMuted: boolean;
+}
+
+export interface MusicRecommendation {
+  tracks: MusicTrack[];
+  emotion: string;
+  confidence: number;
+  reasoning?: string;
 }

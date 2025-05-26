@@ -1,96 +1,50 @@
 
-import { useState, useCallback } from 'react';
-import humeAIService from '@/services/humeai';
-import type { HumeAIOptions } from '@/services/humeai';
+import { useState } from 'react';
+import { EmotionResult } from '@/types/emotions';
 
-interface EmotionAnalysisResult {
-  primary: string;
-  confidence: number;
-  secondary?: string;
-  secondaryConfidence?: number;
-}
-
-interface EmotionAnalysisResponse {
-  emotion: EmotionAnalysisResult;
-  prosody?: {
-    pace: string;
-    pitch: string;
-    variation: string;
-  };
-  facialFeatures?: {
-    eyeOpenness: number;
-    smileIntensity: number;
-    attentionFocus: number;
-  };
-}
-
-interface HumeAIResult {
-  result: EmotionAnalysisResponse | null;
-  loading: boolean;
-  error: string | null;
-}
-
-interface UseHumeAIReturn extends HumeAIResult {
-  analyzeAudio: (audioData: Blob, options?: HumeAIOptions) => Promise<EmotionAnalysisResponse | null>;
-  analyzeImage: (imageData: Blob, options?: HumeAIOptions) => Promise<EmotionAnalysisResponse | null>;
-  checkApiConnection: () => Promise<{ status: boolean; message: string }>;
-  reset: () => void;
-}
-
-export const useHumeAI = (): UseHumeAIReturn => {
-  const [result, setResult] = useState<EmotionAnalysisResponse | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+const useHumeAI = () => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const reset = useCallback(() => {
-    setResult(null);
+  const analyzeEmotion = async (input: string | File): Promise<EmotionResult> => {
+    setIsAnalyzing(true);
     setError(null);
-  }, []);
 
-  const analyzeAudio = useCallback(async (audioData: Blob, options?: HumeAIOptions): Promise<EmotionAnalysisResponse | null> => {
-    setLoading(true);
-    setError(null);
     try {
-      const response = await humeAIService.analyzeEmotion(audioData, options);
-      setResult(response);
-      setLoading(false);
-      return response;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      setError(`Failed to analyze audio: ${errorMessage}`);
-      setLoading(false);
-      return null;
-    }
-  }, []);
+      // Simulation d'analyse émotionnelle
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const emotionResult: EmotionResult = {
+        id: Date.now().toString(),
+        userId: 'user-1',
+        timestamp: new Date(),
+        overallMood: 'positive',
+        emotions: [
+          { emotion: 'joy', confidence: 0.8, intensity: 0.7 },
+          { emotion: 'calm', confidence: 0.6, intensity: 0.5 }
+        ],
+        dominantEmotion: 'joy',
+        confidence: 0.8,
+        source: typeof input === 'string' ? 'text' : 'image',
+        recommendations: [
+          'Continuez sur cette lancée positive !',
+          'Partagez cette énergie avec vos proches'
+        ]
+      };
 
-  const analyzeImage = useCallback(async (imageData: Blob, options?: HumeAIOptions): Promise<EmotionAnalysisResponse | null> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await humeAIService.analyzeFacialExpression(imageData, options);
-      setResult(response);
-      setLoading(false);
-      return response;
+      return emotionResult;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      setError(`Failed to analyze image: ${errorMessage}`);
-      setLoading(false);
-      return null;
+      setError('Erreur lors de l\'analyse émotionnelle');
+      throw err;
+    } finally {
+      setIsAnalyzing(false);
     }
-  }, []);
-
-  const checkApiConnection = useCallback(async () => {
-    return humeAIService.checkApiConnection();
-  }, []);
+  };
 
   return {
-    result,
-    loading,
-    error,
-    analyzeAudio,
-    analyzeImage,
-    checkApiConnection,
-    reset
+    analyzeEmotion,
+    isAnalyzing,
+    error
   };
 };
 

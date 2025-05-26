@@ -1,46 +1,52 @@
 
-import { useState } from 'react';
-import { ChatMessage } from '@/types/chat';
+import { useState, useCallback } from 'react';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 
 export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
 
-  const sendMessage = async (content: string, sender: ChatMessage['sender'] = 'user') => {
-    const message: ChatMessage = {
+  const sendMessage = useCallback(async (text: string): Promise<ChatMessage> => {
+    setIsLoading(true);
+
+    const userMessage: ChatMessage = {
       id: Date.now().toString(),
-      content,
-      sender,
-      timestamp: new Date().toISOString()
+      text,
+      sender: 'user',
+      timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, message]);
+    setMessages(prev => [...prev, userMessage]);
 
-    if (sender === 'user') {
-      setIsTyping(true);
+    try {
+      // Simulate AI response
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setTimeout(() => {
-        const response: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          content: 'Merci pour votre message. Comment puis-je vous aider ?',
-          sender: 'assistant',
-          timestamp: new Date().toISOString()
-        };
-        
-        setMessages(prev => [...prev, response]);
-        setIsTyping(false);
-      }, 1000);
-    }
-  };
+      const aiResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: `Je comprends votre message : "${text}". Comment puis-je vous aider davantage ?`,
+        sender: 'coach',
+        timestamp: new Date()
+      };
 
-  const clearMessages = () => {
+      setMessages(prev => [...prev, aiResponse]);
+      return aiResponse;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const clearMessages = useCallback(() => {
     setMessages([]);
-  };
+  }, []);
 
   return {
     messages,
-    isTyping,
+    isLoading,
     sendMessage,
-    clearMessages
+    clearMessages,
+    currentConversation,
+    setCurrentConversation
   };
 };

@@ -1,43 +1,50 @@
 
-import { useState, useCallback } from 'react';
-import { EmotionResult, EmotionScanOptions } from '@/types/emotions';
+import { useState } from 'react';
+import { EmotionScanOptions, EmotionResult } from '@/types/emotions';
 
 export const useEmotionScan = () => {
   const [isScanning, setIsScanning] = useState(false);
-  const [results, setResults] = useState<EmotionResult[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const scanEmotion = useCallback(async (options: EmotionScanOptions): Promise<EmotionResult> => {
+  const scanEmotion = async (options: EmotionScanOptions): Promise<EmotionResult> => {
     setIsScanning(true);
-    
+    setError(null);
+
     try {
-      // Simulate emotion scanning
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const result: EmotionResult = {
+
+      // Mock emotion analysis result
+      const mockResult: EmotionResult = {
         id: Date.now().toString(),
         userId: 'user-1',
         timestamp: new Date(),
-        overallMood: 'positive',
+        overallMood: 'neutral',
         emotions: [
-          { emotion: 'happy', confidence: 0.8, intensity: 0.7 },
-          { emotion: 'calm', confidence: 0.6, intensity: 0.5 }
+          { emotion: 'calm', confidence: 0.7, intensity: 0.6 },
+          { emotion: 'focused', confidence: 0.5, intensity: 0.4 }
         ],
-        dominantEmotion: 'happy',
-        confidence: 0.8,
+        dominantEmotion: 'calm',
+        confidence: 0.75,
         source: options.type,
-        recommendations: ['Continuez à maintenir cette énergie positive']
+        recommendations: [
+          'Prenez quelques minutes pour respirer profondément',
+          'Écoutez de la musique relaxante'
+        ]
       };
-      
-      setResults(prev => [...prev, result]);
-      return result;
+
+      return mockResult;
+    } catch (err) {
+      setError('Erreur lors de l\'analyse émotionnelle');
+      throw err;
     } finally {
       setIsScanning(false);
     }
-  }, []);
+  };
 
   return {
     scanEmotion,
     isScanning,
-    results
+    error
   };
 };

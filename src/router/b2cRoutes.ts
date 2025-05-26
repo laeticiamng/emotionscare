@@ -2,30 +2,21 @@
 import { RouteObject } from 'react-router-dom';
 import React from 'react';
 
-// Lazy load B2C components
-const LoginPage = React.lazy(() => import('../pages/b2c/LoginPage'));
+const B2CLogin = React.lazy(() => import('../pages/b2c/B2CLogin'));
+const B2CRegister = React.lazy(() => import('../pages/b2c/B2CRegister'));
+const B2CDashboard = React.lazy(() => import('../pages/b2c/B2CDashboard'));
 
 export const b2cRoutes: RouteObject[] = [
   {
-    path: '/b2c',
-    children: [
-      {
-        path: 'login',
-        element: React.createElement(LoginPage),
-      },
-      {
-        path: 'register',
-        element: React.createElement(LoginPage),
-      },
-      {
-        path: 'dashboard',
-        element: React.createElement(() => 
-          React.createElement('div', { className: 'p-8' }, 
-            React.createElement('h1', { className: 'text-2xl font-bold' }, 'Tableau de bord B2C'),
-            React.createElement('p', { className: 'text-muted-foreground' }, 'Bienvenue dans votre espace personnel')
-          )
-        ),
-      }
-    ]
-  }
+    path: '/b2c/login',
+    element: React.createElement(B2CLogin),
+  },
+  {
+    path: '/b2c/register',
+    element: React.createElement(B2CRegister),
+  },
+  {
+    path: '/b2c/dashboard',
+    element: React.createElement(B2CDashboard),
+  },
 ];
