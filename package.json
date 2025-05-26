@@ -12,6 +12,7 @@
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:edge": "vitest --environment edge-runtime",
+    "test:db": "vitest run tests/db",
     "flyway:migrate": "flyway -locations=filesystem:./migrations migrate",
     "test:db": "pgtap-run tests/sql/**/*.sql --dsn $DATABASE_URL",
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
@@ -21,7 +22,8 @@
     "back:audit": "node --loader ts-node/esm scripts/full-back-audit.ts",
     "dev:api": "node --loader ts-node/esm services/journal/index.ts",
     "test:api": "vitest run --config vitest.api.config.ts",
-    "db:migrate": "node scripts/run-migrations.cjs",
+    "db:migrate": "supabase db push",
+    "test:sql": "pgtap-run tests/sql/**/*.sql --dsn $DATABASE_URL",
     "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
     "test:db:config": "vitest run --config vitest.db.config.ts"
   },
