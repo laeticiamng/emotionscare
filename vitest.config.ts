@@ -30,6 +30,6 @@ export default defineConfig({
   },
   esbuild: {
     loader: 'tsx',
-    include: /src\/router\/.*\.ts$/,
+    include: /\.[jt]sx?$/,
   },
 });
