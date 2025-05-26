@@ -10,7 +10,6 @@ import { UserModeProvider } from "@/contexts/UserModeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Suspense } from "react";
 import AppRouter from "./AppRouter";
-import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBoundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
@@ -41,34 +40,46 @@ function App() {
   console.log('[App] Rendering...');
   
   // Ensure React is available before rendering
-  if (!React) {
+  if (!React || !React.createElement) {
     console.error('[App] React is not available!');
-    return <div>Loading...</div>;
+    return React.createElement('div', {}, 'Loading...');
   }
   
-  return (
-    <GlobalErrorBoundary>
-      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider delayDuration={150}>
-            <BrowserRouter>
-              <AuthProvider>
-                <UserModeProvider>
-                  <MusicProvider>
-                    <SkipToContent />
-                    <Toaster />
-                    <Sonner />
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <AppRouter />
-                    </Suspense>
-                  </MusicProvider>
-                </UserModeProvider>
-              </AuthProvider>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </GlobalErrorBoundary>
+  return React.createElement(
+    ThemeProvider,
+    { defaultTheme: "system", storageKey: "ui-theme" },
+    React.createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      React.createElement(
+        TooltipProvider,
+        { delayDuration: 150 },
+        React.createElement(
+          BrowserRouter,
+          {},
+          React.createElement(
+            AuthProvider,
+            {},
+            React.createElement(
+              UserModeProvider,
+              {},
+              React.createElement(
+                MusicProvider,
+                {},
+                React.createElement(SkipToContent),
+                React.createElement(Toaster),
+                React.createElement(Sonner),
+                React.createElement(
+                  Suspense,
+                  { fallback: React.createElement('div', {}, 'Loading...') },
+                  React.createElement(AppRouter)
+                )
+              )
+            )
+          )
+        )
+      )
+    )
   );
 }
 

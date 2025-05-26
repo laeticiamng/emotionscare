@@ -7,21 +7,38 @@ import './index.css';
 console.log('[Main] React version:', React.version);
 console.log('[Main] Starting app initialization...');
 
-// Ensure React is available globally
+// Ensure React is available globally before any rendering
 if (typeof window !== 'undefined') {
   (window as any).React = React;
 }
 
-// Initialiser la sécurité en production
-if (import.meta.env.PROD) {
-  try {
-    const { initProductionSecurity } = await import('@/lib/security/productionSecurity');
-    initProductionSecurity();
-  } catch (error) {
-    console.error('Security initialization failed:', error);
+// Wait for DOM to be ready
+const initializeApp = async () => {
+  // Ensure React is properly initialized
+  if (!React || !React.createElement) {
+    console.error('[Main] React not properly loaded');
+    return;
   }
-}
 
-const root = ReactDOM.createRoot(document.getElementById('root')!);
+  // Initialize security in production
+  if (import.meta.env.PROD) {
+    try {
+      const { initProductionSecurity } = await import('@/lib/security/productionSecurity');
+      initProductionSecurity();
+    } catch (error) {
+      console.error('Security initialization failed:', error);
+    }
+  }
 
-root.render(<App />);
+  const rootElement = document.getElementById('root');
+  if (!rootElement) {
+    console.error('[Main] Root element not found');
+    return;
+  }
+
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(React.createElement(App));
+};
+
+// Initialize the app
+initializeApp().catch(console.error);

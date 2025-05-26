@@ -8,16 +8,17 @@ const Toaster = ({ ...props }: ToasterProps) => {
   console.log('[Sonner] Rendering with React:', !!React);
   
   // Ensure React is available
-  if (!React) {
+  if (!React || !React.createElement) {
     console.error('[Sonner] React not available');
     return null;
   }
 
-  return (
-    <Sonner
-      theme="system"
-      className="toaster group"
-      toastOptions={{
+  return React.createElement(
+    Sonner,
+    {
+      theme: "system",
+      className: "toaster group",
+      toastOptions: {
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
@@ -27,9 +28,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
-      }}
-      {...props}
-    />
+      },
+      ...props
+    }
   )
 }
 
