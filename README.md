@@ -294,6 +294,18 @@ Un tableau de bord dédié permet aux administrateurs de suivre les incidents et
 Il est accessible via la route `/b2b/admin/security`.
 Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
 
+## Build Lovable (CI)
+
+La séquence de build optimisée utilise le flag `SKIP_HEAVY` pour ignorer les binaires lourds lors de l'installation :
+
+```bash
+SKIP_HEAVY=true bun install
+npm run build
+SKIP_HEAVY=true node scripts/install-heavy.js
+npm run test -- --environment=jsdom
+```
+
+
 ## Types d'émotion unifiés
 
 Les interfaces `EmotionResult` et `EmotionRecommendation` se trouvent dans `src/types/emotion.ts`.

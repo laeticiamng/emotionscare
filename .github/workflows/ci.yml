@@ -24,6 +24,9 @@ jobs:
             **/node_modules
             ~/.npm
             ~/.bun
+            ~/.cache/Cypress
+            ~/.cache/ms-playwright
+            ~/.cache/puppeteer
           key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
           restore-keys: |
             ${{ runner.os }}-modules-
@@ -37,10 +40,16 @@ jobs:
           echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
           echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
 
-      - name: Install dependencies with resilient installer
-        run: node scripts/install-with-fallback.js
+      - name: Install dependencies
+        run: SKIP_HEAVY=true bun install
         timeout-minutes: 10
-        
+
+      - name: Build
+        run: npm run build
+
+      - name: Download heavy binaries
+        run: SKIP_HEAVY=true node scripts/install-heavy.js
+
       - name: Run tests
-        run: npm test
+        run: npm run test -- --environment=jsdom
         timeout-minutes: 5
