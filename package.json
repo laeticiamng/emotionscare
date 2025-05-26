@@ -12,7 +12,7 @@
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:edge": "vitest --environment edge-runtime",
-    "test:db": "pgtap-run tests/sql/**/*.sql --dsn $DATABASE_URL",
+    "test:db": "vitest run tests/db/**/*.test.ts",
     "flyway:migrate": "flyway -locations=filesystem:./migrations migrate",
     "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
     "lint": "eslint .",
@@ -168,7 +168,9 @@
     "tailwindcss": "^3.4.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "pgtap-run": "^1.0.0",
+    "pg": "^8.11.3"
   },
   "optionalDependencies": {
     "cypress": "^13.5.0",
