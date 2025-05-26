@@ -1,13 +1,12 @@
 
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { expect, afterEach, vi } from 'vitest';
+import { cleanup } from '@testing-library/react';
 
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+// Cleanup after each test case
+afterEach(() => {
+  cleanup();
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
@@ -16,20 +15,12 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
-// Mock Audio
-Object.defineProperty(window, 'Audio', {
-  writable: true,
-  value: vi.fn().mockImplementation(() => ({
-    play: vi.fn().mockResolvedValue(undefined),
-    pause: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    currentTime: 0,
-    duration: 0,
-    volume: 0.8,
-    src: '',
-  }))
-});
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -46,31 +37,30 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-// Mock navigator.clipboard
-Object.defineProperty(navigator, 'clipboard', {
-  value: {
-    writeText: vi.fn().mockResolvedValue(undefined),
-    readText: vi.fn().mockResolvedValue(''),
-  },
-  writable: true,
-});
-
-// Mock performance API
-Object.defineProperty(window, 'performance', {
-  value: {
-    now: vi.fn(() => Date.now()),
-    mark: vi.fn(),
-    measure: vi.fn(),
-    getEntriesByType: vi.fn(() => []),
-  },
-  writable: true,
-});
-
-// Global error handler for tests
-window.addEventListener('error', (event) => {
-  console.error('Test error:', event.error);
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled promise rejection:', event.reason);
+// Mock canvas context for chart.js
+HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
+  fillRect: vi.fn(),
+  clearRect: vi.fn(),
+  getImageData: vi.fn(() => ({ data: new Array(4) })),
+  putImageData: vi.fn(),
+  createImageData: vi.fn(() => []),
+  setTransform: vi.fn(),
+  drawImage: vi.fn(),
+  save: vi.fn(),
+  fillText: vi.fn(),
+  restore: vi.fn(),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  closePath: vi.fn(),
+  stroke: vi.fn(),
+  translate: vi.fn(),
+  scale: vi.fn(),
+  rotate: vi.fn(),
+  arc: vi.fn(),
+  fill: vi.fn(),
+  measureText: vi.fn(() => ({ width: 0 })),
+  transform: vi.fn(),
+  rect: vi.fn(),
+  clip: vi.fn(),
 });

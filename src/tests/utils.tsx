@@ -1,38 +1,61 @@
+
 import React from 'react';
-import { render, RenderOptions, renderHook } from '@testing-library/react';
+import { render, RenderOptions } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
+import { ThemeProvider } from '@/components/theme-provider';
+import { renderHook, RenderHookOptions } from '@testing-library/react';
 
-export const renderWithMusicProvider = (
-  ui: React.ReactElement,
-  options?: RenderOptions
-) => {
-  const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <MusicProvider>{children}</MusicProvider>
-  );
-  return render(ui, { wrapper: Wrapper, ...options });
-};
-
-export const renderHookWithMusicProvider = <T,>(callback: () => T) =>
-  renderHook(callback, {
-    wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>,
+// Create a custom render function that includes providers
+const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
   });
 
-export function mockResponse({
-  ok = true,
-  status = 200,
-  json = {},
-  text = '',
-}: {
-  ok?: boolean;
-  status?: number;
-  json?: any;
-  text?: string;
-}) {
-  return {
-    ok,
-    status,
-    json: vi.fn().mockResolvedValue(json),
-    text: vi.fn().mockResolvedValue(text),
-    headers: new Headers(),
-  } as unknown as Response;
-}
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <AuthProvider>
+            <UserModeProvider>
+              <MusicProvider>
+                {children}
+              </MusicProvider>
+            </UserModeProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+const customRender = (
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
+) => render(ui, { wrapper: AllTheProviders, ...options });
+
+// Create hook render utilities
+export const renderHookWithMusicProvider = <T,>(
+  callback: () => T,
+  options?: Omit<RenderHookOptions<T>, 'wrapper'>
+) => {
+  return renderHook(callback, { wrapper: AllTheProviders, ...options });
+};
+
+export const renderHookWithAuthProvider = <T,>(
+  callback: () => T,
+  options?: Omit<RenderHookOptions<T>, 'wrapper'>
+) => {
+  return renderHook(callback, { wrapper: AllTheProviders, ...options });
+};
+
+// Re-export everything
+export * from '@testing-library/react';
+export { customRender as render };
