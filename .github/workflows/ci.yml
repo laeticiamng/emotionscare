@@ -60,6 +60,74 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
+          path: |
+            **/node_modules
+            ~/.npm
+            ~/.bun
+            ~/.cache/Cypress
+            ~/.cache/ms-playwright
+            ~/.cache/puppeteer
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-
+            
+      - name: Optimize npm environment  
+        run: |
+          npm config set cache-min 9999999
+          echo "CYPRESS_INSTALL_BINARY=0" >> $GITHUB_ENV
+          echo "CYPRESS_SKIP_BINARY_INSTALL=1" >> $GITHUB_ENV
+          echo "HUSKY_SKIP_INSTALL=1" >> $GITHUB_ENV
+          echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
+          echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
+
+      - name: Fast install
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+          PUPPETEER_SKIP_DOWNLOAD: "1"
+        run: node scripts/emergency-install.js
+        timeout-minutes: 10
+
+      - name: Build
+        run: npm run build
+
+      - name: Download heavy binaries
+        run: SKIP_HEAVY=true node scripts/install-heavy.js
+
+      - name: Run tests
+        run: npm run test -- --environment=jsdom
+        timeout-minutes: 5
+
+  db-test:
+    needs: build-and-test
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner
+          POSTGRES_DB: testdb
+        ports: ['5432:5432']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with: { node-version: 20 }
+      - run: npm ci --prefer-offline --legacy-peer-deps
+      - run: npm run db:migrate
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: testdb
+          DB_USER: runner
+          DB_PASS: runner
+      - run: npm run test:db
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: testdb
+          DB_USER: runner
+          DB_PASS: runner
           node-version: 20
       - run: npm ci
       - run: npm run test:e2e:mobile
