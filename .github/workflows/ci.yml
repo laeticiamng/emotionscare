@@ -7,6 +7,7 @@ on:
 
 env:
   SKIP_HEAVY: "true"
+  SKIP_TEST_DEPS: "false"
   NODE_VERSION: "20"
 
 jobs:
@@ -42,6 +43,7 @@ jobs:
 
       # 3. unit + db tests
       - run: npm run test:db --if-present
+        if: env.SKIP_TEST_DEPS != 'true'
       - run: npm run test -- --coverage --environment=jsdom
 
       # 4. upload coverage
@@ -109,6 +111,7 @@ jobs:
 
       - name: Tests DB
         run: npm run test:db
+        if: env.SKIP_TEST_DEPS != 'true'
 
       - name: Download heavy binaries
         run: SKIP_HEAVY=true node scripts/install-heavy.js
@@ -152,6 +155,7 @@ jobs:
 
       - name: Run DB tests
         run: npm run test:db
+        if: env.SKIP_TEST_DEPS != 'true'
   db-test:
     needs: build-and-test
     runs-on: ubuntu-22.04
@@ -188,10 +192,12 @@ jobs:
           DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
       - name: SQL unit tests
         run: npm run test:sql
+        if: env.SKIP_TEST_DEPS != 'true'
         env:
           DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
       - name: DB integration tests
         run: npm run test:db
+        if: env.SKIP_TEST_DEPS != 'true'
         env:
           DB_HOST: localhost
           DB_PORT: 5432
