@@ -1,106 +1,63 @@
 
 import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
-
-export interface EmotionResult {
-  emotion: string;
-  confidence: number;
-  timestamp: Date;
-  details?: {
-    joy?: number;
-    sadness?: number;
-    anger?: number;
-    fear?: number;
-    surprise?: number;
-    disgust?: number;
-  };
-}
+import { EmotionResult, EmotionScanParams } from '@/types/emotions';
 
 export const useEmotionScan = () => {
   const [isScanning, setIsScanning] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState<EmotionResult | null>(null);
-  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
-  const { toast } = useToast();
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const performScan = useCallback(async (): Promise<EmotionResult | null> => {
+  const scanEmotion = useCallback(async (params: EmotionScanParams): Promise<EmotionResult | null> => {
     setIsScanning(true);
+    setError(null);
+
     try {
-      // Simuler un scan émotionnel
+      // Simulation d'une analyse émotionnelle
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const emotions = ['happy', 'calm', 'focused', 'stressed', 'tired', 'energetic'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const confidence = Math.random() * 0.4 + 0.6; // 60-100%
-      
-      const result: EmotionResult = {
-        emotion: randomEmotion,
-        confidence,
+
+      const mockResult: EmotionResult = {
+        id: Date.now().toString(),
+        userId: 'current-user',
         timestamp: new Date(),
-        details: {
-          joy: Math.random(),
-          sadness: Math.random() * 0.3,
-          anger: Math.random() * 0.2,
-          fear: Math.random() * 0.3,
-          surprise: Math.random() * 0.4,
-          disgust: Math.random() * 0.1,
+        overallMood: 'positive',
+        emotions: [
+          { emotion: 'joie', confidence: 0.8, intensity: 0.7 },
+          { emotion: 'satisfaction', confidence: 0.6, intensity: 0.5 }
+        ],
+        dominantEmotion: 'joie',
+        confidence: 0.8,
+        source: params.type,
+        recommendations: [
+          'Continuez sur cette lancée positive',
+          'Partagez votre bonne humeur avec vos proches'
+        ],
+        metadata: {
+          inputLength: params.text?.length || 0,
+          processingTime: 2000
         }
       };
 
-      setCurrentEmotion(result);
-      setScanHistory(prev => [result, ...prev].slice(0, 10)); // Garder les 10 derniers
-
-      toast({
-        title: "Scan terminé",
-        description: `Émotion détectée: ${randomEmotion} (${Math.round(confidence * 100)}% de confiance)`,
-      });
-
-      return result;
-    } catch (error) {
-      console.error('Error during emotion scan:', error);
-      toast({
-        title: "Erreur de scan",
-        description: "Impossible d'effectuer le scan émotionnel",
-        variant: "destructive",
-      });
+      setResult(mockResult);
+      return mockResult;
+    } catch (err) {
+      const errorMessage = 'Erreur lors de l\'analyse émotionnelle';
+      setError(errorMessage);
       return null;
     } finally {
       setIsScanning(false);
     }
-  }, [toast]);
-
-  const getEmotionDescription = useCallback((emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      happy: "Vous semblez joyeux et optimiste",
-      sad: "Vous paraissez mélancolique",
-      angry: "Une certaine frustration est détectée",
-      calm: "Vous êtes dans un état serein",
-      stressed: "Un niveau de stress est perceptible",
-      focused: "Vous semblez concentré et déterminé",
-      tired: "De la fatigue est détectée",
-      energetic: "Vous débordez d'énergie",
-      neutral: "Votre état émotionnel est équilibré",
-    };
-
-    return descriptions[emotion] || "État émotionnel indéterminé";
   }, []);
 
-  const clearHistory = useCallback(() => {
-    setScanHistory([]);
-    setCurrentEmotion(null);
-    toast({
-      title: "Historique effacé",
-      description: "L'historique des scans a été supprimé",
-    });
-  }, [toast]);
+  const clearResult = useCallback(() => {
+    setResult(null);
+    setError(null);
+  }, []);
 
   return {
+    scanEmotion,
     isScanning,
-    currentEmotion,
-    scanHistory,
-    performScan,
-    getEmotionDescription,
-    clearHistory,
+    result,
+    error,
+    clearResult
   };
 };
-
-export default useEmotionScan;

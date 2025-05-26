@@ -1,131 +1,97 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Heart, Brain, Smile, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Heart, MessageCircle, Mic } from 'lucide-react';
 
 const UnifiedEmotionCheckin: React.FC = () => {
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [checkinText, setCheckinText] = useState('');
+  const [checkinType, setCheckinType] = useState<'quick' | 'detailed'>('quick');
 
-  const moods = [
-    { label: 'Excellent', value: 'excellent', color: 'bg-green-500', emoji: '😊' },
-    { label: 'Bien', value: 'good', color: 'bg-blue-500', emoji: '🙂' },
-    { label: 'Neutre', value: 'neutral', color: 'bg-gray-500', emoji: '😐' },
-    { label: 'Difficile', value: 'difficult', color: 'bg-orange-500', emoji: '😟' },
-    { label: 'Très difficile', value: 'very-difficult', color: 'bg-red-500', emoji: '😰' }
+  const quickEmotions = [
+    { emoji: '😊', label: 'Heureux', color: 'bg-green-100' },
+    { emoji: '😐', label: 'Neutre', color: 'bg-gray-100' },
+    { emoji: '😢', label: 'Triste', color: 'bg-blue-100' },
+    { emoji: '😠', label: 'Énervé', color: 'bg-red-100' },
+    { emoji: '😴', label: 'Fatigué', color: 'bg-purple-100' },
   ];
 
-  const recentAnalyses = [
-    {
-      date: '2024-01-15',
-      mood: 'Positif',
-      score: 75,
-      dominant: 'Joie'
-    },
-    {
-      date: '2024-01-14',
-      mood: 'Neutre',
-      score: 60,
-      dominant: 'Calme'
-    },
-    {
-      date: '2024-01-13',
-      mood: 'Positif',
-      score: 82,
-      dominant: 'Enthousiasme'
+  const handleQuickEmotion = (emotion: string) => {
+    console.log('Quick emotion selected:', emotion);
+  };
+
+  const handleDetailedCheckin = () => {
+    if (checkinText.trim()) {
+      console.log('Detailed checkin:', checkinText);
+      setCheckinText('');
     }
-  ];
+  };
 
   return (
     <div className="space-y-6">
-      {/* Check-in rapide */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-red-500" />
-            Check-in Émotionnel Rapide
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Comment vous sentez-vous en ce moment ?
-          </p>
-          <div className="grid grid-cols-5 gap-2">
-            {moods.map((mood) => (
-              <button
-                key={mood.value}
-                onClick={() => setSelectedMood(mood.value)}
-                className={`
-                  p-3 rounded-lg text-center transition-all
-                  ${selectedMood === mood.value 
-                    ? 'ring-2 ring-primary scale-105' 
-                    : 'hover:scale-102'
-                  }
-                  ${mood.color} text-white
-                `}
-              >
-                <div className="text-2xl mb-1">{mood.emoji}</div>
-                <div className="text-xs font-medium">{mood.label}</div>
-              </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex gap-2 mb-4">
+        <Button
+          variant={checkinType === 'quick' ? 'default' : 'outline'}
+          onClick={() => setCheckinType('quick')}
+          size="sm"
+        >
+          <Heart className="w-4 h-4 mr-2" />
+          Check-in rapide
+        </Button>
+        <Button
+          variant={checkinType === 'detailed' ? 'default' : 'outline'}
+          onClick={() => setCheckinType('detailed')}
+          size="sm"
+        >
+          <MessageCircle className="w-4 h-4 mr-2" />
+          Check-in détaillé
+        </Button>
+      </div>
 
-      {/* Analyses récentes */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-blue-500" />
-            Analyses Récentes
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {recentAnalyses.map((analysis, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div>
-                  <div className="font-medium">{analysis.date}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Humeur: {analysis.mood} • Dominant: {analysis.dominant}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Badge variant="secondary">{analysis.score}%</Badge>
-                  <Progress value={analysis.score} className="w-16 mt-1" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Tendances */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-500" />
-            Tendances de la Semaine
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-green-600">+12%</div>
-              <div className="text-sm text-muted-foreground">Amélioration</div>
+      {checkinType === 'quick' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Comment vous sentez-vous maintenant ?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-5 gap-4">
+              {quickEmotions.map((emotion) => (
+                <button
+                  key={emotion.label}
+                  onClick={() => handleQuickEmotion(emotion.label)}
+                  className={`${emotion.color} p-4 rounded-lg text-center hover:opacity-80 transition-opacity`}
+                >
+                  <div className="text-2xl mb-2">{emotion.emoji}</div>
+                  <div className="text-sm font-medium">{emotion.label}</div>
+                </button>
+              ))}
             </div>
-            <div>
-              <div className="text-2xl font-bold text-blue-600">7</div>
-              <div className="text-sm text-muted-foreground">Sessions</div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Partagez vos ressentis</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              placeholder="Décrivez comment vous vous sentez aujourd'hui..."
+              value={checkinText}
+              onChange={(e) => setCheckinText(e.target.value)}
+              rows={4}
+            />
+            <div className="flex gap-2">
+              <Button onClick={handleDetailedCheckin} disabled={!checkinText.trim()}>
+                Enregistrer
+              </Button>
+              <Button variant="outline" size="icon">
+                <Mic className="w-4 h-4" />
+              </Button>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-purple-600">3</div>
-              <div className="text-sm text-muted-foreground">Objectifs</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

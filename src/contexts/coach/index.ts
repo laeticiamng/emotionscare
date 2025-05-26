@@ -1,2 +1,5 @@
-export { CoachContext, CoachContextProvider, CoachProvider, useCoach } from './CoachContextProvider';
-export type { CoachContextType } from './types';
+
+import { useCoachChat } from '@/hooks/chat/useCoachChat';
+
+// Re-export coach functionality
+export const useCoach = useCoachChat;

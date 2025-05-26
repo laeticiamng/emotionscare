@@ -1,70 +1,46 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import UnifiedNavigation from '@/components/navigation/UnifiedNavigation';
-import UnifiedFooterNav from '@/components/navigation/UnifiedFooterNav';
+import { cn } from '@/lib/utils';
 
 interface UnifiedSidebarProps {
-  open?: boolean;
-  onClose: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
+  className?: string;
 }
 
 const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
-  open = false,
-  onClose,
+  isOpen,
+  onToggle,
+  className
 }) => {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const isCollapsed = !open && !isDesktop;
-  
-  // Handle closing the sidebar after clicking a navigation item
-  const handleNavItemClick = () => {
-    if (!isDesktop) {
-      onClose();
-    }
-  };
-  
   return (
     <>
-      {/* Mobile overlay */}
-      {open && !isDesktop && (
+      {/* Overlay pour mobile */}
+      {isOpen && (
         <div 
-          className="fixed inset-0 z-20 bg-background/80 backdrop-blur-sm"
-          onClick={onClose}
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" 
+          onClick={onToggle}
         />
       )}
       
       {/* Sidebar */}
-      <aside
-        className={`
-          fixed z-30 top-14 h-[calc(100vh-3.5rem)] w-72 border-r bg-background transition-transform
-          md:block md:static md:top-0 md:h-full md:w-64
-          ${isCollapsed ? '-translate-x-full' : 'translate-x-0'}
-        `}
-      >
-        <div className="flex h-full flex-col">
-          {/* Mobile close button */}
-          {!isDesktop && (
-            <div className="flex items-center justify-end p-2">
-              <Button onClick={onClose} size="icon" variant="ghost">
-                <X className="h-5 w-5" />
-                <span className="sr-only">Close sidebar</span>
-              </Button>
-            </div>
-          )}
-          
-          {/* Navigation content */}
-          <ScrollArea className="flex-1 py-2">
-            <UnifiedNavigation collapsed={false} onItemClick={handleNavItemClick} />
-          </ScrollArea>
-          
-          {/* Footer navigation */}
-          <div className="mt-auto border-t p-4">
-            <UnifiedFooterNav collapsed={false} onItemClick={handleNavItemClick} />
-          </div>
+      <aside className={cn(
+        'fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform bg-background border-r transition-transform duration-300 ease-in-out md:relative md:top-0 md:h-full md:translate-x-0',
+        isOpen ? 'translate-x-0' : '-translate-x-full',
+        className
+      )}>
+        <div className="flex items-center justify-between p-4 md:hidden">
+          <h2 className="text-lg font-semibold">Menu</h2>
+          <Button variant="ghost" size="icon" onClick={onToggle}>
+            <X className="h-5 w-5" />
+          </Button>
         </div>
+        
+        <nav className="p-4 space-y-2">
+          <div className="text-sm text-muted-foreground mb-4">Navigation principale</div>
+          {/* Contenu de navigation sera ajouté ici */}
+        </nav>
       </aside>
     </>
   );

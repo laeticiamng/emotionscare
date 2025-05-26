@@ -1,9 +1,10 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserRole } from '@/utils/roleUtils';
+import { UserRole } from '@/types/user';
 
 interface UserModeContextType {
   currentMode: UserRole;
+  userMode: UserRole; // Alias pour compatibilité
   setCurrentMode: (mode: UserRole) => void;
   isLoading: boolean;
 }
@@ -16,6 +17,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const value: UserModeContextType = {
     currentMode,
+    userMode: currentMode, // Alias pour compatibilité
     setCurrentMode,
     isLoading
   };

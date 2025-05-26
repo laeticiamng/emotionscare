@@ -1,19 +1,23 @@
 
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin';
+import { UserRole } from '@/types/user';
 
 export const getRoleName = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
       return 'Particulier';
     case 'b2b_user':
-      return 'Collaborateur';
+      return 'Utilisateur B2B';
     case 'b2b_admin':
-      return 'Administrateur';
+      return 'Administrateur B2B';
     default:
       return 'Utilisateur';
   }
 };
 
-export const isAdminRole = (role: string): boolean => {
-  return role === 'b2b_admin';
+export const getRolePermissions = (role: UserRole) => {
+  return {
+    canAccessAdmin: role === 'b2b_admin',
+    canAccessB2B: role === 'b2b_user' || role === 'b2b_admin',
+    canAccessB2C: role === 'b2c',
+  };
 };

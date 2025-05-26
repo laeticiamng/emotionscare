@@ -6,6 +6,7 @@ export interface MusicTrack {
   url: string;
   duration: number;
   cover?: string;
+  emotion?: string;
 }
 
 export interface MusicPlaylist {
@@ -19,5 +20,6 @@ export interface MusicPlaylist {
 export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
-  preferences?: Record<string, any>;
+  duration?: number;
+  genre?: string;
 }

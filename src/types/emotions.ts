@@ -1,9 +1,5 @@
 
-/**
- * Types pour le système d'analyse émotionnelle
- */
-
-export interface EmotionScore {
+export interface EmotionData {
   emotion: string;
   confidence: number;
   intensity: number;
@@ -14,40 +10,22 @@ export interface EmotionResult {
   userId: string;
   timestamp: Date;
   overallMood: string;
-  emotions: EmotionScore[];
+  emotions: EmotionData[];
   dominantEmotion: string;
   confidence: number;
-  recommendations?: string[];
-  musicSuggestions?: string[];
-  source: 'text' | 'voice' | 'image' | 'manual';
-  metadata?: {
-    duration?: number;
-    inputLength?: number;
-    processingTime?: number;
-  };
+  source: 'text' | 'voice' | 'image';
+  recommendations: string[];
+  metadata?: Record<string, any>;
+  // Legacy fields for compatibility
+  emotion?: string;
+  text?: string;
+  score?: number;
+  date?: string;
 }
 
-export interface EmotionAnalysisRequest {
-  content: string;
+export interface EmotionScanParams {
+  text?: string;
+  audioData?: ArrayBuffer;
+  imageData?: string;
   type: 'text' | 'voice' | 'image';
-  userId: string;
-  context?: string;
-}
-
-export interface EmotionTrend {
-  date: string;
-  averageMood: number;
-  dominantEmotion: string;
-  sessionCount: number;
-}
-
-export interface EmotionHistory {
-  results: EmotionResult[];
-  trends: EmotionTrend[];
-  summary: {
-    totalSessions: number;
-    averageMood: number;
-    mostFrequentEmotion: string;
-    improvementScore: number;
-  };
 }

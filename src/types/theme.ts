@@ -1,22 +1,7 @@
 
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded' | 'system';
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type Theme = ThemeName;
-
-export interface ThemeObject {
-  name: ThemeName;
-  label: string;
-  className: string;
-  value?: string;
-}
-
-export interface ThemeOption {
-  name: string;
-  value: string;
-  label: string;
-  icon?: React.ReactNode;
-}
+export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
+export type FontFamily = 'sans' | 'serif' | 'mono';
 
 export interface ThemeContextType {
   theme: ThemeName;
@@ -31,9 +16,6 @@ export interface ThemeContextType {
   systemTheme: ThemeName;
   reduceMotion: boolean;
   setReduceMotion: (reduce: boolean) => void;
-  preferences?: any;
-  updatePreferences?: (prefs: any) => void;
-  soundEnabled?: boolean;
-  setSoundEnabled?: (enabled: boolean) => void;
-  getContrastText?: (color: string) => string;
+  soundEnabled: boolean;
+  setSoundEnabled: (enabled: boolean) => void;
 }
