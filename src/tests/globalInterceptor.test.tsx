@@ -1,7 +1,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
-import { mockResponse } from './utils';
+import { mockResponse } from '@/tests/utils';
 
 // Mock du localStorage
 const localStorageMock = {
@@ -55,23 +55,9 @@ describe('GlobalInterceptor', () => {
         access_token: 'expired-token'
       }));
 
-      global.fetch = vi
-        .fn()
-        .mockResolvedValueOnce(
-          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
-        )
-        .mockResolvedValueOnce(
-          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
-        )
-        .mockResolvedValueOnce(
-          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
-        )
-        .mockResolvedValueOnce(
-          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
-        )
-        .mockResolvedValueOnce(
-          mockResponse({ ok: false, status: 401, json: { error: 'Unauthorized' } })
-        );
+      global.fetch = vi.fn().mockResolvedValue(
+        mockResponse({ ok: false, status: 401, json: { message: 'unauthorized' } })
+      );
 
       const resultPromise = GlobalInterceptor.secureFetch('/test', {});
       await vi.runAllTimersAsync();
