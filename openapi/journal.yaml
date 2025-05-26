@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Journal API
+  version: 1.0.0
+paths:
+  /journal_voice:
+    post:
+      summary: Create voice capsule
+      responses:
+        '201':
+          description: Created
+  /journal_text:
+    post:
+      summary: Create text story
+      responses:
+        '201':
+          description: Created
+  /me/journal:
+    get:
+      summary: Get journal feed
+      responses:
+        '200':
+          description: Feed
