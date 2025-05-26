@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: VR API
+  version: 1.0.0
+paths:
+  /me/vr/weekly:
+    get:
+      summary: KPIs VR hebdo (utilisateur)
+      responses:
+        '200':
+          description: Weekly VR metrics
+  /org/{orgId}/vr/weekly:
+    get:
+      summary: KPIs VR hebdo (organisation)
+      parameters:
+        - in: path
+          name: orgId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Weekly VR org metrics
