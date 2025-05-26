@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '@/types/user';
+import { User, UserRole } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;
@@ -8,32 +8,22 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, userData?: any) => Promise<void>;
+  register: (email: string, password: string, role: UserRole) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate auth check
-    const checkAuth = async () => {
-      try {
-        // Check for stored user data
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
+    // Check for existing session
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -48,9 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -61,24 +48,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('user');
   };
 
-  const register = async (email: string, password: string, userData?: any) => {
-    setIsLoading(true);
-    try {
-      // Simulate registration
-      const mockUser: User = {
-        id: '1',
-        email,
-        role: 'b2c',
-        name: userData?.name || email.split('@')[0]
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const register = async (email: string, password: string, role: UserRole) => {
+    await login(email, password);
   };
 
   const value: AuthContextType = {

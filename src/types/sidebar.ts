@@ -7,5 +7,10 @@ export interface SidebarContextType {
   setOpen?: (open: boolean) => void;
   isOpen?: boolean;
   toggle?: () => void;
-  expanded?: boolean;
+}
+
+export interface SidebarProviderProps {
+  children: React.ReactNode;
+  defaultCollapsed?: boolean;
+  defaultOpen?: boolean;
 }

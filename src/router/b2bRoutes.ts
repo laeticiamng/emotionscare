@@ -2,7 +2,7 @@
 import { RouteObject } from 'react-router-dom';
 import React from 'react';
 
-const B2BLayout = React.lazy(() => import('../layouts/B2CLayout'));
+const B2BLayout = React.lazy(() => import('../layouts/B2BLayout'));
 
 export const b2bRoutes: RouteObject[] = [
   {

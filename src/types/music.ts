@@ -5,21 +5,25 @@ export interface MusicTrack {
   artist: string;
   url: string;
   duration: number;
-  cover?: string;
-  emotion?: string;
+  genre?: string;
+  mood?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
   tracks: MusicTrack[];
-  emotion?: string;
-  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
-  duration?: number;
-  genre?: string;
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  playlist: MusicTrack[];
+  setCurrentTrack: (track: MusicTrack) => void;
+  togglePlayPause: () => void;
+  setVolume: (volume: number) => void;
+  setPlaylist: (tracks: MusicTrack[]) => void;
 }
