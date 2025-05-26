@@ -1,5 +1,6 @@
 
 #!/usr/bin/env node
+
 import { readFileSync, writeFileSync } from 'fs';
 
 if (process.env.SKIP_HEAVY === 'true') {
