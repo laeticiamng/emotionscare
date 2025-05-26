@@ -14,6 +14,7 @@ import { GlobalErrorBoundary } from "@/components/ErrorBoundary/GlobalErrorBound
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import SecurityProvider from "@/components/security/SecurityProvider";
 import PerformanceMonitor from "@/components/monitoring/PerformanceMonitor";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 // Initialiser la validation d'environnement
 import '@/lib/env-validation';
@@ -39,8 +40,8 @@ function App() {
   console.log('[App] Rendering...');
   
   return (
-    <React.StrictMode>
-      <GlobalErrorBoundary>
+    <GlobalErrorBoundary>
+      <ThemeProvider>
         <SecurityProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider delayDuration={150}>
@@ -60,8 +61,8 @@ function App() {
             </TooltipProvider>
           </QueryClientProvider>
         </SecurityProvider>
-      </GlobalErrorBoundary>
-    </React.StrictMode>
+      </ThemeProvider>
+    </GlobalErrorBoundary>
   );
 }
 
