@@ -165,6 +165,7 @@
     "jsdom": "^22.1.0",
     "lovable-tagger": "^1.1.8",
     "postcss": "^8.5.3",
+    "supertest": "^6.3.3",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.0.1",
