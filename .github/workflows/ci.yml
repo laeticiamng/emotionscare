@@ -149,20 +149,25 @@ jobs:
       - uses: actions/setup-node@v3
         with: { node-version: 20 }
       - run: npm ci --prefer-offline --legacy-peer-deps
-      - run: npm run db:migrate
+      - name: Supabase migrate
+        run: npm run db:migrate
         env:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: testdb
           DB_USER: runner
           DB_PASS: runner
-      - run: npm run test:db
+      - name: SQL unit tests
+        run: npm run test:sql
+        env:
+          DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
+      - name: DB integration tests
+        run: npm run test:db
         env:
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: testdb
           DB_USER: runner
           DB_PASS: runner
-          node-version: 20
       - run: npm ci
       - run: npm run test:e2e:mobile

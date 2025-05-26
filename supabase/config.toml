@@ -22,6 +22,7 @@ port = 54322
 # server_version;` on the remote database to check.
 major_version = 15
 scripts = ["supabase/functions_sql/music_triggers.sql"]
+extensions = ["pg_cron"]
 
 [studio]
 # Port to use for Supabase Studio.
