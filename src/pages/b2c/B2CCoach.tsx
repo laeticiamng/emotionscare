@@ -1,265 +1,237 @@
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Send, Bot, User, Heart, Brain, Target } from 'lucide-react';
-import { mockCoachService } from '@/lib/coach/mockCoachService';
-
-interface Message {
-  id: string;
-  type: 'user' | 'coach';
-  content: string;
-  timestamp: Date;
-  suggestions?: string[];
-}
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Brain, Send, MessageCircle, Lightbulb, Target, Calendar } from 'lucide-react';
 
 const B2CCoach: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([
+  const [message, setMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState([
     {
-      id: '1',
-      type: 'coach',
-      content: 'Bonjour ! Je suis votre coach émotionnel IA. Comment vous sentez-vous aujourd\'hui ?',
-      timestamp: new Date(),
-      suggestions: [
-        'Je me sens stressé(e)',
-        'J\'ai besoin de motivation',
-        'Je veux améliorer mon bien-être'
-      ]
+      id: 1,
+      sender: 'coach',
+      message: 'Bonjour ! Je suis votre coach IA personnel. Comment puis-je vous aider aujourd\'hui à améliorer votre bien-être émotionnel ?',
+      timestamp: '10:30'
     }
   ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = async (message?: string) => {
-    const messageToSend = message || inputMessage.trim();
-    if (!messageToSend) return;
+  const coaches = [
+    {
+      id: 'emma',
+      name: 'Emma',
+      specialty: 'Gestion du stress',
+      avatar: '/api/placeholder/40/40',
+      status: 'active',
+      description: 'Spécialiste en techniques de relaxation et mindfulness'
+    },
+    {
+      id: 'alex',
+      name: 'Alex',
+      specialty: 'Motivation',
+      avatar: '/api/placeholder/40/40',
+      status: 'available',
+      description: 'Expert en développement personnel et confiance en soi'
+    },
+    {
+      id: 'luna',
+      name: 'Luna',
+      specialty: 'Sommeil',
+      avatar: '/api/placeholder/40/40',
+      status: 'available',
+      description: 'Conseillère en hygiène du sommeil et récupération'
+    }
+  ];
 
-    // Ajouter le message de l'utilisateur
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: messageToSend,
-      timestamp: new Date()
+  const quickActions = [
+    {
+      icon: Target,
+      title: 'Définir un objectif',
+      description: 'Créer un plan personnalisé'
+    },
+    {
+      icon: Calendar,
+      title: 'Planifier ma journée',
+      description: 'Optimiser votre routine'
+    },
+    {
+      icon: Lightbulb,
+      title: 'Conseil du jour',
+      description: 'Recommandation personnalisée'
+    }
+  ];
+
+  const sendMessage = () => {
+    if (!message.trim()) return;
+
+    const newMessage = {
+      id: chatHistory.length + 1,
+      sender: 'user',
+      message: message,
+      timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
-    setIsLoading(true);
+    setChatHistory([...chatHistory, newMessage]);
+    setMessage('');
 
-    try {
-      // Appeler le service de coach mock
-      const response = await mockCoachService.askQuestion(messageToSend);
-      
-      const coachMessage: Message = {
-        id: response.id,
-        type: 'coach',
-        content: response.message,
-        timestamp: new Date(response.timestamp),
-        suggestions: response.suggestions
+    // Simulate coach response
+    setTimeout(() => {
+      const coachResponse = {
+        id: chatHistory.length + 2,
+        sender: 'coach',
+        message: 'Je comprends votre situation. Voici quelques stratégies que nous pouvons explorer ensemble...',
+        timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       };
-
-      setMessages(prev => [...prev, coachMessage]);
-    } catch (error) {
-      console.error('Erreur lors de la communication avec le coach:', error);
-      
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        type: 'coach',
-        content: 'Désolé, j\'ai rencontré un problème. Pouvez-vous reformuler votre question ?',
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
+      setChatHistory(prev => [...prev, coachResponse]);
+    }, 1500);
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex items-center gap-3 mb-6">
-        <MessageCircle className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Coach Émotionnel IA</h1>
-          <p className="text-muted-foreground">Votre accompagnateur personnel pour le bien-être mental</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-100 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900 p-6">
+      <div className="container mx-auto max-w-7xl">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center mb-4">
+            <Brain className="h-8 w-8 text-green-600 mr-3" />
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Coach IA Personnel
+            </h1>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300">
+            Votre guide intelligent pour un bien-être optimal
+          </p>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Chat principal */}
-        <div className="lg:col-span-3">
-          <Card className="h-[600px] flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="h-5 w-5" />
-                Conversation
-              </CardTitle>
-            </CardHeader>
-            
-            <CardContent className="flex-1 flex flex-col">
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4 p-2">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div className={`flex gap-2 max-w-[80%] ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-                      }`}>
-                        {message.type === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Coaches disponibles */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Vos Coaches</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {coaches.map((coach) => (
+                  <div key={coach.id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={coach.avatar} />
+                      <AvatarFallback>{coach.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <p className="font-medium text-sm">{coach.name}</p>
+                        <Badge 
+                          variant={coach.status === 'active' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {coach.status === 'active' ? 'Actif' : 'Disponible'}
+                        </Badge>
                       </div>
-                      
-                      <div className={`rounded-lg p-3 ${
-                        message.type === 'user' 
-                          ? 'bg-primary text-primary-foreground' 
-                          : 'bg-secondary'
-                      }`}>
-                        <p className="text-sm">{message.content}</p>
-                        {message.suggestions && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {message.suggestions.map((suggestion, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="cursor-pointer hover:bg-primary hover:text-primary-foreground text-xs"
-                                onClick={() => handleSendMessage(suggestion)}
-                              >
-                                {suggestion}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{coach.specialty}</p>
                     </div>
                   </div>
                 ))}
-                
-                {isLoading && (
-                  <div className="flex gap-3 justify-start">
-                    <div className="flex gap-2">
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                        <Bot className="h-4 w-4" />
-                      </div>
-                      <div className="bg-secondary rounded-lg p-3">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse" />
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse delay-75" />
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse delay-150" />
-                        </div>
-                      </div>
+              </CardContent>
+            </Card>
+
+            {/* Actions rapides */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Actions Rapides</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {quickActions.map((action, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    className="w-full justify-start h-auto p-3 text-left"
+                  >
+                    <action.icon className="h-5 w-5 mr-3 text-blue-500" />
+                    <div>
+                      <p className="font-medium text-sm">{action.title}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{action.description}</p>
                     </div>
+                  </Button>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Chat principale */}
+          <div className="lg:col-span-3">
+            <Card className="h-[600px] flex flex-col">
+              <CardHeader className="border-b">
+                <div className="flex items-center space-x-3">
+                  <Avatar>
+                    <AvatarFallback className="bg-green-100 text-green-700">E</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-lg">Emma - Coach Bien-être</CardTitle>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">En ligne • Spécialiste stress</p>
                   </div>
-                )}
-              </div>
+                </div>
+              </CardHeader>
 
-              {/* Input de message */}
-              <div className="flex gap-2">
-                <Textarea
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Tapez votre message..."
-                  className="flex-1 min-h-[60px] max-h-[120px]"
-                  disabled={isLoading}
-                />
-                <Button
-                  onClick={() => handleSendMessage()}
-                  disabled={isLoading || !inputMessage.trim()}
-                  size="icon"
-                  className="self-end"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              {/* Messages */}
+              <CardContent className="flex-1 overflow-y-auto p-6 space-y-4">
+                {chatHistory.map((msg) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      msg.sender === 'user' 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                    }`}>
+                      <p className="text-sm">{msg.message}</p>
+                      <p className={`text-xs mt-1 ${
+                        msg.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        {msg.timestamp}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </CardContent>
 
-        {/* Panneau latéral */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Heart className="h-5 w-5" />
-                Bien-être
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-3">
-                Votre coach peut vous aider avec :
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  Gestion du stress
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  Amélioration de l'humeur
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  Techniques de relaxation
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  Objectifs personnels
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Brain className="h-5 w-5" />
-                Conseils Rapides
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => handleSendMessage('J\'ai besoin d\'une technique de respiration')}
-                >
-                  <Target className="h-4 w-4 mr-2" />
-                  Exercice de respiration
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => handleSendMessage('Comment puis-je gérer mon stress ?')}
-                >
-                  <Heart className="h-4 w-4 mr-2" />
-                  Gérer le stress
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                  onClick={() => handleSendMessage('J\'aimerais améliorer mon sommeil')}
-                >
-                  <Brain className="h-4 w-4 mr-2" />
-                  Améliorer le sommeil
-                </Button>
+              {/* Input */}
+              <div className="border-t p-4">
+                <div className="flex space-x-2">
+                  <Input
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Écrivez votre message..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    className="flex-1"
+                  />
+                  <Button onClick={sendMessage} className="bg-green-600 hover:bg-green-700">
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex space-x-2 mt-2">
+                  <Button variant="outline" size="sm">
+                    😔 Je me sens triste
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    😰 Je suis stressé
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    💪 J'ai besoin de motivation
+                  </Button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

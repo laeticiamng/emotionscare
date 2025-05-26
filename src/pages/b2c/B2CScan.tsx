@@ -1,299 +1,258 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Scan, Camera, Play, RotateCcw, TrendingUp, Calendar } from 'lucide-react';
-
-interface EmotionResult {
-  emotion: string;
-  confidence: number;
-  intensity: number;
-  timestamp: Date;
-}
+import { Eye, Heart, Brain, TrendingUp, Calendar, Star } from 'lucide-react';
+import { EmotionMoodPicker } from '@/components/emotion/EmotionMoodPicker';
 
 const B2CScan: React.FC = () => {
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [currentResult, setCurrentResult] = useState<EmotionResult | null>(null);
-  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([
-    {
-      emotion: 'calm',
-      confidence: 0.85,
-      intensity: 0.6,
-      timestamp: new Date(Date.now() - 3600000) // 1h ago
-    },
-    {
-      emotion: 'focused',
-      confidence: 0.78,
-      intensity: 0.7,
-      timestamp: new Date(Date.now() - 7200000) // 2h ago
-    },
-    {
-      emotion: 'happy',
-      confidence: 0.92,
-      intensity: 0.8,
-      timestamp: new Date(Date.now() - 86400000) // Yesterday
-    }
-  ]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<any>(null);
 
-  const emotions = {
-    calm: { label: 'Calme', color: 'bg-green-100 text-green-800', emoji: '😌' },
-    happy: { label: 'Heureux', color: 'bg-yellow-100 text-yellow-800', emoji: '😊' },
-    focused: { label: 'Concentré', color: 'bg-blue-100 text-blue-800', emoji: '🎯' },
-    stressed: { label: 'Stressé', color: 'bg-red-100 text-red-800', emoji: '😰' },
-    excited: { label: 'Excité', color: 'bg-purple-100 text-purple-800', emoji: '🤩' },
-    sad: { label: 'Triste', color: 'bg-gray-100 text-gray-800', emoji: '😢' },
-    tired: { label: 'Fatigué', color: 'bg-orange-100 text-orange-800', emoji: '😴' },
-    confident: { label: 'Confiant', color: 'bg-indigo-100 text-indigo-800', emoji: '💪' }
+  const steps = [
+    'Sélection de l\'humeur',
+    'Analyse contextuelle',
+    'Scan émotionnel',
+    'Résultats'
+  ];
+
+  const handleMoodSelect = (mood: string) => {
+    setSelectedMood(mood);
   };
-
-  const mockEmotions = Object.keys(emotions);
 
   const startScan = () => {
-    setIsScanning(true);
-    setScanProgress(0);
-    setCurrentResult(null);
-
-    // Simulation du processus de scan
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsScanning(false);
-          
-          // Générer un résultat aléatoire
-          const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)];
-          const result: EmotionResult = {
-            emotion: randomEmotion,
-            confidence: 0.7 + Math.random() * 0.3, // Entre 70% et 100%
-            intensity: 0.3 + Math.random() * 0.7, // Entre 30% et 100%
-            timestamp: new Date()
-          };
-          
-          setCurrentResult(result);
-          setScanHistory(prev => [result, ...prev.slice(0, 9)]); // Garder les 10 derniers
-          return 100;
-        }
-        return prev + 2;
+    setCurrentStep(2);
+    // Simulation du scan
+    setTimeout(() => {
+      setScanResult({
+        mood: selectedMood,
+        emotionalScore: Math.floor(Math.random() * 40) + 60,
+        stressLevel: Math.floor(Math.random() * 30) + 20,
+        energyLevel: Math.floor(Math.random() * 50) + 50,
+        recommendations: [
+          'Prendre une pause de 10 minutes',
+          'Écouter de la musique relaxante',
+          'Faire quelques exercices de respiration'
+        ]
       });
-    }, 50);
-  };
-
-  const formatTime = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'À l\'instant';
-    if (diffMins < 60) return `Il y a ${diffMins} min`;
-    if (diffHours < 24) return `Il y a ${diffHours}h`;
-    return `Il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
-  };
-
-  const getEmotionInfo = (emotion: string) => {
-    return emotions[emotion as keyof typeof emotions] || emotions.calm;
-  };
-
-  const getRecommendation = (emotion: string, intensity: number) => {
-    const recommendations = {
-      stressed: 'Prenez quelques minutes pour faire des exercices de respiration profonde.',
-      sad: 'Écoutez de la musique apaisante ou parlez à quelqu\'un en qui vous avez confiance.',
-      tired: 'Accordez-vous une pause ou planifiez un moment de repos.',
-      happy: 'Profitez de ce moment positif et partagez votre bonne humeur !',
-      calm: 'Maintenez cet état en pratiquant la pleine conscience.',
-      focused: 'C\'est le moment idéal pour vous concentrer sur vos tâches importantes.',
-      excited: 'Canalisez cette énergie dans des activités créatives ou physiques.',
-      confident: 'Profitez de cette confiance pour relever de nouveaux défis.'
-    };
-
-    return recommendations[emotion as keyof typeof recommendations] || 
-           'Prenez soin de votre bien-être émotionnel aujourd\'hui.';
+      setCurrentStep(3);
+    }, 3000);
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Scan className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Scan Émotionnel</h1>
-          <p className="text-muted-foreground">Analysez votre état émotionnel en temps réel</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 p-6">
+      <div className="container mx-auto max-w-4xl">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center mb-4">
+            <Eye className="h-8 w-8 text-indigo-600 mr-3" />
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Scanner Émotionnel
+            </h1>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300">
+            Analysez votre état émotionnel en quelques étapes simples
+          </p>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Scanner principal */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5" />
-                Scanner Émotionnel
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Zone de scan */}
-              <div className="relative aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center border-2 border-dashed border-primary/30">
-                {isScanning ? (
-                  <div className="text-center space-y-4">
-                    <div className="w-24 h-24 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                    <div className="space-y-2">
-                      <p className="text-lg font-medium">Analyse en cours...</p>
-                      <Progress value={scanProgress} className="w-48 mx-auto" />
-                      <p className="text-sm text-muted-foreground">{scanProgress}%</p>
-                    </div>
+        {/* Progress */}
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              {steps.map((step, index) => (
+                <div key={index} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    index <= currentStep 
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                  }`}>
+                    {index + 1}
                   </div>
-                ) : (
-                  <div className="text-center space-y-4">
-                    <Camera className="h-16 w-16 text-primary/50 mx-auto" />
-                    <div>
-                      <p className="text-lg font-medium mb-2">Prêt à scanner vos émotions</p>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Regardez la caméra et restez naturel pendant le scan
-                      </p>
-                      <Button onClick={startScan} size="lg" disabled={isScanning}>
-                        <Play className="h-4 w-4 mr-2" />
-                        Démarrer le scan
-                      </Button>
-                    </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-12 h-1 mx-2 ${
+                      index < currentStep ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+            <Progress value={(currentStep / (steps.length - 1)) * 100} className="h-2" />
+          </CardContent>
+        </Card>
+
+        {/* Step Content */}
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {currentStep === 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Heart className="h-5 w-5 mr-2 text-pink-500" />
+                  Comment vous sentez-vous maintenant ?
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-8">
+                <EmotionMoodPicker 
+                  onSelect={handleMoodSelect}
+                  selected={selectedMood}
+                />
+                {selectedMood && (
+                  <div className="text-center mt-8">
+                    <Button 
+                      onClick={() => setCurrentStep(1)}
+                      className="bg-indigo-600 hover:bg-indigo-700"
+                      size="lg"
+                    >
+                      Continuer
+                    </Button>
                   </div>
                 )}
-              </div>
+              </CardContent>
+            </Card>
+          )}
 
-              {/* Résultat actuel */}
-              {currentResult && (
-                <Card className="border-primary/20 bg-primary/5">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>Résultat de l'analyse</span>
-                      <span className="text-2xl">{getEmotionInfo(currentResult.emotion).emoji}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-lg font-semibold">
-                          Émotion détectée : {getEmotionInfo(currentResult.emotion).label}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Confiance : {Math.round(currentResult.confidence * 100)}%
-                        </p>
+          {currentStep === 1 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Brain className="h-5 w-5 mr-2 text-purple-500" />
+                  Contexte de votre état
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2">Humeur sélectionnée</h3>
+                    <Badge variant="outline" className="text-lg py-2 px-4">
+                      {selectedMood}
+                    </Badge>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-4">Questions rapides</h3>
+                    <div className="space-y-3">
+                      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <p className="text-sm">Depuis combien de temps ressentez-vous cela ?</p>
+                        <div className="flex gap-2 mt-2">
+                          <Badge variant="outline">Quelques minutes</Badge>
+                          <Badge variant="outline">Quelques heures</Badge>
+                          <Badge variant="outline">Toute la journée</Badge>
+                        </div>
                       </div>
-                      <Badge className={getEmotionInfo(currentResult.emotion).color}>
-                        Intensité : {Math.round(currentResult.intensity * 100)}%
-                      </Badge>
-                    </div>
-
-                    <div className="p-3 bg-background rounded-lg">
-                      <p className="text-sm">
-                        <strong>Recommandation :</strong> {getRecommendation(currentResult.emotion, currentResult.intensity)}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        Écouter musique adaptée
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Parler au coach IA
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Ajouter au journal
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Panneau latéral */}
-        <div className="space-y-4">
-          {/* Statistiques rapides */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Aujourd'hui</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Scans effectués</span>
-                <span className="font-medium">3</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Émotion dominante</span>
-                <Badge className={getEmotionInfo('calm').color}>
-                  Calme
-                </Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Bien-être général</span>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="font-medium text-green-600">+12%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Historique */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Historique récent
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {scanHistory.slice(0, 5).map((result, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-secondary/20">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{getEmotionInfo(result.emotion).emoji}</span>
-                      <div>
-                        <p className="text-sm font-medium">{getEmotionInfo(result.emotion).label}</p>
-                        <p className="text-xs text-muted-foreground">{formatTime(result.timestamp)}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground">
-                        {Math.round(result.confidence * 100)}%
-                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-              
-              {scanHistory.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Aucun scan effectué aujourd'hui
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                  <div className="text-center">
+                    <Button 
+                      onClick={startScan}
+                      className="bg-indigo-600 hover:bg-indigo-700"
+                      size="lg"
+                    >
+                      Commencer le scan
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Actions rapides */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Actions rapides</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full" onClick={startScan}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Nouveau scan
-              </Button>
-              <Button variant="outline" size="sm" className="w-full">
-                Voir tendances
-              </Button>
-              <Button variant="outline" size="sm" className="w-full">
-                Paramètres scan
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+          {currentStep === 2 && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="w-16 h-16 mx-auto mb-6"
+                >
+                  <Eye className="h-16 w-16 text-indigo-600" />
+                </motion.div>
+                <h3 className="text-xl font-semibold mb-2">Analyse en cours...</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Traitement de vos données émotionnelles
+                </p>
+                <Progress value={75} className="mt-6 max-w-md mx-auto" />
+              </CardContent>
+            </Card>
+          )}
+
+          {currentStep === 3 && scanResult && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <TrendingUp className="h-5 w-5 mr-2 text-green-500" />
+                    Résultats de votre scan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600 mb-2">
+                        {scanResult.emotionalScore}%
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Score émotionnel</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-orange-600 mb-2">
+                        {scanResult.stressLevel}%
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Niveau de stress</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600 mb-2">
+                        {scanResult.energyLevel}%
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Niveau d'énergie</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Star className="h-5 w-5 mr-2 text-yellow-500" />
+                    Recommandations personnalisées
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {scanResult.recommendations.map((rec: string, index: number) => (
+                      <div key={index} className="flex items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm mr-3">
+                          {index + 1}
+                        </div>
+                        <span>{rec}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex gap-3">
+                    <Button variant="outline" onClick={() => {
+                      setCurrentStep(0);
+                      setSelectedMood(null);
+                      setScanResult(null);
+                    }}>
+                      Nouveau scan
+                    </Button>
+                    <Button className="bg-indigo-600 hover:bg-indigo-700">
+                      Sauvegarder les résultats
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   );
