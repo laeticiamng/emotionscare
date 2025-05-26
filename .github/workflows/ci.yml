@@ -41,7 +41,7 @@ jobs:
           echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: SKIP_HEAVY=true bun install
+        run: bash scripts/setup.sh
         timeout-minutes: 10
 
       - name: Build
