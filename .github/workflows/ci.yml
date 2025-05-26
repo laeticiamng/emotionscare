@@ -157,6 +157,12 @@ jobs:
           DB_NAME: testdb
           DB_USER: runner
           DB_PASS: runner
+      - name: Flyway migrate
+        run: npm run flyway:migrate
+      - name: Refresh gam metrics
+        run: npm run db:refresh:gam
+        env:
+          DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
       - name: SQL unit tests
         run: npm run test:sql
         env:
