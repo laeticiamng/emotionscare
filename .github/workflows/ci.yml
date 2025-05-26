@@ -57,3 +57,12 @@ jobs:
       - name: Run tests
         run: npm run test -- --environment=jsdom
         timeout-minutes: 5
+
+      - name: Supabase migrate
+        run: npm run db:migrate
+
+      - name: SQL unit tests
+        run: npm run test:sql
+
+      - name: DB integration tests
+        run: npm run test:db
