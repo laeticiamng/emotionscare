@@ -23,7 +23,7 @@
   "db:migrate": "node scripts/run-migrations.cjs",
   "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
   "test:db:config": "vitest run --config vitest.db.config.ts"
-}
+},
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "^3.19.1",
