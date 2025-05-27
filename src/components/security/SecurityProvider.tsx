@@ -25,7 +25,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
 
   useEffect(() => {
     // Vérifications de sécurité de base
-    const checkSecurity = () => {
+    const performSecurityCheck = () => {
       // Vérifier si nous sommes en HTTPS en production
       if (import.meta.env.PROD && window.location.protocol !== 'https:') {
         console.warn('🔒 Site non sécurisé en production');
@@ -37,7 +37,7 @@ export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) 
       setIsSecure(true);
     };
 
-    checkSecurity();
+    performSecurityCheck();
   }, []);
 
   const checkSecurity = () => {

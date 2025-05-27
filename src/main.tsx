@@ -26,9 +26,13 @@ if (typeof globalThis !== 'undefined') {
   (globalThis as any).React = React;
 }
 
-// Startup validation
-if (!validateStartup()) {
-  console.error('❌ Startup validation failed - some dependencies may be missing');
+// Startup validation - but don't block if it fails
+try {
+  if (!validateStartup()) {
+    console.warn('⚠️ Startup validation failed - some features may not work properly');
+  }
+} catch (error) {
+  console.warn('⚠️ Startup validation error:', error);
 }
 
 // Configuration des erreurs globales
@@ -56,7 +60,13 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+// Ensure the root element exists before trying to render
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,

@@ -19,6 +19,12 @@ export const validateStartup = (): boolean => {
       return false;
     }
 
+    // Vérifier que les modules React essentiels sont chargés
+    if (typeof React.createElement !== 'function') {
+      console.error('❌ React.createElement is not available');
+      return false;
+    }
+
     console.log('✅ Startup validation successful');
     return true;
   } catch (error) {
