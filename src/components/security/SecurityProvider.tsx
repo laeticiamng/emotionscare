@@ -1,14 +1,6 @@
 
 import React, { useEffect, useState, useContext, createContext } from 'react';
 
-// Ensure React is available - fallback if needed
-const ReactHooks = (typeof React !== 'undefined' && React) ? React : {
-  useEffect: () => {},
-  useState: () => [false, () => {}],
-  useContext: () => undefined,
-  createContext: () => ({})
-};
-
 interface SecurityContextType {
   isSecure: boolean;
   checkSecurity: () => void;
@@ -29,10 +21,9 @@ interface SecurityProviderProps {
 }
 
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  // Use direct React imports to avoid dependency issues
-  const [isSecure, setIsSecure] = React.useState(true);
+  const [isSecure, setIsSecure] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Vérifications de sécurité de base
     const performSecurityCheck = () => {
       try {
