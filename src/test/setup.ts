@@ -1,28 +1,49 @@
 
 import '@testing-library/jest-dom';
-import { expect, afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { vi } from 'vitest';
 
-// Cleanup after each test case
-afterEach(() => {
-  cleanup();
+// Mock du localStorage pour les tests
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+
+// Mock du sessionStorage pour les tests  
+const sessionStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock
 });
 
-// Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock
+});
 
-// Mock ResizeObserver
+// Mock de l'API fetch
+global.fetch = vi.fn();
+
+// Mock de ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
 
-// Mock matchMedia
+// Mock de IntersectionObserver
+global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+// Mock de matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -35,51 +56,4 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-});
-
-// Mock canvas context for chart.js
-HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
-  fillRect: vi.fn(),
-  clearRect: vi.fn(),
-  getImageData: vi.fn(() => ({ data: new Array(4) })),
-  putImageData: vi.fn(),
-  createImageData: vi.fn(() => []),
-  setTransform: vi.fn(),
-  drawImage: vi.fn(),
-  save: vi.fn(),
-  fillText: vi.fn(),
-  restore: vi.fn(),
-  beginPath: vi.fn(),
-  moveTo: vi.fn(),
-  lineTo: vi.fn(),
-  closePath: vi.fn(),
-  stroke: vi.fn(),
-  translate: vi.fn(),
-  scale: vi.fn(),
-  rotate: vi.fn(),
-  arc: vi.fn(),
-  fill: vi.fn(),
-  measureText: vi.fn(() => ({ width: 0 })),
-  transform: vi.fn(),
-  rect: vi.fn(),
-  clip: vi.fn(),
-});
-
-// Mock fetch
-global.fetch = vi.fn();
-
-// Mock crypto.subtle
-Object.defineProperty(globalThis, 'crypto', {
-  value: {
-    subtle: {
-      digest: vi.fn(async () => new ArrayBuffer(0)),
-    },
-  },
-});
-
-// Mock navigator.share
-Object.defineProperty(globalThis, 'navigator', {
-  value: {
-    share: vi.fn(),
-  },
 });
