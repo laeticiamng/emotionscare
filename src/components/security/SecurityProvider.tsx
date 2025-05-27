@@ -1,15 +1,15 @@
 
-import * as React from 'react';
+import React, { useEffect, useState, useContext, createContext } from 'react';
 
 interface SecurityContextType {
   isSecure: boolean;
   checkSecurity: () => void;
 }
 
-const SecurityContext = React.createContext<SecurityContextType | undefined>(undefined);
+const SecurityContext = createContext<SecurityContextType | undefined>(undefined);
 
 export const useSecurityContext = () => {
-  const context = React.useContext(SecurityContext);
+  const context = useContext(SecurityContext);
   if (!context) {
     throw new Error('useSecurityContext must be used within a SecurityProvider');
   }
@@ -21,9 +21,9 @@ interface SecurityProviderProps {
 }
 
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const [isSecure, setIsSecure] = React.useState(true);
+  const [isSecure, setIsSecure] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Vérifications de sécurité de base
     const checkSecurity = () => {
       // Vérifier si nous sommes en HTTPS en production
