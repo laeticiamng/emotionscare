@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "packageManager": "npm@10.0.0",
   "scripts": {
     "preinstall": "node scripts/skip-heavy.js",
     "postinstall": "node scripts/install-heavy.js",
@@ -30,7 +35,8 @@
     "test:sql": "echo 'Tests SQL désactivés - pgtap-run non disponible'",
     "db:refresh:journal": "psql $DATABASE_URL -c 'CALL public.refresh_metrics_weekly_journal();'",
     "test:db:config": "vitest run --config vitest.db.config.ts",
-    "emergency-fix": "node emergency-bun-fix.js"
+    "install:npm": "npm install --legacy-peer-deps",
+    "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
