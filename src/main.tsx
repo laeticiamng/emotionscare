@@ -6,11 +6,11 @@ import './index.css';
 import './styles/accessibility.css';
 import { validateStartup } from './utils/startupCheck';
 
-// Ensure React is available globally for proper hook functionality
-// This is critical for framer-motion and other libraries that expect React to be global
+// Critical: Ensure React is available globally before anything else
 if (typeof window !== 'undefined') {
   (window as any).React = React;
-  // Also ensure React hooks are available globally
+  (window as any).ReactDOM = ReactDOM;
+  // Make React hooks explicitly available
   (window as any).ReactHooks = {
     useState: React.useState,
     useEffect: React.useEffect,
@@ -24,6 +24,13 @@ if (typeof window !== 'undefined') {
 // Also set it on globalThis for better compatibility
 if (typeof globalThis !== 'undefined') {
   (globalThis as any).React = React;
+  (globalThis as any).ReactDOM = ReactDOM;
+}
+
+// Verify React is properly loaded before proceeding
+if (typeof React === 'undefined' || !React.useEffect) {
+  console.error('❌ CRITICAL: React is not properly loaded');
+  throw new Error('React is not available - cannot start application');
 }
 
 // Startup validation - but don't block if it fails

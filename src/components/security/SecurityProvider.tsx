@@ -1,6 +1,14 @@
 
 import React, { useEffect, useState, useContext, createContext } from 'react';
 
+// Ensure React is available - fallback if needed
+const ReactHooks = (typeof React !== 'undefined' && React) ? React : {
+  useEffect: () => {},
+  useState: () => [false, () => {}],
+  useContext: () => undefined,
+  createContext: () => ({})
+};
+
 interface SecurityContextType {
   isSecure: boolean;
   checkSecurity: () => void;
@@ -21,20 +29,27 @@ interface SecurityProviderProps {
 }
 
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const [isSecure, setIsSecure] = useState(true);
+  // Use direct React imports to avoid dependency issues
+  const [isSecure, setIsSecure] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Vérifications de sécurité de base
     const performSecurityCheck = () => {
-      // Vérifier si nous sommes en HTTPS en production
-      if (import.meta.env.PROD && window.location.protocol !== 'https:') {
-        console.warn('🔒 Site non sécurisé en production');
+      try {
+        // Vérifier si nous sommes en HTTPS en production
+        if (import.meta.env.PROD && window.location.protocol !== 'https:') {
+          console.warn('🔒 Site non sécurisé en production');
+          setIsSecure(false);
+          return;
+        }
+        
+        // Autres vérifications de sécurité
+        setIsSecure(true);
+        console.log('✅ Security check passed');
+      } catch (error) {
+        console.warn('⚠️ Security check failed:', error);
         setIsSecure(false);
-        return;
       }
-      
-      // Autres vérifications de sécurité
-      setIsSecure(true);
     };
 
     performSecurityCheck();
