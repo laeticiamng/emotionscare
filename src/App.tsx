@@ -1,19 +1,23 @@
 
 import React from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import { ToastProvider } from '@/hooks/use-toast';
+import Home from './Home';
 
 function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster />
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <BrowserRouter>
+        <div className="min-h-screen bg-background">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Toaster />
+        </div>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
