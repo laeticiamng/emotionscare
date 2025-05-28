@@ -7,7 +7,7 @@ The `@vitest/browser` package has an integrity conflict with Bun package manager
 ## Immediate Solution
 Run this emergency script:
 ```bash
-node scripts/emergency-npm-fix.js
+node scripts/force-npm-final.js
 ```
 
 ## Going Forward
@@ -18,6 +18,7 @@ node scripts/emergency-npm-fix.js
 
 ## What was done
 - Completely removed Bun from the build process
+- Removed the problematic @vitest/browser dependency
 - Configured `.npmrc` to force npm usage
 - Cleaned all lock files and caches
 - Installed dependencies with npm to avoid the conflict
