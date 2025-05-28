@@ -1,33 +1,34 @@
 
-# 🚨 IMPORTANT: USE NPM ONLY FOR THIS PROJECT
+# 🚨 CRITICAL: Use npm only for this project
 
-## Why this change?
-The `@vitest/browser` package has an integrity conflict with Bun package manager. This is a known issue that causes installation failures.
+## Problem
+The `@vitest/browser` package has an integrity conflict with Bun package manager that prevents installation.
 
-## Quick Fix
-Run this script to resolve the issue:
+## Immediate Solution
+Run this emergency script:
 ```bash
-node scripts/final-vitest-fix.js
+node scripts/emergency-npm-fix.js
 ```
 
-## Commands to use going forward:
-- ✅ `npm run dev` (instead of `bun dev`)
-- ✅ `npm install` (instead of `bun install`)  
-- ✅ `npm run build` (instead of `bun run build`)
-- ✅ `npm test` (instead of `bun test`)
+## Going Forward
+- ✅ Use `npm run dev` (NOT `bun dev`)
+- ✅ Use `npm install` (NOT `bun install`)
+- ✅ Use `npm run build` (NOT `bun run build`)
+- ✅ Use `npm test` (NOT `bun test`)
 
-## What was changed?
-- `.npmrc` configured to force npm usage
-- All lock files removed to start fresh
-- Dependencies installed with npm to avoid the conflict
+## What was done
+- Completely removed Bun from the build process
+- Configured `.npmrc` to force npm usage
+- Cleaned all lock files and caches
+- Installed dependencies with npm to avoid the conflict
 
 ## Verification
-After running the fix script, you should be able to:
+After running the emergency script, test with:
 ```bash
 npm run dev
 ```
 
 If this works, the issue is resolved! 🎉
 
-## Support
-If you continue to have issues, the problem is specifically with the `@vitest/browser` package and Bun compatibility. The solution is to stick with npm for this project.
+## If problems persist
+The issue is specifically with `@vitest/browser` and Bun compatibility. Stick with npm for this project.
