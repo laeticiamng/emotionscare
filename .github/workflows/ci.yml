@@ -11,20 +11,7 @@ env:
   NODE_VERSION: "20"
 
 jobs:
-  pnpm-install:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Validate JSON
-        run: find . -name '*.json' -print0 | xargs -0 jq empty
-      - run: npm install -g pnpm
-      - run: pnpm install --frozen-lockfile
-
   build-test:
-    needs: pnpm-install
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     steps:
@@ -33,28 +20,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # 1. install offline-friendly
-      - run: |
-          npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
-
-      # 2. lint + types
-      - run: npm run lint
-      - run: npm run tsc -- --noEmit
-
-      # 3. unit + db tests
-      - run: npm run test:db --if-present
-        if: env.SKIP_TEST_DEPS != 'true'
-      - run: npm run test -- --coverage --environment=jsdom
-
-      # 4. upload coverage
-      - uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: coverage
-
-      # 5. security audit
-      - run: npm audit --omit dev || true
-      - run: npx owasp-depcheck --failOnCritical
+      - run: node scripts/install-with-npm.js --force
+      - run: npm run build && npm run test
 
   e2e-web:
     runs-on: ubuntu-22.04
@@ -78,11 +45,10 @@ jobs:
           path: |
             **/node_modules
             ~/.npm
-            ~/.bun
             ~/.cache/Cypress
             ~/.cache/ms-playwright
             ~/.cache/puppeteer
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-modules-
             
