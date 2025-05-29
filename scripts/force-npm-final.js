@@ -2,16 +2,16 @@
 #!/usr/bin/env node
 
 /**
- * EMERGENCY SOLUTION: Complete Bun elimination and npm-only setup
- * Resolves @vitest/browser integrity conflict permanently
+ * SOLUTION FINALE - Élimination complète de Bun et force npm
+ * Résout définitivement le conflit @vitest/browser
  */
 
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-console.log('🚨 EMERGENCY: Eliminating Bun completely and forcing npm');
+console.log('🚨 SOLUTION FINALE: Élimination complète de Bun');
 
-// Block Bun at environment level
+// Bloquer Bun au niveau environnement
 process.env.BUN = '';
 process.env.USE_BUN = 'false';
 process.env.PACKAGE_MANAGER = 'npm';
@@ -50,15 +50,15 @@ function safeRemove(path) {
 }
 
 try {
-  // 1. Kill all Bun and Node processes
+  // 1. Arrêter tous les processus Bun et Node
   console.log('🛑 Stopping all Bun and Node processes...');
   safeExec('pkill -f bun');
   safeExec('pkill -f vite');
   safeExec('pkill -f node');
   console.log('✅ Processes stopped');
 
-  // 2. Complete filesystem cleanup
-  console.log('🧹 Complete cleanup...');
+  // 2. Nettoyage complet du système de fichiers
+  console.log('🧹 Complete filesystem cleanup...');
   const filesToRemove = [
     'node_modules',
     'bun.lockb', 
@@ -73,7 +73,7 @@ try {
     safeRemove(file);
   });
 
-  // 3. Create anti-Bun .npmrc
+  // 3. Créer .npmrc anti-Bun ultra-strict
   const npmrcContent = `# ANTI-BUN CONFIGURATION - FORCE NPM ONLY
 engine-strict=true
 package-manager=npm
@@ -114,8 +114,12 @@ save-exact=false`;
   fs.writeFileSync('.npmrc', npmrcContent);
   console.log('✅ Anti-Bun .npmrc created');
 
-  // 4. Clean all caches aggressively
-  console.log('🧽 Cleaning all caches...');
+  // 4. Créer fichier .package-manager strict
+  fs.writeFileSync('.package-manager', 'npm');
+  console.log('✅ .package-manager set to npm');
+
+  // 5. Nettoyer tous les caches de manière agressive
+  console.log('🧽 Cleaning all caches aggressively...');
   if (safeExec('npm cache clean --force')) {
     console.log('✅ npm cache cleaned');
   }
@@ -124,7 +128,7 @@ save-exact=false`;
     console.log('✅ bun cache cleaned');
   }
 
-  // 5. Install with npm using maximum compatibility flags
+  // 6. Installation avec npm en mode de compatibilité maximale
   console.log('📦 Installing with npm (maximum compatibility mode)...');
   execSync('npm install --legacy-peer-deps --no-package-lock --no-audit --no-fund --force', {
     stdio: 'inherit',

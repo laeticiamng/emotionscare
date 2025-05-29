@@ -7,7 +7,7 @@ The `@vitest/browser` package has an integrity conflict with Bun package manager
 ## Immediate Solution
 Run this emergency script:
 ```bash
-node scripts/emergency-npm-fix.js
+node scripts/force-npm-final.js
 ```
 
 ## Going Forward
