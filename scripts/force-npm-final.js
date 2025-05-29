@@ -21,17 +21,41 @@ process.env.HUSKY_SKIP_INSTALL = '1';
 process.env.PUPPETEER_SKIP_DOWNLOAD = '1';
 process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 
+function safeExec(command, options = {}) {
+  try {
+    execSync(command, { stdio: 'pipe', ...options });
+    return true;
+  } catch (e) {
+    console.log(`⚠️ Command failed: ${command}`);
+    return false;
+  }
+}
+
+function safeRemove(path) {
+  try {
+    if (fs.existsSync(path)) {
+      if (fs.lstatSync(path).isDirectory()) {
+        execSync(`rm -rf "${path}"`, { stdio: 'pipe' });
+      } else {
+        fs.unlinkSync(path);
+      }
+      console.log(`✅ Removed: ${path}`);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.log(`⚠️ Could not remove ${path}: ${e.message}`);
+    return false;
+  }
+}
+
 try {
   // 1. Kill all Bun and Node processes
   console.log('🛑 Stopping all Bun and Node processes...');
-  try {
-    execSync('pkill -f bun', { stdio: 'pipe' });
-    execSync('pkill -f vite', { stdio: 'pipe' });
-    execSync('pkill -f node', { stdio: 'pipe' });
-    console.log('✅ Processes stopped');
-  } catch (e) {
-    console.log('ℹ️ No processes to stop');
-  }
+  safeExec('pkill -f bun');
+  safeExec('pkill -f vite');
+  safeExec('pkill -f node');
+  console.log('✅ Processes stopped');
 
   // 2. Complete filesystem cleanup
   console.log('🧹 Complete cleanup...');
@@ -46,18 +70,7 @@ try {
   ];
   
   filesToRemove.forEach(file => {
-    if (fs.existsSync(file)) {
-      try {
-        if (file === 'node_modules' || file === '.bun' || file === '.npm') {
-          execSync(`rm -rf "${file}"`, { stdio: 'pipe' });
-        } else {
-          fs.unlinkSync(file);
-        }
-        console.log(`✅ Removed: ${file}`);
-      } catch (e) {
-        console.log(`⚠️ Could not remove ${file}`);
-      }
-    }
+    safeRemove(file);
   });
 
   // 3. Create anti-Bun .npmrc
@@ -103,18 +116,12 @@ save-exact=false`;
 
   // 4. Clean all caches aggressively
   console.log('🧽 Cleaning all caches...');
-  try {
-    execSync('npm cache clean --force', { stdio: 'pipe' });
+  if (safeExec('npm cache clean --force')) {
     console.log('✅ npm cache cleaned');
-  } catch (e) {
-    console.log('⚠️ npm cache clean failed');
   }
-
-  try {
-    execSync('bun pm cache rm', { stdio: 'pipe' });
+  
+  if (safeExec('bun pm cache rm')) {
     console.log('✅ bun cache cleaned');
-  } catch (e) {
-    console.log('⚠️ bun cache clean failed');
   }
 
   // 5. Install with npm using maximum compatibility flags
