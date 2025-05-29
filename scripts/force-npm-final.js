@@ -49,16 +49,15 @@ try {
   });
 
   // 3. Create .npmrc that completely blocks Bun
-  const npmrcContent = `# FORCE NPM ONLY - BLOCK BUN COMPLETELY
+  const npmrcContent = `# FORCE NPM ONLY - ELIMINATE BUN COMPLETELY
 engine-strict=true
 package-lock=false
 scripts-prepend-node-path=true
 
 # Block Bun completely
 package-manager=npm
-bun=false
 
-# Skip heavy binaries
+# Skip heavy binaries to speed up installation
 cypress_install_binary=0
 cypress_skip_binary_install=1
 husky_skip_install=1

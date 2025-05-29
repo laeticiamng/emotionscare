@@ -1,48 +1,39 @@
+
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface UnifiedSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
-  className?: string;
 }
 
-const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
-  isOpen,
-  onToggle,
-  className
-}) => {
+const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({ isOpen, onToggle }) => {
   return (
-    <>
-      {/* Overlay pour mobile */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden" 
-          onClick={onToggle}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <aside className={cn(
-        'fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform bg-background border-r transition-transform duration-300 ease-in-out md:relative md:top-0 md:h-full md:translate-x-0',
-        isOpen ? 'translate-x-0' : '-translate-x-full',
-        className
-      )}>
-        <div className="flex items-center justify-between p-4 md:hidden">
-          <h2 className="text-lg font-semibold">Menu</h2>
-          <Button variant="ghost" size="icon" onClick={onToggle}>
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        <nav className="p-4 space-y-2">
-          <div className="text-sm text-muted-foreground mb-4">Navigation principale</div>
-          {/* Contenu de navigation sera ajouté ici */}
-        </nav>
-      </aside>
-    </>
+    <aside className={cn(
+      "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-card border-r transition-transform duration-200 z-40",
+      "md:translate-x-0",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
+      <Card className="h-full rounded-none border-0">
+        <CardContent className="p-4">
+          <nav className="space-y-2">
+            <h2 className="text-lg font-semibold mb-4">Navigation</h2>
+            <div className="space-y-1">
+              <a href="/" className="block px-3 py-2 rounded-md hover:bg-muted">
+                Tableau de bord
+              </a>
+              <a href="#" className="block px-3 py-2 rounded-md hover:bg-muted">
+                Sessions VR
+              </a>
+              <a href="#" className="block px-3 py-2 rounded-md hover:bg-muted">
+                Paramètres
+              </a>
+            </div>
+          </nav>
+        </CardContent>
+      </Card>
+    </aside>
   );
 };
 

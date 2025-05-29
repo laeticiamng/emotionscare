@@ -1,41 +1,23 @@
 
-import { UserModeType } from '@/types/userMode';
-
-/**
- * Normalise le mode utilisateur pour assurer la compatibilité
- * avec différents formats de rôles utilisateur
- */
-export function normalizeUserMode(role: string | undefined | null): UserModeType {
-  if (!role) return 'b2c';
+export const normalizeUserMode = (mode: string): string => {
+  const normalizedMode = mode.toLowerCase().trim();
   
-  const normalizedRole = role.toLowerCase().trim();
-  
-  // Mapping des différents formats possibles
-  switch (normalizedRole) {
+  switch (normalizedMode) {
     case 'b2c':
-    case 'particulier':
     case 'individual':
     case 'personal':
       return 'b2c';
-      
     case 'b2b_user':
     case 'b2b-user':
-    case 'collaborateur':
     case 'employee':
-    case 'user':
+    case 'collaborator':
       return 'b2b_user';
-      
     case 'b2b_admin':
     case 'b2b-admin':
     case 'admin':
     case 'administrator':
-    case 'administrateur':
       return 'b2b_admin';
-      
     default:
-      console.warn(`Unknown user role: ${role}, defaulting to b2c`);
       return 'b2c';
   }
-}
-
-export default normalizeUserMode;
+};

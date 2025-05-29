@@ -1,23 +1,39 @@
 
-// Re-export all types for easy access
-export * from './user';
-export * from './userMode';
-export * from './theme';
-export * from './music';
-export * from './emotions';
-export * from './sidebar';
-
-// Additional common types
 export interface EmotionResult {
-  id: string;
   emotion: string;
   confidence: number;
   timestamp: Date;
-  details?: Record<string, any>;
 }
 
-export interface ApiResponse<T = any> {
-  data?: T;
-  error?: string;
-  success: boolean;
+export interface VRSessionTemplate {
+  id: string;
+  title: string;
+  description: string;
+  duration: number | string;
+  difficulty: 'Débutant' | 'Intermédiaire' | 'Avancé';
+  tags?: string[];
+  environment?: string;
+  thumbnailUrl?: string;
+  emotionTarget?: string;
+  category?: string;
+  name?: string;
+  lastUsed?: string;
+}
+
+export interface VRSession {
+  id: string;
+  templateId: string;
+  startTime: string | Date;
+  endTime?: string | Date;
+  duration: number;
+  completed: boolean;
+  progress?: number;
+}
+
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist?: string;
+  coverUrl?: string;
+  emotion?: string;
 }
