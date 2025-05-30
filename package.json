@@ -36,7 +36,7 @@
     "test:db:config": "vitest run --config vitest.db.config.ts",
     "install:npm": "npm install --legacy-peer-deps",
     "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps",
-    "front:ci-install": "npm install --legacy-peer-deps --omit=dev && npm run build"
+    "front:ci-install": "npm ci --prefer-offline --audit=false --omit=dev && npm run build"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
