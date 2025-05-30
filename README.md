@@ -372,6 +372,7 @@ EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe
 [![CI](https://github.com/your-username/emotions-care/actions/workflows/ci.yml/badge.svg?branch=feat/dashboard-widgets)](https://github.com/your-username/emotions-care/actions/workflows/ci.yml)
 
 Les contributions sont les bienvenues ! Veillez à installer les dépendances avec `npm ci`, à lancer `npm run lint` et `npm test` avant de proposer une pull request.
+Bun est interdit pour l'instant. Utilisez npm version 10 ou superieure.
 
 ## Licence
 
