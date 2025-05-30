@@ -19,6 +19,12 @@ EmotionsCare est une plateforme SaaS innovante dédiée au bien-être émotionne
 
 ## Architecture technique
 
+### Prérequis
+
+- **Node.js** >= 18
+- **npm** >= 10
+- PNPM et Bun sont désactivés dans ce projet
+
 ### Stack technologique
 
 - **Frontend** : React 18, TypeScript, Tailwind CSS, Shadcn UI
@@ -136,13 +142,15 @@ Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre `.e
 
 ## Installation et démarrage
 
+> **Important** : PNPM et Bun sont désactivés. Utilisez uniquement npm (version 10 ou supérieure).
+
 ```bash
 # Cloner le repository
 git clone https://github.com/your-username/emotions-care.git
 cd emotions-care
 
-# Installer les dépendances
-npm install
+# Installer les dépendances (npm ≥ 10 requis)
+npm ci --prefer-offline --audit=false
 
 # Créer un fichier .env.local avec les variables nécessaires
 # (voir section Configuration d'environnement)
@@ -299,7 +307,7 @@ Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramèt
 La séquence de build optimisée utilise le flag `SKIP_HEAVY` pour ignorer les binaires lourds lors de l'installation :
 
 ```bash
-SKIP_HEAVY=true bun install
+SKIP_HEAVY=true npm ci --prefer-offline --audit=false
 npm run build
 SKIP_HEAVY=true node scripts/install-heavy.js
 npm run test -- --environment=jsdom

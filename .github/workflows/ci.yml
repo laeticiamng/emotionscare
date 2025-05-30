@@ -17,6 +17,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+      - name: Disable Bun
+        run: |
+          if command -v bun; then
+            echo "🧹 Removing Bun binary"
+            sudo rm -f "$(which bun)"
+          fi
+          rm -rf ~/.bun ~/.cache/bun || true
+      - name: Assert no Bun
+        run: ./bin/assert-no-bun.sh
       - run: npm run front:ci-install
       - run: npm run test -- --environment=jsdom
 
@@ -37,7 +46,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci --legacy-peer-deps
+      - name: Disable Bun
+        run: |
+          if command -v bun; then
+            echo "🧹 Removing Bun binary"
+            sudo rm -f "$(which bun)"
+          fi
+          rm -rf ~/.bun ~/.cache/bun || true
+      - name: Assert no Bun
+        run: ./bin/assert-no-bun.sh
+      - run: npm ci --prefer-offline --audit=false
       - run: npm run flyway:migrate
       - run: npm run db:migrate
       - run: npm run test:db
