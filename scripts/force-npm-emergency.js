@@ -1,6 +1,4 @@
 
-#!/usr/bin/env node
-
 /**
  * Emergency script to completely eliminate Bun and force npm usage
  * Resolves @vitest/browser integrity conflict
