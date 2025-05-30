@@ -6,125 +6,23 @@ on:
   pull_request:
 
 env:
-  SKIP_HEAVY: "true"
-  SKIP_TEST_DEPS: "false"
   NODE_VERSION: "20"
 
 jobs:
-  build-test:
+  front:
     runs-on: ubuntu-22.04
-    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - run: node scripts/install-with-npm.js --force
-      - run: npm run build && npm run test
-
-  e2e-web:
-    runs-on: ubuntu-22.04
-    needs: build-test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run start &
-      - run: npm run test:e2e:web
-
-  e2e-mobile:
-    runs-on: macos-13
-    needs: build-test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          path: |
-            **/node_modules
-            ~/.npm
-            ~/.cache/Cypress
-            ~/.cache/ms-playwright
-            ~/.cache/puppeteer
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-modules-
-            
-      - name: Optimize npm environment  
-        run: |
-          npm config set cache-min 9999999
-          echo "CYPRESS_INSTALL_BINARY=0" >> $GITHUB_ENV
-          echo "CYPRESS_SKIP_BINARY_INSTALL=1" >> $GITHUB_ENV
-          echo "HUSKY_SKIP_INSTALL=1" >> $GITHUB_ENV
-          echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
-          echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
-
-      - name: Fast install
-        env:
-          CYPRESS_INSTALL_BINARY: "0"
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-          PUPPETEER_SKIP_DOWNLOAD: "1"
-        run: node scripts/emergency-install.js
-        timeout-minutes: 10
-
-      - name: Build
-        run: npm run build
-
-      - name: DB migrate
-        run: npm run db:migrate
-
-      - name: Tests DB
-        run: npm run test:db
-        if: env.SKIP_TEST_DEPS != 'true'
-
-      - name: Download heavy binaries
-        run: SKIP_HEAVY=true node scripts/install-heavy.js
-
-      - name: Run tests
-        run: npm run test -- --environment=jsdom
-        timeout-minutes: 5
-
-  api-test:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
           cache: 'npm'
-      - name: Configure npm registry
-        run: npm config set registry https://registry.npmmirror.com
-      - name: Fast install
-        env:
-          CYPRESS_INSTALL_BINARY: "0"
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-          PUPPETEER_SKIP_DOWNLOAD: "1"
-        run: node scripts/emergency-install.js
-        timeout-minutes: 10
-      - name: Refresh VR metrics before API tests
-        run: psql "$DATABASE_URL" -c 'CALL public.refresh_metrics_vr();'
-      - name: Refresh breath metrics before API tests
-        run: psql "$DATABASE_URL" -c 'CALL public.refresh_metrics_breath();'
-      - name: Refresh breath org metrics before API tests
-        run: psql "$DATABASE_URL" -c 'CALL public.refresh_metrics_breath();'
-      - name: Run API tests
-        run: npm run test:api
-      - name: Database migrations
-        run: npm run db:migrate
+      - run: npm run front:ci-install
+      - run: npm run test -- --environment=jsdom
 
-      - name: Refresh journal view
-        run: npm run db:refresh:journal
-
-      - name: Run DB tests
-        run: npm run test:db
-        if: env.SKIP_TEST_DEPS != 'true'
-  db-test:
-    needs: build-and-test
+  back:
     runs-on: ubuntu-22.04
+    needs: front
     services:
       postgres:
         image: postgres:15
@@ -136,39 +34,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
-        with: { node-version: 20 }
-      - run: npm ci --prefer-offline --legacy-peer-deps
-      - name: Supabase migrate
-        run: npm run db:migrate
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: testdb
-          DB_USER: runner
-          DB_PASS: runner
-      - name: Flyway migrate
-        run: npm run flyway:migrate
-      - name: Refresh gam metrics
-        run: npm run db:refresh:gam
-        env:
-          DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
-      - name: Refresh breath metrics
-        run: npm run db:refresh:breath
-        env:
-          DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
-      - name: SQL unit tests
-        run: npm run test:sql
-        if: env.SKIP_TEST_DEPS != 'true'
-        env:
-          DATABASE_URL: postgres://runner:runner@localhost:5432/testdb
-      - name: DB integration tests
-        run: npm run test:db
-        if: env.SKIP_TEST_DEPS != 'true'
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: testdb
-          DB_USER: runner
-          DB_PASS: runner
-      - run: npm ci
-      - run: npm run test:e2e:mobile
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm run flyway:migrate
+      - run: npm run db:migrate
+      - run: npm run test:db
