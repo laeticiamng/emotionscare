@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "18"
 
 jobs:
   front:
@@ -17,15 +17,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - name: Disable Bun
-        run: |
-          if command -v bun; then
-            echo "🧹 Removing Bun binary"
-            sudo rm -f "$(which bun)"
-          fi
-          rm -rf ~/.bun ~/.cache/bun || true
-      - name: Assert no Bun
-        run: ./bin/assert-no-bun.sh
+      - name: bun-slayer
+        run: rm -rf ~/.bun ~/.cache/bun || true
+      - name: Assert package manager
+        run: ./bin/assert-package-manager.sh
       - run: npm run front:ci-install
       - run: npm run test -- --environment=jsdom
 
@@ -46,15 +41,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - name: Disable Bun
-        run: |
-          if command -v bun; then
-            echo "🧹 Removing Bun binary"
-            sudo rm -f "$(which bun)"
-          fi
-          rm -rf ~/.bun ~/.cache/bun || true
-      - name: Assert no Bun
-        run: ./bin/assert-no-bun.sh
+      - name: bun-slayer
+        run: rm -rf ~/.bun ~/.cache/bun || true
+      - name: Assert package manager
+        run: ./bin/assert-package-manager.sh
       - run: npm ci --prefer-offline --audit=false
       - run: npm run flyway:migrate
       - run: npm run db:migrate
