@@ -6,18 +6,26 @@ on:
   pull_request:
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "18"
 
 jobs:
+  bun-slayer:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: rm -rf ~/.bun ~/.cache/bun || true
+
   front:
     runs-on: ubuntu-22.04
+    needs: bun-slayer
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm run front:ci-install
+      - run: ./bin/assert-package-manager.sh
+      - run: npm ci --prefer-offline --audit=false
+      - run: npm run build
       - run: npm run test -- --environment=jsdom
 
   back:
@@ -37,7 +45,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      - run: npm ci --legacy-peer-deps
+      - run: ./bin/assert-package-manager.sh
+      - run: npm ci --prefer-offline --audit=false
       - run: npm run flyway:migrate
       - run: npm run db:migrate
       - run: npm run test:db

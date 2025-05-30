@@ -1,0 +1,36 @@
+image: ./ci/docker/node-npm-only.Dockerfile
+
+stages:
+  - purge
+  - front
+  - back
+
+purge-bun:
+  stage: purge
+  script:
+    - rm -rf ~/.bun ~/.cache/bun || true
+
+frontend-build:
+  stage: front
+  dependencies:
+    - purge-bun
+  script:
+    - ./bin/assert-package-manager.sh
+    - npm ci --prefer-offline --audit=false
+    - npm run build
+    - npm run test -- --environment=jsdom
+
+backend-migrate:
+  stage: back
+  dependencies:
+    - frontend-build
+  services:
+    - name: postgres:15
+      alias: db
+  script:
+    - ./bin/assert-package-manager.sh
+    - npm ci --prefer-offline --audit=false
+    - npm run flyway:migrate
+    - npm run db:migrate
+    - npm run test:db
+
