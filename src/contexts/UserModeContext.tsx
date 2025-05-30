@@ -1,45 +1,21 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin';
+type UserMode = 'b2c' | 'b2b';
 
 interface UserModeContextType {
-  userMode: UserModeType | null;
-  setUserMode: (mode: UserModeType) => void;
-  changeUserMode: (mode: UserModeType) => void;
-  isLoading: boolean;
+  userMode: UserMode;
+  setUserMode: (mode: UserMode) => void;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-interface UserModeProviderProps {
-  children: ReactNode;
-}
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserMode>('b2c');
 
-export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserModeType | null>('b2c');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const setUserMode = (mode: UserModeType) => {
-    setUserModeState(mode);
-  };
-
-  const changeUserMode = (mode: UserModeType) => {
-    setIsLoading(true);
-    try {
-      setUserModeState(mode);
-    } catch (error) {
-      console.error('Error changing user mode:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const value: UserModeContextType = {
+  const value = {
     userMode,
     setUserMode,
-    changeUserMode,
-    isLoading
   };
 
   return (
@@ -49,9 +25,9 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
   );
 };
 
-export const useUserMode = (): UserModeContextType => {
+export const useUserMode = () => {
   const context = useContext(UserModeContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
   return context;

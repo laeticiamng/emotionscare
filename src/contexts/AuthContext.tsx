@@ -1,11 +1,11 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '@/types/user';
+import React, { createContext, useContext, useState } from 'react';
+import type { User } from '@/types/user';
 
 interface AuthContextType {
-  isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, password: string, role?: string) => Promise<void>;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -16,23 +16,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isAuthenticated = !!user;
-
-  const login = async (email: string, password: string, role: string = 'b2c') => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulation d'une connexion
+      // Mock login - replace with actual authentication
       const mockUser: User = {
         id: '1',
         email,
-        name: email.split('@')[0],
-        role: role as 'b2c' | 'b2b_user' | 'b2b_admin',
+        name: 'User Demo',
+        role: 'b2c',
         createdAt: new Date().toISOString(),
       };
       setUser(mockUser);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -42,14 +37,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    login,
+    logout,
+    isLoading,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      isAuthenticated,
-      user,
-      login,
-      logout,
-      isLoading
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -57,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
