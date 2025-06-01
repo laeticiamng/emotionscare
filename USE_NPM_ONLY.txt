@@ -1,0 +1,20 @@
+
+🚨 CRITICAL: This project must use npm only!
+
+The @vitest/browser package has integrity conflicts with Bun.
+
+TO INSTALL:
+1. Run: node scripts/block-bun.js
+2. Run: node scripts/npm-only-install.js
+3. Run: npm run dev
+
+DO NOT USE:
+- bun install
+- bun dev  
+- bun run anything
+
+ONLY USE:
+- npm install --legacy-peer-deps
+- npm run dev
+- npm run build
+- npm run test
