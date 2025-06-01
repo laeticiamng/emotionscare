@@ -1,3 +1,4 @@
+
 name: CI
 
 on:
@@ -21,7 +22,7 @@ jobs:
         run: rm -rf ~/.bun ~/.cache/bun || true
       - name: Assert package manager
         run: ./bin/assert-package-manager.sh
-      - run: npm run front:ci-install
+      - run: node scripts/install-heavy.js
       - run: npm run test -- --environment=jsdom
 
   back:

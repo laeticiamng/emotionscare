@@ -1,5 +1,0 @@
-
-# Ce fichier bloque complètement l'utilisation de Bun
-# Utilisez UNIQUEMENT npm pour ce projet
-package-manager=npm
-use-bun=false
