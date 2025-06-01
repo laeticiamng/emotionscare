@@ -1,26 +1,28 @@
-
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import { componentTagger } from "lovable-tagger";
+import react from '@vitejs/plugin-react-swc';      // ⬅️ switch vers le plugin SWC
+import path from 'node:path';
+import { componentTagger } from 'lovable-tagger';
 
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: '::',
     port: 8080,
   },
+
   plugins: [
     react({
-      // Assurer que React est correctement importé
+      // JSX transform géré par SWC ; on laisse l’option pour compatibilité TSX
       jsxImportSource: 'react',
     }),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
+
   optimizeDeps: {
     include: [
       'react',
@@ -31,6 +33,7 @@ export default defineConfig(({ mode }) => ({
       'lucide-react',
     ],
   },
+
   build: {
     target: 'es2015',
     rollupOptions: {
