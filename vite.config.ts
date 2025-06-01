@@ -1,5 +1,6 @@
+
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';      // ⬅️ switch vers le plugin SWC
+import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import { componentTagger } from 'lovable-tagger';
 
@@ -11,7 +12,6 @@ export default defineConfig(({ mode }) => ({
 
   plugins: [
     react({
-      // JSX transform géré par SWC ; on laisse l’option pour compatibilité TSX
       jsxImportSource: 'react',
     }),
     mode === 'development' && componentTagger(),
