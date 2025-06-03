@@ -3,8 +3,11 @@ import * as React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { LoadingIllustration } from '@/components/ui/loading-illustration';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { b2bAdminRoutes } from './router/b2bAdminRoutes';
+import { b2bUserRoutes } from './router/b2bUserRoutes';
+import { b2cMissingRoutes } from './router/b2cRoutes';
 
-// Lazy loading des composants
+// Lazy loading des composants principaux
 const Home = React.lazy(() => import('./Home'));
 const ChooseModePage = React.lazy(() => import('./pages/auth/ChooseModePage'));
 const B2CLoginPage = React.lazy(() => import('./pages/auth/B2CLoginPage'));
@@ -18,7 +21,7 @@ const B2BAdminLoginPage = React.lazy(() => import('./pages/auth/B2BAdminLoginPag
 const B2BAdminDashboard = React.lazy(() => import('./pages/b2b/admin/B2BAdminDashboard'));
 const GlowBreathPage = React.lazy(() => import('./pages/GlowBreathPage'));
 
-// Pages supplémentaires
+// Pages supplémentaires B2C
 const B2CJournal = React.lazy(() => import('./pages/b2c/B2CJournal'));
 const B2CScan = React.lazy(() => import('./pages/b2c/B2CScan'));
 const B2CMusic = React.lazy(() => import('./pages/b2c/B2CMusic'));
@@ -47,7 +50,7 @@ export const router = createBrowserRouter([
     path: '/b2b/selection',
     element: withSuspense(B2BSelectionPage)(),
   },
-  // Routes B2C
+  // Routes B2C existantes
   {
     path: '/b2c/login',
     element: withSuspense(B2CLoginPage)(),
@@ -112,7 +115,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // Routes B2B User
+  // Routes B2B User existantes
   {
     path: '/b2b/user/login',
     element: withSuspense(B2BUserLoginPage)(),
@@ -129,7 +132,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // Routes B2B Admin
+  // Routes B2B Admin existantes
   {
     path: '/b2b/admin/login',
     element: withSuspense(B2BAdminLoginPage)(),
@@ -151,4 +154,8 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  // Routes B2B supplémentaires depuis les modules de routage
+  ...b2bAdminRoutes,
+  ...b2bUserRoutes,
+  ...b2cMissingRoutes,
 ]);
