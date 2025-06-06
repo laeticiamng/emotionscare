@@ -1,68 +1,51 @@
 
 import React, { useEffect, useState } from 'react';
-import { performanceMonitor } from '@/lib/performance/performanceMonitor';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Activity, Zap, AlertTriangle } from 'lucide-react';
+import { runProductionAudit, ProductionAuditResult } from '@/utils/productionAudit';
 
 const ProductionMonitor: React.FC = () => {
-  const [metrics, setMetrics] = useState(performanceMonitor.getVitalMetrics());
-  const [isVisible, setIsVisible] = useState(false);
+  const [audit, setAudit] = useState<ProductionAuditResult | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMetrics(performanceMonitor.getVitalMetrics());
-    }, 5000);
+    const result = runProductionAudit();
+    setAudit(result);
+  }, []);
 
-    // Show monitor only if performance issues detected
-    const hasIssues = metrics.averageRenderTime > 100 || 
-                     (metrics.memoryUsage && metrics.memoryUsage > 50 * 1024 * 1024);
-    setIsVisible(hasIssues);
-
-    return () => clearInterval(interval);
-  }, [metrics]);
-
-  if (!isVisible || !import.meta.env.PROD) {
+  if (!audit || import.meta.env.PROD) {
     return null;
   }
 
-  const getPerformanceStatus = () => {
-    if (metrics.averageRenderTime > 200) return { status: 'critical', color: 'destructive' };
-    if (metrics.averageRenderTime > 100) return { status: 'warning', color: 'secondary' };
-    return { status: 'good', color: 'default' };
-  };
-
-  const status = getPerformanceStatus();
-
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm">
-      <Card className="border-l-4 border-l-primary">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Activity className="h-4 w-4" />
-            Performance Monitor
-            <Badge variant={status.color as any}>{status.status}</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 space-y-2">
-          <div className="flex items-center gap-2 text-xs">
-            <Zap className="h-3 w-3" />
-            <span>Render: {metrics.averageRenderTime.toFixed(1)}ms</span>
-          </div>
-          
-          {metrics.memoryUsage && (
-            <div className="flex items-center gap-2 text-xs">
-              <AlertTriangle className="h-3 w-3" />
-              <span>Memory: {(metrics.memoryUsage / 1024 / 1024).toFixed(1)}MB</span>
-            </div>
-          )}
-
-          <div className="flex items-center gap-2 text-xs">
-            <Activity className="h-3 w-3" />
-            <span>API: {metrics.averageApiCall.toFixed(1)}ms</span>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="fixed bottom-4 right-4 max-w-sm bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-semibold text-sm">Audit Production</h4>
+        <span className={`text-xs px-2 py-1 rounded ${
+          audit.isReady ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {audit.score}/100
+        </span>
+      </div>
+      
+      {audit.critical.length > 0 && (
+        <div className="mb-2">
+          <p className="text-xs font-medium text-red-600 mb-1">Critiques:</p>
+          <ul className="text-xs text-red-700 space-y-1">
+            {audit.critical.map((issue, index) => (
+              <li key={index}>• {issue}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      
+      {audit.warnings.length > 0 && (
+        <div>
+          <p className="text-xs font-medium text-yellow-600 mb-1">Avertissements:</p>
+          <ul className="text-xs text-yellow-700 space-y-1">
+            {audit.warnings.slice(0, 2).map((warning, index) => (
+              <li key={index}>• {warning}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
