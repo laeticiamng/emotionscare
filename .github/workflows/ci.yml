@@ -30,7 +30,7 @@ jobs:
         run: ./bin/assert-package-manager.sh
       - name: Install with npm and heavy deps
         run: |
-          rm -rf node_modules package-lock.json || true
+          rm -rf node_modules || true
           npm cache clean --force || true
           npm install --legacy-peer-deps
           node scripts/install-heavy.js
