@@ -2,9 +2,8 @@
 import React from 'react';
 import { render, act, waitFor, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useMusic } from '@/contexts/MusicContext';
-import { MockMusicProvider } from '../../../tests/utils/MockMusicProvider';
-import { AudioTrack } from '@/types/audio';
+import { MusicProvider, useMusic, Track } from '@/contexts/MusicContext';
+import { createPlaylist } from '../../../tests/utils/musicMock';
 
 // Mock Audio API
 const mockAudio = {
@@ -25,11 +24,10 @@ Object.defineProperty(window, 'Audio', {
   value: vi.fn().mockImplementation(() => mockAudio)
 });
 
-const mockTrack: AudioTrack = {
+const mockTrack: Track = {
   id: 'test-track-1',
   title: 'Test Track',
   artist: 'Test Artist',
-  duration: 180,
   url: 'test.mp3'
 };
 
@@ -39,7 +37,7 @@ const TestComponent = () => {
     <div>
       <button onClick={() => music.play(mockTrack)}>Play</button>
       <button onClick={music.pause}>Pause</button>
-      <button onClick={music.next}>Next</button>
+      <button onClick={music.nextTrack}>Next</button>
       <span data-testid="is-playing">{music.isPlaying.toString()}</span>
       <span data-testid="current-track">{music.currentTrack?.title || 'None'}</span>
     </div>
@@ -51,9 +49,13 @@ describe('MusicContext', () => {
     vi.clearAllMocks();
   });
 
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <MusicProvider>{children}</MusicProvider>
+  );
+
   it('devrait fournir le contexte musical', () => {
     const { result } = renderHook(() => useMusic(), {
-      wrapper: MockMusicProvider,
+      wrapper,
     });
 
     expect(result.current).toBeDefined();
@@ -63,7 +65,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait jouer une piste', async () => {
-    const { result } = renderHook(() => useMusic(), { wrapper: MockMusicProvider });
+    const { result } = renderHook(() => useMusic(), { wrapper });
 
     await act(async () => {
       result.current.play(mockTrack);
@@ -77,7 +79,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait mettre en pause la lecture', async () => {
-    const { result } = renderHook(() => useMusic(), { wrapper: MockMusicProvider });
+    const { result } = renderHook(() => useMusic(), { wrapper });
 
     await act(async () => {
       result.current.play(mockTrack);
@@ -94,12 +96,9 @@ describe('MusicContext', () => {
   });
 
   it('devrait passer à la piste suivante', async () => {
-    const playlist = [
-      mockTrack,
-      { id: 'track-2', title: 'Track 2', artist: 'Artist 2', duration: 200, url: 'track2.mp3' }
-    ];
+    const playlist = createPlaylist(2);
 
-    const { result } = renderHook(() => useMusic(), { wrapper: MockMusicProvider });
+    const { result } = renderHook(() => useMusic(), { wrapper });
 
     act(() => {
       result.current.setPlaylist(playlist);
@@ -110,7 +109,7 @@ describe('MusicContext', () => {
     });
 
     act(() => {
-      result.current.next();
+      result.current.nextTrack();
     });
 
     await waitFor(() => {
@@ -119,7 +118,7 @@ describe('MusicContext', () => {
   });
 
   it('devrait gérer le contrôle du volume', () => {
-    const { result } = renderHook(() => useMusic(), { wrapper: MockMusicProvider });
+    const { result } = renderHook(() => useMusic(), { wrapper });
 
     act(() => {
       result.current.setVolume(0.5);
@@ -130,15 +129,14 @@ describe('MusicContext', () => {
   });
 
   it('devrait charger une playlist pour une émotion', async () => {
-    const { result } = renderHook(() => useMusic(), { wrapper: MockMusicProvider });
+    const { result } = renderHook(() => useMusic(), { wrapper });
 
     await act(async () => {
-      const playlist = await result.current.loadPlaylistForEmotion({
-        emotion: 'calm',
-        intensity: 0.5,
-      });
-      expect(playlist?.tracks.every(t => t.emotion === 'calm')).toBe(true);
+      await result.current.loadPlaylistForEmotion('calm');
     });
+
+    expect(result.current.playlist).toHaveLength(1);
+    expect(result.current.currentTrack).not.toBeNull();
   });
 
   it('devrait lancer une erreur si utilisé hors du provider', () => {
