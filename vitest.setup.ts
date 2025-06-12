@@ -1,14 +1,7 @@
-import { fetch, Headers, Request, Response } from 'undici';
+import fetch, { Headers, Request, Response } from 'cross-fetch';
 
-if (!globalThis.fetch) {
-  // Polyfill fetch and related classes for headless environments
-  // @ts-ignore
-  globalThis.fetch = fetch as any;
-  // @ts-ignore
-  globalThis.Headers = Headers as any;
-  // @ts-ignore
-  globalThis.Request = Request as any;
-  // @ts-ignore
-  globalThis.Response = Response as any;
-}
+if (!globalThis.fetch) globalThis.fetch = fetch as any;
+if (!globalThis.Headers) globalThis.Headers = Headers as any;
+if (!globalThis.Request) globalThis.Request = Request as any;
+if (!globalThis.Response) globalThis.Response = Response as any;
 
