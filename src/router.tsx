@@ -5,7 +5,7 @@ import { LoadingIllustration } from '@/components/ui/loading-illustration';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { b2bAdminRoutes } from './router/b2bAdminRoutes';
 import { b2bUserRoutes } from './router/b2bUserRoutes';
-import { b2cMissingRoutes } from './router/b2cRoutes';
+import { b2cRoutes } from './router/b2cRoutes';
 
 // Lazy loading des composants principaux
 const Home = React.lazy(() => import('./Home'));
@@ -157,5 +157,5 @@ export const router = createBrowserRouter([
   // Routes B2B supplémentaires depuis les modules de routage
   ...b2bAdminRoutes,
   ...b2bUserRoutes,
-  ...b2cMissingRoutes,
+  ...b2cRoutes,
 ]);
