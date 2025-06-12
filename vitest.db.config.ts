@@ -9,4 +9,9 @@ export default defineConfig({
     environment: 'node',
     include: ['database/tests/**/*.{test,spec}.ts'],
   },
+  resolve: {
+    alias: {
+      'cross-fetch': './tests/polyfills/cross-fetch.ts'
+    }
+  }
 });

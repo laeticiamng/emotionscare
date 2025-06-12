@@ -13,5 +13,10 @@ export default defineConfig({
       'services/privacy/tests/**/*.ts',
       'tests/api/**/*.ts'
     ]
+  },
+  resolve: {
+    alias: {
+      'cross-fetch': './tests/polyfills/cross-fetch.ts'
+    }
   }
 });

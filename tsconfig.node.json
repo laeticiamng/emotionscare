@@ -18,7 +18,8 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@types/*": ["./types/*"]
+      "@types/*": ["./types/*"],
+      "cross-fetch": ["./tests/polyfills/cross-fetch.ts"]
     }
   },
   "include": ["vite.config.ts", "types"]

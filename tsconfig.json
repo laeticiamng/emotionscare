@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@types/*": ["types/*"]
+      "@types/*": ["types/*"],
+      "cross-fetch": ["tests/polyfills/cross-fetch.ts"]
     },
     "jsx": "react-jsx"
   },

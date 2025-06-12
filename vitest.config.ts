@@ -1,3 +1,4 @@
+import './scripts/secureEnv';
 
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
@@ -26,6 +27,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'cross-fetch': path.resolve(__dirname, './tests/polyfills/cross-fetch.ts'),
     },
   },
   esbuild: {

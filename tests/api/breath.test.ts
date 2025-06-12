@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../../services/breath/server';
 import { insertWeekly, clear } from '../../services/breath/lib/db';
 import { hash } from '../../services/journal/lib/hash';
+import fetch from 'cross-fetch';
 
 describe('Breath API', () => {
   beforeEach(() => {
@@ -26,5 +27,12 @@ describe('Breath API', () => {
       .set('Authorization', 'Bearer u1');
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it('fetch polyfill works', async () => {
+    vi.mock('cross-fetch', () => ({
+      default: vi.fn(() => Promise.resolve({ ok: true })),
+    }));
+    await expect(fetch('/ping')).resolves.toBeDefined();
   });
 });
