@@ -13,7 +13,8 @@ interface MusicContextType {
   setVolume: (volume: number) => void;
 }
 
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
+const _MusicContext = createContext<MusicContextType | null>(null);
+export const MusicContext = _MusicContext;
 
 interface MusicProviderProps {
   children: ReactNode;
@@ -92,8 +93,10 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
 export const useMusic = () => {
   const context = useContext(MusicContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useMusic must be used within a MusicProvider');
   }
   return context;
 };
+
+export default MusicProvider;

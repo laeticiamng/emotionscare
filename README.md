@@ -248,6 +248,7 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - ESLint pour la qualité du code (`npm run lint`)
 - Vérification de type TypeScript (`npm run type-check`)
 - Tests unitaires (placeholder) (`npm run test`)
+- Utiliser `MockMusicProvider` pour tester les hooks liés à la musique
 - Nettoyage du build (`npm run clean`)
 
 ### Conventions de typage
