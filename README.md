@@ -162,6 +162,7 @@ npm run dev
 npm run build
 
 # Exécuter les tests
+# Les variables de `.env.test` sont chargées automatiquement
 npm test
 
 # Vérifier les types TypeScript
