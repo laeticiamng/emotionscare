@@ -1,46 +1,49 @@
+// ---------------------------------------------------------------------------
+// src/lib/env-validation.ts
+// ---------------------------------------------------------------------------
 
 /**
- * Validation des variables d'environnement pour la production
+ * Variables d’environnement requises pour l’app
  */
+const REQUIRED = ['VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY'] as const;
 
-// Variables d'environnement requises
-const requiredEnvVars = [
-  'VITE_SUPABASE_URL',
-  'VITE_SUPABASE_ANON_KEY'
-];
-
-// Variables d'environnement optionnelles avec valeurs par défaut
-const optionalEnvVars = {
-  'VITE_APP_NAME': 'EmotionsCare',
-  'VITE_APP_VERSION': '1.0.0',
-  'VITE_ENVIRONMENT': 'development'
+/**
+ * Variables optionnelles + valeurs par défaut
+ */
+const OPTIONAL: Record<string, string> = {
+  VITE_APP_NAME: 'EmotionsCare',
+  VITE_APP_VERSION: '1.0.0',
+  VITE_ENVIRONMENT: 'development',
 };
 
 /**
- * Valide les variables d'environnement
+ * Vérifie les variables d’environnement, applique les valeurs par défaut
+ * et logge un petit récap.
  */
 export function validateEnvironment() {
-  const missing = requiredEnvVars.filter(envVar => !import.meta.env[envVar]);
-  
-  if (missing.length > 0) {
-    console.warn('Variables d\'environnement manquantes:', missing);
-    // En développement, on continue avec des warnings
-    // En production, cela devrait être plus strict
+  const missing = REQUIRED.filter((k) => !import.meta.env[k]);
+
+  if (missing.length) {
+    console.warn('[env-validation] Variables manquantes :', missing);
   }
-  
-  // Définir les valeurs par défaut
-  Object.entries(optionalEnvVars).forEach(([key, defaultValue]) => {
-    if (!import.meta.env[key]) {
-      import.meta.env[key] = defaultValue;
+
+  Object.entries(OPTIONAL).forEach(([k, def]) => {
+    if (!import.meta.env[k]) {
+      import.meta.env[k] = def;
     }
   });
-  
-  console.log('Validation environnement:', {
-    mode: import.meta.env.MODE,
-    prod: import.meta.env.PROD,
-    variables: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_'))
-  });
+
+  console.info('[env-validation] MODE=', import.meta.env.MODE,
+               'VITE_* keys=', Object.keys(import.meta.env).filter((k) => k.startsWith('VITE_')));
 }
 
-// Exécuter la validation
+/* -------------------------------------------------------------------------
+ *  ⬇️  L’export dont Supabase (client.ts) a besoin
+ * ---------------------------------------------------------------------- */
+export const env = {
+  SUPABASE_URL:      import.meta.env.VITE_SUPABASE_URL      || '',
+  SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+};
+
+// Exécute la vérification au chargement du module
 validateEnvironment();
