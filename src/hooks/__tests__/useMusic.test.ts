@@ -1,6 +1,6 @@
 
 import { renderHook } from '@/tests/utils';
-import { MockMusicProvider } from '../../../tests/utils/MockMusicProvider';
+import { MusicProvider } from '@/contexts/MusicContext';
 import { useMusic } from '../useMusic';
 import { vi } from 'vitest';
 
@@ -21,12 +21,12 @@ Object.defineProperty(window, 'Audio', {
 describe('useMusic', () => {
   test('should initialize with default values', () => {
     const { result } = renderHook(() => useMusic(), {
-      wrapper: MockMusicProvider,
+      wrapper: ({ children }) => <MusicProvider>{children}</MusicProvider>,
     });
     
     expect(result.current.isPlaying).toBe(false);
     expect(result.current.currentTrack).toBeNull();
-    expect(result.current.volume).toBe(0.7);
+    expect(result.current.volume).toBe(0.5);
   });
 
   test('should throw error when used outside MusicProvider', () => {

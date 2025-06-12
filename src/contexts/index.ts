@@ -5,7 +5,7 @@ import React from 'react';
 export { AuthProvider, useAuth } from './AuthContext';
 export { ThemeProvider, useTheme } from '@/providers/ThemeProvider';
 export { UserModeProvider, useUserMode } from './UserModeContext';
-export { MusicProvider, useMusic } from './MusicContext';
+export { MusicProvider, useMusic, MusicContext } from './MusicContext';
 
 // Create missing contexts placeholders
 export const ThemeContext = React.createContext(null);
