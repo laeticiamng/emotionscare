@@ -9,6 +9,8 @@ export interface Track {
   emotion?: string;
 }
 
+const _MusicContext = createContext<MusicContextType | null>(null);
+export const MusicContext = _MusicContext;
 interface MusicState {
   playlist: Track[];
   currentIndex: number;
@@ -128,9 +130,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 };
 
 export const useMusic = () => {
-  const ctx = useContext(MusicContext);
-  if (!ctx) throw new Error('useMusic must be used within a MusicProvider');
-  return ctx;
+  const context = useContext(MusicContext);
+  if (!context) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
 };
 
-export default MusicContext;
+export default MusicProvider;
+
