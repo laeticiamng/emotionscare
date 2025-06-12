@@ -8,6 +8,13 @@ const B2CGamification = React.lazy(() => import('@/pages/b2c/GamificationPage'))
 const B2CSocial = React.lazy(() => import('@/pages/b2c/SocialPage'));
 const B2CResetPassword = React.lazy(() => import('@/pages/b2c/ResetPasswordPage'));
 
+// Nouvelles pages pour l'audit de couverture
+const BreathWeeklyPage = React.lazy(() => import('@/pages/stats/BreathWeeklyPage'));
+const ScanWeeklyPage = React.lazy(() => import('@/pages/stats/ScanWeeklyPage'));
+const VRWeeklyPage = React.lazy(() => import('@/pages/stats/VRWeeklyPage'));
+const GamificationWeeklyPage = React.lazy(() => import('@/pages/stats/GamificationWeeklyPage'));
+const PrivacyDashboardPage = React.lazy(() => import('@/pages/privacy/PrivacyDashboardPage'));
+
 const withSuspense = (Component: React.ComponentType) => {
   return (props: any) => (
     <React.Suspense fallback={<LoadingIllustration />}>
@@ -16,7 +23,8 @@ const withSuspense = (Component: React.ComponentType) => {
   );
 };
 
-export const b2cMissingRoutes = [
+export const b2cRoutes = [
+  // Routes B2C existantes
   {
     path: '/b2c/onboarding',
     element: (
@@ -45,4 +53,48 @@ export const b2cMissingRoutes = [
     path: '/b2c/reset-password',
     element: withSuspense(B2CResetPassword)(),
   },
+  // Nouvelles routes pour l'audit de couverture
+  {
+    path: '/b2c/stats/breath-weekly',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(BreathWeeklyPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/stats/scan-weekly',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(ScanWeeklyPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/stats/vr-weekly',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(VRWeeklyPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/stats/gamification-weekly',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(GamificationWeeklyPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/b2c/privacy-dashboard',
+    element: (
+      <ProtectedRoute requiredRole="b2c">
+        {withSuspense(PrivacyDashboardPage)()}
+      </ProtectedRoute>
+    ),
+  },
 ];
+
+// Alias pour compatibilité
+export const b2cMissingRoutes = b2cRoutes;
