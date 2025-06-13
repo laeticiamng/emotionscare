@@ -1,5 +1,6 @@
 
 import { normalizeUserMode } from './normalizeUserMode';
+import { LOGIN_ROUTES, UserMode } from './route';
 
 export { normalizeUserMode };
 
@@ -33,8 +34,14 @@ export const getLoginPath = (userRole: string): string => {
   }
 };
 
+export const getModeLoginPath = (mode: string): string => {
+  const normalized = normalizeUserMode(mode) as UserMode;
+  return LOGIN_ROUTES[normalized] || '/b2c/login';
+};
+
 export default {
   normalizeUserMode,
   getDashboardPath,
-  getLoginPath
+  getLoginPath,
+  getModeLoginPath
 };

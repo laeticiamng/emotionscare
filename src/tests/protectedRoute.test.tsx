@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { routes } from '@/router';
+import { routes } from '@/router/routes';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Verify that the B2C dashboard is protected by the auth guard
