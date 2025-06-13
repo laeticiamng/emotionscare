@@ -9,6 +9,7 @@ export * from './modeChangeEmitter';
 export * from './modeSelectionLogger';
 export * from './security';
 export * from './userModeHelpers';
+export * from './route';
 
 // Add new utility function for user mode display
 export const getUserModeDisplayName = (mode: string | null): string => {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { routes } from '@/router';
+import { routes } from '@/router/routes';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
 
