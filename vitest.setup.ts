@@ -1,5 +1,6 @@
 import './test/setupTests';
 import { loadEnv } from 'vite';
+import { execSync } from 'node:child_process';
 
 // Charge les variables d'environnement de `.env.test`
 const env = loadEnv('test', process.cwd(), '');
@@ -8,6 +9,10 @@ const env = loadEnv('test', process.cwd(), '');
   ...process,
   env: { ...process.env, ...env },
 };
+
+if (process.env.NODE_ENV === 'test') {
+  execSync('npm run db:test:setup', { stdio: 'inherit' });
+}
 
 // Framer-motion injects DOM-specific styles that JSDOM can't handle.
 // Provide minimal mocks so components render in tests without crashing.

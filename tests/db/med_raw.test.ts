@@ -1,6 +1,7 @@
-import { beforeAll, it, expect } from 'vitest';
-import db from '@/tests/helpers/db';
-import db from '../../database/tests/db/helpers/db';
+import { beforeAll, it, expect, afterEach } from 'vitest';
+import db, { resetTables } from '../helpers/db';
+
+afterEach(resetTables);
 
 beforeAll(async () => {
   await db.clear('flow_walk');

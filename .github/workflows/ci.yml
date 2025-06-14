@@ -42,11 +42,9 @@ jobs:
     needs: front
     services:
       postgres:
-        image: postgres:15
+        image: postgres:13
         env:
-          POSTGRES_USER: runner
-          POSTGRES_PASSWORD: runner
-          POSTGRES_DB: testdb
+          POSTGRES_PASSWORD: postgres
         ports: ['5432:5432']
     steps:
       - uses: actions/checkout@v4

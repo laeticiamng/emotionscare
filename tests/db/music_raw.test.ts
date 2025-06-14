@@ -1,6 +1,7 @@
-import { beforeAll, afterAll, expect, it } from 'vitest';
+import { beforeAll, afterAll, expect, it, afterEach } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
+import { resetTables } from '../helpers/db';
 
 const supabase = createClient(
   process.env.SUPA_URL!, process.env.SUPA_SERVICE_ROLE_KEY!
@@ -13,6 +14,8 @@ beforeAll(async () => {
 afterAll(async () => {
   await supabase.removeAllSubscriptions();
 });
+
+afterEach(resetTables);
 
 it('BioTune trigger calcule rmssd_delta et coherence', async () => {
   const { data, error } = await supabase

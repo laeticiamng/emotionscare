@@ -1,5 +1,7 @@
-import { expect, it } from 'vitest';
-import db from '../../database/tests/db/helpers/db';
+import { expect, it, afterEach } from 'vitest';
+import db, { resetTables } from '../helpers/db';
+
+afterEach(resetTables);
 
 it('refresh populates weekly row', async () => {
   await db.exec('CALL public.refresh_metrics_gam()');
