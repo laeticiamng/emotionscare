@@ -39,10 +39,10 @@ describe('GlowBreathPage', () => {
     expect(screen.getByText(/mon souffle/i)).toBeInTheDocument();
     
     await waitFor(() => {
-      expect(screen.getByText(/décompression/i)).toBeVisible();
-      expect(screen.getByText(/breathe sync/i)).toBeVisible();
-      expect(screen.getByText(/move/i)).toBeVisible();
-      expect(screen.getByText(/zen drop/i)).toBeVisible();
+      expect(screen.getByTestId('kpi-card-decompression')).toBeVisible();
+      expect(screen.getByTestId('kpi-card-breathe-sync')).toBeVisible();
+      expect(screen.getByTestId('kpi-card-move')).toBeVisible();
+      expect(screen.getByTestId('kpi-card-zen-drop')).toBeVisible();
     });
   });
 
