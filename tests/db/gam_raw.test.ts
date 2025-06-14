@@ -1,5 +1,8 @@
-import { it, expect } from 'vitest';
-import db from '../../database/tests/db/helpers/db';
+import { it, expect, afterEach } from 'vitest';
+import db from '../helpers/db';
+import { resetTables } from '../helpers/db';
+
+afterEach(resetTables);
 
 it('echo trigger fills pos_affect', async () => {
   await db.insert('echo_crystal').values({

@@ -1,5 +1,7 @@
-import { it, expect } from 'vitest';
-import db from '../../database/tests/db/helpers/db';
+import { it, expect, afterEach } from 'vitest';
+import db, { resetTables } from '../helpers/db';
+
+afterEach(resetTables);
 
 it('nebula trigger computes rmssd_delta and coherence', async () => {
   await db.insertInto('vr_nebula_sessions').values({

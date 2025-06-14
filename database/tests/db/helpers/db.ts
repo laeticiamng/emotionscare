@@ -152,15 +152,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dialect = new PostgresDialect({
-  pool: new pg.Pool({
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT || 5432),
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-  }),
-});
+const pool = process.env.NODE_ENV === 'test' && process.env.DATABASE_URL
+  ? new pg.Pool({ connectionString: process.env.DATABASE_URL })
+  : new pg.Pool({
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT || 5432),
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+    });
+
+const dialect = new PostgresDialect({ pool });
 
 const db = new Kysely({ dialect });
 
