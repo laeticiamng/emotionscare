@@ -1,22 +1,8 @@
-import './test/setupTests';
-import { loadEnv } from 'vite';
-import { execSync } from 'node:child_process';
+/**
+ * Force l’implémentation native Node.js de TextEncoder / TextDecoder
+ * avant qu’esbuild ne soit importé.
+ */
+import { TextEncoder, TextDecoder } from 'util';
 
-// Charge les variables d'environnement de `.env.test`
-const env = loadEnv('test', process.cwd(), '');
-(globalThis as any).importMetaEnv = env;
-(globalThis as any).process = {
-  ...process,
-  env: { ...process.env, ...env },
-};
-
-if (process.env.NODE_ENV === 'test') {
-  execSync('npm run db:test:setup', { stdio: 'inherit' });
-}
-
-// Framer-motion injects DOM-specific styles that JSDOM can't handle.
-// Provide minimal mocks so components render in tests without crashing.
-vi.mock('framer-motion', () => ({
-  motion: { div: 'div', span: 'span', section: 'section' }
-}));
-
+(globalThis as any).TextEncoder = TextEncoder;
+(globalThis as any).TextDecoder = TextDecoder;
