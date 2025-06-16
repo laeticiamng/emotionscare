@@ -2,11 +2,11 @@ import * as React from 'react';
 import { LoadingIllustration } from '@/components/ui/loading-illustration';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
-// Lazy loading des composants B2C manquants
-const B2COnboarding = React.lazy(() => import('@/pages/b2c/onboarding/OnboardingPage'));
-const B2CGamification = React.lazy(() => import('@/pages/b2c/GamificationPage'));
-const B2CSocial = React.lazy(() => import('@/pages/b2c/SocialPage'));
-const B2CResetPassword = React.lazy(() => import('@/pages/b2c/ResetPasswordPage'));
+// Lazy loading des composants B2C existants
+const B2COnboarding = React.lazy(() => import('@/pages/OnboardingPage'));
+const B2CGamification = React.lazy(() => import('@/pages/GamificationPage'));
+const B2CSocial = React.lazy(() => import('@/pages/SocialPage'));
+const B2CResetPassword = React.lazy(() => import('@/pages/ResetPasswordPage'));
 
 // Nouvelles pages pour l'audit de couverture
 const BreathWeeklyPage = React.lazy(() => import('@/pages/stats/BreathWeeklyPage'));
