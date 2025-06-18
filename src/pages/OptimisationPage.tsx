@@ -1,26 +1,26 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, BarChart3 } from 'lucide-react';
+import { Target, TrendingUp, Users } from 'lucide-react';
 
-const ReportsPage: React.FC = () => {
+const OptimisationPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Rapports et Analytics</h1>
+      <h1 className="text-2xl font-bold mb-6">Optimisation RH</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Rapports
+              <Target className="h-5 w-5" />
+              Objectifs
             </CardTitle>
             <CardDescription>
-              Rapports détaillés anonymisés
+              Définition d'objectifs de bien-être
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Générez des rapports complets sur le bien-être organisationnel.
+              Établissez des objectifs de bien-être organisationnel mesurables.
             </p>
           </CardContent>
         </Card>
@@ -28,16 +28,16 @@ const ReportsPage: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              Export
+              <TrendingUp className="h-5 w-5" />
+              Performance
             </CardTitle>
             <CardDescription>
-              Exportation des données
+              Suivi des performances
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Exportez les données sous différents formats pour analyse externe.
+              Analysez l'impact des initiatives de bien-être sur la performance.
             </p>
           </CardContent>
         </Card>
@@ -45,16 +45,16 @@ const ReportsPage: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Analytics
+              <Users className="h-5 w-5" />
+              Recommandations
             </CardTitle>
             <CardDescription>
-              Analyses avancées
+              Recommandations personnalisées
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Analyses approfondies des tendances et patterns organisationnels.
+              Recevez des recommandations basées sur les données de votre organisation.
             </p>
           </CardContent>
         </Card>
@@ -63,4 +63,4 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage;
+export default OptimisationPage;

@@ -1,26 +1,27 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ScanTabContent from '@/components/scan/ScanTabContent';
+import HistoryTabContent from '@/components/scan/HistoryTabContent';
 
 const ScanPage: React.FC = () => {
-  const { user } = useAuth();
-  const { userMode } = useUserMode();
-
-  if (!user || !userMode) {
-    return <Navigate to="/choose-mode" replace />;
-  }
-
-  // Redirect to appropriate scan page based on user mode
-  switch (userMode) {
-    case 'b2c':
-      return <Navigate to="/b2c/scan" replace />;
-    case 'b2b_user':
-      return <Navigate to="/b2b/user/scan" replace />;
-    default:
-      return <Navigate to="/choose-mode" replace />;
-  }
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6">Scanner d'Émotions</h1>
+      <Tabs defaultValue="scan" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="scan">Scanner</TabsTrigger>
+          <TabsTrigger value="history">Historique</TabsTrigger>
+        </TabsList>
+        <TabsContent value="scan">
+          <ScanTabContent />
+        </TabsContent>
+        <TabsContent value="history">
+          <HistoryTabContent />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 };
 
 export default ScanPage;

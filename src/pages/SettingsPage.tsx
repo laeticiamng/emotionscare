@@ -1,65 +1,31 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Bell, Shield, Palette } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import UserSettings from '@/components/settings/UserSettings';
+import NotificationSettings from '@/components/settings/NotificationSettings';
+import ThemeSettingsTab from '@/components/settings/ThemeSettingsTab';
 
 const SettingsPage: React.FC = () => {
   return (
-    <>
-      <Helmet>
-        <title>Paramètres - EmotionsCare</title>
-        <meta name="description" content="Configurez vos préférences EmotionsCare" />
-      </Helmet>
-      
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Paramètres</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Gérez vos préférences de notification
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Confidentialité
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Contrôlez vos données et votre confidentialité
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Apparence
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Personnalisez l'apparence de l'application
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6">Paramètres</h1>
+      <Tabs defaultValue="profile" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="theme">Thème</TabsTrigger>
+        </TabsList>
+        <TabsContent value="profile">
+          <UserSettings />
+        </TabsContent>
+        <TabsContent value="notifications">
+          <NotificationSettings />
+        </TabsContent>
+        <TabsContent value="theme">
+          <ThemeSettingsTab />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

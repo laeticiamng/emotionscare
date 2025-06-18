@@ -1,26 +1,26 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, BarChart3 } from 'lucide-react';
+import { Users, MessageSquare, Heart } from 'lucide-react';
 
-const ReportsPage: React.FC = () => {
+const SocialCoconPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Rapports et Analytics</h1>
+      <h1 className="text-2xl font-bold mb-6">Cocon Social</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Rapports
+              <Users className="h-5 w-5" />
+              Communauté
             </CardTitle>
             <CardDescription>
-              Rapports détaillés anonymisés
+              Connectez-vous avec d'autres utilisateurs
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Générez des rapports complets sur le bien-être organisationnel.
+              Rejoignez une communauté bienveillante pour partager votre parcours de bien-être.
             </p>
           </CardContent>
         </Card>
@@ -28,16 +28,16 @@ const ReportsPage: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              Export
+              <MessageSquare className="h-5 w-5" />
+              Discussions
             </CardTitle>
             <CardDescription>
-              Exportation des données
+              Échangez avec vos pairs
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Exportez les données sous différents formats pour analyse externe.
+              Participez à des discussions enrichissantes sur le bien-être émotionnel.
             </p>
           </CardContent>
         </Card>
@@ -45,16 +45,16 @@ const ReportsPage: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Analytics
+              <Heart className="h-5 w-5" />
+              Soutien
             </CardTitle>
             <CardDescription>
-              Analyses avancées
+              Entraide et bienveillance
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Analyses approfondies des tendances et patterns organisationnels.
+              Recevez et offrez du soutien dans un environnement sécurisé et confidentiel.
             </p>
           </CardContent>
         </Card>
@@ -63,4 +63,4 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage;
+export default SocialCoconPage;

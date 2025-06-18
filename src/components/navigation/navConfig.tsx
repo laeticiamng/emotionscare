@@ -13,7 +13,9 @@ import {
   Target,
   Camera,
   HeartHandshake,
-  Shield
+  Shield,
+  Gamepad2,
+  Sliders
 } from 'lucide-react';
 
 export interface NavItem {
@@ -49,13 +51,22 @@ export const b2cNavItems: NavItem[] = [
     icon: FileText
   },
   {
-    title: 'Mes objectifs',
-    href: '/goals',
+    title: 'VR',
+    href: '/vr',
     icon: Target
+  },
+  {
+    title: 'Gamification',
+    href: '/gamification',
+    icon: Gamepad2
+  },
+  {
+    title: 'Préférences',
+    href: '/preferences',
+    icon: Sliders
   }
 ];
 
-// Navigation limitée pour les collaborateurs B2B - uniquement données personnelles
 export const b2bUserNavItems: NavItem[] = [
   {
     title: 'Mon tableau de bord',
@@ -83,14 +94,27 @@ export const b2bUserNavItems: NavItem[] = [
     icon: FileText
   },
   {
-    title: 'Mes objectifs',
-    href: '/goals',
+    title: 'VR',
+    href: '/vr',
     icon: Target
+  },
+  {
+    title: 'Cocon Social',
+    href: '/social-cocon',
+    icon: Users
+  },
+  {
+    title: 'Gamification',
+    href: '/gamification',
+    icon: Gamepad2
+  },
+  {
+    title: 'Préférences',
+    href: '/preferences',
+    icon: Sliders
   }
-  // Suppression de l'accès aux données d'équipe
 ];
 
-// Navigation pour les RH - données agrégées et anonymisées uniquement
 export const b2bAdminNavItems: NavItem[] = [
   {
     title: 'Tableau de bord RH',
@@ -98,28 +122,53 @@ export const b2bAdminNavItems: NavItem[] = [
     icon: Home
   },
   {
-    title: 'Statistiques agrégées',
-    href: '/b2b/admin/analytics',
+    title: 'Gestion Équipes',
+    href: '/teams',
+    icon: Users
+  },
+  {
+    title: 'Rapports',
+    href: '/reports',
     icon: BarChart3
   },
   {
-    title: 'Bien-être collectif',
-    href: '/b2b/admin/team-wellness',
-    icon: HeartHandshake
+    title: 'Événements',
+    href: '/events',
+    icon: Calendar
   },
   {
-    title: 'Rapports anonymisés',
-    href: '/reports',
+    title: 'Optimisation',
+    href: '/optimisation',
+    icon: Target
+  },
+  {
+    title: 'Scanner émotions',
+    href: '/scan',
+    icon: Brain
+  },
+  {
+    title: 'Coach IA',
+    href: '/coach',
+    icon: MessageSquare
+  },
+  {
+    title: 'Musicothérapie',
+    href: '/music',
+    icon: Music
+  },
+  {
+    title: 'Journal',
+    href: '/journal',
     icon: FileText
   },
   {
-    title: 'Gestion des accès',
-    href: '/b2b/admin/access-management',
-    icon: Shield
+    title: 'Cocon Social',
+    href: '/social-cocon',
+    icon: Users
   },
   {
-    title: 'Paramètres RH',
-    href: '/admin/settings',
+    title: 'Paramètres',
+    href: '/settings',
     icon: Settings
   }
 ];

@@ -1,275 +1,287 @@
 
-import React, { Suspense } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
-import { LoadingIllustration } from '@/components/ui/loading-illustration';
-import Shell from '@/Shell';
+import React from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Layout from '@/components/Layout';
+import B2CLayout from '@/layouts/B2CLayout';
+import B2BLayout from '@/layouts/B2BLayout';
 
-// Lazy loading des composants existants
-const Home = React.lazy(() => import('./Home'));
-const ChooseModePage = React.lazy(() => import('./pages/ChooseModePage'));
-const B2BSelectionPage = React.lazy(() => import('./pages/B2BSelectionPage'));
+// Pages publiques
+import ImmersiveHome from '@/pages/ImmersiveHome';
+import ChooseModePage from '@/pages/ChooseModePage';
+import B2BSelectionPage from '@/pages/B2BSelectionPage';
 
-// Pages d'authentification B2C
-const B2CLoginPage = React.lazy(() => import('./pages/auth/B2CLoginPage'));
-const B2CRegisterPage = React.lazy(() => import('./pages/auth/B2CRegisterPage'));
-const B2CDashboardPage = React.lazy(() => import('./pages/dashboard/B2CDashboardPage'));
+// Pages d'authentification
+import B2CLoginPage from '@/pages/auth/B2CLoginPage';
+import B2CRegisterPage from '@/pages/auth/B2CRegisterPage';
+import B2BUserLoginPage from '@/pages/auth/B2BUserLoginPage';
+import B2BUserRegisterPage from '@/pages/auth/B2BUserRegisterPage';
+import B2BAdminLoginPage from '@/pages/auth/B2BAdminLoginPage';
 
-// Pages d'authentification B2B User
-const B2BUserLoginPage = React.lazy(() => import('./pages/auth/B2BUserLoginPage'));
-const B2BUserRegisterPage = React.lazy(() => import('./pages/auth/B2BUserRegisterPage'));
-const B2BUserDashboardPage = React.lazy(() => import('./pages/dashboard/B2BUserDashboardPage'));
+// Pages de tableau de bord
+import B2CDashboardPage from '@/pages/dashboard/B2CDashboardPage';
+import B2BUserDashboardPage from '@/pages/dashboard/B2BUserDashboardPage';
+import B2BAdminDashboardPage from '@/pages/dashboard/B2BAdminDashboardPage';
 
-// Pages d'authentification B2B Admin
-const B2BAdminLoginPage = React.lazy(() => import('./pages/auth/B2BAdminLoginPage'));
-const B2BAdminDashboardPage = React.lazy(() => import('./pages/dashboard/B2BAdminDashboardPage'));
-
-// Pages fonctionnelles communes - CHEMINS UNIQUES
-const ScanPage = React.lazy(() => import('./pages/ScanPage'));
-const MusicPage = React.lazy(() => import('./pages/MusicPage'));
-const CoachPage = React.lazy(() => import('./pages/CoachPage'));
-const JournalPage = React.lazy(() => import('./pages/JournalPage'));
-const VrPage = React.lazy(() => import('./pages/VrPage'));
-const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
-const PreferencesPage = React.lazy(() => import('./pages/PreferencesPage'));
-const GamificationPage = React.lazy(() => import('./pages/GamificationPage'));
-const SocialCoconPage = React.lazy(() => import('./pages/SocialCoconPage'));
+// Pages de fonctionnalités communes (routes uniques)
+import ScanPage from '@/pages/ScanPage';
+import MusicPage from '@/pages/MusicPage';
+import CoachPage from '@/pages/CoachPage';
+import CoachChatPage from '@/pages/CoachChatPage';
+import JournalPage from '@/pages/JournalPage';
+import VRPage from '@/pages/VRPage';
+import SettingsPage from '@/pages/SettingsPage';
+import PreferencesPage from '@/pages/PreferencesPage';
+import GamificationPage from '@/pages/GamificationPage';
+import SocialCoconPage from '@/pages/SocialCoconPage';
 
 // Pages administrateur uniquement
-const TeamsPage = React.lazy(() => import('./pages/admin/TeamsPage'));
-const ReportsPage = React.lazy(() => import('./pages/admin/ReportsPage'));
-const EventsPage = React.lazy(() => import('./pages/admin/EventsPage'));
-const OptimisationPage = React.lazy(() => import('./pages/admin/OptimisationPage'));
-
-// Import des composants coach existants pour les routes coach
-const CoachChatContainer = React.lazy(() => import('./components/coach/CoachChatContainer'));
-
-// Composant pour envelopper les composants dans une page
-const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="container mx-auto px-4 py-6">
-    {children}
-  </div>
-);
+import TeamsPage from '@/pages/TeamsPage';
+import ReportsPage from '@/pages/ReportsPage';
+import EventsPage from '@/pages/EventsPage';
+import OptimisationPage from '@/pages/OptimisationPage';
 
 export const router = createBrowserRouter([
+  // Routes publiques
   {
     path: '/',
-    element: <Shell />,
+    element: <Layout />,
     children: [
-      // Routes principales
       {
         index: true,
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <Home />
-          </Suspense>
-        ),
+        element: <ImmersiveHome />
       },
       {
         path: 'choose-mode',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <ChooseModePage />
-          </Suspense>
-        ),
+        element: <ChooseModePage />
       },
       {
         path: 'b2b/selection',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2BSelectionPage />
-          </Suspense>
-        ),
-      },
-
-      // Routes d'authentification B2C
-      {
-        path: 'b2c/login',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2CLoginPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'b2c/register',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2CRegisterPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'b2c/dashboard',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2CDashboardPage />
-          </Suspense>
-        ),
-      },
-
-      // Routes d'authentification B2B User
-      {
-        path: 'b2b/user/login',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2BUserLoginPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'b2b/user/register',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2BUserRegisterPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'b2b/user/dashboard',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2BUserDashboardPage />
-          </Suspense>
-        ),
-      },
-
-      // Routes d'authentification B2B Admin
-      {
-        path: 'b2b/admin/login',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2BAdminLoginPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'b2b/admin/dashboard',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <B2BAdminDashboardPage />
-          </Suspense>
-        ),
-      },
-
-      // FONCTIONNALITÉS COMMUNES - CHEMINS UNIQUES
-      {
-        path: 'scan',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <ScanPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'music',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <MusicPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'coach',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <CoachPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'coach-chat',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <PageWrapper>
-              <CoachChatContainer />
-            </PageWrapper>
-          </Suspense>
-        ),
-      },
-      {
-        path: 'journal',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <JournalPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'vr',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <VrPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'settings',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <SettingsPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'preferences',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <PreferencesPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'gamification',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <GamificationPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'social-cocon',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <SocialCoconPage />
-          </Suspense>
-        ),
-      },
-
-      // FONCTIONNALITÉS ADMINISTRATEUR UNIQUEMENT
-      {
-        path: 'teams',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <TeamsPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'reports',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <ReportsPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'events',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <EventsPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'optimisation',
-        element: (
-          <Suspense fallback={<LoadingIllustration />}>
-            <OptimisationPage />
-          </Suspense>
-        ),
-      },
-    ],
+        element: <B2BSelectionPage />
+      }
+    ]
   },
+  
+  // Routes d'authentification B2C
+  {
+    path: '/b2c',
+    children: [
+      {
+        path: 'login',
+        element: <B2CLoginPage />
+      },
+      {
+        path: 'register',
+        element: <B2CRegisterPage />
+      },
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRoute requiredRole="b2c">
+            <B2CLayout>
+              <B2CDashboardPage />
+            </B2CLayout>
+          </ProtectedRoute>
+        )
+      }
+    ]
+  },
+  
+  // Routes d'authentification B2B User
+  {
+    path: '/b2b/user',
+    children: [
+      {
+        path: 'login',
+        element: <B2BUserLoginPage />
+      },
+      {
+        path: 'register',
+        element: <B2BUserRegisterPage />
+      },
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRoute requiredRole="b2b_user">
+            <B2BLayout>
+              <B2BUserDashboardPage />
+            </B2BLayout>
+          </ProtectedRoute>
+        )
+      }
+    ]
+  },
+  
+  // Routes d'authentification B2B Admin
+  {
+    path: '/b2b/admin',
+    children: [
+      {
+        path: 'login',
+        element: <B2BAdminLoginPage />
+      },
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRoute requiredRole="b2b_admin">
+            <B2BLayout>
+              <B2BAdminDashboardPage />
+            </B2BLayout>
+          </ProtectedRoute>
+        )
+      }
+    ]
+  },
+  
+  // ROUTES COMMUNES - CHEMINS UNIQUES POUR TOUTES LES FONCTIONNALITÉS
+  {
+    path: '/scan',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <ScanPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/music',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <MusicPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/coach',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <CoachPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/coach-chat',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <CoachChatPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/journal',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <JournalPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/vr',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <VRPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/settings',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <SettingsPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/preferences',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <PreferencesPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/gamification',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <GamificationPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/social-cocon',
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <SocialCoconPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  
+  // ROUTES ADMINISTRATEUR UNIQUEMENT
+  {
+    path: '/teams',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        <Layout>
+          <TeamsPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/reports',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        <Layout>
+          <ReportsPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/events',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        <Layout>
+          <EventsPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/optimisation',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        <Layout>
+          <OptimisationPage />
+        </Layout>
+      </ProtectedRoute>
+    )
+  },
+  
+  // Route de fallback
+  {
+    path: '*',
+    element: <Navigate to="/" replace />
+  }
 ]);
 
 export default router;
