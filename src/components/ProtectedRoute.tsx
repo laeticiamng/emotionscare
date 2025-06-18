@@ -2,12 +2,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoginRoute, UserMode } from '@/utils/route';
+import { getLoginRoute } from '@/utils/routeUtils';
 
 interface Props {
   children: JSX.Element;
   requiredRole?: 'user' | 'admin';
-  mockUserMode?: UserMode;
+  mockUserMode?: 'b2c' | 'b2b_user' | 'b2b_admin';
   mockAuthenticated?: boolean;
 }
 
@@ -19,7 +19,7 @@ const ProtectedRoute: React.FC<Props> = ({
 }) => {
   const { user } = useAuth();
   const isAuth = mockAuthenticated ?? !!user;
-  const currentMode = (mockUserMode ?? (user?.role as UserMode)) ?? 'B2C';
+  const currentMode = (mockUserMode ?? (user?.role as 'b2c' | 'b2b_user' | 'b2b_admin')) ?? 'b2c';
 
   if (!isAuth) {
     return <Navigate to={getLoginRoute(currentMode)} replace />;
