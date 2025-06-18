@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ImageOptimizationOptions {
   quality?: number;
@@ -8,85 +8,88 @@ interface ImageOptimizationOptions {
   placeholder?: string;
 }
 
-/**
- * Hook pour l'optimisation automatique des images
- */
+interface ImageOptimizationResult {
+  src: string;
+  isLoading: boolean;
+  error: Error | null;
+}
+
 export const useImageOptimization = (
-  src: string, 
+  originalSrc: string,
   options: ImageOptimizationOptions = {}
-) => {
+): ImageOptimizationResult => {
   const [optimizedSrc, setOptimizedSrc] = useState<string>(options.placeholder || '');
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const { quality = 85, format = 'webp', lazy = true } = options;
-
-  const optimizeImage = useCallback(async (originalSrc: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      // Vérifier le support du format
-      const canvas = document.createElement('canvas');
-      const supportsWebP = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-      const supportsAvif = canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0;
-
-      let finalFormat = format;
-      if (format === 'webp' && !supportsWebP) finalFormat = 'original';
-      if (format === 'avif' && !supportsAvif) finalFormat = 'webp';
-      if (finalFormat === 'webp' && !supportsWebP) finalFormat = 'original';
-
-      // Pour les images externes, on utilise un service d'optimisation
-      if (originalSrc.startsWith('http')) {
-        if (finalFormat !== 'original') {
-          // Simuler l'optimisation avec un service externe
-          const optimizedUrl = `${originalSrc}?format=${finalFormat}&quality=${quality}`;
-          setOptimizedSrc(optimizedUrl);
-        } else {
-          setOptimizedSrc(originalSrc);
-        }
-      } else {
-        setOptimizedSrc(originalSrc);
-      }
-    } catch (err) {
-      setError('Failed to optimize image');
-      setOptimizedSrc(src); // Fallback vers l'image originale
-    } finally {
-      setIsLoading(false);
-    }
-  }, [src, format, quality]);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (src) {
-      if (lazy) {
-        // Lazy loading avec Intersection Observer
-        const img = new Image();
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                optimizeImage(src);
-                observer.disconnect();
-              }
-            });
-          },
-          { threshold: 0.1 }
-        );
-        
-        // Observer un élément temporaire
-        const tempDiv = document.createElement('div');
-        observer.observe(tempDiv);
-        document.body.appendChild(tempDiv);
-        
-        return () => {
-          observer.disconnect();
-          document.body.removeChild(tempDiv);
-        };
-      } else {
-        optimizeImage(src);
-      }
+    if (!originalSrc) {
+      setIsLoading(false);
+      return;
     }
-  }, [src, lazy, optimizeImage]);
 
-  return { src: optimizedSrc, isLoading, error };
+    const optimizeImage = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Vérifier le support des formats modernes
+        const supportsWebP = await checkWebPSupport();
+        const supportsAVIF = await checkAVIFSupport();
+
+        let finalSrc = originalSrc;
+
+        // Appliquer le format optimal
+        if (options.format === 'avif' && supportsAVIF) {
+          finalSrc = originalSrc.replace(/\.(jpg|jpeg|png)$/i, '.avif');
+        } else if (options.format === 'webp' && supportsWebP) {
+          finalSrc = originalSrc.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+        }
+
+        // Précharger l'image
+        const img = new Image();
+        img.onload = () => {
+          setOptimizedSrc(finalSrc);
+          setIsLoading(false);
+        };
+        img.onerror = () => {
+          // Fallback vers l'image originale
+          setOptimizedSrc(originalSrc);
+          setIsLoading(false);
+          setError(new Error('Failed to load optimized image'));
+        };
+        img.src = finalSrc;
+
+      } catch (err) {
+        setError(err as Error);
+        setOptimizedSrc(originalSrc);
+        setIsLoading(false);
+      }
+    };
+
+    optimizeImage();
+  }, [originalSrc, options.format]);
+
+  return {
+    src: optimizedSrc,
+    isLoading,
+    error
+  };
+};
+
+// Utilitaires de détection de support
+const checkWebPSupport = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const webp = new Image();
+    webp.onload = webp.onerror = () => resolve(webp.height === 2);
+    webp.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+  });
+};
+
+const checkAVIFSupport = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const avif = new Image();
+    avif.onload = avif.onerror = () => resolve(avif.height === 2);
+    avif.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+  });
 };

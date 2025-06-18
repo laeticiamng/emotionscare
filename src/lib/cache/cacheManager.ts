@@ -3,76 +3,62 @@ interface CacheEntry<T> {
   data: T;
   timestamp: number;
   ttl: number;
+  accessCount: number;
+  lastAccess: number;
 }
 
-interface CacheConfig {
-  defaultTTL: number;
-  maxSize: number;
-  cleanupInterval: number;
-}
+class CacheManager<T> {
+  private cache = new Map<string, CacheEntry<T>>();
+  private maxSize: number;
+  private hits = 0;
+  private misses = 0;
 
-class CacheManager {
-  private cache: Map<string, CacheEntry<any>> = new Map();
-  private config: CacheConfig;
-  private cleanupTimer: NodeJS.Timeout | null = null;
-
-  constructor(config: Partial<CacheConfig> = {}) {
-    this.config = {
-      defaultTTL: 5 * 60 * 1000, // 5 minutes
-      maxSize: 100,
-      cleanupInterval: 60 * 1000, // 1 minute
-      ...config,
-    };
-
-    this.startCleanup();
+  constructor(maxSize: number = 500) {
+    this.maxSize = maxSize;
   }
 
-  set<T>(key: string, data: T, ttl?: number): void {
-    const actualTTL = ttl || this.config.defaultTTL;
+  set(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
+    // Nettoyer le cache si nécessaire
+    this.evictExpired();
     
-    // Remove oldest entries if cache is full
-    if (this.cache.size >= this.config.maxSize) {
-      const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
+    if (this.cache.size >= this.maxSize) {
+      this.evictLRU();
     }
 
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: actualTTL,
+      ttl,
+      accessCount: 0,
+      lastAccess: Date.now()
     });
   }
 
-  get<T>(key: string): T | null {
+  get(key: string): T | null {
     const entry = this.cache.get(key);
     
     if (!entry) {
+      this.misses++;
       return null;
     }
 
-    // Check if entry has expired
+    // Vérifier l'expiration
     if (Date.now() - entry.timestamp > entry.ttl) {
       this.cache.delete(key);
+      this.misses++;
       return null;
     }
+
+    // Mettre à jour les statistiques d'accès
+    entry.accessCount++;
+    entry.lastAccess = Date.now();
+    this.hits++;
 
     return entry.data;
   }
 
   has(key: string): boolean {
-    const entry = this.cache.get(key);
-    
-    if (!entry) {
-      return false;
-    }
-
-    // Check if entry has expired
-    if (Date.now() - entry.timestamp > entry.ttl) {
-      this.cache.delete(key);
-      return false;
-    }
-
-    return true;
+    return this.get(key) !== null;
   }
 
   delete(key: string): boolean {
@@ -81,30 +67,13 @@ class CacheManager {
 
   clear(): void {
     this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
   }
 
-  getStats() {
-    return {
-      size: this.cache.size,
-      maxSize: this.config.maxSize,
-      hitRate: this.calculateHitRate(),
-    };
-  }
-
-  private calculateHitRate(): number {
-    // This would require tracking hits/misses in a real implementation
-    return 0;
-  }
-
-  private startCleanup(): void {
-    this.cleanupTimer = setInterval(() => {
-      this.cleanup();
-    }, this.config.cleanupInterval);
-  }
-
-  private cleanup(): void {
+  // Nettoyage intelligent
+  private evictExpired(): void {
     const now = Date.now();
-    
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > entry.ttl) {
         this.cache.delete(key);
@@ -112,39 +81,77 @@ class CacheManager {
     }
   }
 
-  destroy(): void {
-    if (this.cleanupTimer) {
-      clearInterval(this.cleanupTimer);
-      this.cleanupTimer = null;
+  private evictLRU(): void {
+    let oldestKey = '';
+    let oldestTime = Date.now();
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.lastAccess < oldestTime) {
+        oldestTime = entry.lastAccess;
+        oldestKey = key;
+      }
     }
-    this.clear();
+
+    if (oldestKey) {
+      this.cache.delete(oldestKey);
+    }
+  }
+
+  // Statistiques
+  getStats() {
+    const total = this.hits + this.misses;
+    return {
+      size: this.cache.size,
+      maxSize: this.maxSize,
+      hitRate: total > 0 ? this.hits / total : 0,
+      hits: this.hits,
+      misses: this.misses
+    };
+  }
+
+  // Préchargement intelligent
+  async preload(keys: Array<{ key: string; loader: () => Promise<T> }>, ttl?: number): Promise<void> {
+    const promises = keys.map(async ({ key, loader }) => {
+      if (!this.has(key)) {
+        try {
+          const data = await loader();
+          this.set(key, data, ttl);
+        } catch (error) {
+          console.warn(`Failed to preload cache key: ${key}`, error);
+        }
+      }
+    });
+
+    await Promise.allSettled(promises);
   }
 }
 
-// Global cache instance
-export const globalCache = new CacheManager();
+// Instances globales spécialisées
+export const apiCache = new CacheManager<any>(200);
+export const imageCache = new CacheManager<string>(100);
+export const userCache = new CacheManager<any>(50);
+export const staticCache = new CacheManager<any>(1000);
 
-// Cache decorators
-export function cached(ttl?: number) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-
-    descriptor.value = function (...args: any[]) {
-      const cacheKey = `${target.constructor.name}.${propertyKey}.${JSON.stringify(args)}`;
-      
-      const cachedResult = globalCache.get(cacheKey);
-      if (cachedResult !== null) {
-        return cachedResult;
-      }
-
-      const result = originalMethod.apply(this, args);
-      globalCache.set(cacheKey, result, ttl);
-      
-      return result;
+// Cache manager global unifié
+export const globalCache = {
+  api: apiCache,
+  image: imageCache,
+  user: userCache,
+  static: staticCache,
+  
+  getStats() {
+    return {
+      api: apiCache.getStats(),
+      image: imageCache.getStats(),
+      user: userCache.getStats(),
+      static: staticCache.getStats()
     };
+  },
 
-    return descriptor;
-  };
-}
-
-export default CacheManager;
+  clearAll() {
+    apiCache.clear();
+    imageCache.clear();
+    userCache.clear();
+    staticCache.clear();
+  }
+};
