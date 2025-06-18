@@ -7,8 +7,8 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  console.log('Layout component rendering with children:', children);
   const isMobile = useIsMobile();
-  
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <main className="flex-1">

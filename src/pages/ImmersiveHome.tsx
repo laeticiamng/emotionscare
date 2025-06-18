@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UnifiedActionButtons from '@/components/home/UnifiedActionButtons';
 
 const ImmersiveHome: React.FC = () => {
+  console.log('ImmersiveHome component is rendering');
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center">
       <div className="container mx-auto px-4 py-8 text-center">
