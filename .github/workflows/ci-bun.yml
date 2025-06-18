@@ -1,50 +1,19 @@
 
-name: CI with Bun
+name: CI avec Bun - EmotionsCare
 
 on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 env:
   NODE_VERSION: "20"
-  BUN_VERSION: "1.2"
+  BUN_VERSION: "1.0.25"
 
 jobs:
-  audit:
+  lint-and-type-check:
     runs-on: ubuntu-22.04
-    outputs:
-      features-status: ${{ steps.audit.outputs.status }}
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      
-      - uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      
-      - name: Run project audit
-        id: audit
-        run: |
-          bun run scripts/audit-project.js > audit-report.txt
-          echo "status=completed" >> $GITHUB_OUTPUT
-      
-      - name: Upload audit report
-        uses: actions/upload-artifact@v3
-        with:
-          name: audit-report
-          path: audit-report.txt
-
-  frontend:
-    runs-on: ubuntu-22.04
-    needs: audit
     steps:
       - uses: actions/checkout@v4
       
@@ -68,26 +37,80 @@ jobs:
         run: bun install --frozen-lockfile
       
       - name: Type check
-        run: bun run tsc --noEmit
+        run: bun run type-check
       
       - name: Lint
         run: bun run lint
+
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
       
-      - name: Test with coverage
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      
+      - name: Run tests with coverage
         run: bun test --coverage
       
-      - name: Build
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+
+  build:
+    runs-on: ubuntu-22.04
+    needs: [lint-and-type-check, test]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      
+      - name: Build project
         run: bun run build
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: dist
+          name: build-files
           path: dist/
 
   lighthouse:
     runs-on: ubuntu-22.04
-    needs: frontend
+    needs: build
     steps:
       - uses: actions/checkout@v4
       
@@ -105,7 +128,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: build-files
           path: dist/
       
       - name: Install Lighthouse CI
@@ -121,7 +144,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-22.04
-    needs: frontend
+    needs: build
     steps:
       - uses: actions/checkout@v4
       
@@ -136,36 +159,18 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       
-      - name: Install Cypress
-        run: bun add -d cypress
-      
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: build-files
           path: dist/
+      
+      - name: Install Cypress
+        run: bun add -d cypress @cypress/vite-dev-server
       
       - name: Run E2E tests
         run: |
           bun run preview &
-          bunx cypress run
+          bun run test:e2e
         env:
           CYPRESS_BASE_URL: http://localhost:4173
-
-  deploy:
-    runs-on: ubuntu-22.04
-    needs: [audit, frontend, lighthouse, e2e]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist/
-      
-      - name: Deploy to production
-        run: |
-          echo "🚀 Déploiement en production"
-          # Ajouter ici les commandes de déploiement

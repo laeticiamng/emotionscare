@@ -1,50 +1,51 @@
 
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import path from 'node:path';
-import { componentTagger } from 'lovable-tagger';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: '::',
-    port: 8080,
-  },
-
-  plugins: [
-    react(),
-    mode === 'development' && componentTagger(),
-  ].filter(Boolean),
-
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@radix-ui/react-toast',
-      'framer-motion',
-      'lucide-react',
-    ],
-  },
-
   build: {
-    target: 'es2015',
+    target: 'esnext',
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['@radix-ui/react-toast', '@radix-ui/react-dialog'],
-          icons: ['lucide-react'],
-          animations: ['framer-motion'],
-          'glow-breath': ['./src/pages/GlowBreathPage'],
-        },
-      },
-    },
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast'],
+        }
+      }
+    }
   },
-}));
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/setupTests.ts'],
+    coverage: {
+      reporter: ['text', 'json', 'html', 'lcov'],
+      threshold: {
+        global: {
+          branches: 85,
+          functions: 90,
+          lines: 90,
+          statements: 90
+        }
+      }
+    }
+  },
+  server: {
+    port: 3000,
+    host: true
+  },
+  preview: {
+    port: 4173,
+    host: true
+  }
+});

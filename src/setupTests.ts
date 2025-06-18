@@ -1,47 +1,42 @@
 
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-};
+// Nettoie le DOM après chaque test
+afterEach(() => {
+  cleanup();
+});
 
-// Mock ResizeObserver
-global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-};
-
-// Mock matchMedia
+// Configuration globale pour les tests
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: (query: string) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => {},
+  }),
 });
 
-// Mock Audio
-global.Audio = jest.fn().mockImplementation(() => ({
-  play: jest.fn(),
-  pause: jest.fn(),
-  load: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  currentTime: 0,
-  duration: 0,
-  volume: 1,
-  paused: true,
-  ended: false,
-}));
+// Mock pour les Web APIs non disponibles en test
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
+// Mock pour localStorage
+const localStorageMock = {
+  getItem: (key: string) => null,
+  setItem: (key: string, value: string) => {},
+  removeItem: (key: string) => {},
+  clear: () => {},
+};
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock
+});
