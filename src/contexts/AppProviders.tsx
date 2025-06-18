@@ -7,6 +7,7 @@ import { NotificationProvider } from './NotificationContext';
 import { ThemeProvider } from './theme';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { BrandingProvider } from './BrandingContext';
+import { UserModeProvider } from './UserModeContext';
 import { Toaster } from '@/components/ui/toaster';
 
 interface AppProvidersProps {
@@ -24,14 +25,16 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
         <ThemeProvider>
           <BrandingProvider>
             <AuthProvider>
-              <SidebarProvider>
-                <NotificationProvider>
-                  <MusicProvider>
-                    {children}
-                    <Toaster />
-                  </MusicProvider>
-                </NotificationProvider>
-              </SidebarProvider>
+              <UserModeProvider>
+                <SidebarProvider>
+                  <NotificationProvider>
+                    <MusicProvider>
+                      {children}
+                      <Toaster />
+                    </MusicProvider>
+                  </NotificationProvider>
+                </SidebarProvider>
+              </UserModeProvider>
             </AuthProvider>
           </BrandingProvider>
         </ThemeProvider>
