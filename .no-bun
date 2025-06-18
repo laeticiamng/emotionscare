@@ -1,5 +1,0 @@
-
-This file indicates that Bun should not be used for this project.
-Use npm instead:
-  npm install --legacy-peer-deps
-  npm run dev

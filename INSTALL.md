@@ -52,9 +52,9 @@ After successful installation, start the development server:
 npm run dev
 # or
 yarn dev
-# or
-bun dev
 ```
+
+Bun n'est plus supporté.
 
 ## Support
 

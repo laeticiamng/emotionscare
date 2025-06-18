@@ -56,9 +56,15 @@ functions/analyze-journal, process-emotion-gamification, enhanced-emotion-analyz
 
 6. CI / lint
 • Activer l’option --max-warnings=0 ou corriger les parsing-errors : typiquement fichiers .ts sans isolatedModules.
-• S’assurer que la version Node utilisée par Codex ≥ 18.
+• S’assurer que la version Node utilisée par Codex ≥ 20.
 
 Validation manuelle rapide
+
+```bash
+# Install
+npm install --legacy-peer-deps
+npm run dev
+```
 
 rm -rf node_modules && npm i
 npm run lint          # doit renvoyer 0 erreur
