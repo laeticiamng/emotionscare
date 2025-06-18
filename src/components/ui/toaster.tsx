@@ -1,19 +1,34 @@
 
-import React from 'react';
-import { useToast } from '@/hooks/use-toast';
-import NotificationToast from './notification-toast';
+import {
+  Toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
-export const Toaster: React.FC = () => {
-  const { toasts, dismiss } = useToast();
-  
-  const notifications = toasts.map(toast => ({
-    id: toast.id,
-    type: toast.variant === 'destructive' ? 'error' as const : 
-          toast.variant === 'success' ? 'success' as const : 'info' as const,
-    title: toast.title || '',
-    message: toast.description,
-    duration: toast.duration
-  }));
-  
-  return <NotificationToast notifications={notifications} onRemove={dismiss} />;
-};
+export function Toaster() {
+  const { toasts } = useToast();
+
+  return (
+    <ToastProvider>
+      {toasts.map(function ({ id, title, description, action, ...props }) {
+        return (
+          <Toast key={id} {...props}>
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && (
+                <ToastDescription>{description}</ToastDescription>
+              )}
+            </div>
+            {action}
+            <ToastClose />
+          </Toast>
+        );
+      })}
+      <ToastViewport />
+    </ToastProvider>
+  );
+}

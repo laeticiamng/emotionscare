@@ -1,70 +1,44 @@
 
-import React, { useEffect, useRef, ReactNode } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface FocusManagerProps {
-  children: ReactNode;
-  restoreFocus?: boolean;
+  children: React.ReactNode;
   autoFocus?: boolean;
+  restoreFocus?: boolean;
 }
 
-export const FocusManager: React.FC<FocusManagerProps> = ({
+const FocusManager: React.FC<FocusManagerProps> = ({
   children,
-  restoreFocus = true,
-  autoFocus = false
+  autoFocus = false,
+  restoreFocus = false
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const previousActiveElement = useRef<Element | null>(null);
 
   useEffect(() => {
-    // Sauvegarder le focus précédent
     if (restoreFocus) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
+      previousActiveElement.current = document.activeElement;
     }
 
-    // Auto-focus sur le container si demandé
     if (autoFocus && containerRef.current) {
-      containerRef.current.focus();
+      const firstFocusable = containerRef.current.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as HTMLElement;
+      
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
     }
 
     return () => {
-      // Restaurer le focus précédent
-      if (restoreFocus && previousFocusRef.current) {
-        previousFocusRef.current.focus();
+      if (restoreFocus && previousActiveElement.current) {
+        (previousActiveElement.current as HTMLElement).focus?.();
       }
     };
-  }, [restoreFocus, autoFocus]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Tab' && containerRef.current) {
-      const focusableElements = containerRef.current.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      
-      const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
-        }
-      }
-    }
-  };
+  }, [autoFocus, restoreFocus]);
 
   return (
-    <div
-      ref={containerRef}
-      onKeyDown={handleKeyDown}
-      tabIndex={autoFocus ? -1 : undefined}
-      role="region"
-      aria-label="Zone de contenu focusable"
-    >
+    <div ref={containerRef}>
       {children}
     </div>
   );

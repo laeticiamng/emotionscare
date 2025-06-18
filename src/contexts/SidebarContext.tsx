@@ -1,35 +1,33 @@
 
 import React, { createContext, useContext, useState } from 'react';
-
-type SidebarContextType = {
-  isOpen: boolean;
-  toggleSidebar: () => void;
-  setSidebarOpen: (open: boolean) => void;
-};
+import type { SidebarContextType } from '@/types/sidebar';
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const SidebarProvider: React.FC<{ children: React.ReactNode; defaultCollapsed?: boolean }> = ({ 
+  children, 
+  defaultCollapsed = false 
+}) => {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const setSidebarOpen = (open: boolean) => {
-    setIsOpen(open);
+  const toggleCollapsed = () => {
+    setCollapsed(prev => !prev);
   };
 
   return (
-    <SidebarContext.Provider value={{ isOpen, toggleSidebar, setSidebarOpen }}>
+    <SidebarContext.Provider value={{
+      collapsed,
+      toggleCollapsed,
+      setCollapsed,
+    }}>
       {children}
     </SidebarContext.Provider>
   );
 };
 
-export const useSidebar = (): SidebarContextType => {
+export const useSidebar = () => {
   const context = useContext(SidebarContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSidebar must be used within a SidebarProvider');
   }
   return context;

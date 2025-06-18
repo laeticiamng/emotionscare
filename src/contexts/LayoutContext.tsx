@@ -1,51 +1,40 @@
 
-import React, { createContext, useState, useContext } from 'react';
-import { LayoutContextType, LayoutProviderProps } from '@/types/layout';
-import { Theme } from '@/types/theme';
+import React, { createContext, useContext, useState } from 'react';
+import type { LayoutContextType } from '@/types/layout';
 
-const defaultContext: LayoutContextType = {
-  sidebarCollapsed: false,
-  toggleSidebar: () => {},
-  setSidebarCollapsed: () => {},
-  sidebarOpen: true,
-  setSidebarOpen: () => {},
-  theme: 'light',
-  setTheme: () => {},
-  fullscreen: false,
-  setFullscreen: () => {},
-};
+const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
-export const LayoutContext = createContext<LayoutContextType>(defaultContext);
-
-export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
+export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [theme, setTheme] = useState<Theme>('light');
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);
   };
 
-  const setSidebarOpen = (open: boolean) => {
-    setSidebarCollapsed(!open);
-  };
-
   return (
-    <LayoutContext.Provider value={{ 
-      sidebarCollapsed, 
-      toggleSidebar, 
+    <LayoutContext.Provider value={{
+      sidebarCollapsed,
+      toggleSidebar,
       setSidebarCollapsed,
-      sidebarOpen: !sidebarCollapsed,
+      sidebarOpen,
       setSidebarOpen,
-      theme,
-      setTheme,
       fullscreen,
-      setFullscreen
+      setFullscreen,
+      // Theme sera géré par le ThemeProvider
+      theme: 'system',
+      setTheme: () => {},
     }}>
       {children}
     </LayoutContext.Provider>
   );
 };
 
-export const useLayout = () => useContext(LayoutContext);
-export default LayoutContext;
+export const useLayout = () => {
+  const context = useContext(LayoutContext);
+  if (!context) {
+    throw new Error('useLayout must be used within a LayoutProvider');
+  }
+  return context;
+};

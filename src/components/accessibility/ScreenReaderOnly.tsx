@@ -1,28 +1,20 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface ScreenReaderOnlyProps {
-  children: ReactNode;
-  as?: keyof JSX.IntrinsicElements;
+  children: React.ReactNode;
   className?: string;
 }
 
-export const ScreenReaderOnly: React.FC<ScreenReaderOnlyProps> = ({
-  children,
-  as: Component = 'span',
-  className
+const ScreenReaderOnly: React.FC<ScreenReaderOnlyProps> = ({ 
+  children, 
+  className 
 }) => {
   return (
-    <Component
-      className={cn(
-        "sr-only",
-        className
-      )}
-      aria-hidden="false"
-    >
+    <span className={cn('sr-only', className)}>
       {children}
-    </Component>
+    </span>
   );
 };
 
