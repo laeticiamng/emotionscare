@@ -17,3 +17,6 @@ export * from './separator';
 export * from './switch';
 export * from './card';
 export * from './form';
+
+// Notifications
+export * from '../notifications';

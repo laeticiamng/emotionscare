@@ -1,87 +1,161 @@
 
-import { useState, useEffect } from 'react';
-import { NotificationSettings } from '@/types/notification';
+import { useState, useEffect, useCallback } from 'react';
+import { Notification, NotificationSettings } from '@/types/notifications';
+import { NotificationService } from '@/lib/notifications';
+import { useToast } from '@/hooks/use-toast';
 
-export function useNotifications(userId?: string) {
-  const [notifications, setNotifications] = useState<NotificationSettings[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+interface UseNotificationsReturn {
+  notifications: Notification[];
+  unreadCount: number;
+  settings: NotificationSettings;
+  isLoading: boolean;
+  error: string | null;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => Promise<void>;
+  removeNotification: (id: string) => void;
+  updateSettings: (settings: Partial<NotificationSettings>) => void;
+  refreshNotifications: () => Promise<void>;
+}
 
-  useEffect(() => {
-    if (!userId) {
-      setIsLoading(false);
-      return;
-    }
+export const useNotifications = (): UseNotificationsReturn => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [settings, setSettings] = useState<NotificationSettings>({
+    email: true,
+    push: true,
+    inApp: true,
+    types: {
+      security: true,
+      system: true,
+      social: true,
+      achievements: true,
+      reminders: true,
+    },
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const { toast } = useToast();
 
-    const fetchNotifications = async () => {
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const refreshNotifications = useCallback(async () => {
+    try {
       setIsLoading(true);
-      try {
-        // In a real app, this would be an API call
-        // For now, we'll simulate with mock data
-        const mockNotifications = [
-          {
-            id: '1',
-            user_id: userId,
-            title: 'Nouvelle analyse émotionnelle',
-            message: 'Votre analyse émotionnelle quotidienne est prête',
-            type: 'emotion',
-            read: false,
-            timestamp: new Date().toISOString(),
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '2', 
-            user_id: userId,
-            title: 'Rappel de méditation',
-            message: 'N\'oubliez pas votre session de méditation quotidienne',
-            type: 'reminder',
-            read: true,
-            timestamp: new Date(Date.now() - 86400000).toISOString(),
-            created_at: new Date(Date.now() - 86400000).toISOString()
-          }
-        ];
+      setError(null);
+      const fetchedNotifications = await NotificationService.getNotifications();
+      setNotifications(fetchedNotifications);
+    } catch (err) {
+      setError('Erreur lors du chargement des notifications');
+      console.error('Error fetching notifications:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-        // Convert to proper Notification objects
-        const formattedNotifications: NotificationSettings[] = mockNotifications.map(n => ({
-          id: n.id,
-          userId: n.user_id,
-          title: n.title,
-          message: n.message,
-          type: n.type,
-          read: n.read,
-          createdAt: n.created_at,
-          timestamp: n.timestamp
-        }));
+  const markAsRead = useCallback(async (id: string) => {
+    try {
+      await NotificationService.markAsRead(id);
+      setNotifications(prev => 
+        prev.map(notification => 
+          notification.id === id 
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de marquer la notification comme lue',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
 
-        setNotifications(formattedNotifications);
-        setUnreadCount(formattedNotifications.filter(n => !n.read).length);
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error);
-      } finally {
-        setIsLoading(false);
+  const markAllAsRead = useCallback(async () => {
+    try {
+      await NotificationService.markAllAsRead();
+      setNotifications(prev => 
+        prev.map(notification => ({ ...notification, read: true }))
+      );
+      toast({
+        title: 'Succès',
+        description: 'Toutes les notifications ont été marquées comme lues',
+      });
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de marquer toutes les notifications comme lues',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
+
+  const addNotification = useCallback(async (notificationData: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
+    try {
+      const id = await NotificationService.addNotification(notificationData);
+      const newNotification: Notification = {
+        ...notificationData,
+        id,
+        timestamp: new Date().toISOString(),
+        read: false,
+      };
+      
+      setNotifications(prev => [newNotification, ...prev]);
+      
+      // Afficher une toast si les notifications in-app sont activées
+      if (settings.inApp) {
+        toast({
+          title: newNotification.title,
+          description: newNotification.message,
+          variant: newNotification.type === 'error' ? 'destructive' : 'default',
+        });
       }
-    };
+    } catch (err) {
+      console.error('Error adding notification:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'ajouter la notification',
+        variant: 'destructive',
+      });
+    }
+  }, [settings, toast]);
 
-    fetchNotifications();
-  }, [userId]);
+  const removeNotification = useCallback((id: string) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
+  }, []);
 
-  const markAsRead = (id: string) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  };
+  const updateSettings = useCallback((newSettings: Partial<NotificationSettings>) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  }, []);
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-    setUnreadCount(0);
-  };
+  // Charger les notifications au montage
+  useEffect(() => {
+    refreshNotifications();
+  }, [refreshNotifications]);
+
+  // S'abonner aux changements de notifications (optionnel pour temps réel)
+  useEffect(() => {
+    const unsubscribe = NotificationService.subscribeToNotifications(() => {
+      refreshNotifications();
+    });
+
+    return unsubscribe;
+  }, [refreshNotifications]);
 
   return {
     notifications,
     unreadCount,
+    settings,
     isLoading,
+    error,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    addNotification,
+    removeNotification,
+    updateSettings,
+    refreshNotifications,
   };
-}
+};
