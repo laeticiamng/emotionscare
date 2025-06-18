@@ -1,49 +1,52 @@
 
 import React from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Volume, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Slider } from '@/components/ui/slider';
+import { Volume2, VolumeX } from 'lucide-react';
 
-export interface VolumeControlProps {
+interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (volume: number) => void;
   isMuted: boolean;
+  onVolumeChange: (volume: number) => void;
   onMuteToggle: () => void;
   className?: string;
 }
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
-  onVolumeChange,
   isMuted,
+  onVolumeChange,
   onMuteToggle,
-  className
+  className = ""
 }) => {
+  const handleVolumeChange = (values: number[]) => {
+    onVolumeChange(values[0] / 100);
+  };
+
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={`flex items-center space-x-2 ${className}`}>
       <Button
         variant="ghost"
-        size="icon"
+        size="sm"
         onClick={onMuteToggle}
-        className="h-8 w-8"
+        className="p-1"
       >
-        {isMuted ? (
+        {isMuted || volume === 0 ? (
           <VolumeX className="h-4 w-4" />
         ) : (
-          <Volume className="h-4 w-4" />
+          <Volume2 className="h-4 w-4" />
         )}
       </Button>
-      <Slider
-        className="w-24"
-        value={[isMuted ? 0 : volume * 100]}
-        min={0}
-        max={100}
-        step={1}
-        onValueChange={(value) => {
-          onVolumeChange(value[0] / 100);
-        }}
-      />
+      
+      <div className="w-20">
+        <Slider
+          value={[isMuted ? 0 : volume * 100]}
+          onValueChange={handleVolumeChange}
+          max={100}
+          step={1}
+          className="w-full"
+        />
+      </div>
     </div>
   );
 };

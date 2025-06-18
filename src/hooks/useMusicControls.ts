@@ -1,155 +1,166 @@
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { MusicTrack } from '@/types/music';
+import { useState, useRef, useEffect } from 'react';
+import { MusicTrack, MusicPlayerState } from '@/types/music';
 
-interface UseMusicControlsReturn {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  currentTime: number;
-  duration: number;
-  volume: number;
-  isMuted: boolean;
-  play: (track?: MusicTrack) => void;
-  pause: () => void;
-  stop: () => void;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-}
-
-export const useMusicControls = (playlist: MusicTrack[] = []): UseMusicControlsReturn => {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolumeState] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  
+export const useMusicControls = (initialTrack?: MusicTrack | null) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [state, setState] = useState<MusicPlayerState>({
+    currentTrack: initialTrack || null,
+    isPlaying: false,
+    volume: 0.7,
+    isMuted: false,
+    currentTime: 0,
+    duration: 0,
+    playlist: [],
+    currentIndex: 0,
+    shuffle: false,
+    repeat: 'none'
+  });
 
   useEffect(() => {
-    const audio = new Audio();
-    audioRef.current = audio;
+    if (state.currentTrack && !audioRef.current) {
+      audioRef.current = new Audio(state.currentTrack.url);
+      setupAudioListeners();
+    }
+  }, [state.currentTrack]);
 
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
+  const setupAudioListeners = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
+    audio.addEventListener('loadedmetadata', () => {
+      setState(prev => ({ ...prev, duration: audio.duration }));
+    });
 
-    const handleEnded = () => {
-      setIsPlaying(false);
-      nextTrack();
-    };
+    audio.addEventListener('timeupdate', () => {
+      setState(prev => ({ ...prev, currentTime: audio.currentTime }));
+    });
 
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('ended', handleTrackEnd);
+  };
 
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-      audio.pause();
-    };
-  }, []);
+  const handleTrackEnd = () => {
+    if (state.repeat === 'one') {
+      play();
+    } else if (state.repeat === 'all' || state.currentIndex < state.playlist.length - 1) {
+      next();
+    } else {
+      setState(prev => ({ ...prev, isPlaying: false }));
+    }
+  };
 
-  const play = useCallback((track?: MusicTrack) => {
+  const play = async () => {
     if (!audioRef.current) return;
+    
+    try {
+      await audioRef.current.play();
+      setState(prev => ({ ...prev, isPlaying: true }));
+    } catch (error) {
+      console.error('Erreur lors de la lecture:', error);
+    }
+  };
 
-    if (track && track !== currentTrack) {
-      setCurrentTrack(track);
+  const pause = () => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.pause();
+    setState(prev => ({ ...prev, isPlaying: false }));
+  };
+
+  const seek = (time: number) => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.currentTime = time;
+    setState(prev => ({ ...prev, currentTime: time }));
+  };
+
+  const setVolume = (volume: number) => {
+    if (!audioRef.current) return;
+    
+    const clampedVolume = Math.max(0, Math.min(1, volume));
+    audioRef.current.volume = clampedVolume;
+    setState(prev => ({ ...prev, volume: clampedVolume, isMuted: clampedVolume === 0 }));
+  };
+
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    
+    const newMutedState = !state.isMuted;
+    audioRef.current.muted = newMutedState;
+    setState(prev => ({ ...prev, isMuted: newMutedState }));
+  };
+
+  const loadTrack = (track: MusicTrack) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
       audioRef.current.src = track.url;
+    } else {
+      audioRef.current = new Audio(track.url);
+      setupAudioListeners();
     }
-
-    if (currentTrack || track) {
-      audioRef.current.play();
-      setIsPlaying(true);
-    }
-  }, [currentTrack]);
-
-  const pause = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, []);
-
-  const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setCurrentTime(0);
-    }
-  }, []);
-
-  const seek = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  }, []);
-
-  const setVolume = useCallback((newVolume: number) => {
-    if (audioRef.current) {
-      const clampedVolume = Math.max(0, Math.min(1, newVolume));
-      audioRef.current.volume = clampedVolume;
-      setVolumeState(clampedVolume);
-      setIsMuted(clampedVolume === 0);
-    }
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    if (audioRef.current) {
-      if (isMuted) {
-        audioRef.current.volume = volume;
-        setIsMuted(false);
-      } else {
-        audioRef.current.volume = 0;
-        setIsMuted(true);
-      }
-    }
-  }, [isMuted, volume]);
-
-  const nextTrack = useCallback(() => {
-    if (playlist.length === 0 || !currentTrack) return;
     
-    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % playlist.length;
-    const nextTrack = playlist[nextIndex];
-    
-    play(nextTrack);
-  }, [playlist, currentTrack, play]);
+    setState(prev => ({ 
+      ...prev, 
+      currentTrack: track, 
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0 
+    }));
+  };
 
-  const previousTrack = useCallback(() => {
-    if (playlist.length === 0 || !currentTrack) return;
+  const next = () => {
+    if (state.playlist.length === 0) return;
     
-    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
-    const previousIndex = currentIndex === 0 ? playlist.length - 1 : currentIndex - 1;
-    const previousTrack = playlist[previousIndex];
+    let nextIndex = state.currentIndex + 1;
+    if (nextIndex >= state.playlist.length) {
+      nextIndex = state.repeat === 'all' ? 0 : state.playlist.length - 1;
+    }
     
-    play(previousTrack);
-  }, [playlist, currentTrack, play]);
+    if (nextIndex !== state.currentIndex) {
+      const nextTrack = state.playlist[nextIndex];
+      loadTrack(nextTrack);
+      setState(prev => ({ ...prev, currentIndex: nextIndex }));
+    }
+  };
+
+  const previous = () => {
+    if (state.playlist.length === 0) return;
+    
+    let prevIndex = state.currentIndex - 1;
+    if (prevIndex < 0) {
+      prevIndex = state.repeat === 'all' ? state.playlist.length - 1 : 0;
+    }
+    
+    if (prevIndex !== state.currentIndex) {
+      const prevTrack = state.playlist[prevIndex];
+      loadTrack(prevTrack);
+      setState(prev => ({ ...prev, currentIndex: prevIndex }));
+    }
+  };
+
+  const setPlaylist = (playlist: MusicTrack[], startIndex = 0) => {
+    setState(prev => ({ 
+      ...prev, 
+      playlist, 
+      currentIndex: startIndex 
+    }));
+    
+    if (playlist.length > 0 && playlist[startIndex]) {
+      loadTrack(playlist[startIndex]);
+    }
+  };
 
   return {
-    currentTrack,
-    isPlaying,
-    currentTime,
-    duration,
-    volume,
-    isMuted,
+    ...state,
     play,
     pause,
-    stop,
     seek,
     setVolume,
     toggleMute,
-    nextTrack,
-    previousTrack,
+    loadTrack,
+    next,
+    previous,
+    setPlaylist,
+    audioRef
   };
 };
