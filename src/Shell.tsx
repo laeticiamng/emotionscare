@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '@/components/layout/Sidebar';
+import ResponsiveShell from '@/components/layout/ResponsiveShell';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -9,6 +9,10 @@ import SkipToContent from '@/components/accessibility/SkipToContent';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import { InstantGlowWidget } from '@/components/glow';
 
+/**
+ * Shell principal avec layout responsive complet
+ * Point 7: Layout & Navigation Core - Shell application responsive
+ */
 const Shell: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { isLoading: modeLoading } = useUserMode();
@@ -28,7 +32,6 @@ const Shell: React.FC = () => {
         <main id="main-content" className="min-h-screen">
           <Outlet />
         </main>
-        {/* Widget Instant Glow pour les utilisateurs non connectés */}
         <InstantGlowWidget />
       </EnhancedErrorBoundary>
     );
@@ -37,16 +40,10 @@ const Shell: React.FC = () => {
   return (
     <EnhancedErrorBoundary>
       <SkipToContent />
-      <div className="flex h-screen bg-background">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <main id="main-content" className="flex-1 overflow-y-auto p-6">
-            <Outlet />
-          </main>
-        </div>
-        {/* Widget Instant Glow flottant */}
-        <InstantGlowWidget />
-      </div>
+      <ResponsiveShell>
+        <Outlet />
+      </ResponsiveShell>
+      <InstantGlowWidget />
     </EnhancedErrorBoundary>
   );
 };
