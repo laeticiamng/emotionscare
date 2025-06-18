@@ -1,19 +1,18 @@
 
-export type ThemeName = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark' | 'system';
 
-export interface ThemeConfig {
-  name: ThemeName;
-  displayName: string;
-  colors: {
-    primary: string;
-    secondary: string;
-    background: string;
-    foreground: string;
-  };
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  resolvedTheme: 'light' | 'dark';
 }
 
-export interface ThemePreferences {
-  theme: ThemeName;
-  autoSwitch: boolean;
-  followSystem: boolean;
+export interface ThemeOption {
+  value: Theme;
+  label: string;
+  icon: React.ElementType;
 }
+
+export type FontFamily = 'inter' | 'system' | 'mono';
+export type FontSize = 'sm' | 'base' | 'lg';
+export type ThemeName = 'blue' | 'green' | 'purple' | 'orange';
