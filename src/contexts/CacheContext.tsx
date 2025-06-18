@@ -232,7 +232,7 @@ export const useCache = () => {
 };
 
 // Hook pour cache avec requête
-export const useCachedQuery = <T>(
+export const useCachedQuery = <T extends unknown>(
   key: CacheKey,
   queryFn: () => Promise<T>,
   options: {
