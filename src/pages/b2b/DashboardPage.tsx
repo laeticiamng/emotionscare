@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { Navigate } from 'react-router-dom';
 
 const B2BDashboardPage: React.FC = () => {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Tableau de Bord B2B</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Dashboard B2B - Contenu à venir
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const { userMode } = useUserMode();
+
+  // Rediriger vers le bon dashboard selon le rôle
+  if (userMode === 'b2b_admin') {
+    return <Navigate to="/b2b/admin/dashboard" replace />;
+  } else if (userMode === 'b2b_user') {
+    return <Navigate to="/b2b/user/dashboard" replace />;
+  }
+
+  // Par défaut, rediriger vers la sélection B2B
+  return <Navigate to="/b2b/selection" replace />;
 };
 
 export default B2BDashboardPage;

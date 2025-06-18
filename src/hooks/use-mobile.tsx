@@ -5,14 +5,14 @@ export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkDevice = () => {
+    const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    checkDevice();
-    window.addEventListener('resize', checkDevice);
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
 
-    return () => window.removeEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
   return isMobile;
