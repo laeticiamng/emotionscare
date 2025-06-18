@@ -20,14 +20,14 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: "1.2"
-      - name: Assert package manager
-        run: ./bin/assert-package-manager.sh
+      - name: Assert NPM configuration
+        run: chmod +x bin/assert-npm-only.sh && ./bin/assert-npm-only.sh
       - name: Install dependencies
-        run: bun install --no-save
+        run: npm ci --prefer-offline --legacy-peer-deps
       - name: Install heavy deps
         run: node scripts/install-heavy.js
       - name: Run tests
-        run: bun run test -- --environment=jsdom
+        run: npm run test -- --environment=jsdom
 
   back:
     runs-on: ubuntu-22.04
@@ -46,10 +46,10 @@ jobs:
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: "1.2"
-      - name: Assert package manager
-        run: ./bin/assert-package-manager.sh
+      - name: Assert NPM configuration
+        run: chmod +x bin/assert-npm-only.sh && ./bin/assert-npm-only.sh
       - name: Install dependencies
-        run: bun install --no-save
-      - run: bun run flyway:migrate
-      - run: bun run db:migrate
-      - run: bun run test:db
+        run: npm ci --prefer-offline --legacy-peer-deps
+      - run: npm run flyway:migrate
+      - run: npm run db:migrate
+      - run: npm run test:db
