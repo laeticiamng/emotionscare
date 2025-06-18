@@ -1,56 +1,18 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const RegisterPage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
-      >
-        <Button
-          onClick={() => navigate('/')}
-          variant="ghost"
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour à l'accueil
-        </Button>
-
-        <Card>
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <Heart className="h-12 w-12 text-pink-500" />
-            </div>
-            <CardTitle className="text-2xl">Inscription Personnel</CardTitle>
-            <CardDescription>
-              Créez votre compte pour commencer votre parcours de bien-être
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-center text-gray-600 dark:text-gray-300">
-                Fonctionnalité en cours de développement
-              </p>
-              <Button 
-                onClick={() => navigate('/b2c/login')}
-                className="w-full bg-pink-500 hover:bg-pink-600"
-              >
-                Aller à la connexion
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+    <div className="container mx-auto px-4 py-8">
+      <Card className="max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>Inscription B2C</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Page d'inscription pour les particuliers - À implémenter</p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -2,19 +2,19 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const RegisterPage: React.FC = () => {
+const CommunityPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-md mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle>Inscription Collaborateur</CardTitle>
+          <CardTitle>Communauté</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Page d'inscription pour les collaborateurs - À implémenter</p>
+          <p>Page de la communauté - À implémenter</p>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default RegisterPage;
+export default CommunityPage;
