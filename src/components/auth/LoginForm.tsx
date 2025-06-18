@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const { signIn } = useAuth();
+  const [rememberMe, setRememberMe] = useState(false);
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -27,11 +28,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signIn(data.email, data.password);
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue !",
-      });
+      await signIn(data.email, data.password, rememberMe);
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
@@ -89,6 +86,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
               </FormItem>
             )}
           />
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-muted-foreground">
+              Se souvenir de moi
+            </label>
+          </div>
 
           <Button
             type="submit"

@@ -28,10 +28,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await signUp(data.email, data.password);
-      toast({
-        title: "Inscription réussie",
-        description: "Vérifiez votre email pour confirmer votre compte",
-      });
     } catch (error: any) {
       toast({
         title: "Erreur d'inscription",

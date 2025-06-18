@@ -10,6 +10,8 @@ const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
 const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
+const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage'));
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -43,5 +45,13 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/b2c/register',
     element: <B2CRegisterPage />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPasswordPage />,
+  },
+  {
+    path: '/auth/callback',
+    element: <AuthCallbackPage />,
   },
 ];
