@@ -1,5 +1,6 @@
 
 import type { UserMode } from '@/types/auth';
+import { UNIFIED_ROUTES } from './routeUtils';
 
 export const getUserModeDisplayName = (mode: UserMode | null): string => {
   switch (mode) {
@@ -17,26 +18,26 @@ export const getUserModeDisplayName = (mode: UserMode | null): string => {
 export const getModeLoginPath = (mode: UserMode | null): string => {
   switch (mode) {
     case 'b2c':
-      return '/b2c/login';
+      return UNIFIED_ROUTES.B2C_LOGIN;
     case 'b2b_user':
-      return '/b2b/user/login';
+      return UNIFIED_ROUTES.B2B_USER_LOGIN;
     case 'b2b_admin':
-      return '/b2b/admin/login';
+      return UNIFIED_ROUTES.B2B_ADMIN_LOGIN;
     default:
-      return '/choose-mode';
+      return UNIFIED_ROUTES.CHOOSE_MODE;
   }
 };
 
 export const getModeDashboardPath = (mode: UserMode | null): string => {
   switch (mode) {
     case 'b2c':
-      return '/b2c/dashboard';
+      return UNIFIED_ROUTES.B2C_DASHBOARD;
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return UNIFIED_ROUTES.B2B_USER_DASHBOARD;
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD;
     default:
-      return '/';
+      return UNIFIED_ROUTES.HOME;
   }
 };
 
