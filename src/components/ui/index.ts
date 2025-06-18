@@ -10,3 +10,4 @@ export * from './toaster';
 export * from './loading-spinner';
 export * from './loading-animation';
 export * from './enhanced-error-boundary';
+export * from './loading-illustration';

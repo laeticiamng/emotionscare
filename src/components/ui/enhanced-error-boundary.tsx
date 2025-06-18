@@ -1,26 +1,29 @@
 
-import React, { Component, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Button } from './button';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { AlertTriangle } from 'lucide-react';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-}
-
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
 }
 
-export class EnhancedErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+interface EnhancedErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
+}
+
+export class EnhancedErrorBoundary extends React.Component<
+  EnhancedErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  constructor(props: EnhancedErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
@@ -28,31 +31,40 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
+  resetError = () => {
+    this.setState({ hasError: false, error: undefined });
+  };
+
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        const FallbackComponent = this.props.fallback;
+        return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
       }
 
       return (
         <div className="flex items-center justify-center min-h-[400px] p-4">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
+              <div className="flex justify-center mb-4">
+                <AlertTriangle className="h-12 w-12 text-destructive" />
               </div>
-              <CardTitle>Oups ! Une erreur s'est produite</CardTitle>
-              <CardDescription>
-                Nous sommes désolés, quelque chose s'est mal passé. Veuillez réessayer.
-              </CardDescription>
+              <CardTitle>Une erreur s'est produite</CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <Button
-                onClick={() => window.location.reload()}
-                className="w-full"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Recharger la page
+            <CardContent className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Nous nous excusons pour la gêne occasionnée.
+              </p>
+              {this.state.error && (
+                <details className="text-xs text-left bg-muted p-2 rounded">
+                  <summary className="cursor-pointer">Détails techniques</summary>
+                  <pre className="mt-2 whitespace-pre-wrap">
+                    {this.state.error.message}
+                  </pre>
+                </details>
+              )}
+              <Button onClick={this.resetError} className="w-full">
+                Réessayer
               </Button>
             </CardContent>
           </Card>

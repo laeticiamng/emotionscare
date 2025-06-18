@@ -1,50 +1,40 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface LoadingAnimationProps {
   text?: string;
   size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
-const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
-  text = "Chargement...", 
-  size = 'md' 
+const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
+  text = "Chargement...",
+  size = 'md',
+  className
 }) => {
   const sizeClasses = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
+    sm: 'h-4 w-4',
+    md: 'h-8 w-8',
+    lg: 'h-12 w-12'
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className={cn('flex flex-col items-center justify-center gap-4', className)}>
       <motion.div
-        className={`${sizeClasses[size]} text-primary`}
-        animate={{
-          scale: [1, 1.2, 1],
-          rotate: [0, 180, 360]
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
       >
-        <Heart className="w-full h-full" />
+        <Loader2 className={cn('text-primary', sizeClasses[size])} />
       </motion.div>
-      
       {text && (
         <motion.p
-          className="text-sm text-muted-foreground font-medium"
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-sm text-muted-foreground"
         >
           {text}
         </motion.p>
