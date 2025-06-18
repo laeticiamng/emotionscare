@@ -1,156 +1,143 @@
 
-import { toast } from '@/hooks/use-toast';
+interface RequestMetrics {
+  url: string;
+  method: string;
+  duration: number;
+  status: number;
+  timestamp: number;
+}
 
-/**
- * Intercepteur global consolidé pour la gestion des requêtes API
- * Version production avec sécurité renforcée
- */
-export class GlobalInterceptor {
-  private static readonly BASE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co';
-  private static readonly TOKEN_KEY = 'sb-yaincoxihiqdksxgrsrk-auth-token';
-  private static retryCount = new Map<string, number>();
-  private static readonly MAX_RETRIES = 3;
+class GlobalInterceptor {
+  private static metrics: RequestMetrics[] = [];
+  private static maxMetrics = 100;
 
   /**
-   * Effectue un appel API sécurisé avec retry automatique
+   * Intercepteur global pour fetch avec monitoring
    */
-  static async secureFetch(url: string, options: RequestInit = {}): Promise<Response | null> {
-    const requestKey = `${url}-${JSON.stringify(options)}`;
+  static async secureFetch(url: string, options?: RequestInit): Promise<Response | null> {
+    const startTime = performance.now();
+    const method = options?.method || 'GET';
     
     try {
-      const token = this.getStoredToken();
-      const secureHeaders = this.buildSecureHeaders(token, options.headers);
-      
       const response = await fetch(url, {
         ...options,
-        headers: secureHeaders,
+        headers: {
+          'User-Agent': 'EmotionsCare/1.0',
+          'X-App-Version': '1.0.0',
+          ...options?.headers,
+        },
       });
-
-      if (response.status === 401) {
-        return this.handle401WithRetry(url, options, requestKey);
+      
+      const duration = performance.now() - startTime;
+      
+      // Enregistrer les métriques
+      this.recordMetric({
+        url: this.sanitizeUrl(url),
+        method,
+        duration,
+        status: response.status,
+        timestamp: Date.now()
+      });
+      
+      // Log des erreurs API
+      if (!response.ok) {
+        console.warn(`API Error: ${method} ${url} - Status: ${response.status}`);
       }
-
-      // Reset retry count on success
-      this.retryCount.delete(requestKey);
       
       return response;
+      
     } catch (error: any) {
-      console.error('[GlobalInterceptor] Request failed:', error);
+      const duration = performance.now() - startTime;
+      
+      // Enregistrer l'erreur
+      this.recordMetric({
+        url: this.sanitizeUrl(url),
+        method,
+        duration,
+        status: 0, // Erreur réseau
+        timestamp: Date.now()
+      });
+      
+      console.error(`Network Error: ${method} ${url}`, error);
+      
+      // Retourner null au lieu de lever l'erreur
       return null;
     }
   }
 
-  /**
-   * Gère les erreurs 401 avec retry automatique
-   */
-  private static async handle401WithRetry(
-    url: string, 
-    options: RequestInit, 
-    requestKey: string
-  ): Promise<Response | null> {
-    const currentRetries = this.retryCount.get(requestKey) || 0;
-    
-    if (currentRetries >= this.MAX_RETRIES) {
-      await this.handle401Error();
-      return null;
+  private static sanitizeUrl(url: string): string {
+    try {
+      const urlObj = new URL(url);
+      return `${urlObj.protocol}//${urlObj.host}${urlObj.pathname}`;
+    } catch {
+      return url.split('?')[0]; // Fallback
     }
+  }
 
-    // Increment retry count
-    this.retryCount.set(requestKey, currentRetries + 1);
+  private static recordMetric(metric: RequestMetrics): void {
+    this.metrics.push(metric);
     
-    // Clear current session
-    this.clearSession();
+    // Limiter le nombre de métriques
+    if (this.metrics.length > this.maxMetrics) {
+      this.metrics.shift();
+    }
     
-    // Wait before retry
-    await new Promise(resolve => setTimeout(resolve, 1000 * (currentRetries + 1)));
-    
-    // Retry with fresh token
-    return this.secureFetch(url, options);
+    // Analytics silencieuses
+    if (import.meta.env.PROD && metric.status >= 400) {
+      this.reportErrorMetric(metric);
+    }
+  }
+
+  private static reportErrorMetric(metric: RequestMetrics): void {
+    // Reporter les erreurs API vers le monitoring
+    console.error('API Error Metric:', {
+      url: metric.url,
+      status: metric.status,
+      duration: metric.duration
+    });
   }
 
   /**
-   * Construit les headers sécurisés
+   * Obtenir les métriques récentes
    */
-  private static buildSecureHeaders(token: string | null, customHeaders?: HeadersInit): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block',
-      ...customHeaders,
+  static getMetrics(): RequestMetrics[] {
+    return [...this.metrics];
+  }
+
+  /**
+   * Obtenir les statistiques agrégées
+   */
+  static getAggregateStats() {
+    if (this.metrics.length === 0) {
+      return { averageLatency: 0, errorRate: 0, totalRequests: 0 };
+    }
+
+    const totalRequests = this.metrics.length;
+    const averageLatency = this.metrics.reduce((sum, m) => sum + m.duration, 0) / totalRequests;
+    const errorCount = this.metrics.filter(m => m.status >= 400 || m.status === 0).length;
+    const errorRate = (errorCount / totalRequests) * 100;
+
+    return {
+      averageLatency: Math.round(averageLatency),
+      errorRate: Math.round(errorRate * 100) / 100,
+      totalRequests
     };
-
-    if (token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-    }
-
-    return headers;
   }
 
   /**
-   * Récupère le token stocké de manière sécurisée
+   * Nettoyer les anciennes métriques
    */
-  private static getStoredToken(): string | null {
-    try {
-      const stored = localStorage.getItem(this.TOKEN_KEY);
-      if (!stored) return null;
-      
-      const session = JSON.parse(stored);
-      return session?.access_token || null;
-    } catch {
-      return null;
-    }
-  }
-
-  /**
-   * Gère les erreurs 401 (token expiré)
-   */
-  static async handle401Error(): Promise<void> {
-    console.warn('[GlobalInterceptor] Token expired, clearing session');
-    
-    this.clearSession();
-    
-    // Rediriger vers la page de connexion
-    if (typeof window !== 'undefined') {
-      window.location.href = '/choose-mode';
-    }
-  }
-
-  /**
-   * Vide la session de manière sécurisée
-   */
-  private static clearSession(): void {
-    try {
-      localStorage.removeItem(this.TOKEN_KEY);
-      
-      // Clear all retry counts
-      this.retryCount.clear();
-    } catch (error) {
-      console.error('[GlobalInterceptor] Error clearing session:', error);
-    }
-  }
-
-  /**
-   * Vérifie le statut de la session
-   */
-  static async checkSessionStatus(): Promise<boolean> {
-    const token = this.getStoredToken();
-    if (!token) return false;
-
-    try {
-      const stored = localStorage.getItem(this.TOKEN_KEY);
-      if (!stored) return false;
-      
-      const session = JSON.parse(stored);
-      const expiresAt = session?.expires_at;
-      
-      if (!expiresAt) return false;
-      
-      // Check if token expires in next 5 minutes
-      const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
-      return expiresAt * 1000 > fiveMinutesFromNow;
-    } catch {
-      return false;
-    }
+  static cleanup(): void {
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    this.metrics = this.metrics.filter(m => m.timestamp > oneHourAgo);
   }
 }
+
+// Auto-nettoyage toutes les heures
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    GlobalInterceptor.cleanup();
+  }, 60 * 60 * 1000);
+}
+
+export { GlobalInterceptor };
