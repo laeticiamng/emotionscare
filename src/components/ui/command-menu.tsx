@@ -1,62 +1,95 @@
 
 import React from 'react';
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from './command';
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandShortcut,
+} from '@/components/ui/command';
+import { Button } from '@/components/ui/button';
+import { 
+  Search, 
+  Home, 
+  Brain, 
+  Headphones, 
+  Heart, 
+  Settings,
+  HelpCircle 
+} from 'lucide-react';
 
-interface CommandMenuProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  commands?: Array<{
-    category: string;
-    command: string;
-    shortcut?: string;
-    action?: () => void;
-  }>;
-  placeholder?: string;
-}
-
-export function CommandMenu({ 
-  open, 
-  onOpenChange, 
-  commands = [],
-  placeholder = "Tapez une commande ou recherchez..."
-}: CommandMenuProps) {
-  // Group commands by category
-  const categories = commands.reduce<Record<string, typeof commands>>((acc, command) => {
-    if (!acc[command.category]) {
-      acc[command.category] = [];
-    }
-    acc[command.category].push(command);
-    return acc;
-  }, {});
-
+const CommandMenu: React.FC = () => {
+  const [open, setOpen] = React.useState(false);
+  
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
+  
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder={placeholder} />
-      <CommandList>
-        <CommandEmpty>Aucune commande trouvée.</CommandEmpty>
-        
-        {Object.entries(categories).map(([category, categoryCommands], index) => (
-          <React.Fragment key={category}>
-            {index > 0 && <CommandSeparator />}
-            <CommandGroup heading={category}>
-              {categoryCommands.map((command) => (
-                <CommandItem
-                  key={`${category}-${command.command}`}
-                  onSelect={() => {
-                    if (command.action) {
-                      command.action();
-                    }
-                    onOpenChange(false);
-                  }}
-                >
-                  {command.command}
-                  {command.shortcut && <CommandShortcut>{command.shortcut}</CommandShortcut>}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </React.Fragment>
-        ))}
-      </CommandList>
-    </CommandDialog>
+    <>
+      <Button
+        variant="outline"
+        className="relative h-9 w-9 p-0 xl:h-10 xl:w-60 xl:justify-start xl:px-3 xl:py-2"
+        onClick={() => setOpen(true)}
+      >
+        <Search className="h-4 w-4 xl:mr-2" />
+        <span className="hidden xl:inline-flex">Rechercher...</span>
+        <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 xl:flex">
+          <span className="text-xs">⌘</span>K
+        </kbd>
+      </Button>
+      
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Tapez une commande ou recherchez..." />
+        <CommandList>
+          <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+          <CommandGroup heading="Navigation">
+            <CommandItem>
+              <Home className="mr-2 h-4 w-4" />
+              <span>Accueil</span>
+              <CommandShortcut>⌘H</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
+              <Brain className="mr-2 h-4 w-4" />
+              <span>Scan d'émotion</span>
+              <CommandShortcut>⌘S</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
+              <Headphones className="mr-2 h-4 w-4" />
+              <span>Musique thérapeutique</span>
+              <CommandShortcut>⌘M</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
+              <Heart className="mr-2 h-4 w-4" />
+              <span>Exercices de respiration</span>
+              <CommandShortcut>⌘B</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+          <CommandGroup heading="Paramètres">
+            <CommandItem>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Préférences</span>
+            </CommandItem>
+            <CommandItem>
+              <HelpCircle className="mr-2 h-4 w-4" />
+              <span>Aide</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
   );
-}
+};
+
+export default CommandMenu;
