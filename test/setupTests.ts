@@ -31,3 +31,27 @@ if (!global.fetch || !global.Response) {
 if (!global.fetch) {
   mockFetchResponse({});
 }
+
+// Patch JSDOM globals
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as any;
+
+window.matchMedia = () => ({
+  matches: false,
+  addListener() {},
+  removeListener() {},
+}) as any;
+
+// Provide JSDOM constructor for libs expecting it
+import { JSDOM } from 'jsdom';
+(globalThis as any).JSDOM = JSDOM;
+
+// Global network mocks
+vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => ({}) })));
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({ from: () => ({ select: () => ({}) }) })
+}));
+vi.mock('@vercel/analytics', () => ({ track: vi.fn() }));
