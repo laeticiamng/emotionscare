@@ -14,7 +14,7 @@ interface LoginFormProps {
   onToggleMode: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const { signIn } = useAuth();
   
   const form = useForm<LoginFormData>({
@@ -112,3 +112,5 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
     </div>
   );
 };
+
+export default LoginForm;
