@@ -15,7 +15,6 @@ const path = require('path');
 const { promisify } = require('util');
 
 const readFileAsync = promisify(fs.readFile);
-const writeFileAsync = promisify(fs.writeFile);
 
 // Configuration
 const SOURCE_DIR = path.resolve(__dirname, '..');

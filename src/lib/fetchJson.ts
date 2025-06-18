@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 if (!globalThis.fetch) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   Object.assign(globalThis, require('undici'));
 }
 
