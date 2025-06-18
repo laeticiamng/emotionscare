@@ -1,3 +1,4 @@
+
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { gamificationRoutes } from './routes/gamificationRoutes';
@@ -12,6 +13,10 @@ import { CoachPage } from '@/pages/CoachPage';
 import { MusicTherapyPage } from '@/pages/MusicTherapyPage';
 import { CommunityPage } from '@/pages/CommunityPage';
 import { SettingsPage } from '@/pages/SettingsPage';
+import { TeamsPage } from '@/pages/TeamsPage';
+import { ReportsPage } from '@/pages/ReportsPage';
+import { EventsPage } from '@/pages/EventsPage';
+import { OptimisationPage } from '@/pages/OptimisationPage';
 import { vrRoutes } from './routes/vrRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 import { onboardingRoutes } from './routes/onboardingRoutes';
@@ -79,6 +84,38 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <SettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/teams',
+        element: (
+          <ProtectedRoute>
+            <TeamsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/reports',
+        element: (
+          <ProtectedRoute>
+            <ReportsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/events',
+        element: (
+          <ProtectedRoute>
+            <EventsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/optimisation',
+        element: (
+          <ProtectedRoute>
+            <OptimisationPage />
           </ProtectedRoute>
         ),
       },
