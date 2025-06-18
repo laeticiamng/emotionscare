@@ -1,78 +1,88 @@
 
+export interface UserPoints {
+  id: string;
+  user_id: string;
+  total_points: number;
+  level: number;
+  experience_points: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  category: string;
-  image: string;
-  unlocked: boolean;
-  unlockedAt?: string;
-  progress?: number;
-  threshold?: number;
-  user_id?: string;
-  imageUrl?: string;
-  earned?: boolean;
-  achieved?: boolean;
+  icon: string;
+  category: BadgeCategory;
+  points_required: number;
+  rarity: BadgeRarity;
+  conditions: BadgeCondition[];
 }
 
-export interface GamificationStats {
-  level: number;
-  xp: number;
-  xpToNextLevel: number;
-  consecutiveLogins: number;
-  totalSessions: number;
-  totalMoodEntries: number;
-  totalMeditationMinutes: number;
-  badges: Badge[];
-  achievements: string[];
-  streakDays: number;
-  progressToNextLevel?: number;
-  points?: number;
-  longestStreak?: number;
-  completedChallenges?: number;
-  totalChallenges?: number;
-  unlockedBadges?: number;
-  totalBadges?: number;
-}
-
-export interface Challenge {
+export interface UserBadge {
   id: string;
+  user_id: string;
+  badge_id: string;
+  earned_at: string;
+  badge: Badge;
+}
+
+export interface Achievement {
+  id: string;
+  user_id: string;
+  type: AchievementType;
   title: string;
   description: string;
-  points?: number;
-  progress?: number;
-  threshold?: number;
-  completed: boolean;
-  category: string;
-  type?: string;
-  name?: string;
-  userId?: string;
-  reward?: any;
-  startDate?: string;
-  endDate?: string;
-  imageUrl?: string;
-  goal?: string;
-  targetValue?: number;
-  currentValue?: number;
-  completions?: number;
-  total?: number;
-  totalSteps?: number;
-  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
-  isCompleted?: boolean;
-  unlocked?: boolean;
-  icon?: string | null;
-  deadline?: string | null;
+  points_awarded: number;
+  earned_at: string;
 }
 
-export interface LeaderboardEntry {
+export interface Streak {
   id: string;
-  userId: string;
-  username: string;
-  avatarUrl?: string;
-  score: number;
-  rank: number;
-  points?: number;
-  progress?: number;
-  level?: number;
-  position?: number;
+  user_id: string;
+  activity_type: StreakType;
+  current_streak: number;
+  longest_streak: number;
+  last_activity_date: string;
+}
+
+export type BadgeCategory = 
+  | 'emotion_mastery'
+  | 'consistency'
+  | 'social'
+  | 'exploration'
+  | 'achievement'
+  | 'wellness';
+
+export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+export type AchievementType = 
+  | 'first_scan'
+  | 'daily_streak'
+  | 'weekly_goal'
+  | 'emotion_balance'
+  | 'social_connection'
+  | 'music_discovery';
+
+export type StreakType = 
+  | 'daily_checkin'
+  | 'emotion_scan'
+  | 'journal_entry'
+  | 'music_session'
+  | 'breathing_exercise';
+
+export interface BadgeCondition {
+  type: 'activity_count' | 'streak_length' | 'score_threshold' | 'time_period';
+  value: number;
+  activity?: string;
+}
+
+export interface LevelConfig {
+  level: number;
+  min_points: number;
+  max_points: number;
+  title: string;
+  benefits: string[];
+  badge_unlock?: string;
 }
