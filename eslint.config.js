@@ -4,9 +4,17 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'supabase/functions/**',
+      '*.js',
+      'scripts/**',
+    ],
+  },
   ...tseslint.configs.recommended,
   {
-    ignores: ['dist', 'node_modules', 'supabase/functions/**'],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -27,6 +35,18 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'off',
       '@typescript-eslint/prefer-as-const': 'off',
       'react-hooks/exhaustive-deps': 'off',
+    },
+  },
+  {
+    files: ['tailwind.config.ts', 'test/setupTests.ts'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
+    files: ['**/*.js'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   }
 );

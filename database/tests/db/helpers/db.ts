@@ -32,7 +32,7 @@ class MockDb {
 
   async clearTables(names: string[]) {
     for (const n of names) {
-      // @ts-ignore
+      // @ts-expect-error assigning dynamic table
       this.tables[n] = [];
     }
   }
@@ -41,7 +41,7 @@ class MockDb {
     return {
       values: async (row: any) => {
         const r = { ts: new Date(), ...row };
-        // @ts-ignore
+        // @ts-expect-error push to dynamic table
         this.tables[table].push(r);
       },
     };
