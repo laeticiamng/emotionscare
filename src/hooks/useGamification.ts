@@ -1,75 +1,92 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { GamificationService } from '@/services/gamificationService';
 import { UserPoints, UserBadge, Achievement, Streak } from '@/types/gamification';
+import { gamificationService } from '@/services/gamificationService';
 
 export const useGamification = () => {
-  const { user } = useAuth();
   const [userPoints, setUserPoints] = useState<UserPoints | null>(null);
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
-  const [recentAchievements, setRecentAchievements] = useState<Achievement[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [streaks, setStreaks] = useState<Streak[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchGamificationData = async () => {
-    if (!user) return;
-    
-    setLoading(true);
+  useEffect(() => {
+    loadGamificationData();
+  }, []);
+
+  const loadGamificationData = async () => {
     try {
-      const [points, badges] = await Promise.all([
-        GamificationService.getUserPoints(user.id),
-        GamificationService.getUserBadges(user.id),
-      ]);
+      setLoading(true);
+      setError(null);
       
-      setUserPoints(points);
-      setUserBadges(badges);
-    } catch (error) {
-      console.error('Error fetching gamification data:', error);
+      const [pointsData, badgesData, achievementsData, streaksData] = await Promise.all([
+        gamificationService.getUserPoints(),
+        gamificationService.getUserBadges(),
+        gamificationService.getUserAchievements(),
+        gamificationService.getUserStreaks()
+      ]);
+
+      setUserPoints(pointsData);
+      setUserBadges(badgesData);
+      setAchievements(achievementsData);
+      setStreaks(streaksData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
+      console.error('Erreur gamification:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const addPoints = async (points: number, reason: string) => {
-    if (!user) return false;
-    
-    const success = await GamificationService.addPoints(user.id, points, reason);
-    if (success) {
-      await fetchGamificationData();
+  const awardPoints = async (points: number, reason: string) => {
+    try {
+      const result = await gamificationService.awardPoints(points, reason);
+      setUserPoints(result);
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'attribution des points');
+      throw err;
     }
-    return success;
+  };
+
+  const checkAchievements = async () => {
+    try {
+      const newAchievements = await gamificationService.checkAndAwardAchievements();
+      if (newAchievements.length > 0) {
+        setAchievements(prev => [...prev, ...newAchievements]);
+        await loadGamificationData(); // Refresh all data
+      }
+      return newAchievements;
+    } catch (err) {
+      console.error('Erreur lors de la vérification des succès:', err);
+      return [];
+    }
   };
 
   const updateStreak = async (activityType: string) => {
-    if (!user) return null;
-    
-    return await GamificationService.updateStreak(user.id, activityType);
-  };
-
-  const checkNewBadges = async () => {
-    if (!user) return [];
-    
-    const newBadges = await GamificationService.checkAndAwardBadges(user.id);
-    if (newBadges.length > 0) {
-      await fetchGamificationData();
+    try {
+      const updatedStreak = await gamificationService.updateStreak(activityType);
+      setStreaks(prev => prev.map(s => 
+        s.activity_type === activityType ? updatedStreak : s
+      ));
+      return updatedStreak;
+    } catch (err) {
+      console.error('Erreur lors de la mise à jour de la série:', err);
+      throw err;
     }
-    return newBadges;
   };
-
-  useEffect(() => {
-    fetchGamificationData();
-  }, [user]);
 
   return {
     userPoints,
     userBadges,
-    recentAchievements,
+    achievements,
     streaks,
     loading,
-    addPoints,
+    error,
+    awardPoints,
+    checkAchievements,
     updateStreak,
-    checkNewBadges,
-    refreshData: fetchGamificationData
+    refreshData: loadGamificationData
   };
 };
