@@ -1,303 +1,307 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Scan, 
-  Mic, 
-  Camera, 
-  FileText, 
+  Heart, 
   Brain, 
-  Heart,
-  Smile,
-  Frown,
+  Smile, 
+  Frown, 
   Meh,
   Angry,
-  Surprised,
+  Zap,
   Play,
   Pause,
-  RotateCcw
+  Volume2,
+  Mic,
+  Camera,
+  BarChart3,
+  History,
+  TrendingUp,
+  Users,
+  Calendar,
+  MessageCircle
 } from 'lucide-react';
 
 const ScanPage: React.FC = () => {
-  const [scanType, setScanType] = useState<'text' | 'voice' | 'video' | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [textInput, setTextInput] = useState('');
-  const [results, setResults] = useState<any>(null);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
 
   const emotions = [
-    { name: 'Joie', icon: <Smile className="h-6 w-6" />, color: 'text-yellow-500', percentage: 0 },
-    { name: 'Tristesse', icon: <Frown className="h-6 w-6" />, color: 'text-blue-500', percentage: 0 },
-    { name: 'Colère', icon: <Angry className="h-6 w-6" />, color: 'text-red-500', percentage: 0 },
-    { name: 'Surprise', icon: <Surprised className="h-6 w-6" />, color: 'text-purple-500', percentage: 0 },
-    { name: 'Neutre', icon: <Meh className="h-6 w-6" />, color: 'text-gray-500', percentage: 0 },
+    { name: 'Joyeux', icon: Smile, color: 'text-yellow-500', level: 85 },
+    { name: 'Calme', icon: Heart, color: 'text-blue-500', level: 70 },
+    { name: 'Énergique', icon: Zap, color: 'text-orange-500', level: 60 },
+    { name: 'Pensif', icon: Brain, color: 'text-purple-500', level: 45 },
+    { name: 'Neutre', icon: Meh, color: 'text-gray-500', level: 30 },
+    { name: 'Triste', icon: Frown, color: 'text-blue-600', level: 20 },
+    { name: 'Stressé', icon: Angry, color: 'text-red-500', level: 15 }
   ];
 
-  const handleStartScan = async (type: 'text' | 'voice' | 'video') => {
-    setScanType(type);
+  const recentScans = [
+    { date: '2024-06-18', time: '14:30', emotion: 'Joyeux', score: 85 },
+    { date: '2024-06-18', time: '09:15', emotion: 'Calme', score: 70 },
+    { date: '2024-06-17', time: '16:45', emotion: 'Énergique', score: 60 },
+    { date: '2024-06-17', time: '11:20', emotion: 'Pensif', score: 45 }
+  ];
+
+  const handleStartScan = () => {
     setIsScanning(true);
-    setScanProgress(0);
-    
-    // Simulation d'un scan progressif
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsScanning(false);
-          // Simulation de résultats
-          setResults({
-            dominantEmotion: 'Joie',
-            confidence: 87,
-            emotions: [
-              { name: 'Joie', percentage: 65 },
-              { name: 'Surprise', percentage: 20 },
-              { name: 'Neutre', percentage: 15 },
-              { name: 'Tristesse', percentage: 0 },
-              { name: 'Colère', percentage: 0 },
-            ]
-          });
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 300);
+    // Simulation d'un scan
+    setTimeout(() => {
+      setCurrentEmotion('Joyeux');
+      setIsScanning(false);
+    }, 3000);
   };
-
-  const resetScan = () => {
-    setScanType(null);
-    setIsScanning(false);
-    setScanProgress(0);
-    setResults(null);
-    setTextInput('');
-  };
-
-  if (results) {
-    return (
-      <div className="container mx-auto px-4 py-8 space-y-6">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">Résultats de votre Scan Émotionnel</h1>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            Analyse terminée avec {results.confidence}% de confiance
-          </Badge>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Brain className="h-6 w-6 text-primary" />
-              <span>Émotion Dominante</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center space-y-4">
-              <div className="text-4xl font-bold text-primary">{results.dominantEmotion}</div>
-              <p className="text-muted-foreground">
-                Cette émotion représente l'état principal détecté lors de votre scan.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Répartition Émotionnelle</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {results.emotions.map((emotion: any, index: number) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                    {emotions.find(e => e.name === emotion.name)?.icon}
-                    <span className="font-medium">{emotion.name}</span>
-                  </div>
-                  <span className="text-sm font-medium">{emotion.percentage}%</span>
-                </div>
-                <Progress value={emotion.percentage} className="h-2" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-center space-x-4">
-          <Button onClick={resetScan} variant="outline">
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Nouveau Scan
-          </Button>
-          <Button>
-            Sauvegarder dans le Journal
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (scanType && isScanning) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="max-w-2xl mx-auto">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-6">
-              <div className="relative">
-                <div className="w-24 h-24 mx-auto bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
-                  <Scan className="h-12 w-12 text-primary animate-spin" />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <h2 className="text-2xl font-semibold">Analyse en cours...</h2>
-                <p className="text-muted-foreground">
-                  {scanType === 'text' && 'Analyse de votre texte en cours'}
-                  {scanType === 'voice' && 'Analyse de votre voix en cours'}
-                  {scanType === 'video' && 'Analyse de votre expression faciale en cours'}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Progress value={scanProgress} className="h-3" />
-                <p className="text-sm text-muted-foreground">{scanProgress}% complété</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (scanType === 'text') {
-    return (
-      <div className="container mx-auto px-4 py-8 space-y-6">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">Scan Émotionnel par Texte</h1>
-          <p className="text-muted-foreground">
-            Écrivez vos pensées et sentiments pour analyser votre état émotionnel
-          </p>
-        </div>
-
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-6 w-6" />
-              <span>Votre Expression</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder="Décrivez comment vous vous sentez aujourd'hui, vos pensées, vos émotions..."
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              className="min-h-32"
-            />
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">
-                {textInput.length} caractères
-              </span>
-              <div className="space-x-2">
-                <Button variant="outline" onClick={() => setScanType(null)}>
-                  Retour
-                </Button>
-                <Button 
-                  onClick={() => handleStartScan('text')}
-                  disabled={textInput.length < 10}
-                >
-                  Analyser
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      {/* Header */}
+    <div className="container mx-auto px-4 py-8 space-y-6">
+      {/* En-tête */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-          Scanner Émotionnel
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Scanner d'Émotions
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Analysez votre état émotionnel grâce à nos technologies d'intelligence artificielle avancées.
-          Choisissez votre méthode d'analyse préférée.
+          Analysez votre état émotionnel en temps réel grâce à notre technologie avancée d'IA
         </p>
       </div>
 
-      {/* Options de scan */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setScanType('text')}>
-          <CardHeader className="text-center">
-            <div className="w-16 h-16 mx-auto bg-blue-500 rounded-full flex items-center justify-center text-white mb-4">
-              <FileText className="h-8 w-8" />
-            </div>
-            <CardTitle>Analyse Textuelle</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Exprimez vos sentiments par écrit et obtenez une analyse détaillée de votre état émotionnel.
-            </p>
-            <Badge variant="secondary">Recommandé pour commencer</Badge>
-            <Button className="w-full">
-              Commencer l'analyse
-            </Button>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="scan" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="scan">Scanner</TabsTrigger>
+          <TabsTrigger value="history">Historique</TabsTrigger>
+          <TabsTrigger value="analytics">Analyses</TabsTrigger>
+          <TabsTrigger value="team">Équipe</TabsTrigger>
+        </TabsList>
 
-        <Card className="hover:shadow-lg transition-shadow opacity-75">
-          <CardHeader className="text-center">
-            <div className="w-16 h-16 mx-auto bg-green-500 rounded-full flex items-center justify-center text-white mb-4">
-              <Mic className="h-8 w-8" />
-            </div>
-            <CardTitle>Analyse Vocale</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Parlez librement et laissez notre IA analyser le ton et les nuances de votre voix.
-            </p>
-            <Badge variant="outline">Bientôt disponible</Badge>
-            <Button disabled className="w-full">
-              Fonctionnalité à venir
-            </Button>
-          </CardContent>
-        </Card>
+        <TabsContent value="scan" className="space-y-6">
+          {/* Zone de scan principal */}
+          <Card className="relative overflow-hidden">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center gap-2">
+                <Brain className="h-6 w-6" />
+                Analyse Émotionnelle
+              </CardTitle>
+              <CardDescription>
+                Utilisez votre voix, votre visage ou du texte pour analyser vos émotions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Boutons de scan */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={handleStartScan}
+                  disabled={isScanning}
+                >
+                  <Mic className="h-6 w-6" />
+                  Scan Vocal
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={handleStartScan}
+                  disabled={isScanning}
+                >
+                  <Camera className="h-6 w-6" />
+                  Scan Facial
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="h-20 flex flex-col gap-2"
+                  onClick={handleStartScan}
+                  disabled={isScanning}
+                >
+                  <MessageCircle className="h-6 w-6" />
+                  Scan Textuel
+                </Button>
+              </div>
 
-        <Card className="hover:shadow-lg transition-shadow opacity-75">
-          <CardHeader className="text-center">
-            <div className="w-16 h-16 mx-auto bg-purple-500 rounded-full flex items-center justify-center text-white mb-4">
-              <Camera className="h-8 w-8" />
-            </div>
-            <CardTitle>Analyse Faciale</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Utilisez votre caméra pour une analyse en temps réel de vos expressions faciales.
-            </p>
-            <Badge variant="outline">Bientôt disponible</Badge>
-            <Button disabled className="w-full">
-              Fonctionnalité à venir
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+              {/* Zone de résultat */}
+              <div className="text-center p-8 bg-muted/50 rounded-lg">
+                {isScanning ? (
+                  <div className="space-y-4">
+                    <div className="animate-pulse">
+                      <Brain className="h-16 w-16 mx-auto text-primary" />
+                    </div>
+                    <p className="text-lg font-medium">Analyse en cours...</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-primary h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+                    </div>
+                  </div>
+                ) : currentEmotion ? (
+                  <div className="space-y-4">
+                    <div className="text-6xl">😊</div>
+                    <h3 className="text-2xl font-bold text-primary">Joyeux</h3>
+                    <p className="text-lg">Score de bien-être: 85/100</p>
+                    <Badge variant="secondary" className="text-sm">
+                      Excellente humeur détectée
+                    </Badge>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Heart className="h-16 w-16 mx-auto text-muted-foreground" />
+                    <p className="text-lg text-muted-foreground">
+                      Cliquez sur l'un des boutons ci-dessus pour commencer une analyse
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Informations sur la confidentialité */}
-      <Card className="max-w-2xl mx-auto bg-muted/50">
-        <CardContent className="pt-6">
-          <div className="text-center space-y-4">
-            <Heart className="h-8 w-8 mx-auto text-red-500" />
-            <h3 className="font-semibold">Confidentialité et Sécurité</h3>
-            <p className="text-sm text-muted-foreground">
-              Toutes vos données sont traitées de manière sécurisée et confidentielle. 
-              Aucune information personnelle n'est stockée sans votre consentement explicite.
-            </p>
+          {/* Émotions détectées */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Palette Émotionnelle
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                {emotions.map((emotion) => {
+                  const IconComponent = emotion.icon;
+                  return (
+                    <div key={emotion.name} className="text-center space-y-2">
+                      <div className={`p-3 rounded-full bg-muted ${emotion.color}`}>
+                        <IconComponent className="h-6 w-6 mx-auto" />
+                      </div>
+                      <p className="text-sm font-medium">{emotion.name}</p>
+                      <div className="w-full bg-gray-200 rounded-full h-1">
+                        <div 
+                          className="bg-primary h-1 rounded-full" 
+                          style={{width: `${emotion.level}%`}}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{emotion.level}%</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Historique des Scans
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentScans.map((scan, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="text-2xl">
+                        {scan.emotion === 'Joyeux' ? '😊' : 
+                         scan.emotion === 'Calme' ? '😌' : 
+                         scan.emotion === 'Énergique' ? '⚡' : '🤔'}
+                      </div>
+                      <div>
+                        <p className="font-medium">{scan.emotion}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {scan.date} à {scan.time}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline">{scan.score}/100</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Tendance Hebdomadaire</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-8 w-8 text-green-500" />
+                  <div>
+                    <p className="text-2xl font-bold">+15%</p>
+                    <p className="text-sm text-muted-foreground">Amélioration</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Score Moyen</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-primary">72</p>
+                  <p className="text-sm text-muted-foreground">Cette semaine</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Scans Réalisés</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-8 w-8 text-blue-500" />
+                  <div>
+                    <p className="text-2xl font-bold">24</p>
+                    <p className="text-sm text-muted-foreground">Ce mois-ci</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+
+        <TabsContent value="team" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Vue d'Équipe
+              </CardTitle>
+              <CardDescription>
+                Aperçu anonymisé du bien-être de votre équipe
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <h4 className="font-medium text-green-800">Score d'équipe moyen</h4>
+                    <p className="text-2xl font-bold text-green-600">78/100</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium text-blue-800">Participation</h4>
+                    <p className="text-2xl font-bold text-blue-600">89%</p>
+                  </div>
+                </div>
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    Données agrégées et anonymisées conformément au RGPD
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
-export { ScanPage };
 export default ScanPage;
