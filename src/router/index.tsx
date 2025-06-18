@@ -17,7 +17,8 @@ import { adminRoutes } from './routes/adminRoutes';
 import { onboardingRoutes } from './routes/onboardingRoutes';
 import { auditRoutes } from './routes/auditRoutes';
 import { b2bRoutes } from './routes/b2bRoutes';
-import { ImmersiveHome } from '@/pages/ImmersiveHome';
+
+console.log('Creating router with publicRoutes:', publicRoutes);
 
 export const router = createBrowserRouter([
   {
