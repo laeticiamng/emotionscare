@@ -1,167 +1,165 @@
 
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Building2, ShieldCheck, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getUserModeLabel } from '@/utils/userModeHelpers';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { getUserModeDisplayName, getModeDashboardPath } from '@/utils/userModeHelpers';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import type { LoginFormData } from '@/types/auth';
 
-interface LoginPageProps {
-  mode?: 'b2c' | 'b2b_user' | 'b2b_admin';
-}
+const loginSchema = z.object({
+  email: z.string().email('Email invalide'),
+  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
+});
 
-const LoginPage: React.FC<LoginPageProps> = ({ mode = 'b2c' }) => {
+const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error("Champs obligatoires", {
-        description: "Veuillez remplir tous les champs"
-      });
-      return;
+  const [searchParams] = useSearchParams();
+  const { signIn, isLoading } = useAuth();
+  const { userMode } = useUserMode();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await signIn(data);
+      const dashboardPath = getModeDashboardPath(userMode);
+      navigate(dashboardPath);
+    } catch (error) {
+      // L'erreur est déjà gérée dans le contexte
     }
-    
-    // Exemple de login de démonstration. Dans une vraie application, il faudrait
-    // s'authentifier auprès d'un backend
-    login({
-      id: '1',
-      email,
-      name: email.split('@')[0],
-      role: mode
-    });
-    
-    toast.success("Connexion réussie", {
-      description: "Redirection vers votre tableau de bord"
-    });
-    
-    setTimeout(() => {
-      if (mode === 'b2c') {
-        navigate('/b2c/dashboard');
-      } else if (mode === 'b2b_user') {
-        navigate('/b2b/user/dashboard');
-      } else if (mode === 'b2b_admin') {
-        navigate('/b2b/admin/dashboard');
-      }
-    }, 1000);
   };
-  
-  const getModeIcon = () => {
-    if (mode === 'b2c') return <User className="h-6 w-6" />;
-    if (mode === 'b2b_user') return <Building2 className="h-6 w-6" />;
-    return <ShieldCheck className="h-6 w-6" />;
+
+  const handleGoBack = () => {
+    navigate('/choose-mode');
   };
-  
-  const getModeColor = () => {
-    if (mode === 'b2c') return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
-    if (mode === 'b2b_user') return "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-    return "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300";
+
+  const handleSignUpRedirect = () => {
+    const currentPath = window.location.pathname;
+    const signupPath = currentPath.replace('/login', '/register');
+    navigate(signupPath);
   };
-  
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
         className="w-full max-w-md"
       >
-        <Card>
-          <CardHeader className={getModeColor()}>
-            <div className="flex items-center gap-3">
-              {getModeIcon()}
-              <div>
-                <CardTitle className="text-xl">Connexion</CardTitle>
-                <CardDescription className="text-foreground/70">
-                  Mode {getUserModeLabel(mode)}
-                </CardDescription>
-              </div>
-            </div>
+        <Button
+          variant="ghost"
+          onClick={handleGoBack}
+          className="mb-4 hover:bg-muted/50"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Retour au choix du mode
+        </Button>
+
+        <Card className="shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
+            <CardDescription>
+              Mode : {getUserModeDisplayName(userMode)}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    placeholder="votre@email.com"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Mot de passe</Label>
-                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                      Mot de passe oublié ?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  Se connecter
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="votre@email.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Votre mot de passe"
+                            {...field}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Connexion...' : 'Se connecter'}
                 </Button>
-              </div>
-            </form>
+              </form>
+            </Form>
+
+            <div className="mt-6 text-center space-y-2">
+              <Button
+                variant="link"
+                onClick={handleSignUpRedirect}
+                className="w-full"
+              >
+                Pas encore de compte ? S'inscrire
+              </Button>
+              <Button
+                variant="link"
+                onClick={() => navigate('/forgot-password')}
+                className="w-full text-sm text-muted-foreground"
+              >
+                Mot de passe oublié ?
+              </Button>
+            </div>
           </CardContent>
-          <CardFooter className="flex flex-col items-center gap-4">
-            <div className="text-sm text-center text-muted-foreground">
-              Pas encore de compte ?{' '}
-              <Link
-                to={
-                  mode === 'b2c'
-                    ? '/b2c/register'
-                    : mode === 'b2b_user'
-                    ? '/b2b/user/register'
-                    : '/b2b/admin/register'
-                }
-                className="text-primary hover:underline"
-              >
-                Créer un compte
-              </Link>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/')}
-              >
-                Retour à l'accueil
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/mode-switcher')}
-              >
-                Changer de mode
-              </Button>
-            </div>
-          </CardFooter>
         </Card>
       </motion.div>
     </div>

@@ -1,28 +1,21 @@
 
-import { normalizeUserMode } from './normalizeUserMode';
-import { LOGIN_ROUTES, UserMode } from './route';
+import type { UserMode } from '@/types/auth';
 
-export { normalizeUserMode };
-
-export const getDashboardPath = (userRole: string): string => {
-  const normalizedRole = normalizeUserMode(userRole);
-  
-  switch (normalizedRole) {
+export const getUserModeDisplayName = (mode: UserMode | null): string => {
+  switch (mode) {
     case 'b2c':
-      return '/b2c/dashboard';
+      return 'Particulier';
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return 'Collaborateur';
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return 'Administrateur RH';
     default:
-      return '/b2c/dashboard';
+      return 'Non défini';
   }
 };
 
-export const getLoginPath = (userRole: string): string => {
-  const normalizedRole = normalizeUserMode(userRole);
-  
-  switch (normalizedRole) {
+export const getModeLoginPath = (mode: UserMode | null): string => {
+  switch (mode) {
     case 'b2c':
       return '/b2c/login';
     case 'b2b_user':
@@ -34,14 +27,24 @@ export const getLoginPath = (userRole: string): string => {
   }
 };
 
-export const getModeLoginPath = (mode: string): string => {
-  const normalized = normalizeUserMode(mode) as UserMode;
-  return LOGIN_ROUTES[normalized] || '/b2c/login';
+export const getModeDashboardPath = (mode: UserMode | null): string => {
+  switch (mode) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    default:
+      return '/';
+  }
 };
 
-export default {
-  normalizeUserMode,
-  getDashboardPath,
-  getLoginPath,
-  getModeLoginPath
+export const normalizeUserMode = (mode: string | null): UserMode | null => {
+  if (!mode) return null;
+  
+  const normalized = mode.toLowerCase();
+  if (normalized.includes('admin')) return 'b2b_admin';
+  if (normalized.includes('user') || normalized.includes('b2b')) return 'b2b_user';
+  return 'b2c';
 };
