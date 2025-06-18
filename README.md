@@ -2,6 +2,7 @@
 # EmotionsCare - Plateforme de bien-être émotionnel
 
 ![Node version](https://img.shields.io/badge/node-20%2B-brightgreen)
+![Bun version](https://img.shields.io/badge/bun-1.2%2B-blue)
 
 ## À propos du projet
 
@@ -24,8 +25,7 @@ EmotionsCare est une plateforme SaaS innovante dédiée au bien-être émotionne
 ### Prérequis
 
 - **Node.js** >= 20
-- **npm** >= 10
-- PNPM est désactivé. **Bun n'est plus supporté**
+- **Bun** >= 1.2
 
 ### Stack technologique
 
@@ -144,40 +144,43 @@ Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre `.e
 
 ## Installation et démarrage
 
-> **Important** : PNPM est désactivé. **Bun n'est plus supporté**. Utilisez uniquement npm (version 10 ou supérieure).
+### Setup Bun
 
 ```bash
-# Install
-npm install --legacy-peer-deps
-npm run dev
+# Install dependencies
+bun install --no-save
+
+# Start development server
+bun run dev
 ```
 
 ```bash
+
 # Cloner le repository
 git clone https://github.com/your-username/emotions-care.git
 cd emotions-care
 
-# Installer les dépendances (npm ≥ 10 requis)
-npm install --legacy-peer-deps
+# Installer les dépendances
+bun install --no-save
 
 # Créer un fichier .env.local avec les variables nécessaires
 # (voir section Configuration d'environnement)
 
 # Démarrer l'application en mode développement
-npm run dev
+bun run dev
 
 # Build pour la production
-npm run build
+bun run build
 
 # Exécuter les tests
 # Les variables de `.env.test` sont chargées automatiquement
-npm test
+bun run test
 
 # Vérifier les types TypeScript
-npm run type-check
+bun run type-check
 
 # Démarrer le serveur de production
-npm start
+bun run start
 ```
 
 ## Système de design et thèmes
@@ -253,17 +256,17 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 
 ## Tests et qualité
 
-- ESLint pour la qualité du code (`npm run lint`)
-- Vérification de type TypeScript (`npm run type-check`)
-- Tests unitaires (placeholder) (`npm run test`)
+- ESLint pour la qualité du code (`bun run lint`)
+- Vérification de type TypeScript (`bun run type-check`)
+- Tests unitaires (placeholder) (`bun run test`)
 - Utiliser `MockMusicProvider` pour tester les hooks liés à la musique
-- Nettoyage du build (`npm run clean`)
+- Nettoyage du build (`bun run clean`)
 
 ### Conventions de typage
 
 Les interfaces et propriétés utilisent systématiquement l'anglais en `camelCase`.
 Les champs en `snake_case` ne subsistent que pour la compatibilité avec
-certaines sources de données. La commande `npm run type-check` doit s'exécuter
+certaines sources de données. La commande `bun run type-check` doit s'exécuter
 sans erreur pour valider la cohérence des types.
 
 ## Données de test
@@ -317,10 +320,10 @@ Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramèt
 La séquence de build optimisée utilise le flag `SKIP_HEAVY` pour ignorer les binaires lourds lors de l'installation :
 
 ```bash
-SKIP_HEAVY=true npm ci --prefer-offline --audit=false
-npm run build
+SKIP_HEAVY=true bun install --no-save
+bun run build
 SKIP_HEAVY=true node scripts/install-heavy.js
-npm run test -- --environment=jsdom
+bun run test -- --environment=jsdom
 ```
 
 
@@ -381,8 +384,7 @@ EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe
 
 [![CI](https://github.com/your-username/emotions-care/actions/workflows/ci.yml/badge.svg?branch=feat/dashboard-widgets)](https://github.com/your-username/emotions-care/actions/workflows/ci.yml)
 
-Les contributions sont les bienvenues ! Veillez à installer les dépendances avec `npm ci`, à lancer `npm run lint` et `npm test` avant de proposer une pull request.
-Bun n'est plus supporté. Utilisez npm version 10 ou supérieure.
+Les contributions sont les bienvenues ! Veillez à installer les dépendances avec `bun install --no-save`, à lancer `bun run lint` et `bun run test` avant de proposer une pull request.
 
 ## Licence
 

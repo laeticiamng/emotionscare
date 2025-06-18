@@ -36,8 +36,7 @@
     "db:test:setup": "node --loader ts-node/esm scripts/test-db-setup.ts",
     "install:npm": "npm install --legacy-peer-deps",
     "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps",
-    "front:ci-install": "npm ci --prefer-offline --audit=false --omit=dev && npm run build",
-    "postinstall": "node scripts/force-npm-only.js"
+    "front:ci-install": "npm ci --prefer-offline --audit=false --omit=dev && npm run build"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",

@@ -8,9 +8,6 @@ on:
 
 env:
   NODE_VERSION: "20"
-  BUN_DISABLED: "true"
-  USE_NPM_ONLY: "true"
-  PACKAGE_MANAGER: "npm"
 
 jobs:
   front:
@@ -20,22 +17,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - name: Remove Bun completely
-        run: |
-          sudo rm -rf ~/.bun ~/.cache/bun /usr/local/bin/bun || true
-          which bun && sudo rm -f $(which bun) || true
-          echo "✅ Bun removal completed"
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "1.2"
       - name: Assert package manager
         run: ./bin/assert-package-manager.sh
-      - name: Install with npm and heavy deps
-        run: |
-          rm -rf node_modules || true
-          npm cache clean --force || true
-          npm install --legacy-peer-deps
-          node scripts/install-heavy.js
+      - name: Install dependencies
+        run: bun install --no-save
+      - name: Install heavy deps
+        run: node scripts/install-heavy.js
       - name: Run tests
-        run: npm run test -- --environment=jsdom
+        run: bun run test -- --environment=jsdom
 
   back:
     runs-on: ubuntu-22.04
@@ -51,16 +43,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - name: Remove Bun completely
-        run: |
-          sudo rm -rf ~/.bun ~/.cache/bun /usr/local/bin/bun || true
-          which bun && sudo rm -f $(which bun) || true
-          echo "✅ Bun removal completed"
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "1.2"
       - name: Assert package manager
         run: ./bin/assert-package-manager.sh
       - name: Install dependencies
-        run: npm ci --prefer-offline --audit=false
-      - run: npm run flyway:migrate
-      - run: npm run db:migrate
-      - run: npm run test:db
+        run: bun install --no-save
+      - run: bun run flyway:migrate
+      - run: bun run db:migrate
+      - run: bun run test:db
