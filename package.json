@@ -39,6 +39,7 @@
     "front:ci-install": "npm ci --prefer-offline --audit=false --omit=dev && npm run build"
   },
   "dependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "^3.19.1",
     "@dnd-kit/core": "^6.3.1",

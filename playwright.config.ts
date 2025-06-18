@@ -1,4 +1,3 @@
-
 import 'ts-node/register';
 import 'tsconfig-paths/register.js';
 import { defineConfig, devices } from '@playwright/test';
@@ -13,11 +12,16 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: [
+    ['html'],
+    ['json', { outputFile: 'reports/e2e-report.json' }],
+    ['junit', { outputFile: 'reports/e2e-results.xml' }]
+  ],
   use: {
     baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
 
   projects: [
@@ -41,12 +45,17 @@ export default defineConfig({
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },
     },
+    {
+      name: 'Tablet',
+      use: { ...devices['iPad'] },
+    },
   ],
 
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:8080',
     reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
   },
   resolve: {
     alias: {
