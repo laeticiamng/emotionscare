@@ -2,16 +2,16 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const VRPage: React.FC = () => {
+const B2BDashboardPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Card>
         <CardHeader>
-          <CardTitle>Réalité Virtuelle</CardTitle>
+          <CardTitle>Tableau de Bord B2B</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Page VR - Contenu à venir
+            Dashboard B2B - Contenu à venir
           </p>
         </CardContent>
       </Card>
@@ -19,4 +19,4 @@ const VRPage: React.FC = () => {
   );
 };
 
-export default VRPage;
+export default B2BDashboardPage;

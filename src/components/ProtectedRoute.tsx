@@ -2,34 +2,39 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getLoginRoute } from '@/utils/routeUtils';
+import { useUserMode } from '@/contexts/UserModeContext';
+import type { UserMode } from '@/types/auth';
 
-interface Props {
-  children: JSX.Element;
-  requiredRole?: 'user' | 'admin';
-  mockUserMode?: 'b2c' | 'b2b_user' | 'b2b_admin';
-  mockAuthenticated?: boolean;
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: UserMode;
 }
 
-const ProtectedRoute: React.FC<Props> = ({
-  children,
-  requiredRole = 'user',
-  mockUserMode,
-  mockAuthenticated,
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requiredRole 
 }) => {
-  const { user } = useAuth();
-  const isAuth = mockAuthenticated ?? !!user;
-  const currentMode = (mockUserMode ?? (user?.role as 'b2c' | 'b2b_user' | 'b2b_admin')) ?? 'b2c';
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const { userMode } = useUserMode();
 
-  if (!isAuth) {
-    return <Navigate to={getLoginRoute(currentMode)} replace />;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
-  if (requiredRole === 'admin' && user?.role !== 'admin') {
-    return <Navigate to={getLoginRoute(currentMode)} replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/choose-mode" replace />;
   }
 
-  return children;
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/choose-mode" replace />;
+  }
+
+  return <>{children}</>;
 };
 
+export { ProtectedRoute };
 export default ProtectedRoute;
