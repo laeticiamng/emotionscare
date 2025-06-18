@@ -1,277 +1,277 @@
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
   Palette, 
   Zap, 
   Heart, 
   Star, 
-  Award,
-  Smartphone,
+  Trophy, 
+  Clock,
   Users,
-  BarChart3,
+  TrendingUp,
   Settings
 } from 'lucide-react';
-import FloatingActionButton from './FloatingActionButton';
+
 import PremiumCard from './PremiumCard';
+import FloatingActionButton from './FloatingActionButton';
 import AnimatedCounter from './AnimatedCounter';
 import GlassmorphismPanel from './GlassmorphismPanel';
 import InteractiveTimeline from './InteractiveTimeline';
+import ThemeCustomizer from './ThemeCustomizer';
 
 const PremiumUIShowcase: React.FC = () => {
-  const [activeDemo, setActiveDemo] = useState('components');
-  const [isFloating, setIsFloating] = useState(true);
+  const [activeDemo, setActiveDemo] = useState('cards');
+  const [showThemeCustomizer, setShowThemeCustomizer] = useState(false);
 
-  const premiumFeatures = [
+  const timelineEvents = [
     {
-      icon: Palette,
-      title: 'Design System Premium',
-      description: 'Composants UI avancés avec animations fluides',
-      color: 'from-purple-500 to-pink-500'
+      date: '2024-01-15',
+      title: 'Inscription EmotionsCare',
+      description: 'Début de votre parcours de bien-être émotionnel',
+      completed: true
     },
     {
-      icon: Zap,
-      title: 'Micro-interactions',
-      description: 'Animations subtiles qui enchantent',
-      color: 'from-yellow-500 to-orange-500'
+      date: '2024-02-01',
+      title: 'Premier scan émotionnel',
+      description: 'Analyse de votre état émotionnel de base',
+      completed: true
     },
     {
-      icon: Smartphone,
-      title: 'Expérience Mobile',
-      description: 'PWA avec notifications push',
-      color: 'from-blue-500 to-cyan-500'
+      date: '2024-02-15',
+      title: 'Programme personnalisé',
+      description: 'Création de votre plan de développement personnel',
+      completed: true
     },
     {
-      icon: Users,
-      title: 'Social Premium',
-      description: 'Communauté et partage avancés',
-      color: 'from-green-500 to-emerald-500'
+      date: '2024-03-01',
+      title: 'Coaching IA avancé',
+      description: 'Accès aux fonctionnalités premium de coaching',
+      completed: false
     }
   ];
 
-  const timelineEvents = [
-    { date: '2024', title: 'Lancement EmotionsCare', description: 'Première version de la plateforme' },
-    { date: '2024 Q3', title: 'IA Coach Intégré', description: 'Intelligence artificielle conversationnelle' },
-    { date: '2024 Q4', title: 'Version Premium', description: 'Interface utilisateur avancée' },
-    { date: '2025', title: 'Expansion Globale', description: 'Disponible dans 15 langues' }
+  const premiumFeatures = [
+    {
+      icon: Sparkles,
+      title: 'Animations Premium',
+      description: 'Micro-interactions fluides et engageantes pour une expérience utilisateur exceptionnelle',
+      gradient: 'from-purple-500 to-pink-500',
+      delay: 0
+    },
+    {
+      icon: Palette,
+      title: 'Thèmes Personnalisables',
+      description: 'Système de thèmes avancé avec personnalisation complète des couleurs et styles',
+      gradient: 'from-blue-500 to-cyan-500',
+      delay: 0.1
+    },
+    {
+      icon: Zap,
+      title: 'Composants Interactifs',
+      description: 'Boutons flottants, compteurs animés et éléments interactifs premium',
+      gradient: 'from-yellow-500 to-orange-500',
+      delay: 0.2
+    },
+    {
+      icon: Heart,
+      title: 'Design Émotionnel',
+      description: 'Interface pensée pour le bien-être avec des effets visuels apaisants',
+      gradient: 'from-red-500 to-pink-500',
+      delay: 0.3
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto"
-      >
-        {/* Header Premium */}
-        <div className="text-center mb-12">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", duration: 0.6 }}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full mb-6"
-          >
-            <Sparkles className="h-5 w-5" />
-            <span className="font-semibold">Interface Premium Activée</span>
-            <Badge variant="secondary" className="bg-white/20 text-white">
-              Point 18
-            </Badge>
-          </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Sparkles className="h-8 w-8 text-purple-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Interface Premium EmotionsCare
+            </h1>
+          </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            Expérience UI Premium
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Découvrez une interface utilisateur révolutionnaire avec des animations fluides, 
-            des composants premium et une expérience utilisateur exceptionnelle.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Découvrez notre système d'interface utilisateur premium avec des composants avancés, 
+            des animations fluides et une expérience utilisateur exceptionnelle.
           </p>
-        </div>
 
-        {/* Navigation Premium */}
-        <Tabs value={activeDemo} onValueChange={setActiveDemo} className="mb-8">
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-4 h-14 bg-white/50 backdrop-blur-sm border shadow-lg">
-            <TabsTrigger value="components" className="flex items-center gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
-              <Palette className="h-4 w-4" />
-              Composants
-            </TabsTrigger>
-            <TabsTrigger value="animations" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-              <Zap className="h-4 w-4" />
-              Animations
-            </TabsTrigger>
-            <TabsTrigger value="mobile" className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
-              <Smartphone className="h-4 w-4" />
-              Mobile
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
+          <div className="flex items-center justify-center gap-4">
+            <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">
+              Point 18 - Interface Premium
+            </Badge>
+            <Badge variant="outline">
+              100% Complété
+            </Badge>
+          </div>
+        </motion.div>
+
+        {/* Navigation Tabs */}
+        <Tabs value={activeDemo} onValueChange={setActiveDemo} className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="cards">Cartes Premium</TabsTrigger>
+            <TabsTrigger value="animations">Animations</TabsTrigger>
+            <TabsTrigger value="counters">Compteurs</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="glass">Glassmorphism</TabsTrigger>
           </TabsList>
 
-          <AnimatePresence mode="wait">
-            <TabsContent value="components" className="mt-8">
-              <motion.div
-                key="components"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {premiumFeatures.map((feature, index) => (
-                  <PremiumCard
-                    key={index}
-                    icon={feature.icon}
-                    title={feature.title}
-                    description={feature.description}
-                    gradient={feature.color}
-                    delay={index * 0.1}
+          {/* Premium Cards Demo */}
+          <TabsContent value="cards" className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+              {premiumFeatures.map((feature, index) => (
+                <PremiumCard
+                  key={index}
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                  gradient={feature.gradient}
+                  delay={feature.delay}
+                  onClick={() => console.log(`Clicked on ${feature.title}`)}
+                />
+              ))}
+            </motion.div>
+          </TabsContent>
+
+          {/* Animations Demo */}
+          <TabsContent value="animations" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="relative overflow-hidden">
+                <CardHeader>
+                  <CardTitle>Hover Effects</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <motion.div
+                    className="w-full h-32 bg-gradient-to-r from-purple-400 to-pink-400 rounded-lg"
+                    whileHover={{ scale: 1.05, rotate: 2 }}
+                    whileTap={{ scale: 0.95 }}
                   />
-                ))}
-              </motion.div>
-            </TabsContent>
+                </CardContent>
+              </Card>
 
-            <TabsContent value="animations" className="mt-8">
-              <motion.div
-                key="animations"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-8"
-              >
-                <GlassmorphismPanel />
-                
-                <Card className="p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      Compteurs Animés
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <AnimatedCounter label="Utilisateurs" value={12543} />
-                      <AnimatedCounter label="Sessions" value={8921} />
-                      <AnimatedCounter label="Analyses" value={34567} />
-                      <AnimatedCounter label="Satisfaction" value={98} suffix="%" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </TabsContent>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Boutons Flottants</CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                  <FloatingActionButton
+                    icon={Heart}
+                    onClick={() => console.log('Floating button clicked')}
+                    variant="primary"
+                  />
+                </CardContent>
+              </Card>
 
-            <TabsContent value="mobile" className="mt-8">
-              <motion.div
-                key="mobile"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Smartphone className="h-5 w-5 text-blue-500" />
-                      Expérience Mobile Premium
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                      <span>PWA (Progressive Web App)</span>
-                      <Badge className="bg-green-500">Activée</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-                      <span>Notifications Push</span>
-                      <Badge className="bg-green-500">Configurées</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-                      <span>Mode Hors-ligne</span>
-                      <Badge className="bg-purple-500">Disponible</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pulsations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <motion.div
+                    className="w-16 h-16 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mx-auto"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-                <InteractiveTimeline events={timelineEvents} />
-              </motion.div>
-            </TabsContent>
+          {/* Counters Demo */}
+          <TabsContent value="counters" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <AnimatedCounter
+                value={1248}
+                label="Utilisateurs actifs"
+                suffix=" utilisateurs"
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg"
+              />
+              <AnimatedCounter
+                value={89.7}
+                label="Satisfaction"
+                suffix="%"
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg"
+              />
+              <AnimatedCounter
+                value={432}
+                label="Sessions cette semaine"
+                prefix="+"
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg"
+              />
+              <AnimatedCounter
+                value={25}
+                label="Améliorations"
+                suffix=" nouvelles fonctionnalités"
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg"
+              />
+            </div>
+          </TabsContent>
 
-            <TabsContent value="analytics" className="mt-8">
-              <motion.div
-                key="analytics"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-              >
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5 text-orange-500" />
-                      Métriques Temps Réel
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span>Utilisateurs actifs</span>
-                        <AnimatedCounter value={1247} />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>Sessions aujourd'hui</span>
-                        <AnimatedCounter value={892} />
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>Score moyen bien-être</span>
-                        <AnimatedCounter value={87} suffix="/100" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+          {/* Timeline Demo */}
+          <TabsContent value="timeline" className="space-y-6">
+            <InteractiveTimeline events={timelineEvents} />
+          </TabsContent>
 
-                <Card className="p-6">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Award className="h-5 w-5 text-yellow-500" />
-                      Achievements Premium
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                        <Award className="h-5 w-5 text-yellow-500" />
-                        <span>Interface Premium Activée</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                        <Star className="h-5 w-5 text-blue-500" />
-                        <span>Expérience Utilisateur Excellence</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                        <Heart className="h-5 w-5 text-green-500" />
-                        <span>Design System Complet</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </TabsContent>
-          </AnimatePresence>
+          {/* Glassmorphism Demo */}
+          <TabsContent value="glass" className="space-y-6">
+            <div className="relative min-h-[500px] bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 rounded-3xl p-8">
+              <GlassmorphismPanel />
+            </div>
+          </TabsContent>
         </Tabs>
 
-        {/* Floating Action Button Premium */}
-        <AnimatePresence>
-          {isFloating && (
-            <FloatingActionButton
-              icon={Settings}
-              onClick={() => setIsFloating(false)}
-              className="fixed bottom-6 right-6"
+        {/* Bottom Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-center gap-4 pt-8"
+        >
+          <Button
+            onClick={() => setShowThemeCustomizer(true)}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Personnaliser le thème
+          </Button>
+          
+          <Button variant="outline">
+            <Star className="h-4 w-4 mr-2" />
+            Évaluer l'expérience
+          </Button>
+        </motion.div>
+      </div>
+
+      {/* Theme Customizer Overlay */}
+      <AnimatePresence>
+        {showThemeCustomizer && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-40"
+              onClick={() => setShowThemeCustomizer(false)}
             />
-          )}
-        </AnimatePresence>
-      </motion.div>
+            <ThemeCustomizer onClose={() => setShowThemeCustomizer(false)} />
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
