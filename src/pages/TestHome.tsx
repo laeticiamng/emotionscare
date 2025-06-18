@@ -2,110 +2,116 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Users, Building, ArrowRight } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Brain, Users, Zap } from 'lucide-react';
 
 const TestHome: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="container mx-auto px-4 py-16">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <Heart className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
             EmotionsCare
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Votre plateforme de bien-être émotionnel pour une vie plus équilibrée et épanouie
+            Votre plateforme de bien-être émotionnel pour une vie plus épanouie et des équipes plus performantes
           </p>
-          <Link to="/choose-mode">
-            <Button size="lg" className="text-lg px-8 py-6">
-              Commencer votre parcours
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+          <div className="flex gap-4 justify-center">
+            <Link to="/choose-mode">
+              <Button size="lg" className="px-8 py-3">
+                Commencer maintenant
+              </Button>
+            </Link>
+            <Link to="/home">
+              <Button variant="outline" size="lg" className="px-8 py-3">
+                Découvrir la plateforme
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          <Card className="hover:shadow-lg transition-shadow">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-500" />
-                Utilisateur individuel (B2C)
-              </CardTitle>
+              <Heart className="h-12 w-12 mx-auto text-red-500 mb-4" />
+              <CardTitle>Scan émotionnel</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Accès personnel à tous les outils de bien-être émotionnel
-              </p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Scanner d'émotions</li>
-                <li>• Journal personnel</li>
-                <li>• Coach virtuel</li>
-                <li>• Musicothérapie</li>
-              </ul>
+              <CardDescription>
+                Analysez votre état émotionnel en temps réel grâce à notre technologie avancée
+              </CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5 text-green-500" />
-                Utilisateur B2B
-              </CardTitle>
+              <Brain className="h-12 w-12 mx-auto text-blue-500 mb-4" />
+              <CardTitle>Coach IA</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Outils collaboratifs pour le bien-être en entreprise
-              </p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Outils individuels</li>
-                <li>• Collaboration d'équipe</li>
-                <li>• Cocon social</li>
-                <li>• Gamification</li>
-              </ul>
+              <CardDescription>
+                Bénéficiez de conseils personnalisés avec votre coach virtuel disponible 24h/24
+              </CardDescription>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5 text-purple-500" />
-                Administrateur B2B
-              </CardTitle>
+              <Users className="h-12 w-12 mx-auto text-green-500 mb-4" />
+              <CardTitle>Communauté</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Gestion complète et analytics pour les organisations
-              </p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Tableau de bord admin</li>
-                <li>• Gestion des équipes</li>
-                <li>• Rapports détaillés</li>
-                <li>• Événements d'entreprise</li>
-              </ul>
+              <CardDescription>
+                Rejoignez une communauté bienveillante et partagez vos expériences
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardHeader>
+              <Zap className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
+              <CardTitle>Thérapies</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Accédez à diverses thérapies : musicothérapie, VR, méditation et plus
+              </CardDescription>
             </CardContent>
           </Card>
         </div>
 
-        {/* CTA Section */}
+        {/* Quick Navigation */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Prêt à transformer votre bien-être ?
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            Explorez nos fonctionnalités
           </h2>
-          <p className="text-gray-600 mb-8">
-            Choisissez votre mode d'utilisation et commencez votre parcours vers un meilleur équilibre émotionnel
-          </p>
-          <Link to="/choose-mode">
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6">
-              Choisir mon mode d'utilisation
-            </Button>
-          </Link>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+            {[
+              { path: '/scan', label: 'Scan' },
+              { path: '/journal', label: 'Journal' },
+              { path: '/coach', label: 'Coach' },
+              { path: '/music', label: 'Musique' },
+              { path: '/vr', label: 'VR' },
+              { path: '/meditation', label: 'Méditation' },
+              { path: '/community', label: 'Communauté' },
+              { path: '/gamification', label: 'Défis' },
+              { path: '/settings', label: 'Paramètres' },
+              { path: '/teams', label: 'Équipes' }
+            ].map((item) => (
+              <Link key={item.path} to={item.path}>
+                <Button variant="outline" className="w-full h-12">
+                  {item.label}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-20 pt-8 border-t text-center text-gray-600">
+          <p>&copy; 2024 EmotionsCare. Tous droits réservés.</p>
         </div>
       </div>
     </div>

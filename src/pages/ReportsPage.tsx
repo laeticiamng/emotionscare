@@ -1,154 +1,164 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { FileText, Download, Calendar, TrendingUp, Users, BarChart3 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText, Download, Calendar, BarChart3 } from 'lucide-react';
 
 const ReportsPage: React.FC = () => {
-  const reports = [
-    {
-      id: 1,
-      title: "Rapport mensuel de bien-être",
-      description: "Analyse complète du bien-être des employés pour le mois dernier",
-      type: "wellness",
-      period: "Janvier 2024",
-      status: "completed",
-      downloadUrl: "#"
-    },
-    {
-      id: 2,
-      title: "Analyse des tendances émotionnelles",
-      description: "Évolution des émotions au sein des équipes",
-      type: "emotions",
-      period: "Q4 2023",
-      status: "completed",
-      downloadUrl: "#"
-    },
-    {
-      id: 3,
-      title: "Rapport d'engagement",
-      description: "Niveau d'engagement et participation aux activités",
-      type: "engagement",
-      period: "Décembre 2023",
-      status: "in_progress",
-      downloadUrl: null
-    }
-  ];
-
-  const getReportIcon = (type: string) => {
-    switch (type) {
-      case 'wellness':
-        return <TrendingUp className="h-4 w-4" />;
-      case 'emotions':
-        return <BarChart3 className="h-4 w-4" />;
-      case 'engagement':
-        return <Users className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <Badge variant="default">Terminé</Badge>;
-      case 'in_progress':
-        return <Badge variant="secondary">En cours</Badge>;
-      default:
-        return <Badge variant="outline">Brouillon</Badge>;
-    }
-  };
-
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Rapports</h1>
-          <p className="text-muted-foreground">
-            Générez et consultez les rapports de bien-être
-          </p>
+          <h1 className="text-3xl font-bold">Rapports et analyses</h1>
+          <p className="text-muted-foreground">Consultez vos rapports et analyses détaillées</p>
         </div>
-        <Button className="gap-2">
-          <FileText className="h-4 w-4" />
-          Générer un rapport
+        <Button>
+          <Download className="h-4 w-4 mr-2" />
+          Exporter
         </Button>
       </div>
 
-      {/* Statistiques rapides */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rapports ce mois</CardTitle>
+            <CardTitle className="text-sm font-medium">Rapports générés</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+2 depuis le mois dernier</p>
+            <div className="text-2xl font-bold">24</div>
+            <p className="text-xs text-muted-foreground">Ce mois</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Téléchargements</CardTitle>
             <Download className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">847</div>
-            <p className="text-xs text-muted-foreground">+15% ce mois</p>
+            <div className="text-2xl font-bold">156</div>
+            <p className="text-xs text-muted-foreground">+12% vs mois dernier</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Équipes analysées</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Analyses automatiques</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Toutes les équipes</p>
+            <p className="text-xs text-muted-foreground">En cours</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Dernière mise à jour</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2h</div>
+            <p className="text-xs text-muted-foreground">Il y a</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Liste des rapports */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Rapports disponibles</h2>
-        
-        {reports.map((report) => (
-          <Card key={report.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    {getReportIcon(report.type)}
-                    <CardTitle className="text-lg">{report.title}</CardTitle>
+      <Tabs defaultValue="weekly" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="weekly">Hebdomadaire</TabsTrigger>
+          <TabsTrigger value="monthly">Mensuel</TabsTrigger>
+          <TabsTrigger value="quarterly">Trimestriel</TabsTrigger>
+          <TabsTrigger value="custom">Personnalisé</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="weekly" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Rapport bien-être hebdomadaire</CardTitle>
+                <CardDescription>Analyse des données de la semaine</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>Score moyen de bien-être</span>
+                    <span className="font-bold">7.2/10</span>
                   </div>
-                  <p className="text-muted-foreground">{report.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span>Participations</span>
+                    <span className="font-bold">89%</span>
+                  </div>
+                  <Button className="w-full" variant="outline">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Télécharger le rapport
+                  </Button>
                 </div>
-                {getStatusBadge(report.status)}
-              </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Analyses des tendances</CardTitle>
+                <CardDescription>Évolution des indicateurs clés</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>Stress niveau</span>
+                    <span className="text-green-600 font-bold">-15%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Satisfaction</span>
+                    <span className="text-green-600 font-bold">+8%</span>
+                  </div>
+                  <Button className="w-full" variant="outline">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Voir les détails
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="monthly">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapport mensuel</CardTitle>
+              <CardDescription>Analyses approfondies du mois</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{report.period}</span>
-                  </div>
-                </div>
-                
-                {report.downloadUrl && (
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Download className="h-4 w-4" />
-                    Télécharger
-                  </Button>
-                )}
-              </div>
+              <p>Contenu du rapport mensuel à venir...</p>
             </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
+
+        <TabsContent value="quarterly">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapport trimestriel</CardTitle>
+              <CardDescription>Vue d'ensemble trimestrielle</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Contenu du rapport trimestriel à venir...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="custom">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapport personnalisé</CardTitle>
+              <CardDescription>Créez votre propre rapport</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Interface de création de rapport personnalisé à venir...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

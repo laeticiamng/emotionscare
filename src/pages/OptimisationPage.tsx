@@ -1,174 +1,216 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Settings, Zap, Target, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { 
+  TrendingUp, 
+  Target, 
+  Zap, 
+  Settings, 
+  BarChart3, 
+  Lightbulb,
+  CheckCircle,
+  AlertCircle 
+} from 'lucide-react';
 
 const OptimisationPage: React.FC = () => {
-  const optimizations = [
-    {
-      id: 1,
-      title: "Améliorer l'engagement des équipes",
-      description: "Augmenter la participation aux activités de bien-être",
-      priority: "high",
-      status: "active",
-      impact: "85%",
-      recommendation: "Organiser des sessions interactives courtes"
-    },
-    {
-      id: 2,
-      title: "Réduire le stress au travail",
-      description: "Identifier et réduire les sources de stress",
-      priority: "medium",
-      status: "in_progress",
-      impact: "72%",
-      recommendation: "Implémenter des pauses méditatives"
-    },
-    {
-      id: 3,
-      title: "Optimiser les horaires de bien-être",
-      description: "Trouver les créneaux les plus efficaces",
-      priority: "low",
-      status: "completed",
-      impact: "91%",
-      recommendation: "Maintenir les sessions de 14h-15h"
-    }
-  ];
-
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return <Badge variant="destructive">Haute</Badge>;
-      case 'medium':
-        return <Badge variant="secondary">Moyenne</Badge>;
-      case 'low':
-        return <Badge variant="outline">Basse</Badge>;
-      default:
-        return <Badge variant="outline">Inconnue</Badge>;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'in_progress':
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
-      case 'active':
-        return <Target className="h-4 w-4 text-blue-500" />;
-      default:
-        return <Settings className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Optimisation</h1>
-          <p className="text-muted-foreground">
-            Optimisez les performances et le bien-être de vos équipes
-          </p>
+          <h1 className="text-3xl font-bold">Optimisation RH</h1>
+          <p className="text-muted-foreground">Améliorez les performances et le bien-être de vos équipes</p>
         </div>
-        <Button className="gap-2">
-          <Zap className="h-4 w-4" />
-          Nouvelle optimisation
+        <Button>
+          <Settings className="h-4 w-4 mr-2" />
+          Configurer
         </Button>
       </div>
 
-      {/* Métriques de performance */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Score global</CardTitle>
+            <CardTitle className="text-sm font-medium">Score d'optimisation</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">82%</div>
-            <p className="text-xs text-muted-foreground">+5% ce mois</p>
+            <div className="text-2xl font-bold">87%</div>
+            <Progress value={87} className="mt-2" />
+            <p className="text-xs text-muted-foreground mt-2">+5% ce mois</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Optimisations actives</CardTitle>
+            <CardTitle className="text-sm font-medium">Objectifs atteints</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">En cours</p>
+            <div className="text-2xl font-bold">12/15</div>
+            <Progress value={80} className="mt-2" />
+            <p className="text-xs text-muted-foreground mt-2">80% de réussite</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Améliorations</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">Ce trimestre</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Impact moyen</CardTitle>
+            <CardTitle className="text-sm font-medium">Améliorations actives</CardTitle>
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">79%</div>
-            <p className="text-xs text-muted-foreground">D'efficacité</p>
+            <div className="text-2xl font-bold">6</div>
+            <p className="text-xs text-muted-foreground">Initiatives en cours</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">ROI estimé</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+23%</div>
+            <p className="text-xs text-muted-foreground">Productivité équipe</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Liste des optimisations */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Optimisations en cours</h2>
-        
-        {optimizations.map((optimization) => (
-          <Card key={optimization.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(optimization.status)}
-                    <CardTitle className="text-lg">{optimization.title}</CardTitle>
+      <Tabs defaultValue="recommendations" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="goals">Objectifs</TabsTrigger>
+          <TabsTrigger value="analytics">Analyses</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="recommendations" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-500" />
+                  Recommandations prioritaires
+                </CardTitle>
+                <CardDescription>
+                  Actions suggérées pour optimiser le bien-être
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3 p-3 border rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-medium">Améliorer la communication équipe</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Organiser des points hebdomadaires pour réduire le stress
+                    </p>
+                    <Button size="sm" className="mt-2">Appliquer</Button>
                   </div>
-                  <p className="text-muted-foreground">{optimization.description}</p>
                 </div>
-                <div className="flex gap-2">
-                  {getPriorityBadge(optimization.priority)}
+
+                <div className="flex items-start gap-3 p-3 border rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-medium">Espace de détente aménagé</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Impact positif observé sur le moral des équipes
+                    </p>
+                    <Button size="sm" variant="outline" className="mt-2">Voir détails</Button>
+                  </div>
                 </div>
-              </div>
+
+                <div className="flex items-start gap-3 p-3 border rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-medium">Formation gestion du stress</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Plusieurs équipes montrent des signes de fatigue
+                    </p>
+                    <Button size="sm" className="mt-2">Planifier</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Indicateurs clés</CardTitle>
+                <CardDescription>Métriques de performance RH</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Satisfaction employés</span>
+                    <span className="text-sm text-muted-foreground">8.2/10</span>
+                  </div>
+                  <Progress value={82} />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Taux de rétention</span>
+                    <span className="text-sm text-muted-foreground">94%</span>
+                  </div>
+                  <Progress value={94} />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Engagement équipes</span>
+                    <span className="text-sm text-muted-foreground">76%</span>
+                  </div>
+                  <Progress value={76} />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Productivité globale</span>
+                    <span className="text-sm text-muted-foreground">89%</span>
+                  </div>
+                  <Progress value={89} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="performance">
+          <Card>
+            <CardHeader>
+              <CardTitle>Analyse de performance</CardTitle>
+              <CardDescription>Évolution des métriques de performance</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Impact estimé</span>
-                  <span className="font-bold text-primary">{optimization.impact}</span>
-                </div>
-                
-                <div className="space-y-1">
-                  <span className="text-sm font-medium">Recommandation</span>
-                  <p className="text-sm text-muted-foreground">{optimization.recommendation}</p>
-                </div>
-                
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" size="sm">
-                    Voir détails
-                  </Button>
-                  <Button size="sm">
-                    Appliquer
-                  </Button>
-                </div>
-              </div>
+              <p>Graphiques et analyses de performance à implémenter...</p>
             </CardContent>
           </Card>
-        ))}
-      </div>
+        </TabsContent>
+
+        <TabsContent value="goals">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des objectifs</CardTitle>
+              <CardDescription>Définissez et suivez vos objectifs RH</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Interface de gestion des objectifs à implémenter...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <Card>
+            <CardHeader>
+              <CardTitle>Analyses avancées</CardTitle>
+              <CardDescription>Analyses prédictives et insights</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Tableaux de bord analytiques à implémenter...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
