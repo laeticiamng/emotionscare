@@ -2,76 +2,78 @@
 #!/usr/bin/env node
 
 /**
- * Preinstall script to block Bun and force npm usage
- * This runs before any package installation
+ * Preinstall script - BLOCAGE IMMÉDIAT de Bun
+ * S'exécute AVANT toute installation de package
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Check if Bun is being used
-if (process.env.npm_execpath && process.env.npm_execpath.includes('bun')) {
-  console.error('🚨 ERROR: Bun is not supported for this project');
-  console.error('Please use npm instead:');
-  console.error('  npm install');
+// DÉTECTION ULTRA-PRÉCOCE de Bun
+const execPath = process.env.npm_execpath || '';
+const userAgent = process.env.npm_config_user_agent || '';
+
+if (execPath.includes('bun') || userAgent.includes('bun')) {
+  console.error('\n🚨 BLOCAGE IMMÉDIAT: Bun détecté');
+  console.error('╔════════════════════════════════════════════════════╗');
+  console.error('║  ERREUR: Ce projet exige npm exclusivement        ║');
+  console.error('║  Raison: Conflit @vitest/browser avec Bun 1.2.15  ║');
+  console.error('╚════════════════════════════════════════════════════╝');
+  console.error('\n✅ SOLUTION IMMÉDIATE:');
+  console.error('  npm install --legacy-peer-deps');
   console.error('  npm run dev');
+  console.error('\n❌ NE PAS UTILISER:');
+  console.error('  bun install  ← INTERDIT');
+  console.error('  bun dev      ← INTERDIT');
   process.exit(1);
 }
 
-// Check if bun command is being used
+// Vérification des arguments de processus
 if (process.argv[0] && process.argv[0].includes('bun')) {
-  console.error('🚨 ERROR: Bun detected in process arguments');
-  console.error('This project requires npm. Please use:');
-  console.error('  npm install');
-  console.error('  npm run dev');
+  console.error('\n❌ Processus Bun détecté dans argv[0]');
+  console.error('Utilisez npm pour ce projet');
   process.exit(1);
 }
 
-// Create or update .npmrc to force npm
+console.log('✅ Preinstall: npm détecté, autorisation accordée');
+
+// Création/mise à jour .npmrc pour forcer npm
 const npmrcPath = path.join(process.cwd(), '.npmrc');
-const npmrcContent = `
-# FORCE NPM EXCLUSIVEMENT - SOLUTION DÉFINITIVE
+const npmrcContent = `# FORCE NPM - SOLUTION DÉFINITIVE CONFLIT BUN/VITEST
 engine-strict=true
 package-manager=npm
 
-# Bloquer complètement Bun
+# INTERDICTION COMPLÈTE DE BUN
 bun=false
 use-bun=false
+allow-bun=false
 
-# Éviter les binaires lourds pour accélérer l'installation
-cypress_install_binary=0
-cypress_skip_binary_install=1
-husky_skip_install=1
-puppeteer_skip_download=1
-playwright_skip_browser_download=1
-
-# Optimisations réseau
+# Optimisations réseau et résolution
 prefer-offline=false
 fund=false
 audit=false
 loglevel=warn
 progress=true
-
-# Résolution des dépendances pour éviter les conflits
 legacy-peer-deps=true
 auto-install-peers=true
 strict-peer-dependencies=false
 
-# Timeouts optimisés
+# Timeouts étendus pour éviter les timeouts
 network-timeout=300000
-fetch-retry-mintimeout=15000
-fetch-retry-maxtimeout=60000
-fetch-retries=3
+fetch-retry-mintimeout=20000
+fetch-retry-maxtimeout=120000
+fetch-retries=5
 
-# Éviter package-lock pour plus de flexibilité
+# Configuration package
 package-lock=false
 save-exact=false
+`;
 
-# Forcer la résolution npm
-resolution-mode=highest
-`.trim();
+try {
+  fs.writeFileSync(npmrcPath, npmrcContent);
+  console.log('✅ Configuration .npmrc appliquée');
+} catch (error) {
+  console.warn('⚠️ Impossible de créer .npmrc:', error.message);
+}
 
-fs.writeFileSync(npmrcPath, npmrcContent);
-
-console.log('✅ Preinstall: npm configuration enforced');
-console.log('✅ Preinstall: Bun usage blocked');
+console.log('✅ Preinstall terminé - npm autorisé');
