@@ -1,6 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { authorizeRole } from '../_shared/auth.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -15,6 +16,13 @@ serve(async (req) => {
   }
 
   try {
+    const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     const { emotionData, userProfile, requestType } = await req.json();
 
     if (!openAIApiKey) {
