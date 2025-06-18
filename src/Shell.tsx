@@ -7,6 +7,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import SkipToContent from '@/components/accessibility/SkipToContent';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
+import { InstantGlowWidget } from '@/components/glow';
 
 const Shell: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -27,6 +28,8 @@ const Shell: React.FC = () => {
         <main id="main-content" className="min-h-screen">
           <Outlet />
         </main>
+        {/* Widget Instant Glow pour les utilisateurs non connectés */}
+        <InstantGlowWidget />
       </EnhancedErrorBoundary>
     );
   }
@@ -41,6 +44,8 @@ const Shell: React.FC = () => {
             <Outlet />
           </main>
         </div>
+        {/* Widget Instant Glow flottant */}
+        <InstantGlowWidget />
       </div>
     </EnhancedErrorBoundary>
   );

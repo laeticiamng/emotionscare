@@ -8,7 +8,7 @@ import { CheckCircle, XCircle, AlertCircle, PlayCircle } from 'lucide-react';
 
 interface AuditItem {
   name: string;
-  status: 'implemented' | 'missing' | 'partial';
+  status: 'implemented' | 'missing' | 'partial' | 'complete';
   priority: 'high' | 'medium' | 'low';
   component?: string;
   endpoint?: string;
@@ -28,7 +28,7 @@ const ProjectAuditDashboard: React.FC = () => {
     { name: 'Bubble-Beat', status: 'missing', priority: 'high' },
     { name: 'Screen-Silk Break', status: 'missing', priority: 'high' },
     { name: 'VR Galactique', status: 'missing', priority: 'medium' },
-    { name: 'Instant Glow Widget', status: 'implemented', priority: 'high', component: 'GlowGauge' },
+    { name: 'Instant Glow Widget', status: 'complete', priority: 'high', component: 'InstantGlowWidget' },
     { name: 'Weekly Bars', status: 'implemented', priority: 'medium', component: 'WeeklyBars' },
     { name: 'Heatmap Vibes', status: 'partial', priority: 'medium', component: 'DashboardRH' },
     { name: 'Journal Voix/Texte', status: 'implemented', priority: 'high', component: 'JournalPage' },
@@ -52,6 +52,7 @@ const ProjectAuditDashboard: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'implemented': return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'complete': return <CheckCircle className="h-4 w-4 text-emerald-600" />;
       case 'partial': return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       case 'missing': return <XCircle className="h-4 w-4 text-red-500" />;
       default: return <PlayCircle className="h-4 w-4 text-gray-500" />;
@@ -61,6 +62,7 @@ const ProjectAuditDashboard: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'implemented': return <Badge className="bg-green-100 text-green-800">Implémenté</Badge>;
+      case 'complete': return <Badge className="bg-emerald-100 text-emerald-800">100% Complété</Badge>;
       case 'partial': return <Badge className="bg-yellow-100 text-yellow-800">Partiel</Badge>;
       case 'missing': return <Badge className="bg-red-100 text-red-800">Manquant</Badge>;
       default: return <Badge variant="secondary">Inconnu</Badge>;
@@ -82,12 +84,13 @@ const ProjectAuditDashboard: React.FC = () => {
 
   const stats = {
     implemented: auditItems.filter(item => item.status === 'implemented').length,
+    complete: auditItems.filter(item => item.status === 'complete').length,
     partial: auditItems.filter(item => item.status === 'partial').length,
     missing: auditItems.filter(item => item.status === 'missing').length,
     total: auditItems.length
   };
 
-  const progress = ((stats.implemented + stats.partial * 0.5) / stats.total) * 100;
+  const progress = ((stats.implemented + stats.complete + stats.partial * 0.5) / stats.total) * 100;
 
   return (
     <div className="space-y-6">
@@ -99,10 +102,14 @@ const ProjectAuditDashboard: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{stats.implemented}</div>
               <div className="text-sm text-muted-foreground">Implémentées</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-600">{stats.complete}</div>
+              <div className="text-sm text-muted-foreground">100% Complètes</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-600">{stats.partial}</div>
