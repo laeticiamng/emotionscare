@@ -1,79 +1,97 @@
 
-// Define a Theme type for theme preferences
 export type Theme = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'sans' | 'serif' | 'mono';
 
-// Define the structure for user preferences
-export interface UserPreferences {
-  theme: Theme;
-  fontSize?: 'small' | 'medium' | 'large';
-  language?: 'fr' | 'en';
-  notifications?: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
-  };
-  privacy?: {
-    shareData: boolean;
-    analytics: boolean;
-  };
-  accessibility?: {
-    fontSize: 'small' | 'medium' | 'large';
-    contrast: 'normal' | 'high';
-    reducedMotion: boolean;
-  };
-}
-
-// Définition des préférences de notifications
 export interface NotificationsPreferences {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  types?: {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+  types: {
+    security: boolean;
     system: boolean;
+    social: boolean;
+    achievements: boolean;
     reminders: boolean;
-    updates: boolean;
-    marketing: boolean;
   };
 }
 
-// Définition des préférences de confidentialité
-export type PrivacyPreferences = 'private' | 'friends' | 'public' | {
-  shareData: boolean;
+export interface PrivacyPreferences {
+  profileVisibility: 'private' | 'friends' | 'public';
+  dataCollection: boolean;
   analytics: boolean;
-  dataRetention?: string;
-};
+  marketing: boolean;
+}
 
-// Interface de contexte des préférences utilisateur
+export interface AccessibilityPreferences {
+  highContrast: boolean;
+  reduceMotion: boolean;
+  screenReader: boolean;
+  keyboardNavigation: boolean;
+  largeText: boolean;
+}
+
+export interface UserPreferences {
+  theme?: Theme;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  language?: string;
+  notifications?: NotificationsPreferences;
+  privacy?: PrivacyPreferences | 'private' | 'public';
+  accessibility?: AccessibilityPreferences;
+  vibration?: boolean;
+  soundEffects?: boolean;
+  darkMode?: boolean;
+}
+
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  theme: Theme;
+  theme: string;
   fontSize: string;
   language: string;
   notifications: NotificationsPreferences;
-  privacy: PrivacyPreferences | string;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
-  resetPreferences: () => void;
-  isLoading: boolean;
-  error: Error | null;
+  privacy: string | PrivacyPreferences;
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
+  resetPreferences?: () => void;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
-// Définition des valeurs par défaut pour les préférences utilisateur
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
   fontSize: 'medium',
+  fontFamily: 'sans',
   language: 'fr',
   notifications: {
     email: true,
-    push: false,
-    inApp: true
+    push: true,
+    inApp: true,
+    types: {
+      security: true,
+      system: true,
+      social: false,
+      achievements: true,
+      reminders: true,
+    },
   },
   privacy: {
-    shareData: false,
-    analytics: true
+    profileVisibility: 'private',
+    dataCollection: false,
+    analytics: false,
+    marketing: false,
   },
   accessibility: {
-    fontSize: 'medium',
-    contrast: 'normal',
-    reducedMotion: false
-  }
+    highContrast: false,
+    reduceMotion: false,
+    screenReader: false,
+    keyboardNavigation: false,
+    largeText: false,
+  },
+  vibration: true,
+  soundEffects: true,
+  darkMode: false,
+};
+
+export const normalizePreferences = (prefs: Partial<UserPreferences>): UserPreferences => {
+  return { ...DEFAULT_PREFERENCES, ...prefs };
 };

@@ -1,47 +1,72 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface UserPreferences {
-  theme: 'light' | 'dark' | 'system';
-  soundEnabled: boolean;
-  ambientSound: string;
-  language: string;
-}
-
-interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
-}
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
-
-export const useUserPreferences = () => {
-  const context = useContext(UserPreferencesContext);
-  if (!context) {
-    throw new Error('useUserPreferences must be used within a UserPreferencesProvider');
-  }
-  return context;
-};
 
 interface UserPreferencesProviderProps {
   children: ReactNode;
 }
 
 export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = ({ children }) => {
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    theme: 'system',
-    soundEnabled: true,
-    ambientSound: 'nature',
-    language: 'fr'
-  });
+  const [storedPreferences, setStoredPreferences] = useLocalStorage<UserPreferences>('user-preferences', DEFAULT_PREFERENCES);
+  const [preferences, setPreferences] = useState<UserPreferences>(storedPreferences);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const updatePreferences = (newPreferences: Partial<UserPreferences>) => {
-    setPreferences(prev => ({ ...prev, ...newPreferences }));
+  // Sync with localStorage when preferences change
+  useEffect(() => {
+    setStoredPreferences(preferences);
+  }, [preferences, setStoredPreferences]);
+
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const updated = { ...preferences, ...newPreferences };
+      setPreferences(updated);
+      
+      // TODO: Sync with Supabase when user is authenticated
+      console.log('Preferences updated:', updated);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to update preferences'));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetPreferences = () => {
+    setPreferences(DEFAULT_PREFERENCES);
+    setStoredPreferences(DEFAULT_PREFERENCES);
+  };
+
+  const value: UserPreferencesContextType = {
+    preferences,
+    theme: preferences.theme || 'system',
+    fontSize: preferences.fontSize || 'medium',
+    language: preferences.language || 'fr',
+    notifications: preferences.notifications || DEFAULT_PREFERENCES.notifications!,
+    privacy: preferences.privacy || 'private',
+    updatePreferences,
+    resetPreferences,
+    isLoading,
+    error,
   };
 
   return (
-    <UserPreferencesContext.Provider value={{ preferences, updatePreferences }}>
+    <UserPreferencesContext.Provider value={value}>
       {children}
     </UserPreferencesContext.Provider>
   );
+};
+
+export const useUserPreferences = (): UserPreferencesContextType => {
+  const context = useContext(UserPreferencesContext);
+  if (!context) {
+    throw new Error('useUserPreferences must be used within a UserPreferencesProvider');
+  }
+  return context;
 };

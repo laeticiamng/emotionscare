@@ -20,3 +20,9 @@ export * from './form';
 
 // Notifications
 export * from '../notifications';
+
+// Preferences
+export * from '../preferences';
+
+// Select component
+export * from './select';

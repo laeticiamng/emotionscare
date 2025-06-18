@@ -1,35 +1,65 @@
 
-import React, { useState } from 'react';
-import { UserPreferences, UserPreferencesFormProps } from '@/types/preferences';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
+import ThemeSettings from './ThemeSettings';
+import NotificationSettings from './NotificationSettings';
+import PrivacySettings from './PrivacySettings';
+import AccessibilitySettings from './AccessibilitySettings';
 
-// Define the actual component implementation
-const PreferencesForm: React.FC<{
-  preferences: UserPreferences;
-  onSave: (preferences: UserPreferences) => void;
-  isLoading?: boolean;
-}> = ({ preferences, onSave, isLoading = false }) => {
-  const [formData, setFormData] = useState<UserPreferences>(preferences);
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-  
+const PreferencesForm: React.FC = () => {
+  const { preferences, isLoading } = useUserPreferences();
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-muted rounded w-1/4"></div>
+            <div className="h-10 bg-muted rounded"></div>
+            <div className="h-4 bg-muted rounded w-1/2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Form implementation */}
-      <div>
-        <h3 className="text-lg font-medium">Préférences Utilisateur</h3>
-        {/* Add form fields based on UserPreferences type */}
-        <button 
-          type="submit" 
-          disabled={isLoading} 
-          className="mt-4 px-4 py-2 bg-primary text-white rounded-md"
-        >
-          {isLoading ? 'Sauvegarde...' : 'Enregistrer'}
-        </button>
-      </div>
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Préférences utilisateur</CardTitle>
+        <CardDescription>
+          Personnalisez votre expérience selon vos besoins
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="theme" className="space-y-4">
+          <TabsList className="grid grid-cols-4 w-full">
+            <TabsTrigger value="theme">Thème</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+            <TabsTrigger value="accessibility">Accessibilité</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="theme" className="space-y-4">
+            <ThemeSettings />
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-4">
+            <NotificationSettings />
+          </TabsContent>
+
+          <TabsContent value="privacy" className="space-y-4">
+            <PrivacySettings />
+          </TabsContent>
+
+          <TabsContent value="accessibility" className="space-y-4">
+            <AccessibilitySettings />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
