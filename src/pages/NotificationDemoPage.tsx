@@ -1,203 +1,226 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useNotificationContext } from '@/components/notifications/NotificationProvider';
-import NotificationSettings from '@/components/notifications/NotificationSettings';
-import { 
-  Trophy, 
-  Clock, 
-  Users, 
-  AlertTriangle, 
-  CheckCircle,
-  Info,
-  Zap
-} from 'lucide-react';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import NotificationPermissionDialog from '@/components/notifications/NotificationPermissionDialog';
+import { Bell, Award, Calendar, Heart, Info, AlertTriangle } from 'lucide-react';
 
 const NotificationDemoPage: React.FC = () => {
-  const { notifications, unreadCount, markAllAsRead, clearAll } = useNotifications();
-  const { showToast } = useNotificationContext();
+  const { sendNotification } = useNotifications();
+  const { 
+    permission, 
+    showPermissionDialog, 
+    setShowPermissionDialog, 
+    requestPermission,
+    isSupported 
+  } = usePushNotifications();
 
-  const demoNotifications = [
-    {
-      title: '🏆 Nouveau Badge Débloqué !',
-      message: 'Vous avez obtenu le badge "Régularité" pour 7 jours consécutifs',
-      type: 'success' as const,
-      priority: 'medium' as const,
-      actionText: 'Voir mes badges',
-      actionUrl: '/gamification'
-    },
-    {
-      title: '⏰ Rappel quotidien',
-      message: 'Il est temps de faire votre scan émotionnel quotidien',
-      type: 'info' as const,
-      priority: 'high' as const,
-      actionText: 'Commencer le scan',
-      actionUrl: '/scan'
-    },
-    {
-      title: '💡 Suggestion du Coach IA',
-      message: 'Essayez une séance de méditation de 5 minutes pour réduire votre stress',
-      type: 'info' as const,
-      priority: 'medium' as const,
-      actionText: 'Parler au coach',
-      actionUrl: '/coach'
-    },
-    {
-      title: '⚠️ Attention',
-      message: 'Votre niveau de stress semble élevé aujourd\'hui. Prenez une pause',
-      type: 'warning' as const,
-      priority: 'high' as const,
-      actionText: 'Voir conseils',
-      actionUrl: '/coach'
-    },
-    {
-      title: '👥 Nouvelle activité communautaire',
-      message: 'Un nouveau groupe de soutien vient d\'être créé dans votre région',
-      type: 'info' as const,
-      priority: 'low' as const,
-      actionText: 'Rejoindre',
-      actionUrl: '/community'
+  const handleSendDemo = async (type: string) => {
+    switch (type) {
+      case 'welcome':
+        await sendNotification({
+          type: 'system',
+          priority: 'medium',
+          title: 'Bienvenue sur EmotionsCare',
+          message: 'Commencez votre parcours de bien-être émotionnel.',
+          actionUrl: '/scan',
+          actionText: 'Faire un scan'
+        });
+        break;
+      
+      case 'achievement':
+        await sendNotification({
+          type: 'achievement',
+          priority: 'medium',
+          title: 'Nouveau badge débloqué !',
+          message: 'Félicitations ! Vous avez obtenu le badge "Premier scan".',
+          actionUrl: '/gamification',
+          actionText: 'Voir mes badges'
+        });
+        break;
+      
+      case 'reminder':
+        await sendNotification({
+          type: 'reminder',
+          priority: 'low',
+          title: 'Rappel quotidien',
+          message: 'Il est temps de faire votre scan émotionnel quotidien.',
+          actionUrl: '/scan',
+          actionText: 'Commencer'
+        });
+        break;
+      
+      case 'emotion':
+        await sendNotification({
+          type: 'emotion',
+          priority: 'medium',
+          title: 'Analyse émotionnelle disponible',
+          message: 'Votre rapport hebdomadaire est prêt à consulter.',
+          actionUrl: '/journal',
+          actionText: 'Voir le rapport'
+        });
+        break;
+      
+      case 'urgent':
+        await sendNotification({
+          type: 'urgent',
+          priority: 'high',
+          title: 'Attention requise',
+          message: 'Votre niveau de stress semble élevé. Prenez un moment pour vous.',
+          actionUrl: '/music',
+          actionText: 'Se relaxer'
+        });
+        break;
     }
-  ];
+  };
 
-  const handleDemoNotification = (demo: typeof demoNotifications[0]) => {
-    showToast(demo);
+  const getPermissionBadge = () => {
+    switch (permission) {
+      case 'granted':
+        return <Badge variant="default" className="bg-green-500">Autorisées</Badge>;
+      case 'denied':
+        return <Badge variant="destructive">Refusées</Badge>;
+      default:
+        return <Badge variant="secondary">Non demandées</Badge>;
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      <div className="text-center space-y-4">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Système de Notifications</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Découvrez le système complet de notifications push et en temps réel d'EmotionsCare. 
-          Testez les différents types de notifications et personnalisez vos préférences.
+        <p className="text-muted-foreground">
+          Testez et configurez les différents types de notifications
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full">
-              <Info className="h-6 w-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{notifications.length}</p>
-              <p className="text-sm text-muted-foreground">Total notifications</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-full">
-              <Zap className="h-6 w-6 text-red-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{unreadCount}</p>
-              <p className="text-sm text-muted-foreground">Non lues</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-full">
-              <CheckCircle className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{notifications.filter(n => n.read).length}</p>
-              <p className="text-sm text-muted-foreground">Lues</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Demo Section */}
+      {/* Statut des notifications push */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Tester les Notifications
+            <Bell className="h-5 w-5" />
+            Notifications Push
           </CardTitle>
+          <CardDescription>
+            Configurez les notifications push de votre navigateur
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Cliquez sur les boutons ci-dessous pour tester différents types de notifications :
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Support navigateur</p>
+              <p className="text-sm text-muted-foreground">
+                {isSupported ? 'Supporté' : 'Non supporté'}
+              </p>
+            </div>
+            <Badge variant={isSupported ? 'default' : 'secondary'}>
+              {isSupported ? 'Oui' : 'Non'}
+            </Badge>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {demoNotifications.map((demo, index) => (
-              <Card key={index} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <CardContent className="p-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-sm">{demo.title}</h4>
-                      <Badge variant={
-                        demo.type === 'success' ? 'default' :
-                        demo.type === 'warning' ? 'destructive' : 'secondary'
-                      }>
-                        {demo.type}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{demo.message}</p>
-                    <Button 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => handleDemoNotification(demo)}
-                    >
-                      Tester
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Statut des permissions</p>
+              <p className="text-sm text-muted-foreground">
+                Autorisation pour les notifications push
+              </p>
+            </div>
+            {getPermissionBadge()}
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowPermissionDialog(true)}
+              disabled={!isSupported}
+            >
+              Configurer les notifications
+            </Button>
+            {permission === 'default' && (
+              <Button
+                variant="outline"
+                onClick={requestPermission}
+                disabled={!isSupported}
+              >
+                Demander l'autorisation
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Actions */}
+      {/* Démonstration des types de notifications */}
       <Card>
         <CardHeader>
-          <CardTitle>Actions Rapides</CardTitle>
+          <CardTitle>Types de notifications</CardTitle>
+          <CardDescription>
+            Cliquez sur les boutons pour tester les différents types
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-4">
-            <Button 
-              variant="outline" 
-              onClick={markAllAsRead}
-              disabled={unreadCount === 0}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => handleSendDemo('welcome')}
             >
-              Marquer tout comme lu ({unreadCount})
+              <Info className="h-6 w-6 text-blue-500" />
+              <span className="font-medium">Système</span>
+              <span className="text-xs text-muted-foreground">Message de bienvenue</span>
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={clearAll}
-              disabled={notifications.length === 0}
+
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => handleSendDemo('achievement')}
             >
-              Effacer toutes les notifications ({notifications.length})
+              <Award className="h-6 w-6 text-yellow-500" />
+              <span className="font-medium">Réussite</span>
+              <span className="text-xs text-muted-foreground">Nouveau badge</span>
             </Button>
-            <Button 
-              onClick={() => showToast({
-                title: '👋 Bienvenue !',
-                message: 'Ceci est une notification de bienvenue personnalisée',
-                type: 'success',
-                priority: 'medium',
-                actionText: 'Découvrir',
-                actionUrl: '/dashboard'
-              })}
+
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => handleSendDemo('reminder')}
             >
-              Notification de bienvenue
+              <Calendar className="h-6 w-6 text-green-500" />
+              <span className="font-medium">Rappel</span>
+              <span className="text-xs text-muted-foreground">Scan quotidien</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => handleSendDemo('emotion')}
+            >
+              <Heart className="h-6 w-6 text-purple-500" />
+              <span className="font-medium">Émotion</span>
+              <span className="text-xs text-muted-foreground">Analyse disponible</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => handleSendDemo('urgent')}
+            >
+              <AlertTriangle className="h-6 w-6 text-red-500" />
+              <span className="font-medium">Urgent</span>
+              <span className="text-xs text-muted-foreground">Attention requise</span>
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Settings */}
-      <NotificationSettings />
+      <NotificationPermissionDialog
+        isOpen={showPermissionDialog}
+        onClose={() => setShowPermissionDialog(false)}
+        onPermissionGranted={() => {
+          console.log('Notifications push activées avec succès');
+        }}
+      />
     </div>
   );
 };

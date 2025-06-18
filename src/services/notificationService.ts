@@ -1,142 +1,127 @@
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  priority: 'low' | 'medium' | 'high';
-  timestamp: string;
-  read: boolean;
-  actionUrl?: string;
-  actionText?: string;
-  icon?: string;
-  image?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface NotificationSettings {
-  pushEnabled: boolean;
-  emailEnabled: boolean;
-  soundEnabled: boolean;
-  vibrationEnabled: boolean;
-  quietHours: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
-  categories: {
-    achievements: boolean;
-    reminders: boolean;
-    social: boolean;
-    system: boolean;
-  };
-}
+import { Notification, NotificationType, NotificationPriority } from '@/types/notifications';
+import { pushNotificationService } from '@/lib/notifications/pushNotifications';
 
 class NotificationService {
   private notifications: Notification[] = [];
-  private listeners: ((notifications: Notification[]) => void)[] = [];
-  private settings: NotificationSettings = {
-    pushEnabled: true,
-    emailEnabled: true,
-    soundEnabled: true,
-    vibrationEnabled: true,
-    quietHours: {
-      enabled: false,
-      start: '22:00',
-      end: '08:00'
-    },
-    categories: {
-      achievements: true,
-      reminders: true,
-      social: true,
-      system: true
-    }
-  };
+  private listeners: Array<(notifications: Notification[]) => void> = [];
+  private storageKey = 'emotionscare-notifications';
 
   constructor() {
     this.loadNotifications();
-    this.loadSettings();
-    this.requestPermission();
   }
 
-  async requestPermission(): Promise<boolean> {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      return permission === 'granted';
+  private loadNotifications() {
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+      if (stored) {
+        this.notifications = JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des notifications:', error);
     }
-    return false;
   }
 
-  private isQuietHours(): boolean {
-    if (!this.settings.quietHours.enabled) return false;
-    
-    const now = new Date();
-    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    return currentTime >= this.settings.quietHours.start || currentTime <= this.settings.quietHours.end;
+  private saveNotifications() {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.notifications));
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des notifications:', error);
+    }
   }
 
-  async sendNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>): Promise<void> {
+  private notifyListeners() {
+    this.listeners.forEach(listener => listener([...this.notifications]));
+  }
+
+  subscribe(listener: (notifications: Notification[]) => void) {
+    this.listeners.push(listener);
+    listener([...this.notifications]);
+    
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  }
+
+  async sendNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) {
     const newNotification: Notification = {
       ...notification,
-      id: crypto.randomUUID(),
+      id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
-      read: false
+      read: false,
     };
 
     this.notifications.unshift(newNotification);
     this.saveNotifications();
     this.notifyListeners();
 
-    // Send browser notification if enabled and not in quiet hours
-    if (this.settings.pushEnabled && !this.isQuietHours()) {
-      await this.sendBrowserNotification(newNotification);
+    // Envoyer notification push si autorisée
+    if (notification.priority === 'high' || notification.priority === 'critical') {
+      await this.sendPushNotification(newNotification);
     }
 
-    // Play sound if enabled
-    if (this.settings.soundEnabled && !this.isQuietHours()) {
-      this.playNotificationSound();
-    }
+    // Jouer le son de notification
+    this.playNotificationSound();
 
-    // Vibrate if enabled (mobile)
-    if (this.settings.vibrationEnabled && 'vibrate' in navigator) {
-      navigator.vibrate([200, 100, 200]);
-    }
+    return newNotification.id;
   }
 
-  private async sendBrowserNotification(notification: Notification): Promise<void> {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      const browserNotification = new Notification(notification.title, {
+  private async sendPushNotification(notification: Notification) {
+    try {
+      await pushNotificationService.showNotification(notification.title, {
         body: notification.message,
-        icon: notification.icon || '/favicon.ico',
-        image: notification.image,
-        badge: '/favicon.ico',
+        icon: '/favicon.ico',
         tag: notification.id,
-        requireInteraction: notification.priority === 'high'
+        requireInteraction: notification.priority === 'critical',
       });
-
-      browserNotification.onclick = () => {
-        window.focus();
-        if (notification.actionUrl) {
-          window.location.href = notification.actionUrl;
-        }
-        browserNotification.close();
-      };
-
-      // Auto-close after 5 seconds for non-critical notifications
-      if (notification.priority !== 'high') {
-        setTimeout(() => browserNotification.close(), 5000);
-      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de la notification push:', error);
     }
   }
 
-  private playNotificationSound(): void {
-    const audio = new Audio('/sounds/notification.mp3');
-    audio.volume = 0.3;
-    audio.play().catch(() => {
-      // Fallback to system beep
-      console.beep?.();
+  private playNotificationSound() {
+    try {
+      const audio = new Audio('/sounds/notification.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(error => {
+        console.log('Impossible de jouer le son de notification:', error);
+      });
+    } catch (error) {
+      console.log('Son de notification non disponible:', error);
+    }
+  }
+
+  markAsRead(id: string) {
+    const notification = this.notifications.find(n => n.id === id);
+    if (notification && !notification.read) {
+      notification.read = true;
+      this.saveNotifications();
+      this.notifyListeners();
+    }
+  }
+
+  markAllAsRead() {
+    let hasChanges = false;
+    this.notifications.forEach(notification => {
+      if (!notification.read) {
+        notification.read = true;
+        hasChanges = true;
+      }
     });
+
+    if (hasChanges) {
+      this.saveNotifications();
+      this.notifyListeners();
+    }
+  }
+
+  removeNotification(id: string) {
+    const index = this.notifications.findIndex(n => n.id === id);
+    if (index !== -1) {
+      this.notifications.splice(index, 1);
+      this.saveNotifications();
+      this.notifyListeners();
+    }
   }
 
   getNotifications(): Notification[] {
@@ -147,127 +132,48 @@ class NotificationService {
     return this.notifications.filter(n => !n.read).length;
   }
 
-  markAsRead(id: string): void {
-    const notification = this.notifications.find(n => n.id === id);
-    if (notification) {
-      notification.read = true;
-      this.saveNotifications();
-      this.notifyListeners();
-    }
-  }
-
-  markAllAsRead(): void {
-    this.notifications.forEach(n => n.read = true);
-    this.saveNotifications();
-    this.notifyListeners();
-  }
-
-  deleteNotification(id: string): void {
-    this.notifications = this.notifications.filter(n => n.id !== id);
-    this.saveNotifications();
-    this.notifyListeners();
-  }
-
-  clearAll(): void {
-    this.notifications = [];
-    this.saveNotifications();
-    this.notifyListeners();
-  }
-
-  subscribe(listener: (notifications: Notification[]) => void): () => void {
-    this.listeners.push(listener);
-    return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
-    };
-  }
-
-  private notifyListeners(): void {
-    this.listeners.forEach(listener => listener([...this.notifications]));
-  }
-
-  updateSettings(newSettings: Partial<NotificationSettings>): void {
-    this.settings = { ...this.settings, ...newSettings };
-    this.saveSettings();
-  }
-
-  getSettings(): NotificationSettings {
-    return { ...this.settings };
-  }
-
-  private saveNotifications(): void {
-    localStorage.setItem('emotionscare_notifications', JSON.stringify(this.notifications));
-  }
-
-  private loadNotifications(): void {
-    try {
-      const saved = localStorage.getItem('emotionscare_notifications');
-      if (saved) {
-        this.notifications = JSON.parse(saved);
-      }
-    } catch (error) {
-      console.error('Failed to load notifications:', error);
-    }
-  }
-
-  private saveSettings(): void {
-    localStorage.setItem('emotionscare_notification_settings', JSON.stringify(this.settings));
-  }
-
-  private loadSettings(): void {
-    try {
-      const saved = localStorage.getItem('emotionscare_notification_settings');
-      if (saved) {
-        this.settings = { ...this.settings, ...JSON.parse(saved) };
-      }
-    } catch (error) {
-      console.error('Failed to load notification settings:', error);
-    }
-  }
-
-  // Predefined notification templates
-  async sendAchievementNotification(achievement: string, points: number): Promise<void> {
-    await this.sendNotification({
-      title: '🏆 Nouveau Succès !',
-      message: `Vous avez débloqué : ${achievement} (+${points} points)`,
-      type: 'success',
+  // Méthodes utilitaires pour créer des notifications spécifiques
+  async sendWelcomeNotification() {
+    return this.sendNotification({
+      type: 'system',
       priority: 'medium',
-      icon: '🏆',
+      title: 'Bienvenue sur EmotionsCare',
+      message: 'Commencez votre parcours de bien-être émotionnel.',
+      actionUrl: '/scan',
+      actionText: 'Faire un scan'
+    });
+  }
+
+  async sendAchievementNotification(achievementName: string) {
+    return this.sendNotification({
+      type: 'achievement',
+      priority: 'medium',
+      title: 'Nouveau badge débloqué !',
+      message: `Félicitations ! Vous avez obtenu le badge "${achievementName}".`,
       actionUrl: '/gamification',
-      actionText: 'Voir mes succès'
+      actionText: 'Voir mes badges'
     });
   }
 
-  async sendReminderNotification(title: string, message: string): Promise<void> {
-    await this.sendNotification({
-      title: `⏰ ${title}`,
-      message,
-      type: 'info',
-      priority: 'high',
-      icon: '⏰'
-    });
-  }
-
-  async sendWelcomeNotification(): Promise<void> {
-    await this.sendNotification({
-      title: '👋 Bienvenue dans EmotionsCare !',
-      message: 'Découvrez toutes les fonctionnalités pour améliorer votre bien-être émotionnel.',
-      type: 'info',
-      priority: 'medium',
-      icon: '👋',
-      actionUrl: '/dashboard',
+  async sendReminderNotification(activity: string) {
+    return this.sendNotification({
+      type: 'reminder',
+      priority: 'low',
+      title: 'Rappel quotidien',
+      message: `Il est temps de faire votre ${activity}.`,
+      actionUrl: '/scan',
       actionText: 'Commencer'
     });
   }
 
-  async sendCoachSuggestion(suggestion: string): Promise<void> {
-    await this.sendNotification({
-      title: '💡 Suggestion de votre Coach IA',
-      message: suggestion,
-      type: 'info',
+  async sendEmotionInsight(insight: string) {
+    return this.sendNotification({
+      type: 'emotion',
       priority: 'medium',
-      icon: '💡',
-      actionUrl: '/coach',
-      actionText: 'Parler au coach'
+      title: 'Nouvelle analyse émotionnelle',
+      message: insight,
+      actionUrl: '/journal',
+      actionText: 'Voir détails'
     });
   }
 }

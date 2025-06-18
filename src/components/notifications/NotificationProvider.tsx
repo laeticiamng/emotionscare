@@ -1,8 +1,9 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useNotifications } from '@/hooks/useNotifications';
-import { Notification } from '@/services/notificationService';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { Notification } from '@/types/notifications';
 import NotificationToast from './NotificationToast';
 
 interface NotificationContextType {
@@ -25,49 +26,52 @@ interface NotificationProviderProps {
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const { sendNotification, notifications } = useNotifications();
-  const [toastNotifications, setToastNotifications] = useState<Notification[]>([]);
+  const { promptForPermission } = usePushNotifications();
 
-  // Show toast for new notifications
+  // Proposer l'activation des notifications push au premier lancement
   useEffect(() => {
-    const newNotifications = notifications.filter(n => 
-      !n.read && 
-      !toastNotifications.some(t => t.id === n.id) &&
-      new Date(n.timestamp).getTime() > Date.now() - 5000 // Only show recent notifications
-    );
-
-    if (newNotifications.length > 0) {
-      setToastNotifications(prev => [...prev, ...newNotifications]);
+    const hasSeenPermissionPrompt = localStorage.getItem('notification-permission-prompted');
+    if (!hasSeenPermissionPrompt) {
+      setTimeout(() => {
+        promptForPermission();
+        localStorage.setItem('notification-permission-prompted', 'true');
+      }, 3000); // Attendre 3 secondes avant de proposer
     }
-  }, [notifications, toastNotifications]);
+  }, [promptForPermission]);
 
   const showToast = async (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     await sendNotification(notification);
   };
 
-  const closeToast = (id: string) => {
-    setToastNotifications(prev => prev.filter(n => n.id !== id));
-  };
-
-  const handleToastAction = (notification: Notification) => {
-    if (notification.actionUrl) {
-      window.location.href = notification.actionUrl;
-    }
-    closeToast(notification.id);
-  };
+  // Obtenir les notifications récentes non lues pour les toasts
+  const recentUnreadNotifications = notifications
+    .filter(n => !n.read)
+    .filter(n => {
+      const notifTime = new Date(n.timestamp).getTime();
+      const now = Date.now();
+      return (now - notifTime) < 10000; // Moins de 10 secondes
+    })
+    .slice(0, 3); // Max 3 toasts
 
   return (
     <NotificationContext.Provider value={{ showToast }}>
       {children}
       
       {/* Toast Notifications */}
-      <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+      <div className="fixed top-4 right-4 z-50 pointer-events-none space-y-2">
         <AnimatePresence>
-          {toastNotifications.map((notification) => (
+          {recentUnreadNotifications.map((notification) => (
             <div key={notification.id} className="pointer-events-auto">
               <NotificationToast
                 notification={notification}
-                onClose={() => closeToast(notification.id)}
-                onAction={() => handleToastAction(notification)}
+                onClose={() => {
+                  // Les toasts se ferment automatiquement, mais on peut les marquer comme lues
+                }}
+                onAction={() => {
+                  if (notification.actionUrl) {
+                    window.location.href = notification.actionUrl;
+                  }
+                }}
               />
             </div>
           ))}
