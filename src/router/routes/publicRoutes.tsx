@@ -1,17 +1,37 @@
 
 import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-import TestHome from '@/pages/TestHome';
 
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const AboutPage = lazy(() => import('@/pages/AboutPage'));
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
+const BrowsingPage = lazy(() => import('@/pages/BrowsingPage'));
+const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
 
 export const publicRoutes: RouteObject[] = [
   {
     index: true,
-    element: <TestHome />,
+    element: <HomePage />,
   },
   {
-    path: '/choose-mode',
-    element: <ChooseModePage />,
+    path: '/about',
+    element: <AboutPage />,
+  },
+  {
+    path: '/contact',
+    element: <ContactPage />,
+  },
+  {
+    path: '/browsing',
+    element: <BrowsingPage />,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPage />,
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
   },
 ];

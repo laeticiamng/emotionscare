@@ -1,26 +1,10 @@
 
 import React, { useState } from 'react';
-import Shell from '@/Shell';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  MessageSquare,
-  Send,
-  Loader2
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Mail, Phone, MapPin, Clock, Send, MessageCircle, Users, Shield } from 'lucide-react';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -29,232 +13,258 @@ const ContactPage: React.FC = () => {
     subject: '',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simuler l'envoi du formulaire
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success('Votre message a bien été envoyé');
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-    }, 1500);
+    // Simulation d'envoi - en production, connecter à un service d'email
+    alert('Merci pour votre message ! Nous vous répondrons dans les plus brefs délais.');
+    setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
-  const contactMethods = [
+  const contactInfo = [
     {
-      icon: <Mail className="h-6 w-6 text-primary" />,
-      title: 'Email',
-      value: 'contact@emotionscare.fr',
-      description: 'Notre équipe vous répondra sous 24h'
+      icon: <Mail className="h-6 w-6 text-blue-500" />,
+      title: "Email",
+      content: "contact@emotionscare.fr",
+      description: "Réponse sous 24h"
     },
     {
-      icon: <Phone className="h-6 w-6 text-primary" />,
-      title: 'Téléphone',
-      value: '+33 1 23 45 67 89',
-      description: 'Lun-Ven de 9h à 18h'
+      icon: <Phone className="h-6 w-6 text-green-500" />,
+      title: "Téléphone",
+      content: "+33 1 23 45 67 89",
+      description: "Du lundi au vendredi, 9h-18h"
     },
     {
-      icon: <MapPin className="h-6 w-6 text-primary" />,
-      title: 'Adresse',
-      value: '123 Avenue de la Paix, 75001 Paris',
-      description: 'Siège social'
+      icon: <MapPin className="h-6 w-6 text-red-500" />,
+      title: "Adresse",
+      content: "123 Avenue des Innovations\n75001 Paris, France",
+      description: "Siège social"
     },
     {
-      icon: <MessageSquare className="h-6 w-6 text-primary" />,
-      title: 'Support Live',
-      value: 'Discuter maintenant',
-      description: 'Disponible 24/7',
-      isButton: true
+      icon: <Clock className="h-6 w-6 text-purple-500" />,
+      title: "Horaires",
+      content: "Lun-Ven: 9h-18h\nSam: 10h-16h",
+      description: "Support client"
+    }
+  ];
+
+  const supportTypes = [
+    {
+      icon: <MessageCircle className="h-8 w-8 text-blue-500" />,
+      title: "Support Technique",
+      description: "Aide avec l'utilisation de la plateforme",
+      email: "support@emotionscare.fr"
+    },
+    {
+      icon: <Users className="h-8 w-8 text-green-500" />,
+      title: "Partenariats B2B",
+      description: "Solutions pour entreprises",
+      email: "business@emotionscare.fr"
+    },
+    {
+      icon: <Shield className="h-8 w-8 text-purple-500" />,
+      title: "Confidentialité",
+      description: "Questions sur la protection des données",
+      email: "privacy@emotionscare.fr"
     }
   ];
 
   return (
-    <Shell>
-      <div className="container mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-5xl mx-auto"
-        >
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Contactez-nous</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Notre équipe est à votre disposition pour répondre à toutes vos questions sur EmotionsCare.
-            </p>
-          </div>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <Badge variant="secondary" className="mb-4">
+            Contactez-nous
+          </Badge>
+          <h1 className="text-4xl font-bold mb-6">
+            Nous sommes là pour vous aider
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Une question, un problème ou simplement envie d'échanger ? 
+            Notre équipe est à votre disposition pour vous accompagner.
+          </p>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Envoyez-nous un message</CardTitle>
-                  <CardDescription>
-                    Remplissez le formulaire ci-dessous et nous vous répondrons dans les meilleurs délais.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="block text-sm font-medium">
-                        Nom complet
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Contact Form */}
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5" />
+                  Envoyez-nous un message
+                </CardTitle>
+                <CardDescription>
+                  Remplissez le formulaire ci-dessous et nous vous répondrons rapidement
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium mb-2">
+                        Nom complet *
                       </label>
                       <Input
                         id="name"
-                        name="name"
-                        placeholder="Votre nom"
-                        value={formData.name}
-                        onChange={handleChange}
+                        type="text"
                         required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Votre nom"
                       />
                     </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="block text-sm font-medium">
-                        Adresse email
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium mb-2">
+                        Email *
                       </label>
                       <Input
                         id="email"
-                        name="email"
                         type="email"
-                        placeholder="votre@email.com"
+                        required
                         value={formData.email}
-                        onChange={handleChange}
-                        required
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="votre@email.fr"
                       />
                     </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="subject" className="block text-sm font-medium">
-                        Sujet
-                      </label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        placeholder="Comment pouvons-nous vous aider ?"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="message" className="block text-sm font-medium">
-                        Message
-                      </label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        placeholder="Détaillez votre demande ici..."
-                        rows={4}
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Envoi en cours...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="mr-2 h-4 w-4" />
-                          Envoyer le message
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
-                <h2 className="text-2xl font-bold mb-4">Nos coordonnées</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {contactMethods.map((method, index) => (
-                    <Card key={index} className="h-full">
-                      <CardContent className="p-6">
-                        <div className="mb-4">{method.icon}</div>
-                        <h3 className="font-semibold mb-1">{method.title}</h3>
-                        {method.isButton ? (
-                          <Button 
-                            variant="link" 
-                            className="p-0 h-auto font-normal justify-start"
-                            onClick={() => toast.info('La fonctionnalité de chat en direct sera bientôt disponible')}
-                          >
-                            {method.value}
-                          </Button>
-                        ) : (
-                          <p className="font-medium">{method.value}</p>
-                        )}
-                        <p className="text-sm text-muted-foreground mt-1">{method.description}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-              >
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Horaires d'ouverture</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Lundi - Vendredi</span>
-                        <span>9h - 18h</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Samedi</span>
-                        <span>10h - 16h</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Dimanche</span>
-                        <span>Fermé</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                      Sujet *
+                    </label>
+                    <Input
+                      id="subject"
+                      type="text"
+                      required
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      placeholder="De quoi souhaitez-vous parler ?"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium mb-2">
+                      Message *
+                    </label>
+                    <textarea
+                      id="message"
+                      required
+                      rows={6}
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Décrivez votre demande en détail..."
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                  
+                  <Button type="submit" className="w-full">
+                    <Send className="h-4 w-4 mr-2" />
+                    Envoyer le message
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
-        </motion.div>
+
+          {/* Contact Info */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations de contact</CardTitle>
+                <CardDescription>
+                  Plusieurs moyens de nous joindre selon vos préférences
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {contactInfo.map((info, index) => (
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-lg bg-muted/50">
+                    {info.icon}
+                    <div>
+                      <h3 className="font-semibold">{info.title}</h3>
+                      <p className="text-sm whitespace-pre-line">{info.content}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{info.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Support spécialisé</CardTitle>
+                <CardDescription>
+                  Contactez directement le service adapté à votre demande
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {supportTypes.map((support, index) => (
+                  <div key={index} className="p-4 rounded-lg border">
+                    <div className="flex items-center gap-3 mb-2">
+                      {support.icon}
+                      <h3 className="font-semibold">{support.title}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">{support.description}</p>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={`mailto:${support.email}`}>
+                        Contacter par email
+                      </a>
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* FAQ Preview */}
+        <section className="mt-16">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle>Questions fréquentes</CardTitle>
+              <CardDescription>
+                Peut-être trouverez-vous votre réponse ici
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Comment fonctionne le scan émotionnel ?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Notre IA analyse votre voix, expressions faciales et réponses pour évaluer votre état émotionnel.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Mes données sont-elles sécurisées ?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Oui, nous respectons strictement le RGPD et chiffrons toutes vos données personnelles.
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Puis-je annuler mon abonnement ?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Oui, vous pouvez annuler à tout moment depuis vos paramètres de compte.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Y a-t-il une version d'essai gratuite ?</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Oui, profitez de 14 jours d'essai gratuit pour découvrir toutes nos fonctionnalités.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
       </div>
-    </Shell>
+    </div>
   );
 };
 
