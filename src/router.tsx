@@ -199,99 +199,195 @@ export const router = createBrowserRouter([
       },
       {
         path: "/b2b/admin/user-management",
-        element: <B2BAdminUserManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminUserManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/settings",
-        element: <B2BAdminSettings />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminSettings />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/analytics",
-        element: <B2BAdminAnalytics />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminAnalytics />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/access-logs",
-        element: <B2BAdminAccessLogs />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminAccessLogs />
+          </RoleProtectedRoute>
+        ),
       },
 	  {
         path: "/b2b/admin/access-logs/:logId",
-        element: <B2BAdminAccessLogDetail />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminAccessLogDetail />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/vr-management",
-        element: <B2BAdminVRManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminVRManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/emotion-analytics",
-        element: <B2BAdminEmotionAnalytics />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminEmotionAnalytics />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/scan-management",
-        element: <B2BAdminScanManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminScanManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/journal-management",
-        element: <B2BAdminJournalManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminJournalManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/music-management",
-        element: <B2BAdminMusicManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminMusicManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/coach-management",
-        element: <B2BAdminCoachManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminCoachManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/breath-management",
-        element: <B2BAdminBreathManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminBreathManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/community-management",
-        element: <B2BAdminCommunityManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminCommunityManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/notification-management",
-        element: <B2BAdminNotificationManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminNotificationManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/badge-management",
-        element: <B2BAdminBadgeManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminBadgeManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/challenge-management",
-        element: <B2BAdminChallengeManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminChallengeManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/report-management",
-        element: <B2BAdminReportManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminReportManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/preferences-management",
-        element: <B2BAdminPreferencesManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminPreferencesManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/theme-management",
-        element: <B2BAdminThemeManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminThemeManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/user-mode-management",
-        element: <B2BAdminUserModeManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminUserModeManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/segment-management",
-        element: <B2BAdminSegmentManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminSegmentManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/orchestration-management",
-        element: <B2BAdminOrchestrationManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminOrchestrationManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/support-management",
-        element: <B2BAdminSupportManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminSupportManagement />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/billing-management",
-        element: <B2BAdminBillingManagement />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminBillingManagement />
+          </RoleProtectedRoute>
+        ),
       },
     ],
   },
