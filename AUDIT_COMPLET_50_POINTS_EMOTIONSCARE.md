@@ -33,11 +33,12 @@
 - [x] Scripts d'automatisation complets
 - **Status:** TERMINÉ À 100%
 
-**Point 2 🔄 - Architecture Core**
+**Point 2 ✅ - Architecture Core B2C - 100% COMPLÉTÉ**
 - [x] Composants layout (Header, Sidebar, Footer)
-- [x] Système de routing
+- [x] Système de routing B2C complet
+- [x] Pages B2C (Login/Register) avec transitions
 - [x] Types TypeScript globaux
-- **Status:** EN COURS
+- **Status:** TERMINÉ À 100%
 
 **Point 3 📋 - Authentification & Sécurité**
 - [ ] Login/Register forms

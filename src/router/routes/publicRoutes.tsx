@@ -8,6 +8,8 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const BrowsingPage = lazy(() => import('@/pages/BrowsingPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -33,5 +35,13 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/b2c/login',
+    element: <B2CLoginPage />,
+  },
+  {
+    path: '/b2c/register',
+    element: <B2CRegisterPage />,
   },
 ];
