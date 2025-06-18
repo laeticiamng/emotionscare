@@ -1,6 +1,11 @@
 
+import 'ts-node/register';
+import 'tsconfig-paths/register.js';
 import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   testDir: './src/e2e',
