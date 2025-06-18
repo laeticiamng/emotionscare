@@ -1,39 +1,62 @@
 
-export interface EmotionResult {
-  emotion: string;
-  confidence: number;
-  timestamp: Date;
+// Types globaux de l'application
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url?: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  preferences: UserPreferences;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface VRSessionTemplate {
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  language: 'fr' | 'en';
+  notifications_enabled: boolean;
+  email_notifications: boolean;
+  privacy_settings: PrivacySettings;
+}
+
+export interface PrivacySettings {
+  camera_enabled: boolean;
+  microphone_enabled: boolean;
+  heart_rate_enabled: boolean;
+  gps_enabled: boolean;
+  social_sharing_enabled: boolean;
+  nft_enabled: boolean;
+}
+
+export interface EmotionData {
   id: string;
-  title: string;
+  user_id: string;
+  emotion_type: 'joy' | 'calm' | 'energy' | 'focus' | 'stress' | 'neutral';
+  intensity: number; // 1-10
+  source: 'voice' | 'text' | 'camera' | 'manual';
+  metadata?: Record<string, any>;
+  created_at: string;
+}
+
+export interface Module {
+  id: string;
+  name: string;
   description: string;
-  duration: number | string;
-  difficulty: 'Débutant' | 'Intermédiaire' | 'Avancé';
-  tags?: string[];
-  environment?: string;
-  thumbnailUrl?: string;
-  emotionTarget?: string;
-  category?: string;
-  name?: string;
-  lastUsed?: string;
+  icon: string;
+  route: string;
+  premium: boolean;
+  enabled: boolean;
+  category: 'emotion' | 'analytics' | 'wellness' | 'social';
 }
 
-export interface VRSession {
-  id: string;
-  templateId: string;
-  startTime: string | Date;
-  endTime?: string | Date;
-  duration: number;
-  completed: boolean;
-  progress?: number;
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  status: 'success' | 'error';
+  timestamp: string;
 }
 
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist?: string;
-  coverUrl?: string;
-  emotion?: string;
+export interface LoadingState {
+  isLoading: boolean;
+  error: string | null;
 }
