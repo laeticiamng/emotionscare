@@ -1,391 +1,211 @@
 
-# EmotionsCare - Plateforme de bien-être émotionnel
+# EmotionsCare 🧠💙
 
-![Node version](https://img.shields.io/badge/node-20%2B-brightgreen)
-![Bun version](https://img.shields.io/badge/bun-1.2%2B-blue)
+Plateforme de bien-être émotionnel avec intelligence artificielle, réalité virtuelle et monitoring physiologique.
 
-## À propos du projet
-
-EmotionsCare est une plateforme SaaS innovante dédiée au bien-être émotionnel en entreprise et pour les particuliers. Notre solution combine intelligence artificielle, analyse émotionnelle et techniques de relaxation pour aider les utilisateurs à comprendre et gérer leurs émotions efficacement.
-
-## Fonctionnalités principales
-
-- **Analyse émotionnelle** : Détection des émotions par texte, voix et expression faciale
-- **Coaching personnalisé** : Recommandations adaptées à l'état émotionnel
-- **Thérapie musicale** : Générations de musiques adaptées aux émotions détectées
-- **Journal émotionnel** : Suivi de l'évolution émotionnelle au fil du temps
-- **Personnalisation prédictive** : Interface et suggestions IA qui s'adaptent automatiquement à vos besoins
-- **Gamification** : Défis, badges et récompenses pour encourager l'engagement
-- **Réalité Virtuelle** : Sessions de relaxation immersives en VR
-- **Cocoon social** : Communauté bienveillante pour partager et progresser ensemble
-- **Traçabilité** : Journalisation anonymisée des sélections de mode avec intégration d'APIs d'analytics
-
-## Architecture technique
+## 🚀 Démarrage Rapide
 
 ### Prérequis
+- [Bun](https://bun.sh) (recommandé) ou Node.js 18+
+- Git
 
-- **Node.js** >= 20
-- **Bun** >= 1.2
+### Installation
 
-### Stack technologique
+```bash
+# Cloner le projet
+git clone <repository-url>
+cd emotionscare
 
-- **Frontend** : React 18, TypeScript, Tailwind CSS, Shadcn UI
-- **State Management** : Context API, React Hooks
-- **API Integration** : OpenAI, HumeAI, MusicGen
-- **Authentication** : Supabase Auth
-- **Database** : Supabase PostgreSQL
-- **Storage** : Supabase Storage
-- **Deployment** : Vite, Netlify/Vercel
+# Configuration Bun (recommandée)
+bun run scripts/setup-bun.js
 
-### Structure du projet
+# OU installation classique
+bun install
 
+# Démarrer le serveur de développement
+bun dev
+```
+
+## 📋 Scripts Disponibles
+
+```bash
+# Développement
+bun dev                 # Serveur de développement
+bun build              # Build de production
+bun preview            # Aperçu du build
+
+# Tests et qualité
+bun test               # Tests unitaires
+bun test:watch         # Tests en mode watch
+bun test:coverage      # Tests avec couverture
+bun lint               # Linter ESLint
+
+# Audit et maintenance
+bun audit              # Audit complet du projet
+bun setup              # Installation complète
+```
+
+## 🏗️ Architecture
+
+### Structure du Projet
 ```
 src/
-├── components/          # Composants React organisés par domaine
-│   ├── ui/              # Composants UI réutilisables (shadcn)
-│   ├── layout/          # Layouts et composants structurels
-│   ├── music/           # Composants liés à la musique
-│   ├── scan/            # Composants d'analyse émotionnelle
-│   └── ...
-├── contexts/            # Contextes React pour le state global
-│   ├── ThemeContext.tsx # Gestion du thème
-│   ├── AuthContext.tsx  # Gestion de l'authentification
-│   ├── music/           # Contextes liés à la musique
-│   └── ...
-├── hooks/               # Custom hooks
-├── pages/               # Composants de page
-├── types/               # TypeScript type definitions
-├── utils/               # Fonctions utilitaires
-└── services/            # Services d'API et intégrations
+├── components/        # Composants réutilisables
+│   ├── ui/           # Composants UI de base
+│   ├── emotions/     # Composants émotionnels
+│   ├── dashboard/    # Composants dashboard
+│   ├── charts/       # Composants graphiques
+│   └── audit/        # Composants d'audit
+├── pages/            # Pages de l'application
+├── hooks/            # Hooks personnalisés
+├── services/         # Services API
+├── contexts/         # Contextes React
+├── types/            # Types TypeScript
+└── utils/            # Utilitaires
 ```
 
-## Routes principales
+### Technologies
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **Build**: Vite, Bun (gestionnaire de paquets)
+- **UI**: Shadcn/ui, Framer Motion
+- **Backend**: Supabase (base de données, auth, edge functions)
+- **Tests**: Vitest, Cypress, Lighthouse
+- **CI/CD**: GitHub Actions
 
-- `/` - Page d'accueil (publique, aucune authentification requise)
-- `/auth/login` - Connexion
-- `/auth/register` - Inscription
-- `/dashboard` - Tableau de bord utilisateur
-- `/scan` - Analyse émotionnelle
-- `/journal` - Journal émotionnel
-- `/music` - Thérapie musicale
-- `/vr` - Sessions de réalité virtuelle
-- `/predictive` - Tableau de bord d'intelligence prédictive
-- `/admin/dashboard` - Tableau de bord administrateur
+## 🎯 Fonctionnalités
 
-## Configuration d'environnement
+### ✅ Implémentées
+- [x] Dashboard utilisateur avec widgets Glow
+- [x] Système d'authentification Supabase
+- [x] Composants UI de base (Shadcn/ui)
+- [x] Gestion d'état avec Zustand
+- [x] Routing avec React Router
+- [x] Thème sombre/clair automatique
+- [x] Audit de projet intégré
 
-La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir ses fonctionnalités d'IA, d'analyse émotionnelle et de génération de musique.
+### 🚧 En Développement
+- [ ] Glow Experiences (Flash Glow, Filtres AR, Bubble-Beat)
+- [ ] Modules bien-être (Journal, Musicothérapie, Scan)
+- [ ] VR/AR Integration (WebXR, Three.js)
+- [ ] Gamification (Leaderboard, Badges)
 
-### APIs intégrées
+### 📋 Planifiées
+- [ ] Tests E2E Cypress complets
+- [ ] PWA et notifications push
+- [ ] Internationalisation (i18n)
+- [ ] Analytics et monitoring
+- [ ] Optimisations performance
 
-1. **OpenAI** - Pour GPT-4, DALL-E et Whisper
-   - Utilisation : Conseils IA, génération de texte et d'images, transcription audio
-   - Variable d'environnement : `VITE_OPENAI_API_KEY`
+## 🔗 Mapping Fonctionnalité ↔ Endpoint ↔ Composant
 
-2. **Hume AI** - Pour l'analyse émotionnelle avancée
-   - Utilisation : Détection d'émotions dans le texte, la voix et les expressions faciales
-   - Variable d'environnement : `VITE_HUME_API_KEY`
+| Fonctionnalité | Endpoint | Composant | Status |
+|----------------|----------|-----------|---------|
+| Flash Glow | `POST /metrics/flash_glow` | `FlashGlow` | 🟡 Partiel |
+| Filtres Visage AR | `POST /metrics/face_filter` | `FaceFilterAR` | 🟡 Partiel |
+| Bubble-Beat | `GET /me/heart_rate/live` | `BubbleBeat` | ❌ À faire |
+| Dashboard Glow | `GET /me/dashboard/weekly` | `GlowGauge` | ✅ Prêt |
+| Weekly Bars | `GET /me/dashboard/weekly` | `WeeklyBars` | ✅ Prêt |
+| Journal | `POST /journal_voice` | `JournalPage` | ✅ Prêt |
+| Scan Émotionnel | `POST /metrics/scan` | `EmotionSelector` | ✅ Prêt |
+| VR Galactique | `POST /metrics/vr_galaxy` | `VRGalaxy` | ❌ À faire |
+| Gamification | `GET /me/gamification` | `LeaderboardPage` | 🟡 Partiel |
+| Privacy | `PATCH /me/privacy_prefs` | `PrivacyToggle` | ❌ À faire |
 
-3. **MusicGen** - Pour la génération de musique personnalisée
-   - Utilisation : Création de musique adaptée aux émotions
-   - Gérée par le backend
+## 🧪 Tests et Qualité
 
-4. **Supabase** - Authentification, base de données et stockage
-   - Utilisation : Gestion des utilisateurs et des fichiers
-   - Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+### Couverture Actuelle
+- **Tests Unitaires**: 45% (Objectif: 90%)
+- **Tests E2E**: 0% (À implémenter)
+- **Lighthouse**: 85/100 (Objectif: 90+)
 
-5. **Firebase** (optionnel) - Utilisé pour la configuration de l'exemple
-   - Variables d'environnement : `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MEASUREMENT_ID`
-
-### Configuration du fichier .env.local
-
-Un exemple de configuration est fourni dans `src/.env.example`. Copiez ce fichier
-vers `.env.local` puis renseignez vos propres clés et URLs.
-
-```
-NEXT_PUBLIC_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-NEXT_PUBLIC_APP_ENV=development
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_WEB_URL=http://localhost:3000
-
-
-> **Note**
-> L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
-> Toutes les fonctions backend passent désormais par `authorizeRole` dans `supabase/functions/_shared/auth.ts` pour vérifier l'authentification **et** le rôle. Chaque tentative d'accès refusée est enregistrée dans la table `auth_attempts` avec l'adresse IP et le `user-agent`.
-
-### Utilisateurs de test
-
-Trois comptes standards sont mis à disposition pour les démonstrations :
-
-| Email              | Mot de passe | Rôle      |
-| ------------------ | ------------ | --------- |
-| `b2c@exemple.fr`   | `b2c`        | B2C       |
-| `user@exemple.fr`  | `user`       | B2B User  |
-| `admin@exemple.fr` | `admin`      | B2B Admin |
-
-Si l'un de ces comptes n'existe pas dans votre base Supabase, vous pouvez les créer ou les réinitialiser avec la commande suivante :
-
-
+### Commandes de Test
 ```bash
-npx ts-node scripts/ensureTestUser.ts
+# Tests unitaires avec couverture
+bun test:coverage
+
+# Tests E2E (à implémenter)
+bunx cypress run
+
+# Audit Lighthouse
+bunx lighthouse http://localhost:4173 --output=json
 ```
 
-Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre `.env.local` afin d'utiliser l'API d'administration Supabase.
+## 🌍 Variables d'Environnement
 
-## Installation et démarrage
+Créer un fichier `.env.local` :
 
-### Setup Bun
+```env
+# Supabase
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-```bash
-# Install dependencies
-bun install --no-save
+# APIs externes
+VITE_OPENAI_API_KEY=your_openai_key
+VITE_HUME_API_KEY=your_hume_key
 
-# Start development server
-bun run dev
+# Configuration
+VITE_APP_ENV=development
 ```
 
+## 🚀 Déploiement
+
+### Build de Production
 ```bash
-
-# Cloner le repository
-git clone https://github.com/your-username/emotions-care.git
-cd emotions-care
-
-# Installer les dépendances
-bun install --no-save
-
-# Créer un fichier .env.local avec les variables nécessaires
-# (voir section Configuration d'environnement)
-
-# Démarrer l'application en mode développement
-bun run dev
-
-# Build pour la production
 bun run build
-
-# Exécuter les tests
-# Les variables de `.env.test` sont chargées automatiquement
-bun run test
-
-# Vérifier les types TypeScript
-bun run type-check
-
-# Démarrer le serveur de production
-bun run start
+bun run preview  # Test du build local
 ```
 
-## Système de design et thèmes
+### CI/CD
+Le projet utilise GitHub Actions avec Bun :
+- Tests automatisés sur chaque PR
+- Audit Lighthouse automatique
+- Déploiement automatique sur main
 
-EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, avec prise en charge des thèmes clairs et sombres. Le thème est configurable par l'utilisateur et peut s'adapter automatiquement aux préférences système.
+## 📊 Monitoring et Analytics
 
-Le `ThemeContext` expose également des préférences d'accessibilité comme `soundEnabled` et `reduceMotion` ainsi que leurs setters correspondants. Ces valeurs sont définies dans `src/types/theme.ts` et stockées via `useLocalStorage`.
+### Audit Intégré
+Accédez à `/audit` pour voir :
+- État des fonctionnalités
+- Couverture de tests
+- Performance Lighthouse
+- Configuration technique
 
-## Contextes globaux
-
-- **ThemeContext** - Gestion du thème (clair/sombre)
-- **AuthContext** - Authentification et informations utilisateur
-- **UserModeContext** - Mode utilisateur (B2B/B2C)
-- **LayoutContext** - Mise en page et navigation (sidebar, plein écran)
-- **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
-- **SocialCoconContext** - Gestion des posts, commentaires et réactions du cocon social
-L'ordre d'injection de ces contextes est géré par le composant `AppProviders`. La hiérarchie complète (avec `LayoutProvider`) est détaillée dans `docs/layout-shell-audit.md` et `docs/shell-navigation-premium-audit.md`.
-
-## Préférences utilisateur par défaut
-
-La constante `DEFAULT_PREFERENCES` centralise les valeurs initiales utilisées
-dans les contextes de préférences utilisateur. Elle est définie dans
-`src/constants/defaults.ts` et réexportée par `src/types/preferences.ts`.
-Sa structure est la suivante :
-
-```ts
-{
-  theme: 'system',
-  fontSize: 'medium',
-  fontFamily: 'system',
-  reduceMotion: false,
-  colorBlindMode: false,
-  autoplayMedia: true,
-  soundEnabled: true,
-  emotionalCamouflage: false,
-  aiSuggestions: true,
-  notifications_enabled: true,
-  language: 'fr',
-  privacy: {
-    shareData: false,
-    allowAnalytics: true,
-    showProfile: true,
-    shareActivity: true,
-    allowMessages: true,
-    allowNotifications: true
-  },
-  notifications: {
-    email: true,
-    push: true,
-    sms: false,
-    frequency: 'daily',
-    enabled: true,
-    emailEnabled: true,
-    pushEnabled: true,
-    inAppEnabled: true
-  }
-}
-```
-
-Les composants peuvent l'importer via :
-
-```ts
-import { DEFAULT_PREFERENCES } from '@/types/preferences';
-```
-
-## Gestion du responsive
-
-L'application est entièrement responsive et optimisée pour les appareils mobiles, tablettes et desktop. Nous utilisons:
-
-- Media queries via Tailwind
-- Hook `useMediaQuery` pour la logique conditionnelle
-- Layouts adaptifs pour chaque taille d'écran
-
-## Tests et qualité
-
-- ESLint pour la qualité du code (`bun run lint`)
-- Vérification de type TypeScript (`bun run type-check`)
-- Tests unitaires (placeholder) (`bun run test`)
-- Utiliser `MockMusicProvider` pour tester les hooks liés à la musique
-- Nettoyage du build (`bun run clean`)
-
-### Conventions de typage
-
-Les interfaces et propriétés utilisent systématiquement l'anglais en `camelCase`.
-Les champs en `snake_case` ne subsistent que pour la compatibilité avec
-certaines sources de données. La commande `bun run type-check` doit s'exécuter
-sans erreur pour valider la cohérence des types.
-
-## Données de test
-
-Les fichiers de mock utilisés pendant le développement se trouvent dans les
-répertoires `src/data` et `src/mocks`. Ils respectent les interfaces TypeScript
-définies dans `src/types` et sont régulièrement alignés avec celles-ci. Veillez
-à mettre à jour ces mocks en même temps que les types pour éviter toute erreur
-de typage.
-
-## Notifications CI
-
-Par défaut, GitHub envoie un email à chaque échec du workflow CI. Pour 
-éviter d'être submergé par ces messages :
-
-1. Ouvrez **Settings > Notifications** sur GitHub et désactivez
-   l'option *Actions*.
-2. Vous pouvez toujours réactiver les alertes en cas d'incident majeur
-   depuis cette même page.
-
-## Monitoring & Alerting
-
-L'application intègre **Sentry** pour la surveillance des erreurs et des incidents.
-Le fichier `src/monitoring.ts` initialise Sentry si la variable d'environnement
-`NEXT_PUBLIC_SENTRY_DSN` est présente. Les erreurs non gérées et les variables
-d'environnement manquantes sont automatiquement reportées sur le tableau de bord
-Sentry.
-
-Pour activer la surveillance, ajoutez dans votre `.env.local` la clé :
-
+### Scripts d'Audit
 ```bash
-NEXT_PUBLIC_SENTRY_DSN=<votre_DSN_Sentry>
+# Audit complet du projet
+bun audit
+
+# Audit de performance
+bun run lighthouse
+
+# Analyse du bundle
+bunx vite-bundle-analyzer
 ```
 
-Le tableau de bord et la gestion des alertes sont configurables directement sur
-Sentry.
+## 🤝 Contribution
 
-## Sécurité proactive
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/amazing-feature`)
+3. Commit les changements (`git commit -m 'Add amazing feature'`)
+4. Push la branche (`git push origin feature/amazing-feature`)
+5. Ouvrir une Pull Request
 
-## Plan de mise en production
+### Standards de Code
+- TypeScript strict
+- ESLint + Prettier
+- Tests unitaires obligatoires (nouvelles fonctionnalités)
+- Accessibilité WCAG 2.1 AA
 
-Le document [`docs/migration-prod.md`](docs/migration-prod.md) décrit l'ensemble des étapes pour migrer la plateforme vers un environnement de production sécurisé.
+## 📞 Support
 
+- **Documentation**: `/audit` dans l'application
+- **Issues**: GitHub Issues
+- **Discussions**: GitHub Discussions
 
-Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
-Il est accessible via la route `/b2b/admin/security`.
-Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
+## 📄 Licence
 
-## Build Lovable (CI)
+MIT License - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-La séquence de build optimisée utilise le flag `SKIP_HEAVY` pour ignorer les binaires lourds lors de l'installation :
+---
 
-```bash
-SKIP_HEAVY=true bun install --no-save
-bun run build
-SKIP_HEAVY=true node scripts/install-heavy.js
-bun run test -- --environment=jsdom
-```
-
-
-## Types d'émotion unifiés
-
-Les interfaces `EmotionResult` et `EmotionRecommendation` se trouvent dans `src/types/emotion.ts`.
-Elles sont utilisées par tous les modules de scan et de recommandations. Les champs
-suivants sont disponibles :
-
-- `EmotionResult` : informations détaillées sur l'émotion détectée (confidence,
-  intensity, recommandations, etc.).
-- `EmotionRecommendation` : objet décrivant une action ou une ressource associée
-  à l'émotion (type, titre, description, lien, etc.).
-
-Les mocks du dossier `src/mocks` respectent désormais strictement ces
-définitions pour éviter les erreurs de typage lors du build.
-## Développement des fonctions Edge
-Pour tester localement les nouvelles fonctions, utilisez le serveur Supabase:
-
-```bash
-supabase start
-supabase functions serve --env-file supabase/.env
-```
-
-Les routes sont disponibles sur `http://localhost:54321/functions/v1`.
-
-
-## Documentation technique
-
-Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
-
-- `ARCHITECTURE.md` : présentation de la structure du projet
-- `API_INTEGRATION.md` : intégration des services tiers
-- `BUILD_CHECKLIST.md` : étapes à vérifier avant un déploiement
-- `home-routing-audit.md` : audit et conventions d'accès public
-- `RoutingFlow.md` : schéma du flux d'accès (accueil → login → dashboard)
-- `unified-access-adaptive-audit.md` : logique d'accès centralisée et expérience adaptative
-- `onboarding-training-audit.md` : structure du module d'onboarding
-- `onboarding-formation-point14-audit.md` : audit détaillé du point 14 (onboarding et formation)
-
-Des audits complémentaires sont disponibles dans le dossier `docs` :
-- `scalability-innovation-audit.md` : évolutivité et innovation continue
-- `module-registry.md` : registre des modules et roadmap
-- `music-module-technical-audit-2025.md` : état du module musique et recommandations
-- `scan-audio-type-fixes.md` : corrections de typage pour les modules scan/audio
-- `ui-polish-restoration.md` : rétablissement de l'apparence initiale
-- `shell-layout-point4-audit.md` : synthèse du Shell et de la navigation (point 4)
-- `user-preferences-point7-audit.md` : état actuel des préférences utilisateur et recommandations premium
-- `evaluation-improvement-point20-audit.md` : boucle de feedback et amélioration proactive (point 20)
-- `critical-access-logs-cli.md` : consultation et export des logs d'accès critiques
-
-
-## Équipe et contribution
-
-EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe dédiée au développement, au design et à l'expérience utilisateur.
-
-## Contributing
-
-[![CI](https://github.com/your-username/emotions-care/actions/workflows/ci.yml/badge.svg?branch=feat/dashboard-widgets)](https://github.com/your-username/emotions-care/actions/workflows/ci.yml)
-
-Les contributions sont les bienvenues ! Veillez à installer les dépendances avec `bun install --no-save`, à lancer `bun run lint` et `bun run test` avant de proposer une pull request.
-
-## Licence
-
-Tous droits réservés © 2023-2025 [Votre Entreprise]
+🔥 **Powered by Bun + React + Supabase**
