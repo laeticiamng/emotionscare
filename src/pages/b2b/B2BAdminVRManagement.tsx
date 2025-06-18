@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { VrIcon as Vr, Play, Pause, Settings } from 'lucide-react';
+import { Headphones as Vr, Play, Pause, Settings } from 'lucide-react';
 
 const B2BAdminVRManagement: React.FC = () => {
   return (
