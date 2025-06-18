@@ -85,11 +85,11 @@ export const router = createBrowserRouter([
       ...vrRoutes,
       ...gamificationRoutes,
       ...notificationRoutes,
+      ...b2bRoutes,
     ],
   },
   ...userRoutes,
   ...adminRoutes,
-  ...b2bRoutes,
   ...onboardingRoutes,
   ...auditRoutes,
 ]);
