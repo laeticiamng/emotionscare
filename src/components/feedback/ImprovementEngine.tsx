@@ -6,291 +6,196 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Sparkles, 
-  TrendingUp, 
-  Target, 
-  CheckCircle2,
-  Clock,
-  Lightbulb,
-  Users,
-  Zap,
-  Brain,
-  ArrowRight
+import {
+  Brain, TrendingUp, Lightbulb, Target, Users, Zap,
+  CheckCircle, Clock, AlertTriangle, ArrowRight, Sparkles
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { ImprovementSuggestion, FeedbackEntry } from '@/types/feedback';
 
-interface ImprovementSuggestion {
-  id: string;
-  title: string;
-  description: string;
-  impact: 'low' | 'medium' | 'high';
-  effort: 'low' | 'medium' | 'high';
-  confidence: number;
-  category: 'ui' | 'performance' | 'feature' | 'workflow';
-  affected_users: number;
-  expected_benefit: string;
-  implementation_time: string;
-  status: 'pending' | 'approved' | 'in_progress' | 'completed';
+interface ImprovementEngineProps {
+  feedbacks: FeedbackEntry[];
+  suggestions: ImprovementSuggestion[];
+  onImplementSuggestion: (id: string) => void;
+  onGenerateNewSuggestions: () => void;
 }
 
-const ImprovementEngine: React.FC = () => {
-  const [suggestions, setSuggestions] = useState<ImprovementSuggestion[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+const ImprovementEngine: React.FC<ImprovementEngineProps> = ({
+  feedbacks,
+  suggestions,
+  onImplementSuggestion,
+  onGenerateNewSuggestions
+}) => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
 
-  // Données mockées pour la démo
-  const mockSuggestions: ImprovementSuggestion[] = [
-    {
-      id: '1',
-      title: 'Optimisation des animations de transition',
-      description: 'Réduire la durée des animations pour améliorer la perception de fluidité',
-      impact: 'medium',
-      effort: 'low',
-      confidence: 87,
-      category: 'performance',
-      affected_users: 1250,
-      expected_benefit: '+12% satisfaction utilisateur',
-      implementation_time: '2-3 jours',
-      status: 'pending'
-    },
-    {
-      id: '2', 
-      title: 'Raccourcis clavier avancés',
-      description: 'Ajouter des raccourcis pour les actions fréquentes identifiées dans les analytics',
-      impact: 'high',
-      effort: 'medium',
-      confidence: 92,
-      category: 'workflow',
-      affected_users: 890,
-      expected_benefit: '+25% efficacité',
-      implementation_time: '1-2 semaines',
-      status: 'approved'
-    },
-    {
-      id: '3',
-      title: 'Mode sombre amélioré',
-      description: 'Peaufiner les contrastes et la lisibilité en mode sombre',
-      impact: 'medium',
-      effort: 'low',
-      confidence: 78,
-      category: 'ui',
-      affected_users: 2100,
-      expected_benefit: '+18% satisfaction',
-      implementation_time: '3-4 jours',
-      status: 'in_progress'
-    },
-    {
-      id: '4',
-      title: 'Suggestions contextuelles IA',
-      description: 'Intégrer des suggestions intelligentes basées sur le comportement utilisateur',
-      impact: 'high',
-      effort: 'high',
-      confidence: 85,
-      category: 'feature',
-      affected_users: 3200,
-      expected_benefit: '+30% engagement',
-      implementation_time: '3-4 semaines',
-      status: 'pending'
-    }
-  ];
-
-  useEffect(() => {
-    setSuggestions(mockSuggestions);
-  }, []);
-
-  const generateNewSuggestions = async () => {
-    setIsGenerating(true);
-    try {
-      // Simulation de génération IA
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast.success('Nouvelles suggestions générées avec succès !');
-    } catch (error) {
-      toast.error('Erreur lors de la génération');
-    } finally {
-      setIsGenerating(false);
-    }
+  const typeIcons = {
+    feature: { icon: Lightbulb, color: 'text-yellow-500', bg: 'bg-yellow-50' },
+    ui_improvement: { icon: Sparkles, color: 'text-purple-500', bg: 'bg-purple-50' },
+    workflow: { icon: Target, color: 'text-blue-500', bg: 'bg-blue-50' },
+    performance: { icon: Zap, color: 'text-green-500', bg: 'bg-green-50' }
   };
 
-  const approveSuggestion = (id: string) => {
-    setSuggestions(prev => 
-      prev.map(s => s.id === id ? { ...s, status: 'approved' } : s)
-    );
-    toast.success('Suggestion approuvée !');
+  const effortConfig = {
+    low: { label: 'Faible', color: 'bg-green-100 text-green-800', progress: 25 },
+    medium: { label: 'Moyen', color: 'bg-yellow-100 text-yellow-800', progress: 50 },
+    high: { label: 'Élevé', color: 'bg-red-100 text-red-800', progress: 75 }
   };
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
+  const statusConfig = {
+    generated: { label: 'Généré', color: 'bg-blue-100 text-blue-800', icon: Brain },
+    reviewed: { label: 'Examiné', color: 'bg-purple-100 text-purple-800', icon: Users },
+    approved: { label: 'Approuvé', color: 'bg-green-100 text-green-800', icon: CheckCircle },
+    implemented: { label: 'Implémenté', color: 'bg-gray-100 text-gray-800', icon: CheckCircle }
   };
 
-  const getEffortColor = (effort: string) => {
-    switch (effort) {
-      case 'high': return 'text-red-600';
-      case 'medium': return 'text-yellow-600';
-      case 'low': return 'text-green-600';
-      default: return 'text-gray-600';
-    }
+  // Analyse des tendances des feedbacks
+  const analyzePattern = () => {
+    const patterns = {
+      mostReportedIssues: feedbacks
+        .filter(f => f.type === 'bug')
+        .reduce((acc, feedback) => {
+          const key = feedback.module;
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>),
+      
+      mostRequestedFeatures: feedbacks
+        .filter(f => f.type === 'feature_request')
+        .slice(0, 5),
+      
+      averageRatingByModule: Object.entries(
+        feedbacks.reduce((acc, f) => {
+          if (!acc[f.module]) {
+            acc[f.module] = { total: 0, count: 0 };
+          }
+          acc[f.module].total += f.rating;
+          acc[f.module].count += 1;
+          return acc;
+        }, {} as Record<string, { total: number; count: number }>)
+      ).map(([module, data]) => ({
+        module,
+        average: (data.total / data.count).toFixed(1)
+      }))
+    };
+
+    return patterns;
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'ui': return <Target className="h-4 w-4" />;
-      case 'performance': return <Zap className="h-4 w-4" />;
-      case 'feature': return <Sparkles className="h-4 w-4" />;
-      case 'workflow': return <Users className="h-4 w-4" />;
-      default: return <Lightbulb className="h-4 w-4" />;
-    }
+  const patterns = analyzePattern();
+
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    // Simulation d'analyse IA
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    onGenerateNewSuggestions();
+    setIsAnalyzing(false);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-gray-500';
-      case 'approved': return 'bg-blue-500';
-      case 'in_progress': return 'bg-yellow-500';
-      case 'completed': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const filteredSuggestions = selectedCategory === 'all' 
-    ? suggestions 
-    : suggestions.filter(s => s.category === selectedCategory);
+  const prioritizedSuggestions = suggestions.sort((a, b) => 
+    (b.impact_score * b.confidence) - (a.impact_score * a.confidence)
+  );
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Brain className="h-6 w-6 text-purple-600" />
-            Moteur d'amélioration IA
-          </h2>
-          <p className="text-muted-foreground">
-            Suggestions intelligentes basées sur l'analyse des feedbacks utilisateur
-          </p>
-        </div>
+      {/* En-tête avec statistiques */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Suggestions actives</p>
+                <p className="text-2xl font-bold">{suggestions.length}</p>
+              </div>
+              <Brain className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Implémentées</p>
+                <p className="text-2xl font-bold">
+                  {suggestions.filter(s => s.status === 'implemented').length}
+                </p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Impact moyen</p>
+                <p className="text-2xl font-bold">
+                  {suggestions.length > 0 
+                    ? (suggestions.reduce((acc, s) => acc + s.impact_score, 0) / suggestions.length).toFixed(1)
+                    : '0'
+                  }
+                </p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Confiance IA</p>
+                <p className="text-2xl font-bold">
+                  {suggestions.length > 0 
+                    ? Math.round(suggestions.reduce((acc, s) => acc + s.confidence, 0) / suggestions.length)
+                    : 0
+                  }%
+                </p>
+              </div>
+              <Sparkles className="h-8 w-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Bouton d'analyse */}
+      <div className="flex justify-center">
         <Button 
-          onClick={generateNewSuggestions}
-          disabled={isGenerating}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          onClick={handleAnalyze} 
+          disabled={isAnalyzing}
+          size="lg"
+          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
         >
-          {isGenerating ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Génération...
-            </div>
+          {isAnalyzing ? (
+            <>
+              <Brain className="h-5 w-5 mr-2 animate-spin" />
+              Analyse en cours...
+            </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Générer nouvelles suggestions
-            </div>
+            <>
+              <Brain className="h-5 w-5 mr-2" />
+              Analyser et générer des suggestions
+            </>
           )}
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-full">
-                <Brain className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold">{suggestions.length}</p>
-                <p className="text-sm text-muted-foreground">Suggestions actives</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-full">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold">
-                  {suggestions.filter(s => s.status === 'completed').length}
-                </p>
-                <p className="text-sm text-muted-foreground">Implémentées</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-full">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold">
-                  {Math.round(suggestions.reduce((acc, s) => acc + s.confidence, 0) / suggestions.length)}%
-                </p>
-                <p className="text-sm text-muted-foreground">Confiance moyenne</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-full">
-                <Users className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-lg font-bold">
-                  {suggestions.reduce((acc, s) => acc + s.affected_users, 0).toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">Utilisateurs impactés</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="suggestions">
+      <Tabs defaultValue="suggestions" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="suggestions">Suggestions IA</TabsTrigger>
+          <TabsTrigger value="patterns">Analyse des tendances</TabsTrigger>
           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
         </TabsList>
 
         <TabsContent value="suggestions" className="space-y-4">
-          {/* Filtres */}
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              variant={selectedCategory === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedCategory('all')}
-            >
-              Toutes
-            </Button>
-            {['ui', 'performance', 'feature', 'workflow'].map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-
-          {/* Liste des suggestions */}
-          <div className="space-y-4">
-            <AnimatePresence>
-              {filteredSuggestions.map((suggestion, index) => (
+          <AnimatePresence>
+            {prioritizedSuggestions.map((suggestion, index) => {
+              const typeConfig = typeIcons[suggestion.type];
+              const StatusIcon = statusConfig[suggestion.status].icon;
+              
+              return (
                 <motion.div
                   key={suggestion.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -298,149 +203,174 @@ const ImprovementEngine: React.FC = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
+                  <Card className={`cursor-pointer transition-all hover:shadow-lg ${
+                    selectedSuggestion === suggestion.id ? 'ring-2 ring-primary' : ''
+                  }`}
+                  onClick={() => setSelectedSuggestion(
+                    selectedSuggestion === suggestion.id ? null : suggestion.id
+                  )}>
+                    <CardHeader>
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="flex items-center gap-2">
-                              {getCategoryIcon(suggestion.category)}
-                              <h3 className="font-semibold text-lg">{suggestion.title}</h3>
-                            </div>
-                            <Badge className={getStatusColor(suggestion.status)}>
-                              {suggestion.status}
-                            </Badge>
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg ${typeConfig.bg}`}>
+                            <typeConfig.icon className={`h-5 w-5 ${typeConfig.color}`} />
                           </div>
-
-                          <p className="text-muted-foreground mb-4">
-                            {suggestion.description}
-                          </p>
-
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                            <div>
-                              <p className="text-sm font-medium">Impact</p>
-                              <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${getImpactColor(suggestion.impact)}`} />
-                                <span className="capitalize text-sm">{suggestion.impact}</span>
-                              </div>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-medium">Effort</p>
-                              <span className={`text-sm capitalize ${getEffortColor(suggestion.effort)}`}>
-                                {suggestion.effort}
-                              </span>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-medium">Confiance</p>
-                              <div className="flex items-center gap-2">
-                                <Progress value={suggestion.confidence} className="w-16 h-2" />
-                                <span className="text-sm font-medium">{suggestion.confidence}%</span>
-                              </div>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-medium">Utilisateurs</p>
-                              <span className="text-sm font-medium">
-                                {suggestion.affected_users.toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <TrendingUp className="h-4 w-4" />
-                              {suggestion.expected_benefit}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {suggestion.implementation_time}
+                          <div>
+                            <CardTitle className="text-lg">{suggestion.title}</CardTitle>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge className={statusConfig[suggestion.status].color}>
+                                {statusConfig[suggestion.status].label}
+                              </Badge>
+                              <Badge className={effortConfig[suggestion.effort_estimation].color}>
+                                Effort: {effortConfig[suggestion.effort_estimation].label}
+                              </Badge>
                             </div>
                           </div>
                         </div>
-
-                        <div className="flex flex-col gap-2 ml-4">
-                          {suggestion.status === 'pending' && (
-                            <Button
-                              onClick={() => approveSuggestion(suggestion.id)}
-                              size="sm"
-                              className="bg-gradient-to-r from-green-600 to-emerald-600"
-                            >
-                              <div className="flex items-center gap-1">
-                                <CheckCircle2 className="h-4 w-4" />
-                                Approuver
-                              </div>
-                            </Button>
-                          )}
-                          <Button size="sm" variant="outline">
-                            Détails
-                            <ArrowRight className="h-4 w-4 ml-1" />
-                          </Button>
+                        <div className="text-right">
+                          <div className="text-sm text-muted-foreground">Impact</div>
+                          <div className="font-bold text-lg">{suggestion.impact_score}/10</div>
+                          <div className="text-xs text-muted-foreground">
+                            Confiance: {suggestion.confidence}%
+                          </div>
                         </div>
                       </div>
-                    </CardContent>
+                    </CardHeader>
+                    
+                    <AnimatePresence>
+                      {selectedSuggestion === suggestion.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                        >
+                          <CardContent>
+                            <div className="space-y-4">
+                              <p className="text-muted-foreground">{suggestion.description}</p>
+                              
+                              <div>
+                                <h4 className="font-semibold mb-2">Raisonnement IA:</h4>
+                                <p className="text-sm text-muted-foreground">{suggestion.reasoning}</p>
+                              </div>
+                              
+                              <div className="flex items-center justify-between pt-4">
+                                <div className="flex items-center gap-4">
+                                  <div>
+                                    <div className="text-sm text-muted-foreground">Effort estimé</div>
+                                    <Progress 
+                                      value={effortConfig[suggestion.effort_estimation].progress} 
+                                      className="w-20"
+                                    />
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Basé sur {suggestion.feedback_ids.length} feedbacks
+                                  </div>
+                                </div>
+                                
+                                {suggestion.status !== 'implemented' && (
+                                  <Button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onImplementSuggestion(suggestion.id);
+                                    }}
+                                    className="bg-green-600 hover:bg-green-700"
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Implémenter
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </Card>
                 </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+              );
+            })}
+          </AnimatePresence>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics d'amélioration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 border rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">+23%</p>
-                    <p className="text-sm text-muted-foreground">Satisfaction après améliorations</p>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">87%</p>
-                    <p className="text-sm text-muted-foreground">Taux de succès des suggestions</p>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">15j</p>
-                    <p className="text-sm text-muted-foreground">Temps moyen d'implémentation</p>
-                  </div>
+        <TabsContent value="patterns" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  Problèmes les plus signalés
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {Object.entries(patterns.mostReportedIssues)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 5)
+                    .map(([module, count]) => (
+                      <div key={module} className="flex items-center justify-between">
+                        <span className="font-medium">{module}</span>
+                        <Badge variant="destructive">{count} signalements</Badge>
+                      </div>
+                    ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-blue-500" />
+                  Notes moyennes par module
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {patterns.averageRatingByModule
+                    .sort((a, b) => parseFloat(a.average) - parseFloat(b.average))
+                    .map(({ module, average }) => (
+                      <div key={module} className="flex items-center justify-between">
+                        <span className="font-medium">{module}</span>
+                        <div className="flex items-center gap-2">
+                          <Progress value={parseFloat(average) * 20} className="w-16" />
+                          <span className="text-sm font-bold">{average}/5</span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="roadmap" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Roadmap des améliorations</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <ArrowRight className="h-5 w-5 text-green-500" />
+                Roadmap d'amélioration
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {suggestions
-                  .filter(s => s.status !== 'completed')
-                  .sort((a, b) => {
-                    const priorityOrder = { high: 3, medium: 2, low: 1 };
-                    return (priorityOrder[b.impact as keyof typeof priorityOrder] || 0) - 
-                           (priorityOrder[a.impact as keyof typeof priorityOrder] || 0);
-                  })
-                  .map((suggestion, index) => (
-                    <div key={suggestion.id} className="flex items-center gap-4">
-                      <div className="text-sm font-medium text-muted-foreground w-8">
-                        Q{Math.floor(index / 3) + 1}
-                      </div>
-                      <div className="flex-1 p-3 border rounded-lg">
-                        <h4 className="font-medium">{suggestion.title}</h4>
-                        <p className="text-sm text-muted-foreground">{suggestion.implementation_time}</p>
-                      </div>
-                      <Badge className={getStatusColor(suggestion.status)}>
-                        {suggestion.status}
-                      </Badge>
+                {prioritizedSuggestions.slice(0, 5).map((suggestion, index) => (
+                  <div key={suggestion.id} className="flex items-center gap-4">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                      {index + 1}
                     </div>
-                  ))}
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{suggestion.title}</h4>
+                      <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={effortConfig[suggestion.effort_estimation].color}>
+                          {effortConfig[suggestion.effort_estimation].label}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          Impact: {suggestion.impact_score}/10
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
