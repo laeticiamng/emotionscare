@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Menu, Search, Bell } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/components/theme-provider';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 
 interface EnhancedHeaderProps {
