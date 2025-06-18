@@ -5,6 +5,7 @@ import type { UserMode } from '@/types/auth';
 interface UserModeContextType {
   userMode: UserMode | null;
   setUserMode: (mode: UserMode) => void;
+  changeUserMode: (mode: UserMode) => void;
   isLoading: boolean;
 }
 
@@ -17,7 +18,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     // Récupérer le mode depuis localStorage au démarrage
     const savedMode = localStorage.getItem('userMode') as UserMode;
-    if (savedMode) {
+    if (savedMode && ['b2c', 'b2b_user', 'b2b_admin'].includes(savedMode)) {
       setUserModeState(savedMode);
     }
     setIsLoading(false);
@@ -28,10 +29,15 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('userMode', mode);
   };
 
+  const changeUserMode = (mode: UserMode) => {
+    setUserMode(mode);
+  };
+
   return (
     <UserModeContext.Provider value={{
       userMode,
       setUserMode,
+      changeUserMode,
       isLoading,
     }}>
       {children}
