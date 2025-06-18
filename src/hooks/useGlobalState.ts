@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { useErrorHandler } from '@/contexts/ErrorContext';
 import { useCache } from '@/contexts/CacheContext';
