@@ -26,9 +26,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    // Pour le développement, on affiche directement le contenu
-    // En production, ceci devrait rediriger vers la page de connexion
-    return <>{children}</>;
+    // Redirection vers la page d'authentification
+    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
   // Si un rôle spécifique est requis, vérifier si l'utilisateur l'a

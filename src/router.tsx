@@ -12,6 +12,8 @@ import Community from "@/pages/Community";
 import Settings from "@/pages/Settings";
 import Auth from "@/pages/Auth";
 import NotFound from "@/pages/NotFound";
+import Unauthorized from "@/pages/Unauthorized";
+import RoleProtectedRoute from "@/components/RoleProtectedRoute";
 import B2BUserDashboard from "@/pages/b2b/B2BUserDashboard";
 import B2BAdminDashboard from "@/pages/b2b/B2BAdminDashboard";
 import B2BAdminUserManagement from "@/pages/b2b/B2BAdminUserManagement";
@@ -53,75 +55,147 @@ export const router = createBrowserRouter([
       },
       {
         path: "/b2c/scan",
-        element: <Scan />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Scan />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/journal",
-        element: <Journal />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Journal />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/dashboard",
-        element: <Dashboard />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Dashboard />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/coach",
-        element: <Coach />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Coach />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/music",
-        element: <Music />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Music />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/vr",
-        element: <VR />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <VR />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/breath",
-        element: <Breath />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Breath />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/community",
-        element: <Community />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Community />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2c/settings",
-        element: <Settings />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c']}>
+            <Settings />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/dashboard",
-        element: <B2BUserDashboard />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <B2BUserDashboard />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/scan",
-        element: <Scan />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <Scan />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/journal",
-        element: <Journal />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <Journal />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/coach",
-        element: <Coach />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <Coach />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/music",
-        element: <Music />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <Music />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/vr",
-        element: <VR />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <VR />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/breath",
-        element: <Breath />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <Breath />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/user/community",
-        element: <Community />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_user']}>
+            <Community />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/dashboard",
-        element: <B2BAdminDashboard />,
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2b_admin']}>
+            <B2BAdminDashboard />
+          </RoleProtectedRoute>
+        ),
       },
       {
         path: "/b2b/admin/user-management",
@@ -224,6 +298,10 @@ export const router = createBrowserRouter([
   {
     path: "/auth",
     element: <Auth />,
+  },
+  {
+    path: "/unauthorized",
+    element: <Unauthorized />,
   },
   {
     path: "/enhanced",

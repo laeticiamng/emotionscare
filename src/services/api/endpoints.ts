@@ -1,128 +1,53 @@
+import { httpClient } from './httpClient';
+import { mockServer } from './mockServer';
+import { ApiResponse, EmotionAnalysisResult, UserProfile, JournalEntry } from '@/types/api';
 
-// Définition centralisée des endpoints API
-export const API_ENDPOINTS = {
-  // Authentication
-  AUTH: {
-    LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    REFRESH: '/auth/refresh',
-    REGISTER: '/auth/register'
-  },
-
-  // User Dashboard
-  DASHBOARD: {
-    WEEKLY: '/me/dashboard/weekly',
-    DAILY: '/me/dashboard/daily'
-  },
-
-  // Glow Experiences
-  GLOW: {
-    FLASH: '/metrics/flash_glow',
-    FACE_FILTER: '/metrics/face_filter',
-    BUBBLE_BEAT: '/me/heart_rate/live',
-    VR_GALAXY: '/metrics/vr_galaxy'
-  },
-
-  // Wellness Modules
-  WELLNESS: {
-    JOURNAL: {
-      VOICE: '/journal_voice',
-      TEXT: '/journal_text',
-      FEED: '/me/journal',
-      WEEKLY: '/me/journal/weekly'
-    },
-    MUSIC: {
-      WEEKLY: '/me/music/weekly',
-      SESSION: '/biotune_session'
-    },
-    SCAN: {
-      WEEKLY: '/me/scan/weekly',
-      SUBMIT: '/metrics/scan'
-    },
-    BREATH: {
-      WEEKLY: '/me/breath/weekly',
-      SESSION: '/breath_session'
-    },
-    VR: {
-      WEEKLY: '/me/vr/weekly',
-      SESSION: '/vr_session'
+/**
+ * Services API avec fallback vers le mock server
+ * Point 5: Services API Foundation - Endpoints organisés
+ */
+class ApiService {
+  /**
+   * Service d'analyse d'émotion
+   */
+  async analyzeEmotion(text: string): Promise<ApiResponse<EmotionAnalysisResult>> {
+    if (mockServer.isActive()) {
+      return mockServer.analyzeEmotion(text);
     }
-  },
-
-  // Gamification
-  GAMIFICATION: {
-    USER: '/me/gamification',
-    LEADERBOARD: '/leaderboard',
-    BADGES: '/me/badges'
-  },
-
-  // Organization (B2B)
-  ORG: {
-    DASHBOARD: '/org/{orgId}/dashboard/weekly',
-    USERS: '/org/{orgId}/users',
-    METRICS: '/org/{orgId}/metrics'
-  },
-
-  // Privacy & RGPD
-  PRIVACY: {
-    PREFS: '/user/privacy',
-    EXPORT: '/user/export',
-    EXPORT_STATUS: '/user/export/{jobId}',
-    DELETE: '/user/delete',
-    DELETE_STATUS: '/user/delete/status'
-  },
-
-  // Micro-breaks
-  BREAKS: {
-    START: '/micro_breaks',
-    STOP: '/micro_breaks/{id}/stop',
-    HISTORY: '/me/micro_breaks'
+    
+    return httpClient.post<EmotionAnalysisResult>('analyze-emotion', { text });
   }
-} as const;
 
-// Helper pour remplacer les paramètres dans les URLs
-export const buildEndpoint = (endpoint: string, params: Record<string, string | number>) => {
-  return Object.entries(params).reduce(
-    (url, [key, value]) => url.replace(`{${key}}`, String(value)),
-    endpoint
-  );
-};
+  /**
+   * Service d'analyse vocale
+   */
+  async analyzeVoice(audioBlob: Blob): Promise<ApiResponse<EmotionAnalysisResult>> {
+    if (mockServer.isActive()) {
+      return mockServer.analyzeVoice(audioBlob);
+    }
 
-// Types pour les réponses API
-export interface ApiResponse<T = any> {
-  data: T;
-  message?: string;
-  status: 'success' | 'error';
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    
+    return httpClient.post<EmotionAnalysisResult>('voice-analysis', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  /**
+   * Service de chat avec l'IA coach
+   */
+  async chatWithAI(message: string, conversationHistory?: any[]): Promise<ApiResponse<{ response: string; conversationId: string }>> {
+    return httpClient.post<{ response: string; conversationId: string }>('chat-with-ai', {
+      message,
+      conversationHistory,
+      userContext: 'Utilisateur EmotionsCare',
+    });
+  }
 }
 
-export interface PaginatedResponse<T = any> {
-  data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-}
-
-// Types pour les métriques communes
-export interface WeeklyMetrics {
-  glow_score: number;
-  delta_rmssd: number;
-  panas_pa: number;
-  week_start: string;
-  week_end: string;
-}
-
-export interface DashboardData {
-  user: {
-    name: string;
-    avatar?: string;
-    level: string;
-    points: number;
-  };
-  metrics: WeeklyMetrics;
-  recent_activities: Array<{
-    type: string;
-    date: string;
-    score: number;
-  }>;
-}
+// Instance singleton du service API
+export const apiService = new ApiService();
+export default apiService;
