@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Brain, Music, BookOpen, Users, Settings } from 'lucide-react';
+import { Heart, Brain, Music, BookOpen, Users, Settings, Headphones } from 'lucide-react';
 
 const ActionButtons: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +36,13 @@ const ActionButtons: React.FC = () => {
       description: "Accompagnement personnalisé",
       path: "/coach",
       color: "bg-red-500 hover:bg-red-600"
+    },
+    {
+      icon: <Headphones className="h-6 w-6" />,
+      title: "Réalité Virtuelle",
+      description: "Expériences immersives",
+      path: "/vr",
+      color: "bg-indigo-500 hover:bg-indigo-600"
     },
     {
       icon: <Users className="h-6 w-6" />,
