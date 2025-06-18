@@ -1,5 +1,5 @@
 
-import { Home, Scan, Bot, Music, BookOpen, Users, Settings, HelpCircle, BarChart, UserCheck } from 'lucide-react';
+import { Home, Scan, Bot, Music, BookOpen, Users, Settings, HelpCircle, BarChart, UserCheck, Calendar, Target } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export interface NavItem {
@@ -10,7 +10,7 @@ export interface NavItem {
   badge?: string;
 }
 
-// Navigation items for B2C users
+// Navigation items for B2C users - CHEMINS UNIQUES
 export const b2cNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
@@ -41,10 +41,28 @@ export const b2cNavItems: NavItem[] = [
     href: '/journal',
     icon: BookOpen,
     description: 'Votre journal intime'
+  },
+  {
+    title: 'VR Expérience',
+    href: '/vr',
+    icon: Target,
+    description: 'Expériences immersives'
+  },
+  {
+    title: 'Gamification',
+    href: '/gamification',
+    icon: Target,
+    description: 'Défis et récompenses'
+  },
+  {
+    title: 'Préférences',
+    href: '/preferences',
+    icon: Settings,
+    description: 'Vos préférences'
   }
 ];
 
-// Navigation items for B2B users (collaborators)
+// Navigation items for B2B users (collaborators) - CHEMINS UNIQUES
 export const b2bUserNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
@@ -75,10 +93,34 @@ export const b2bUserNavItems: NavItem[] = [
     href: '/journal',
     icon: BookOpen,
     description: 'Votre journal personnel'
+  },
+  {
+    title: 'VR Expérience',
+    href: '/vr',
+    icon: Target,
+    description: 'Expériences immersives'
+  },
+  {
+    title: 'Cocon Social',
+    href: '/social-cocon',
+    icon: Users,
+    description: 'Espace collaboratif'
+  },
+  {
+    title: 'Gamification',
+    href: '/gamification',
+    icon: Target,
+    description: 'Défis d\'équipe'
+  },
+  {
+    title: 'Préférences',
+    href: '/preferences',
+    icon: Settings,
+    description: 'Vos préférences'
   }
 ];
 
-// Navigation items for B2B admins
+// Navigation items for B2B admins - CHEMINS UNIQUES
 export const b2bAdminNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
@@ -87,16 +129,28 @@ export const b2bAdminNavItems: NavItem[] = [
     description: 'Vue d\'ensemble administrateur'
   },
   {
-    title: 'Analytics',
-    href: '/b2b/admin/analytics',
-    icon: BarChart,
-    description: 'Analyses et statistiques'
+    title: 'Gestion Équipes',
+    href: '/teams',
+    icon: Users,
+    description: 'Gérer les équipes'
   },
   {
-    title: 'Gestion Utilisateurs',
-    href: '/b2b/admin/users',
-    icon: UserCheck,
-    description: 'Gérer les collaborateurs'
+    title: 'Rapports',
+    href: '/reports',
+    icon: BarChart,
+    description: 'Analyses et rapports'
+  },
+  {
+    title: 'Événements',
+    href: '/events',
+    icon: Calendar,
+    description: 'Gestion des événements'
+  },
+  {
+    title: 'Optimisation',
+    href: '/optimisation',
+    icon: Target,
+    description: 'Optimisation RH'
   },
   {
     title: 'Scanner Émotions',
@@ -121,17 +175,23 @@ export const b2bAdminNavItems: NavItem[] = [
     href: '/journal',
     icon: BookOpen,
     description: 'Votre journal personnel'
+  },
+  {
+    title: 'Cocon Social',
+    href: '/social-cocon',
+    icon: Users,
+    description: 'Espace collaboratif'
+  },
+  {
+    title: 'Paramètres',
+    href: '/settings',
+    icon: Settings,
+    description: 'Paramètres administrateur'
   }
 ];
 
-// Common navigation items (footer)
+// Common navigation items (footer) - CHEMINS UNIQUES
 export const commonNavItems: NavItem[] = [
-  {
-    title: 'Profil',
-    href: '/profile',
-    icon: Users,
-    description: 'Gérer votre profil'
-  },
   {
     title: 'Paramètres',
     href: '/settings',

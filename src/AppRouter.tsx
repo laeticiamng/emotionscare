@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { LoadingIllustration } from '@/components/ui/loading-illustration';
 
-// Lazy load components
+// Lazy load components - CHEMINS UNIQUES UNIQUEMENT
 const Home = React.lazy(() => import('./Home'));
 const BreathHome = React.lazy(() => import('./pages/BreathHome'));
 const FlowWalkStart = React.lazy(() => import('./pages/FlowWalkStart'));
@@ -31,8 +31,7 @@ const AppRouter: React.FC = () => {
         <Route path="/breath/glowmug/summary" element={<GlowMugSummary />} />
         <Route path="/settings/wallpapers" element={<SilkPage />} />
         <Route path="/glow-breath" element={<GlowBreathPage />} />
-        <Route path="/flow-field-walk" element={<FlowWalkStart />} />
-        <Route path="/glow-pulse-mug" element={<GlowMugStart />} />
+        {/* SUPPRESSION DES DOUBLONS - les routes principales sont gérées par src/router.tsx */}
         <Route path="/*" element={<Home />} />
       </Routes>
     </React.Suspense>

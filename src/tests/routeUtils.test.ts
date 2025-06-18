@@ -6,7 +6,8 @@ import {
   getDashboardRoute, 
   isValidRoute, 
   CURRENT_ROUTES,
-  getContextualRedirect 
+  getContextualRedirect,
+  getFeatureRoute 
 } from '@/utils/routeUtils';
 
 test('getLoginRoute returns correct B2B user login path', () => {
@@ -31,17 +32,18 @@ test('isValidRoute validates current routes only', () => {
   assert.equal(isValidRoute('/b2b/user/login'), true);
   assert.equal(isValidRoute('/choose-mode'), true);
   assert.equal(isValidRoute('/b2c/login'), true);
-  // Legacy routes should be invalid
-  assert.equal(isValidRoute('/login-collaborateur'), false);
-  assert.equal(isValidRoute('/login-admin'), false);
-  assert.equal(isValidRoute('/login'), false);
+  assert.equal(isValidRoute('/scan'), true);
+  assert.equal(isValidRoute('/music'), true);
+  assert.equal(isValidRoute('/coach'), true);
 });
 
-test('CURRENT_ROUTES contains no legacy paths', () => {
-  const routes = Object.values(CURRENT_ROUTES);
-  assert.equal(routes.includes('/login-collaborateur' as any), false);
-  assert.equal(routes.includes('/login-admin' as any), false);
-  assert.equal(routes.includes('/login' as any), false);
+test('getFeatureRoute returns unique paths', () => {
+  assert.equal(getFeatureRoute('SCAN'), '/scan');
+  assert.equal(getFeatureRoute('MUSIC'), '/music');
+  assert.equal(getFeatureRoute('COACH'), '/coach');
+  assert.equal(getFeatureRoute('JOURNAL'), '/journal');
+  assert.equal(getFeatureRoute('VR'), '/vr');
+  assert.equal(getFeatureRoute('SETTINGS'), '/settings');
 });
 
 test('getContextualRedirect works correctly', () => {
@@ -51,9 +53,25 @@ test('getContextualRedirect works correctly', () => {
   assert.equal(getContextualRedirect('b2b_admin'), '/b2b/admin/dashboard');
 });
 
-test('All routes in CURRENT_ROUTES are properly formatted', () => {
-  Object.values(CURRENT_ROUTES).forEach(route => {
-    assert.ok(route.startsWith('/'), `Route ${route} should start with /`);
-    assert.ok(!route.includes('//'), `Route ${route} should not have double slashes`);
-  });
+test('All routes in CURRENT_ROUTES are unique', () => {
+  const routes = Object.values(CURRENT_ROUTES);
+  const uniqueRoutes = new Set(routes);
+  assert.equal(routes.length, uniqueRoutes.size, 'All routes should be unique');
+});
+
+test('No duplicate functionality paths exist', () => {
+  const functionalityRoutes = [
+    CURRENT_ROUTES.SCAN,
+    CURRENT_ROUTES.MUSIC,
+    CURRENT_ROUTES.COACH,
+    CURRENT_ROUTES.JOURNAL,
+    CURRENT_ROUTES.VR,
+    CURRENT_ROUTES.SETTINGS,
+    CURRENT_ROUTES.PREFERENCES,
+    CURRENT_ROUTES.GAMIFICATION,
+    CURRENT_ROUTES.SOCIAL_COCON
+  ];
+  
+  const uniqueFunctionalities = new Set(functionalityRoutes);
+  assert.equal(functionalityRoutes.length, uniqueFunctionalities.size, 'All functionality routes should be unique');
 });

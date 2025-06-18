@@ -3,9 +3,6 @@ import * as React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { LoadingIllustration } from '@/components/ui/loading-illustration';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { b2bAdminRoutes } from './router/b2bAdminRoutes';
-import { b2bUserRoutes } from './router/b2bUserRoutes';
-import { b2cRoutes } from './router/b2cRoutes';
 
 // Lazy loading des composants principaux
 const Home = React.lazy(() => import('./Home'));
@@ -19,15 +16,24 @@ const B2BUserRegisterPage = React.lazy(() => import('./pages/auth/B2BUserRegiste
 const B2BUserDashboard = React.lazy(() => import('./pages/b2b/user/B2BUserDashboard'));
 const B2BAdminLoginPage = React.lazy(() => import('./pages/auth/B2BAdminLoginPage'));
 const B2BAdminDashboard = React.lazy(() => import('./pages/b2b/admin/B2BAdminDashboard'));
-const GlowBreathPage = React.lazy(() => import('./pages/GlowBreathPage'));
 
-// Pages supplémentaires B2C
-const B2CJournal = React.lazy(() => import('./pages/b2c/B2CJournal'));
-const B2CScan = React.lazy(() => import('./pages/b2c/B2CScan'));
-const B2CMusic = React.lazy(() => import('./pages/b2c/B2CMusic'));
-const B2CCoach = React.lazy(() => import('./pages/b2c/B2CCoach'));
-const B2CVR = React.lazy(() => import('./pages/b2c/B2CVR'));
-const B2CSettings = React.lazy(() => import('./pages/b2c/B2CSettings'));
+// Pages communes (un seul chemin par fonctionnalité)
+const ScanPage = React.lazy(() => import('./pages/ScanPage'));
+const MusicPage = React.lazy(() => import('./pages/MusicPage'));
+const CoachPage = React.lazy(() => import('./pages/CoachPage'));
+const CoachChatPage = React.lazy(() => import('./pages/CoachChatPage'));
+const JournalPage = React.lazy(() => import('./pages/JournalPage'));
+const VRPage = React.lazy(() => import('./pages/VRPage'));
+const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
+const PreferencesPage = React.lazy(() => import('./pages/PreferencesPage'));
+const GamificationPage = React.lazy(() => import('./pages/GamificationPage'));
+const SocialCoconPage = React.lazy(() => import('./pages/SocialCoconPage'));
+
+// Pages spécifiques B2B Admin
+const B2BAdminTeamsPage = React.lazy(() => import('./pages/b2b/admin/TeamsPage'));
+const B2BAdminReportsPage = React.lazy(() => import('./pages/b2b/admin/ReportsPage'));
+const B2BAdminEventsPage = React.lazy(() => import('./pages/b2b/admin/EventsPage'));
+const B2BAdminOptimisationPage = React.lazy(() => import('./pages/b2b/admin/OptimisationPage'));
 
 const withSuspense = (Component: React.ComponentType) => {
   return (props: any) => (
@@ -50,7 +56,8 @@ export const router = createBrowserRouter([
     path: '/b2b/selection',
     element: withSuspense(B2BSelectionPage)(),
   },
-  // Routes B2C existantes
+  
+  // Routes d'authentification B2C
   {
     path: '/b2c/login',
     element: withSuspense(B2CLoginPage)(),
@@ -67,55 +74,8 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  {
-    path: '/b2c/journal',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CJournal)()}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/b2c/scan',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CScan)()}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/b2c/music',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CMusic)()}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/b2c/coach',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CCoach)()}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/b2c/vr',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CVR)()}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/b2c/settings',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        {withSuspense(B2CSettings)()}
-      </ProtectedRoute>
-    ),
-  },
-  // Routes B2B User existantes
+  
+  // Routes d'authentification B2B User
   {
     path: '/b2b/user/login',
     element: withSuspense(B2BUserLoginPage)(),
@@ -132,7 +92,8 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // Routes B2B Admin existantes
+  
+  // Routes d'authentification B2B Admin
   {
     path: '/b2b/admin/login',
     element: withSuspense(B2BAdminLoginPage)(),
@@ -145,17 +106,120 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // Route protégée générale
+
+  // ROUTES COMMUNES - UN SEUL CHEMIN PAR FONCTIONNALITÉ
   {
-    path: '/glow-breath',
+    path: '/scan',
     element: (
       <ProtectedRoute>
-        {withSuspense(GlowBreathPage)()}
+        {withSuspense(ScanPage)()}
       </ProtectedRoute>
     ),
   },
-  // Routes B2B supplémentaires depuis les modules de routage
-  ...b2bAdminRoutes,
-  ...b2bUserRoutes,
-  ...b2cRoutes,
+  {
+    path: '/music',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(MusicPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/coach',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(CoachPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/coach-chat',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(CoachChatPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/journal',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(JournalPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/vr',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(VRPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/settings',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(SettingsPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/preferences',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(PreferencesPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/gamification',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(GamificationPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/social-cocon',
+    element: (
+      <ProtectedRoute>
+        {withSuspense(SocialCoconPage)()}
+      </ProtectedRoute>
+    ),
+  },
+
+  // ROUTES SPÉCIFIQUES B2B ADMIN UNIQUEMENT
+  {
+    path: '/teams',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        {withSuspense(B2BAdminTeamsPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/reports',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        {withSuspense(B2BAdminReportsPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/events',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        {withSuspense(B2BAdminEventsPage)()}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/optimisation',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        {withSuspense(B2BAdminOptimisationPage)()}
+      </ProtectedRoute>
+    ),
+  },
 ]);

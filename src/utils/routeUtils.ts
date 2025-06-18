@@ -1,10 +1,10 @@
 
 /**
- * Utilitaires pour la gestion des routes - VERSION FINALE NETTOYÉE
- * TOUTES les routes legacy ont été définitivement supprimées
+ * Utilitaires pour la gestion des routes - VERSION NETTOYÉE SANS DOUBLONS
+ * Chaque fonctionnalité a UN SEUL chemin d'accès
  */
 
-// Routes actuelles uniquement
+// Routes principales - CHEMINS UNIQUES
 export const CURRENT_ROUTES = {
   // Routes communes
   HOME: '/',
@@ -24,6 +24,24 @@ export const CURRENT_ROUTES = {
   // Routes B2B Admin
   B2B_ADMIN_LOGIN: '/b2b/admin/login',
   B2B_ADMIN_DASHBOARD: '/b2b/admin/dashboard',
+
+  // FONCTIONNALITÉS COMMUNES - UN SEUL CHEMIN
+  SCAN: '/scan',
+  MUSIC: '/music',
+  COACH: '/coach',
+  COACH_CHAT: '/coach-chat',
+  JOURNAL: '/journal',
+  VR: '/vr',
+  SETTINGS: '/settings',
+  PREFERENCES: '/preferences',
+  GAMIFICATION: '/gamification',
+  SOCIAL_COCON: '/social-cocon',
+
+  // FONCTIONNALITÉS ADMIN UNIQUEMENT
+  TEAMS: '/teams',
+  REPORTS: '/reports',
+  EVENTS: '/events',
+  OPTIMISATION: '/optimisation',
 } as const;
 
 /**
@@ -73,4 +91,11 @@ export function getContextualRedirect(userRole?: string): string {
   }
   
   return getDashboardRoute(userRole as any);
+}
+
+/**
+ * Obtient le chemin unique pour une fonctionnalité donnée
+ */
+export function getFeatureRoute(feature: keyof typeof CURRENT_ROUTES): string {
+  return CURRENT_ROUTES[feature];
 }
