@@ -1,7 +1,26 @@
 
-export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'security' | 'system';
+export type NotificationType = 
+  | 'info' 
+  | 'success' 
+  | 'warning' 
+  | 'error' 
+  | 'achievement' 
+  | 'badge' 
+  | 'reminder' 
+  | 'streak' 
+  | 'journal' 
+  | 'emotion' 
+  | 'system' 
+  | 'urgent'
+  | 'security';
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'critical';
+
+export type NotificationFilter = 
+  | 'all' 
+  | 'unread' 
+  | 'read' 
+  | NotificationType;
 
 export interface Notification {
   id: string;
@@ -16,6 +35,8 @@ export interface Notification {
   actionText?: string;
   metadata?: Record<string, any>;
   expiresAt?: string;
+  created_at?: string;
+  createdAt?: string;
 }
 
 export interface NotificationSettings {
