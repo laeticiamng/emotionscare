@@ -1,157 +1,275 @@
 
-import { Notification } from '@/types/notifications';
-import { supabase } from '@/integrations/supabase/client';
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  priority: 'low' | 'medium' | 'high';
+  timestamp: string;
+  read: boolean;
+  actionUrl?: string;
+  actionText?: string;
+  icon?: string;
+  image?: string;
+  metadata?: Record<string, any>;
+}
 
-export class NotificationService {
-  /**
-   * Ajouter une notification
-   */
-  static async addNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>): Promise<string> {
-    try {
-      const notificationWithDefaults = {
-        ...notification,
-        timestamp: new Date().toISOString(),
-        read: false,
-        created_at: new Date().toISOString(),
+export interface NotificationSettings {
+  pushEnabled: boolean;
+  emailEnabled: boolean;
+  soundEnabled: boolean;
+  vibrationEnabled: boolean;
+  quietHours: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
+  categories: {
+    achievements: boolean;
+    reminders: boolean;
+    social: boolean;
+    system: boolean;
+  };
+}
+
+class NotificationService {
+  private notifications: Notification[] = [];
+  private listeners: ((notifications: Notification[]) => void)[] = [];
+  private settings: NotificationSettings = {
+    pushEnabled: true,
+    emailEnabled: true,
+    soundEnabled: true,
+    vibrationEnabled: true,
+    quietHours: {
+      enabled: false,
+      start: '22:00',
+      end: '08:00'
+    },
+    categories: {
+      achievements: true,
+      reminders: true,
+      social: true,
+      system: true
+    }
+  };
+
+  constructor() {
+    this.loadNotifications();
+    this.loadSettings();
+    this.requestPermission();
+  }
+
+  async requestPermission(): Promise<boolean> {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      return permission === 'granted';
+    }
+    return false;
+  }
+
+  private isQuietHours(): boolean {
+    if (!this.settings.quietHours.enabled) return false;
+    
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    return currentTime >= this.settings.quietHours.start || currentTime <= this.settings.quietHours.end;
+  }
+
+  async sendNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>): Promise<void> {
+    const newNotification: Notification = {
+      ...notification,
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    this.notifications.unshift(newNotification);
+    this.saveNotifications();
+    this.notifyListeners();
+
+    // Send browser notification if enabled and not in quiet hours
+    if (this.settings.pushEnabled && !this.isQuietHours()) {
+      await this.sendBrowserNotification(newNotification);
+    }
+
+    // Play sound if enabled
+    if (this.settings.soundEnabled && !this.isQuietHours()) {
+      this.playNotificationSound();
+    }
+
+    // Vibrate if enabled (mobile)
+    if (this.settings.vibrationEnabled && 'vibrate' in navigator) {
+      navigator.vibrate([200, 100, 200]);
+    }
+  }
+
+  private async sendBrowserNotification(notification: Notification): Promise<void> {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const browserNotification = new Notification(notification.title, {
+        body: notification.message,
+        icon: notification.icon || '/favicon.ico',
+        image: notification.image,
+        badge: '/favicon.ico',
+        tag: notification.id,
+        requireInteraction: notification.priority === 'high'
+      });
+
+      browserNotification.onclick = () => {
+        window.focus();
+        if (notification.actionUrl) {
+          window.location.href = notification.actionUrl;
+        }
+        browserNotification.close();
       };
-      
-      // Utiliser une fonction edge ou mock pour le développement
-      const { data, error } = await supabase.functions.invoke('add-notification', { 
-        body: notificationWithDefaults 
-      });
-      
-      if (error) throw error;
-      return data?.id || Math.random().toString(36).substr(2, 9);
-    } catch (error) {
-      console.error('Error adding notification:', error);
-      // Fallback pour le développement local
-      return Math.random().toString(36).substr(2, 9);
+
+      // Auto-close after 5 seconds for non-critical notifications
+      if (notification.priority !== 'high') {
+        setTimeout(() => browserNotification.close(), 5000);
+      }
     }
   }
 
-  /**
-   * Récupérer toutes les notifications d'un utilisateur
-   */
-  static async getNotifications(userId?: string): Promise<Notification[]> {
+  private playNotificationSound(): void {
+    const audio = new Audio('/sounds/notification.mp3');
+    audio.volume = 0.3;
+    audio.play().catch(() => {
+      // Fallback to system beep
+      console.beep?.();
+    });
+  }
+
+  getNotifications(): Notification[] {
+    return [...this.notifications];
+  }
+
+  getUnreadCount(): number {
+    return this.notifications.filter(n => !n.read).length;
+  }
+
+  markAsRead(id: string): void {
+    const notification = this.notifications.find(n => n.id === id);
+    if (notification) {
+      notification.read = true;
+      this.saveNotifications();
+      this.notifyListeners();
+    }
+  }
+
+  markAllAsRead(): void {
+    this.notifications.forEach(n => n.read = true);
+    this.saveNotifications();
+    this.notifyListeners();
+  }
+
+  deleteNotification(id: string): void {
+    this.notifications = this.notifications.filter(n => n.id !== id);
+    this.saveNotifications();
+    this.notifyListeners();
+  }
+
+  clearAll(): void {
+    this.notifications = [];
+    this.saveNotifications();
+    this.notifyListeners();
+  }
+
+  subscribe(listener: (notifications: Notification[]) => void): () => void {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener([...this.notifications]));
+  }
+
+  updateSettings(newSettings: Partial<NotificationSettings>): void {
+    this.settings = { ...this.settings, ...newSettings };
+    this.saveSettings();
+  }
+
+  getSettings(): NotificationSettings {
+    return { ...this.settings };
+  }
+
+  private saveNotifications(): void {
+    localStorage.setItem('emotionscare_notifications', JSON.stringify(this.notifications));
+  }
+
+  private loadNotifications(): void {
     try {
-      const { data, error } = await supabase.functions.invoke('get-notifications', { 
-        body: { userId } 
-      });
-      
-      if (error) throw error;
-      return data || [];
+      const saved = localStorage.getItem('emotionscare_notifications');
+      if (saved) {
+        this.notifications = JSON.parse(saved);
+      }
     } catch (error) {
-      console.error('Error getting notifications:', error);
-      // Retourner des données de démonstration pour le développement
-      return this.getMockNotifications();
+      console.error('Failed to load notifications:', error);
     }
   }
 
-  /**
-   * Obtenir le nombre de notifications non lues
-   */
-  static async getUnreadCount(userId?: string): Promise<number> {
+  private saveSettings(): void {
+    localStorage.setItem('emotionscare_notification_settings', JSON.stringify(this.settings));
+  }
+
+  private loadSettings(): void {
     try {
-      const { data, error } = await supabase.functions.invoke('get-unread-count', { 
-        body: { userId } 
-      });
-      
-      if (error) throw error;
-      return data?.count || 0;
+      const saved = localStorage.getItem('emotionscare_notification_settings');
+      if (saved) {
+        this.settings = { ...this.settings, ...JSON.parse(saved) };
+      }
     } catch (error) {
-      console.error('Error getting unread count:', error);
-      return 0;
+      console.error('Failed to load notification settings:', error);
     }
   }
 
-  /**
-   * Marquer une notification comme lue
-   */
-  static async markAsRead(notificationId: string): Promise<void> {
-    try {
-      const { error } = await supabase.functions.invoke('mark-notification-read', { 
-        body: { notificationId } 
-      });
-      
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      // Ne pas lancer d'erreur pour permettre la continuation
-    }
+  // Predefined notification templates
+  async sendAchievementNotification(achievement: string, points: number): Promise<void> {
+    await this.sendNotification({
+      title: '🏆 Nouveau Succès !',
+      message: `Vous avez débloqué : ${achievement} (+${points} points)`,
+      type: 'success',
+      priority: 'medium',
+      icon: '🏆',
+      actionUrl: '/gamification',
+      actionText: 'Voir mes succès'
+    });
   }
 
-  /**
-   * Marquer toutes les notifications comme lues
-   */
-  static async markAllAsRead(userId?: string): Promise<void> {
-    try {
-      const { error } = await supabase.functions.invoke('mark-all-notifications-read', { 
-        body: { userId } 
-      });
-      
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      // Ne pas lancer d'erreur pour permettre la continuation
-    }
-  }
-  
-  /**
-   * S'abonner aux changements de notifications
-   */
-  static subscribeToNotifications(callback: () => void): (() => void) {
-    // Implémentation optionnelle pour le temps réel
-    // Retourner une fonction de désabonnement
-    return () => {};
+  async sendReminderNotification(title: string, message: string): Promise<void> {
+    await this.sendNotification({
+      title: `⏰ ${title}`,
+      message,
+      type: 'info',
+      priority: 'high',
+      icon: '⏰'
+    });
   }
 
-  /**
-   * Données de démonstration pour le développement
-   */
-  private static getMockNotifications(): Notification[] {
-    return [
-      {
-        id: '1',
-        type: 'achievement',
-        priority: 'medium',
-        title: 'Nouveau badge débloqué !',
-        message: 'Félicitations ! Vous avez obtenu le badge "Première semaine"',
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        read: false,
-        actionText: 'Voir le badge',
-        actionUrl: '/achievements',
-      },
-      {
-        id: '2',
-        type: 'reminder',
-        priority: 'low',
-        title: 'Rappel de bien-être',
-        message: 'Il est temps de faire votre check-in émotionnel quotidien',
-        timestamp: new Date(Date.now() - 7200000).toISOString(),
-        read: false,
-        actionText: 'Commencer',
-        actionUrl: '/scan',
-      },
-      {
-        id: '3',
-        type: 'system',
-        priority: 'high',
-        title: 'Mise à jour disponible',
-        message: 'Une nouvelle version de l\'application est disponible avec des améliorations importantes',
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
-        read: true,
-        actionText: 'Mettre à jour',
-        actionUrl: '/settings',
-      },
-      {
-        id: '4',
-        type: 'social',
-        priority: 'low',
-        title: 'Nouveau membre dans votre équipe',
-        message: 'Sophie Martin a rejoint votre équipe de bien-être',
-        timestamp: new Date(Date.now() - 172800000).toISOString(),
-        read: true,
-      },
-    ];
+  async sendWelcomeNotification(): Promise<void> {
+    await this.sendNotification({
+      title: '👋 Bienvenue dans EmotionsCare !',
+      message: 'Découvrez toutes les fonctionnalités pour améliorer votre bien-être émotionnel.',
+      type: 'info',
+      priority: 'medium',
+      icon: '👋',
+      actionUrl: '/dashboard',
+      actionText: 'Commencer'
+    });
+  }
+
+  async sendCoachSuggestion(suggestion: string): Promise<void> {
+    await this.sendNotification({
+      title: '💡 Suggestion de votre Coach IA',
+      message: suggestion,
+      type: 'info',
+      priority: 'medium',
+      icon: '💡',
+      actionUrl: '/coach',
+      actionText: 'Parler au coach'
+    });
   }
 }
+
+export const notificationService = new NotificationService();

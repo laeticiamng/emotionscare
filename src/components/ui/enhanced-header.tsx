@@ -2,9 +2,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Menu, Search, Bell } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 interface EnhancedHeaderProps {
   onMenuToggle?: () => void;
@@ -48,9 +49,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({
           <Button variant="ghost" size="icon">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon">
-            <Bell className="h-4 w-4" />
-          </Button>
+          <NotificationBell />
           <ThemeSwitcher />
         </div>
       </div>

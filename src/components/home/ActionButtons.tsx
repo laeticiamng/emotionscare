@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Brain, Music, BookOpen, Users, Settings, Headphones, Trophy } from 'lucide-react';
+import { Heart, Brain, Music, BookOpen, Users, Settings, Headphones, Trophy, Bell } from 'lucide-react';
 
 const ActionButtons: React.FC = () => {
   const navigate = useNavigate();
@@ -51,18 +52,25 @@ const ActionButtons: React.FC = () => {
       color: "bg-orange-500 hover:bg-orange-600"
     },
     {
-      icon: <Settings className="h-6 w-6" />,
-      title: "Paramètres",
-      description: "Personnalisez votre expérience",
-      path: "/settings",
-      color: "bg-gray-500 hover:bg-gray-600"
-    },
-    {
       icon: <Trophy className="h-6 w-6" />,
       title: "Récompenses",
       description: "Badges et progression",
       path: "/gamification",
       color: "bg-yellow-500 hover:bg-yellow-600"
+    },
+    {
+      icon: <Bell className="h-6 w-6" />,
+      title: "Notifications",
+      description: "Système de notifications",
+      path: "/notifications",
+      color: "bg-cyan-500 hover:bg-cyan-600"
+    },
+    {
+      icon: <Settings className="h-6 w-6" />,
+      title: "Paramètres",
+      description: "Personnalisez votre expérience",
+      path: "/settings",
+      color: "bg-gray-500 hover:bg-gray-600"
     },
   ];
 
