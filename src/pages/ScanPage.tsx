@@ -1,25 +1,36 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ScanTabContent from '@/components/scan/ScanTabContent';
-import HistoryTabContent from '@/components/scan/HistoryTabContent';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Scan } from 'lucide-react';
 
+/**
+ * Page de scan des émotions
+ */
 const ScanPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Scanner d'Émotions</h1>
-      <Tabs defaultValue="scan" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scan">Scanner</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
-        </TabsList>
-        <TabsContent value="scan">
-          <ScanTabContent />
-        </TabsContent>
-        <TabsContent value="history">
-          <HistoryTabContent />
-        </TabsContent>
-      </Tabs>
+    <div className="container mx-auto py-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <Scan className="h-8 w-8 text-blue-600" />
+          Scanner d'Émotions
+        </h1>
+        <p className="text-gray-600">
+          Analysez vos émotions en temps réel grâce à notre technologie avancée
+        </p>
+      </div>
+
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Scanner Émotionnel</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              Module de scan des émotions en cours de développement...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

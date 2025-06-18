@@ -4,72 +4,75 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UNIFIED_ROUTES } from '@/utils/routeUtils';
-import { UserCheck, Settings } from 'lucide-react';
+import { Users, User } from 'lucide-react';
 
 /**
- * Page de sélection B2B - Collaborateur ou Administration
+ * Page de sélection du mode utilisateur
+ * Permet de choisir entre B2C (particulier) et B2B (entreprise)
  */
-const B2BSelectionPage: React.FC = () => {
+const ModeSelectorPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Accès Entreprise
+            Choisissez votre mode d'accès
           </h1>
           <p className="text-xl text-gray-600">
-            Choisissez votre type d'accès
+            Sélectionnez le mode qui correspond à votre utilisation
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Collaborateur */}
+          {/* Mode B2C - Particulier */}
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit">
-                <UserCheck className="h-8 w-8 text-green-600" />
+              <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit">
+                <User className="h-8 w-8 text-blue-600" />
               </div>
-              <CardTitle className="text-2xl">Collaborateur</CardTitle>
+              <CardTitle className="text-2xl">Particulier</CardTitle>
               <CardDescription className="text-base">
-                Accès employé à la plateforme
+                Accès personnel à EmotionsCare
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="space-y-2 text-sm text-gray-600">
-                <li>• Outils de bien-être personnel</li>
-                <li>• Participation au cocon social</li>
-                <li>• Défis d'équipe</li>
-                <li>• Feedback émotionnel</li>
+                <li>• Scanner d'émotions personnel</li>
+                <li>• Coach IA personnalisé</li>
+                <li>• Musicothérapie adaptative</li>
+                <li>• Journal personnel</li>
+                <li>• Expériences VR</li>
               </ul>
-              <Link to={UNIFIED_ROUTES.B2B_USER_LOGIN} className="block">
+              <Link to={UNIFIED_ROUTES.B2C_LOGIN} className="block">
                 <Button className="w-full" size="lg">
-                  Connexion Collaborateur
+                  Accès Particulier
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          {/* Administration */}
+          {/* Mode B2B - Entreprise */}
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-3 bg-orange-100 rounded-full w-fit">
-                <Settings className="h-8 w-8 text-orange-600" />
+              <div className="mx-auto mb-4 p-3 bg-purple-100 rounded-full w-fit">
+                <Users className="h-8 w-8 text-purple-600" />
               </div>
-              <CardTitle className="text-2xl">Administration</CardTitle>
+              <CardTitle className="text-2xl">Entreprise</CardTitle>
               <CardDescription className="text-base">
-                Gestion et supervision RH
+                Solutions pour organisations
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="space-y-2 text-sm text-gray-600">
-                <li>• Tableaux de bord administrateur</li>
-                <li>• Gestion des équipes</li>
-                <li>• Rapports et analyses</li>
-                <li>• Configuration système</li>
+                <li>• Gestion d'équipes</li>
+                <li>• Tableaux de bord RH</li>
+                <li>• Analyses collectives</li>
+                <li>• Cocon social d'entreprise</li>
+                <li>• Rapports et optimisation</li>
               </ul>
-              <Link to={UNIFIED_ROUTES.B2B_ADMIN_LOGIN} className="block">
+              <Link to={UNIFIED_ROUTES.B2B_SELECTION} className="block">
                 <Button className="w-full" variant="outline" size="lg">
-                  Connexion Administration
+                  Accès Entreprise
                 </Button>
               </Link>
             </CardContent>
@@ -78,10 +81,10 @@ const B2BSelectionPage: React.FC = () => {
 
         <div className="text-center mt-8">
           <Link 
-            to={UNIFIED_ROUTES.CHOOSE_MODE} 
+            to={UNIFIED_ROUTES.HOME} 
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            ← Retour à la sélection de mode
+            ← Retour à l'accueil
           </Link>
         </div>
       </div>
@@ -89,4 +92,4 @@ const B2BSelectionPage: React.FC = () => {
   );
 };
 
-export default B2BSelectionPage;
+export default ModeSelectorPage;

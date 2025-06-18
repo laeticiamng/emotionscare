@@ -1,12 +1,36 @@
 
 import React from 'react';
-import GamificationDashboard from '@/components/gamification/GamificationDashboard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trophy } from 'lucide-react';
 
+/**
+ * Page de gamification
+ */
 const GamificationPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Gamification</h1>
-      <GamificationDashboard />
+    <div className="container mx-auto py-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <Trophy className="h-8 w-8 text-yellow-600" />
+          Gamification
+        </h1>
+        <p className="text-gray-600">
+          Défis, badges et récompenses pour votre progression
+        </p>
+      </div>
+
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Système de Récompenses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              Module de gamification en cours de développement...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

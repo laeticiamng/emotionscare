@@ -1,60 +1,32 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Download, BarChart3 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart } from 'lucide-react';
 
+/**
+ * Page des rapports (Admin)
+ */
 const ReportsPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Rapports et Analytics</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="container mx-auto py-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <BarChart className="h-8 w-8 text-green-600" />
+          Rapports et Analyses
+        </h1>
+        <p className="text-gray-600">
+          Consultez les analyses et métriques de votre organisation
+        </p>
+      </div>
+
+      <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Rapports
-            </CardTitle>
-            <CardDescription>
-              Rapports détaillés anonymisés
-            </CardDescription>
+            <CardTitle>Tableaux de Bord Analytiques</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Générez des rapports complets sur le bien-être organisationnel.
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              Export
-            </CardTitle>
-            <CardDescription>
-              Exportation des données
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Exportez les données sous différents formats pour analyse externe.
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Analytics
-            </CardTitle>
-            <CardDescription>
-              Analyses avancées
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Analyses approfondies des tendances et patterns organisationnels.
+            <p className="text-gray-600">
+              Module de rapports en cours de développement...
             </p>
           </CardContent>
         </Card>
