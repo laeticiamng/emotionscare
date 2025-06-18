@@ -13,7 +13,7 @@ interface RegisterFormProps {
   onToggleMode: () => void;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
+const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
   const { signUp } = useAuth();
   
   const form = useForm<RegisterFormData>({
@@ -130,3 +130,5 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
     </div>
   );
 };
+
+export default RegisterForm;

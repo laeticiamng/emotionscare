@@ -4,9 +4,13 @@ import RegisterForm from '@/components/auth/RegisterForm';
 import B2CAuthLayout from '@/components/auth/B2CAuthLayout';
 
 const B2CRegisterPage: React.FC = () => {
+  const handleToggleMode = () => {
+    window.location.href = '/b2c/login';
+  };
+
   return (
     <B2CAuthLayout>
-      <RegisterForm userType="b2c" />
+      <RegisterForm onToggleMode={handleToggleMode} />
     </B2CAuthLayout>
   );
 };

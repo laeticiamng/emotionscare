@@ -1,13 +1,17 @@
 
 import React from 'react';
 import RegisterForm from '@/components/auth/RegisterForm';
-import B2BPremiumAuthLayout from '@/components/auth/B2BPremiumAuthLayout';
+import B2CAuthLayout from '@/components/auth/B2CAuthLayout';
 
 const B2BUserRegisterPage: React.FC = () => {
+  const handleToggleMode = () => {
+    window.location.href = '/b2b/user/login';
+  };
+
   return (
-    <B2BPremiumAuthLayout>
-      <RegisterForm userType="b2b_user" />
-    </B2BPremiumAuthLayout>
+    <B2CAuthLayout>
+      <RegisterForm onToggleMode={handleToggleMode} />
+    </B2CAuthLayout>
   );
 };
 
