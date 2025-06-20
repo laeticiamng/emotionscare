@@ -14,6 +14,7 @@ import Auth from "@/pages/Auth";
 import NotFound from "@/pages/NotFound";
 import Unauthorized from "@/pages/Unauthorized";
 import Profile from "@/pages/Profile";
+import NotificationCenter from "@/pages/NotificationCenter";
 import RoleProtectedRoute from "@/components/RoleProtectedRoute";
 import B2BUserDashboard from "@/pages/b2b/B2BUserDashboard";
 import B2BAdminDashboard from "@/pages/b2b/B2BAdminDashboard";
@@ -59,6 +60,14 @@ export const router = createBrowserRouter([
         element: (
           <RoleProtectedRoute allowedRoles={['b2c', 'b2b_user', 'b2b_admin']}>
             <Profile />
+          </RoleProtectedRoute>
+        ),
+      },
+      {
+        path: "/notifications",
+        element: (
+          <RoleProtectedRoute allowedRoles={['b2c', 'b2b_user', 'b2b_admin']}>
+            <NotificationCenter />
           </RoleProtectedRoute>
         ),
       },

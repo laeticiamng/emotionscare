@@ -16,6 +16,7 @@ import {
 import { APP_CONFIG } from '@/lib/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { useNotifications } from '@/contexts/NotificationContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,6 +33,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const location = useLocation();
   const { user } = useAuth();
   const { userMode } = useUserMode();
+  const { unreadCount } = useNotifications();
   const { toast } = useToast();
 
   const handleLogout = async () => {
@@ -104,14 +106,21 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="relative">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => navigate('/notifications')}
+          >
             <Bell className="h-5 w-5" />
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-            >
-              3
-            </Badge>
+            {unreadCount > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              >
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </Badge>
+            )}
           </Button>
           
           <DropdownMenu>
