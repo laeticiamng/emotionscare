@@ -1,92 +1,168 @@
 
 import { useState, useEffect } from 'react';
-import { UserPoints, UserBadge, Achievement, Streak } from '@/types/gamification';
-import { gamificationService } from '@/services/gamificationService';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface UserStats {
+  totalPoints: number;
+  level: number;
+  rank: string;
+  streak: number;
+  completedChallenges: number;
+  achievements: number;
+}
+
+interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  progress: number;
+  maxProgress: number;
+  category: 'daily' | 'weekly' | 'special';
+  difficulty: 'facile' | 'moyen' | 'difficile';
+  completed: boolean;
+  deadline?: string;
+}
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  points: number;
+  unlocked: boolean;
+  unlockedAt?: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+}
 
 export const useGamification = () => {
-  const [userPoints, setUserPoints] = useState<UserPoints | null>(null);
-  const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
+  const { user } = useAuth();
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [streaks, setStreaks] = useState<Streak[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadGamificationData();
-  }, []);
+    if (user) {
+      loadGamificationData();
+    }
+  }, [user]);
 
   const loadGamificationData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      setError(null);
+      // Simuler le chargement des données
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const [pointsData, badgesData, achievementsData, streaksData] = await Promise.all([
-        gamificationService.getUserPoints(),
-        gamificationService.getUserBadges(),
-        gamificationService.getUserAchievements(),
-        gamificationService.getUserStreaks()
+      // Mock data
+      setUserStats({
+        totalPoints: 1250,
+        level: 8,
+        rank: 'Explorateur Émotionnel',
+        streak: 5,
+        completedChallenges: 23,
+        achievements: 12
+      });
+
+      setChallenges([
+        {
+          id: '1',
+          title: 'Scanner quotidien',
+          description: 'Effectuez un scan émotionnel aujourd\'hui',
+          points: 50,
+          progress: 0,
+          maxProgress: 1,
+          category: 'daily',
+          difficulty: 'facile',
+          completed: false
+        },
+        {
+          id: '2',
+          title: 'Méditation guidée',
+          description: 'Complétez 3 sessions de méditation cette semaine',
+          points: 150,
+          progress: 1,
+          maxProgress: 3,
+          category: 'weekly',
+          difficulty: 'moyen',
+          completed: false,
+          deadline: '2025-06-29'
+        }
       ]);
 
-      setUserPoints(pointsData);
-      setUserBadges(badgesData);
-      setAchievements(achievementsData);
-      setStreaks(streaksData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
-      console.error('Erreur gamification:', err);
+      setAchievements([
+        {
+          id: '1',
+          title: 'Premier Pas',
+          description: 'Première connexion à l\'application',
+          icon: null,
+          points: 50,
+          unlocked: true,
+          unlockedAt: '2025-06-20',
+          rarity: 'common'
+        }
+      ]);
+    } catch (error) {
+      console.error('Error loading gamification data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const awardPoints = async (points: number, reason: string) => {
-    try {
-      const result = await gamificationService.awardPoints(points, reason);
-      setUserPoints(result);
-      return result;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'attribution des points');
-      throw err;
-    }
+  const updateChallengeProgress = async (challengeId: string, progress: number) => {
+    setChallenges(prev => 
+      prev.map(challenge => 
+        challenge.id === challengeId 
+          ? { ...challenge, progress: Math.min(progress, challenge.maxProgress) }
+          : challenge
+      )
+    );
   };
 
-  const checkAchievements = async () => {
-    try {
-      const newAchievements = await gamificationService.checkAndAwardAchievements();
-      if (newAchievements.length > 0) {
-        setAchievements(prev => [...prev, ...newAchievements]);
-        await loadGamificationData(); // Refresh all data
+  const claimReward = async (challengeId: string) => {
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (challenge && challenge.progress >= challenge.maxProgress) {
+      setChallenges(prev => 
+        prev.map(c => 
+          c.id === challengeId 
+            ? { ...c, completed: true }
+            : c
+        )
+      );
+
+      // Mettre à jour les points
+      if (userStats) {
+        setUserStats(prev => prev ? {
+          ...prev,
+          totalPoints: prev.totalPoints + challenge.points,
+          completedChallenges: prev.completedChallenges + 1
+        } : null);
       }
-      return newAchievements;
-    } catch (err) {
-      console.error('Erreur lors de la vérification des succès:', err);
-      return [];
     }
   };
 
-  const updateStreak = async (activityType: string) => {
-    try {
-      const updatedStreak = await gamificationService.updateStreak(activityType);
-      setStreaks(prev => prev.map(s => 
-        s.activity_type === activityType ? updatedStreak : s
-      ));
-      return updatedStreak;
-    } catch (err) {
-      console.error('Erreur lors de la mise à jour de la série:', err);
-      throw err;
-    }
+  const unlockAchievement = async (achievementId: string) => {
+    setAchievements(prev => 
+      prev.map(achievement => 
+        achievement.id === achievementId 
+          ? { 
+              ...achievement, 
+              unlocked: true, 
+              unlockedAt: new Date().toISOString() 
+            }
+          : achievement
+      )
+    );
   };
 
   return {
-    userPoints,
-    userBadges,
+    userStats,
+    challenges,
     achievements,
-    streaks,
     loading,
-    error,
-    awardPoints,
-    checkAchievements,
-    updateStreak,
+    updateChallengeProgress,
+    claimReward,
+    unlockAchievement,
     refreshData: loadGamificationData
   };
 };
