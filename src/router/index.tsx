@@ -5,6 +5,7 @@ import { gamificationRoutes } from './routes/gamificationRoutes';
 import { notificationRoutes } from './routes/notificationRoutes';
 import { userRoutes } from './routes/userRoutes';
 import { publicRoutes } from './routes/publicRoutes';
+import { accessRoutes } from './routes/accessRoutes';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { HomePage } from '@/pages/HomePage';
 import { ScanPage } from '@/pages/ScanPage';
@@ -122,6 +123,7 @@ export const router = createBrowserRouter([
       ...vrRoutes,
       ...gamificationRoutes,
       ...notificationRoutes,
+      ...accessRoutes,
       ...b2bRoutes,
     ],
   },
