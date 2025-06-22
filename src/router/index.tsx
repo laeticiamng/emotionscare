@@ -6,7 +6,9 @@ import { notificationRoutes } from './routes/notificationRoutes';
 import { userRoutes } from './routes/userRoutes';
 import { publicRoutes } from './routes/publicRoutes';
 import { accessRoutes } from './routes/accessRoutes';
+import { securityRoutes } from './routes/securityRoutes';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import PageAccessGuard from '@/components/access/PageAccessGuard';
 import { HomePage } from '@/pages/HomePage';
 import { ScanPage } from '@/pages/ScanPage';
 import { JournalPage } from '@/pages/JournalPage';
@@ -36,7 +38,9 @@ export const router = createBrowserRouter([
         path: '/home',
         element: (
           <ProtectedRoute>
-            <HomePage />
+            <PageAccessGuard>
+              <HomePage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -44,7 +48,9 @@ export const router = createBrowserRouter([
         path: '/scan',
         element: (
           <ProtectedRoute>
-            <ScanPage />
+            <PageAccessGuard>
+              <ScanPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -52,7 +58,9 @@ export const router = createBrowserRouter([
         path: '/journal',
         element: (
           <ProtectedRoute>
-            <JournalPage />
+            <PageAccessGuard>
+              <JournalPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -60,7 +68,9 @@ export const router = createBrowserRouter([
         path: '/coach',
         element: (
           <ProtectedRoute>
-            <CoachPage />
+            <PageAccessGuard>
+              <CoachPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -68,7 +78,9 @@ export const router = createBrowserRouter([
         path: '/music',
         element: (
           <ProtectedRoute>
-            <MusicTherapyPage />
+            <PageAccessGuard>
+              <MusicTherapyPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -76,7 +88,9 @@ export const router = createBrowserRouter([
         path: '/community',
         element: (
           <ProtectedRoute>
-            <CommunityPage />
+            <PageAccessGuard>
+              <CommunityPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -84,7 +98,9 @@ export const router = createBrowserRouter([
         path: '/settings',
         element: (
           <ProtectedRoute>
-            <SettingsPage />
+            <PageAccessGuard>
+              <SettingsPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -92,7 +108,9 @@ export const router = createBrowserRouter([
         path: '/teams',
         element: (
           <ProtectedRoute>
-            <TeamsPage />
+            <PageAccessGuard adminOnly={true}>
+              <TeamsPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -100,7 +118,9 @@ export const router = createBrowserRouter([
         path: '/reports',
         element: (
           <ProtectedRoute>
-            <ReportsPage />
+            <PageAccessGuard adminOnly={true}>
+              <ReportsPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -108,7 +128,9 @@ export const router = createBrowserRouter([
         path: '/events',
         element: (
           <ProtectedRoute>
-            <EventsPage />
+            <PageAccessGuard adminOnly={true}>
+              <EventsPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -116,7 +138,9 @@ export const router = createBrowserRouter([
         path: '/optimisation',
         element: (
           <ProtectedRoute>
-            <OptimisationPage />
+            <PageAccessGuard adminOnly={true}>
+              <OptimisationPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -124,6 +148,7 @@ export const router = createBrowserRouter([
       ...gamificationRoutes,
       ...notificationRoutes,
       ...accessRoutes,
+      ...securityRoutes,
       ...b2bRoutes,
     ],
   },

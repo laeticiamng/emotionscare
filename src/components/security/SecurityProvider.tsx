@@ -1,12 +1,67 @@
 
-import React, { useEffect, useState, useContext, createContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
+import { useSecurity } from '@/hooks/useSecurity';
 
 interface SecurityContextType {
-  isSecure: boolean;
-  checkSecurity: () => void;
+  logAccess: (page: string, success: boolean, reason?: string) => void;
+  exportSecurityData: () => Promise<void>;
+  requestDataDeletion: () => Promise<void>;
+  updateSecurityPreferences: (preferences: Record<string, boolean>) => Promise<void>;
+  metrics: {
+    securityScore: number;
+    lastLogin: string;
+    eventsCount: number;
+    complianceLevel: 'high' | 'medium' | 'low';
+  };
+  accessHistory: Array<{
+    page: string;
+    timestamp: string;
+    success: boolean;
+    userRole: string;
+    reason?: string;
+  }>;
+  loading: boolean;
 }
 
 const SecurityContext = createContext<SecurityContextType | undefined>(undefined);
+
+export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
+  const security = useSecurity();
+
+  // Enregistrer automatiquement les accès aux pages
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      security.logAccess(location.pathname, true);
+    }
+  }, [location.pathname, isAuthenticated, user]);
+
+  // Enregistrer les tentatives d'accès refusées
+  useEffect(() => {
+    const handleUnauthorizedAccess = (event: CustomEvent) => {
+      security.logAccess(
+        event.detail.page,
+        false,
+        event.detail.reason
+      );
+    };
+
+    window.addEventListener('unauthorized-access', handleUnauthorizedAccess as EventListener);
+    
+    return () => {
+      window.removeEventListener('unauthorized-access', handleUnauthorizedAccess as EventListener);
+    };
+  }, []);
+
+  return (
+    <SecurityContext.Provider value={security}>
+      {children}
+    </SecurityContext.Provider>
+  );
+};
 
 export const useSecurityContext = () => {
   const context = useContext(SecurityContext);
@@ -14,52 +69,6 @@ export const useSecurityContext = () => {
     throw new Error('useSecurityContext must be used within a SecurityProvider');
   }
   return context;
-};
-
-interface SecurityProviderProps {
-  children: React.ReactNode;
-}
-
-export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
-  const [isSecure, setIsSecure] = useState(true);
-
-  useEffect(() => {
-    // Vérifications de sécurité de base
-    const performSecurityCheck = () => {
-      try {
-        // Vérifier si nous sommes en HTTPS en production
-        if (import.meta.env.PROD && window.location.protocol !== 'https:') {
-          console.warn('🔒 Site non sécurisé en production');
-          setIsSecure(false);
-          return;
-        }
-        
-        // Autres vérifications de sécurité
-        setIsSecure(true);
-        console.log('✅ Security check passed');
-      } catch (error) {
-        console.warn('⚠️ Security check failed:', error);
-        setIsSecure(false);
-      }
-    };
-
-    performSecurityCheck();
-  }, []);
-
-  const checkSecurity = () => {
-    console.log('🔍 Vérification de sécurité effectuée');
-  };
-
-  const value: SecurityContextType = {
-    isSecure,
-    checkSecurity
-  };
-
-  return (
-    <SecurityContext.Provider value={value}>
-      {children}
-    </SecurityContext.Provider>
-  );
 };
 
 export default SecurityProvider;
