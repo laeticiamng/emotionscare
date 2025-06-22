@@ -1,85 +1,151 @@
 
 import React from 'react';
-import { Notification, NotificationType } from '@/types/notifications';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bell, Check } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Check, X, ExternalLink, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  category: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  read: boolean;
+  created_at: string;
+  action_link?: string;
+  action_text?: string;
+  icon?: string;
+  metadata?: Record<string, any>;
+}
+
 interface NotificationItemProps {
   notification: Notification;
-  onMarkAsRead?: (id: string) => void;
+  onMarkAsRead: () => void;
+  onDelete: () => void;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onMarkAsRead,
+  onDelete
 }) => {
-  const handleMarkAsRead = () => {
-    if (onMarkAsRead) {
-      onMarkAsRead(notification.id);
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'bg-red-500';
+      case 'high': return 'bg-orange-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'low': return 'bg-green-500';
+      default: return 'bg-gray-500';
     }
   };
 
-  // Détermine l'horodatage à utiliser
-  const timestamp = notification.timestamp || notification.created_at || notification.createdAt || '';
-  
-  // Fonction pour obtenir l'icône et la couleur en fonction du type
-  const getTypeStyles = () => {
-    const type = notification.type;
-    
-    switch (type) {
-      case 'success':
-        return { color: 'text-green-500', bgColor: 'bg-green-100 dark:bg-green-900' };
-      case 'warning':
-        return { color: 'text-amber-500', bgColor: 'bg-amber-100 dark:bg-amber-900' };
-      case 'error':
-        return { color: 'text-red-500', bgColor: 'bg-red-100 dark:bg-red-900' };
-      case 'achievement':
-        return { color: 'text-purple-500', bgColor: 'bg-purple-100 dark:bg-purple-900' };
-      case 'badge':
-        return { color: 'text-blue-500', bgColor: 'bg-blue-100 dark:bg-blue-900' };
-      case 'streak':
-        return { color: 'text-orange-500', bgColor: 'bg-orange-100 dark:bg-orange-900' };
-      case 'system':
-        return { color: 'text-slate-500', bgColor: 'bg-slate-100 dark:bg-slate-800' };
-      default:
-        return { color: 'text-primary', bgColor: 'bg-primary/10' };
-    }
+  const getCategoryIcon = (category: string) => {
+    // Icons based on category would be implemented here
+    return notification.icon || '🔔';
   };
-
-  const { color, bgColor } = getTypeStyles();
 
   return (
-    <div className={`p-4 rounded-lg border ${!notification.read ? 'bg-muted/30' : ''}`}>
-      <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-full ${bgColor}`}>
-          <Bell className={`h-4 w-4 ${color}`} />
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm">{notification.title}</h4>
-          <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-muted-foreground">
-              {timestamp ? formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: fr }) : ''}
-            </span>
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      className={`relative ${!notification.read ? 'ring-2 ring-primary/20' : ''}`}
+    >
+      <Card className={`${!notification.read ? 'bg-accent/10' : ''} transition-all duration-200`}>
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            {/* Priority indicator */}
+            <div className={`w-2 h-2 rounded-full ${getPriorityColor(notification.priority)} mt-2`} />
             
-            {!notification.read && onMarkAsRead && (
-              <Button
-                variant="ghost" 
-                size="sm" 
-                className="h-8 px-2"
-                onClick={handleMarkAsRead}
-              >
-                <Check className="h-3 w-3 mr-1" />
-                <span className="text-xs">Marquer comme lu</span>
-              </Button>
-            )}
+            {/* Icon */}
+            <div className="text-2xl">{getCategoryIcon(notification.category)}</div>
+            
+            {/* Content */}
+            <div className="flex-1 space-y-2">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className={`font-medium ${!notification.read ? 'font-semibold' : ''}`}>
+                    {notification.title}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {notification.message}
+                  </p>
+                </div>
+                
+                {/* Status badges */}
+                <div className="flex items-center gap-2 ml-4">
+                  <Badge variant="outline" className="capitalize">
+                    {notification.category}
+                  </Badge>
+                  {!notification.read && (
+                    <Badge variant="default" className="bg-primary/20 text-primary">
+                      Nouveau
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Metadata */}
+              {notification.metadata && (
+                <div className="text-xs text-muted-foreground">
+                  {Object.entries(notification.metadata).map(([key, value]) => (
+                    <span key={key} className="mr-3">
+                      {key}: {String(value)}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Timestamp and actions */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  {formatDistanceToNow(new Date(notification.created_at), {
+                    addSuffix: true,
+                    locale: fr
+                  })}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {notification.action_link && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(notification.action_link, '_blank')}
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      {notification.action_text || 'Voir'}
+                    </Button>
+                  )}
+                  
+                  {!notification.read && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onMarkAsRead}
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  )}
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onDelete}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

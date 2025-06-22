@@ -1,16 +1,18 @@
 
-import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-
-const NotificationDemoPage = lazy(() => import('@/pages/NotificationDemoPage'));
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import PageAccessGuard from '@/components/access/PageAccessGuard';
+import NotificationsPage from '@/pages/NotificationsPage';
 
 export const notificationRoutes: RouteObject[] = [
   {
     path: '/notifications',
-    element: <NotificationDemoPage />,
-  },
-  {
-    path: '/notifications/demo',
-    element: <NotificationDemoPage />,
-  },
+    element: (
+      <ProtectedRoute>
+        <PageAccessGuard>
+          <NotificationsPage />
+        </PageAccessGuard>
+      </ProtectedRoute>
+    ),
+  }
 ];
