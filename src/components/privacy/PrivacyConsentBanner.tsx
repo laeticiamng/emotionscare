@@ -1,196 +1,252 @@
 
 import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Shield, X, Check } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Shield, Settings, X, Eye, Target, BarChart, Cookie } from 'lucide-react';
+import { useEthics } from '@/contexts/EthicsContext';
 
-interface PrivacyConsentBannerProps {
-  onAccept: (selections: {
-    essential: boolean;
-    functional: boolean;
-    analytics: boolean;
-    marketing: boolean;
-  }) => void;
-  onClose: () => void;
+interface ConsentOption {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  required: boolean;
+  defaultValue: boolean;
 }
 
-const PrivacyConsentBanner: React.FC<PrivacyConsentBannerProps> = ({ onAccept, onClose }) => {
-  const [show, setShow] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  const [selections, setSelections] = useState({
-    essential: true, // Essential is always required
-    functional: true,
-    analytics: false,
-    marketing: false,
-  });
+const PrivacyConsentBanner: React.FC = () => {
+  const { updateConsent } = useEthics();
+  const [isVisible, setIsVisible] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [consents, setConsents] = useState<Record<string, boolean>>({});
+
+  const consentOptions: ConsentOption[] = [
+    {
+      id: 'essential',
+      title: 'Cookies essentiels',
+      description: 'Nécessaires au fonctionnement du site. Ne peuvent pas être désactivés.',
+      icon: Shield,
+      required: true,
+      defaultValue: true
+    },
+    {
+      id: 'functional',
+      title: 'Cookies fonctionnels',
+      description: 'Améliorent votre expérience en sauvegardant vos préférences.',
+      icon: Settings,
+      required: false,
+      defaultValue: true
+    },
+    {
+      id: 'analytics',
+      title: 'Cookies analytiques',
+      description: 'Nous aident à comprendre comment vous utilisez notre site.',
+      icon: BarChart,
+      required: false,
+      defaultValue: false
+    },
+    {
+      id: 'marketing',
+      title: 'Cookies marketing',
+      description: 'Permettent de personnaliser les publicités selon vos intérêts.',
+      icon: Target,
+      required: false,
+      defaultValue: false
+    }
+  ];
 
   useEffect(() => {
-    // Simulate a delay before showing the banner
-    const timer = setTimeout(() => {
-      setShow(true);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    // Vérifier si l'utilisateur a déjà donné son consentement
+    const hasConsented = localStorage.getItem('privacy-consent');
+    if (!hasConsented) {
+      setIsVisible(true);
+      // Initialiser les consentements avec les valeurs par défaut
+      const defaultConsents: Record<string, boolean> = {};
+      consentOptions.forEach(option => {
+        defaultConsents[option.id] = option.defaultValue;
+      });
+      setConsents(defaultConsents);
+    }
   }, []);
 
-  const handleToggle = (key: keyof typeof selections) => {
-    if (key === 'essential') return; // Essential cannot be toggled
-    setSelections(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleConsentChange = (optionId: string, value: boolean) => {
+    setConsents(prev => ({ ...prev, [optionId]: value }));
   };
 
-  const handleAccept = () => {
-    onAccept(selections);
-    setShow(false);
+  const handleAcceptAll = async () => {
+    const allConsents: Record<string, boolean> = {};
+    consentOptions.forEach(option => {
+      allConsents[option.id] = true;
+    });
+    
+    await saveConsents(allConsents);
   };
 
-  const handleAcceptAll = () => {
-    const allAccepted = {
-      essential: true,
-      functional: true,
-      analytics: true,
-      marketing: true,
-    };
-    onAccept(allAccepted);
-    setShow(false);
+  const handleAcceptSelected = async () => {
+    await saveConsents(consents);
   };
+
+  const handleRejectAll = async () => {
+    const minimalConsents: Record<string, boolean> = {};
+    consentOptions.forEach(option => {
+      minimalConsents[option.id] = option.required;
+    });
+    
+    await saveConsents(minimalConsents);
+  };
+
+  const saveConsents = async (finalConsents: Record<string, boolean>) => {
+    // Sauvegarder les consentements
+    for (const [consentType, granted] of Object.entries(finalConsents)) {
+      await updateConsent(consentType as any, granted);
+    }
+    
+    // Marquer comme traité
+    localStorage.setItem('privacy-consent', JSON.stringify({
+      consents: finalConsents,
+      timestamp: new Date().toISOString(),
+      version: '1.0'
+    }));
+    
+    setIsVisible(false);
+  };
+
+  if (!isVisible) return null;
 
   return (
     <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 100 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-          className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:bottom-8 md:right-8 md:max-w-lg"
-        >
-          <div className="bg-card border shadow-lg rounded-lg overflow-hidden">
-            <div className="p-4 sm:p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold">Vos choix de confidentialité</h2>
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 100 }}
+        className="fixed bottom-0 left-0 right-0 z-50 p-4"
+      >
+        <Card className="mx-auto max-w-4xl shadow-2xl border-2">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Cookie className="h-6 w-6 text-primary" />
                 </div>
-                <Button variant="ghost" size="icon" onClick={onClose}>
-                  <X className="h-4 w-4" />
-                  <span className="sr-only">Fermer</span>
-                </Button>
+                <div>
+                  <h2 className="text-xl font-semibold">Gestion de la confidentialité</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Nous respectons votre vie privée et vos droits
+                  </p>
+                </div>
               </div>
-              
-              <p className="text-sm text-muted-foreground mt-2">
-                Nous utilisons des cookies et des technologies similaires pour personnaliser votre expérience et comprendre comment vous interagissez avec notre plateforme.
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsVisible(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Nous utilisons des cookies et des technologies similaires pour améliorer votre expérience, 
+                analyser notre trafic et personnaliser le contenu. Vous pouvez choisir quels cookies accepter.
               </p>
-              
+
+              {/* Options de consentement détaillées */}
               <AnimatePresence>
-                {expanded && (
+                {showDetails && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4 space-y-3"
+                    className="space-y-3 border rounded-lg p-4 bg-muted/30"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="essential" className="font-medium">Essentiels</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Toujours actifs. Nécessaires au fonctionnement du site.
-                        </p>
-                      </div>
-                      <Switch
-                        id="essential"
-                        checked={selections.essential}
-                        disabled
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="functional" className="font-medium">Fonctionnels</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Améliorent votre expérience utilisateur.
-                        </p>
-                      </div>
-                      <Switch
-                        id="functional"
-                        checked={selections.functional}
-                        onCheckedChange={() => handleToggle('functional')}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="analytics" className="font-medium">Analytiques</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Nous aident à comprendre comment vous utilisez le site.
-                        </p>
-                      </div>
-                      <Switch
-                        id="analytics"
-                        checked={selections.analytics}
-                        onCheckedChange={() => handleToggle('analytics')}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="marketing" className="font-medium">Marketing</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Permettent de vous proposer des contenus personnalisés.
-                        </p>
-                      </div>
-                      <Switch
-                        id="marketing"
-                        checked={selections.marketing}
-                        onCheckedChange={() => handleToggle('marketing')}
-                      />
-                    </div>
+                    {consentOptions.map((option, index) => (
+                      <motion.div
+                        key={option.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-center justify-between space-x-3"
+                      >
+                        <div className="flex items-center space-x-3 flex-1">
+                          <option.icon className="h-4 w-4 text-primary" />
+                          <div>
+                            <Label className="font-medium">{option.title}</Label>
+                            <p className="text-xs text-muted-foreground">
+                              {option.description}
+                            </p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={consents[option.id] || false}
+                          onCheckedChange={(checked) => handleConsentChange(option.id, checked)}
+                          disabled={option.required}
+                        />
+                      </motion.div>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
-              
-              <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setExpanded(!expanded)}
-                  className="sm:order-1"
-                >
-                  {expanded ? "Masquer les options" : "Personnaliser"}
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="sm:order-3"
-                  onClick={handleAcceptAll}
-                >
-                  <Check className="mr-2 h-4 w-4" />
-                  Tout accepter
-                </Button>
-                {expanded && (
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    className="sm:order-2"
-                    onClick={handleAccept}
+
+              <Separator />
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-between">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowDetails(!showDetails)}
                   >
-                    Enregistrer mes choix
+                    <Settings className="h-4 w-4 mr-2" />
+                    {showDetails ? 'Masquer' : 'Personnaliser'}
                   </Button>
-                )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRejectAll}
+                  >
+                    Rejeter tout
+                  </Button>
+                </div>
+                
+                <div className="flex gap-2">
+                  {showDetails && (
+                    <Button
+                      onClick={handleAcceptSelected}
+                      size="sm"
+                    >
+                      Accepter la sélection
+                    </Button>
+                  )}
+                  <Button
+                    onClick={handleAcceptAll}
+                    size="sm"
+                    className="bg-primary"
+                  >
+                    Tout accepter
+                  </Button>
+                </div>
               </div>
+
+              <p className="text-xs text-muted-foreground text-center">
+                En utilisant notre site, vous acceptez notre{' '}
+                <button className="text-primary hover:underline">
+                  politique de confidentialité
+                </button>
+                {' '}et nos{' '}
+                <button className="text-primary hover:underline">
+                  conditions d'utilisation
+                </button>
+                .
+              </p>
             </div>
-            
-            <motion.div 
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 5, ease: "linear" }}
-              className="h-1 bg-primary origin-left"
-            />
-          </div>
-        </motion.div>
-      )}
+          </CardContent>
+        </Card>
+      </motion.div>
     </AnimatePresence>
   );
 };

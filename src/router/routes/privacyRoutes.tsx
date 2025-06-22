@@ -2,15 +2,15 @@
 import { RouteObject } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import PageAccessGuard from '@/components/access/PageAccessGuard';
-import SystemAuditPage from '@/pages/SystemAuditPage';
+import PrivacyDashboardPage from '@/pages/PrivacyDashboardPage';
 
-export const auditRoutes: RouteObject[] = [
+export const privacyRoutes: RouteObject[] = [
   {
-    path: '/audit',
+    path: '/privacy',
     element: (
-      <ProtectedRoute allowedRoles={['b2b_admin']}>
+      <ProtectedRoute>
         <PageAccessGuard>
-          <SystemAuditPage />
+          <PrivacyDashboardPage />
         </PageAccessGuard>
       </ProtectedRoute>
     ),

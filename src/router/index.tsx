@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Shell from '@/Shell';
@@ -18,6 +17,8 @@ import { gamificationRoutes } from './routes/gamificationRoutes';
 import { notificationRoutes } from './routes/notificationRoutes';
 import { securityRoutes } from './routes/securityRoutes';
 import { reportsRoutes } from './routes/reportsRoutes';
+import { privacyRoutes } from './routes/privacyRoutes';
+import { auditRoutes } from './routes/auditRoutes';
 
 export const router = createBrowserRouter([
   {
@@ -95,7 +96,9 @@ export const router = createBrowserRouter([
         path: 'scan',
         element: (
           <ProtectedRoute>
-            <ScanPage />
+            <PageAccessGuard>
+              <ScanPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -103,7 +106,9 @@ export const router = createBrowserRouter([
         path: 'music',
         element: (
           <ProtectedRoute>
-            <MusicPage />
+            <PageAccessGuard>
+              <MusicPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -111,7 +116,9 @@ export const router = createBrowserRouter([
         path: 'coach',
         element: (
           <ProtectedRoute>
-            <CoachPage />
+            <PageAccessGuard>
+              <CoachPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -119,7 +126,9 @@ export const router = createBrowserRouter([
         path: 'journal',
         element: (
           <ProtectedRoute>
-            <JournalPage />
+            <PageAccessGuard>
+              <JournalPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -127,7 +136,9 @@ export const router = createBrowserRouter([
         path: 'vr',
         element: (
           <ProtectedRoute>
-            <VRPage />
+            <PageAccessGuard>
+              <VRPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
@@ -135,16 +146,20 @@ export const router = createBrowserRouter([
         path: 'preferences',
         element: (
           <ProtectedRoute>
-            <PreferencesPage />
+            <PageAccessGuard>
+              <PreferencesPage />
+            </PageAccessGuard>
           </ProtectedRoute>
         ),
       },
 
-      // Routes protégées - Fonctionnalités administrateur uniquement
+      // Routes protégées - Fonctionnalités administrateur et nouvelles routes
       ...gamificationRoutes,
       ...notificationRoutes,
       ...securityRoutes,
       ...reportsRoutes,
+      ...privacyRoutes,
+      ...auditRoutes,
 
       // Route 404
       {

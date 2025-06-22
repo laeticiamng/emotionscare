@@ -41,6 +41,10 @@ export const UNIFIED_ROUTES = {
   EVENTS: '/events',
   OPTIMISATION: '/optimisation',
   SETTINGS: '/settings',
+  NOTIFICATIONS: '/notifications',
+  SECURITY: '/security',
+  PRIVACY: '/privacy',
+  AUDIT: '/audit',
 } as const;
 
 /**

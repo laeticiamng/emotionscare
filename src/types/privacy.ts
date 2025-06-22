@@ -1,87 +1,61 @@
 
-export type GdprRequestType = 'access' | 'rectification' | 'deletion' | 'portability' | 'objection' | 'restriction';
-
-export type GdprRequestStatus = 'pending' | 'in_progress' | 'completed' | 'rejected';
-
-export interface GdprRequest {
+export interface AuditLog {
   id: string;
   userId: string;
-  userName?: string;
-  requestType: GdprRequestType;
-  status: GdprRequestStatus;
-  submittedAt: string;
-  dueDate: string;
-  completedAt?: string;
-  rejectionReason?: string;
-  details?: string;
-}
-
-export interface PrivacyConsentSettings {
-  essential: boolean;
-  functional: boolean;
-  analytics: boolean;
-  marketing: boolean;
-  thirdParty: boolean;
-}
-
-export interface AccessLog {
-  id: string;
-  userId: string;
+  action: 'login' | 'logout' | 'data_access' | 'data_export' | 'data_delete' | 'preference_change' | 'consent_given' | 'consent_revoked';
+  resource: string;
   timestamp: string;
-  action: string;
-  ip: string;
-  device: string;
-  location?: string;
-  status: 'success' | 'warning' | 'error';
-  details?: string;
-}
-
-export interface SecurityAlert {
-  id: string;
-  userId?: string;
-  severity: 'critical' | 'warning' | 'info';
-  title: string;
-  description: string;
-  date: string;
-  isNew: boolean;
-  actionRequired?: boolean;
-  actionText?: string;
-  relatedTo?: string;
-}
-
-export interface AuditEvent {
-  id: string;
-  timestamp: string;
-  userId: string;
-  action: string;
-  targetId?: string;
-  targetType?: string;
-  changes?: Record<string, any>;
   ipAddress?: string;
   userAgent?: string;
+  success: boolean;
+  details?: string;
+  metadata?: Record<string, any>;
 }
 
-export interface DataExportRequest {
+export interface ConsentRecord {
   id: string;
   userId: string;
-  requestDate: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  format: 'json' | 'csv' | 'pdf' | 'zip';
-  expiresAt?: string;
-  downloadUrl?: string;
-  includedData: string[];
+  consentType: 'marketing' | 'analytics' | 'functional' | 'essential' | 'cookies';
+  granted: boolean;
+  timestamp: string;
+  version: string;
+  source: 'banner' | 'settings' | 'registration';
+  ipAddress?: string;
 }
 
-export type DataBreachSeverity = 'critical' | 'high' | 'medium' | 'low';
-
-export interface DataBreachNotification {
+export interface DataRequest {
   id: string;
-  title: string;
-  description: string;
-  affectedUsers: number;
-  detectedAt: string;
-  resolvedAt?: string;
-  severity: DataBreachSeverity;
-  actions: string[];
-  status: 'investigating' | 'contained' | 'resolved';
+  userId: string;
+  type: 'export' | 'delete' | 'rectification' | 'portability';
+  status: 'pending' | 'processing' | 'completed' | 'rejected';
+  requestDate: string;
+  completedDate?: string;
+  notes?: string;
+  downloadUrl?: string;
+}
+
+export interface PrivacySettings {
+  dataSharing: boolean;
+  analytics: boolean;
+  marketing: boolean;
+  anonymization: boolean;
+  dataRetention: number; // en mois
+  exportFormat: 'json' | 'csv' | 'xml';
+}
+
+export interface SecurityMetrics {
+  securityScore: number;
+  lastLogin: string;
+  eventsCount: number;
+  complianceLevel: 'high' | 'medium' | 'low';
+  threatLevel: 'none' | 'low' | 'medium' | 'high';
+}
+
+export interface GdprRights {
+  access: boolean;
+  rectification: boolean;
+  erasure: boolean;
+  portability: boolean;
+  restriction: boolean;
+  objection: boolean;
 }
