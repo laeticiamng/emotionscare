@@ -1,230 +1,165 @@
 
 import { createBrowserRouter } from 'react-router-dom';
-import { Layout } from '@/components/Layout';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import Shell from '@/Shell';
+import HomePage from '@/pages/HomePage';
+import ChooseModePage from '@/pages/ChooseModePage';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import DashboardPage from '@/pages/DashboardPage';
+import ScanPage from '@/pages/ScanPage';
+import MusicPage from '@/pages/MusicPage';
+import CoachPage from '@/pages/CoachPage';
+import JournalPage from '@/pages/JournalPage';
+import VRPage from '@/pages/VRPage';
+import PreferencesPage from '@/pages/PreferencesPage';
+import B2BSelectionPage from '@/pages/B2BSelectionPage';
 import { gamificationRoutes } from './routes/gamificationRoutes';
 import { notificationRoutes } from './routes/notificationRoutes';
-import { userRoutes } from './routes/userRoutes';
-import { publicRoutes } from './routes/publicRoutes';
-import { accessRoutes } from './routes/accessRoutes';
 import { securityRoutes } from './routes/securityRoutes';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import PageAccessGuard from '@/components/access/PageAccessGuard';
-import RouteValidator from '@/components/routing/RouteValidator';
-import PageRenderer from '@/components/layout/PageRenderer';
-import UnifiedRouteGuard from '@/components/routing/UnifiedRouteGuard';
-import RouteDebugger from '@/components/routing/RouteDebugger';
-import { HomePage } from '@/pages/HomePage';
-import { ScanPage } from '@/pages/ScanPage';
-import { JournalPage } from '@/pages/JournalPage';
-import { CoachPage } from '@/pages/CoachPage';
-import { MusicTherapyPage } from '@/pages/MusicTherapyPage';
-import { CommunityPage } from '@/pages/CommunityPage';
-import { SettingsPage } from '@/pages/SettingsPage';
-import { TeamsPage } from '@/pages/TeamsPage';
-import { ReportsPage } from '@/pages/ReportsPage';
-import { EventsPage } from '@/pages/EventsPage';
-import { OptimisationPage } from '@/pages/OptimisationPage';
-import { vrRoutes } from './routes/vrRoutes';
-import { adminRoutes } from './routes/adminRoutes';
-import { onboardingRoutes } from './routes/onboardingRoutes';
-import { auditRoutes } from './routes/auditRoutes';
-import { b2bRoutes } from './routes/b2bRoutes';
-
-console.log('Creating unified router with complete page validation');
-
-// Wrapper pour toutes les pages avec validation et rendu unifié
-const PageWrapper = ({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) => (
-  <RouteValidator>
-    <UnifiedRouteGuard allowedRoles={allowedRoles}>
-      <PageRenderer>
-        {children}
-        <RouteDebugger />
-      </PageRenderer>
-    </UnifiedRouteGuard>
-  </RouteValidator>
-);
+import { reportsRoutes } from './routes/reportsRoutes';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <Shell />,
     children: [
-      ...publicRoutes,
+      // Routes publiques
       {
-        path: '/home',
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: 'choose-mode',
+        element: <ChooseModePage />,
+      },
+      {
+        path: 'b2b/selection',
+        element: <B2BSelectionPage />,
+      },
+
+      // Routes d'authentification B2C
+      {
+        path: 'b2c/login',
+        element: <LoginPage mode="b2c" />,
+      },
+      {
+        path: 'b2c/register',
+        element: <RegisterPage mode="b2c" />,
+      },
+
+      // Routes d'authentification B2B User
+      {
+        path: 'b2b/user/login',
+        element: <LoginPage mode="b2b_user" />,
+      },
+      {
+        path: 'b2b/user/register',
+        element: <RegisterPage mode="b2b_user" />,
+      },
+
+      // Routes d'authentification B2B Admin
+      {
+        path: 'b2b/admin/login',
+        element: <LoginPage mode="b2b_admin" />,
+      },
+
+      // Routes protégées - Dashboards
+      {
+        path: 'b2c/dashboard',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <HomePage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute allowedRoles={['b2c']}>
+            <DashboardPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/scan',
+        path: 'b2b/user/dashboard',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <ScanPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute allowedRoles={['b2b_user']}>
+            <DashboardPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/journal',
+        path: 'b2b/admin/dashboard',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <JournalPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute allowedRoles={['b2b_admin']}>
+            <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+
+      // Routes protégées - Fonctionnalités communes unifiées
+      {
+        path: 'scan',
+        element: (
+          <ProtectedRoute>
+            <ScanPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/coach',
+        path: 'music',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <CoachPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute>
+            <MusicPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/music',
+        path: 'coach',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <MusicTherapyPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute>
+            <CoachPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/community',
+        path: 'journal',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <CommunityPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute>
+            <JournalPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/settings',
+        path: 'vr',
         element: (
-          <PageWrapper>
-            <ProtectedRoute>
-              <PageAccessGuard>
-                <SettingsPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute>
+            <VRPage />
+          </ProtectedRoute>
         ),
       },
       {
-        path: '/teams',
+        path: 'preferences',
         element: (
-          <PageWrapper allowedRoles={['b2b_admin']}>
-            <ProtectedRoute>
-              <PageAccessGuard adminOnly={true}>
-                <TeamsPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <ProtectedRoute>
+            <PreferencesPage />
+          </ProtectedRoute>
         ),
       },
+
+      // Routes protégées - Fonctionnalités administrateur uniquement
+      ...gamificationRoutes,
+      ...notificationRoutes,
+      ...securityRoutes,
+      ...reportsRoutes,
+
+      // Route 404
       {
-        path: '/reports',
+        path: '*',
         element: (
-          <PageWrapper allowedRoles={['b2b_admin']}>
-            <ProtectedRoute>
-              <PageAccessGuard adminOnly={true}>
-                <ReportsPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">404</h1>
+              <p className="text-muted-foreground">Page non trouvée</p>
+            </div>
+          </div>
         ),
       },
-      {
-        path: '/events',
-        element: (
-          <PageWrapper allowedRoles={['b2b_admin']}>
-            <ProtectedRoute>
-              <PageAccessGuard adminOnly={true}>
-                <EventsPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
-        ),
-      },
-      {
-        path: '/optimisation',
-        element: (
-          <PageWrapper allowedRoles={['b2b_admin']}>
-            <ProtectedRoute>
-              <PageAccessGuard adminOnly={true}>
-                <OptimisationPage />
-              </PageAccessGuard>
-            </ProtectedRoute>
-          </PageWrapper>
-        ),
-      },
-      ...vrRoutes.map(route => ({
-        ...route,
-        element: <PageWrapper>{route.element}</PageWrapper>
-      })),
-      ...gamificationRoutes.map(route => ({
-        ...route,
-        element: <PageWrapper>{route.element}</PageWrapper>
-      })),
-      ...notificationRoutes.map(route => ({
-        ...route,
-        element: <PageWrapper>{route.element}</PageWrapper>
-      })),
-      ...accessRoutes.map(route => ({
-        ...route,
-        element: <PageWrapper>{route.element}</PageWrapper>
-      })),
-      ...securityRoutes.map(route => ({
-        ...route,
-        element: <PageWrapper>{route.element}</PageWrapper>
-      })),
-      ...b2bRoutes.map(route => ({
-        ...route,
-        element: <PageWrapper>{route.element}</PageWrapper>
-      })),
     ],
   },
-  ...userRoutes.map(route => ({
-    ...route,
-    element: <PageWrapper>{route.element}</PageWrapper>
-  })),
-  ...adminRoutes.map(route => ({
-    ...route,
-    element: <PageWrapper allowedRoles={['b2b_admin']}>{route.element}</PageWrapper>
-  })),
-  ...onboardingRoutes.map(route => ({
-    ...route,
-    element: <PageWrapper>{route.element}</PageWrapper>
-  })),
-  ...auditRoutes.map(route => ({
-    ...route,
-    element: <PageWrapper allowedRoles={['b2b_admin']}>{route.element}</PageWrapper>
-  })),
 ]);
 
-// Validation au démarrage
-console.log('✅ Router unified - Point 14 complété à 100%');
+export default router;
