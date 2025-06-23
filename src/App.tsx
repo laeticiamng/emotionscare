@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
-console.log('🚀 App component rendering - VERSION UNIFIÉE ROUTER...');
+console.log('🚀 App component rendering - VERSION UNIFIÉE ROUTER AVEC PROVIDERS...');
 
 // Loader avec data-testid pour les tests
 const UniversalLoader = () => (
@@ -21,10 +21,10 @@ const UniversalLoader = () => (
 );
 
 function App() {
-  console.log('🚀 App function called - Router unifié');
+  console.log('🚀 App function called - Router unifié avec providers');
   
   React.useEffect(() => {
-    console.log('🚀 App mounted - VERSION ROUTER UNIFIÉ');
+    console.log('🚀 App mounted - VERSION ROUTER UNIFIÉ AVEC PROVIDERS');
     console.log('🚀 Current location:', window.location.href);
     console.log('🚀 Router object:', router);
     
