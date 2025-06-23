@@ -1,7 +1,7 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+type UserMode = 'b2c' | 'b2b-user' | 'b2b-admin' | 'guest';
 
 interface UserModeContextType {
   userMode: UserMode;
@@ -11,40 +11,28 @@ interface UserModeContextType {
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserMode>(null);
-  const [isLoading, setIsLoading] = useState(true);
+interface UserModeProviderProps {
+  children: ReactNode;
+}
 
-  useEffect(() => {
-    // Simulation de chargement du mode utilisateur
-    const savedMode = localStorage.getItem('userMode') as UserMode;
-    if (savedMode) {
-      setUserModeState(savedMode);
-    }
-    setIsLoading(false);
-  }, []);
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserMode>('guest');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const setUserMode = (mode: UserMode) => {
-    setUserModeState(mode);
-    if (mode) {
-      localStorage.setItem('userMode', mode);
-    } else {
-      localStorage.removeItem('userMode');
-    }
+  const value: UserModeContextType = {
+    userMode,
+    setUserMode,
+    isLoading,
   };
 
   return (
-    <UserModeContext.Provider value={{
-      userMode,
-      setUserMode,
-      isLoading
-    }}>
+    <UserModeContext.Provider value={value}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => {
+export const useUserMode = (): UserModeContextType => {
   const context = useContext(UserModeContext);
   if (!context) {
     throw new Error('useUserMode must be used within a UserModeProvider');

@@ -1,27 +1,35 @@
 
 import { useState, useEffect } from 'react';
 
-export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
-  // Get initial value from localStorage or use provided initial value
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  // State pour stocker notre valeur
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
+      // Récupérer depuis localStorage
       const item = window.localStorage.getItem(key);
+      // Parser le JSON stocké ou retourner la valeur initiale
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
+      // Si erreur, retourner la valeur initiale
+      console.log(error);
       return initialValue;
     }
   });
 
-  // Return a wrapped version of useState's setter function that persists the new value to localStorage
-  const setValue = (value: T) => {
+  // Retourner une version wrappée de useState qui persiste la nouvelle valeur dans localStorage
+  const setValue = (value: T | ((val: T) => T)) => {
     try {
-      setStoredValue(value);
-      window.localStorage.setItem(key, JSON.stringify(value));
+      // Permettre à value d'être une fonction pour avoir la même API que useState
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      // Sauvegarder l'état
+      setStoredValue(valueToStore);
+      // Sauvegarder dans localStorage
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
+      // Une implémentation plus robuste pourrait gérer l'erreur de manière plus nuancée
+      console.log(error);
     }
   };
 
-  return [storedValue, setValue];
+  return [storedValue, setValue] as const;
 }

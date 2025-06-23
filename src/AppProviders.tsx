@@ -1,19 +1,11 @@
 
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
-import { EthicsProvider } from '@/contexts/EthicsContext';
-import { UserPreferencesProvider } from '@/contexts/UserPreferencesProvider';
-import { SessionProvider } from '@/contexts/SessionContext';
-import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
-import { OptimizationProvider } from '@/contexts/OptimizationContext';
-import { InnovationProvider } from '@/contexts/InnovationContext';
-import { FeedbackProvider } from '@/contexts/FeedbackContext';
+import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
 import { Toaster } from 'sonner';
-import PrivacyConsentBanner from '@/components/privacy/PrivacyConsentBanner';
-import { initializeProductionSecurity } from '@/utils/productionSecurity';
 
 // Configuration React Query avec optimisations
 const queryClient = new QueryClient({
@@ -31,41 +23,23 @@ interface AppProvidersProps {
 }
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
-  // Initialiser la sécurité production
-  React.useEffect(() => {
-    initializeProductionSecurity();
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AccessibilityProvider>
-        <ThemeProvider>
-          <OptimizationProvider>
-            <InnovationProvider>
-              <FeedbackProvider>
-                <SessionProvider>
-                  <AuthProvider>
-                    <UserModeProvider>
-                      <UserPreferencesProvider>
-                        <EthicsProvider>
-                          {children}
-                          <PrivacyConsentBanner />
-                          <Toaster 
-                            position="top-right" 
-                            richColors 
-                            closeButton
-                            duration={4000}
-                          />
-                        </EthicsProvider>
-                      </UserPreferencesProvider>
-                    </UserModeProvider>
-                  </AuthProvider>
-                </SessionProvider>
-              </FeedbackProvider>
-            </InnovationProvider>
-          </OptimizationProvider>
-        </ThemeProvider>
-      </AccessibilityProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <UserModeProvider>
+            <UserPreferencesProvider>
+              {children}
+              <Toaster 
+                position="top-right" 
+                richColors 
+                closeButton
+                duration={4000}
+              />
+            </UserPreferencesProvider>
+          </UserModeProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
