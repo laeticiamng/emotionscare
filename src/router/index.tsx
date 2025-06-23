@@ -1,5 +1,7 @@
+
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import PageAccessGuard from '@/components/access/PageAccessGuard';
 import Shell from '@/Shell';
 import HomePage from '@/pages/HomePage';
 import ChooseModePage from '@/pages/ChooseModePage';
@@ -19,6 +21,7 @@ import { securityRoutes } from './routes/securityRoutes';
 import { reportsRoutes } from './routes/reportsRoutes';
 import { privacyRoutes } from './routes/privacyRoutes';
 import { auditRoutes } from './routes/auditRoutes';
+import { accessibilityRoutes } from './routes/accessibilityRoutes';
 
 export const router = createBrowserRouter([
   {
@@ -160,6 +163,7 @@ export const router = createBrowserRouter([
       ...reportsRoutes,
       ...privacyRoutes,
       ...auditRoutes,
+      ...accessibilityRoutes,
 
       // Route 404
       {

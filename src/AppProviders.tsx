@@ -1,11 +1,13 @@
+
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { EthicsProvider } from '@/contexts/EthicsContext';
-import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
+import { UserPreferencesProvider } from '@/contexts/UserPreferencesProvider';
 import { SessionProvider } from '@/contexts/SessionContext';
+import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { Toaster } from 'sonner';
 import PrivacyConsentBanner from '@/components/privacy/PrivacyConsentBanner';
 import { OptimizationProvider } from '@/contexts/OptimizationContext';
@@ -34,28 +36,30 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <OptimizationProvider>
-          <SessionProvider>
-            <AuthProvider>
-              <UserModeProvider>
-                <UserPreferencesProvider>
-                  <EthicsProvider>
-                    {children}
-                    <PrivacyConsentBanner />
-                    <Toaster 
-                      position="top-right" 
-                      richColors 
-                      closeButton
-                      duration={4000}
-                    />
-                  </EthicsProvider>
-                </UserPreferencesProvider>
-              </UserModeProvider>
-            </AuthProvider>
-          </SessionProvider>
-        </OptimizationProvider>
-      </ThemeProvider>
+      <AccessibilityProvider>
+        <ThemeProvider>
+          <OptimizationProvider>
+            <SessionProvider>
+              <AuthProvider>
+                <UserModeProvider>
+                  <UserPreferencesProvider>
+                    <EthicsProvider>
+                      {children}
+                      <PrivacyConsentBanner />
+                      <Toaster 
+                        position="top-right" 
+                        richColors 
+                        closeButton
+                        duration={4000}
+                      />
+                    </EthicsProvider>
+                  </UserPreferencesProvider>
+                </UserModeProvider>
+              </AuthProvider>
+            </SessionProvider>
+          </OptimizationProvider>
+        </ThemeProvider>
+      </AccessibilityProvider>
     </QueryClientProvider>
   );
 };

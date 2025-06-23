@@ -45,6 +45,7 @@ export const UNIFIED_ROUTES = {
   SECURITY: '/security',
   PRIVACY: '/privacy',
   AUDIT: '/audit',
+  ACCESSIBILITY: '/accessibility',
 } as const;
 
 /**
