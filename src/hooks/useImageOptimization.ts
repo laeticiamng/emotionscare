@@ -1,95 +1,81 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface ImageOptimizationOptions {
   quality?: number;
-  format?: 'webp' | 'avif' | 'original';
+  format?: 'webp' | 'avif' | 'auto';
   lazy?: boolean;
-  placeholder?: string;
+  preload?: boolean;
 }
 
-interface ImageOptimizationResult {
-  src: string;
-  isLoading: boolean;
-  error: Error | null;
-}
-
-export const useImageOptimization = (
-  originalSrc: string,
-  options: ImageOptimizationOptions = {}
-): ImageOptimizationResult => {
-  const [optimizedSrc, setOptimizedSrc] = useState<string>(options.placeholder || '');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+export const useImageOptimization = () => {
+  const [supportsWebP, setSupportsWebP] = useState(false);
+  const [supportsAVIF, setSupportsAVIF] = useState(false);
+  const [connectionSpeed, setConnectionSpeed] = useState<'slow' | 'fast'>('fast');
 
   useEffect(() => {
-    if (!originalSrc) {
-      setIsLoading(false);
-      return;
+    // Détection du support WebP
+    const webpTest = new Image();
+    webpTest.onload = webpTest.onerror = () => {
+      setSupportsWebP(webpTest.height === 2);
+    };
+    webpTest.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+
+    // Détection du support AVIF
+    const avifTest = new Image();
+    avifTest.onload = avifTest.onerror = () => {
+      setSupportsAVIF(avifTest.height === 2);
+    };
+    avifTest.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+
+    // Détection de la vitesse de connexion
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      const speed = connection.effectiveType;
+      setConnectionSpeed(['slow-2g', '2g', '3g'].includes(speed) ? 'slow' : 'fast');
+    }
+  }, []);
+
+  const optimizeImageUrl = useCallback((src: string, options: ImageOptimizationOptions = {}) => {
+    const { quality = connectionSpeed === 'slow' ? 70 : 85, format = 'auto' } = options;
+    
+    // Si c'est déjà un data URL ou une URL externe, retourner tel quel
+    if (src.startsWith('data:') || src.startsWith('http')) {
+      return src;
     }
 
-    const optimizeImage = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+    // Déterminer le meilleur format
+    let bestFormat = 'jpg';
+    if (format === 'auto') {
+      if (supportsAVIF) bestFormat = 'avif';
+      else if (supportsWebP) bestFormat = 'webp';
+    } else if (format === 'webp' && supportsWebP) {
+      bestFormat = 'webp';
+    } else if (format === 'avif' && supportsAVIF) {
+      bestFormat = 'avif';
+    }
 
-        // Vérifier le support des formats modernes
-        const supportsWebP = await checkWebPSupport();
-        const supportsAVIF = await checkAVIFSupport();
+    // Ajouter les paramètres d'optimisation
+    const separator = src.includes('?') ? '&' : '?';
+    return `${src}${separator}format=${bestFormat}&quality=${quality}`;
+  }, [supportsWebP, supportsAVIF, connectionSpeed]);
 
-        let finalSrc = originalSrc;
-
-        // Appliquer le format optimal
-        if (options.format === 'avif' && supportsAVIF) {
-          finalSrc = originalSrc.replace(/\.(jpg|jpeg|png)$/i, '.avif');
-        } else if (options.format === 'webp' && supportsWebP) {
-          finalSrc = originalSrc.replace(/\.(jpg|jpeg|png)$/i, '.webp');
-        }
-
-        // Précharger l'image
-        const img = new Image();
-        img.onload = () => {
-          setOptimizedSrc(finalSrc);
-          setIsLoading(false);
-        };
-        img.onerror = () => {
-          // Fallback vers l'image originale
-          setOptimizedSrc(originalSrc);
-          setIsLoading(false);
-          setError(new Error('Failed to load optimized image'));
-        };
-        img.src = finalSrc;
-
-      } catch (err) {
-        setError(err as Error);
-        setOptimizedSrc(originalSrc);
-        setIsLoading(false);
-      }
-    };
-
-    optimizeImage();
-  }, [originalSrc, options.format]);
+  const preloadImage = useCallback((src: string, options: ImageOptimizationOptions = {}) => {
+    return new Promise<void>((resolve, reject) => {
+      const img = new Image();
+      const optimizedSrc = optimizeImageUrl(src, options);
+      
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error(`Failed to preload image: ${optimizedSrc}`));
+      img.src = optimizedSrc;
+    });
+  }, [optimizeImageUrl]);
 
   return {
-    src: optimizedSrc,
-    isLoading,
-    error
+    optimizeImageUrl,
+    preloadImage,
+    supportsWebP,
+    supportsAVIF,
+    connectionSpeed
   };
-};
-
-// Utilitaires de détection de support
-const checkWebPSupport = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const webp = new Image();
-    webp.onload = webp.onerror = () => resolve(webp.height === 2);
-    webp.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
-  });
-};
-
-const checkAVIFSupport = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const avif = new Image();
-    avif.onload = avif.onerror = () => resolve(avif.height === 2);
-    avif.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A=';
-  });
 };

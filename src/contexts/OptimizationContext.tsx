@@ -1,82 +1,86 @@
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { performanceOptimizer } from '@/lib/performance/performanceOptimizer';
-import { globalCache } from '@/lib/cache/cacheManager';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
+import { cacheManager } from '@/utils/cacheManager';
+import { measureWebVitals, preloadCriticalResources } from '@/utils/performanceOptimizer';
 
 interface OptimizationContextType {
-  isOptimized: boolean;
   performanceScore: number;
   cacheStats: any;
-  enableOptimizations: () => void;
-  disableOptimizations: () => void;
+  webVitals: {[key: string]: number};
+  optimizationsEnabled: boolean;
+  toggleOptimizations: () => void;
+  preloadResources: () => Promise<void>;
   clearCache: () => void;
 }
 
-const OptimizationContext = createContext<OptimizationContextType | null>(null);
+const OptimizationContext = createContext<OptimizationContextType | undefined>(undefined);
 
-interface OptimizationProviderProps {
-  children: ReactNode;
-}
-
-export const OptimizationProvider: React.FC<OptimizationProviderProps> = ({ children }) => {
-  const [isOptimized, setIsOptimized] = useState(true);
+export const OptimizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [performanceScore, setPerformanceScore] = useState(0);
   const [cacheStats, setCacheStats] = useState({});
+  const [webVitals, setWebVitals] = useState<{[key: string]: number}>({});
+  const [optimizationsEnabled, setOptimizationsEnabled] = useState(true);
+  const performanceMetrics = usePerformanceMonitor();
 
   useEffect(() => {
-    // Calculer le score de performance initial
-    const calculatePerformanceScore = () => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      if (!navigation) return 0;
+    // Calculer le score de performance basé sur les métriques
+    const calculateScore = () => {
+      let score = 100;
+      
+      if (performanceMetrics.fcp && performanceMetrics.fcp > 1500) score -= 20;
+      if (performanceMetrics.lcp && performanceMetrics.lcp > 2500) score -= 20;
+      if (performanceMetrics.cls && performanceMetrics.cls > 0.1) score -= 20;
+      if (performanceMetrics.fid && performanceMetrics.fid > 100) score -= 20;
+      if (performanceMetrics.renderTime > 100) score -= 10;
+      if (performanceMetrics.memoryUsage > 50) score -= 10;
 
-      const loadTime = navigation.loadEventEnd - navigation.loadEventStart;
-      const domTime = navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart;
-      
-      // Score basé sur les temps de chargement (100 = parfait, 0 = très lent)
-      const loadScore = Math.max(0, 100 - (loadTime / 50)); // 5s = score 0
-      const domScore = Math.max(0, 100 - (domTime / 20)); // 2s = score 0
-      
-      return Math.round((loadScore + domScore) / 2);
+      setPerformanceScore(Math.max(0, score));
     };
 
-    // Mettre à jour les statistiques périodiquement
-    const updateStats = () => {
-      setPerformanceScore(calculatePerformanceScore());
-      setCacheStats(globalCache.getStats());
+    calculateScore();
+  }, [performanceMetrics]);
+
+  useEffect(() => {
+    // Mettre à jour les statistiques du cache périodiquement
+    const updateCacheStats = () => {
+      setCacheStats(cacheManager.getGlobalStats());
     };
 
-    updateStats();
-    const interval = setInterval(updateStats, 10000); // Toutes les 10 secondes
+    updateCacheStats();
+    const interval = setInterval(updateCacheStats, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const enableOptimizations = () => {
-    setIsOptimized(true);
-    console.log('🚀 Optimizations enabled');
+  useEffect(() => {
+    // Mesurer les Web Vitals
+    measureWebVitals().then(setWebVitals);
+  }, []);
+
+  const toggleOptimizations = () => {
+    setOptimizationsEnabled(!optimizationsEnabled);
   };
 
-  const disableOptimizations = () => {
-    setIsOptimized(false);
-    console.log('⏸️ Optimizations disabled');
+  const preloadResources = async () => {
+    await preloadCriticalResources();
   };
 
   const clearCache = () => {
-    globalCache.clearAll();
-    console.log('🗑️ Cache cleared');
-  };
-
-  const value: OptimizationContextType = {
-    isOptimized,
-    performanceScore,
-    cacheStats,
-    enableOptimizations,
-    disableOptimizations,
-    clearCache
+    cacheManager.clearAll();
+    setCacheStats(cacheManager.getGlobalStats());
   };
 
   return (
-    <OptimizationContext.Provider value={value}>
+    <OptimizationContext.Provider value={{
+      performanceScore,
+      cacheStats,
+      webVitals,
+      optimizationsEnabled,
+      toggleOptimizations,
+      preloadResources,
+      clearCache
+    }}>
       {children}
     </OptimizationContext.Provider>
   );
@@ -85,7 +89,7 @@ export const OptimizationProvider: React.FC<OptimizationProviderProps> = ({ chil
 export const useOptimization = () => {
   const context = useContext(OptimizationContext);
   if (!context) {
-    throw new Error('useOptimization must be used within an OptimizationProvider');
+    throw new Error('useOptimization must be used within OptimizationProvider');
   }
   return context;
 };
