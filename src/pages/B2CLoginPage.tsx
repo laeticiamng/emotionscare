@@ -1,102 +1,84 @@
+
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, User, Shield } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import LoginForm from '@/components/auth/LoginForm';
-import RegisterForm from '@/components/auth/RegisterForm';
-import { PostLoginTransition } from '@/components/auth/PostLoginTransition';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Eye, EyeOff, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const B2CLoginPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
-  const [showTransition, setShowTransition] = useState(false);
-
-  // Redirection si déjà connecté
-  if (isAuthenticated && !showTransition) {
-    return <Navigate to="/home" replace />;
-  }
-
-  // Affichage de la transition post-login
-  if (showTransition) {
-    return (
-      <PostLoginTransition 
-        onComplete={() => {
-          setShowTransition(false);
-          // Navigation vers le dashboard B2C sera gérée par le contexte
-        }}
-      />
-    );
-  }
-
-  const handleAuthSuccess = () => {
-    setShowTransition(true);
-    // Marquer la connexion récente pour la persistance
-    sessionStorage.setItem('just_logged_in', 'true');
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <Link 
-            to="/login" 
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-4"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour à la sélection
-          </Link>
-          
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <User className="h-8 w-8 text-blue-600" />
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit">
+            <Heart className="h-8 w-8 text-blue-600" />
           </div>
-          
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Espace Particulier
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Accès à votre plateforme de bien-être émotionnel
-          </p>
-        </div>
-
-        {/* Form Card */}
-        <Card>
-          <CardContent className="pt-6">
-            {isRegisterMode ? (
-              <RegisterForm onToggleMode={() => setIsRegisterMode(false)} />
-            ) : (
-              <LoginForm onToggleMode={() => setIsRegisterMode(true)} />
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Security Notice */}
-        <Card className="mt-6 bg-muted/50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Shield className="h-4 w-4" />
-              <span>Connexion sécurisée - Données protégées RGPD</span>
+          <CardTitle className="text-2xl">Connexion Personnelle</CardTitle>
+          <CardDescription>
+            Accédez à votre espace de bien-être personnel
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="votre@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Mot de passe</Label>
+            <div className="relative">
+              <Input 
+                id="password" 
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Links */}
-        <div className="text-center mt-6 space-y-2 text-sm text-muted-foreground">
-          <div className="flex justify-center gap-4">
-            <Link to="/about" className="hover:text-primary">
-              À propos
+          </div>
+          <Button className="w-full bg-blue-600 hover:bg-blue-700">
+            Se connecter
+          </Button>
+          <div className="text-center space-y-2">
+            <Link to="/reset-password" className="text-sm text-blue-600 hover:underline">
+              Mot de passe oublié ?
             </Link>
-            <Link to="/privacy" className="hover:text-primary">
-              Confidentialité
-            </Link>
-            <Link to="/contact" className="hover:text-primary">
-              Support
+            <div className="text-sm text-gray-600">
+              Pas encore de compte ?{' '}
+              <Link to="/b2c/register" className="text-blue-600 hover:underline">
+                S'inscrire
+              </Link>
+            </div>
+          </div>
+          <div className="text-center">
+            <Link to="/choose-mode">
+              <Button variant="ghost" size="sm">
+                ← Changer de mode
+              </Button>
             </Link>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

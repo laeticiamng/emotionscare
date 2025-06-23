@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import ResponsiveShell from '@/components/layout/ResponsiveShell';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -11,7 +10,6 @@ import { InstantGlowWidget } from '@/components/glow';
 
 /**
  * Shell principal avec layout responsive complet
- * Point 7: Layout & Navigation Core - Shell application responsive
  */
 const Shell: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -28,9 +26,11 @@ const Shell: React.FC = () => {
   return (
     <EnhancedErrorBoundary>
       <SkipToContent />
-      <main id="main-content" className="min-h-screen">
-        <Outlet />
-      </main>
+      <div className="min-h-screen">
+        <main id="main-content">
+          <Outlet />
+        </main>
+      </div>
       <InstantGlowWidget />
     </EnhancedErrorBoundary>
   );
