@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 
@@ -16,7 +16,16 @@ function App() {
 
   return (
     <div className="app-root">
-      <RouterProvider router={router} />
+      <Suspense fallback={
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-lg text-gray-600">Chargement de la page...</p>
+          </div>
+        </div>
+      }>
+        <RouterProvider router={router} />
+      </Suspense>
     </div>
   );
 }

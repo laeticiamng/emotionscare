@@ -1,109 +1,57 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Users, Brain, Sparkles } from 'lucide-react';
+
+console.log('🏠 HomePage component rendering...');
 
 const HomePage: React.FC = () => {
+  console.log('🏠 HomePage function called');
+  
+  React.useEffect(() => {
+    console.log('🏠 HomePage mounted');
+    return () => console.log('🏠 HomePage unmounted');
+  }, []);
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-purple-950 dark:to-background">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 text-white">
       <div className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
-            EmotionsCare
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Votre plateforme de bien-être émotionnel et de développement personnel
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="text-lg px-8">
-              <Link to="/choose-mode">
-                Commencer
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg px-8">
-              <Link to="/help-center">
-                En savoir plus
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Heart className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <CardTitle className="text-xl">Scan Émotionnel</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Analysez vos émotions en temps réel avec notre technologie avancée
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Brain className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <CardTitle className="text-xl">Coach IA</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Recevez des conseils personnalisés de notre coach intelligent
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Users className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <CardTitle className="text-xl">Social Cocon</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Connectez-vous avec une communauté bienveillante
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <Sparkles className="h-12 w-12 text-purple-500 mx-auto mb-4" />
-              <CardTitle className="text-xl">VR Immersive</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Vivez des expériences immersives pour votre bien-être
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Access */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold mb-8">Accès rapide</h2>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Button asChild variant="outline">
-              <Link to="/scan">Scan Émotions</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/music">Musicothérapie</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/coach">Coach IA</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/journal">Journal</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/vr">Expérience VR</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/gamification">Gamification</Link>
-            </Button>
+          <h1 className="text-6xl font-bold mb-8 text-white">EmotionsCare</h1>
+          <p className="text-2xl mb-8 text-blue-100">
+            PAGE D'ACCUEIL - NOUVELLE VERSION
+          </p>
+          
+          <div className="bg-green-500/20 border border-green-400 rounded-lg p-8 mb-8">
+            <h2 className="text-3xl font-semibold mb-4 text-green-300">✅ Page d'accueil fonctionnelle</h2>
+            <p className="text-lg text-blue-100">
+              Si vous voyez ce contenu, la page d'accueil fonctionne enfin !
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-4 text-green-400">🏠 Accueil</h3>
+              <p className="text-blue-100">Vous êtes ici - page fonctionnelle</p>
+            </div>
+            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-4 text-red-400">🧪 Test</h3>
+              <a href="/test" className="text-yellow-300 underline hover:text-yellow-100">
+                Aller à la page test
+              </a>
+            </div>
+            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-4 text-purple-400">📊 Point 20</h3>
+              <a href="/point20" className="text-yellow-300 underline hover:text-yellow-100">
+                Aller au Point 20 (fonctionne)
+              </a>
+            </div>
+          </div>
+
+          <div className="bg-blue-500/20 border border-blue-400 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-300 mb-2">🔍 Debug Info HomePage</h3>
+            <p className="text-sm text-blue-200">
+              Route actuelle: {window.location.pathname}<br/>
+              Timestamp: {new Date().toLocaleTimeString()}
+            </p>
           </div>
         </div>
       </div>
