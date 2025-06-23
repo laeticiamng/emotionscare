@@ -1,271 +1,203 @@
 
-import React, { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouteObject } from 'react-router-dom';
+import React, { lazy } from 'react';
+import { RouteObject } from 'react-router-dom';
+import { ROUTE_MANIFEST } from '../../scripts/route-manifest';
+import Shell from '../Shell';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
-import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
-// Lazy load all pages for optimal performance
+// Import des pages existantes
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
-const Point20Page = lazy(() => import('@/pages/Point20Page'));
-
-// Auth pages
-const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
-const B2BUserLoginPage = lazy(() => import('@/pages/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/B2BUserRegisterPage'));
-const B2BAdminLoginPage = lazy(() => import('@/pages/B2BAdminLoginPage'));
-
-// Dashboard pages
-const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
-
-// Feature pages
 const ScanPage = lazy(() => import('@/pages/ScanPage'));
 const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const CoachPage = lazy(() => import('@/pages/CoachPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+
+// Import des nouvelles pages générées
+const OnboardingFlowPage = lazy(() => import('@/pages/OnboardingFlowPage'));
+const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2BUserLoginPage = lazy(() => import('@/pages/B2BUserLoginPage'));
+const B2BUserRegisterPage = lazy(() => import('@/pages/B2BUserRegisterPage'));
+const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
+const B2BAdminLoginPage = lazy(() => import('@/pages/B2BAdminLoginPage'));
+const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
+const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
+const EmotionScanPage = lazy(() => import('@/pages/EmotionScanPage'));
+const MusicotherapiePage = lazy(() => import('@/pages/MusicotherapiePage'));
+const AICoachPage = lazy(() => import('@/pages/AICoachPage'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
-const VRPage = lazy(() => import('@/pages/VRPage'));
-const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
-const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
+const VRHubPage = lazy(() => import('@/pages/VRHubPage'));
+const UserPreferencesPage = lazy(() => import('@/pages/UserPreferencesPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
-
-// Admin-only pages
+const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
+const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
+const AmbitionArcadePage = lazy(() => import('@/pages/AmbitionArcadePage'));
+const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
+const StorySynthLabPage = lazy(() => import('@/pages/StorySynthLabPage'));
+const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
+const ARFiltersPage = lazy(() => import('@/pages/ARFiltersPage'));
+const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
+const ScreenSilkBreakPage = lazy(() => import('@/pages/ScreenSilkBreakPage'));
+const VRGalactiquePage = lazy(() => import('@/pages/VRGalactiquePage'));
+const InstantGlowWidgetPage = lazy(() => import('@/pages/InstantGlowWidgetPage'));
+const WeeklyBarsPage = lazy(() => import('@/pages/WeeklyBarsPage'));
+const HeatmapVibesPage = lazy(() => import('@/pages/HeatmapVibesPage'));
+const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
+const PrivacyTogglesPage = lazy(() => import('@/pages/PrivacyTogglesPage'));
+const DataExportPage = lazy(() => import('@/pages/DataExportPage'));
+const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
+const PlatformStatusPage = lazy(() => import('@/pages/PlatformStatusPage'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
+const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
+const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
+const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
+const InAppFeedbackPage = lazy(() => import('@/pages/InAppFeedbackPage'));
 const TeamsPage = lazy(() => import('@/pages/TeamsPage'));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
 const EventsPage = lazy(() => import('@/pages/EventsPage'));
 const OptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
-const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
-const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
-const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
-const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
-const AuditPage = lazy(() => import('@/pages/AuditPage'));
+const PlatformSettingsPage = lazy(() => import('@/pages/PlatformSettingsPage'));
+const SecurityDashboardPage = lazy(() => import('@/pages/SecurityDashboardPage'));
+const SystemAuditPage = lazy(() => import('@/pages/SystemAuditPage'));
 const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
-const InnovationPage = lazy(() => import('@/pages/InnovationPage'));
-const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
 
-// Additional pages
-const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
-const AccessDiagnosticPage = lazy(() => import('@/pages/AccessDiagnosticPage'));
+// Mapping des composants par chemin
+const componentMap: Record<string, React.ComponentType> = {
+  '/': HomePage,
+  '/choose-mode': ChooseModePage,
+  '/onboarding': OnboardingFlowPage,
+  '/b2b/selection': B2BSelectionPage,
+  '/b2c/login': B2CLoginPage,
+  '/b2c/register': B2CRegisterPage,
+  '/b2c/dashboard': B2CDashboardPage,
+  '/b2b/user/login': B2BUserLoginPage,
+  '/b2b/user/register': B2BUserRegisterPage,
+  '/b2b/user/dashboard': B2BUserDashboardPage,
+  '/b2b/admin/login': B2BAdminLoginPage,
+  '/b2b/admin/dashboard': B2BAdminDashboardPage,
+  '/b2b': B2BLandingPage,
+  '/scan': EmotionScanPage,
+  '/music': MusicotherapiePage,
+  '/coach': AICoachPage,
+  '/journal': JournalPage,
+  '/vr': VRHubPage,
+  '/preferences': UserPreferencesPage,
+  '/gamification': GamificationPage,
+  '/social-cocon': SocialCoconPage,
+  '/boss-level-grit': BossLevelGritPage,
+  '/mood-mixer': MoodMixerPage,
+  '/ambition-arcade': AmbitionArcadePage,
+  '/bounce-back-battle': BounceBackBattlePage,
+  '/story-synth-lab': StorySynthLabPage,
+  '/flash-glow': FlashGlowPage,
+  '/ar-filters': ARFiltersPage,
+  '/bubble-beat': BubbleBeatPage,
+  '/screen-silk-break': ScreenSilkBreakPage,
+  '/vr-galactique': VRGalactiquePage,
+  '/instant-glow': InstantGlowWidgetPage,
+  '/weekly-bars': WeeklyBarsPage,
+  '/heatmap-vibes': HeatmapVibesPage,
+  '/breathwork': BreathworkPage,
+  '/privacy-toggles': PrivacyTogglesPage,
+  '/export-csv': DataExportPage,
+  '/account/delete': AccountDeletionPage,
+  '/health-check-badge': PlatformStatusPage,
+  '/notifications': NotificationsPage,
+  '/help-center': HelpCenterPage,
+  '/profile-settings': ProfileSettingsPage,
+  '/activity-history': ActivityHistoryPage,
+  '/feedback': InAppFeedbackPage,
+  '/teams': TeamsPage,
+  '/reports': ReportsPage,
+  '/events': EventsPage,
+  '/optimisation': OptimisationPage,
+  '/settings': PlatformSettingsPage,
+  '/security': SecurityDashboardPage,
+  '/audit': SystemAuditPage,
+  '/accessibility': AccessibilityPage,
+};
 
-// 404 Error page
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-
-// Wrapper with suspense and error boundary
-const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <UniversalErrorBoundary>
-    <Suspense fallback={<ComponentLoadingFallback />}>
-      {children}
-    </Suspense>
-  </UniversalErrorBoundary>
-);
-
-// Route manifest for validation and testing
-export const ROUTES_MANIFEST = [
-  { path: "/", auth: "public", module: "home", component: "HomePage" },
-  { path: "/choose-mode", auth: "public", module: "auth", component: "ChooseModePage" },
-  { path: "/b2b/selection", auth: "public", module: "b2b", component: "B2BSelectionPage" },
-  { path: "/point20", auth: "public", module: "public", component: "Point20Page" },
-  { path: "/b2c/login", auth: "public", module: "auth", component: "B2CLoginPage" },
-  { path: "/b2c/register", auth: "public", module: "auth", component: "B2CRegisterPage" },
-  { path: "/b2b/user/login", auth: "public", module: "auth", component: "B2BUserLoginPage" },
-  { path: "/b2b/user/register", auth: "public", module: "auth", component: "B2BUserRegisterPage" },
-  { path: "/b2b/admin/login", auth: "public", module: "auth", component: "B2BAdminLoginPage" },
-  { path: "/b2c/dashboard", auth: "b2c", module: "dashboard", component: "B2CDashboardPage" },
-  { path: "/b2b/user/dashboard", auth: "b2b_user", module: "dashboard", component: "B2BUserDashboardPage" },
-  { path: "/b2b/admin/dashboard", auth: "b2b_admin", module: "dashboard", component: "B2BAdminDashboardPage" },
-  { path: "/scan", auth: "b2c", module: "emotion", component: "ScanPage" },
-  { path: "/music", auth: "b2c", module: "music", component: "MusicPage" },
-  { path: "/coach", auth: "b2c", module: "coach", component: "CoachPage" },
-  { path: "/journal", auth: "b2c", module: "journal", component: "JournalPage" },
-  { path: "/vr", auth: "b2c", module: "vr", component: "VRPage" },
-  { path: "/meditation", auth: "b2c", module: "vr", component: "MeditationPage" },
-  { path: "/preferences", auth: "b2c", module: "settings", component: "PreferencesPage" },
-  { path: "/gamification", auth: "b2c", module: "gamification", component: "GamificationPage" },
-  { path: "/social-cocon", auth: "b2c", module: "social", component: "SocialCoconPage" },
-  { path: "/teams", auth: "b2b_admin", role: "b2b_admin", module: "admin", component: "TeamsPage" },
-  { path: "/reports", auth: "b2b_admin", role: "b2b_admin", module: "admin", component: "ReportsPage" },
-  { path: "/events", auth: "b2b_admin", role: "b2b_admin", module: "admin", component: "EventsPage" },
-  { path: "/optimisation", auth: "b2b_admin", role: "b2b_admin", module: "admin", component: "OptimisationPage" },
-  { path: "/settings", auth: "b2b_admin", role: "b2b_admin", module: "admin", component: "SettingsPage" },
-  { path: "/notifications", auth: "b2b_admin", role: "b2b_admin", module: "admin", component: "NotificationsPage" },
-  { path: "/security", auth: "b2b_admin", role: "b2b_admin", module: "security", component: "SecurityPage" },
-  { path: "/privacy", auth: "b2b_admin", role: "b2b_admin", module: "privacy", component: "PrivacyPage" },
-  { path: "/audit", auth: "b2b_admin", role: "b2b_admin", module: "audit", component: "AuditPage" },
-  { path: "/accessibility", auth: "b2b_admin", role: "b2b_admin", module: "accessibility", component: "AccessibilityPage" },
-  { path: "/innovation", auth: "b2b_admin", role: "b2b_admin", module: "innovation", component: "InnovationPage" },
-  { path: "/feedback", auth: "b2b_admin", role: "b2b_admin", module: "feedback", component: "FeedbackPage" },
-  { path: "/onboarding", auth: "b2c", module: "onboarding", component: "OnboardingPage" },
-  { path: "/access-diagnostic", auth: "b2c", module: "accessibility", component: "AccessDiagnosticPage" }
-];
-
-export const ROUTE_MANIFEST = ROUTES_MANIFEST.map(route => route.path);
-
-// Build unified routes configuration
 export function buildUnifiedRoutes(): RouteObject[] {
+  console.log('🔧 Building unified routes with', ROUTE_MANIFEST.length, 'entries');
+
+  // Génération automatique des routes depuis le manifeste
+  const routes: RouteObject[] = ROUTE_MANIFEST.map(routePath => {
+    const Component = componentMap[routePath];
+    
+    if (!Component) {
+      console.warn(`⚠️ Component not found for route: ${routePath}`);
+      return {
+        path: routePath,
+        element: (
+          <div data-testid="page-root" className="min-h-screen bg-background p-8">
+            <h1 className="text-2xl font-bold text-red-600">
+              Route non implémentée: {routePath}
+            </h1>
+          </div>
+        ),
+      };
+    }
+
+    return {
+      path: routePath,
+      element: (
+        <React.Suspense fallback={<ComponentLoadingFallback />}>
+          <Component />
+        </React.Suspense>
+      ),
+    };
+  });
+
+  // Route 404 en fallback
+  routes.push({
+    path: '*',
+    element: (
+      <React.Suspense fallback={<ComponentLoadingFallback />}>
+        <NotFoundPage />
+      </React.Suspense>
+    ),
+  });
+
+  console.log('✅ Unified routes built:', routes.length, 'total routes');
   return [
     {
-      path: "/",
-      element: <PageWrapper><HomePage /></PageWrapper>,
-    },
-    {
-      path: "/choose-mode",
-      element: <PageWrapper><ChooseModePage /></PageWrapper>,
-    },
-    {
-      path: "/b2b/selection",
-      element: <PageWrapper><B2BSelectionPage /></PageWrapper>,
-    },
-    {
-      path: "/point20",
-      element: <PageWrapper><Point20Page /></PageWrapper>,
-    },
-    // Auth routes
-    {
-      path: "/b2c/login",
-      element: <PageWrapper><B2CLoginPage /></PageWrapper>,
-    },
-    {
-      path: "/b2c/register",
-      element: <PageWrapper><B2CRegisterPage /></PageWrapper>,
-    },
-    {
-      path: "/b2b/user/login",
-      element: <PageWrapper><B2BUserLoginPage /></PageWrapper>,
-    },
-    {
-      path: "/b2b/user/register",
-      element: <PageWrapper><B2BUserRegisterPage /></PageWrapper>,
-    },
-    {
-      path: "/b2b/admin/login",
-      element: <PageWrapper><B2BAdminLoginPage /></PageWrapper>,
-    },
-    // Dashboard routes
-    {
-      path: "/b2c/dashboard",
-      element: <PageWrapper><B2CDashboardPage /></PageWrapper>,
-    },
-    {
-      path: "/b2b/user/dashboard",
-      element: <PageWrapper><B2BUserDashboardPage /></PageWrapper>,
-    },
-    {
-      path: "/b2b/admin/dashboard",
-      element: <PageWrapper><B2BAdminDashboardPage /></PageWrapper>,
-    },
-    // Feature routes
-    {
-      path: "/scan",
-      element: <PageWrapper><ScanPage /></PageWrapper>,
-    },
-    {
-      path: "/music",
-      element: <PageWrapper><MusicPage /></PageWrapper>,
-    },
-    {
-      path: "/coach",
-      element: <PageWrapper><CoachPage /></PageWrapper>,
-    },
-    {
-      path: "/journal",
-      element: <PageWrapper><JournalPage /></PageWrapper>,
-    },
-    {
-      path: "/vr",
-      element: <PageWrapper><VRPage /></PageWrapper>,
-    },
-    {
-      path: "/meditation",
-      element: <PageWrapper><MeditationPage /></PageWrapper>,
-    },
-    {
-      path: "/preferences",
-      element: <PageWrapper><PreferencesPage /></PageWrapper>,
-    },
-    {
-      path: "/gamification",
-      element: <PageWrapper><GamificationPage /></PageWrapper>,
-    },
-    {
-      path: "/social-cocon",
-      element: <PageWrapper><SocialCoconPage /></PageWrapper>,
-    },
-    // Admin routes
-    {
-      path: "/teams",
-      element: <PageWrapper><TeamsPage /></PageWrapper>,
-    },
-    {
-      path: "/reports",
-      element: <PageWrapper><ReportsPage /></PageWrapper>,
-    },
-    {
-      path: "/events",
-      element: <PageWrapper><EventsPage /></PageWrapper>,
-    },
-    {
-      path: "/optimisation",
-      element: <PageWrapper><OptimisationPage /></PageWrapper>,
-    },
-    {
-      path: "/settings",
-      element: <PageWrapper><SettingsPage /></PageWrapper>,
-    },
-    {
-      path: "/notifications",
-      element: <PageWrapper><NotificationsPage /></PageWrapper>,
-    },
-    {
-      path: "/security",
-      element: <PageWrapper><SecurityPage /></PageWrapper>,
-    },
-    {
-      path: "/privacy",
-      element: <PageWrapper><PrivacyPage /></PageWrapper>,
-    },
-    {
-      path: "/audit",
-      element: <PageWrapper><AuditPage /></PageWrapper>,
-    },
-    {
-      path: "/accessibility",
-      element: <PageWrapper><AccessibilityPage /></PageWrapper>,
-    },
-    {
-      path: "/innovation",
-      element: <PageWrapper><InnovationPage /></PageWrapper>,
-    },
-    {
-      path: "/feedback",
-      element: <PageWrapper><FeedbackPage /></PageWrapper>,
-    },
-    {
-      path: "/onboarding",
-      element: <PageWrapper><OnboardingPage /></PageWrapper>,
-    },
-    {
-      path: "/access-diagnostic",
-      element: <PageWrapper><AccessDiagnosticPage /></PageWrapper>,
-    },
-    // 404 - MUST BE LAST
-    {
-      path: "*",
-      element: <PageWrapper><NotFoundPage /></PageWrapper>,
+      path: '/',
+      element: <Shell />,
+      children: routes,
     },
   ];
 }
 
-export function validateRoutesManifest() {
-  const paths = ROUTES_MANIFEST.map(route => route.path);
-  const uniquePaths = new Set(paths);
+// Export du manifeste pour les audits
+export const ROUTES_MANIFEST = ROUTE_MANIFEST;
+export type RouteManifestEntry = string;
+
+// Fonction de validation
+export function validateRoutesManifest(): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  
+  // Vérification des doublons
+  const duplicates = ROUTE_MANIFEST.filter((route, index) => 
+    ROUTE_MANIFEST.indexOf(route) !== index
+  );
+  
+  if (duplicates.length > 0) {
+    errors.push(`Doublons détectés: ${duplicates.join(', ')}`);
+  }
+  
+  // Vérification des routes manquantes dans le componentMap
+  const missingComponents = ROUTE_MANIFEST.filter(route => !componentMap[route]);
+  if (missingComponents.length > 0) {
+    errors.push(`Composants manquants pour: ${missingComponents.join(', ')}`);
+  }
   
   return {
-    valid: paths.length === uniquePaths.size,
-    errors: paths.length !== uniquePaths.size ? ['Duplicate paths found in manifest'] : [],
-    totalRoutes: paths.length
+    valid: errors.length === 0,
+    errors
   };
 }
+
+console.log('📊 Route coverage validation:', validateRoutesManifest());

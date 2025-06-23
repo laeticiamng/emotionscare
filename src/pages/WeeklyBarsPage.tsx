@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const WeeklyBarsPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Weekly Bars</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Graphiques hebdomadaires</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Visualisation de vos progrès émotionnels semaine par semaine.</p>
-          </CardContent>
-        </Card>
+    <main data-testid="page-root" className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Barres Hebdomadaires</h1>
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-2xl font-semibold mb-4">Visualisation Hebdomadaire</h2>
+          <p className="text-muted-foreground">
+            Graphiques de progression hebdomadaire
+          </p>
+          {/* TODO: Implémenter l'interface Weekly Bars complète */}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

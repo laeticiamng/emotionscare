@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ScreenSilkBreakPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Screen-Silk Break</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Pause écran premium</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Techniques avancées de repos visuel et mental.</p>
-          </CardContent>
-        </Card>
+    <main data-testid="page-root" className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Screen Silk Break</h1>
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-2xl font-semibold mb-4">Pause Écran Soie</h2>
+          <p className="text-muted-foreground">
+            Pauses douces pour vos yeux et votre esprit
+          </p>
+          {/* TODO: Implémenter l'interface Screen Silk Break complète */}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

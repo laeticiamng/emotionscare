@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const VRGalactiquePage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">VR Galactique</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Voyage spatial virtuel</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Exploration de l'espace en réalité virtuelle pour la méditation.</p>
-          </CardContent>
-        </Card>
+    <main data-testid="page-root" className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">VR Galactique</h1>
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-2xl font-semibold mb-4">Voyage Galactique</h2>
+          <p className="text-muted-foreground">
+            Exploration VR de l'espace pour la méditation
+          </p>
+          {/* TODO: Implémenter l'interface VR Galactique complète */}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

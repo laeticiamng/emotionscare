@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const FlashGlowPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Flash Glow</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Éclats de bien-être</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Sessions courtes et intenses de boost émotionnel.</p>
-          </CardContent>
-        </Card>
+    <main data-testid="page-root" className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Flash Glow</h1>
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-2xl font-semibold mb-4">Éclat Flash</h2>
+          <p className="text-muted-foreground">
+            Moments de bien-être instantané
+          </p>
+          {/* TODO: Implémenter l'interface Flash Glow complète */}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

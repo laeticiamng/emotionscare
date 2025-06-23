@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const PrivacyTogglesPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Privacy Toggles</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Contrôles de confidentialité</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Gérez vos paramètres de confidentialité et de données.</p>
-          </CardContent>
-        </Card>
+    <main data-testid="page-root" className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Paramètres de Confidentialité</h1>
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-2xl font-semibold mb-4">Contrôles de Confidentialité</h2>
+          <p className="text-muted-foreground">
+            Gérez vos paramètres de confidentialité
+          </p>
+          {/* TODO: Implémenter l'interface Privacy Toggles complète */}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

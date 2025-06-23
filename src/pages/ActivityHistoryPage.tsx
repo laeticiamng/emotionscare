@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ActivityHistoryPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Historique Activité</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Votre parcours</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Consultez l'historique de toutes vos activités sur la plateforme.</p>
-          </CardContent>
-        </Card>
+    <main data-testid="page-root" className="min-h-screen bg-background p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Historique d'Activité</h1>
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-2xl font-semibold mb-4">Vos Activités</h2>
+          <p className="text-muted-foreground">
+            Consultez votre historique d'utilisation
+          </p>
+          {/* TODO: Implémenter l'interface Activity History complète */}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 
