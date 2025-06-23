@@ -232,7 +232,7 @@ export const useCache = () => {
 };
 
 // Hook pour cache avec requête
-export const useCachedQuery = <T extends unknown>(
+export function useCachedQuery<T>(
   key: CacheKey,
   queryFn: () => Promise<T>,
   options: {
@@ -240,7 +240,7 @@ export const useCachedQuery = <T extends unknown>(
     tags?: string[];
     enabled?: boolean;
   } = {}
-) => {
+) {
   const cache = useCache();
   const [data, setData] = React.useState<T | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -293,4 +293,4 @@ export const useCachedQuery = <T extends unknown>(
     error,
     refetch,
   };
-};
+}

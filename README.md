@@ -145,6 +145,7 @@ VITE_HUME_API_KEY=your_hume_key
 
 # Configuration
 VITE_APP_ENV=development
+VITE_SENTRY_DSN=
 ```
 
 ## 🚀 Déploiement
