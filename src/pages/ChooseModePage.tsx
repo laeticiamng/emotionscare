@@ -1,73 +1,36 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Building } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-blue-950 dark:to-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Choisissez votre mode d'accès</h1>
-          <p className="text-xl text-muted-foreground">
-            Sélectionnez l'option qui correspond le mieux à votre situation
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-8">Choisir votre mode d'utilisation</h1>
+          <p className="text-xl mb-12 text-indigo-100">
+            Sélectionnez comment vous souhaitez utiliser EmotionsCare
           </p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="hover:shadow-xl transition-all hover:scale-105">
-            <CardHeader className="text-center">
-              <User className="h-16 w-16 text-blue-500 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Particulier</CardTitle>
-              <CardDescription className="text-lg">
-                Accès personnel à toutes les fonctionnalités de bien-être
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-left space-y-2 mb-6 text-muted-foreground">
-                <li>• Scan émotionnel personnel</li>
-                <li>• Coach IA personnalisé</li>
-                <li>• Journal intime</li>
-                <li>• Musicothérapie</li>
-                <li>• Expériences VR</li>
-                <li>• Communauté bienveillante</li>
-              </ul>
-              <Button asChild size="lg" className="w-full">
-                <Link to="/b2c/login">Accès Particulier</Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-xl transition-all hover:scale-105">
-            <CardHeader className="text-center">
-              <Building className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Entreprise</CardTitle>
-              <CardDescription className="text-lg">
-                Solutions dédiées aux organisations et équipes
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-left space-y-2 mb-6 text-muted-foreground">
-                <li>• Tableau de bord RH</li>
-                <li>• Analytics d'équipe</li>
-                <li>• Gestion des collaborateurs</li>
-                <li>• Rapports de bien-être</li>
-                <li>• Outils d'optimisation</li>
-                <li>• Support dédié</li>
-              </ul>
-              <Button asChild size="lg" className="w-full">
-                <Link to="/b2b/selection">Accès Entreprise</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="text-center mt-12">
-          <Button asChild variant="ghost">
-            <Link to="/">← Retour à l'accueil</Link>
-          </Button>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Link to="/b2c/login" className="bg-white/10 p-8 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-all transform hover:scale-105">
+              <div className="text-6xl mb-4">👤</div>
+              <h2 className="text-2xl font-bold mb-4 text-blue-300">Mode B2C</h2>
+              <p className="text-blue-100">Utilisation personnelle pour gérer votre bien-être émotionnel</p>
+            </Link>
+            
+            <Link to="/b2b/selection" className="bg-white/10 p-8 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-all transform hover:scale-105">
+              <div className="text-6xl mb-4">🏢</div>
+              <h2 className="text-2xl font-bold mb-4 text-orange-300">Mode B2B</h2>
+              <p className="text-orange-100">Solution pour les entreprises et équipes RH</p>
+            </Link>
+          </div>
+          
+          <div className="mt-12">
+            <Link to="/" className="text-indigo-300 hover:text-indigo-100 underline">
+              ← Retour à l'accueil
+            </Link>
+          </div>
         </div>
       </div>
     </div>
