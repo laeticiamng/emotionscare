@@ -1,105 +1,66 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Brain, Heart, Users, Shield, Award, Lightbulb, ArrowRight } from 'lucide-react';
+import { Heart, Users, Award, Lightbulb, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const AboutPage: React.FC = () => {
-  const values = [
-    {
-      icon: <Heart className="h-8 w-8 text-red-500" />,
-      title: "Bienveillance",
-      description: "Nous plaçons le bien-être humain au cœur de nos préoccupations"
-    },
-    {
-      icon: <Shield className="h-8 w-8 text-blue-500" />,
-      title: "Confidentialité",
-      description: "Vos données personnelles sont protégées selon les normes RGPD"
-    },
-    {
-      icon: <Lightbulb className="h-8 w-8 text-yellow-500" />,
-      title: "Innovation",
-      description: "Nous utilisons les dernières technologies d'IA pour votre bien-être"
-    },
-    {
-      icon: <Users className="h-8 w-8 text-green-500" />,
-      title: "Communauté",
-      description: "Nous créons des liens authentiques entre les utilisateurs"
-    }
-  ];
-
-  const team = [
-    {
-      name: "Dr. Sophie Martin",
-      role: "Directrice Scientifique",
-      description: "Spécialiste en psychologie cognitive et intelligence artificielle",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=sophie"
-    },
-    {
-      name: "Thomas Dubois",
-      role: "CTO",
-      description: "Expert en développement d'applications de santé mentale",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=thomas"
-    },
-    {
-      name: "Marie Chen",
-      role: "UX Lead",
-      description: "Designeuse spécialisée dans l'expérience utilisateur thérapeutique",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=marie"
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
+    <div data-testid="page-root" className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <Badge variant="secondary" className="mb-4">
-              À propos d'EmotionsCare
-            </Badge>
-            <h1 className="text-4xl font-bold mb-6">
-              Notre mission : démocratiser le bien-être émotionnel
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Nous croyons que chacun mérite d'avoir accès à des outils de bien-être émotionnel 
-              performants et personnalisés, guidés par l'intelligence artificielle.
-            </p>
-          </div>
+      <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-5xl font-bold mb-6">À propos d'EmotionsCare</h1>
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            Nous révolutionnons le bien-être émotionnel des professionnels de santé 
+            grâce à l'intelligence artificielle et une approche scientifique validée.
+          </p>
+          <Button size="lg" asChild>
+            <Link to="/choose-mode">
+              Rejoindre la communauté
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 
-      {/* Story Section */}
-      <section className="py-16">
+      {/* Mission Section */}
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold text-center mb-12">Notre Mission</h2>
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-3xl font-bold mb-6">Notre histoire</h2>
-                <p className="text-muted-foreground mb-4">
-                  EmotionsCare est né de la conviction que la technologie peut révolutionner 
-                  notre approche du bien-être mental. Fondée en 2024 par une équipe de 
-                  psychologues, développeurs et designers passionnés.
+                <h3 className="text-2xl font-semibold mb-6">
+                  Soutenir ceux qui nous soignent
+                </h3>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                  Les professionnels de santé font face à des défis émotionnels uniques : 
+                  stress intense, surcharge de travail, exposition à la souffrance. 
+                  Notre mission est de leur offrir des outils scientifiquement validés 
+                  pour préserver et améliorer leur bien-être.
                 </p>
-                <p className="text-muted-foreground mb-4">
-                  Nous avons créé une plateforme qui combine recherche scientifique, 
-                  intelligence artificielle et design centré sur l'humain pour offrir 
-                  une expérience de bien-être personnalisée et efficace.
-                </p>
-                <p className="text-muted-foreground">
-                  Aujourd'hui, plus de 10,000 utilisateurs font confiance à EmotionsCare 
-                  pour améliorer leur qualité de vie émotionnelle.
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Avec EmotionsCare, nous créons un écosystème de soutien qui combine 
+                  technologie de pointe, expertise clinique et communauté bienveillante.
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg p-8">
-                <Brain className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-center mb-2">Intelligence Émotionnelle</h3>
-                <p className="text-center text-muted-foreground">
-                  Notre IA analyse plus de 50 paramètres émotionnels pour vous offrir 
-                  des recommandations personnalisées
-                </p>
+              <div className="grid grid-cols-2 gap-6">
+                <Card className="text-center p-6">
+                  <Heart className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                  <h4 className="font-semibold mb-2">Empathie</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Comprendre et accompagner avec bienveillance
+                  </p>
+                </Card>
+                <Card className="text-center p-6">
+                  <Lightbulb className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+                  <h4 className="font-semibold mb-2">Innovation</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Technologies avancées au service du bien-être
+                  </p>
+                </Card>
               </div>
             </div>
           </div>
@@ -107,99 +68,101 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Values Section */}
-      <section className="bg-muted/50 py-16">
+      <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Nos valeurs</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="mx-auto mb-4">
-                    {value.icon}
-                  </div>
-                  <CardTitle>{value.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    {value.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
+          <h2 className="text-4xl font-bold text-center mb-16">Nos Valeurs</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="text-center p-8">
+              <CardHeader>
+                <Users className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl">Communauté</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Nous croyons en la force du collectif. Ensemble, nous sommes plus forts 
+                  face aux défis émotionnels du quotidien professionnel.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center p-8">
+              <CardHeader>
+                <Award className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl">Excellence</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Nous nous engageons à fournir des outils de la plus haute qualité, 
+                  basés sur la recherche scientifique la plus récente.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center p-8">
+              <CardHeader>
+                <Heart className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                <CardTitle className="text-2xl">Bienveillance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Chaque interaction est guidée par la compassion et le respect 
+                  de l'expérience unique de chaque professionnel.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Team Section */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Notre équipe</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {team.map((member, index) => (
-              <Card key={index} className="text-center">
-                <CardHeader>
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto mb-4"
-                  />
-                  <CardTitle className="text-xl">{member.name}</CardTitle>
-                  <Badge variant="outline">{member.role}</Badge>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>
-                    {member.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-6">Notre Équipe</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Une équipe pluridisciplinaire d'experts en psychologie, technologie 
+              et sciences de la santé, unis par une vision commune.
+            </p>
           </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold mb-2">10K+</div>
-              <div className="text-blue-100">Utilisateurs actifs</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">1M+</div>
-              <div className="text-blue-100">Scans émotionnels</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">95%</div>
-              <div className="text-blue-100">Satisfaction utilisateur</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">24/7</div>
-              <div className="text-blue-100">Support disponible</div>
+          
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="space-y-4">
+                <div className="w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
+                <h3 className="text-xl font-semibold">Dr. Marie Dubois</h3>
+                <p className="text-muted-foreground">Psychologue clinicienne & Co-fondatrice</p>
+              </div>
+              <div className="space-y-4">
+                <div className="w-32 h-32 bg-gradient-to-r from-green-500 to-blue-500 rounded-full mx-auto"></div>
+                <h3 className="text-xl font-semibold">Alex Martin</h3>
+                <p className="text-muted-foreground">CTO & Expert IA</p>
+              </div>
+              <div className="space-y-4">
+                <div className="w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto"></div>
+                <h3 className="text-xl font-semibold">Dr. Sophie Laurent</h3>
+                <p className="text-muted-foreground">Responsable Recherche & Validation</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Prêt à commencer votre parcours bien-être ?
+          <h2 className="text-4xl font-bold mb-6">
+            Rejoignez le mouvement
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Découvrez comment EmotionsCare peut transformer votre quotidien
+          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            Faites partie de la communauté de professionnels qui transforment 
+            leur approche du bien-être émotionnel.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg">
-              <Link to="/b2c/register">
-                Créer mon compte <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/contact">Nous contacter</Link>
-            </Button>
-          </div>
+          <Button size="lg" variant="secondary" asChild>
+            <Link to="/choose-mode">
+              Commencer maintenant
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </section>
     </div>
