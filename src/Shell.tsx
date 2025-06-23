@@ -28,15 +28,9 @@ const Shell: React.FC = () => {
   return (
     <EnhancedErrorBoundary>
       <SkipToContent />
-      {isAuthenticated ? (
-        <ResponsiveShell>
-          <Outlet />
-        </ResponsiveShell>
-      ) : (
-        <main id="main-content" className="min-h-screen">
-          <Outlet />
-        </main>
-      )}
+      <main id="main-content" className="min-h-screen">
+        <Outlet />
+      </main>
       <InstantGlowWidget />
     </EnhancedErrorBoundary>
   );

@@ -1,58 +1,37 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Shield, Users, Brain, Music, Zap } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Heart, Shield, Users, ArrowRight } from 'lucide-react';
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            EmotionsCare
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4 text-foreground">EmotionsCare</h1>
+          <p className="text-xl text-muted-foreground mb-8">
             Plateforme de bien-être émotionnel pour les professionnels de santé
           </p>
           
-          <div className="flex justify-center gap-4 mb-12">
-            <Button 
-              size="lg" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-              onClick={() => navigate('/choose-mode')}
-            >
-              Commencer maintenant
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="px-8 py-3"
-              onClick={() => navigate('/about')}
-            >
-              En savoir plus
-            </Button>
+          <div className="flex justify-center gap-4 mb-8">
+            <Link to="/choose-mode">
+              <Button size="lg" className="bg-primary hover:bg-primary/90">
+                Commencer
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/scan">
+              <Button size="lg" variant="outline">
+                Scanner émotionnel
+              </Button>
+            </Link>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Features Grid */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="grid md:grid-cols-3 gap-6 mb-12"
-        >
-          <Card className="hover:shadow-lg transition-shadow">
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-red-500" />
@@ -63,13 +42,18 @@ const HomePage: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Scanner émotionnel, journal, musique thérapeutique et exercices de respiration.
+              <p className="text-sm text-muted-foreground mb-4">
+                Scanner émotionnel, journal, musique thérapeutique et plus encore.
               </p>
+              <Link to="/scan">
+                <Button variant="ghost" size="sm">
+                  Découvrir <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-blue-500" />
@@ -80,13 +64,18 @@ const HomePage: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground mb-4">
                 Vos données sont protégées avec les plus hauts standards de sécurité.
               </p>
+              <Link to="/privacy">
+                <Button variant="ghost" size="sm">
+                  En savoir plus <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-green-500" />
@@ -97,56 +86,44 @@ const HomePage: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground mb-4">
                 Partagez vos expériences et soutenez-vous mutuellement.
               </p>
+              <Link to="/social-cocon">
+                <Button variant="ghost" size="sm">
+                  Rejoindre <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
-        {/* Quick Access */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8"
-        >
-          <h2 className="text-2xl font-bold text-center mb-6">Accès rapide</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col gap-2"
-              onClick={() => navigate('/b2c/login')}
-            >
-              <Brain className="h-6 w-6" />
-              <span className="text-sm">Particuliers</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col gap-2"
-              onClick={() => navigate('/b2b/selection')}
-            >
-              <Users className="h-6 w-6" />
-              <span className="text-sm">Entreprises</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col gap-2"
-              onClick={() => navigate('/scan')}
-            >
-              <Zap className="h-6 w-6" />
-              <span className="text-sm">Scan Émotionnel</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="h-20 flex flex-col gap-2"
-              onClick={() => navigate('/music')}
-            >
-              <Music className="h-6 w-6" />
-              <span className="text-sm">Musicothérapie</span>
-            </Button>
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-6">Commencer votre parcours</h2>
+          <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <Link to="/b2c/login">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Particulier</CardTitle>
+                  <CardDescription>
+                    Accès individuel aux outils de bien-être
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+            
+            <Link to="/b2b/selection">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Entreprise</CardTitle>
+                  <CardDescription>
+                    Solutions pour équipes et organisations
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -1,95 +1,84 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building2, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { User, Building, ArrowLeft } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-4xl"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Choisissez votre mode d'accès</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Sélectionnez le type de compte qui vous correspond
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link to="/">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour à l'accueil
+            </Button>
+          </Link>
+        </div>
+
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold mb-4">Choisissez votre mode d'accès</h1>
+          <p className="text-lg text-muted-foreground">
+            Sélectionnez le type de compte qui correspond à vos besoins
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-full w-fit">
-                <User className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit">
+                <User className="h-8 w-8 text-blue-600" />
               </div>
-              <CardTitle className="text-2xl">Particuliers (B2C)</CardTitle>
-              <CardDescription className="text-base">
-                Accès personnel pour votre bien-être émotionnel
-              </CardDescription>
+              <CardTitle className="text-xl">Particulier (B2C)</CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-sm text-gray-600 dark:text-gray-400 mb-6 space-y-2">
+            <CardContent className="text-center space-y-4">
+              <p className="text-muted-foreground">
+                Accès individuel aux outils de bien-être émotionnel, 
+                gestion personnelle du stress et de l'humeur.
+              </p>
+              <ul className="text-sm text-left space-y-2">
                 <li>• Scanner émotionnel personnel</li>
                 <li>• Journal de bord privé</li>
                 <li>• Musicothérapie adaptée</li>
                 <li>• Coach IA personnel</li>
               </ul>
-              <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700" 
-                size="lg"
-                onClick={() => navigate('/b2c/login')}
-              >
-                Accès Particuliers
-              </Button>
+              <Link to="/b2c/login" className="block">
+                <Button className="w-full">
+                  Accès Particulier
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-purple-100 dark:bg-purple-900 rounded-full w-fit">
-                <Building2 className="h-12 w-12 text-purple-600 dark:text-purple-400" />
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit">
+                <Building className="h-8 w-8 text-green-600" />
               </div>
-              <CardTitle className="text-2xl">Entreprises (B2B)</CardTitle>
-              <CardDescription className="text-base">
-                Solutions pour les organisations et équipes
-              </CardDescription>
+              <CardTitle className="text-xl">Entreprise (B2B)</CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-sm text-gray-600 dark:text-gray-400 mb-6 space-y-2">
-                <li>• Tableau de bord équipe</li>
-                <li>• Analytics et rapports</li>
-                <li>• Gestion des utilisateurs</li>
-                <li>• Support dédié</li>
+            <CardContent className="text-center space-y-4">
+              <p className="text-muted-foreground">
+                Solutions pour équipes et organisations, 
+                tableau de bord administrateur et analyses d'équipe.
+              </p>
+              <ul className="text-sm text-left space-y-2">
+                <li>• Dashboard équipe</li>
+                <li>• Analytics RH</li>
+                <li>• Gestion multi-utilisateurs</li>
+                <li>• Rapports de bien-être</li>
               </ul>
-              <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700" 
-                size="lg"
-                onClick={() => navigate('/b2b/selection')}
-              >
-                Accès Entreprises
-              </Button>
+              <Link to="/b2b/selection" className="block">
+                <Button className="w-full" variant="outline">
+                  Accès Entreprise
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
-
-        <div className="text-center mt-8">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/')}
-            className="text-gray-600 dark:text-gray-400"
-          >
-            ← Retour à l'accueil
-          </Button>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

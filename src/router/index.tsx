@@ -6,6 +6,8 @@ import Shell from '@/Shell';
 import HomePage from '@/pages/HomePage';
 import ChooseModePage from '@/pages/ChooseModePage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import ScanPage from '@/pages/ScanPage';
+import MusicPage from '@/pages/MusicPage';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 // Routes d'authentification
@@ -15,8 +17,6 @@ import { b2bUserRoutes } from './routes/b2bUserRoutes';
 import { b2bAdminRoutes } from './routes/b2bAdminRoutes';
 
 // Routes de fonctionnalités
-import { scanRoutes } from './routes/scanRoutes';
-import { musicRoutes } from './routes/musicRoutes';
 import { coachRoutes } from './routes/coachRoutes';
 import { journalRoutes } from './routes/journalRoutes';
 import { vrRoutes } from './routes/vrRoutes';
@@ -80,6 +80,10 @@ export const router = createBrowserRouter([
       { path: 'choose-mode', element: <ChooseModePage /> },
       { path: 'b2b/selection', element: <B2BSelectionPage /> },
       
+      // Pages principales
+      { path: 'scan', element: <ScanPage /> },
+      { path: 'music', element: <MusicPage /> },
+      
       // Routes d'authentification
       ...authRoutes,
       
@@ -93,8 +97,6 @@ export const router = createBrowserRouter([
       ...b2bAdminRoutes,
       
       // Routes de fonctionnalités communes
-      ...scanRoutes,
-      ...musicRoutes,
       ...coachRoutes,
       ...journalRoutes,
       ...vrRoutes,
