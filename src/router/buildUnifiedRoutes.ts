@@ -47,15 +47,15 @@ export function buildUnifiedRoutes(): RouteObject[] {
   // Routes principales en premier (routes exactes)
   const mainRoutes: RouteObject[] = [
     {
-      path: '/',
+      index: true,
       element: <HomePage />,
     },
     {
-      path: '/test',
+      path: 'test',
       element: <TestPage />,
     },
     {
-      path: '/point20',
+      path: 'point20',
       element: <Point20Page />,
     },
   ];
@@ -83,9 +83,9 @@ export function buildUnifiedRoutes(): RouteObject[] {
   ];
 
   // Filtrer les doublons avec les routes principales
-  const mainPaths = mainRoutes.map(r => r.path);
+  const mainPaths = ['/', '/test', '/point20'];
   const filteredModularRoutes = allModularRoutes.filter(route => 
-    !mainPaths.includes(route.path) && route.path !== '/' && route.path !== '/test' && route.path !== '/point20'
+    !mainPaths.includes(route.path) && route.path !== '/'
   );
 
   // Combiner toutes les routes
@@ -101,7 +101,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
   ];
 
   // Vérification des doublons
-  const paths = allRoutes.map(route => route.path).filter(Boolean);
+  const paths = allRoutes.map(route => route.path || (route.index ? 'index' : 'unknown')).filter(Boolean);
   const duplicates = paths.filter((path, index) => paths.indexOf(path) !== index);
   
   if (duplicates.length > 0) {
@@ -109,7 +109,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
   }
   
   console.log(`✅ ${allRoutes.length} routes configurées (sans doublons)`);
-  console.log('📋 Routes principales:', mainPaths);
+  console.log('📋 Routes principales:', ['index', '/test', '/point20']);
   
   return allRoutes;
 }
