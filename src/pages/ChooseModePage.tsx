@@ -3,75 +3,71 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Building, ArrowLeft } from 'lucide-react';
+import { User, Building } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour à l'accueil
-          </Link>
-          <h1 className="text-3xl font-bold mb-2">Choisissez votre espace</h1>
-          <p className="text-muted-foreground">
-            Sélectionnez le type de compte qui correspond à vos besoins
+    <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-blue-950 dark:to-background">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Choisissez votre mode d'accès</h1>
+          <p className="text-xl text-muted-foreground">
+            Sélectionnez l'option qui correspond le mieux à votre situation
           </p>
         </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* B2C Option */}
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <Card className="hover:shadow-xl transition-all hover:scale-105">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                <User className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              <CardTitle>Particulier (B2C)</CardTitle>
-              <CardDescription>
-                Pour un usage personnel et le développement de votre bien-être
+              <User className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+              <CardTitle className="text-2xl">Particulier</CardTitle>
+              <CardDescription className="text-lg">
+                Accès personnel à toutes les fonctionnalités de bien-être
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>✓ Accès à tous les modules de bien-être</li>
-                <li>✓ Coach IA personnalisé</li>
-                <li>✓ Suivi de votre progression</li>
-                <li>✓ Communauté de soutien</li>
+            <CardContent className="text-center">
+              <ul className="text-left space-y-2 mb-6 text-muted-foreground">
+                <li>• Scan émotionnel personnel</li>
+                <li>• Coach IA personnalisé</li>
+                <li>• Journal intime</li>
+                <li>• Musicothérapie</li>
+                <li>• Expériences VR</li>
+                <li>• Communauté bienveillante</li>
               </ul>
-              <Link to="/b2c/login" className="block">
-                <Button className="w-full" size="lg">
-                  Accéder à l'espace particulier
-                </Button>
-              </Link>
+              <Button asChild size="lg" className="w-full">
+                <Link to="/b2c/login">Accès Particulier</Link>
+              </Button>
             </CardContent>
           </Card>
 
-          {/* B2B Option */}
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="hover:shadow-xl transition-all hover:scale-105">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                <Building className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-              <CardTitle>Professionnel (B2B)</CardTitle>
-              <CardDescription>
-                Pour les entreprises et organisations soucieuses du bien-être de leurs équipes
+              <Building className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <CardTitle className="text-2xl">Entreprise</CardTitle>
+              <CardDescription className="text-lg">
+                Solutions dédiées aux organisations et équipes
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>✓ Dashboard administrateur</li>
-                <li>✓ Gestion des équipes</li>
-                <li>✓ Rapports et analytiques</li>
-                <li>✓ Support prioritaire</li>
+            <CardContent className="text-center">
+              <ul className="text-left space-y-2 mb-6 text-muted-foreground">
+                <li>• Tableau de bord RH</li>
+                <li>• Analytics d'équipe</li>
+                <li>• Gestion des collaborateurs</li>
+                <li>• Rapports de bien-être</li>
+                <li>• Outils d'optimisation</li>
+                <li>• Support dédié</li>
               </ul>
-              <Link to="/b2b/selection" className="block">
-                <Button className="w-full" size="lg" variant="outline">
-                  Accéder à l'espace professionnel
-                </Button>
-              </Link>
+              <Button asChild size="lg" className="w-full">
+                <Link to="/b2b/selection">Accès Entreprise</Link>
+              </Button>
             </CardContent>
           </Card>
+        </div>
+        
+        <div className="text-center mt-12">
+          <Button asChild variant="ghost">
+            <Link to="/">← Retour à l'accueil</Link>
+          </Button>
         </div>
       </div>
     </div>
