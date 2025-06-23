@@ -1,158 +1,95 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { User, Building2, Shield, ArrowRight } from 'lucide-react';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { Button } from '@/components/ui/button';
+import { Building2, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const ChooseModePage: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
-
-  const handleModeSelection = (mode: 'b2c' | 'b2b_user' | 'b2b_admin') => {
-    setUserMode(mode);
-    navigate('/home');
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Choisissez votre expérience
-          </h1>
-          <p className="text-lg text-gray-600">
-            Sélectionnez le mode qui correspond le mieux à vos besoins
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-4xl"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-4">Choisissez votre mode d'accès</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Sélectionnez le type de compte qui vous correspond
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Mode B2C */}
-          <Card className="relative hover:shadow-lg transition-shadow cursor-pointer group" 
-                onClick={() => handleModeSelection('b2c')}>
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-                <User className="h-8 w-8 text-blue-600" />
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-full w-fit">
+                <User className="h-12 w-12 text-blue-600 dark:text-blue-400" />
               </div>
-              <CardTitle className="text-xl">Particulier</CardTitle>
-              <Badge variant="secondary">B2C</Badge>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <CardDescription className="text-center">
-                Idéal pour votre développement personnel et votre bien-être individuel
+              <CardTitle className="text-2xl">Particuliers (B2C)</CardTitle>
+              <CardDescription className="text-base">
+                Accès personnel pour votre bien-être émotionnel
               </CardDescription>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                  Scan émotionnel personnel
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                  Coach IA personnalisé
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                  Journal intime sécurisé
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                  Communauté bienveillante
-                </li>
+            </CardHeader>
+            <CardContent className="text-center">
+              <ul className="text-sm text-gray-600 dark:text-gray-400 mb-6 space-y-2">
+                <li>• Scanner émotionnel personnel</li>
+                <li>• Journal de bord privé</li>
+                <li>• Musicothérapie adaptée</li>
+                <li>• Coach IA personnel</li>
               </ul>
-              <Button className="w-full group-hover:bg-blue-700">
-                Choisir ce mode
-                <ArrowRight className="h-4 w-4 ml-2" />
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700" 
+                size="lg"
+                onClick={() => navigate('/b2c/login')}
+              >
+                Accès Particuliers
               </Button>
             </CardContent>
           </Card>
 
-          {/* Mode B2B User */}
-          <Card className="relative hover:shadow-lg transition-shadow cursor-pointer group" 
-                onClick={() => handleModeSelection('b2b_user')}>
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
-                <Building2 className="h-8 w-8 text-green-600" />
+          <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-4 p-4 bg-purple-100 dark:bg-purple-900 rounded-full w-fit">
+                <Building2 className="h-12 w-12 text-purple-600 dark:text-purple-400" />
               </div>
-              <CardTitle className="text-xl">Collaborateur</CardTitle>
-              <Badge variant="secondary">B2B User</Badge>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <CardDescription className="text-center">
-                Pour les employés souhaitant améliorer leur bien-être au travail
+              <CardTitle className="text-2xl">Entreprises (B2B)</CardTitle>
+              <CardDescription className="text-base">
+                Solutions pour les organisations et équipes
               </CardDescription>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                  Outils personnels + équipe
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                  Suivi du bien-être au travail
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                  Activités collaboratives
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                  Accès aux événements RH
-                </li>
-              </ul>
-              <Button className="w-full group-hover:bg-green-700">
-                Choisir ce mode
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Mode B2B Admin */}
-          <Card className="relative hover:shadow-lg transition-shadow cursor-pointer group" 
-                onClick={() => handleModeSelection('b2b_admin')}>
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
-                <Shield className="h-8 w-8 text-purple-600" />
-              </div>
-              <CardTitle className="text-xl">Administrateur RH</CardTitle>
-              <Badge variant="secondary">B2B Admin</Badge>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <CardDescription className="text-center">
-                Pour les RH et managers gérant le bien-être des équipes
-              </CardDescription>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
-                  Tableau de bord RH complet
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
-                  Analytics et rapports
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
-                  Gestion des équipes
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
-                  Outils d'optimisation
-                </li>
+            <CardContent className="text-center">
+              <ul className="text-sm text-gray-600 dark:text-gray-400 mb-6 space-y-2">
+                <li>• Tableau de bord équipe</li>
+                <li>• Analytics et rapports</li>
+                <li>• Gestion des utilisateurs</li>
+                <li>• Support dédié</li>
               </ul>
-              <Button className="w-full group-hover:bg-purple-700">
-                Choisir ce mode
-                <ArrowRight className="h-4 w-4 ml-2" />
+              <Button 
+                className="w-full bg-purple-600 hover:bg-purple-700" 
+                size="lg"
+                onClick={() => navigate('/b2b/selection')}
+              >
+                Accès Entreprises
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-sm text-gray-500">
-            Vous pourrez changer de mode à tout moment dans les paramètres
-          </p>
+        <div className="text-center mt-8">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="text-gray-600 dark:text-gray-400"
+          >
+            ← Retour à l'accueil
+          </Button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

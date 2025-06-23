@@ -47,6 +47,22 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Composant 404 personnalisé
+const NotFoundPage = () => (
+  <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold mb-4">Page introuvable</h1>
+      <p className="text-gray-600 mb-6">La page que vous recherchez n'existe pas.</p>
+      <a 
+        href="/" 
+        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Retour à l'accueil
+      </a>
+    </div>
+  </div>
+);
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -57,6 +73,7 @@ export const router = createBrowserRouter([
         </AppProviders>
       </Suspense>
     ),
+    errorElement: <NotFoundPage />,
     children: [
       // Routes publiques
       { index: true, element: <HomePage /> },
@@ -101,6 +118,9 @@ export const router = createBrowserRouter([
       
       // Routes de diagnostic et d'accès
       ...accessRoutes,
+      
+      // Catch-all pour les routes non trouvées
+      { path: '*', element: <NotFoundPage /> }
     ],
   },
 ]);
