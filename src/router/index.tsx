@@ -1,25 +1,24 @@
 
 import { createBrowserRouter } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
 import Shell from '@/Shell';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-
-// Import direct pour la page d'accueil
 import Home from '@/Home';
-import TestPage from '@/pages/TestPage';
 
-// Lazy imports pour les autres pages
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-
-// Wrapper pour les composants lazy
-const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<LoadingSpinner />}>
-    {children}
-  </Suspense>
+// Pages simples pour tester
+const TestPage = () => (
+  <div data-testid="page-root" className="min-h-screen bg-red-500 text-white p-8">
+    <h1 className="text-4xl font-bold">PAGE TEST - VISIBLE</h1>
+    <p>Si vous voyez cette page rouge, le routage fonctionne !</p>
+  </div>
 );
 
-console.log('Router configuration is loading'); // Debug log
+const NotFoundPage = () => (
+  <div data-testid="page-root" className="min-h-screen bg-yellow-500 text-black p-8">
+    <h1 className="text-4xl font-bold">404 - Page introuvable</h1>
+    <p>Cette page n'existe pas</p>
+  </div>
+);
+
+console.log('Creating router...');
 
 export const router = createBrowserRouter([
   {
@@ -34,24 +33,12 @@ export const router = createBrowserRouter([
         path: 'test',
         element: <TestPage />,
       },
-      {
-        path: 'choose-mode',
-        element: (
-          <LazyWrapper>
-            <ChooseModePage />
-          </LazyWrapper>
-        ),
-      },
-      {
-        path: '*',
-        element: (
-          <LazyWrapper>
-            <NotFoundPage />
-          </LazyWrapper>
-        ),
-      },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ]);
 
-console.log('Router configuration loaded successfully'); // Debug log
+console.log('Router created successfully');
