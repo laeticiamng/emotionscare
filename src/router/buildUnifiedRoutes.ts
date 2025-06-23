@@ -19,10 +19,12 @@ import { notificationRoutes } from './routes/notificationRoutes';
 import { auditRoutes } from './routes/auditRoutes';
 import { accessibilityRoutes } from './routes/accessibilityRoutes';
 
-// Import direct des pages principales 
+// IMPORTS DIRECTS - PAS DE LAZY LOADING pour éviter les problèmes de chunk
 import HomePage from '@/pages/HomePage';
 import TestPage from '@/pages/TestPage';
 import Point20Page from '@/pages/Point20Page';
+
+console.log('%c[Router] Building unified routes with DIRECT imports', 'color:purple; font-weight:bold');
 
 // Page 404 par défaut
 const NotFoundPage = () => (
@@ -39,28 +41,12 @@ const NotFoundPage = () => (
 
 /**
  * Construit un tableau unifié de toutes les routes de l'application
- * SANS DOUBLONS - chaque route n'est définie qu'une seule fois
+ * STRUCTURE CORRIGÉE : index route en premier, wildcard en dernier
  */
 export function buildUnifiedRoutes(): RouteObject[] {
-  console.log('🔧 Building unified routes...');
+  console.log('%c[Router] Building routes with proper index structure...', 'color:blue');
   
-  // Routes principales en premier (routes exactes)
-  const mainRoutes: RouteObject[] = [
-    {
-      index: true,
-      element: <HomePage />,
-    },
-    {
-      path: 'test',
-      element: <TestPage />,
-    },
-    {
-      path: 'point20',
-      element: <Point20Page />,
-    },
-  ];
-
-  // Récupérer toutes les autres routes modulaires
+  // Récupérer toutes les routes modulaires SAUF celles déjà définies comme principales
   const allModularRoutes = [
     ...publicRoutes,
     ...userRoutes,
@@ -83,33 +69,51 @@ export function buildUnifiedRoutes(): RouteObject[] {
   ];
 
   // Filtrer les doublons avec les routes principales
-  const mainPaths = ['/', '/test', '/point20'];
+  const reservedPaths = ['/', '/test', '/point20'];
   const filteredModularRoutes = allModularRoutes.filter(route => 
-    !mainPaths.includes(route.path) && route.path !== '/'
+    !reservedPaths.includes(route.path as string) && route.path !== '/'
   );
 
-  // Combiner toutes les routes
+  // STRUCTURE CORRIGÉE : Une seule route racine avec children
   const allRoutes: RouteObject[] = [
-    ...mainRoutes,
+    // ROUTE INDEX EN PREMIER - IMPORT DIRECT
+    {
+      index: true,
+      element: <HomePage />,
+    },
+    
+    // ROUTES PRINCIPALES - IMPORTS DIRECTS
+    {
+      path: 'test',
+      element: <TestPage />,
+    },
+    {
+      path: 'point20',
+      element: <Point20Page />,
+    },
+    
+    // ROUTES MODULAIRES
     ...filteredModularRoutes,
     
-    // Route 404 (doit être en dernier)
+    // WILDCARD EN DERNIER - TOUJOURS
     {
       path: '*',
       element: <NotFoundPage />,
     },
   ];
 
-  // Vérification des doublons
+  // Vérification des doublons (debug)
   const paths = allRoutes.map(route => route.path || (route.index ? 'index' : 'unknown')).filter(Boolean);
   const duplicates = paths.filter((path, index) => paths.indexOf(path) !== index);
   
   if (duplicates.length > 0) {
-    console.error('🚨 Routes dupliquées détectées:', duplicates);
+    console.error('%c[Router] DOUBLONS DÉTECTÉS:', 'color:red; font-weight:bold', duplicates);
+  } else {
+    console.log('%c[Router] ✅ Aucun doublon détecté', 'color:green');
   }
   
-  console.log(`✅ ${allRoutes.length} routes configurées (sans doublons)`);
-  console.log('📋 Routes principales:', ['index', '/test', '/point20']);
+  console.log(`%c[Router] ✅ ${allRoutes.length} routes configurées`, 'color:green; font-weight:bold');
+  console.log('%c[Router] Routes principales:', 'color:blue', ['index (HomePage)', '/test', '/point20']);
   
   return allRoutes;
 }

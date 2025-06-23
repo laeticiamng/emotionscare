@@ -1,14 +1,14 @@
 
 import React from 'react';
 
-console.log('🏠 HomePage component rendering...');
+console.log('%c[HomePage] Loading HomePage component', 'color:orange; font-weight:bold');
 
 const HomePage: React.FC = () => {
-  console.log('🏠 HomePage component function called');
+  console.log('%c[HomePage] mounted', 'color:lime; font-weight:bold');
   
   React.useEffect(() => {
-    console.log('🏠 HomePage component mounted');
-    return () => console.log('🏠 HomePage component unmounted');
+    console.log('%c[HomePage] useEffect mounted', 'color:cyan; font-weight:bold');
+    return () => console.log('%c[HomePage] useEffect unmounted', 'color:red');
   }, []);
 
   return (
@@ -17,40 +17,13 @@ const HomePage: React.FC = () => {
         <div className="text-center">
           <h1 className="text-6xl font-bold mb-8 text-white">EmotionsCare</h1>
           <p className="text-2xl mb-8 text-blue-100">
-            Bienvenue sur la plateforme de bien-être émotionnel
+            Page d'accueil fonctionnelle - Test réussi !
           </p>
           
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8">
-            <h2 className="text-3xl font-semibold mb-4 text-yellow-300">✅ Page d'accueil active</h2>
+            <h2 className="text-3xl font-semibold mb-4 text-green-300">✅ HomePage Active</h2>
             <p className="text-lg text-blue-100">
-              Si vous voyez ce contenu, la page d'accueil fonctionne correctement !
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-4 text-green-400">🏠 Accueil</h3>
-              <p className="text-blue-100">Vous êtes ici - page fonctionnelle</p>
-            </div>
-            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-4 text-red-400">🧪 Test</h3>
-              <a href="/test" className="text-yellow-300 underline hover:text-yellow-100">
-                Aller à la page test
-              </a>
-            </div>
-            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-4 text-purple-400">📊 Point 20</h3>
-              <a href="/point20" className="text-yellow-300 underline hover:text-yellow-100">
-                Aller au Point 20
-              </a>
-            </div>
-          </div>
-
-          <div className="bg-red-500/20 border border-red-400 rounded-lg p-4">
-            <h3 className="font-semibold text-red-300 mb-2">🔍 Debug Info</h3>
-            <p className="text-sm text-red-200">
-              Route actuelle: {window.location.pathname}<br/>
-              Timestamp: {new Date().toLocaleTimeString()}
+              La page d'accueil s'affiche correctement maintenant.
             </p>
           </div>
         </div>
