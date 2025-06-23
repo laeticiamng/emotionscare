@@ -76,6 +76,8 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ filters, userRole
     { id: 'correlation-analysis', name: 'Analyse Corrélations', icon: Eye },
   ];
 
+  const SelectedIcon = chartTypes.find(c => c.id === selectedChart)?.icon;
+
   const renderSelectedChart = () => {
     switch (selectedChart) {
       case 'emotional-trends':
@@ -295,9 +297,7 @@ const DataVisualization: React.FC<DataVisualizationProps> = ({ filters, userRole
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {chartTypes.find(c => c.id === selectedChart)?.icon && (
-                <chartTypes.find(c => c.id === selectedChart)!.icon className="h-5 w-5" />
-              )}
+              {SelectedIcon && <SelectedIcon className="h-5 w-5" />}
               {chartTypes.find(c => c.id === selectedChart)?.name}
             </CardTitle>
           </CardHeader>
