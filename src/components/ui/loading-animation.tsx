@@ -5,11 +5,13 @@ import { Loader2 } from 'lucide-react';
 interface LoadingAnimationProps {
   text?: string;
   size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
 const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
   text = "Chargement...", 
-  size = 'md' 
+  size = 'md',
+  className = ''
 }) => {
   const sizeClasses = {
     sm: 'h-4 w-4',
@@ -18,9 +20,16 @@ const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
-      <Loader2 className={`${sizeClasses[size]} animate-spin text-blue-600`} />
-      <p className="text-gray-600 dark:text-gray-300">{text}</p>
+    <div className={`flex flex-col items-center justify-center space-y-4 ${className}`}>
+      <Loader2 
+        className={`${sizeClasses[size]} animate-spin text-primary`} 
+        aria-label="Chargement en cours"
+      />
+      {text && (
+        <p className="text-muted-foreground text-center" role="status" aria-live="polite">
+          {text}
+        </p>
+      )}
     </div>
   );
 };

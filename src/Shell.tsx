@@ -6,19 +6,20 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import SkipToContent from '@/components/accessibility/SkipToContent';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
-import { InstantGlowWidget } from '@/components/glow';
+import InstantGlowWidget from '@/components/glow/InstantGlowWidget';
 
 /**
- * Shell principal avec layout responsive complet
+ * Shell principal avec layout responsive et gestion d'erreurs robuste
  */
 const Shell: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { isLoading: modeLoading } = useUserMode();
 
+  // Affichage du loader pendant les vérifications d'authentification
   if (authLoading || modeLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement..." />
+      <div className="flex h-screen items-center justify-center bg-background">
+        <LoadingAnimation text="Initialisation..." />
       </div>
     );
   }
@@ -26,8 +27,8 @@ const Shell: React.FC = () => {
   return (
     <EnhancedErrorBoundary>
       <SkipToContent />
-      <div className="min-h-screen">
-        <main id="main-content">
+      <div className="min-h-screen bg-background text-foreground">
+        <main id="main-content" className="min-h-screen">
           <Outlet />
         </main>
       </div>
