@@ -1,219 +1,98 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Camera, Mic, FileText, Heart, Smile, Frown, Meh } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Scan, Camera, Mic, Brain } from 'lucide-react';
 
 const ScanPage: React.FC = () => {
-  const [scanType, setScanType] = useState<'text' | 'voice' | 'face'>('text');
-  const [textInput, setTextInput] = useState('');
-  const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState<any>(null);
-
-  const handleScan = () => {
-    setIsScanning(true);
-    // Simulation d'un scan
-    setTimeout(() => {
-      setResult({
-        emotion: 'positive',
-        confidence: 85,
-        suggestions: [
-          'Continuez sur cette lancée !',
-          'Prenez un moment pour savourer ce bien-être',
-          'Partagez votre bonne humeur avec vos collègues'
-        ]
-      });
-      setIsScanning(false);
-    }, 2000);
-  };
-
-  const getEmotionIcon = (emotion: string) => {
-    switch (emotion) {
-      case 'positive': return <Smile className="h-8 w-8 text-green-500" />;
-      case 'negative': return <Frown className="h-8 w-8 text-red-500" />;
-      default: return <Meh className="h-8 w-8 text-yellow-500" />;
-    }
-  };
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
-            <Heart className="h-10 w-10 text-pink-500" />
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-100 p-4">
+      <div className="container mx-auto max-w-6xl">
+        <div className="text-center mb-12 pt-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Scanner Émotionnel
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Analysez votre état émotionnel pour un meilleur bien-être
+          <p className="text-xl text-gray-600">
+            Analysez votre état émotionnel en temps réel avec nos outils avancés
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Scanner */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Choisissez votre méthode de scan</CardTitle>
-                <CardDescription>
-                  Sélectionnez la méthode qui vous convient le mieux
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <Button
-                    variant={scanType === 'text' ? 'default' : 'outline'}
-                    onClick={() => setScanType('text')}
-                    className="h-16 flex-col"
-                  >
-                    <FileText className="h-6 w-6 mb-1" />
-                    Texte
-                  </Button>
-                  <Button
-                    variant={scanType === 'voice' ? 'default' : 'outline'}
-                    onClick={() => setScanType('voice')}
-                    className="h-16 flex-col"
-                  >
-                    <Mic className="h-6 w-6 mb-1" />
-                    Voix
-                  </Button>
-                  <Button
-                    variant={scanType === 'face' ? 'default' : 'outline'}
-                    onClick={() => setScanType('face')}
-                    className="h-16 flex-col"
-                  >
-                    <Camera className="h-6 w-6 mb-1" />
-                    Visage
-                  </Button>
-                </div>
-
-                {scanType === 'text' && (
-                  <div className="space-y-4">
-                    <Textarea
-                      placeholder="Décrivez comment vous vous sentez..."
-                      value={textInput}
-                      onChange={(e) => setTextInput(e.target.value)}
-                      rows={4}
-                    />
-                  </div>
-                )}
-
-                {scanType === 'voice' && (
-                  <div className="text-center py-8">
-                    <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Mic className="h-12 w-12 text-red-500" />
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Cliquez sur "Scanner" pour commencer l'enregistrement vocal
-                    </p>
-                  </div>
-                )}
-
-                {scanType === 'face' && (
-                  <div className="text-center py-8">
-                    <div className="w-48 h-36 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Camera className="h-16 w-16 text-blue-500" />
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Positionnez votre visage devant la caméra
-                    </p>
-                  </div>
-                )}
-
-                <Button
-                  onClick={handleScan}
-                  className="w-full mt-6"
-                  disabled={isScanning || (scanType === 'text' && !textInput.trim())}
-                >
-                  {isScanning ? 'Analyse en cours...' : 'Scanner'}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Résultats */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Résultats de l'analyse</CardTitle>
-                <CardDescription>
-                  Votre état émotionnel analysé
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!result ? (
-                  <div className="text-center py-12 text-gray-500">
-                    Effectuez un scan pour voir vos résultats
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      {getEmotionIcon(result.emotion)}
-                      <h3 className="text-2xl font-semibold mt-2 capitalize">
-                        État {result.emotion}
-                      </h3>
-                      <Badge variant="secondary" className="mt-2">
-                        Confiance: {result.confidence}%
-                      </Badge>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold mb-3">Suggestions personnalisées:</h4>
-                      <ul className="space-y-2">
-                        {result.suggestions.map((suggestion: string, index: number) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-blue-500 mt-1">•</span>
-                            <span>{suggestion}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Link to="/music" className="flex-1">
-                        <Button variant="outline" className="w-full">
-                          Musique adaptée
-                        </Button>
-                      </Link>
-                      <Link to="/coach" className="flex-1">
-                        <Button variant="outline" className="w-full">
-                          Parler au coach
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Historique récent */}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Historique récent</CardTitle>
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-fit">
+                <Camera className="h-8 w-8 text-blue-600" />
+              </div>
+              <CardTitle>Scan Facial</CardTitle>
+              <CardDescription>
+                Analyse des micro-expressions faciales
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: 7 }, (_, i) => (
-                  <div key={i} className="text-center">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Smile className="h-6 w-6 text-green-500" />
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      J-{7-i}
-                    </div>
-                  </div>
-                ))}
+              <p className="text-sm text-gray-600 mb-4">
+                Notre IA analyse vos expressions pour détecter votre état émotionnel actuel.
+              </p>
+              <Button className="w-full">Démarrer le scan facial</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 p-4 bg-green-100 rounded-full w-fit">
+                <Mic className="h-8 w-8 text-green-600" />
               </div>
+              <CardTitle>Analyse Vocale</CardTitle>
+              <CardDescription>
+                Détection des émotions par la voix
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Analysez le ton, le rythme et les inflexions de votre voix pour identifier vos émotions.
+              </p>
+              <Button className="w-full">Démarrer l'analyse vocale</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4 p-4 bg-purple-100 rounded-full w-fit">
+                <Brain className="h-8 w-8 text-purple-600" />
+              </div>
+              <CardTitle>Scan Complet</CardTitle>
+              <CardDescription>
+                Analyse multimodale complète
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Combinaison de tous nos outils pour une analyse émotionnelle complète et précise.
+              </p>
+              <Button className="w-full">Scan complet</Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Navigation */}
-        <div className="text-center mt-8">
+        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-center">Derniers résultats</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-semibold text-blue-800 mb-2">État émotionnel actuel</h3>
+              <p className="text-blue-600">Calme et concentré (85%)</p>
+              <p className="text-sm text-gray-600 mt-2">Basé sur votre dernier scan facial</p>
+            </div>
+            <div className="p-4 bg-green-50 rounded-lg">
+              <h3 className="font-semibold text-green-800 mb-2">Tendance de la semaine</h3>
+              <p className="text-green-600">Amélioration constante (+12%)</p>
+              <p className="text-sm text-gray-600 mt-2">Votre bien-être progresse positivement</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center">
           <Link to="/">
-            <Button variant="ghost">← Retour à l'accueil</Button>
+            <Button variant="outline">← Retour à l'accueil</Button>
           </Link>
         </div>
       </div>

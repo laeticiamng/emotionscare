@@ -1,7 +1,6 @@
 
 import { createBrowserRouter } from 'react-router-dom';
 import { Suspense } from 'react';
-import AppProviders from '@/AppProviders';
 import Shell from '@/Shell';
 import HomePage from '@/pages/HomePage';
 import ChooseModePage from '@/pages/ChooseModePage';
@@ -40,9 +39,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <Suspense fallback={<LoadingFallback />}>
-        <AppProviders>
-          <Shell />
-        </AppProviders>
+        <Shell />
       </Suspense>
     ),
     errorElement: <NotFoundPage />,
