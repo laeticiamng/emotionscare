@@ -1,294 +1,268 @@
 
-import { createBrowserRouter } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
+import { createBrowserRouter, RouteObject } from 'react-router-dom';
 import Shell from '@/Shell';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
+import { retryLazyImport } from '@/utils/retryLazyImport';
 
-// Lazy loading with error boundaries
-const LazyPage = ({ Component }: { Component: React.ComponentType }) => (
-  <EnhancedErrorBoundary>
-    <Suspense fallback={<LoadingAnimation text="Chargement..." />}>
-      <div data-testid="page-root">
-        <Component />
-      </div>
-    </Suspense>
-  </EnhancedErrorBoundary>
-);
-
-// Pages principales
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+// Pages principales avec retry automatique
+const HomePage = React.lazy(() => retryLazyImport(() => import('@/pages/HomePage')));
+const ChooseModePage = React.lazy(() => retryLazyImport(() => import('@/pages/ChooseModePage')));
+const B2BSelectionPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2BSelectionPage')));
+const NotFoundPage = React.lazy(() => retryLazyImport(() => import('@/pages/NotFoundPage')));
 
 // Pages B2C
-const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2CLoginPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2CLoginPage')));
+const B2CRegisterPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2CRegisterPage')));
+const B2CDashboardPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2CDashboardPage')));
 
 // Pages B2B User
-const B2BUserLoginPage = lazy(() => import('@/pages/B2BUserLoginPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
+const B2BUserLoginPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2BUserLoginPage')));
+const B2BUserDashboardPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2BUserDashboardPage')));
 
 // Pages B2B Admin
-const B2BAdminLoginPage = lazy(() => import('@/pages/B2BAdminLoginPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
+const B2BAdminLoginPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2BAdminLoginPage')));
+const B2BAdminDashboardPage = React.lazy(() => retryLazyImport(() => import('@/pages/B2BAdminDashboardPage')));
 
-// Pages fonctionnelles
-const ScanPage = lazy(() => import('@/pages/ScanPage'));
-const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const CoachPage = lazy(() => import('@/pages/CoachPage'));
-const JournalPage = lazy(() => import('@/pages/JournalPage'));
-const VRPage = lazy(() => import('@/pages/VRPage'));
-const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
-const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const SocialCocoonPage = lazy(() => import('@/pages/SocialCocoonPage'));
+// Pages fonctionnelles principales
+const ScanPage = React.lazy(() => retryLazyImport(() => import('@/pages/ScanPage')));
+const MusicPage = React.lazy(() => retryLazyImport(() => import('@/pages/MusicPage')));
+const CoachPage = React.lazy(() => retryLazyImport(() => import('@/pages/CoachPage')));
+const JournalPage = React.lazy(() => retryLazyImport(() => import('@/pages/JournalPage')));
+const VRPage = React.lazy(() => retryLazyImport(() => import('@/pages/VRPage')));
+const PreferencesPage = React.lazy(() => retryLazyImport(() => import('@/pages/PreferencesPage')));
+const GamificationPage = React.lazy(() => retryLazyImport(() => import('@/pages/GamificationPage')));
+const SocialCocoonPage = React.lazy(() => retryLazyImport(() => import('@/pages/SocialCocoonPage')));
 
-// Pages premium/spécialisées
-const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
-const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
-const AmbitionArcadePage = lazy(() => import('@/pages/AmbitionArcadePage'));
-const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
-const StorySynthLabPage = lazy(() => import('@/pages/StorySynthLabPage'));
-const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
-const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
-const ARFiltersPage = lazy(() => import('@/pages/ARFiltersPage'));
-const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
-const ScreenSilkBreakPage = lazy(() => import('@/pages/ScreenSilkBreakPage'));
-const VRGalactiquePage = lazy(() => import('@/pages/VRGalactiquePage'));
-const WeeklyBarsPage = lazy(() => import('@/pages/WeeklyBarsPage'));
-const HeatmapVibesPage = lazy(() => import('@/pages/HeatmapVibesPage'));
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
-const PrivacyTogglesPa = lazy(() => import('@/pages/PrivacyTogglesPage'));
-const ExportCSVPage = lazy(() => import('@/pages/ExportCSVPage'));
-const HealthCheckBadgePage = lazy(() => import('@/pages/HealthCheckBadgePage'));
-const OnboardingFlowPage = lazy(() => import('@/pages/OnboardingFlowPage'));
-const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
-const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
-const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
-const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
-const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+// Pages premium
+const BossLevelGritPage = React.lazy(() => retryLazyImport(() => import('@/pages/BossLevelGritPage')));
+const MoodMixerPage = React.lazy(() => retryLazyImport(() => import('@/pages/MoodMixerPage')));
+const AmbitionArcadePage = React.lazy(() => retryLazyImport(() => import('@/pages/AmbitionArcadePage')));
+const BounceBackBattlePage = React.lazy(() => retryLazyImport(() => import('@/pages/BounceBackBattlePage')));
+const StorySynthLabPage = React.lazy(() => retryLazyImport(() => import('@/pages/StorySynthLabPage')));
+const FlashGlowPage = React.lazy(() => retryLazyImport(() => import('@/pages/FlashGlowPage')));
+const InstantGlowPage = React.lazy(() => retryLazyImport(() => import('@/pages/InstantGlowPage')));
+const ARFiltersPage = React.lazy(() => retryLazyImport(() => import('@/pages/ARFiltersPage')));
+const BubbleBeatPage = React.lazy(() => retryLazyImport(() => import('@/pages/BubbleBeatPage')));
+const ScreenSilkBreakPage = React.lazy(() => retryLazyImport(() => import('@/pages/ScreenSilkBreakPage')));
+const VRGalactiquePage = React.lazy(() => retryLazyImport(() => import('@/pages/VRGalactiquePage')));
+const WeeklyBarsPage = React.lazy(() => retryLazyImport(() => import('@/pages/WeeklyBarsPage')));
+const HeatmapVibesPage = React.lazy(() => retryLazyImport(() => import('@/pages/HeatmapVibesPage')));
+const BreathworkPage = React.lazy(() => retryLazyImport(() => import('@/pages/BreathworkPage')));
+const PrivacyTogglesPage = React.lazy(() => retryLazyImport(() => import('@/pages/PrivacyTogglesPage')));
+const ExportCSVPage = React.lazy(() => retryLazyImport(() => import('@/pages/ExportCSVPage')));
+const HealthCheckBadgePage = React.lazy(() => retryLazyImport(() => import('@/pages/HealthCheckBadgePage')));
+const OnboardingFlowPage = React.lazy(() => retryLazyImport(() => import('@/pages/OnboardingFlowPage')));
+const NotificationsPage = React.lazy(() => retryLazyImport(() => import('@/pages/NotificationsPage')));
+const HelpCenterPage = React.lazy(() => retryLazyImport(() => import('@/pages/HelpCenterPage')));
+const ProfileSettingsPage = React.lazy(() => retryLazyImport(() => import('@/pages/ProfileSettingsPage')));
+const ActivityHistoryPage = React.lazy(() => retryLazyImport(() => import('@/pages/ActivityHistoryPage')));
+const FeedbackPage = React.lazy(() => retryLazyImport(() => import('@/pages/FeedbackPage')));
 
-export const router = createBrowserRouter([
+// Wrapper unifié pour toutes les pages avec Suspense
+const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Suspense fallback={
+    <div className="flex h-screen items-center justify-center">
+      <LoadingAnimation text="Chargement de la page..." />
+    </div>
+  }>
+    {children}
+  </Suspense>
+);
+
+// Configuration des routes unifiée
+const routes: RouteObject[] = [
   {
     path: '/',
     element: <Shell />,
-    errorElement: (
-      <EnhancedErrorBoundary>
-        <div data-testid="page-root">
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold mb-4">Erreur de routage</h1>
-              <p className="text-muted-foreground">Une erreur inattendue s'est produite.</p>
-            </div>
-          </div>
-        </div>
-      </EnhancedErrorBoundary>
-    ),
     children: [
       {
         index: true,
-        element: <LazyPage Component={HomePage} />,
+        element: <PageWrapper><HomePage /></PageWrapper>,
       },
       {
         path: 'choose-mode',
-        element: <LazyPage Component={ChooseModePage} />,
+        element: <PageWrapper><ChooseModePage /></PageWrapper>,
       },
-      
-      // Routes B2B
+      {
+        path: 'b2b/selection',
+        element: <PageWrapper><B2BSelectionPage /></PageWrapper>,
+      },
       {
         path: 'b2b',
-        children: [
-          {
-            index: true,
-            element: <LazyPage Component={B2BSelectionPage} />,
-          },
-          {
-            path: 'selection',
-            element: <LazyPage Component={B2BSelectionPage} />,
-          },
-          {
-            path: 'user',
-            children: [
-              {
-                path: 'login',
-                element: <LazyPage Component={B2BUserLoginPage} />,
-              },
-              {
-                path: 'dashboard',
-                element: <LazyPage Component={B2BUserDashboardPage} />,
-              },
-            ],
-          },
-          {
-            path: 'admin',
-            children: [
-              {
-                path: 'login',
-                element: <LazyPage Component={B2BAdminLoginPage} />,
-              },
-              {
-                path: 'dashboard',
-                element: <LazyPage Component={B2BAdminDashboardPage} />,
-              },
-            ],
-          },
-        ],
+        element: <PageWrapper><B2BSelectionPage /></PageWrapper>, // Redirection vers sélection
       },
       
       // Routes B2C
       {
-        path: 'b2c',
-        children: [
-          {
-            path: 'login',
-            element: <LazyPage Component={B2CLoginPage} />,
-          },
-          {
-            path: 'register',
-            element: <LazyPage Component={B2CRegisterPage} />,
-          },
-          {
-            path: 'dashboard',
-            element: <LazyPage Component={B2CDashboardPage} />,
-          },
-        ],
+        path: 'b2c/login',
+        element: <PageWrapper><B2CLoginPage /></PageWrapper>,
+      },
+      {
+        path: 'b2c/register',
+        element: <PageWrapper><B2CRegisterPage /></PageWrapper>,
+      },
+      {
+        path: 'b2c/dashboard',
+        element: <PageWrapper><B2CDashboardPage /></PageWrapper>,
       },
       
-      // Routes fonctionnelles principales
+      // Routes B2B User
+      {
+        path: 'b2b/user/login',
+        element: <PageWrapper><B2BUserLoginPage /></PageWrapper>,
+      },
+      {
+        path: 'b2b/user/dashboard',
+        element: <PageWrapper><B2BUserDashboardPage /></PageWrapper>,
+      },
+      
+      // Routes B2B Admin
+      {
+        path: 'b2b/admin/login',
+        element: <PageWrapper><B2BAdminLoginPage /></PageWrapper>,
+      },
+      {
+        path: 'b2b/admin/dashboard',
+        element: <PageWrapper><B2BAdminDashboardPage /></PageWrapper>,
+      },
+      
+      // Fonctionnalités principales
       {
         path: 'scan',
-        element: <LazyPage Component={ScanPage} />,
+        element: <PageWrapper><ScanPage /></PageWrapper>,
       },
       {
         path: 'music',
-        element: <LazyPage Component={MusicPage} />,
+        element: <PageWrapper><MusicPage /></PageWrapper>,
       },
       {
         path: 'coach',
-        element: <LazyPage Component={CoachPage} />,
+        element: <PageWrapper><CoachPage /></PageWrapper>,
       },
       {
         path: 'journal',
-        element: <LazyPage Component={JournalPage} />,
+        element: <PageWrapper><JournalPage /></PageWrapper>,
       },
       {
         path: 'vr',
-        element: <LazyPage Component={VRPage} />,
+        element: <PageWrapper><VRPage /></PageWrapper>,
       },
       {
         path: 'preferences',
-        element: <LazyPage Component={PreferencesPage} />,
+        element: <PageWrapper><PreferencesPage /></PageWrapper>,
       },
       {
         path: 'gamification',
-        element: <LazyPage Component={GamificationPage} />,
+        element: <PageWrapper><GamificationPage /></PageWrapper>,
       },
       {
         path: 'social-cocon',
-        element: <LazyPage Component={SocialCocoonPage} />,
+        element: <PageWrapper><SocialCocoonPage /></PageWrapper>,
       },
       
-      // Routes premium/spécialisées
+      // Pages premium
       {
         path: 'boss-level-grit',
-        element: <LazyPage Component={BossLevelGritPage} />,
+        element: <PageWrapper><BossLevelGritPage /></PageWrapper>,
       },
       {
         path: 'mood-mixer',
-        element: <LazyPage Component={MoodMixerPage} />,
+        element: <PageWrapper><MoodMixerPage /></PageWrapper>,
       },
       {
         path: 'ambition-arcade',
-        element: <LazyPage Component={AmbitionArcadePage} />,
+        element: <PageWrapper><AmbitionArcadePage /></PageWrapper>,
       },
       {
         path: 'bounce-back-battle',
-        element: <LazyPage Component={BounceBackBattlePage} />,
+        element: <PageWrapper><BounceBackBattlePage /></PageWrapper>,
       },
       {
         path: 'story-synth-lab',
-        element: <LazyPage Component={StorySynthLabPage} />,
+        element: <PageWrapper><StorySynthLabPage /></PageWrapper>,
       },
       {
         path: 'flash-glow',
-        element: <LazyPage Component={FlashGlowPage} />,
+        element: <PageWrapper><FlashGlowPage /></PageWrapper>,
       },
       {
         path: 'instant-glow',
-        element: <LazyPage Component={InstantGlowPage} />,
+        element: <PageWrapper><InstantGlowPage /></PageWrapper>,
       },
       {
         path: 'ar-filters',
-        element: <LazyPage Component={ARFiltersPage} />,
+        element: <PageWrapper><ARFiltersPage /></PageWrapper>,
       },
       {
         path: 'bubble-beat',
-        element: <LazyPage Component={BubbleBeatPage} />,
+        element: <PageWrapper><BubbleBeatPage /></PageWrapper>,
       },
       {
         path: 'screen-silk-break',
-        element: <LazyPage Component={ScreenSilkBreakPage} />,
+        element: <PageWrapper><ScreenSilkBreakPage /></PageWrapper>,
       },
       {
         path: 'vr-galactique',
-        element: <LazyPage Component={VRGalactiquePage} />,
+        element: <PageWrapper><VRGalactiquePage /></PageWrapper>,
       },
       {
         path: 'weekly-bars',
-        element: <LazyPage Component={WeeklyBarsPage} />,
+        element: <PageWrapper><WeeklyBarsPage /></PageWrapper>,
       },
       {
         path: 'heatmap-vibes',
-        element: <LazyPage Component={HeatmapVibesPage} />,
+        element: <PageWrapper><HeatmapVibesPage /></PageWrapper>,
       },
       {
         path: 'breathwork',
-        element: <LazyPage Component={BreathworkPage} />,
+        element: <PageWrapper><BreathworkPage /></PageWrapper>,
       },
       {
         path: 'privacy-toggles',
-        element: <LazyPage Component={PrivacyTogglesPa} />,
+        element: <PageWrapper><PrivacyTogglesPage /></PageWrapper>,
       },
       {
         path: 'export-csv',
-        element: <LazyPage Component={ExportCSVPage} />,
+        element: <PageWrapper><ExportCSVPage /></PageWrapper>,
       },
       {
         path: 'health-check-badge',
-        element: <LazyPage Component={HealthCheckBadgePage} />,
+        element: <PageWrapper><HealthCheckBadgePage /></PageWrapper>,
       },
       {
         path: 'onboarding-flow',
-        element: <LazyPage Component={OnboardingFlowPage} />,
+        element: <PageWrapper><OnboardingFlowPage /></PageWrapper>,
       },
       {
         path: 'notifications',
-        element: <LazyPage Component={NotificationsPage} />,
+        element: <PageWrapper><NotificationsPage /></PageWrapper>,
       },
       {
         path: 'help-center',
-        element: <LazyPage Component={HelpCenterPage} />,
+        element: <PageWrapper><HelpCenterPage /></PageWrapper>,
       },
       {
         path: 'profile-settings',
-        element: <LazyPage Component={ProfileSettingsPage} />,
+        element: <PageWrapper><ProfileSettingsPage /></PageWrapper>,
       },
       {
         path: 'activity-history',
-        element: <LazyPage Component={ActivityHistoryPage} />,
+        element: <PageWrapper><ActivityHistoryPage /></PageWrapper>,
       },
       {
         path: 'feedback',
-        element: <LazyPage Component={FeedbackPage} />,
+        element: <PageWrapper><FeedbackPage /></PageWrapper>,
       },
       
-      // Page 404 - doit être en dernier
+      // Page 404
       {
         path: '*',
-        element: <LazyPage Component={NotFoundPage} />,
+        element: <PageWrapper><NotFoundPage /></PageWrapper>,
       },
     ],
   },
-]);
+];
+
+export const router = createBrowserRouter(routes);
+export default router;

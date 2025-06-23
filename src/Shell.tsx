@@ -31,7 +31,9 @@ const Shell: React.FC = () => {
       <div className="min-h-screen bg-background text-foreground">
         <main id="main-content" className="min-h-screen">
           <EnhancedErrorBoundary>
-            <Outlet />
+            <div data-testid="page-root">
+              <Outlet />
+            </div>
           </EnhancedErrorBoundary>
         </main>
       </div>
