@@ -1,1 +1,15 @@
-/* /index.html 200
+
+# SPA Redirections pour toutes les routes
+# Toute URL qui n'existe pas en tant que fichier doit retourner index.html
+
+# Fichiers statiques en priorité
+/assets/*  /assets/:splat  200
+/images/*  /images/:splat  200
+/audio/*   /audio/:splat   200
+/sounds/*  /sounds/:splat  200
+
+# API calls (si applicable)
+/api/*     /api/:splat     200
+
+# Toutes les autres routes vers index.html (SPA)
+/*         /index.html     200

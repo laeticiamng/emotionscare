@@ -2,53 +2,52 @@
 import React, { Suspense } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
-console.log('🚀 App component rendering - VERSION DEBUG ULTRA-SIMPLE...');
+console.log('🚀 App component rendering - VERSION UNIFIÉE ROUTER...');
 
-// Fallback d'erreur simple
-const ErrorFallback = ({ error }: { error: Error }) => (
-  <div style={{color:'red', padding:20, fontSize:20}}>
-    <h2>❌ Erreur détectée :</h2>
-    <pre style={{fontSize:14, background:'#fee', padding:10}}>
-      {error.message}
-    </pre>
-    <button onClick={() => window.location.reload()}>
-      Recharger la page
-    </button>
-  </div>
-);
-
-// Loader simple
-const SimpleLoader = () => (
-  <div style={{
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    minHeight: '100vh',
-    fontSize: '20px',
-    color: 'blue'
-  }}>
-    🔄 Chargement de l'application...
+// Loader avec data-testid pour les tests
+const UniversalLoader = () => (
+  <div 
+    data-testid="page-loading" 
+    className="min-h-screen bg-background flex items-center justify-center"
+  >
+    <div className="text-center space-y-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+      <p className="text-lg font-medium">Chargement EmotionsCare...</p>
+      <p className="text-sm text-muted-foreground">Initialisation du router unifié</p>
+    </div>
   </div>
 );
 
 function App() {
-  console.log('🚀 App function called');
+  console.log('🚀 App function called - Router unifié');
   
   React.useEffect(() => {
-    console.log('🚀 App mounted - VERSION ULTRA-SIMPLE');
+    console.log('🚀 App mounted - VERSION ROUTER UNIFIÉ');
     console.log('🚀 Current location:', window.location.href);
     console.log('🚀 Router object:', router);
-    return () => console.log('🚀 App unmounted');
+    
+    // Log de navigation pour debug
+    const handleRouteChange = () => {
+      console.info('%c[Route] mounted', 'color:lime', window.location.pathname);
+    };
+    
+    window.addEventListener('popstate', handleRouteChange);
+    handleRouteChange(); // Log initial
+    
+    return () => {
+      console.log('🚀 App unmounted');
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   return (
-    <ErrorBoundary fallback={<ErrorFallback error={new Error('Erreur inconnue')} />}>
-      <Suspense fallback={<SimpleLoader />}>
+    <UniversalErrorBoundary>
+      <Suspense fallback={<UniversalLoader />}>
         <RouterProvider router={router} />
       </Suspense>
-    </ErrorBoundary>
+    </UniversalErrorBoundary>
   );
 }
 

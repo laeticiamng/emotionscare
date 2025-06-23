@@ -1,50 +1,82 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Users, Shield } from 'lucide-react';
 
 const B2BSelectionPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 text-white">
+    <main data-testid="page-root" className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4">Espace B2B</h1>
-          <p className="text-xl text-gray-300">Choisissez votre type d'accès</p>
+          <h1 className="text-4xl font-bold mb-4">Sélection B2B</h1>
+          <p className="text-xl text-muted-foreground">
+            Choisissez votre profil pour accéder à EmotionsCare
+          </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4 text-blue-400">👤 Collaborateur</h2>
-            <p className="text-gray-300 mb-6">
-              Accès utilisateur pour les employés
-            </p>
-            <a 
-              href="/b2b/user/login"
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
-            >
-              Accès Collaborateur
-            </a>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4 text-green-400">⚙️ Administration</h2>
-            <p className="text-gray-300 mb-6">
-              Accès administrateur pour les RH
-            </p>
-            <a 
-              href="/b2b/admin/login"
-              className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition-colors inline-block"
-            >
-              Accès Administration
-            </a>
-          </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="text-center">
+              <Users className="h-16 w-16 mx-auto mb-4 text-blue-500" />
+              <CardTitle className="text-2xl">Utilisateur</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-muted-foreground">
+                Accès aux fonctionnalités de bien-être et d'analyse émotionnelle
+              </p>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => navigate('/b2b/user/login')}
+                  className="w-full"
+                >
+                  Se connecter
+                </Button>
+                <Button 
+                  onClick={() => navigate('/b2b/user/register')}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Créer un compte
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="text-center">
+              <Shield className="h-16 w-16 mx-auto mb-4 text-green-500" />
+              <CardTitle className="text-2xl">Administrateur</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-muted-foreground">
+                Gestion d'équipe, rapports et administration de la plateforme
+              </p>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => navigate('/b2b/admin/login')}
+                  className="w-full"
+                >
+                  Connexion Admin
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        
-        <div className="mt-12 text-center">
-          <a href="/" className="text-gray-400 hover:text-gray-200 underline">
+
+        <div className="text-center mt-12">
+          <Button 
+            onClick={() => navigate('/')}
+            variant="ghost"
+          >
             ← Retour à l'accueil
-          </a>
+          </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
