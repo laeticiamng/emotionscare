@@ -1,21 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const FeedbackPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Feedback in-App</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Votre avis compte</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Partagez vos commentaires pour améliorer EmotionsCare.</p>
-          </CardContent>
-        </Card>
-      </div>
+    <div data-testid="page-root">
+      <h1>Feedback - Page en construction</h1>
     </div>
   );
 };

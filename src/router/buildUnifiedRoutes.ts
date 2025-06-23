@@ -1,149 +1,287 @@
 
-import { lazy, Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
+import { UNIFIED_ROUTES } from '../utils/routeUtils';
+import { lazy } from 'react';
 
-// Import direct des routes pour éviter les échecs silencieux
-import { publicRoutes } from './routes/publicRoutes';
-import { userRoutes } from './routes/userRoutes';
-import { adminRoutes } from './routes/adminRoutes';
-import { b2bRoutes } from './routes/b2bRoutes';
-import { vrRoutes } from './routes/vrRoutes';
-import { scanRoutes } from './routes/scanRoutes';
-import { musicRoutes } from './routes/musicRoutes';
-import { onboardingRoutes } from './routes/onboardingRoutes';
-import { securityRoutes } from './routes/securityRoutes';
-import { gamificationRoutes } from './routes/gamificationRoutes';
-import { accessRoutes } from './routes/accessRoutes';
-import { reportsRoutes } from './routes/reportsRoutes';
-import { feedbackRoutes } from './routes/feedbackRoutes';
-import { innovationRoutes } from './routes/innovationRoutes';
-import { privacyRoutes } from './routes/privacyRoutes';
-import { notificationRoutes } from './routes/notificationRoutes';
-import { auditRoutes } from './routes/auditRoutes';
-import { accessibilityRoutes } from './routes/accessibilityRoutes';
+// Pages principales
+const HomePage = lazy(() => import('../pages/HomePage'));
+const ChooseModePage = lazy(() => import('../pages/ChooseModePage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+const Point20Page = lazy(() => import('../pages/Point20Page'));
 
-// Fallback universel pour les lazy imports
-const LazyPageWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={
-    <div data-testid="page-loading" className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
-  }>
-    {children}
-  </Suspense>
-);
+// Pages B2C
+const B2CLoginPage = lazy(() => import('../pages/b2c/LoginPage'));
+const B2CRegisterPage = lazy(() => import('../pages/b2c/RegisterPage'));
+const B2CDashboardPage = lazy(() => import('../pages/b2c/DashboardPage'));
 
-// Page 404 universelle
-const NotFoundPage = lazy(() => 
-  import('@/pages/NotFoundPage').catch(() => ({
-    default: () => (
-      <div data-testid="page-root" className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">404 - Page introuvable</h1>
-          <p className="text-muted-foreground">La page que vous cherchez n'existe pas.</p>
-        </div>
-      </div>
-    )
-  }))
-);
+// Pages B2B
+const B2BSelectionPage = lazy(() => import('../pages/b2b/SelectionPage'));
+const B2BUserLoginPage = lazy(() => import('../pages/b2b/user/LoginPage'));
+const B2BUserRegisterPage = lazy(() => import('../pages/b2b/user/RegisterPage'));
+const B2BUserDashboardPage = lazy(() => import('../pages/b2b/user/DashboardPage'));
+const B2BAdminLoginPage = lazy(() => import('../pages/b2b/admin/LoginPage'));
+const B2BAdminDashboardPage = lazy(() => import('../pages/b2b/admin/DashboardPage'));
 
-console.log('%c[Router] Building unified routes...', 'color:orange; font-weight:bold');
+// Pages modules
+const ScanPage = lazy(() => import('../pages/ScanPage'));
+const MusicPage = lazy(() => import('../pages/MusicPage'));
+const CoachPage = lazy(() => import('../pages/CoachPage'));
+const JournalPage = lazy(() => import('../pages/JournalPage'));
+const VRPage = lazy(() => import('../pages/VRPage'));
+const MeditationPage = lazy(() => import('../pages/MeditationPage'));
+const PreferencesPage = lazy(() => import('../pages/PreferencesPage'));
+const GamificationPage = lazy(() => import('../pages/GamificationPage'));
+const SocialCoconPage = lazy(() => import('../pages/SocialCoconPage'));
+const TeamsPage = lazy(() => import('../pages/TeamsPage'));
+const ReportsPage = lazy(() => import('../pages/ReportsPage'));
+const EventsPage = lazy(() => import('../pages/EventsPage'));
+const OptimisationPage = lazy(() => import('../pages/OptimisationPage'));
+const SettingsPage = lazy(() => import('../pages/SettingsPage'));
+const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
+const SecurityPage = lazy(() => import('../pages/SecurityPage'));
+const PrivacyPage = lazy(() => import('../pages/PrivacyPage'));
+const AuditPage = lazy(() => import('../pages/AuditPage'));
+const AccessibilityPage = lazy(() => import('../pages/AccessibilityPage'));
+const InnovationPage = lazy(() => import('../pages/InnovationPage'));
+const FeedbackPage = lazy(() => import('../pages/FeedbackPage'));
+const OnboardingPage = lazy(() => import('../pages/OnboardingPage'));
+const AccessDiagnosticPage = lazy(() => import('../pages/AccessDiagnosticPage'));
+
+export interface RouteManifestEntry {
+  path: string;
+  auth: 'public' | 'b2c' | 'b2b_user' | 'b2b_admin';
+  role?: string;
+  module: string;
+  component: string;
+}
+
+export const ROUTES_MANIFEST: RouteManifestEntry[] = [
+  // Routes publiques
+  { path: '/', auth: 'public', module: 'home', component: 'HomePage' },
+  { path: '/choose-mode', auth: 'public', module: 'auth', component: 'ChooseModePage' },
+  { path: '/b2b/selection', auth: 'public', module: 'b2b', component: 'B2BSelectionPage' },
+  { path: '/point20', auth: 'public', module: 'public', component: 'Point20Page' },
+  
+  // Routes d'authentification
+  { path: '/b2c/login', auth: 'public', module: 'auth', component: 'B2CLoginPage' },
+  { path: '/b2c/register', auth: 'public', module: 'auth', component: 'B2CRegisterPage' },
+  { path: '/b2b/user/login', auth: 'public', module: 'auth', component: 'B2BUserLoginPage' },
+  { path: '/b2b/user/register', auth: 'public', module: 'auth', component: 'B2BUserRegisterPage' },
+  { path: '/b2b/admin/login', auth: 'public', module: 'auth', component: 'B2BAdminLoginPage' },
+  
+  // Dashboards
+  { path: '/b2c/dashboard', auth: 'b2c', module: 'dashboard', component: 'B2CDashboardPage' },
+  { path: '/b2b/user/dashboard', auth: 'b2b_user', module: 'dashboard', component: 'B2BUserDashboardPage' },
+  { path: '/b2b/admin/dashboard', auth: 'b2b_admin', module: 'dashboard', component: 'B2BAdminDashboardPage' },
+  
+  // Modules communs
+  { path: '/scan', auth: 'b2c', module: 'emotion', component: 'ScanPage' },
+  { path: '/music', auth: 'b2c', module: 'music', component: 'MusicPage' },
+  { path: '/coach', auth: 'b2c', module: 'coach', component: 'CoachPage' },
+  { path: '/journal', auth: 'b2c', module: 'journal', component: 'JournalPage' },
+  { path: '/vr', auth: 'b2c', module: 'vr', component: 'VRPage' },
+  { path: '/meditation', auth: 'b2c', module: 'vr', component: 'MeditationPage' },
+  { path: '/preferences', auth: 'b2c', module: 'settings', component: 'PreferencesPage' },
+  { path: '/gamification', auth: 'b2c', module: 'gamification', component: 'GamificationPage' },
+  { path: '/social-cocon', auth: 'b2c', module: 'social', component: 'SocialCoconPage' },
+  
+  // Modules admin
+  { path: '/teams', auth: 'b2b_admin', role: 'b2b_admin', module: 'admin', component: 'TeamsPage' },
+  { path: '/reports', auth: 'b2b_admin', role: 'b2b_admin', module: 'admin', component: 'ReportsPage' },
+  { path: '/events', auth: 'b2b_admin', role: 'b2b_admin', module: 'admin', component: 'EventsPage' },
+  { path: '/optimisation', auth: 'b2b_admin', role: 'b2b_admin', module: 'admin', component: 'OptimisationPage' },
+  { path: '/settings', auth: 'b2b_admin', role: 'b2b_admin', module: 'admin', component: 'SettingsPage' },
+  { path: '/notifications', auth: 'b2b_admin', role: 'b2b_admin', module: 'admin', component: 'NotificationsPage' },
+  { path: '/security', auth: 'b2b_admin', role: 'b2b_admin', module: 'security', component: 'SecurityPage' },
+  { path: '/privacy', auth: 'b2b_admin', role: 'b2b_admin', module: 'privacy', component: 'PrivacyPage' },
+  { path: '/audit', auth: 'b2b_admin', role: 'b2b_admin', module: 'audit', component: 'AuditPage' },
+  { path: '/accessibility', auth: 'b2b_admin', role: 'b2b_admin', module: 'accessibility', component: 'AccessibilityPage' },
+  { path: '/innovation', auth: 'b2b_admin', role: 'b2b_admin', module: 'innovation', component: 'InnovationPage' },
+  { path: '/feedback', auth: 'b2b_admin', role: 'b2b_admin', module: 'feedback', component: 'FeedbackPage' },
+  { path: '/onboarding', auth: 'b2c', module: 'onboarding', component: 'OnboardingPage' },
+  { path: '/access-diagnostic', auth: 'b2c', module: 'accessibility', component: 'AccessDiagnosticPage' },
+];
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  const routes: RouteObject[] = [];
+  const routes: RouteObject[] = [
+    // Route principale
+    {
+      path: '/',
+      element: <HomePage />,
+    },
+    // Routes publiques
+    {
+      path: '/choose-mode',
+      element: <ChooseModePage />,
+    },
+    {
+      path: '/point20',
+      element: <Point20Page />,
+    },
+    // B2B Selection
+    {
+      path: '/b2b/selection',
+      element: <B2BSelectionPage />,
+    },
+    // Authentication routes
+    {
+      path: '/b2c/login',
+      element: <B2CLoginPage />,
+    },
+    {
+      path: '/b2c/register',
+      element: <B2CRegisterPage />,
+    },
+    {
+      path: '/b2b/user/login',
+      element: <B2BUserLoginPage />,
+    },
+    {
+      path: '/b2b/user/register',
+      element: <B2BUserRegisterPage />,
+    },
+    {
+      path: '/b2b/admin/login',
+      element: <B2BAdminLoginPage />,
+    },
+    // Dashboard routes
+    {
+      path: '/b2c/dashboard',
+      element: <B2CDashboardPage />,
+    },
+    {
+      path: '/b2b/user/dashboard',
+      element: <B2BUserDashboardPage />,
+    },
+    {
+      path: '/b2b/admin/dashboard',
+      element: <B2BAdminDashboardPage />,
+    },
+    // Module routes
+    {
+      path: '/scan',
+      element: <ScanPage />,
+    },
+    {
+      path: '/music',
+      element: <MusicPage />,
+    },
+    {
+      path: '/coach',
+      element: <CoachPage />,
+    },
+    {
+      path: '/journal',
+      element: <JournalPage />,
+    },
+    {
+      path: '/vr',
+      element: <VRPage />,
+    },
+    {
+      path: '/meditation',
+      element: <MeditationPage />,
+    },
+    {
+      path: '/preferences',
+      element: <PreferencesPage />,
+    },
+    {
+      path: '/gamification',
+      element: <GamificationPage />,
+    },
+    {
+      path: '/social-cocon',
+      element: <SocialCoconPage />,
+    },
+    // Admin routes
+    {
+      path: '/teams',
+      element: <TeamsPage />,
+    },
+    {
+      path: '/reports',
+      element: <ReportsPage />,
+    },
+    {
+      path: '/events',
+      element: <EventsPage />,
+    },
+    {
+      path: '/optimisation',
+      element: <OptimisationPage />,
+    },
+    {
+      path: '/settings',
+      element: <SettingsPage />,
+    },
+    {
+      path: '/notifications',
+      element: <NotificationsPage />,
+    },
+    {
+      path: '/security',
+      element: <SecurityPage />,
+    },
+    {
+      path: '/privacy',
+      element: <PrivacyPage />,
+    },
+    {
+      path: '/audit',
+      element: <AuditPage />,
+    },
+    {
+      path: '/accessibility',
+      element: <AccessibilityPage />,
+    },
+    {
+      path: '/innovation',
+      element: <InnovationPage />,
+    },
+    {
+      path: '/feedback',
+      element: <FeedbackPage />,
+    },
+    {
+      path: '/onboarding',
+      element: <OnboardingPage />,
+    },
+    {
+      path: '/access-diagnostic',
+      element: <AccessDiagnosticPage />,
+    },
+    // 404 catch-all
+    {
+      path: '*',
+      element: <NotFoundPage />,
+    },
+  ];
 
-  try {
-    // Routes publiques (toujours en premier)
-    routes.push(...publicRoutes);
-    console.log('%c[Router] ✅ Public routes loaded:', 'color:green', publicRoutes.length);
-
-    // Routes utilisateur
-    routes.push(...userRoutes);
-    console.log('%c[Router] ✅ User routes loaded:', 'color:green', userRoutes.length);
-
-    // Routes admin
-    routes.push(...adminRoutes);
-    console.log('%c[Router] ✅ Admin routes loaded:', 'color:green', adminRoutes.length);
-
-    // Routes B2B
-    routes.push(...b2bRoutes);
-    console.log('%c[Router] ✅ B2B routes loaded:', 'color:green', b2bRoutes.length);
-
-    // Routes des fonctionnalités
-    routes.push(...vrRoutes);
-    routes.push(...scanRoutes);
-    routes.push(...musicRoutes);
-    routes.push(...onboardingRoutes);
-    routes.push(...securityRoutes);
-    routes.push(...gamificationRoutes);
-    routes.push(...accessRoutes);
-    routes.push(...reportsRoutes);
-    routes.push(...feedbackRoutes);
-    routes.push(...innovationRoutes);
-    routes.push(...privacyRoutes);
-    routes.push(...notificationRoutes);
-    routes.push(...auditRoutes);
-    routes.push(...accessibilityRoutes);
-
-    console.log('%c[Router] ✅ Feature routes loaded', 'color:green');
-
-  } catch (error) {
-    console.error('%c[Router] ❌ Error loading routes:', 'color:red', error);
-  }
-
-  // Route 404 (toujours en dernier)
-  routes.push({
-    path: '*',
-    element: (
-      <LazyPageWrapper>
-        <NotFoundPage />
-      </LazyPageWrapper>
-    ),
-  });
-
-  console.log('%c[Router] ✅ Total routes configured:', 'color:blue; font-weight:bold', routes.length);
-  
   return routes;
 }
 
-// Manifest des routes pour les tests
-export const ROUTE_MANIFEST = [
-  '/',
-  '/about',
-  '/contact',
-  '/browsing',
-  '/privacy',
-  '/login',
-  '/b2c/login',
-  '/b2c/register',
-  '/reset-password',
-  '/auth/callback',
-  '/b2c/dashboard',
-  '/b2b/selection',
-  '/b2b/user/login',
-  '/b2b/user/register',
-  '/b2b/user/dashboard',
-  '/b2b/admin/login',
-  '/b2b/admin/dashboard',
-  '/b2b',
-  '/vr',
-  '/meditation',
-  '/scan',
-  '/music',
-  '/onboarding',
-  '/security',
-  '/gamification',
-  '/access-diagnostic',
-  '/reports',
-  '/feedback',
-  '/innovation',
-  '/privacy',
-  '/notifications',
-  '/audit',
-  '/accessibility',
-  '/teams',
-  '/events',
-  '/optimisation'
-];
-
-console.log('%c[Router] ✅ Route manifest ready:', 'color:purple', ROUTE_MANIFEST.length, 'routes');
+export function validateRoutesManifest(): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  const pathsSeen = new Set<string>();
+  
+  for (const route of ROUTES_MANIFEST) {
+    if (pathsSeen.has(route.path)) {
+      errors.push(`Duplicate path: ${route.path}`);
+    }
+    pathsSeen.add(route.path);
+    
+    if (!route.path.startsWith('/')) {
+      errors.push(`Invalid path format: ${route.path}`);
+    }
+    
+    if (!['public', 'b2c', 'b2b_user', 'b2b_admin'].includes(route.auth)) {
+      errors.push(`Invalid auth type: ${route.auth} for ${route.path}`);
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
