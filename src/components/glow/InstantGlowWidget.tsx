@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
 
-export const InstantGlowWidget: React.FC = () => {
+const InstantGlowWidget: React.FC = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <Button
@@ -15,3 +15,5 @@ export const InstantGlowWidget: React.FC = () => {
     </div>
   );
 };
+
+export default InstantGlowWidget;
