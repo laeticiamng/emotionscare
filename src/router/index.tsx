@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
       { path: 'choose-mode', element: <ChooseModePage /> },
       { path: 'b2b/selection', element: <B2BSelectionPage /> },
       
-      // Pages de fonctionnalités
+      // Pages de fonctionnalités - ROUTES FONCTIONNELLES
       { path: 'scan', element: <ScanPage /> },
       { path: 'music', element: <MusicPage /> },
       { path: 'coach', element: <CoachPage /> },
@@ -57,6 +57,9 @@ export const router = createBrowserRouter([
       
       // Routes d'authentification B2C
       { path: 'b2c/login', element: <B2CLoginPage /> },
+      
+      // AJOUT DE LA ROUTE /b2b QUI MANQUAIT
+      { path: 'b2b', element: <B2BSelectionPage /> },
       
       // Pages avec contenu de base pour éviter les 404
       { 

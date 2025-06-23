@@ -1,127 +1,66 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MessageCircle, Brain, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Brain, MessageCircle, Lightbulb, Target } from 'lucide-react';
 
 const CoachPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-indigo-50 to-cyan-100 p-4">
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-12 pt-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Coach IA Personnel
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 dark:from-gray-900 dark:to-gray-800 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="bg-purple-100 dark:bg-purple-900/30 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Brain className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Coach Virtuel
           </h1>
-          <p className="text-xl text-gray-600">
-            Votre assistant intelligent pour un bien-être émotionnel optimal
+          <p className="text-gray-600 dark:text-gray-300">
+            Votre accompagnateur bien-être personnalisé
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-3 p-3 bg-blue-100 rounded-full w-fit">
-                <MessageCircle className="h-6 w-6 text-blue-600" />
-              </div>
-              <CardTitle className="text-lg">Chat en temps réel</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">Commencer une conversation</Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-3 p-3 bg-green-100 rounded-full w-fit">
-                <Lightbulb className="h-6 w-6 text-green-600" />
-              </div>
-              <CardTitle className="text-lg">Conseils personnalisés</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">Obtenir des conseils</Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-3 p-3 bg-purple-100 rounded-full w-fit">
-                <Target className="h-6 w-6 text-purple-600" />
-              </div>
-              <CardTitle className="text-lg">Objectifs bien-être</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">Définir des objectifs</Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-3 p-3 bg-orange-100 rounded-full w-fit">
-                <Brain className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle className="text-lg">Exercices mentaux</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">Faire un exercice</Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Suggestions du jour</h2>
-            <div className="space-y-4">
-              <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                <h3 className="font-semibold text-blue-800 mb-1">Exercice de respiration</h3>
-                <p className="text-sm text-blue-600">Prenez 5 minutes pour une session de respiration guidée</p>
-                <Button size="sm" className="mt-2">Commencer</Button>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-400">
-                <h3 className="font-semibold text-green-800 mb-1">Pause gratitude</h3>
-                <p className="text-sm text-green-600">Notez 3 choses pour lesquelles vous êtes reconnaissant</p>
-                <Button size="sm" className="mt-2">Ouvrir le journal</Button>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-400">
-                <h3 className="font-semibold text-purple-800 mb-1">Écoute musicale</h3>
-                <p className="text-sm text-purple-600">Une playlist relaxante basée sur votre humeur</p>
-                <Button size="sm" className="mt-2">Écouter</Button>
-              </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
+          <div className="flex items-center mb-6">
+            <div className="bg-gradient-to-br from-purple-400 to-pink-500 h-12 w-12 rounded-full flex items-center justify-center mr-4">
+              <Heart className="h-6 w-6 text-white" />
             </div>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Votre progression</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Séances cette semaine</span>
-                <span className="text-blue-600 font-bold">7/7</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Score de bien-être</span>
-                <span className="text-green-600 font-bold">8.2/10</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Objectifs atteints</span>
-                <span className="text-purple-600 font-bold">4/5</span>
-              </div>
-              <Button className="w-full mt-4">Voir les détails</Button>
+            <div>
+              <h3 className="font-semibold text-lg">Bonjour ! 👋</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Comment vous sentez-vous aujourd'hui ?
+              </p>
             </div>
-          </Card>
-        </div>
+          </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Prêt à discuter avec votre coach ?</h2>
-          <p className="text-gray-600 mb-6">
-            Notre IA est disponible 24h/24 pour vous accompagner dans votre parcours de bien-être
-          </p>
-          <Button size="lg" className="mr-4">
-            <MessageCircle className="h-5 w-5 mr-2" />
-            Démarrer une conversation
-          </Button>
-          <Link to="/">
-            <Button size="lg" variant="outline">← Retour à l'accueil</Button>
-          </Link>
+          <div className="space-y-4 mb-6">
+            <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4">
+              <p className="text-purple-800 dark:text-purple-200">
+                "Basé sur votre dernier scan, je recommande une petite séance de méditation de 5 minutes."
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <Button className="bg-purple-600 hover:bg-purple-700 h-12">
+                💪 Continuez sur cette lancée !
+              </Button>
+              <Button variant="outline" className="h-12">
+                🧘 Une petite méditation ?
+              </Button>
+            </div>
+          </div>
+
+          <div className="border-t pt-6">
+            <div className="flex items-center space-x-2">
+              <input 
+                type="text" 
+                placeholder="Tapez votre message..."
+                className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+              />
+              <Button size="icon" className="bg-purple-600 hover:bg-purple-700">
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
