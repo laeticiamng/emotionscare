@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,13 +31,59 @@ interface AuditSummary {
   overallScore: number;
 }
 
-const PageAuditTool: React.FC = () => {
+interface PageAuditToolProps {
+  onAuditComplete?: () => void;
+}
+
+const PageAuditTool: React.FC<PageAuditToolProps> = ({ onAuditComplete }) => {
   const [auditResults, setAuditResults] = useState<PageAuditResult[]>([]);
   const [summary, setSummary] = useState<AuditSummary | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const { user, isAuthenticated } = useAuth();
   const { userMode } = useUserMode();
+
+  const routes = [
+    // Routes publiques
+    { path: '/', name: 'Accueil', roles: ['public'] },
+    { path: '/choose-mode', name: 'Choix du mode', roles: ['public'] },
+    { path: '/b2b/selection', name: 'Sélection B2B', roles: ['public'] },
+    
+    // Routes d'authentification
+    { path: '/b2c/login', name: 'Connexion B2C', roles: ['public'] },
+    { path: '/b2c/register', name: 'Inscription B2C', roles: ['public'] },
+    { path: '/b2b/user/login', name: 'Connexion B2B User', roles: ['public'] },
+    { path: '/b2b/user/register', name: 'Inscription B2B User', roles: ['public'] },
+    { path: '/b2b/admin/login', name: 'Connexion B2B Admin', roles: ['public'] },
+    
+    // Dashboards
+    { path: '/b2c/dashboard', name: 'Dashboard B2C', roles: ['b2c'] },
+    { path: '/b2b/user/dashboard', name: 'Dashboard B2B User', roles: ['b2b_user'] },
+    { path: '/b2b/admin/dashboard', name: 'Dashboard B2B Admin', roles: ['b2b_admin'] },
+    
+    // Fonctionnalités communes
+    { path: '/scan', name: 'Scanner', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/music', name: 'Musique', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/coach', name: 'Coach', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/journal', name: 'Journal', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/vr', name: 'Réalité Virtuelle', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/preferences', name: 'Préférences', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/gamification', name: 'Gamification', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/social-cocon', name: 'Social Cocon', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    
+    // Fonctionnalités admin
+    { path: '/teams', name: 'Équipes', roles: ['b2b_admin'] },
+    { path: '/reports', name: 'Rapports', roles: ['b2b_admin'] },
+    { path: '/events', name: 'Événements', roles: ['b2b_admin'] },
+    { path: '/optimisation', name: 'Optimisation', roles: ['b2b_admin'] },
+    { path: '/settings', name: 'Paramètres', roles: ['b2b_admin'] },
+    { path: '/notifications', name: 'Notifications', roles: ['b2b_admin'] },
+    { path: '/security', name: 'Sécurité', roles: ['b2b_admin'] },
+    { path: '/privacy', name: 'Confidentialité', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/audit', name: 'Audit Système', roles: ['b2b_admin'] },
+    { path: '/accessibility', name: 'Accessibilité', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
+    { path: '/innovation', name: 'Innovation Lab', roles: ['b2b_admin'] },
+  ];
 
   const auditAllPages = async () => {
     setIsAuditing(true);

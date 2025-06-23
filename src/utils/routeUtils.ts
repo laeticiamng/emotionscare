@@ -1,4 +1,3 @@
-
 /**
  * Utilitaires pour la gestion des routes - VERSION UNIFIÉE SANS DOUBLONS
  * RÈGLE ABSOLUE : Chaque fonctionnalité a UN SEUL chemin d'accès unique
@@ -46,6 +45,7 @@ export const UNIFIED_ROUTES = {
   PRIVACY: '/privacy',
   AUDIT: '/audit',
   ACCESSIBILITY: '/accessibility',
+  INNOVATION: '/innovation',
 } as const;
 
 /**

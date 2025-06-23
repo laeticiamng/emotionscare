@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,12 +18,54 @@ interface RouteAuditResult {
   score: number;
 }
 
-export const SystemAudit: React.FC = () => {
+const SystemAudit: React.FC = () => {
   const [auditResults, setAuditResults] = useState<RouteAuditResult[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const [overallScore, setOverallScore] = useState(0);
   const { isAuthenticated, user } = useAuth();
   const { userMode } = useUserMode();
+
+  const allRoutes = [
+    // Routes publiques
+    { path: '/', name: 'Accueil', category: 'Public', expectedContent: 'Page d\'accueil avec navigation' },
+    { path: '/choose-mode', name: 'Choix du mode', category: 'Public', expectedContent: 'Sélection B2C/B2B' },
+    { path: '/b2b/selection', name: 'Sélection B2B', category: 'Public', expectedContent: 'Choix User/Admin' },
+    
+    // Authentification
+    { path: '/b2c/login', name: 'Connexion B2C', category: 'Auth', expectedContent: 'Formulaire de connexion B2C' },
+    { path: '/b2c/register', name: 'Inscription B2C', category: 'Auth', expectedContent: 'Formulaire d\'inscription B2C' },
+    { path: '/b2b/user/login', name: 'Connexion B2B User', category: 'Auth', expectedContent: 'Formulaire de connexion B2B User' },
+    { path: '/b2b/user/register', name: 'Inscription B2B User', category: 'Auth', expectedContent: 'Formulaire d\'inscription B2B User' },
+    { path: '/b2b/admin/login', name: 'Connexion B2B Admin', category: 'Auth', expectedContent: 'Formulaire de connexion B2B Admin' },
+    
+    // Dashboards
+    { path: '/b2c/dashboard', name: 'Dashboard B2C', category: 'Dashboard', expectedContent: 'Tableau de bord personnel B2C' },
+    { path: '/b2b/user/dashboard', name: 'Dashboard B2B User', category: 'Dashboard', expectedContent: 'Tableau de bord collaborateur' },
+    { path: '/b2b/admin/dashboard', name: 'Dashboard B2B Admin', category: 'Dashboard', expectedContent: 'Tableau de bord administrateur' },
+    
+    // Fonctionnalités principales
+    { path: '/scan', name: 'Scanner Émotions', category: 'Features', expectedContent: 'Interface de scan émotionnel' },
+    { path: '/music', name: 'Thérapie Musicale', category: 'Features', expectedContent: 'Lecteur et recommandations musicales' },
+    { path: '/coach', name: 'Coach IA', category: 'Features', expectedContent: 'Interface de chat avec le coach' },
+    { path: '/journal', name: 'Journal', category: 'Features', expectedContent: 'Interface de journal personnel' },
+    { path: '/vr', name: 'Réalité Virtuelle', category: 'Features', expectedContent: 'Expériences VR immersives' },
+    { path: '/preferences', name: 'Préférences', category: 'Features', expectedContent: 'Paramètres utilisateur' },
+    { path: '/gamification', name: 'Gamification', category: 'Features', expectedContent: 'Éléments de jeu et défis' },
+    { path: '/social-cocon', name: 'Social Cocon', category: 'Features', expectedContent: 'Communauté et partage' },
+    
+    // Administration
+    { path: '/teams', name: 'Gestion Équipes', category: 'Admin', expectedContent: 'Gestion des équipes et utilisateurs' },
+    { path: '/reports', name: 'Rapports', category: 'Admin', expectedContent: 'Rapports et analytics' },
+    { path: '/events', name: 'Événements', category: 'Admin', expectedContent: 'Gestion des événements' },
+    { path: '/optimisation', name: 'Optimisation', category: 'Admin', expectedContent: 'Outils d\'optimisation performance' },
+    { path: '/settings', name: 'Paramètres Système', category: 'Admin', expectedContent: 'Configuration système' },
+    { path: '/notifications', name: 'Notifications', category: 'Admin', expectedContent: 'Gestion des notifications' },
+    { path: '/security', name: 'Sécurité', category: 'Admin', expectedContent: 'Paramètres de sécurité' },
+    { path: '/privacy', name: 'Confidentialité', category: 'Privacy', expectedContent: 'Gestion RGPD et confidentialité' },
+    { path: '/audit', name: 'Audit Système', category: 'Admin', expectedContent: 'Outils d\'audit et monitoring' },
+    { path: '/accessibility', name: 'Accessibilité', category: 'Accessibility', expectedContent: 'Configuration accessibilité' },
+    { path: '/innovation', name: 'Innovation Lab', category: 'Admin', expectedContent: 'Laboratoire d\'innovation et expérimentations' },
+  ];
 
   const auditRoute = async (route: string): Promise<RouteAuditResult> => {
     const startTime = performance.now();
@@ -132,6 +173,10 @@ export const SystemAudit: React.FC = () => {
     runFullAudit();
   }, [isAuthenticated, userMode]);
 
+  const totalRoutes = allRoutes.length; // Should be 26 now
+  const completedAudits = auditResults.filter(r => r.status === 'success').length;
+  const globalScore = totalRoutes > 0 ? Math.round((completedAudits / totalRoutes) * 100) : 0;
+
   return (
     <div className="space-y-6">
       <Card>
@@ -153,9 +198,9 @@ export const SystemAudit: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Score Global</span>
-                <span className="text-sm text-muted-foreground">{overallScore.toFixed(1)}/100</span>
+                <span className="text-sm text-muted-foreground">{globalScore.toFixed(1)}/100</span>
               </div>
-              <Progress value={overallScore} className="h-2" />
+              <Progress value={globalScore} className="h-2" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -184,7 +229,7 @@ export const SystemAudit: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Détail des Routes ({auditResults.length}/{Object.values(UNIFIED_ROUTES).length})</CardTitle>
+          <CardTitle>Détail des Routes ({auditResults.length}/{totalRoutes})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">

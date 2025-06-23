@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import PageAccessGuard from '@/components/access/PageAccessGuard';
@@ -22,11 +21,13 @@ import { reportsRoutes } from './routes/reportsRoutes';
 import { privacyRoutes } from './routes/privacyRoutes';
 import { auditRoutes } from './routes/auditRoutes';
 import { accessibilityRoutes } from './routes/accessibilityRoutes';
+import { innovationRoutes } from './routes/innovationRoutes';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Shell />,
+    errorElement: <ErrorPage />,
     children: [
       // Routes publiques
       {
@@ -164,6 +165,7 @@ export const router = createBrowserRouter([
       ...privacyRoutes,
       ...auditRoutes,
       ...accessibilityRoutes,
+      ...innovationRoutes,
 
       // Route 404
       {

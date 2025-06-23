@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -11,6 +10,7 @@ import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { Toaster } from 'sonner';
 import PrivacyConsentBanner from '@/components/privacy/PrivacyConsentBanner';
 import { OptimizationProvider } from '@/contexts/OptimizationContext';
+import { InnovationProvider } from '@/contexts/InnovationContext';
 import { initializeProductionSecurity } from '@/utils/productionSecurity';
 
 // Configuration React Query avec optimisations
@@ -39,24 +39,26 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <AccessibilityProvider>
         <ThemeProvider>
           <OptimizationProvider>
-            <SessionProvider>
-              <AuthProvider>
-                <UserModeProvider>
-                  <UserPreferencesProvider>
-                    <EthicsProvider>
-                      {children}
-                      <PrivacyConsentBanner />
-                      <Toaster 
-                        position="top-right" 
-                        richColors 
-                        closeButton
-                        duration={4000}
-                      />
-                    </EthicsProvider>
-                  </UserPreferencesProvider>
-                </UserModeProvider>
-              </AuthProvider>
-            </SessionProvider>
+            <InnovationProvider>
+              <SessionProvider>
+                <AuthProvider>
+                  <UserModeProvider>
+                    <UserPreferencesProvider>
+                      <EthicsProvider>
+                        {children}
+                        <PrivacyConsentBanner />
+                        <Toaster 
+                          position="top-right" 
+                          richColors 
+                          closeButton
+                          duration={4000}
+                        />
+                      </EthicsProvider>
+                    </UserPreferencesProvider>
+                  </UserModeProvider>
+                </AuthProvider>
+              </SessionProvider>
+            </InnovationProvider>
           </OptimizationProvider>
         </ThemeProvider>
       </AccessibilityProvider>
