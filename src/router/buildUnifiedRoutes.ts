@@ -19,7 +19,7 @@ import { notificationRoutes } from './routes/notificationRoutes';
 import { auditRoutes } from './routes/auditRoutes';
 import { accessibilityRoutes } from './routes/accessibilityRoutes';
 
-// Import direct des pages principales pour éviter les problèmes de lazy loading
+// Import direct des pages principales 
 import HomePage from '@/pages/HomePage';
 import TestPage from '@/pages/TestPage';
 import Point20Page from '@/pages/Point20Page';
@@ -39,13 +39,13 @@ const NotFoundPage = () => (
 
 /**
  * Construit un tableau unifié de toutes les routes de l'application
- * Fusionne tous les modules de routes et ajoute la route 404
+ * SANS DOUBLONS - chaque route n'est définie qu'une seule fois
  */
 export function buildUnifiedRoutes(): RouteObject[] {
   console.log('🔧 Building unified routes...');
   
-  const allRoutes: RouteObject[] = [
-    // Routes principales en direct (sans lazy loading pour debug)
+  // Routes principales en premier (routes exactes)
+  const mainRoutes: RouteObject[] = [
     {
       path: '/',
       element: <HomePage />,
@@ -58,17 +58,13 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/point20',
       element: <Point20Page />,
     },
-    
-    // Routes publiques (/, /about, /contact, etc.)
+  ];
+
+  // Récupérer toutes les autres routes modulaires
+  const allModularRoutes = [
     ...publicRoutes,
-    
-    // Routes utilisateur (B2C/B2B login, dashboard, etc.)
     ...userRoutes,
-    
-    // Routes admin
     ...adminRoutes,
-    
-    // Routes fonctionnelles
     ...scanRoutes,
     ...musicRoutes,
     ...vrRoutes,
@@ -84,6 +80,18 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...notificationRoutes,
     ...auditRoutes,
     ...accessibilityRoutes,
+  ];
+
+  // Filtrer les doublons avec les routes principales
+  const mainPaths = mainRoutes.map(r => r.path);
+  const filteredModularRoutes = allModularRoutes.filter(route => 
+    !mainPaths.includes(route.path) && route.path !== '/' && route.path !== '/test' && route.path !== '/point20'
+  );
+
+  // Combiner toutes les routes
+  const allRoutes: RouteObject[] = [
+    ...mainRoutes,
+    ...filteredModularRoutes,
     
     // Route 404 (doit être en dernier)
     {
@@ -100,8 +108,8 @@ export function buildUnifiedRoutes(): RouteObject[] {
     console.error('🚨 Routes dupliquées détectées:', duplicates);
   }
   
-  console.log(`✅ ${allRoutes.length} routes configurées`);
-  console.log('📋 Routes détectées:', paths.slice(0, 10), '...');
+  console.log(`✅ ${allRoutes.length} routes configurées (sans doublons)`);
+  console.log('📋 Routes principales:', mainPaths);
   
   return allRoutes;
 }
