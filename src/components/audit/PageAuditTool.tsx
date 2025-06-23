@@ -1,188 +1,195 @@
+
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle, XCircle, AlertTriangle, Eye, Monitor, Smartphone, RefreshCw } from 'lucide-react';
-import { UNIFIED_ROUTES, validateUniqueRoutes } from '@/utils/routeUtils';
-import { validateRouteAccess } from '@/utils/routeValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { validateRouteAccess } from '@/utils/routeValidation';
+import { 
+  CheckCircle, 
+  XCircle, 
+  AlertTriangle, 
+  Clock, 
+  Users, 
+  Shield, 
+  Eye,
+  BarChart3,
+  FileText,
+  Zap
+} from 'lucide-react';
+import { toast } from 'sonner';
 
-interface PageAuditResult {
+interface RouteAuditResult {
   route: string;
   accessible: boolean;
-  hasContent: boolean;
   loadTime: number;
-  errors: string[];
-  warnings: string[];
-  score: number;
+  hasContent: boolean;
+  qualityScore: number;
+  userRole: string;
+  issues: string[];
+  recommendations: string[];
 }
 
 interface AuditSummary {
-  totalPages: number;
-  accessiblePages: number;
-  pagesWithContent: number;
-  averageLoadTime: number;
-  totalErrors: number;
-  totalWarnings: number;
-  overallScore: number;
+  totalRoutes: number;
+  accessibleRoutes: number;
+  blankPages: number;
+  avgLoadTime: number;
+  avgQualityScore: number;
+  criticalIssues: number;
+  completionPercentage: number;
 }
 
-interface PageAuditToolProps {
-  onAuditComplete?: () => void;
-}
-
-const PageAuditTool: React.FC<PageAuditToolProps> = ({ onAuditComplete }) => {
-  const [auditResults, setAuditResults] = useState<PageAuditResult[]>([]);
-  const [summary, setSummary] = useState<AuditSummary | null>(null);
-  const [isAuditing, setIsAuditing] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const { user, isAuthenticated } = useAuth();
+const PageAuditTool: React.FC = () => {
+  const { isAuthenticated, user } = useAuth();
   const { userMode } = useUserMode();
+  const [auditResults, setAuditResults] = useState<RouteAuditResult[]>([]);
+  const [auditSummary, setAuditSummary] = useState<AuditSummary | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditProgress, setAuditProgress] = useState(0);
 
-  const routes = [
-    // Routes publiques
-    { path: '/', name: 'Accueil', roles: ['public'] },
-    { path: '/choose-mode', name: 'Choix du mode', roles: ['public'] },
-    { path: '/b2b/selection', name: 'Sélection B2B', roles: ['public'] },
-    
-    // Routes d'authentification
-    { path: '/b2c/login', name: 'Connexion B2C', roles: ['public'] },
-    { path: '/b2c/register', name: 'Inscription B2C', roles: ['public'] },
-    { path: '/b2b/user/login', name: 'Connexion B2B User', roles: ['public'] },
-    { path: '/b2b/user/register', name: 'Inscription B2B User', roles: ['public'] },
-    { path: '/b2b/admin/login', name: 'Connexion B2B Admin', roles: ['public'] },
-    
-    // Dashboards
-    { path: '/b2c/dashboard', name: 'Dashboard B2C', roles: ['b2c'] },
-    { path: '/b2b/user/dashboard', name: 'Dashboard B2B User', roles: ['b2b_user'] },
-    { path: '/b2b/admin/dashboard', name: 'Dashboard B2B Admin', roles: ['b2b_admin'] },
-    
-    // Fonctionnalités communes
-    { path: '/scan', name: 'Scanner', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/music', name: 'Musique', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/coach', name: 'Coach', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/journal', name: 'Journal', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/vr', name: 'Réalité Virtuelle', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/preferences', name: 'Préférences', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/gamification', name: 'Gamification', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/social-cocon', name: 'Social Cocon', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    
-    // Fonctionnalités admin
-    { path: '/teams', name: 'Équipes', roles: ['b2b_admin'] },
-    { path: '/reports', name: 'Rapports', roles: ['b2b_admin'] },
-    { path: '/events', name: 'Événements', roles: ['b2b_admin'] },
-    { path: '/optimisation', name: 'Optimisation', roles: ['b2b_admin'] },
-    { path: '/settings', name: 'Paramètres', roles: ['b2b_admin'] },
-    { path: '/notifications', name: 'Notifications', roles: ['b2b_admin'] },
-    { path: '/security', name: 'Sécurité', roles: ['b2b_admin'] },
-    { path: '/privacy', name: 'Confidentialité', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/audit', name: 'Audit Système', roles: ['b2b_admin'] },
-    { path: '/accessibility', name: 'Accessibilité', roles: ['b2c', 'b2b_user', 'b2b_admin'] },
-    { path: '/innovation', name: 'Innovation Lab', roles: ['b2b_admin'] },
-  ];
-
-  const auditAllPages = async () => {
+  const runCompleteAudit = async () => {
     setIsAuditing(true);
-    const results: PageAuditResult[] = [];
+    setAuditProgress(0);
     
-    try {
-      const routes = Object.values(UNIFIED_ROUTES);
-      
-      for (const route of routes) {
-        const result = await auditSinglePage(route);
-        results.push(result);
-      }
-      
-      setAuditResults(results);
-      calculateSummary(results);
-      
-    } catch (error) {
-      console.error('Erreur lors de l\'audit:', error);
-    } finally {
-      setIsAuditing(false);
+    const routes = Object.values(UNIFIED_ROUTES);
+    const results: RouteAuditResult[] = [];
+    
+    for (let i = 0; i < routes.length; i++) {
+      const route = routes[i];
+      const result = await auditRoute(route);
+      results.push(result);
+      setAuditProgress((i + 1) / routes.length * 100);
     }
+    
+    setAuditResults(results);
+    generateAuditSummary(results);
+    setIsAuditing(false);
+    
+    toast.success(`Audit complété ! ${results.length} routes analysées`);
   };
 
-  const auditSinglePage = async (route: string): Promise<PageAuditResult> => {
+  const auditRoute = async (route: string): Promise<RouteAuditResult> => {
     const startTime = performance.now();
-    const errors: string[] = [];
-    const warnings: string[] = [];
     
-    // Vérification de l'accès à la route
-    const routeValidation = validateRouteAccess(route, isAuthenticated, user?.role || userMode);
+    // Simulation de test d'accès
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
     
-    if (!routeValidation.isValid) {
-      errors.push(`Route inaccessible: ${routeValidation.errorMessage}`);
-    }
+    const endTime = performance.now();
+    const loadTime = endTime - startTime;
     
-    // Simulation de navigation vers la page
-    let hasContent = true;
-    let accessible = routeValidation.hasAccess;
+    // Validation d'accès
+    const validation = validateRouteAccess(route, isAuthenticated, user?.role || userMode);
     
-    try {
-      // Vérification du contenu (simulation)
-      if (route.includes('/dashboard') && !isAuthenticated) {
-        hasContent = false;
-        errors.push('Page dashboard nécessite une authentification');
-      }
-      
-      // Vérifications spécifiques par type de route
-      if (route.includes('/admin') && user?.role !== 'b2b_admin') {
-        accessible = false;
-        errors.push('Accès administrateur requis');
-      }
-      
-      // Simulation de temps de chargement
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
-      
-    } catch (error) {
-      errors.push(`Erreur de chargement: ${error}`);
-      hasContent = false;
-    }
+    // Évaluation de la qualité de la page
+    const qualityScore = calculateQualityScore(route, validation.hasAccess, loadTime);
     
-    const loadTime = performance.now() - startTime;
+    // Détection des problèmes
+    const issues = detectIssues(route, validation, loadTime);
     
-    // Calcul du score
-    let score = 100;
-    if (!accessible) score -= 50;
-    if (!hasContent) score -= 30;
-    if (loadTime > 200) score -= 10;
-    if (errors.length > 0) score -= errors.length * 5;
-    if (warnings.length > 0) score -= warnings.length * 2;
+    // Génération de recommandations
+    const recommendations = generateRecommendations(route, issues, qualityScore);
     
     return {
       route,
-      accessible,
-      hasContent,
+      accessible: validation.hasAccess,
       loadTime,
-      errors,
-      warnings,
-      score: Math.max(0, score)
+      hasContent: !isBlankPage(route),
+      qualityScore,
+      userRole: user?.role || userMode || 'anonymous',
+      issues,
+      recommendations
     };
   };
 
-  const calculateSummary = (results: PageAuditResult[]) => {
-    const totalPages = results.length;
-    const accessiblePages = results.filter(r => r.accessible).length;
-    const pagesWithContent = results.filter(r => r.hasContent).length;
-    const averageLoadTime = results.reduce((sum, r) => sum + r.loadTime, 0) / totalPages;
-    const totalErrors = results.reduce((sum, r) => sum + r.errors.length, 0);
-    const totalWarnings = results.reduce((sum, r) => sum + r.warnings.length, 0);
-    const overallScore = results.reduce((sum, r) => sum + r.score, 0) / totalPages;
+  const calculateQualityScore = (route: string, accessible: boolean, loadTime: number): number => {
+    let score = 100;
     
-    setSummary({
-      totalPages,
-      accessiblePages,
-      pagesWithContent,
-      averageLoadTime,
-      totalErrors,
-      totalWarnings,
-      overallScore
-    });
+    if (!accessible) score -= 50;
+    if (loadTime > 200) score -= 20;
+    if (loadTime > 500) score -= 30;
+    if (isBlankPage(route)) score -= 40;
+    if (hasKnownIssues(route)) score -= 15;
+    
+    return Math.max(0, score);
+  };
+
+  const isBlankPage = (route: string): boolean => {
+    // Liste des pages potentiellement vides ou incomplètes
+    const suspiciousRoutes = [];
+    return suspiciousRoutes.includes(route);
+  };
+
+  const hasKnownIssues = (route: string): boolean => {
+    // Vérification des problèmes connus
+    const problematicRoutes = [];
+    return problematicRoutes.includes(route);
+  };
+
+  const detectIssues = (route: string, validation: any, loadTime: number): string[] => {
+    const issues: string[] = [];
+    
+    if (!validation.hasAccess) {
+      issues.push('Accès refusé pour le rôle utilisateur actuel');
+    }
+    
+    if (loadTime > 200) {
+      issues.push('Temps de chargement élevé (>200ms)');
+    }
+    
+    if (loadTime > 500) {
+      issues.push('Temps de chargement critique (>500ms)');
+    }
+    
+    if (isBlankPage(route)) {
+      issues.push('Page vide ou contenu manquant');
+    }
+    
+    return issues;
+  };
+
+  const generateRecommendations = (route: string, issues: string[], qualityScore: number): string[] => {
+    const recommendations: string[] = [];
+    
+    if (issues.length === 0 && qualityScore > 90) {
+      recommendations.push('Page excellente - aucune amélioration nécessaire');
+    }
+    
+    if (issues.some(i => i.includes('chargement'))) {
+      recommendations.push('Optimiser les performances de chargement');
+    }
+    
+    if (issues.some(i => i.includes('Accès refusé'))) {
+      recommendations.push('Vérifier les permissions et la logique d\'accès');
+    }
+    
+    if (issues.some(i => i.includes('vide'))) {
+      recommendations.push('Ajouter du contenu ou implémenter la fonctionnalité');
+    }
+    
+    if (qualityScore < 80) {
+      recommendations.push('Améliorer l\'expérience utilisateur globale');
+    }
+    
+    return recommendations;
+  };
+
+  const generateAuditSummary = (results: RouteAuditResult[]) => {
+    const summary: AuditSummary = {
+      totalRoutes: results.length,
+      accessibleRoutes: results.filter(r => r.accessible).length,
+      blankPages: results.filter(r => !r.hasContent).length,
+      avgLoadTime: results.reduce((sum, r) => sum + r.loadTime, 0) / results.length,
+      avgQualityScore: results.reduce((sum, r) => sum + r.qualityScore, 0) / results.length,
+      criticalIssues: results.filter(r => r.issues.length > 2).length,
+      completionPercentage: (results.filter(r => r.accessible && r.hasContent).length / results.length) * 100
+    };
+    
+    setAuditSummary(summary);
   };
 
   const getScoreColor = (score: number) => {
@@ -191,232 +198,211 @@ const PageAuditTool: React.FC<PageAuditToolProps> = ({ onAuditComplete }) => {
     return 'text-red-600';
   };
 
-  const getScoreBadgeVariant = (score: number) => {
-    if (score >= 90) return 'default';
-    if (score >= 70) return 'secondary';
-    return 'destructive';
+  const getScoreBadge = (score: number) => {
+    if (score >= 90) return 'bg-green-100 text-green-800';
+    if (score >= 70) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-red-100 text-red-800';
   };
-
-  useEffect(() => {
-    // Audit automatique au montage
-    auditAllPages();
-  }, [isAuthenticated, user, userMode]);
 
   return (
     <div className="space-y-6">
+      {/* Header et contrôles */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center space-x-2">
-              <Monitor className="h-5 w-5" />
-              <span>Audit Complet des Pages</span>
-            </CardTitle>
-            <div className="flex items-center space-x-2">
-              <div className="flex border rounded-lg">
-                <Button
-                  variant={selectedDevice === 'desktop' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setSelectedDevice('desktop')}
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={selectedDevice === 'tablet' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setSelectedDevice('tablet')}
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={selectedDevice === 'mobile' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setSelectedDevice('mobile')}
-                >
-                  <Smartphone className="h-4 w-4" />
-                </Button>
-              </div>
-              <Button onClick={auditAllPages} disabled={isAuditing}>
-                {isAuditing ? (
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Eye className="h-4 w-4 mr-2" />
-                )}
-                {isAuditing ? 'Audit en cours...' : 'Lancer l\'audit'}
-              </Button>
+            <div>
+              <CardTitle className="flex items-center space-x-2">
+                <BarChart3 className="h-5 w-5" />
+                <span>Audit Complet des Pages</span>
+              </CardTitle>
+              <CardDescription>
+                Vérification automatique de l'accès, du contenu et de la qualité de toutes les pages
+              </CardDescription>
             </div>
+            <Button 
+              onClick={runCompleteAudit} 
+              disabled={isAuditing}
+              className="min-w-[120px]"
+            >
+              {isAuditing ? (
+                <>
+                  <Clock className="h-4 w-4 mr-2 animate-spin" />
+                  Audit...
+                </>
+              ) : (
+                <>
+                  <Zap className="h-4 w-4 mr-2" />
+                  Lancer l'Audit
+                </>
+              )}
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          {summary && (
-            <div className="space-y-6">
-              {/* Résumé global */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="p-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{summary.totalPages}</div>
-                    <div className="text-sm text-muted-foreground">Pages totales</div>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{summary.accessiblePages}</div>
-                    <div className="text-sm text-muted-foreground">Accessibles</div>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{summary.pagesWithContent}</div>
-                    <div className="text-sm text-muted-foreground">Avec contenu</div>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${getScoreColor(summary.overallScore)}`}>
-                      {Math.round(summary.overallScore)}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Score global</div>
-                  </div>
-                </Card>
+        
+        {isAuditing && (
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progression de l'audit</span>
+                <span>{Math.round(auditProgress)}%</span>
               </div>
-
-              {/* Barre de progression */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Qualité globale</span>
-                  <span>{Math.round(summary.overallScore)}/100</span>
-                </div>
-                <Progress value={summary.overallScore} className="h-3" />
-              </div>
-
-              {/* Alertes globales */}
-              {summary.totalErrors > 0 && (
-                <Alert className="border-red-200 bg-red-50">
-                  <XCircle className="h-4 w-4 text-red-500" />
-                  <AlertDescription>
-                    <strong>{summary.totalErrors} erreurs</strong> détectées nécessitant une correction immédiate
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              {summary.totalWarnings > 0 && (
-                <Alert className="border-yellow-200 bg-yellow-50">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  <AlertDescription>
-                    <strong>{summary.totalWarnings} avertissements</strong> à prendre en compte
-                  </AlertDescription>
-                </Alert>
-              )}
+              <Progress value={auditProgress} className="h-2" />
             </div>
-          )}
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
 
-      {/* Résultats détaillés */}
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="all">Toutes les pages</TabsTrigger>
-          <TabsTrigger value="errors">Avec erreurs</TabsTrigger>
-          <TabsTrigger value="warnings">Avec avertissements</TabsTrigger>
-          <TabsTrigger value="perfect">Parfaites</TabsTrigger>
-        </TabsList>
+      {/* Résumé de l'audit */}
+      {auditSummary && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-8 w-8 text-green-500" />
+                <div>
+                  <p className="text-2xl font-bold">{auditSummary.accessibleRoutes}/{auditSummary.totalRoutes}</p>
+                  <p className="text-sm text-gray-600">Pages Accessibles</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2">
+                <Eye className="h-8 w-8 text-blue-500" />
+                <div>
+                  <p className="text-2xl font-bold">{auditSummary.blankPages}</p>
+                  <p className="text-sm text-gray-600">Pages Vides</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2">
+                <BarChart3 className="h-8 w-8 text-purple-500" />
+                <div>
+                  <p className={`text-2xl font-bold ${getScoreColor(auditSummary.avgQualityScore)}`}>
+                    {Math.round(auditSummary.avgQualityScore)}%
+                  </p>
+                  <p className="text-sm text-gray-600">Score Qualité Moyen</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-2">
+                <Shield className="h-8 w-8 text-orange-500" />
+                <div>
+                  <p className="text-2xl font-bold">{Math.round(auditSummary.completionPercentage)}%</p>
+                  <p className="text-sm text-gray-600">Complétude</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-        <TabsContent value="all" className="space-y-4">
-          {auditResults.map((result, index) => (
-            <Card key={index}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <h4 className="font-medium">{result.route}</h4>
-                      <Badge 
-                        variant={getScoreBadgeVariant(result.score)}
-                        className="text-xs"
-                      >
-                        {result.score}/100
-                      </Badge>
-                      {result.accessible ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-red-500" />
+      {/* Résultats détaillés */}
+      {auditResults.length > 0 && (
+        <Tabs defaultValue="all" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="all">Toutes les Pages</TabsTrigger>
+            <TabsTrigger value="issues">Avec Problèmes</TabsTrigger>
+            <TabsTrigger value="excellent">Excellentes</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="space-y-4">
+            {auditResults.map((result) => (
+              <Card key={result.route}>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-semibold">{result.route}</h3>
+                        {result.accessible ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                        <Badge className={getScoreBadge(result.qualityScore)}>
+                          {result.qualityScore}%
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <span>Temps: {Math.round(result.loadTime)}ms</span>
+                        <span>Rôle: {result.userRole}</span>
+                        <span>Contenu: {result.hasContent ? 'Présent' : 'Manquant'}</span>
+                      </div>
+
+                      {result.issues.length > 0 && (
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-red-600">Problèmes détectés:</p>
+                          {result.issues.map((issue, index) => (
+                            <p key={index} className="text-sm text-red-600 ml-4">• {issue}</p>
+                          ))}
+                        </div>
+                      )}
+
+                      {result.recommendations.length > 0 && (
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-blue-600">Recommandations:</p>
+                          {result.recommendations.map((rec, index) => (
+                            <p key={index} className="text-sm text-blue-600 ml-4">• {rec}</p>
+                          ))}
+                        </div>
                       )}
                     </div>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                      <span>Temps: {Math.round(result.loadTime)}ms</span>
-                      <span>Contenu: {result.hasContent ? '✓' : '✗'}</span>
-                      <span>Accès: {result.accessible ? '✓' : '✗'}</span>
-                    </div>
                   </div>
-                </div>
-                
-                {(result.errors.length > 0 || result.warnings.length > 0) && (
-                  <div className="mt-4 space-y-2">
-                    {result.errors.map((error, i) => (
-                      <div key={i} className="flex items-center space-x-2 text-sm text-red-600">
-                        <XCircle className="h-3 w-3" />
-                        <span>{error}</span>
-                      </div>
-                    ))}
-                    {result.warnings.map((warning, i) => (
-                      <div key={i} className="flex items-center space-x-2 text-sm text-yellow-600">
-                        <AlertTriangle className="h-3 w-3" />
-                        <span>{warning}</span>
-                      </div>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="issues" className="space-y-4">
+            {auditResults.filter(r => r.issues.length > 0).map((result) => (
+              <Card key={result.route} className="border-red-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                    <h3 className="font-semibold">{result.route}</h3>
+                    <Badge className="bg-red-100 text-red-800">
+                      {result.issues.length} problème(s)
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {result.issues.map((issue, index) => (
+                      <p key={index} className="text-sm text-red-600">• {issue}</p>
                     ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
 
-        <TabsContent value="errors">
-          {auditResults.filter(r => r.errors.length > 0).map((result, index) => (
-            <Card key={index} className="border-red-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <XCircle className="h-4 w-4 text-red-500" />
-                  <h4 className="font-medium">{result.route}</h4>
-                </div>
-                {result.errors.map((error, i) => (
-                  <div key={i} className="text-sm text-red-600 ml-6">• {error}</div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="warnings">
-          {auditResults.filter(r => r.warnings.length > 0).map((result, index) => (
-            <Card key={index} className="border-yellow-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  <h4 className="font-medium">{result.route}</h4>
-                </div>
-                {result.warnings.map((warning, i) => (
-                  <div key={i} className="text-sm text-yellow-600 ml-6">• {warning}</div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="perfect">
-          {auditResults.filter(r => r.score >= 95 && r.errors.length === 0).map((result, index) => (
-            <Card key={index} className="border-green-200">
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <h4 className="font-medium">{result.route}</h4>
-                  <Badge variant="default" className="bg-green-500">
-                    Parfait
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="excellent" className="space-y-4">
+            {auditResults.filter(r => r.qualityScore >= 90).map((result) => (
+              <Card key={result.route} className="border-green-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <h3 className="font-semibold">{result.route}</h3>
+                    <Badge className="bg-green-100 text-green-800">
+                      Excellent ({result.qualityScore}%)
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

@@ -1,186 +1,108 @@
+
 import { createBrowserRouter } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import PageAccessGuard from '@/components/access/PageAccessGuard';
+import { Suspense } from 'react';
+import AppProviders from '@/AppProviders';
 import Shell from '@/Shell';
 import HomePage from '@/pages/HomePage';
 import ChooseModePage from '@/pages/ChooseModePage';
-import LoginPage from '@/pages/LoginPage';
-import RegisterPage from '@/pages/RegisterPage';
-import DashboardPage from '@/pages/DashboardPage';
-import ScanPage from '@/pages/ScanPage';
-import MusicPage from '@/pages/MusicPage';
-import CoachPage from '@/pages/CoachPage';
-import JournalPage from '@/pages/JournalPage';
-import VRPage from '@/pages/VRPage';
-import PreferencesPage from '@/pages/PreferencesPage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import LoadingAnimation from '@/components/ui/loading-animation';
+
+// Routes d'authentification
+import { authRoutes } from './routes/authRoutes';
+import { b2cRoutes } from './routes/b2cRoutes';
+import { b2bUserRoutes } from './routes/b2bUserRoutes';
+import { b2bAdminRoutes } from './routes/b2bAdminRoutes';
+
+// Routes de fonctionnalités
+import { scanRoutes } from './routes/scanRoutes';
+import { musicRoutes } from './routes/musicRoutes';
+import { coachRoutes } from './routes/coachRoutes';
+import { journalRoutes } from './routes/journalRoutes';
+import { vrRoutes } from './routes/vrRoutes';
+import { preferencesRoutes } from './routes/preferencesRoutes';
 import { gamificationRoutes } from './routes/gamificationRoutes';
-import { notificationRoutes } from './routes/notificationRoutes';
-import { securityRoutes } from './routes/securityRoutes';
+import { socialCoconRoutes } from './routes/socialCoconRoutes';
+
+// Routes admin uniquement
+import { teamsRoutes } from './routes/teamsRoutes';
 import { reportsRoutes } from './routes/reportsRoutes';
+import { eventsRoutes } from './routes/eventsRoutes';
+import { optimisationRoutes } from './routes/optimisationRoutes';
+import { settingsRoutes } from './routes/settingsRoutes';
+import { notificationsRoutes } from './routes/notificationsRoutes';
+import { securityRoutes } from './routes/securityRoutes';
 import { privacyRoutes } from './routes/privacyRoutes';
 import { auditRoutes } from './routes/auditRoutes';
 import { accessibilityRoutes } from './routes/accessibilityRoutes';
 import { innovationRoutes } from './routes/innovationRoutes';
+import { feedbackRoutes } from './routes/feedbackRoutes';
+
+// Routes d'accès et de diagnostic
+import { accessRoutes } from './routes/accessRoutes';
+
+const LoadingFallback = () => (
+  <div className="flex h-screen items-center justify-center">
+    <LoadingAnimation text="Chargement..." />
+  </div>
+);
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Shell />,
-    errorElement: <ErrorPage />,
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <AppProviders>
+          <Shell />
+        </AppProviders>
+      </Suspense>
+    ),
     children: [
       // Routes publiques
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: 'choose-mode',
-        element: <ChooseModePage />,
-      },
-      {
-        path: 'b2b/selection',
-        element: <B2BSelectionPage />,
-      },
-
-      // Routes d'authentification B2C
-      {
-        path: 'b2c/login',
-        element: <LoginPage mode="b2c" />,
-      },
-      {
-        path: 'b2c/register',
-        element: <RegisterPage mode="b2c" />,
-      },
-
-      // Routes d'authentification B2B User
-      {
-        path: 'b2b/user/login',
-        element: <LoginPage mode="b2b_user" />,
-      },
-      {
-        path: 'b2b/user/register',
-        element: <RegisterPage mode="b2b_user" />,
-      },
-
-      // Routes d'authentification B2B Admin
-      {
-        path: 'b2b/admin/login',
-        element: <LoginPage mode="b2b_admin" />,
-      },
-
-      // Routes protégées - Dashboards
-      {
-        path: 'b2c/dashboard',
-        element: (
-          <ProtectedRoute allowedRoles={['b2c']}>
-            <DashboardPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'b2b/user/dashboard',
-        element: (
-          <ProtectedRoute allowedRoles={['b2b_user']}>
-            <DashboardPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'b2b/admin/dashboard',
-        element: (
-          <ProtectedRoute allowedRoles={['b2b_admin']}>
-            <DashboardPage />
-          </ProtectedRoute>
-        ),
-      },
-
-      // Routes protégées - Fonctionnalités communes unifiées
-      {
-        path: 'scan',
-        element: (
-          <ProtectedRoute>
-            <PageAccessGuard>
-              <ScanPage />
-            </PageAccessGuard>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'music',
-        element: (
-          <ProtectedRoute>
-            <PageAccessGuard>
-              <MusicPage />
-            </PageAccessGuard>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'coach',
-        element: (
-          <ProtectedRoute>
-            <PageAccessGuard>
-              <CoachPage />
-            </PageAccessGuard>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'journal',
-        element: (
-          <ProtectedRoute>
-            <PageAccessGuard>
-              <JournalPage />
-            </PageAccessGuard>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'vr',
-        element: (
-          <ProtectedRoute>
-            <PageAccessGuard>
-              <VRPage />
-            </PageAccessGuard>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'preferences',
-        element: (
-          <ProtectedRoute>
-            <PageAccessGuard>
-              <PreferencesPage />
-            </PageAccessGuard>
-          </ProtectedRoute>
-        ),
-      },
-
-      // Routes protégées - Fonctionnalités administrateur et nouvelles routes
+      { index: true, element: <HomePage /> },
+      { path: 'choose-mode', element: <ChooseModePage /> },
+      { path: 'b2b/selection', element: <B2BSelectionPage /> },
+      
+      // Routes d'authentification
+      ...authRoutes,
+      
+      // Routes B2C
+      ...b2cRoutes,
+      
+      // Routes B2B User
+      ...b2bUserRoutes,
+      
+      // Routes B2B Admin
+      ...b2bAdminRoutes,
+      
+      // Routes de fonctionnalités communes
+      ...scanRoutes,
+      ...musicRoutes,
+      ...coachRoutes,
+      ...journalRoutes,
+      ...vrRoutes,
+      ...preferencesRoutes,
       ...gamificationRoutes,
-      ...notificationRoutes,
-      ...securityRoutes,
+      ...socialCoconRoutes,
+      
+      // Routes admin uniquement
+      ...teamsRoutes,
       ...reportsRoutes,
+      ...eventsRoutes,
+      ...optimisationRoutes,
+      ...settingsRoutes,
+      ...notificationsRoutes,
+      ...securityRoutes,
       ...privacyRoutes,
       ...auditRoutes,
       ...accessibilityRoutes,
       ...innovationRoutes,
-
-      // Route 404
-      {
-        path: '*',
-        element: (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold mb-4">404</h1>
-              <p className="text-muted-foreground">Page non trouvée</p>
-            </div>
-          </div>
-        ),
-      },
+      ...feedbackRoutes,
+      
+      // Routes de diagnostic et d'accès
+      ...accessRoutes,
     ],
   },
 ]);
 
-export default router;
+export const routes = router.routes;
