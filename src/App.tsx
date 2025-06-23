@@ -2,7 +2,7 @@
 import React, { Suspense } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 console.log('🚀 App component rendering - VERSION DEBUG ULTRA-SIMPLE...');
 
@@ -44,7 +44,7 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary fallback={<ErrorFallback error={new Error('Erreur inconnue')} />}>
       <Suspense fallback={<SimpleLoader />}>
         <RouterProvider router={router} />
       </Suspense>
