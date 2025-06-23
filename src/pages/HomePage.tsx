@@ -1,12 +1,14 @@
 
 import React from 'react';
 
+console.log('🏠 HomePage component rendering...');
+
 const HomePage: React.FC = () => {
-  console.log('🏠 HomePage component rendering...');
+  console.log('🏠 HomePage component function called');
   
   React.useEffect(() => {
-    console.log('🏠 HomePage mounted');
-    return () => console.log('🏠 HomePage unmounted');
+    console.log('🏠 HomePage component mounted');
+    return () => console.log('🏠 HomePage component unmounted');
   }, []);
 
   return (
@@ -31,22 +33,22 @@ const HomePage: React.FC = () => {
               <p className="text-blue-100">Vous êtes ici - page fonctionnelle</p>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-4 text-red-400">🎵 Musique</h3>
-              <a href="/music" className="text-yellow-300 underline hover:text-yellow-100">
-                Aller à la page musique
+              <h3 className="text-xl font-semibold mb-4 text-red-400">🧪 Test</h3>
+              <a href="/test" className="text-yellow-300 underline hover:text-yellow-100">
+                Aller à la page test
               </a>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-4 text-purple-400">🔍 Scan</h3>
-              <a href="/scan" className="text-yellow-300 underline hover:text-yellow-100">
-                Aller au scan émotionnel
+              <h3 className="text-xl font-semibold mb-4 text-purple-400">📊 Point 20</h3>
+              <a href="/point20" className="text-yellow-300 underline hover:text-yellow-100">
+                Aller au Point 20 (fonctionne)
               </a>
             </div>
           </div>
 
-          <div className="bg-green-500/20 border border-green-400 rounded-lg p-4">
-            <h3 className="font-semibold text-green-300 mb-2">🔍 Routage Unifié Actif</h3>
-            <p className="text-sm text-green-200">
+          <div className="bg-red-500/20 border border-red-400 rounded-lg p-4">
+            <h3 className="font-semibold text-red-300 mb-2">🔍 Debug Info</h3>
+            <p className="text-sm text-red-200">
               Route actuelle: {window.location.pathname}<br/>
               Timestamp: {new Date().toLocaleTimeString()}
             </p>

@@ -19,6 +19,11 @@ import { notificationRoutes } from './routes/notificationRoutes';
 import { auditRoutes } from './routes/auditRoutes';
 import { accessibilityRoutes } from './routes/accessibilityRoutes';
 
+// Import direct des pages principales pour éviter les problèmes de lazy loading
+import HomePage from '@/pages/HomePage';
+import TestPage from '@/pages/TestPage';
+import Point20Page from '@/pages/Point20Page';
+
 // Page 404 par défaut
 const NotFoundPage = () => (
   <div data-testid="page-root" className="min-h-screen bg-yellow-500 text-black p-8 text-center">
@@ -40,6 +45,20 @@ export function buildUnifiedRoutes(): RouteObject[] {
   console.log('🔧 Building unified routes...');
   
   const allRoutes: RouteObject[] = [
+    // Routes principales en direct (sans lazy loading pour debug)
+    {
+      path: '/',
+      element: <HomePage />,
+    },
+    {
+      path: '/test',
+      element: <TestPage />,
+    },
+    {
+      path: '/point20',
+      element: <Point20Page />,
+    },
+    
     // Routes publiques (/, /about, /contact, etc.)
     ...publicRoutes,
     
