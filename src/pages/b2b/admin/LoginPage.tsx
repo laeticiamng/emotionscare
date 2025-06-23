@@ -1,119 +1,50 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Mail, Lock, Building } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 
 const B2BAdminLoginPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    adminCode: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('B2B Admin Login:', formData);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-100 dark:from-purple-950 dark:to-blue-900">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <Card className="border-2 border-purple-200 dark:border-purple-800">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mb-4">
-              <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-md mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-8">
+          <h1 className="text-3xl font-bold mb-8 text-center">Connexion Administration</h1>
+          
+          <form className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email administrateur</label>
+              <input 
+                type="email" 
+                className="w-full px-4 py-2 rounded bg-white/20 border border-white/30 text-white placeholder-white/70"
+                placeholder="admin@entreprise.com"
+              />
             </div>
-            <CardTitle className="text-2xl text-purple-800 dark:text-purple-200">
-              Connexion Administrateur
-            </CardTitle>
-            <CardDescription>
-              Accès sécurisé à l'interface de gestion RH
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email administrateur</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="admin@entreprise.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">Mot de passe</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="adminCode" className="text-sm font-medium">Code administrateur</label>
-                <div className="relative">
-                  <Shield className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="adminCode"
-                    name="adminCode"
-                    placeholder="Code d'accès sécurisé"
-                    value={formData.adminCode}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
-                Accéder à l'administration
-              </Button>
-            </form>
-            <div className="mt-4 text-center space-y-2">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                <Link to="/b2b/selection" className="text-purple-600 hover:underline">
-                  ← Retour à la sélection
-                </Link>
-              </p>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Mot de passe</label>
+              <input 
+                type="password" 
+                className="w-full px-4 py-2 rounded bg-white/20 border border-white/30 text-white placeholder-white/70"
+                placeholder="Mot de passe administrateur"
+              />
             </div>
-            <div className="mt-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <p className="text-xs text-purple-800 dark:text-purple-200 text-center">
-                🔒 Accès restreint aux administrateurs RH autorisés
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            
+            <button 
+              type="submit"
+              className="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-semibold transition-colors"
+            >
+              Accès Administration
+            </button>
+          </form>
+          
+          <div className="mt-8 text-center space-y-2">
+            <a href="/b2b/selection" className="text-red-300 hover:text-red-100 underline block">
+              ← Retour sélection B2B
+            </a>
+            <a href="/" className="text-gray-400 hover:text-gray-200 underline block">
+              ← Retour à l'accueil
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

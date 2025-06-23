@@ -1,118 +1,50 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Mail, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 
 const B2BUserLoginPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    company: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('B2B User Login:', formData);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100 dark:from-green-950 dark:to-blue-900">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <Card>
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
-              <Building className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-800 to-indigo-900 text-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-md mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-8">
+          <h1 className="text-3xl font-bold mb-8 text-center">Connexion Collaborateur</h1>
+          
+          <form className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email professionnel</label>
+              <input 
+                type="email" 
+                className="w-full px-4 py-2 rounded bg-white/20 border border-white/30 text-white placeholder-white/70"
+                placeholder="collaborateur@entreprise.com"
+              />
             </div>
-            <CardTitle className="text-2xl">Connexion Collaborateur</CardTitle>
-            <CardDescription>
-              Accédez à votre espace bien-être professionnel
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="company" className="text-sm font-medium">Entreprise</label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="company"
-                    name="company"
-                    placeholder="Nom de votre entreprise"
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email professionnel</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="votre.nom@entreprise.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">Mot de passe</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="w-full">
-                Se connecter
-              </Button>
-            </form>
-            <div className="mt-4 text-center space-y-2">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Pas encore de compte ?{' '}
-                <Link to="/b2b/user/register" className="text-blue-600 hover:underline">
-                  S'inscrire
-                </Link>
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                <Link to="/b2b/selection" className="text-blue-600 hover:underline">
-                  ← Retour à la sélection
-                </Link>
-              </p>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Mot de passe</label>
+              <input 
+                type="password" 
+                className="w-full px-4 py-2 rounded bg-white/20 border border-white/30 text-white placeholder-white/70"
+                placeholder="Votre mot de passe"
+              />
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            
+            <button 
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold transition-colors"
+            >
+              Se connecter
+            </button>
+          </form>
+          
+          <div className="mt-8 text-center space-y-2">
+            <a href="/b2b/selection" className="text-blue-300 hover:text-blue-100 underline block">
+              ← Retour sélection B2B
+            </a>
+            <a href="/" className="text-gray-400 hover:text-gray-200 underline block">
+              ← Retour à l'accueil
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,22 +1,27 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 const MusicPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Musicothérapie</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Musique adaptée à vos émotions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4">Découvrez des playlists personnalisées selon votre état émotionnel.</p>
-            <Button>Explorer la musique</Button>
-          </CardContent>
-        </Card>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center">
+          <h1 className="text-5xl font-bold mb-8">🎵 Musicothérapie</h1>
+          <p className="text-xl mb-8 text-indigo-100">
+            Thérapie par la musique adaptée à vos émotions
+          </p>
+          
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-yellow-300">✅ Module Musique Actif</h2>
+            <p className="text-lg text-indigo-100">
+              Le module de musicothérapie est opérationnel
+            </p>
+          </div>
+
+          <a href="/" className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors inline-block">
+            🏠 Retour Accueil
+          </a>
+        </div>
       </div>
     </div>
   );

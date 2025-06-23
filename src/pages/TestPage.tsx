@@ -4,11 +4,11 @@ import React from 'react';
 console.log('🧪 TestPage component rendering...');
 
 const TestPage: React.FC = () => {
-  console.log('🧪 TestPage component function called');
+  console.log('🧪 TestPage function called');
   
   React.useEffect(() => {
-    console.log('🧪 TestPage component mounted');
-    return () => console.log('🧪 TestPage component unmounted');
+    console.log('🧪 TestPage mounted');
+    return () => console.log('🧪 TestPage unmounted');
   }, []);
 
   return (
@@ -21,17 +21,17 @@ const TestPage: React.FC = () => {
           </p>
           
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8">
-            <h2 className="text-3xl font-semibold mb-4 text-yellow-300">✅ Test réussi</h2>
+            <h2 className="text-3xl font-semibold mb-4 text-yellow-300">✅ Test Page Active</h2>
             <p className="text-lg text-green-100">
-              Cette page de test s'affiche correctement !
+              Cette page de test fonctionne correctement !
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-4 text-green-400">🏠 Accueil</h3>
+              <h3 className="text-xl font-semibold mb-4 text-green-400">🏠 Retour Accueil</h3>
               <a href="/" className="text-yellow-300 underline hover:text-yellow-100">
-                Retour à l'accueil
+                Retourner à l'accueil
               </a>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
@@ -43,7 +43,7 @@ const TestPage: React.FC = () => {
           </div>
 
           <div className="bg-green-500/20 border border-green-400 rounded-lg p-4">
-            <h3 className="font-semibold text-green-300 mb-2">🔍 Debug Info</h3>
+            <h3 className="font-semibold text-green-300 mb-2">🔍 Test Info</h3>
             <p className="text-sm text-green-200">
               Route actuelle: {window.location.pathname}<br/>
               Timestamp: {new Date().toLocaleTimeString()}
