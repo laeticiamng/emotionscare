@@ -1,61 +1,47 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 const B2BAdminDashboardPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Dashboard Administration</h1>
-        
-        <div className="grid md:grid-cols-4 gap-6">
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Dashboard Administrateur</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Analytics RH</CardTitle>
+              <CardTitle>Utilisateurs</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Tableau de bord complet</p>
-              <Button asChild>
-                <Link to="/analytics">Voir les stats</Link>
-              </Button>
+              <p className="text-2xl font-bold">324</p>
+              <p className="text-muted-foreground">Actifs ce mois</p>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader>
-              <CardTitle>Gestion Équipes</CardTitle>
+              <CardTitle>Bien-être Équipe</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Administrer les équipes</p>
-              <Button asChild>
-                <Link to="/teams">Gérer</Link>
-              </Button>
+              <p className="text-2xl font-bold">78%</p>
+              <p className="text-muted-foreground">Score moyen</p>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader>
-              <CardTitle>Rapports</CardTitle>
+              <CardTitle>Analyses</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Générer des rapports</p>
-              <Button asChild>
-                <Link to="/reports">Créer</Link>
-              </Button>
+              <p className="text-2xl font-bold">1,247</p>
+              <p className="text-muted-foreground">Cette semaine</p>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader>
-              <CardTitle>Paramètres</CardTitle>
+              <CardTitle>Alertes</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Configuration système</p>
-              <Button asChild>
-                <Link to="/settings">Configurer</Link>
-              </Button>
+              <p className="text-2xl font-bold">3</p>
+              <p className="text-muted-foreground">À traiter</p>
             </CardContent>
           </Card>
         </div>

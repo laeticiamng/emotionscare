@@ -1,49 +1,41 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 const B2CDashboardPage: React.FC = () => {
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background p-6">
-      <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Dashboard Particulier</h1>
-        
-        <div className="grid md:grid-cols-3 gap-6">
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Dashboard Personnel</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Scan Émotionnel</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Analysez vos émotions du moment</p>
-              <Button asChild>
-                <Link to="/scan">Commencer un scan</Link>
-              </Button>
+              <p className="text-muted-foreground">
+                Analysez votre état émotionnel actuel
+              </p>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader>
-              <CardTitle>Coach Personnel</CardTitle>
+              <CardTitle>Journal</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Discutez avec votre coach IA</p>
-              <Button asChild>
-                <Link to="/coach">Ouvrir le coach</Link>
-              </Button>
+              <p className="text-muted-foreground">
+                Suivez votre évolution émotionnelle
+              </p>
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader>
-              <CardTitle>Musicothérapie</CardTitle>
+              <CardTitle>Coach IA</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">Écoutez de la musique adaptée</p>
-              <Button asChild>
-                <Link to="/music">Explorer la musique</Link>
-              </Button>
+              <p className="text-muted-foreground">
+                Obtenez des conseils personnalisés
+              </p>
             </CardContent>
           </Card>
         </div>

@@ -1,136 +1,114 @@
 
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { emotionsCareApi } from '@/services/emotionsCareApi';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
-export const useEmotionsCareApi = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+/**
+ * Hook pour l'analyse d'émotion via texte
+ */
+export const useEmotionAnalysis = () => {
+  return useMutation({
+    mutationFn: (text: string) => emotionsCareApi.analyzeEmotion(text),
+    onSuccess: (data) => {
+      console.log('Analyse d\'émotion réussie:', data);
+    },
+    onError: (error) => {
+      console.error('Erreur analyse émotion:', error);
+      toast.error('Erreur lors de l\'analyse d\'émotion');
+    },
+  });
+};
 
-  const analyzeEmotion = useCallback(async (text: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const result = await emotionsCareApi.analyzeEmotion(text);
-      toast({
-        title: "Analyse terminée",
-        description: "Votre émotion a été analysée avec succès",
-      });
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+/**
+ * Hook pour l'analyse d'émotion via voix
+ */
+export const useVoiceEmotionAnalysis = () => {
+  return useMutation({
+    mutationFn: (audioBlob: Blob) => emotionsCareApi.analyzeVoiceEmotion(audioBlob),
+    onSuccess: (data) => {
+      console.log('Analyse vocale réussie:', data);
+    },
+    onError: (error) => {
+      console.error('Erreur analyse vocale:', error);
+      toast.error('Erreur lors de l\'analyse vocale');
+    },
+  });
+};
 
-  const analyzeVoice = useCallback(async (audioBlob: Blob) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const result = await emotionsCareApi.analyzeVoiceEmotion(audioBlob);
-      toast({
-        title: "Analyse vocale terminée",
-        description: "Votre voix a été analysée avec succès",
-      });
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse vocale';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+/**
+ * Hook pour le chat avec l'IA coach
+ */
+export const useCoachChat = () => {
+  return useMutation({
+    mutationFn: ({ message, history }: { message: string; history?: any[] }) => 
+      emotionsCareApi.chatWithCoach(message, history),
+    onSuccess: (data) => {
+      console.log('Réponse du coach reçue:', data);
+    },
+    onError: (error) => {
+      console.error('Erreur chat coach:', error);
+      toast.error('Erreur lors de la communication avec le coach');
+    },
+  });
+};
 
-  const chatWithCoach = useCallback(async (message: string, history?: any[]) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const result = await emotionsCareApi.chatWithCoach(message, history);
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chat';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+/**
+ * Hook pour récupérer les données du dashboard
+ */
+export const useDashboardData = () => {
+  return useQuery({
+    queryKey: ['dashboard', 'stats'],
+    queryFn: () => emotionsCareApi.getDashboardData(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    onError: (error) => {
+      console.error('Erreur données dashboard:', error);
+      toast.error('Erreur lors du chargement du dashboard');
+    },
+  });
+};
 
-  const getDashboardData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const result = await emotionsCareApi.getDashboardData();
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement du tableau de bord';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+/**
+ * Hook pour sauvegarder une entrée de journal
+ */
+export const useJournalEntry = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (content: string) => emotionsCareApi.saveJournalEntry(content),
+    onSuccess: () => {
+      toast.success('Entrée de journal sauvegardée');
+      // Invalider le cache des entrées de journal
+      queryClient.invalidateQueries({ queryKey: ['journal'] });
+    },
+    onError: (error) => {
+      console.error('Erreur sauvegarde journal:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    },
+  });
+};
 
-  const saveJournalEntry = useCallback(async (content: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const result = await emotionsCareApi.saveJournalEntry(content);
-      toast({
-        title: "Entrée sauvegardée",
-        description: "Votre entrée de journal a été sauvegardée",
-      });
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la sauvegarde';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+/**
+ * Hook général pour les interactions avec l'API EmotionsCare
+ */
+export const useEmotionsCare = () => {
+  const emotionAnalysis = useEmotionAnalysis();
+  const voiceAnalysis = useVoiceEmotionAnalysis();
+  const coachChat = useCoachChat();
+  const dashboardData = useDashboardData();
+  const journalEntry = useJournalEntry();
 
   return {
-    loading,
-    error,
-    analyzeEmotion,
-    analyzeVoice,
-    chatWithCoach,
-    getDashboardData,
-    saveJournalEntry,
+    analyzeEmotion: emotionAnalysis.mutate,
+    analyzeVoice: voiceAnalysis.mutate,
+    chatWithCoach: coachChat.mutate,
+    saveJournalEntry: journalEntry.mutate,
+    dashboardData: dashboardData.data,
+    isLoadingDashboard: dashboardData.isLoading,
+    
+    // États de chargement
+    isAnalyzingEmotion: emotionAnalysis.isPending,
+    isAnalyzingVoice: voiceAnalysis.isPending,
+    isChatting: coachChat.isPending,
+    isSavingJournal: journalEntry.isPending,
   };
 };
