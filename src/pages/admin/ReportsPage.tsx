@@ -1,73 +1,73 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, MessageCircle, Heart, Share2 } from 'lucide-react';
+import { FileText, Download, Calendar, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const SocialCoconPage: React.FC = () => {
+const ReportsPage: React.FC = () => {
   return (
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Cocon social</h1>
+        <h1 className="text-3xl font-bold">Rapports et analyses</h1>
         <Button>
-          <MessageCircle className="w-4 h-4 mr-2" />
-          Nouveau post
+          <Download className="w-4 h-4 mr-2" />
+          Générer rapport
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Amis connectés</CardTitle>
-            <Users className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium">Rapports générés</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">47</div>
-            <p className="text-xs text-muted-foreground">Dans votre réseau</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Messages échangés</CardTitle>
-            <MessageCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">234</div>
-            <p className="text-xs text-muted-foreground">Cette semaine</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Encouragements reçus</CardTitle>
-            <Heart className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">89</div>
             <p className="text-xs text-muted-foreground">Ce mois</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Partages d'expériences</CardTitle>
-            <Share2 className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium">Analyses automatiques</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">Publications</p>
+            <div className="text-2xl font-bold">156</div>
+            <p className="text-xs text-muted-foreground">Cette semaine</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Rapports planifiés</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-muted-foreground">Actifs</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Téléchargements</CardTitle>
+            <Download className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">321</div>
+            <p className="text-xs text-muted-foreground">Ce mois</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Fil d'actualité du bien-être</CardTitle>
+          <CardTitle>Rapports récents</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            Réseau social de bien-être et d'entraide en cours de développement
+            Module de rapports avancés en cours de développement
           </div>
         </CardContent>
       </Card>
@@ -75,4 +75,4 @@ const SocialCoconPage: React.FC = () => {
   );
 };
 
-export default SocialCoconPage;
+export default ReportsPage;

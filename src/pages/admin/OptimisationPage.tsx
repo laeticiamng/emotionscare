@@ -1,73 +1,73 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Music, Play, Pause, Volume2 } from 'lucide-react';
+import { Zap, TrendingUp, Target, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const MusicPage: React.FC = () => {
+const OptimisationPage: React.FC = () => {
   return (
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Musicothérapie</h1>
+        <h1 className="text-3xl font-bold">Optimisation RH</h1>
         <Button>
-          <Music className="w-4 h-4 mr-2" />
-          Nouvelle playlist
+          <Zap className="w-4 h-4 mr-2" />
+          Nouvelle analyse
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sessions d'écoute</CardTitle>
-            <Music className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium">Performance globale</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">127</div>
-            <p className="text-xs text-muted-foreground">Cette semaine</p>
+            <div className="text-2xl font-bold">92%</div>
+            <p className="text-xs text-muted-foreground">+8% ce trimestre</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Temps d'écoute</CardTitle>
-            <Volume2 className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium">Objectifs atteints</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24h</div>
+            <div className="text-2xl font-bold">78%</div>
             <p className="text-xs text-muted-foreground">Ce mois</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Playlists actives</CardTitle>
-            <Play className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium">Employés excellents</CardTitle>
+            <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Personnalisées</p>
+            <div className="text-2xl font-bold">64</div>
+            <p className="text-xs text-muted-foreground">Top performers</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Amélioration humeur</CardTitle>
-            <Music className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium">Optimisations suggérées</CardTitle>
+            <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+34%</div>
-            <p className="text-xs text-muted-foreground">Après écoute</p>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">En attente</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Lecteur musical thérapeutique</CardTitle>
+          <CardTitle>Recommandations d'optimisation</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            Interface de musicothérapie interactive en cours de développement
+            Moteur d'optimisation RH en cours de développement
           </div>
         </CardContent>
       </Card>
@@ -75,4 +75,4 @@ const MusicPage: React.FC = () => {
   );
 };
 
-export default MusicPage;
+export default OptimisationPage;
