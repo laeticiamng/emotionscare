@@ -30,8 +30,6 @@ export function validateRoutesManifest() {
 }
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  console.log('🔥 Building unified routes with LandingPage...');
-  
   return [
     {
       path: '/',

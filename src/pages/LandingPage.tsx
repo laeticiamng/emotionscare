@@ -6,10 +6,8 @@ import TestimonialsSection from '@/components/home/TestimonialsSection';
 import CtaSection from '@/components/home/CtaSection';
 
 const LandingPage: React.FC = () => {
-  console.log('🏠 LandingPage component rendered successfully');
-  
   return (
-    <div className="min-h-screen" data-testid="page-root">
+    <div className="min-h-screen bg-background" data-testid="page-root">
       <HeroSection />
       <FeaturesSection />
       <TestimonialsSection />

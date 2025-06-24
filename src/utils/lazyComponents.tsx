@@ -2,7 +2,6 @@
 import { lazy } from 'react';
 
 // Pages principales
-export const HomePage = lazy(() => import('@/Home'));
 export const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 
 // B2C Pages
