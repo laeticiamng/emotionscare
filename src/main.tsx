@@ -7,6 +7,7 @@ import AppProviders from './AppProviders';
 import './index.css';
 
 console.log('🚀 Starting EmotionsCare application...');
+console.log('🔍 Router configuration loaded:', router);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
