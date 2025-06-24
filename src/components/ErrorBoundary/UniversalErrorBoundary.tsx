@@ -2,125 +2,116 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 
-interface UniversalErrorBoundaryState {
+interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
 }
 
 interface UniversalErrorBoundaryProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
 }
 
-export class UniversalErrorBoundary extends React.Component<
+class UniversalErrorBoundary extends React.Component<
   UniversalErrorBoundaryProps,
-  UniversalErrorBoundaryState
+  ErrorBoundaryState
 > {
   constructor(props: UniversalErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): UniversalErrorBoundaryState {
-    console.error('🚨 Universal Error Boundary caught error:', error);
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('🚨 Error Details:', error, errorInfo);
-    this.setState({ errorInfo });
-    
-    // Log pour le monitoring en production
-    if (import.meta.env.PROD) {
-      console.log('📊 Would send to monitoring service:', { error, errorInfo });
-    }
+    this.setState({ error, errorInfo });
+    console.error('UniversalErrorBoundary caught an error:', error, errorInfo);
   }
 
-  handleReload = () => {
-    window.location.reload();
+  resetError = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
-  handleGoHome = () => {
+  goHome = () => {
     window.location.href = '/';
   };
 
-  handleResetError = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+  reload = () => {
+    window.location.reload();
   };
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        const FallbackComponent = this.props.fallback;
+        return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
+      }
+
       return (
-        <div data-testid="page-root" className="min-h-screen bg-background flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg mx-auto">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+          <Card className="w-full max-w-md">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
-                <AlertTriangle className="h-16 w-16 text-destructive" />
+                <AlertTriangle className="h-12 w-12 text-destructive" />
               </div>
-              <CardTitle className="text-xl">Erreur Application</CardTitle>
+              <CardTitle className="text-xl">Une erreur s'est produite</CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                L'application a rencontré une erreur inattendue.
+            <CardContent className="text-center space-y-6">
+              <p className="text-muted-foreground">
+                Nous nous excusons pour la gêne occasionnée. L'application a rencontré une erreur inattendue.
               </p>
               
-              {this.state.error && import.meta.env.DEV && (
-                <details className="text-xs text-left bg-muted p-3 rounded mt-4">
-                  <summary className="cursor-pointer font-medium">
-                    Détails techniques (dev uniquement)
+              {this.state.error && (
+                <details className="text-xs text-left bg-muted p-3 rounded-md">
+                  <summary className="cursor-pointer font-medium mb-2">
+                    Détails techniques
                   </summary>
-                  <pre className="mt-2 whitespace-pre-wrap overflow-auto max-h-32">
-                    {this.state.error.name}: {this.state.error.message}
-                    {this.state.error.stack}
-                  </pre>
+                  <div className="space-y-2">
+                    <div>
+                      <strong>Erreur:</strong>
+                      <pre className="mt-1 whitespace-pre-wrap break-words">
+                        {this.state.error.message}
+                      </pre>
+                    </div>
+                    {this.state.error.stack && (
+                      <div>
+                        <strong>Stack trace:</strong>
+                        <pre className="mt-1 whitespace-pre-wrap break-words text-xs">
+                          {this.state.error.stack}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
                 </details>
               )}
-              
-              <div className="flex flex-col sm:flex-row gap-2 pt-4">
-                <Button 
-                  onClick={this.handleResetError} 
-                  variant="outline" 
-                  className="flex-1"
-                >
+
+              <div className="flex flex-col gap-3">
+                <Button onClick={this.resetError} className="w-full">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Réessayer
                 </Button>
-                <Button 
-                  onClick={this.handleGoHome} 
-                  className="flex-1"
-                >
+                <Button onClick={this.reload} variant="outline" className="w-full">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Recharger la page
+                </Button>
+                <Button onClick={this.goHome} variant="secondary" className="w-full">
                   <Home className="h-4 w-4 mr-2" />
-                  Accueil
+                  Retour à l'accueil
                 </Button>
               </div>
-              
-              <Button 
-                onClick={this.handleReload} 
-                variant="secondary"
-                className="w-full"
-              >
-                Recharger l'application
-              </Button>
             </CardContent>
           </Card>
         </div>
       );
     }
 
-    return this.props.children;
+    return this.props.children || null;
   }
 }
 
-// Hook pour reset d'erreur programmatique
-export const useErrorBoundary = () => {
-  const [, setError] = React.useState();
-  
-  return React.useCallback((error: Error) => {
-    setError(() => {
-      throw error;
-    });
-  }, []);
-};
+export default UniversalErrorBoundary;

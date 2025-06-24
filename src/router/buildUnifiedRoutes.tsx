@@ -1,87 +1,75 @@
-import React from 'react';
-import { jsxDEV } from 'react/jsx-dev-runtime';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import B2BLayout from '@/layouts/B2BLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
+import UniversalErrorBoundary from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
-// Lazy loading des pages pour optimiser le chargement initial
-import {
-  B2CLoginPage,
-  B2CRegisterPage,
-  B2CDashboardPage,
-  B2COnboardingPage,
-  B2BUserLoginPage,
-  B2BUserRegisterPage,
-  B2BUserDashboardPage,
-  B2BAdminLoginPage,
-  B2BAdminDashboardPage,
-} from '@/utils/lazyComponents';
+// Définition des pages lazy-loaded
+const ImmersiveHome = lazy(() => import('@/pages/ImmersiveHome'));
+const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+const Point20Page = lazy(() => import('@/pages/Point20Page'));
+const B2COnboardingPage = lazy(() => import('@/pages/B2COnboardingPage'));
 
-// Pages publiques
-import ImmersiveHome from '@/pages/ImmersiveHome';
-import ChooseModePage from '@/pages/ChooseModePage';
-import B2BSelectionPage from '@/pages/B2BSelectionPage';
-import Point20Page from '@/pages/Point20Page';
+const B2CLoginPage = lazy(() => import('@/pages/b2c/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/b2c/B2CRegisterPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
+const B2CJournalPage = lazy(() => import('@/pages/b2c/B2CJournalPage'));
+const B2CScanPage = lazy(() => import('@/pages/b2c/B2CScanPage'));
+const B2CMusicPage = lazy(() => import('@/pages/b2c/B2CMusicPage'));
+const B2CCoachPage = lazy(() => import('@/pages/b2c/B2CCoachPage'));
+const B2CVRPage = lazy(() => import('@/pages/b2c/B2CVRPage'));
+const B2CGamificationPage = lazy(() => import('@/pages/b2c/B2CGamificationPage'));
+const B2CSocialPage = lazy(() => import('@/pages/b2c/B2CSocialPage'));
+const B2CSettingsPage = lazy(() => import('@/pages/b2c/B2CSettingsPage'));
 
-// Pages B2C
-import B2CJournalPage from '@/pages/b2c/JournalPage';
-import B2CMusicPage from '@/pages/b2c/MusicPage';
-import B2CScanPage from '@/pages/b2c/ScanPage';
-import B2CCoachPage from '@/pages/b2c/CoachPage';
-import B2CVRPage from '@/pages/b2c/VRPage';
-import B2CGamificationPage from '@/pages/b2c/GamificationPage';
-import B2CSocialPage from '@/pages/b2c/SocialPage';
-import B2CSettingsPage from '@/pages/b2c/SettingsPage';
+const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/B2BUserLoginPage'));
+const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/B2BUserRegisterPage'));
+const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/B2BUserDashboardPage'));
+const B2BUserScanPage = lazy(() => import('@/pages/b2b/user/B2BUserScanPage'));
+const B2BUserCoachPage = lazy(() => import('@/pages/b2b/user/B2BUserCoachPage'));
+const B2BUserMusicPage = lazy(() => import('@/pages/b2b/user/B2BUserMusicPage'));
 
-// Pages B2B User
-import B2BUserScanPage from '@/pages/b2b/user/ScanPage';
-import B2BUserCoachPage from '@/pages/b2b/user/CoachPage';
-import B2BUserMusicPage from '@/pages/b2b/user/MusicPage';
+const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/B2BAdminLoginPage'));
+const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/B2BAdminDashboardPage'));
+const TeamsPage = lazy(() => import('@/pages/b2b/admin/TeamsPage'));
+const ReportsPage = lazy(() => import('@/pages/b2b/admin/ReportsPage'));
+const EventsPage = lazy(() => import('@/pages/b2b/admin/EventsPage'));
+const OptimisationPage = lazy(() => import('@/pages/b2b/admin/OptimisationPage'));
+const SettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
+const NotificationsPage = lazy(() => import('@/pages/b2b/admin/NotificationsPage'));
+const SecurityPage = lazy(() => import('@/pages/b2b/admin/SecurityPage'));
+const PrivacyPage = lazy(() => import('@/pages/b2b/admin/PrivacyPage'));
+const AuditPage = lazy(() => import('@/pages/b2b/admin/AuditPage'));
+const AccessibilityPage = lazy(() => import('@/pages/b2b/admin/AccessibilityPage'));
+const InnovationPage = lazy(() => import('@/pages/b2b/admin/InnovationPage'));
+const FeedbackPage = lazy(() => import('@/pages/b2b/admin/FeedbackPage'));
 
-// Pages B2B Admin
-import TeamsPage from '@/pages/b2b/admin/TeamsPage';
-import ReportsPage from '@/pages/b2b/admin/ReportsPage';
-import EventsPage from '@/pages/b2b/admin/EventsPage';
-import OptimisationPage from '@/pages/b2b/admin/OptimisationPage';
-import SettingsPage from '@/pages/b2b/admin/SettingsPage';
-import NotificationsPage from '@/pages/b2b/admin/NotificationsPage';
-import SecurityPage from '@/pages/b2b/admin/SecurityPage';
-import PrivacyPage from '@/pages/b2b/admin/PrivacyPage';
-import AuditPage from '@/pages/b2b/admin/AuditPage';
-import AccessibilityPage from '@/pages/b2b/admin/AccessibilityPage';
-import InnovationPage from '@/pages/b2b/admin/InnovationPage';
-import FeedbackPage from '@/pages/b2b/admin/FeedbackPage';
+const BossLevelGritPage = lazy(() => import('@/pages/emotional/BossLevelGritPage'));
+const MoodMixerPage = lazy(() => import('@/pages/emotional/MoodMixerPage'));
+const AmbitionArcadePage = lazy(() => import('@/pages/emotional/AmbitionArcadePage'));
+const BounceBackBattlePage = lazy(() => import('@/pages/emotional/BounceBackBattlePage'));
+const StorySynthLabPage = lazy(() => import('@/pages/emotional/StorySynthLabPage'));
+const FlashGlowPage = lazy(() => import('@/pages/emotional/FlashGlowPage'));
+const ARFiltersPage = lazy(() => import('@/pages/emotional/ARFiltersPage'));
+const BubbleBeatPage = lazy(() => import('@/pages/emotional/BubbleBeatPage'));
+const ScreenSilkBreakPage = lazy(() => import('@/pages/emotional/ScreenSilkBreakPage'));
+const VRGalactiquePage = lazy(() => import('@/pages/emotional/VRGalactiquePage'));
 
-// Nouvelles pages des modules émotionnels
-import BossLevelGritPage from '@/pages/modules/BossLevelGritPage';
-import MoodMixerPage from '@/pages/modules/MoodMixerPage';
-import AmbitionArcadePage from '@/pages/modules/AmbitionArcadePage';
-import BounceBackBattlePage from '@/pages/modules/BounceBackBattlePage';
-import StorySynthLabPage from '@/pages/modules/StorySynthLabPage';
-import FlashGlowPage from '@/pages/modules/FlashGlowPage';
-import ARFiltersPage from '@/pages/modules/ARFiltersPage';
-import BubbleBeatPage from '@/pages/modules/BubbleBeatPage';
-import ScreenSilkBreakPage from '@/pages/modules/ScreenSilkBreakPage';
-import VRGalactiquePage from '@/pages/modules/VRGalactiquePage';
+const InstantGlowPage = lazy(() => import('@/pages/analytics/InstantGlowPage'));
+const WeeklyBarsPage = lazy(() => import('@/pages/analytics/WeeklyBarsPage'));
+const HeatmapVibesPage = lazy(() => import('@/pages/analytics/HeatmapVibesPage'));
+const BreathworkPage = lazy(() => import('@/pages/analytics/BreathworkPage'));
 
-// Nouvelles pages d'analytics
-import InstantGlowPage from '@/pages/analytics/InstantGlowPage';
-import WeeklyBarsPage from '@/pages/analytics/WeeklyBarsPage';
-import HeatmapVibesPage from '@/pages/analytics/HeatmapVibesPage';
-import BreathworkPage from '@/pages/analytics/BreathworkPage';
+const PrivacyTogglesPage = lazy(() => import('@/pages/settings/PrivacyTogglesPage'));
+const ExportCSVPage = lazy(() => import('@/pages/settings/ExportCSVPage'));
+const AccountDeletePage = lazy(() => import('@/pages/settings/AccountDeletePage'));
+const ProfileSettingsPage = lazy(() => import('@/pages/settings/ProfileSettingsPage'));
+const ActivityHistoryPage = lazy(() => import('@/pages/settings/ActivityHistoryPage'));
 
-// Nouvelles pages de fonctionnalités
-import PrivacyTogglesPage from '@/pages/settings/PrivacyTogglesPage';
-import ExportCSVPage from '@/pages/settings/ExportCSVPage';
-import AccountDeletePage from '@/pages/settings/AccountDeletePage';
-
-// Pages manquantes (création simple)
-import HelpCenterPage from '@/pages/support/HelpCenterPage';
-import ProfileSettingsPage from '@/pages/settings/ProfileSettingsPage';
-import ActivityHistoryPage from '@/pages/user/ActivityHistoryPage';
-import HealthCheckBadgePage from '@/pages/health/HealthCheckBadgePage';
+const HelpCenterPage = lazy(() => import('@/pages/support/HelpCenterPage'));
+const HealthCheckBadgePage = lazy(() => import('@/pages/support/HealthCheckBadgePage'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
@@ -111,7 +99,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       element: <B2COnboardingPage />,
       errorElement: <UniversalErrorBoundary />
     },
-    
+
     // Routes B2C
     {
       path: '/b2c/login',
@@ -176,10 +164,9 @@ export function buildUnifiedRoutes(): RouteObject[] {
           element: <B2CSettingsPage />,
           errorElement: <UniversalErrorBoundary />
         }
-      ],
-      errorElement: <UniversalErrorBoundary />
+      ]
     },
-    
+
     // Routes B2B User
     {
       path: '/b2b/user/login',
@@ -195,7 +182,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/b2b/user',
       element: (
         <ProtectedRoute requiredRole="b2b_user">
-          <Layout />
+          <B2BLayout />
         </ProtectedRoute>
       ),
       children: [
@@ -219,10 +206,9 @@ export function buildUnifiedRoutes(): RouteObject[] {
           element: <B2BUserMusicPage />,
           errorElement: <UniversalErrorBoundary />
         }
-      ],
-      errorElement: <UniversalErrorBoundary />
+      ]
     },
-    
+
     // Routes B2B Admin
     {
       path: '/b2b/admin/login',
@@ -297,262 +283,197 @@ export function buildUnifiedRoutes(): RouteObject[] {
           element: <InnovationPage />,
           errorElement: <UniversalErrorBoundary />
         },
-         {
+        {
           path: 'feedback',
           element: <FeedbackPage />,
           errorElement: <UniversalErrorBoundary />
         }
-      ],
-      errorElement: <UniversalErrorBoundary />
+      ]
     },
-    
-    // NOUVELLES ROUTES - Modules émotionnels (accessibles selon le rôle)
+
+    // Routes modules émotionnels
     {
       path: '/boss-level-grit',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <BossLevelGritPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <BossLevelGritPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/mood-mixer',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <MoodMixerPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <MoodMixerPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/ambition-arcade',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <AmbitionArcadePage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <AmbitionArcadePage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/bounce-back-battle',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <BounceBackBattlePage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <BounceBackBattlePage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/story-synth-lab',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <StorySynthLabPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <StorySynthLabPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/flash-glow',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <FlashGlowPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <FlashGlowPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/ar-filters',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <ARFiltersPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <ARFiltersPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/bubble-beat',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <BubbleBeatPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <BubbleBeatPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/screen-silk-break',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <ScreenSilkBreakPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <ScreenSilkBreakPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/vr-galactique',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <VRGalactiquePage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <VRGalactiquePage />,
       errorElement: <UniversalErrorBoundary />
     },
 
-    // NOUVELLES ROUTES - Analytics avancés
+    // Routes analytics
     {
       path: '/instant-glow',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <InstantGlowPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <InstantGlowPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/weekly-bars',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <WeeklyBarsPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <WeeklyBarsPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/heatmap-vibes',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <HeatmapVibesPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <HeatmapVibesPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/breathwork',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <BreathworkPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <BreathworkPage />,
       errorElement: <UniversalErrorBoundary />
     },
 
-    // NOUVELLES ROUTES - Fonctionnalités spécialisées
+    // Routes settings/privacy
     {
       path: '/privacy-toggles',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <PrivacyTogglesPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <PrivacyTogglesPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/export-csv',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <ExportCSVPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <ExportCSVPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/account/delete',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <AccountDeletePage />
-          </Layout>
-        </ProtectedRoute>
-      ),
-      errorElement: <UniversalErrorBoundary />
-    },
-    {
-      path: '/health-check-badge',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <HealthCheckBadgePage />
-          </Layout>
-        </ProtectedRoute>
-      ),
-      errorElement: <UniversalErrorBoundary />
-    },
-    {
-      path: '/help-center',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <HelpCenterPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <AccountDeletePage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/profile-settings',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <ProfileSettingsPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <ProfileSettingsPage />,
       errorElement: <UniversalErrorBoundary />
     },
     {
       path: '/activity-history',
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <ActivityHistoryPage />
-          </Layout>
-        </ProtectedRoute>
-      ),
+      element: <ActivityHistoryPage />,
       errorElement: <UniversalErrorBoundary />
     },
 
-    // Route pour /b2b (redirection vers /b2b/selection)
+    // Routes support
     {
-      path: '/b2b',
-      element: <Navigate to="/b2b/selection" replace />
+      path: '/help-center',
+      element: <HelpCenterPage />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/health-check-badge',
+      element: <HealthCheckBadgePage />,
+      errorElement: <UniversalErrorBoundary />
     },
 
-    // Fallback 404
+    // Route 404
     {
       path: '*',
       element: <Navigate to="/" replace />
     }
   ];
+}
+
+// Export pour les tests
+export const ROUTE_MANIFEST = [
+  '/',
+  '/choose-mode',
+  '/onboarding',
+  '/b2b/selection',
+  '/b2c/login',
+  '/b2c/register',
+  '/b2b/user/login',
+  '/b2b/user/register',
+  '/b2b/admin/login',
+  '/b2c/dashboard',
+  '/b2b/user/dashboard',
+  '/b2b/admin/dashboard',
+  '/scan',
+  '/music',
+  '/coach',
+  '/journal',
+  '/vr',
+  '/preferences',
+  '/gamification',
+  '/social-cocon',
+  '/boss-level-grit',
+  '/mood-mixer',
+  '/ambition-arcade',
+  '/bounce-back-battle',
+  '/story-synth-lab',
+  '/flash-glow',
+  '/ar-filters',
+  '/bubble-beat',
+  '/screen-silk-break',
+  '/vr-galactique',
+  '/instant-glow',
+  '/weekly-bars',
+  '/heatmap-vibes',
+  '/breathwork',
+  '/privacy-toggles',
+  '/export-csv',
+  '/account/delete',
+  '/health-check-badge',
+  '/help-center',
+  '/profile-settings',
+  '/activity-history',
+  '/teams',
+  '/reports',
+  '/events',
+  '/optimisation',
+  '/settings',
+  '/notifications',
+  '/security',
+  '/audit',
+  '/accessibility',
+  '/feedback'
+];
+
+export function validateRoutesManifest() {
+  const routes = ROUTE_MANIFEST;
+  const uniqueRoutes = new Set(routes);
+  
+  return {
+    valid: routes.length === uniqueRoutes.size && routes.length === 52,
+    errors: routes.length !== uniqueRoutes.size ? ['Duplicate routes found'] : 
+             routes.length !== 52 ? [`Expected 52 routes, found ${routes.length}`] : []
+  };
 }
