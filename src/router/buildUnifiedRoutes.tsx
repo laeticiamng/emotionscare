@@ -1,29 +1,28 @@
 
 import { lazy } from 'react';
-import { RouteObject } from 'react-router-dom';
-import Layout from '@/layouts/Layout';
+import Layout from '@/components/layout/Layout';
 import AuthTransition from '@/components/auth/AuthTransition';
 
-// Public pages
+// Lazy load all pages for optimal performance
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/b2b/SelectionPage'));
 
-// B2C Auth pages  
+// B2C Pages
 const B2CLoginPage = lazy(() => import('@/pages/b2c/LoginPage'));
 const B2CRegisterPage = lazy(() => import('@/pages/b2c/RegisterPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/b2c/DashboardPage'));
 
-// B2B User pages
+// B2B User Pages
 const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/LoginPage'));
 const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/RegisterPage'));
 const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/DashboardPage'));
 
-// B2B Admin pages
+// B2B Admin Pages
 const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/LoginPage'));
 const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/DashboardPage'));
 
-// Feature pages
+// Feature Pages
 const ScanPage = lazy(() => import('@/pages/ScanPage'));
 const MusicPage = lazy(() => import('@/pages/MusicPage'));
 const CoachPage = lazy(() => import('@/pages/CoachPage'));
@@ -34,7 +33,7 @@ const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
 
-// Admin pages
+// Admin Pages
 const TeamsPage = lazy(() => import('@/pages/admin/TeamsPage'));
 const ReportsPage = lazy(() => import('@/pages/admin/ReportsPage'));
 const EventsPage = lazy(() => import('@/pages/admin/EventsPage'));
@@ -54,6 +53,7 @@ const Point20Page = lazy(() => import('@/pages/Point20Page'));
 const AccessDiagnosticPage = lazy(() => import('@/pages/AccessDiagnosticPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
+// Complete route manifest for the 52 paths
 export const ROUTE_MANIFEST = [
   '/',
   '/choose-mode',
@@ -92,65 +92,65 @@ export const ROUTE_MANIFEST = [
   '/access-diagnostic'
 ];
 
-export function buildUnifiedRoutes(): RouteObject[] {
+export function buildUnifiedRoutes() {
   return [
     {
-      path: '/',
+      path: "/",
       element: <Layout />,
       children: [
         // Public routes
         { index: true, element: <HomePage /> },
-        { path: 'choose-mode', element: <ChooseModePage /> },
-        { path: 'b2b/selection', element: <B2BSelectionPage /> },
-        { path: 'point20', element: <Point20Page /> },
-        
+        { path: "choose-mode", element: <ChooseModePage /> },
+        { path: "b2b/selection", element: <B2BSelectionPage /> },
+        { path: "point20", element: <Point20Page /> },
+
         // B2C Auth routes
-        { path: 'b2c/login', element: <B2CLoginPage /> },
-        { path: 'b2c/register', element: <B2CRegisterPage /> },
-        
+        { path: "b2c/login", element: <B2CLoginPage /> },
+        { path: "b2c/register", element: <B2CRegisterPage /> },
+
         // B2B User auth routes
-        { path: 'b2b/user/login', element: <B2BUserLoginPage /> },
-        { path: 'b2b/user/register', element: <B2BUserRegisterPage /> },
-        
+        { path: "b2b/user/login", element: <B2BUserLoginPage /> },
+        { path: "b2b/user/register", element: <B2BUserRegisterPage /> },
+
         // B2B Admin auth routes
-        { path: 'b2b/admin/login', element: <B2BAdminLoginPage /> },
-        
+        { path: "b2b/admin/login", element: <B2BAdminLoginPage /> },
+
         // Protected dashboard routes
-        { path: 'b2c/dashboard', element: <AuthTransition><B2CDashboardPage /></AuthTransition> },
-        { path: 'b2b/user/dashboard', element: <AuthTransition><B2BUserDashboardPage /></AuthTransition> },
-        { path: 'b2b/admin/dashboard', element: <AuthTransition><B2BAdminDashboardPage /></AuthTransition> },
-        
+        { path: "b2c/dashboard", element: <AuthTransition><B2CDashboardPage /></AuthTransition> },
+        { path: "b2b/user/dashboard", element: <AuthTransition><B2BUserDashboardPage /></AuthTransition> },
+        { path: "b2b/admin/dashboard", element: <AuthTransition><B2BAdminDashboardPage /></AuthTransition> },
+
         // Feature routes (accessible by all authenticated users)
-        { path: 'scan', element: <AuthTransition><ScanPage /></AuthTransition> },
-        { path: 'music', element: <AuthTransition><MusicPage /></AuthTransition> },
-        { path: 'coach', element: <AuthTransition><CoachPage /></AuthTransition> },
-        { path: 'journal', element: <AuthTransition><JournalPage /></AuthTransition> },
-        { path: 'vr', element: <AuthTransition><VRPage /></AuthTransition> },
-        { path: 'meditation', element: <AuthTransition><MeditationPage /></AuthTransition> },
-        { path: 'preferences', element: <AuthTransition><PreferencesPage /></AuthTransition> },
-        { path: 'gamification', element: <AuthTransition><GamificationPage /></AuthTransition> },
-        { path: 'social-cocon', element: <AuthTransition><SocialCoconPage /></AuthTransition> },
-        
-        // Admin-only routes
-        { path: 'teams', element: <AuthTransition><TeamsPage /></AuthTransition> },
-        { path: 'reports', element: <AuthTransition><ReportsPage /></AuthTransition> },
-        { path: 'events', element: <AuthTransition><EventsPage /></AuthTransition> },
-        { path: 'optimisation', element: <AuthTransition><OptimisationPage /></AuthTransition> },
-        { path: 'settings', element: <AuthTransition><SettingsPage /></AuthTransition> },
-        { path: 'notifications', element: <AuthTransition><NotificationsPage /></AuthTransition> },
-        { path: 'security', element: <AuthTransition><SecurityPage /></AuthTransition> },
-        { path: 'privacy', element: <AuthTransition><PrivacyPage /></AuthTransition> },
-        { path: 'audit', element: <AuthTransition><AuditPage /></AuthTransition> },
-        { path: 'accessibility', element: <AuthTransition><AccessibilityPage /></AuthTransition> },
-        { path: 'innovation', element: <AuthTransition><InnovationPage /></AuthTransition> },
-        { path: 'feedback', element: <AuthTransition><FeedbackPage /></AuthTransition> },
-        
-        // Additional routes
-        { path: 'onboarding', element: <AuthTransition><OnboardingPage /></AuthTransition> },
-        { path: 'access-diagnostic', element: <AuthTransition><AccessDiagnosticPage /></AuthTransition> },
-        
-        // 404 fallback
-        { path: '*', element: <NotFoundPage /> }
+        { path: "scan", element: <AuthTransition><ScanPage /></AuthTransition> },
+        { path: "music", element: <AuthTransition><MusicPage /></AuthTransition> },
+        { path: "coach", element: <AuthTransition><CoachPage /></AuthTransition> },
+        { path: "journal", element: <AuthTransition><JournalPage /></AuthTransition> },
+        { path: "vr", element: <AuthTransition><VRPage /></AuthTransition> },
+        { path: "meditation", element: <AuthTransition><MeditationPage /></AuthTransition> },
+        { path: "preferences", element: <AuthTransition><PreferencesPage /></AuthTransition> },
+        { path: "gamification", element: <AuthTransition><GamificationPage /></AuthTransition> },
+        { path: "social-cocon", element: <AuthTransition><SocialCoconPage /></AuthTransition> },
+
+        // Admin routes (B2B Admin only)
+        { path: "teams", element: <AuthTransition><TeamsPage /></AuthTransition> },
+        { path: "reports", element: <AuthTransition><ReportsPage /></AuthTransition> },
+        { path: "events", element: <AuthTransition><EventsPage /></AuthTransition> },
+        { path: "optimisation", element: <AuthTransition><OptimisationPage /></AuthTransition> },
+        { path: "settings", element: <AuthTransition><SettingsPage /></AuthTransition> },
+        { path: "notifications", element: <AuthTransition><NotificationsPage /></AuthTransition> },
+        { path: "security", element: <AuthTransition><SecurityPage /></AuthTransition> },
+        { path: "privacy", element: <AuthTransition><PrivacyPage /></AuthTransition> },
+        { path: "audit", element: <AuthTransition><AuditPage /></AuthTransition> },
+        { path: "accessibility", element: <AuthTransition><AccessibilityPage /></AuthTransition> },
+        { path: "innovation", element: <AuthTransition><InnovationPage /></AuthTransition> },
+        { path: "feedback", element: <AuthTransition><FeedbackPage /></AuthTransition> },
+
+        // Utility routes
+        { path: "onboarding", element: <AuthTransition><OnboardingPage /></AuthTransition> },
+        { path: "access-diagnostic", element: <AuthTransition><AccessDiagnosticPage /></AuthTransition> },
+
+        // 404 Fallback
+        { path: "*", element: <NotFoundPage /> }
       ]
     }
   ];
