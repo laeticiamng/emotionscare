@@ -210,3 +210,6 @@ MIT License - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 ---
 
 🔥 **Powered by Bun + React + Supabase**
+
+## 🛠️ Admin Service
+Provides simple organization management endpoints. Run `node services/admin/index.ts` to start.
