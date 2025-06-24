@@ -1,7 +1,7 @@
 
 #!/usr/bin/env node
 
-const { ROUTE_MANIFEST } = require('../src/router/buildUnifiedRoutes.ts');
+const { ROUTE_MANIFEST } = require('../src/router/buildUnifiedRoutes.tsx');
 
 console.log('🔍 VERIFICATION DES ROUTES - ROUTER UNIFIÉ');
 console.log('==========================================\n');
