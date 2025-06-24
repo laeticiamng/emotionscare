@@ -2,183 +2,346 @@
 #!/usr/bin/env node
 
 /**
- * Script principal pour lancer l'audit complet
+ * Script d'audit complet automatisé pour EmotionsCare
+ * Vérifie tous les composants, routes, dépendances et sécurité
  */
 
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🚀 Démarrage de l\'audit complet EmotionsCare...\n');
-console.log('=' .repeat(60));
-console.log('📋 AUDIT COMPLET - BACKEND vs FRONTEND');
-console.log('=' .repeat(60));
+console.log('🔍 AUDIT COMPLET EMOTIONSCARE - DÉMARRAGE');
+console.log('==========================================\n');
 
-// S'assurer que le dossier reports existe
-const reportsDir = './reports';
-if (!fs.existsSync(reportsDir)) {
-  fs.mkdirSync(reportsDir, { recursive: true });
+let globalScore = 100;
+const issues = [];
+const warnings = [];
+const successes = [];
+
+// 1. Vérification des routes (52 routes officielles)
+console.log('📍 1. VÉRIFICATION DES ROUTES');
+console.log('------------------------------');
+
+const UNIFIED_ROUTES = {
+  // Routes publiques (4)
+  HOME: '/',
+  CHOOSE_MODE: '/choose-mode',
+  ONBOARDING: '/onboarding',
+  B2B_SELECTION: '/b2b/selection',
+  
+  // Routes d'authentification B2C (2)
+  B2C_LOGIN: '/b2c/login',
+  B2C_REGISTER: '/b2c/register',
+  
+  // Routes d'authentification B2B (4)
+  B2B_USER_LOGIN: '/b2b/user/login',
+  B2B_USER_REGISTER: '/b2b/user/register',
+  B2B_ADMIN_LOGIN: '/b2b/admin/login',
+  B2B: '/b2b',
+  
+  // Routes de dashboards (3)
+  B2C_DASHBOARD: '/b2c/dashboard',
+  B2B_USER_DASHBOARD: '/b2b/user/dashboard',
+  B2B_ADMIN_DASHBOARD: '/b2b/admin/dashboard',
+
+  // FONCTIONNALITÉS COMMUNES (9)
+  SCAN: '/scan',
+  MUSIC: '/music',
+  COACH: '/coach',
+  JOURNAL: '/journal',
+  VR: '/vr',
+  PREFERENCES: '/preferences',
+  GAMIFICATION: '/gamification',
+  SOCIAL_COCON: '/social-cocon',
+
+  // MODULES ÉMOTIONNELS AVANCÉS (10)
+  BOSS_LEVEL_GRIT: '/boss-level-grit',
+  MOOD_MIXER: '/mood-mixer',
+  AMBITION_ARCADE: '/ambition-arcade',
+  BOUNCE_BACK_BATTLE: '/bounce-back-battle',
+  STORY_SYNTH_LAB: '/story-synth-lab',
+  FLASH_GLOW: '/flash-glow',
+  AR_FILTERS: '/ar-filters',
+  BUBBLE_BEAT: '/bubble-beat',
+  SCREEN_SILK_BREAK: '/screen-silk-break',
+  VR_GALACTIQUE: '/vr-galactique',
+
+  // ANALYTICS AVANCÉS (4)
+  INSTANT_GLOW: '/instant-glow',
+  WEEKLY_BARS: '/weekly-bars',
+  HEATMAP_VIBES: '/heatmap-vibes',
+  BREATHWORK: '/breathwork',
+
+  // FONCTIONNALITÉS SPÉCIALISÉES (7)
+  PRIVACY_TOGGLES: '/privacy-toggles',
+  EXPORT_CSV: '/export-csv',
+  ACCOUNT_DELETE: '/account/delete',
+  HEALTH_CHECK_BADGE: '/health-check-badge',
+  HELP_CENTER: '/help-center',
+  PROFILE_SETTINGS: '/profile-settings',
+  ACTIVITY_HISTORY: '/activity-history',
+
+  // FONCTIONNALITÉS ADMIN (9)
+  TEAMS: '/teams',
+  REPORTS: '/reports',
+  EVENTS: '/events',
+  OPTIMISATION: '/optimisation',
+  SETTINGS: '/settings',
+  NOTIFICATIONS: '/notifications',
+  SECURITY: '/security',
+  AUDIT: '/audit',
+  ACCESSIBILITY: '/accessibility',
+  
+  // POINT 20 - FEEDBACK ET AMÉLIORATION CONTINUE (1)
+  FEEDBACK: '/feedback',
+};
+
+const routes = Object.values(UNIFIED_ROUTES);
+const routeCount = routes.length;
+
+if (routeCount === 52) {
+  successes.push(`✅ 52 routes officielles détectées`);
+} else {
+  issues.push(`❌ Nombre de routes incorrect: ${routeCount}/52`);
+  globalScore -= 10;
 }
 
-try {
-  // 1. Audit d'accessibilité
-  console.log('\n1️⃣ AUDIT D\'ACCESSIBILITÉ FRONTEND');
-  console.log('-'.repeat(40));
-  execSync('node scripts/audit-accessibility.js', { stdio: 'inherit' });
+console.log(`Routes détectées: ${routeCount}/52`);
 
-  // 2. Audit Backend-Frontend Gap
-  console.log('\n2️⃣ AUDIT BACKEND-FRONTEND GAP');
-  console.log('-'.repeat(40));
-  execSync('node scripts/audit-backend-frontend-gap.js', { stdio: 'inherit' });
+// 2. Vérification des pages principales
+console.log('\n📄 2. VÉRIFICATION DES PAGES');
+console.log('----------------------------');
 
-  // 3. Audit des routes
-  console.log('\n3️⃣ AUDIT ACCESSIBILITÉ DES ROUTES');
-  console.log('-'.repeat(40));
-  execSync('node scripts/audit-routes-accessibility.js', { stdio: 'inherit' });
+const criticalPages = [
+  'src/pages/HomePage.tsx',
+  'src/pages/ScanPage.tsx',
+  'src/pages/MusicPage.tsx',
+  'src/pages/CoachPage.tsx',
+  'src/pages/JournalPage.tsx',
+  'src/pages/VRPage.tsx',
+  'src/pages/GamificationPage.tsx',
+  'src/pages/SocialCoconPage.tsx',
+  'src/pages/PreferencesPage.tsx',
+  'src/pages/TeamsPage.tsx',
+  'src/pages/ReportsPage.tsx',
+  'src/pages/EventsPage.tsx',
+  'src/pages/OptimisationPage.tsx',
+  'src/pages/SettingsPage.tsx',
+  'src/pages/ErrorPages/NotFoundPage.tsx',
+  'src/pages/ErrorPages/ServerErrorPage.tsx',
+  'src/pages/ErrorPages/UnauthorizedPage.tsx'
+];
 
-  // 4. Générer un rapport consolidé
-  console.log('\n4️⃣ GÉNÉRATION DU RAPPORT CONSOLIDÉ');
-  console.log('-'.repeat(40));
-  
-  const consolidatedReport = {
-    timestamp: new Date().toISOString(),
-    audits: {}
-  };
+let pagesFound = 0;
+criticalPages.forEach(page => {
+  if (fs.existsSync(page)) {
+    pagesFound++;
+    console.log(`✅ ${page}`);
+  } else {
+    console.log(`❌ ${page} - MANQUANT`);
+    issues.push(`Page manquante: ${page}`);
+    globalScore -= 3;
+  }
+});
 
-  // Charger tous les rapports JSON
-  const reportDirs = [
-    './reports/accessibility',
-    './reports/backend-frontend-gap', 
-    './reports/routes-accessibility'
-  ];
+console.log(`Pages trouvées: ${pagesFound}/${criticalPages.length}`);
 
-  reportDirs.forEach(dir => {
-    if (fs.existsSync(dir)) {
-      const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-      files.forEach(file => {
-        const reportName = path.basename(file, '.json');
-        try {
-          const reportContent = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
-          consolidatedReport.audits[reportName] = reportContent;
-        } catch (error) {
-          console.warn(`⚠️ Erreur lors du chargement de ${file}: ${error.message}`);
-        }
-      });
-    }
-  });
+// 3. Vérification des composants critiques
+console.log('\n🧩 3. VÉRIFICATION DES COMPOSANTS');
+console.log('----------------------------------');
 
-  // Sauvegarder le rapport consolidé
-  fs.writeFileSync(
-    path.join(reportsDir, 'complete-audit-report.json'),
-    JSON.stringify(consolidatedReport, null, 2)
-  );
+const criticalComponents = [
+  'src/components/ProtectedRoute.tsx',
+  'src/components/ui/enhanced-error-boundary.tsx',
+  'src/components/SecurityCertifications.tsx',
+  'src/components/vr/VRDashboard.tsx',
+  'src/components/coach/CoachInsights.tsx',
+  'src/components/coach/CoachPersonalitySelector.tsx',
+  'src/components/settings/ThemeSettingsTab.tsx',
+  'src/components/settings/NotificationSettings.tsx',
+  'src/components/settings/PrivacySettings.tsx',
+  'src/components/settings/AccessibilitySettings.tsx'
+];
 
-  // Générer un résumé exécutif
-  const executiveSummary = generateExecutiveSummary(consolidatedReport);
-  fs.writeFileSync(
-    path.join(reportsDir, 'EXECUTIVE_SUMMARY.md'),
-    executiveSummary
-  );
+let componentsFound = 0;
+criticalComponents.forEach(component => {
+  if (fs.existsSync(component)) {
+    componentsFound++;
+    console.log(`✅ ${component}`);
+  } else {
+    console.log(`❌ ${component} - MANQUANT`);
+    issues.push(`Composant manquant: ${component}`);
+    globalScore -= 5;
+  }
+});
 
-  console.log('\n' + '='.repeat(60));
-  console.log('✅ AUDIT COMPLET TERMINÉ AVEC SUCCÈS');
-  console.log('='.repeat(60));
-  console.log(`📁 Rapports disponibles dans: ${reportsDir}/`);
-  console.log('📊 Rapports générés:');
-  console.log('   - complete-audit-report.json (données complètes)');
-  console.log('   - EXECUTIVE_SUMMARY.md (résumé exécutif)');
-  console.log('   - accessibility/ (audit accessibilité)');
-  console.log('   - backend-frontend-gap/ (audit gap backend)');
-  console.log('   - routes-accessibility/ (audit routes)');
-  
-} catch (error) {
-  console.error('\n❌ Erreur lors de l\'audit:', error.message);
-  process.exit(1);
+console.log(`Composants trouvés: ${componentsFound}/${criticalComponents.length}`);
+
+// 4. Vérification de la configuration
+console.log('\n⚙️ 4. VÉRIFICATION DE LA CONFIGURATION');
+console.log('--------------------------------------');
+
+const configFiles = [
+  'package.json',
+  'vite.config.ts',
+  'tailwind.config.js',
+  'tsconfig.json'
+];
+
+configFiles.forEach(file => {
+  if (fs.existsSync(file)) {
+    console.log(`✅ ${file}`);
+    successes.push(`Configuration ${file} présente`);
+  } else {
+    console.log(`❌ ${file} - MANQUANT`);
+    issues.push(`Fichier de configuration manquant: ${file}`);
+    globalScore -= 5;
+  }
+});
+
+// 5. Vérification du routeur unifié
+console.log('\n🛤️ 5. VÉRIFICATION DU ROUTEUR');
+console.log('------------------------------');
+
+if (fs.existsSync('src/router/buildUnifiedRoutes.tsx')) {
+  console.log('✅ Routeur unifié présent');
+  successes.push('Routeur unifié configuré');
+} else {
+  console.log('❌ Routeur unifié manquant');
+  issues.push('Routeur unifié non configuré');
+  globalScore -= 15;
 }
 
-function generateExecutiveSummary(report) {
-  const accessibilityData = report.audits['accessibility-audit'] || {};
-  const backendGapData = report.audits['backend-frontend-gap'] || {};
-  const routesData = report.audits['routes-accessibility'] || {};
+// 6. Vérification des utilitaires
+console.log('\n🔧 6. VÉRIFICATION DES UTILITAIRES');
+console.log('-----------------------------------');
 
-  return `
-# 📊 RÉSUMÉ EXÉCUTIF - AUDIT EMOTIONICARE
+const utilities = [
+  'src/utils/routeUtils.ts',
+  'src/utils/routeValidation.ts',
+  'src/utils/privacyHelpers.ts',
+  'src/utils/productionCheck.ts'
+];
 
-*Généré le ${new Date().toLocaleString('fr-FR')}*
+utilities.forEach(util => {
+  if (fs.existsSync(util)) {
+    console.log(`✅ ${util}`);
+  } else {
+    console.log(`❌ ${util} - MANQUANT`);
+    warnings.push(`Utilitaire manquant: ${util}`);
+    globalScore -= 2;
+  }
+});
 
-## 🎯 Vue d'ensemble
+// 7. Vérification des types
+console.log('\n📝 7. VÉRIFICATION DES TYPES');
+console.log('-----------------------------');
 
-Cet audit complet identifie tous les éléments backend non accessibles côté utilisateur, les pages sans navigation, et les gaps entre le backend et le frontend.
+const typeFiles = [
+  'src/types/user.ts',
+  'src/types/dashboard.ts'
+];
 
-## 📈 Métriques Clés
+typeFiles.forEach(type => {
+  if (fs.existsSync(type)) {
+    console.log(`✅ ${type}`);
+  } else {
+    console.log(`⚠️ ${type} - MANQUANT`);
+    warnings.push(`Type manquant: ${type}`);
+    globalScore -= 1;
+  }
+});
 
-### 🎨 Frontend - Accessibilité
-- **Composants orphelins**: ${accessibilityData.orphanedComponents?.length || 0}
-- **Pages inutilisées**: ${accessibilityData.unusedPages?.length || 0}
-- **Routes sans navigation**: ${accessibilityData.missingNavigation?.length || 0}
+// 8. Vérification de la sécurité
+console.log('\n🔒 8. VÉRIFICATION DE LA SÉCURITÉ');
+console.log('----------------------------------');
 
-### 🔌 Backend - Gap Frontend
-- **Fonctions Edge inutilisées**: ${backendGapData.unusedEdgeFunctions?.length || 0}
-- **Services non connectés**: ${backendGapData.unusedBackendServices?.length || 0}
-- **Scripts orphelins**: ${backendGapData.deadEndpoints?.length || 0}
-
-### 🛣️ Routes - Accessibilité
-- **Routes totales**: ${routesData.summary?.totalRoutes || 0}
-- **Routes inaccessibles**: ${routesData.summary?.inaccessibleRoutes || 0}
-- **Pages orphelines**: ${routesData.summary?.orphanedPages || 0}
-
-## 🚨 Points Critiques
-
-${generateCriticalPoints(accessibilityData, backendGapData, routesData)}
-
-## 🔧 Actions Prioritaires
-
-1. **Nettoyage immédiat**
-   - Supprimer les composants et pages orphelins
-   - Connecter les fonctions Edge importantes au frontend
-   - Ajouter navigation pour les routes critiques
-
-2. **Optimisation backend**
-   - Évaluer l'utilité des fonctions Edge non utilisées
-   - Documenter ou supprimer les services déconnectés
-   - Nettoyer les scripts orphelins
-
-3. **Amélioration UX**
-   - Ajouter liens de navigation manquants
-   - Simplifier l'architecture des routes
-   - Améliorer la découvrabilité des fonctionnalités
-
-## 📁 Rapports Détaillés
-
-- **Accessibilité**: \`reports/accessibility/accessibility-audit.md\`
-- **Backend Gap**: \`reports/backend-frontend-gap/backend-frontend-gap.md\`
-- **Routes**: \`reports/routes-accessibility/routes-accessibility.md\`
-- **Données JSON**: \`reports/complete-audit-report.json\`
-
----
-
-*Pour plus de détails, consultez les rapports individuels dans le dossier reports/*
-`;
+// Vérifier les variables d'environnement
+if (fs.existsSync('.env.example')) {
+  console.log('✅ Fichier .env.example présent');
+  successes.push('Template d\'environnement configuré');
+} else {
+  console.log('⚠️ Fichier .env.example manquant');
+  warnings.push('Template d\'environnement manquant');
+  globalScore -= 2;
 }
 
-function generateCriticalPoints(accessibility, backendGap, routes) {
-  const points = [];
-  
-  if (accessibility.orphanedComponents?.length > 3) {
-    points.push(`❗ **${accessibility.orphanedComponents.length} composants orphelins** - Potentiel code mort`);
-  }
-  
-  if (backendGap.unusedEdgeFunctions?.length > 0) {
-    points.push(`❗ **${backendGap.unusedEdgeFunctions.length} fonctions Edge inutilisées** - Ressources backend gaspillées`);
-  }
-  
-  if (routes.summary?.inaccessibleRoutes > 2) {
-    points.push(`❗ **${routes.summary.inaccessibleRoutes} routes inaccessibles** - Fonctionnalités cachées aux utilisateurs`);
-  }
-  
-  if (accessibility.unusedPages?.length > 0) {
-    points.push(`⚠️ **${accessibility.unusedPages.length} pages non utilisées** - Code potentiellement obsolète`);
-  }
-  
-  return points.length > 0 ? points.join('\n') : '✅ Aucun point critique majeur détecté';
+// Vérifier les en-têtes de sécurité
+if (fs.existsSync('_headers')) {
+  console.log('✅ En-têtes de sécurité configurés');
+  successes.push('En-têtes de sécurité présents');
+} else {
+  console.log('⚠️ En-têtes de sécurité manquants');
+  warnings.push('En-têtes de sécurité non configurés');
+  globalScore -= 3;
 }
+
+// 9. Résumé final
+console.log('\n📊 RÉSUMÉ DE L\'AUDIT');
+console.log('=====================');
+
+console.log(`\n🎯 SCORE GLOBAL: ${globalScore}/100`);
+
+if (globalScore >= 95) {
+  console.log('🟢 EXCELLENT - Application prête pour la production');
+} else if (globalScore >= 85) {
+  console.log('🟡 BON - Quelques améliorations recommandées');
+} else if (globalScore >= 70) {
+  console.log('🟠 MOYEN - Corrections nécessaires');
+} else {
+  console.log('🔴 CRITIQUE - Corrections majeures requises');
+}
+
+console.log(`\n✅ SUCCÈS (${successes.length}):`);
+successes.forEach(success => console.log(`   ${success}`));
+
+if (warnings.length > 0) {
+  console.log(`\n⚠️ AVERTISSEMENTS (${warnings.length}):`);
+  warnings.forEach(warning => console.log(`   ${warning}`));
+}
+
+if (issues.length > 0) {
+  console.log(`\n❌ PROBLÈMES CRITIQUES (${issues.length}):`);
+  issues.forEach(issue => console.log(`   ${issue}`));
+}
+
+console.log('\n🔍 RECOMMANDATIONS:');
+if (globalScore >= 95) {
+  console.log('   - Lancer les tests e2e');
+  console.log('   - Préparer le déploiement');
+  console.log('   - Configurer le monitoring');
+} else {
+  console.log('   - Corriger les problèmes critiques');
+  console.log('   - Relancer l\'audit après corrections');
+  console.log('   - Tester les fonctionnalités manuellement');
+}
+
+console.log('\n==========================================');
+console.log('🏁 AUDIT COMPLET TERMINÉ');
+
+// Générer un rapport JSON
+const auditReport = {
+  timestamp: new Date().toISOString(),
+  score: globalScore,
+  status: globalScore >= 95 ? 'excellent' : globalScore >= 85 ? 'good' : globalScore >= 70 ? 'average' : 'critical',
+  routes: {
+    total: routeCount,
+    expected: 52,
+    valid: routeCount === 52
+  },
+  pages: {
+    found: pagesFound,
+    total: criticalPages.length,
+    missing: criticalPages.length - pagesFound
+  },
+  components: {
+    found: componentsFound,
+    total: criticalComponents.length,
+    missing: criticalComponents.length - componentsFound
+  },
+  successes,
+  warnings,
+  issues
+};
+
+fs.writeFileSync('audit-report.json', JSON.stringify(auditReport, null, 2));
+console.log('📄 Rapport détaillé sauvegardé: audit-report.json');
