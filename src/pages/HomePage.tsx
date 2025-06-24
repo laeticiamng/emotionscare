@@ -6,7 +6,7 @@ import TestimonialsSection from '@/components/home/TestimonialsSection';
 import CtaSection from '@/components/home/CtaSection';
 
 const HomePage: React.FC = () => {
-  console.log('🏠 HomePage component is rendering');
+  console.log('🏠 HomePage component rendering - NEW VERSION');
   
   return (
     <div className="min-h-screen bg-background">

@@ -13,7 +13,7 @@ import B2BSelectionPage from '@/pages/B2BSelectionPage';
 const Point20Page = React.lazy(() => import('@/pages/Point20Page'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  console.log('🔥 Building unified routes with NEW HomePage...');
+  console.log('🔥 Building unified routes with REAL HomePage...');
   
   return [
     {
