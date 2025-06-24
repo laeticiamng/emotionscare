@@ -9,7 +9,7 @@ const LandingPage: React.FC = () => {
   console.log('🏠 LandingPage component rendered successfully');
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" data-testid="page-root">
       <HeroSection />
       <FeaturesSection />
       <TestimonialsSection />
