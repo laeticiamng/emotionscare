@@ -8,6 +8,7 @@ import './index.css';
 
 console.log('🚀 Starting EmotionsCare application...');
 console.log('🔍 Router configuration loaded:', router);
+console.log('📍 Current route should load LandingPage component');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

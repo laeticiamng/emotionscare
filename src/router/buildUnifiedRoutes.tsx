@@ -4,7 +4,7 @@ import { RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
 
-// Import de la nouvelle page d'accueil
+// Import de la page d'accueil
 import LandingPage from '@/pages/LandingPage';
 import ChooseModePage from '@/pages/ChooseModePage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
@@ -13,7 +13,7 @@ import B2BSelectionPage from '@/pages/B2BSelectionPage';
 const Point20Page = React.lazy(() => import('@/pages/Point20Page'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  console.log('🔥 Building unified routes with NEW LandingPage...');
+  console.log('🔥 Building unified routes with LandingPage...');
   
   return [
     {
@@ -40,10 +40,9 @@ export function buildUnifiedRoutes(): RouteObject[] {
             </React.Suspense>
           ),
         },
-        // Pages browsing / demo
         {
           path: 'browsing',
-          element: <LandingPage />, // Temporairement, redirect vers la home
+          element: <LandingPage />,
         },
       ],
     },
