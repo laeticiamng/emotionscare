@@ -4,7 +4,7 @@ import { RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
 
-// Import des pages principales
+// Import de la nouvelle page d'accueil
 import HomePage from '@/pages/HomePage';
 import ChooseModePage from '@/pages/ChooseModePage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
@@ -13,7 +13,7 @@ import B2BSelectionPage from '@/pages/B2BSelectionPage';
 const Point20Page = React.lazy(() => import('@/pages/Point20Page'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  console.log('🔥 Building unified routes...');
+  console.log('🔥 Building unified routes with NEW HomePage...');
   
   return [
     {

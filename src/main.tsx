@@ -1,18 +1,17 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { RouterProvider } from 'react-router-dom';
+import { router } from '@/router';
 import AppProviders from './AppProviders';
 import './index.css';
 
-console.log('%c[Main] Démarrage VERSION AVEC PROVIDERS', 'color:purple; font-weight:bold');
+console.log('🚀 Starting EmotionsCare application...');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppProviders>
-      <App />
+      <RouterProvider router={router} />
     </AppProviders>
   </React.StrictMode>
 );
-
-console.log('%c[Main] ✅ App rendu avec providers complets', 'color:green; font-weight:bold');
