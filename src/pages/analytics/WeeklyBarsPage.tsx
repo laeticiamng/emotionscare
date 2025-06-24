@@ -55,8 +55,8 @@ const WeeklyBarsPage: React.FC = () => {
               <div className="space-y-2">
                 <div className="text-2xl font-bold">7/7</div>
                 <p className="text-sm text-muted-foreground">Jours actifs</p>
-                <Badge className="bg-gold-100 text-gold-800">
-                  Série parfaite !
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  Parfait!
                 </Badge>
               </div>
             </CardContent>
@@ -66,14 +66,16 @@ const WeeklyBarsPage: React.FC = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Trophy className="h-5 w-5" />
-                Meilleur Jour
+                Performances
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-2xl font-bold">Mer</div>
-                <p className="text-sm text-muted-foreground">Score: 94</p>
-                <Badge variant="outline">9 activités</Badge>
+                <div className="text-2xl font-bold">94</div>
+                <p className="text-sm text-muted-foreground">Meilleur score</p>
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                  Mercredi
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -81,26 +83,29 @@ const WeeklyBarsPage: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Graphique Hebdomadaire</CardTitle>
-            <CardDescription>Vos scores de bien-être jour par jour</CardDescription>
+            <CardTitle>Progression Hebdomadaire</CardTitle>
+            <CardDescription>
+              Barres interactives montrant votre évolution jour par jour
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-end justify-between h-64 p-4">
-              {weekData.map((data, index) => (
-                <div key={index} className="flex flex-col items-center space-y-2">
-                  <div 
-                    className="bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-lg flex items-end justify-center text-white text-xs font-medium min-w-8"
-                    style={{ 
-                      height: `${(data.value / maxValue) * 200}px`,
-                      width: '40px'
-                    }}
-                  >
-                    {data.value}
+            <div className="space-y-4">
+              {weekData.map((day, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">{day.day}</span>
+                    <span className="text-muted-foreground">{day.value}/100</span>
                   </div>
-                  <span className="text-sm font-medium">{data.day}</span>
-                  <Badge variant="outline" className="text-xs">
-                    {data.activities} act.
-                  </Badge>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${(day.value / maxValue) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{day.activities} activités</span>
+                    <span>{day.value}/100</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -110,43 +115,51 @@ const WeeklyBarsPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tendances</CardTitle>
-              <CardDescription>Analyse de vos patterns</CardDescription>
+              <CardTitle className="text-lg">Objectifs de la Semaine</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between items-center p-2 bg-accent rounded">
-                <span className="text-sm">Milieu de semaine</span>
-                <Badge className="bg-green-100 text-green-800">+18%</Badge>
-              </div>
-              <div className="flex justify-between items-center p-2 bg-accent rounded">
-                <span className="text-sm">Sessions matinales</span>
-                <Badge className="bg-blue-100 text-blue-800">Efficaces</Badge>
-              </div>
-              <div className="flex justify-between items-center p-2 bg-accent rounded">
-                <span className="text-sm">Week-end</span>
-                <Badge variant="outline">Stable</Badge>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Score hebdo &gt; 80</span>
+                  <span className="text-green-600">✓ Atteint</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-500 h-2 rounded-full w-full" />
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Activités &gt; 6/jour</span>
+                  <span className="text-orange-600">6/7 jours</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-orange-500 h-2 rounded-full w-4/5" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Objectifs</CardTitle>
-              <CardDescription>Progression vers vos cibles</CardDescription>
+              <CardTitle className="text-lg">Tendance Mensuelle</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Score hebdo > 80</span>
-                  <span className="text-green-600">✓ Atteint</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>7 jours consécutifs</span>
-                  <span className="text-green-600">✓ Atteint</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Activités > 6/jour</span>
-                  <span className="text-orange-600">6/7 jours</span>
+                <div className="text-2xl font-bold text-green-600">↗ +12%</div>
+                <p className="text-sm text-muted-foreground">
+                  Amélioration constante ce mois-ci
+                </p>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span>Semaine 1</span>
+                    <span>72.3</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Semaine 2</span>
+                    <span>78.1</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span>Semaine 3</span>
+                    <span>81.4</span>
+                  </div>
                 </div>
               </div>
             </CardContent>
