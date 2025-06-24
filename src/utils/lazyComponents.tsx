@@ -12,7 +12,7 @@ export const B2CDashboardPage = lazy(() => import('@/pages/b2c/DashboardPage'));
 export const B2COnboardingPage = lazy(() => import('@/pages/b2c/OnboardingPage'));
 
 // B2B Pages
-export const B2BSelectionPage = lazy(() => import('@/pages/b2b/SelectionPage'));
+export const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 export const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/LoginPage'));
 export const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/RegisterPage'));
 export const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/DashboardPage'));

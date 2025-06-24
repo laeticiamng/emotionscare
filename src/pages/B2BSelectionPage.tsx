@@ -1,100 +1,91 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { UserCheck, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Shield, ArrowLeft } from 'lucide-react';
 
 const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
-        <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/choose-mode')}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
-        </div>
-        
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Espace Entreprise
+            Mode Entreprise
           </h1>
           <p className="text-xl text-gray-600">
-            Choisissez votre type d'accès
+            Sélectionnez votre type d'accès
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
-                onClick={() => navigate('/b2b/user/login')}>
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-green-100 rounded-full w-fit group-hover:bg-green-200 transition-colors">
-                <Users className="h-12 w-12 text-green-600" />
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Accès Collaborateur */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <UserCheck className="h-8 w-8 text-blue-600" />
               </div>
               <CardTitle className="text-2xl">Collaborateur</CardTitle>
-              <CardDescription className="text-base">
-                Accès collaborateur pour améliorer votre bien-être au travail
+              <CardDescription className="text-lg">
+                Accès aux outils de bien-être pour employés
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center text-sm">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3" />
-                  Outils de bien-être personnalisés
-                </li>
-                <li className="flex items-center text-sm">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3" />
-                  Suivi de votre santé émotionnelle
-                </li>
-                <li className="flex items-center text-sm">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3" />
-                  Accès aux ressources d'entreprise
-                </li>
+            <CardContent className="space-y-4">
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• Scan émotionnel quotidien</li>
+                <li>• Coach IA personnalisé</li>
+                <li>• Sessions VR de relaxation</li>
+                <li>• Musique thérapeutique</li>
               </ul>
-              <Button className="w-full bg-green-600 hover:bg-green-700">
+              <Button 
+                onClick={() => navigate('/b2b/user/login')} 
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                size="lg"
+              >
                 Connexion Collaborateur
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
-                onClick={() => navigate('/b2b/admin/login')}>
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 p-4 bg-purple-100 rounded-full w-fit group-hover:bg-purple-200 transition-colors">
-                <Shield className="h-12 w-12 text-purple-600" />
+          {/* Accès Administrateur */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                <Shield className="h-8 w-8 text-purple-600" />
               </div>
-              <CardTitle className="text-2xl">Administration</CardTitle>
-              <CardDescription className="text-base">
-                Accès administrateur pour gérer votre organisation
+              <CardTitle className="text-2xl">Administrateur</CardTitle>
+              <CardDescription className="text-lg">
+                Interface de gestion et analytics RH
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center text-sm">
-                  <div className="h-2 w-2 bg-purple-500 rounded-full mr-3" />
-                  Tableaux de bord RH complets
-                </li>
-                <li className="flex items-center text-sm">
-                  <div className="h-2 w-2 bg-purple-500 rounded-full mr-3" />
-                  Gestion des équipes et utilisateurs
-                </li>
-                <li className="flex items-center text-sm">
-                  <div className="h-2 w-2 bg-purple-500 rounded-full mr-3" />
-                  Analytics avancés et rapports
-                </li>
+            <CardContent className="space-y-4">
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• Dashboard RH complet</li>
+                <li>• Analytics d'équipe</li>
+                <li>• Gestion des utilisateurs</li>
+                <li>• Rapports de conformité</li>
               </ul>
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                Connexion Administration
+              <Button 
+                onClick={() => navigate('/b2b/admin/login')} 
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                size="lg"
+              >
+                Connexion Administrateur
               </Button>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="text-center mt-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/choose-mode')}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            ← Choisir un autre mode
+          </Button>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import CtaSection from '@/components/home/CtaSection';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background" data-testid="page-root">
+    <div data-testid="page-root" className="min-h-screen bg-background">
       <HeroSection />
       <FeaturesSection />
       <TestimonialsSection />

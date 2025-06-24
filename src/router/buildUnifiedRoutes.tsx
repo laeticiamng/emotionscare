@@ -4,7 +4,7 @@ import { RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
 
-// Import de la page d'accueil
+// Import direct de la page d'accueil
 import LandingPage from '@/pages/LandingPage';
 import ChooseModePage from '@/pages/ChooseModePage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
