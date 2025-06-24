@@ -2,155 +2,88 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Building2, ArrowRight, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Heart, Building2 } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Choisissez votre
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent block">
-              mode d'accès
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Choisissez votre espace
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            EmotionsCare s'adapte à vos besoins, que vous soyez un particulier ou une entreprise
+          <p className="text-xl text-gray-600">
+            Sélectionnez l'espace qui correspond à vos besoins
           </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* B2C Card */}
-          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-full -translate-y-16 translate-x-16"></div>
-            
-            <CardHeader className="relative z-10 pb-4">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="p-4 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
-                  <Users className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">Particulier</CardTitle>
-                  <CardDescription className="text-base">
-                    Accès personnel et familial
-                  </CardDescription>
-                </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Card className="hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
+                onClick={() => navigate('/b2c/login')}>
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-4 p-4 bg-pink-100 rounded-full w-fit group-hover:bg-pink-200 transition-colors">
+                <Heart className="h-12 w-12 text-pink-600" />
               </div>
+              <CardTitle className="text-2xl">Espace Personnel</CardTitle>
+              <CardDescription className="text-base">
+                Pour les particuliers souhaitant améliorer leur bien-être émotionnel
+              </CardDescription>
             </CardHeader>
-
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Scanner émotionnel personnel</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Musicothérapie adaptative</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Coach IA 24/7</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Journal émotionnel privé</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Communauté Social Cocon</span>
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <Button className="w-full group" size="lg" asChild>
-                  <Link to="/b2c/login">
-                    Accéder en tant que particulier
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-                <p className="text-center text-sm text-muted-foreground mt-3">
-                  Pas encore de compte ?{' '}
-                  <Link to="/b2c/register" className="text-primary hover:underline">
-                    Créer un compte
-                  </Link>
-                </p>
-              </div>
+            <CardContent>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-center text-sm">
+                  <div className="h-2 w-2 bg-pink-500 rounded-full mr-3" />
+                  Analyse émotionnelle personnalisée
+                </li>
+                <li className="flex items-center text-sm">
+                  <div className="h-2 w-2 bg-pink-500 rounded-full mr-3" />
+                  Coach IA disponible 24/7
+                </li>
+                <li className="flex items-center text-sm">
+                  <div className="h-2 w-2 bg-pink-500 rounded-full mr-3" />
+                  Musique thérapeutique adaptée
+                </li>
+              </ul>
+              <Button className="w-full bg-pink-600 hover:bg-pink-700">
+                Accéder à l'espace personnel
+              </Button>
             </CardContent>
           </Card>
 
-          {/* B2B Card */}
-          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 relative overflow-hidden border-primary/30">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-primary/20 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute top-4 right-4 bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-medium">
-              Recommandé
-            </div>
-            
-            <CardHeader className="relative z-10 pb-4">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="p-4 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
-                  <Building2 className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">Entreprise</CardTitle>
-                  <CardDescription className="text-base">
-                    Solutions pour équipes et organisations
-                  </CardDescription>
-                </div>
+          <Card className="hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
+                onClick={() => navigate('/b2b/selection')}>
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-4 p-4 bg-blue-100 rounded-full w-fit group-hover:bg-blue-200 transition-colors">
+                <Building2 className="h-12 w-12 text-blue-600" />
               </div>
+              <CardTitle className="text-2xl">Espace Entreprise</CardTitle>
+              <CardDescription className="text-base">
+                Solutions complètes pour le bien-être de vos équipes
+              </CardDescription>
             </CardHeader>
-
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Tableau de bord RH complet</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Analytics d'équipe avancées</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Gestion multi-utilisateurs</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Rapports de conformité RGPD</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-sm">Support prioritaire</span>
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <Button className="w-full group" size="lg" variant="outline" asChild>
-                  <Link to="/b2b/selection">
-                    Accéder aux solutions entreprise
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-                <p className="text-center text-sm text-muted-foreground mt-3">
-                  Découvrez nos formules adaptées à votre organisation
-                </p>
-              </div>
+            <CardContent>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-center text-sm">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full mr-3" />
+                  Tableaux de bord RH avancés
+                </li>
+                <li className="flex items-center text-sm">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full mr-3" />
+                  Analytics d'équipe en temps réel
+                </li>
+                <li className="flex items-center text-sm">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full mr-3" />
+                  Rapports détaillés et conformité RGPD
+                </li>
+              </ul>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                Accéder à l'espace entreprise
+              </Button>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Additional Info */}
-        <div className="text-center mt-16">
-          <p className="text-muted-foreground mb-4">
-            Besoin d'aide pour choisir ? Notre équipe est là pour vous accompagner
-          </p>
-          <Button variant="ghost" asChild>
-            <Link to="/feedback">
-              Contactez-nous
-            </Link>
-          </Button>
         </div>
       </div>
     </div>

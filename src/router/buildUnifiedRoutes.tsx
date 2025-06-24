@@ -1,47 +1,47 @@
-import React, { Suspense } from 'react';
+import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
-import OptimizedErrorBoundary from '@/components/ErrorBoundary/OptimizedErrorBoundary';
 import Layout from '@/components/layout/Layout';
+import Shell from '@/Shell';
 
-// Lazy loading des pages
-const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
-const B2BSelectionPage = React.lazy(() => import('@/pages/B2BSelectionPage'));
-const Point20Page = React.lazy(() => import('@/pages/Point20Page'));
-const B2CLoginPage = React.lazy(() => import('@/pages/B2CLoginPage'));
-const B2CRegisterPage = React.lazy(() => import('@/pages/B2CRegisterPage'));
-const B2BUserLoginPage = React.lazy(() => import('@/pages/B2BUserLoginPage'));
-const B2BUserRegisterPage = React.lazy(() => import('@/pages/B2BUserRegisterPage'));
-const B2BAdminLoginPage = React.lazy(() => import('@/pages/B2BAdminLoginPage'));
-const B2CDashboardPage = React.lazy(() => import('@/pages/B2CDashboardPage'));
-const B2BUserDashboardPage = React.lazy(() => import('@/pages/B2BUserDashboardPage'));
-const B2BAdminDashboardPage = React.lazy(() => import('@/pages/B2BAdminDashboardPage'));
-const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
-const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
-const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
-const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
-const VRPage = React.lazy(() => import('@/pages/VRPage'));
-const MeditationPage = React.lazy(() => import('@/pages/MeditationPage'));
-const PreferencesPage = React.lazy(() => import('@/pages/PreferencesPage'));
-const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
-const SocialCoconPage = React.lazy(() => import('@/pages/SocialCoconPage'));
-const TeamsPage = React.lazy(() => import('@/pages/TeamsPage'));
-const ReportsPage = React.lazy(() => import('@/pages/ReportsPage'));
-const EventsPage = React.lazy(() => import('@/pages/EventsPage'));
-const OptimisationPage = React.lazy(() => import('@/pages/OptimisationPage'));
-const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
-const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
-const SecurityPage = React.lazy(() => import('@/pages/SecurityPage'));
-const PrivacyPage = React.lazy(() => import('@/pages/PrivacyPage'));
-const AuditPage = React.lazy(() => import('@/pages/AuditPage'));
-const AccessibilityPage = React.lazy(() => import('@/pages/AccessibilityPage'));
-const InnovationPage = React.lazy(() => import('@/pages/InnovationPage'));
-const FeedbackPage = React.lazy(() => import('@/pages/FeedbackPage'));
-const OnboardingPage = React.lazy(() => import('@/pages/OnboardingPage'));
-const AccessDiagnosticPage = React.lazy(() => import('@/pages/AccessDiagnosticPage'));
+// Import des pages avec lazy loading
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+const Point20Page = lazy(() => import('@/pages/Point20Page'));
+const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
+const B2BUserLoginPage = lazy(() => import('@/pages/B2BUserLoginPage'));
+const B2BUserRegisterPage = lazy(() => import('@/pages/B2BUserRegisterPage'));
+const B2BAdminLoginPage = lazy(() => import('@/pages/B2BAdminLoginPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
+const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
+const ScanPage = lazy(() => import('@/pages/ScanPage'));
+const MusicPage = lazy(() => import('@/pages/MusicPage'));
+const CoachPage = lazy(() => import('@/pages/CoachPage'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const VRPage = lazy(() => import('@/pages/VRPage'));
+const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
+const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
+const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
+const TeamsPage = lazy(() => import('@/pages/TeamsPage'));
+const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
+const EventsPage = lazy(() => import('@/pages/EventsPage'));
+const OptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
+const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
+const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+const AuditPage = lazy(() => import('@/pages/AuditPage'));
+const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
+const InnovationPage = lazy(() => import('@/pages/InnovationPage'));
+const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+const AccessDiagnosticPage = lazy(() => import('@/pages/AccessDiagnosticPage'));
 
-// Routes manifest pour validation
+// Manifeste des routes - VERSION UNIFIÉE
 export const ROUTES_MANIFEST = [
   { path: '/', auth: 'public', module: 'home', component: 'HomePage' },
   { path: '/choose-mode', auth: 'public', module: 'auth', component: 'ChooseModePage' },
@@ -80,197 +80,188 @@ export const ROUTES_MANIFEST = [
   { path: '/access-diagnostic', auth: 'b2c', module: 'accessibility', component: 'AccessDiagnosticPage' }
 ];
 
-export interface RouteManifestEntry {
+export type RouteManifestEntry = {
   path: string;
-  auth: string;
+  auth: 'public' | 'b2c' | 'b2b_user' | 'b2b_admin';
   module: string;
   component: string;
   role?: string;
-}
+};
 
 export function validateRoutesManifest(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  const paths = new Set<string>();
   
-  ROUTES_MANIFEST.forEach((route, index) => {
-    if (!route.path) errors.push(`Route ${index}: missing path`);
-    if (!route.component) errors.push(`Route ${index}: missing component`);
-    if (paths.has(route.path)) errors.push(`Duplicate path: ${route.path}`);
-    paths.add(route.path);
-  });
+  // Vérification des doublons
+  const paths = ROUTES_MANIFEST.map(route => route.path);
+  const duplicates = paths.filter((path, index) => paths.indexOf(path) !== index);
   
-  return { valid: errors.length === 0, errors };
-}
-
-function withSuspenseAndErrorBoundary(Component: React.LazyExoticComponent<React.ComponentType<any>>) {
-  return (
-    <OptimizedErrorBoundary>
-      <Suspense fallback={<ComponentLoadingFallback />}>
-        <Component />
-      </Suspense>
-    </OptimizedErrorBoundary>
-  );
+  if (duplicates.length > 0) {
+    errors.push(`Chemins dupliqués détectés: ${duplicates.join(', ')}`);
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors
+  };
 }
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  return [
+  console.log('🚀 Building unified routes...');
+  
+  const routes: RouteObject[] = [
     {
       path: '/',
       element: <Layout />,
       children: [
         {
           index: true,
-          element: withSuspenseAndErrorBoundary(HomePage),
+          element: <HomePage />,
         },
         {
           path: 'choose-mode',
-          element: withSuspenseAndErrorBoundary(ChooseModePage),
+          element: <ChooseModePage />,
         },
         {
           path: 'b2b/selection',
-          element: withSuspenseAndErrorBoundary(B2BSelectionPage),
+          element: <B2BSelectionPage />,
         },
         {
           path: 'point20',
-          element: withSuspenseAndErrorBoundary(Point20Page),
+          element: <Point20Page />,
         },
         {
-          path: '/b2c/login',
-          element: withSuspenseAndErrorBoundary(B2CLoginPage),
+          path: 'b2c/login',
+          element: <B2CLoginPage />,
         },
         {
-          path: '/b2c/register',
-          element: withSuspenseAndErrorBoundary(B2CRegisterPage),
+          path: 'b2c/register',
+          element: <B2CRegisterPage />,
         },
         {
-          path: '/b2b/user/login',
-          element: withSuspenseAndErrorBoundary(B2BUserLoginPage),
+          path: 'b2b/user/login',
+          element: <B2BUserLoginPage />,
         },
         {
-          path: '/b2b/user/register',
-          element: withSuspenseAndErrorBoundary(B2BUserRegisterPage),
+          path: 'b2b/user/register',
+          element: <B2BUserRegisterPage />,
         },
         {
-          path: '/b2b/admin/login',
-          element: withSuspenseAndErrorBoundary(B2BAdminLoginPage),
+          path: 'b2b/admin/login',
+          element: <B2BAdminLoginPage />,
         },
         {
-          path: '/b2c/dashboard',
-          element: withSuspenseAndErrorBoundary(B2CDashboardPage),
+          path: 'b2c/dashboard',
+          element: <B2CDashboardPage />,
         },
         {
-          path: '/b2b/user/dashboard',
-          element: withSuspenseAndErrorBoundary(B2BUserDashboardPage),
+          path: 'b2b/user/dashboard',
+          element: <B2BUserDashboardPage />,
         },
         {
-          path: '/b2b/admin/dashboard',
-          element: withSuspenseAndErrorBoundary(B2BAdminDashboardPage),
+          path: 'b2b/admin/dashboard',
+          element: <B2BAdminDashboardPage />,
         },
         {
-          path: '/scan',
-          element: withSuspenseAndErrorBoundary(ScanPage),
+          path: 'scan',
+          element: <ScanPage />,
         },
         {
-          path: '/music',
-          element: withSuspenseAndErrorBoundary(MusicPage),
+          path: 'music',
+          element: <MusicPage />,
         },
         {
-          path: '/coach',
-          element: withSuspenseAndErrorBoundary(CoachPage),
+          path: 'coach',
+          element: <CoachPage />,
         },
         {
-          path: '/journal',
-          element: withSuspenseAndErrorBoundary(JournalPage),
+          path: 'journal',
+          element: <JournalPage />,
         },
         {
-          path: '/vr',
-          element: withSuspenseAndErrorBoundary(VRPage),
+          path: 'vr',
+          element: <VRPage />,
         },
         {
-          path: '/meditation',
-          element: withSuspenseAndErrorBoundary(MeditationPage),
+          path: 'meditation',
+          element: <MeditationPage />,
         },
         {
-          path: '/preferences',
-          element: withSuspenseAndErrorBoundary(PreferencesPage),
+          path: 'preferences',
+          element: <PreferencesPage />,
         },
         {
-          path: '/gamification',
-          element: withSuspenseAndErrorBoundary(GamificationPage),
+          path: 'gamification',
+          element: <GamificationPage />,
         },
         {
-          path: '/social-cocon',
-          element: withSuspenseAndErrorBoundary(SocialCoconPage),
+          path: 'social-cocon',
+          element: <SocialCoconPage />,
         },
         {
-          path: '/teams',
-          element: withSuspenseAndErrorBoundary(TeamsPage),
+          path: 'teams',
+          element: <TeamsPage />,
         },
         {
-          path: '/reports',
-          element: withSuspenseAndErrorBoundary(ReportsPage),
+          path: 'reports',
+          element: <ReportsPage />,
         },
         {
-          path: '/events',
-          element: withSuspenseAndErrorBoundary(EventsPage),
+          path: 'events',
+          element: <EventsPage />,
         },
         {
-          path: '/optimisation',
-          element: withSuspenseAndErrorBoundary(OptimisationPage),
+          path: 'optimisation',
+          element: <OptimisationPage />,
         },
         {
-          path: '/settings',
-          element: withSuspenseAndErrorBoundary(SettingsPage),
+          path: 'settings',
+          element: <SettingsPage />,
         },
         {
-          path: '/notifications',
-          element: withSuspenseAndErrorBoundary(NotificationsPage),
+          path: 'notifications',
+          element: <NotificationsPage />,
         },
         {
-          path: '/security',
-          element: withSuspenseAndErrorBoundary(SecurityPage),
+          path: 'security',
+          element: <SecurityPage />,
         },
         {
-          path: '/privacy',
-          element: withSuspenseAndErrorBoundary(PrivacyPage),
+          path: 'privacy',
+          element: <PrivacyPage />,
         },
         {
-          path: '/audit',
-          element: withSuspenseAndErrorBoundary(AuditPage),
+          path: 'audit',
+          element: <AuditPage />,
         },
         {
-          path: '/accessibility',
-          element: withSuspenseAndErrorBoundary(AccessibilityPage),
+          path: 'accessibility',
+          element: <AccessibilityPage />,
         },
         {
-          path: '/innovation',
-          element: withSuspenseAndErrorBoundary(InnovationPage),
+          path: 'innovation',
+          element: <InnovationPage />,
         },
         {
-          path: '/feedback',
-          element: withSuspenseAndErrorBoundary(FeedbackPage),
+          path: 'feedback',
+          element: <FeedbackPage />,
         },
         {
-          path: '/onboarding',
-          element: withSuspenseAndErrorBoundary(OnboardingPage),
+          path: 'onboarding',
+          element: <OnboardingPage />,
         },
         {
-          path: '/access-diagnostic',
-          element: withSuspenseAndErrorBoundary(AccessDiagnosticPage),
-        },
-        // Catch-all route pour les pages non trouvées
-        {
-          path: '*',
-          element: (
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold mb-4">404</h1>
-                <p className="text-muted-foreground">Page non trouvée</p>
-              </div>
-            </div>
-          ),
+          path: 'access-diagnostic',
+          element: <AccessDiagnosticPage />,
         },
       ],
     },
+    // Route de fallback pour les chemins non trouvés
+    {
+      path: '*',
+      element: <Shell />,
+    },
   ];
+  
+  console.log('✅ Unified routes built successfully');
+  return routes;
 }
