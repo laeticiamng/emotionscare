@@ -12,6 +12,7 @@ export default defineConfig({
       'services/breath/tests/**/*.ts',
       'services/account/tests/**/*.ts',
       'services/privacy/tests/**/*.ts',
+      'services/fullapi/tests/**/*.ts',
       'tests/api/**/*.ts'
     ]
   },
