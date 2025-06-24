@@ -1,125 +1,222 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { 
+  Bell, 
+  Mail, 
+  Smartphone, 
+  Clock, 
+  Heart,
+  Users,
+  TrendingUp,
+  AlertTriangle
+} from 'lucide-react';
 
-const NotificationSettings = () => {
-  const { toast } = useToast();
-  const [settings, setSettings] = useState({
-    email: true,
-    push: true,
-    sms: false,
-    weeklyReport: true,
-    activityReminders: true,
-    wellbeingTips: true,
-    marketingEmails: false
-  });
-
-  const handleChange = (key: string, value: boolean) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  const saveSettings = () => {
-    // In a real app, you would save the notification settings here
-    toast({
-      title: "Paramètres de notification mis à jour",
-      description: "Vos préférences de notification ont été enregistrées avec succès."
-    });
-  };
+const NotificationSettings: React.FC = () => {
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [emotionalAlerts, setEmotionalAlerts] = useState(true);
+  const [teamUpdates, setTeamUpdates] = useState(false);
+  const [weeklyReports, setWeeklyReports] = useState(true);
+  const [criticalAlerts, setCriticalAlerts] = useState(true);
+  const [quietHours, setQuietHours] = useState(true);
+  const [quietStart, setQuietStart] = useState('22:00');
+  const [quietEnd, setQuietEnd] = useState('08:00');
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
-        <h3 className="text-lg font-medium">Canaux de notification</h3>
-        <div className="space-y-3">
+      {/* Canaux de notification */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Canaux de notification
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Email</p>
-              <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
+            <div className="space-y-0.5">
+              <Label htmlFor="email-notifications" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                Notifications par email
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Recevez des mises à jour par email
+              </p>
             </div>
             <Switch
-              checked={settings.email}
-              onCheckedChange={(checked) => handleChange('email', checked)}
+              id="email-notifications"
+              checked={emailNotifications}
+              onCheckedChange={setEmailNotifications}
             />
           </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Notifications push</p>
-              <p className="text-sm text-muted-foreground">Recevoir des notifications dans le navigateur</p>
-            </div>
-            <Switch
-              checked={settings.push}
-              onCheckedChange={(checked) => handleChange('push', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">SMS</p>
-              <p className="text-sm text-muted-foreground">Recevoir des notifications importantes par SMS</p>
-            </div>
-            <Switch
-              checked={settings.sms}
-              onCheckedChange={(checked) => handleChange('sms', checked)}
-            />
-          </div>
-        </div>
-      </div>
 
-      <div className="space-y-3 pt-4 border-t">
-        <h3 className="text-lg font-medium">Types de notification</h3>
-        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Rapport hebdomadaire</p>
-              <p className="text-sm text-muted-foreground">Résumé hebdomadaire de votre bien-être émotionnel</p>
+            <div className="space-y-0.5">
+              <Label htmlFor="push-notifications" className="flex items-center gap-2">
+                <Smartphone className="h-4 w-4" />
+                Notifications push
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Notifications instantanées sur votre appareil
+              </p>
             </div>
             <Switch
-              checked={settings.weeklyReport}
-              onCheckedChange={(checked) => handleChange('weeklyReport', checked)}
+              id="push-notifications"
+              checked={pushNotifications}
+              onCheckedChange={setPushNotifications}
             />
           </div>
-          
+        </CardContent>
+      </Card>
+
+      {/* Types de notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Types de notifications</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Rappels d'activité</p>
-              <p className="text-sm text-muted-foreground">Rappels pour vos séances VR et scans émotionnels</p>
+            <div className="space-y-0.5">
+              <Label htmlFor="emotional-alerts" className="flex items-center gap-2">
+                <Heart className="h-4 w-4 text-red-500" />
+                Alertes émotionnelles
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Notifications pour votre bien-être émotionnel
+              </p>
             </div>
             <Switch
-              checked={settings.activityReminders}
-              onCheckedChange={(checked) => handleChange('activityReminders', checked)}
+              id="emotional-alerts"
+              checked={emotionalAlerts}
+              onCheckedChange={setEmotionalAlerts}
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Conseils bien-être</p>
-              <p className="text-sm text-muted-foreground">Conseils personnalisés pour améliorer votre bien-être</p>
+            <div className="space-y-0.5">
+              <Label htmlFor="team-updates" className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-blue-500" />
+                Mises à jour d'équipe
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Nouvelles activités et interactions d'équipe
+              </p>
             </div>
             <Switch
-              checked={settings.wellbeingTips}
-              onCheckedChange={(checked) => handleChange('wellbeingTips', checked)}
+              id="team-updates"
+              checked={teamUpdates}
+              onCheckedChange={setTeamUpdates}
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Emails marketing</p>
-              <p className="text-sm text-muted-foreground">Nouvelles fonctionnalités et offres spéciales</p>
+            <div className="space-y-0.5">
+              <Label htmlFor="weekly-reports" className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-green-500" />
+                Rapports hebdomadaires
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Résumé de vos progrès chaque semaine
+              </p>
             </div>
             <Switch
-              checked={settings.marketingEmails}
-              onCheckedChange={(checked) => handleChange('marketingEmails', checked)}
+              id="weekly-reports"
+              checked={weeklyReports}
+              onCheckedChange={setWeeklyReports}
             />
           </div>
-        </div>
-      </div>
-      
-      <Button onClick={saveSettings}>
-        Enregistrer les préférences
-      </Button>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="critical-alerts" className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                Alertes critiques
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Notifications importantes pour votre sécurité
+              </p>
+            </div>
+            <Switch
+              id="critical-alerts"
+              checked={criticalAlerts}
+              onCheckedChange={setCriticalAlerts}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Heures de silence */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Heures de silence
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="quiet-hours">Activer les heures de silence</Label>
+              <p className="text-sm text-muted-foreground">
+                Suspendre les notifications non critiques pendant certaines heures
+              </p>
+            </div>
+            <Switch
+              id="quiet-hours"
+              checked={quietHours}
+              onCheckedChange={setQuietHours}
+            />
+          </div>
+
+          {quietHours && (
+            <div className="space-y-4 pt-4 border-t">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="quiet-start">Début</Label>
+                  <Input
+                    id="quiet-start"
+                    type="time"
+                    value={quietStart}
+                    onChange={(e) => setQuietStart(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quiet-end">Fin</Label>
+                  <Input
+                    id="quiet-end"
+                    type="time"
+                    value={quietEnd}
+                    onChange={(e) => setQuietEnd(e.target.value)}
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Les notifications seront suspendues de {quietStart} à {quietEnd}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Test de notification */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Test</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Testez vos paramètres de notification avec un exemple
+            </p>
+            <Button>Envoyer une notification de test</Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
