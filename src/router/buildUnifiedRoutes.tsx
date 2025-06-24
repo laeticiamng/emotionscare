@@ -1,9 +1,10 @@
 import React from 'react';
+import { jsxDEV } from 'react/jsx-dev-runtime';
 import { Navigate, RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import B2BLayout from '@/layouts/B2BLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import UniversalErrorBoundary from '@/components/ErrorBoundary/UniversalErrorBoundary';
+import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
 // Lazy loading des pages pour optimiser le chargement initial
 import {
