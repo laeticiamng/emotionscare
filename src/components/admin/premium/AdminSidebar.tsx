@@ -1,167 +1,152 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  LayoutDashboard, Users, BarChart3, CalendarClock, 
-  Settings, ChevronRight, ChevronDown
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import {
+  Users,
+  BarChart3,
+  Settings,
+  Heart,
+  Calendar,
+  Shield,
+  FileText,
+  Activity,
+  UserCog,
+  Globe,
+  Zap,
+  Database
+} from 'lucide-react';
 
 interface AdminSidebarProps {
-  currentPath?: string;
+  currentPath: string;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath = '/admin' }) => {
-  const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({
-    reporting: false,
-    teams: false
-  });
-
-  const toggleMenu = (menu: string) => {
-    setOpenMenus(prev => ({
-      ...prev,
-      [menu]: !prev[menu]
-    }));
-  };
-
-  const isActive = (path: string) => currentPath === path;
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
+  const location = useLocation();
 
   const navigationItems = [
     {
-      name: "Dashboard",
-      path: "/b2b/admin/dashboard",
-      icon: <LayoutDashboard className="h-4 w-4 mr-2" />
+      title: 'Vue d\'ensemble',
+      href: '/b2b/admin',
+      icon: BarChart3,
+      description: 'Dashboard principal'
     },
     {
-      name: "Teams",
-      path: "/b2b/admin/teams",
-      icon: <Users className="h-4 w-4 mr-2" />,
-      submenu: true,
-      key: "teams"
+      title: 'Gestion des équipes',
+      href: '/b2b/admin/teams',
+      icon: Users,
+      description: 'Équipes et collaborateurs'
     },
     {
-      name: "Reports",
-      path: "/b2b/admin/reports",
-      icon: <BarChart3 className="h-4 w-4 mr-2" />,
-      submenu: true,
-      key: "reporting"
+      title: 'Analyses émotionnelles',
+      href: '/b2b/admin/emotional-analysis',
+      icon: Heart,
+      description: 'Bien-être des équipes'
     },
     {
-      name: "Events",
-      path: "/b2b/admin/events",
-      icon: <CalendarClock className="h-4 w-4 mr-2" />
+      title: 'Rapports avancés',
+      href: '/b2b/admin/reports',
+      icon: FileText,
+      description: 'Rapports et exports'
     },
     {
-      name: "Settings",
-      path: "/b2b/admin/settings",
-      icon: <Settings className="h-4 w-4 mr-2" />
+      title: 'Journal d\'activité',
+      href: '/b2b/admin/activity-logs',
+      icon: Activity,
+      description: 'Logs et audit'
+    },
+    {
+      title: 'Événements',
+      href: '/b2b/admin/events',
+      icon: Calendar,
+      description: 'Événements d\'entreprise'
+    },
+    {
+      title: 'Social Cocon',
+      href: '/b2b/admin/social-cocon',
+      icon: Globe,
+      description: 'Groupes sociaux'
+    },
+    {
+      title: 'Utilisateurs',
+      href: '/b2b/admin/users',
+      icon: UserCog,
+      description: 'Gestion utilisateurs'
+    },
+    {
+      title: 'Gamification',
+      href: '/b2b/admin/gamification',
+      icon: Zap,
+      description: 'Achievements et défis'
+    },
+    {
+      title: 'Statistiques d\'usage',
+      href: '/b2b/admin/usage-stats',
+      icon: Database,
+      description: 'Analytics d\'utilisation'
+    },
+    {
+      title: 'Conformité RGPD',
+      href: '/b2b/admin/compliance',
+      icon: Shield,
+      description: 'Sécurité et conformité'
+    },
+    {
+      title: 'Paramètres',
+      href: '/b2b/admin/settings',
+      icon: Settings,
+      description: 'Configuration'
     }
   ];
 
-  const reportingSubItems = [
-    { name: "Emotional Trends", path: "/b2b/admin/reports/emotional-trends" },
-    { name: "Engagement", path: "/b2b/admin/reports/engagement" },
-    { name: "Utilization", path: "/b2b/admin/reports/utilization" }
-  ];
-
-  const teamsSubItems = [
-    { name: "Team Overview", path: "/b2b/admin/teams/overview" },
-    { name: "Members", path: "/b2b/admin/teams/members" },
-    { name: "Departments", path: "/b2b/admin/teams/departments" }
-  ];
+  const isActivePath = (href: string) => {
+    if (href === '/b2b/admin') {
+      return location.pathname === href;
+    }
+    return location.pathname.startsWith(href);
+  };
 
   return (
-    <div className="w-64 h-full bg-background dark:bg-gray-900 border-r dark:border-gray-800 flex flex-col">
-      <div className="p-4 border-b dark:border-gray-800">
-        <h2 className="text-lg font-semibold text-primary">Admin Dashboard</h2>
-        <p className="text-sm text-muted-foreground">Manage your organization</p>
-      </div>
-      
-      <nav className="flex-1 overflow-y-auto py-4">
-        <ul className="space-y-1 px-2">
-          {navigationItems.map((item) => (
-            <li key={item.path}>
-              {item.submenu ? (
-                <>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-between",
-                      isActive(item.path) && "bg-accent"
-                    )}
-                    onClick={() => toggleMenu(item.key!)}
-                  >
-                    <span className="flex items-center">
-                      {item.icon}
-                      {item.name}
-                    </span>
-                    {openMenus[item.key!] ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </Button>
-                  
-                  {openMenus[item.key!] && (
-                    <ul className="pl-6 mt-1 space-y-1">
-                      {item.key === "reporting" && reportingSubItems.map((subItem) => (
-                        <li key={subItem.path}>
-                          <Link to={subItem.path}>
-                            <Button 
-                              variant="ghost" 
-                              className={cn(
-                                "w-full justify-start text-sm",
-                                isActive(subItem.path) && "bg-accent"
-                              )}
-                            >
-                              {subItem.name}
-                            </Button>
-                          </Link>
-                        </li>
-                      ))}
-                      
-                      {item.key === "teams" && teamsSubItems.map((subItem) => (
-                        <li key={subItem.path}>
-                          <Link to={subItem.path}>
-                            <Button 
-                              variant="ghost" 
-                              className={cn(
-                                "w-full justify-start text-sm",
-                                isActive(subItem.path) && "bg-accent"
-                              )}
-                            >
-                              {subItem.name}
-                            </Button>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+    <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 h-full overflow-y-auto">
+      <div className="p-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Administration
+        </h2>
+        
+        <nav className="space-y-1">
+          {navigationItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = isActivePath(item.href);
+            
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                  isActive
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'mr-3 h-5 w-5 flex-shrink-0',
+                    isActive
+                      ? 'text-blue-500 dark:text-blue-400'
+                      : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300'
                   )}
-                </>
-              ) : (
-                <Link to={item.path}>
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start",
-                      isActive(item.path) && "bg-accent"
-                    )}
-                  >
-                    {item.icon}
-                    {item.name}
-                  </Button>
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-      
-      <div className="p-4 border-t dark:border-gray-800">
-        <p className="text-xs text-muted-foreground text-center">
-          EmotionsCare Admin v1.0
-        </p>
+                />
+                <div className="flex flex-col">
+                  <span>{item.title}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {item.description}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );

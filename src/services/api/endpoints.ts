@@ -1,12 +1,13 @@
 
 /**
  * Configuration centralisée des endpoints API pour EmotionsCare
+ * Mise à jour pour intégration backend production
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 /**
- * Service API unifié pour tous les endpoints
+ * Service API unifié pour tous les endpoints - Version Production
  */
 class ApiService {
   private baseUrl: string;
@@ -25,6 +26,15 @@ class ApiService {
       },
     };
 
+    // Ajouter le token d'authentification si disponible
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      defaultOptions.headers = {
+        ...defaultOptions.headers,
+        'Authorization': `Bearer ${token}`,
+      };
+    }
+
     const response = await fetch(url, { ...defaultOptions, ...options });
     
     if (!response.ok) {
@@ -34,7 +44,8 @@ class ApiService {
     return response.json();
   }
 
-  // Analyse d'émotion via texte
+  // =================== LEGACY METHODS (maintenues pour compatibilité) ===================
+  
   async analyzeEmotion(text: string) {
     return this.request('/emotion/analyze', {
       method: 'POST',
@@ -42,7 +53,6 @@ class ApiService {
     });
   }
 
-  // Analyse d'émotion via voix
   async analyzeVoice(audioBlob: Blob) {
     const formData = new FormData();
     formData.append('audio', audioBlob);
@@ -50,6 +60,9 @@ class ApiService {
     return fetch(`${this.baseUrl}/emotion/voice`, {
       method: 'POST',
       body: formData,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+      },
     }).then(response => {
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
@@ -58,7 +71,6 @@ class ApiService {
     });
   }
 
-  // Chat avec l'IA coach
   async chatWithAI(message: string, conversationHistory?: any[]) {
     return this.request('/coach/chat', {
       method: 'POST',
@@ -69,30 +81,35 @@ class ApiService {
     });
   }
 
-  // Données du dashboard
-  async getDashboardStats() {
-    return this.request('/dashboard/stats');
-  }
-
-  // Journal - récupérer les entrées
-  async getJournalEntries() {
-    return this.request('/journal/entries');
-  }
-
-  // Journal - sauvegarder une entrée
-  async saveJournalEntry(content: string) {
-    return this.request('/journal/entry', {
-      method: 'POST',
-      body: JSON.stringify({ content }),
-    });
-  }
-
-  // Musique - recommandations basées sur l'émotion
   async getMusicRecommendations(emotion: string) {
     return this.request(`/music/recommendations?emotion=${encodeURIComponent(emotion)}`);
   }
 
-  // Paramètres utilisateur
+  // =================== NOUVEAUX ENDPOINTS PRODUCTION ===================
+  
+  // Dashboard unifié
+  async getDashboardStats() {
+    return this.request('/user/dashboard-stats');
+  }
+
+  // Journal avec backend complet
+  async getJournalEntries(params?: any) {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return this.request(`/journal/entries${queryString}`);
+  }
+
+  async saveJournalEntry(content: string, moodScore?: number) {
+    return this.request('/journal/entries', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        content, 
+        mood_score: moodScore,
+        is_private: true 
+      }),
+    });
+  }
+
+  // Préférences utilisateur avec backend
   async getUserPreferences() {
     return this.request('/user/preferences');
   }
@@ -102,6 +119,61 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify(preferences),
     });
+  }
+
+  // Gamification avec backend
+  async getAchievements() {
+    return this.request('/gamification/achievements');
+  }
+
+  async getUserGamificationStats() {
+    return this.request('/gamification/user-stats');
+  }
+
+  // Social/Cocon avec backend
+  async getSocialGroups() {
+    return this.request('/social/groups');
+  }
+
+  async joinSocialGroup(groupId: string) {
+    return this.request(`/social/groups/${groupId}/join`, {
+      method: 'POST',
+    });
+  }
+
+  // VR Sessions avec backend
+  async getVRTemplates() {
+    return this.request('/vr/templates');
+  }
+
+  async createVRSession(templateName: string) {
+    return this.request('/vr/sessions', {
+      method: 'POST',
+      body: JSON.stringify({ template_name: templateName }),
+    });
+  }
+
+  // Admin endpoints avec backend
+  async getAdminTeams() {
+    return this.request('/admin/teams');
+  }
+
+  async getAdminUsers() {
+    return this.request('/admin/users');
+  }
+
+  async getAdminAnalytics() {
+    return this.request('/admin/analytics/overview');
+  }
+
+  // Notifications avec backend
+  async getNotifications() {
+    return this.request('/notifications/user');
+  }
+
+  // Health check
+  async getHealthStatus() {
+    return this.request('/health');
   }
 }
 

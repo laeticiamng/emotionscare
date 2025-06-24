@@ -1,200 +1,136 @@
 
-import { useState, useEffect } from 'react';
-import { AnonymousActivity, ActivityStats, ActivityTabView } from '../../dashboard/admin/tabs/activity-logs/types';
-import { getActivityData, getActivityStats } from '@/lib/activityLogService';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useCallback } from 'react';
+import { fullApiService } from '@/services/api/fullApiService';
 
-interface UseUserActivityLogStateResult {
-  activeTab: ActivityTabView;
-  setActiveTab: (tab: ActivityTabView) => void;
-  activities: AnonymousActivity[];
-  filteredActivities: AnonymousActivity[];
-  stats: ActivityStats[];
-  isLoading: boolean;
-  error: string | null;
-  filters: {
-    startDate: string;
-    endDate: string;
-    activityType: string;
-    searchTerm: string;
-  };
-  setFilters: React.Dispatch<React.SetStateAction<{
-    startDate: string;
-    endDate: string;
-    activityType: string;
-    searchTerm: string;
-  }>>;
-  handleDateRangeChange: (range: { from?: Date; to?: Date }) => void;
-  handleExport: () => void;
+export interface ActivityLogFilters {
+  searchTerm: string;
+  activityType: string;
+  startDate: string;
+  endDate: string;
 }
 
-export const useUserActivityLogState = (): UseUserActivityLogStateResult => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<ActivityTabView>('daily');
-  const [activities, setActivities] = useState<AnonymousActivity[]>([]);
+export interface AnonymousActivity {
+  id: string;
+  activity_type: string;
+  category: string;
+  count: number;
+  timestamp_day: string;
+}
+
+export interface ActivityStats {
+  activity_type: string;
+  total_count: number;
+  percentage: number;
+}
+
+export const useUserActivityLogState = () => {
+  const [activeTab, setActiveTab] = useState<'daily' | 'stats'>('daily');
   const [filteredActivities, setFilteredActivities] = useState<AnonymousActivity[]>([]);
   const [stats, setStats] = useState<ActivityStats[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Use string-based date representation
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ActivityLogFilters>({
     searchTerm: '',
     activityType: 'all',
     startDate: '',
     endDate: ''
   });
 
-  // Fetch activity data
-  useEffect(() => {
-    console.log("useUserActivityLogState: Fetching activity data...");
+  const fetchActivityData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
-    Promise.all([
-      getActivityData(),
-      getActivityStats()
-    ])
-      .then(([activitiesData, statsData]) => {
-        console.log("useUserActivityLogState: Data fetched successfully", { 
-          activitiesLength: activitiesData.length, 
-          statsLength: statsData.length 
-        });
-        setActivities(activitiesData);
-        setFilteredActivities(activitiesData);
-        setStats(statsData);
-      })
-      .catch(err => {
-        console.error("Error fetching activity data:", err);
-        setError("Impossible de charger les données d'activité");
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les données d'activité",
-          variant: "destructive"
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [toast]);
-
-  // Apply filters when they change
-  useEffect(() => {
-    if (!activities.length) return;
-    
-    let filtered = [...activities];
-    
-    // Apply date filters
-    if (filters.startDate) {
-      filtered = filtered.filter(item => 
-        new Date(item.timestamp_day) >= new Date(filters.startDate)
-      );
-    }
-    
-    if (filters.endDate) {
-      filtered = filtered.filter(item => 
-        new Date(item.timestamp_day) <= new Date(filters.endDate)
-      );
-    }
-    
-    // Apply type filter
-    if (filters.activityType && filters.activityType !== 'all') {
-      filtered = filtered.filter(item => 
-        item.activity_type === filters.activityType
-      );
-    }
-    
-    // Apply search filter
-    if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
-      filtered = filtered.filter(item => 
-        item.activity_type.toLowerCase().includes(searchLower) ||
-        item.category.toLowerCase().includes(searchLower)
-      );
-    }
-    
-    setFilteredActivities(filtered);
-  }, [filters, activities]);
-
-  // Handle date range selection
-  const handleDateRangeChange = (range: { from?: Date; to?: Date }) => {
-    setFilters({
-      ...filters,
-      startDate: range.from ? range.from.toISOString() : '',
-      endDate: range.to ? range.to.toISOString() : ''
-    });
-  };
-
-  // Export data functionality
-  const handleExport = () => {
     try {
-      const dataToExport = activeTab === 'daily' ? filteredActivities : stats;
-      const headers = activeTab === 'daily' 
-        ? ['ID', 'Type', 'Catégorie', 'Nombre', 'Date']
-        : ['Type', 'Nombre total', 'Pourcentage'];
-      
-      // Create CSV content
-      const csvContent = [
-        headers.join(','),
-        ...dataToExport.map(item => {
-          if (activeTab === 'daily') {
-            const dailyItem = item as AnonymousActivity;
-            return [
-              dailyItem.id,
-              dailyItem.activity_type,
-              dailyItem.category,
-              dailyItem.count,
-              dailyItem.timestamp_day
-            ].join(',');
-          } else {
-            const statItem = item as ActivityStats;
-            return [
-              statItem.activity_type,
-              statItem.total_count,
-              statItem.percentage.toFixed(1) + '%'
-            ].join(',');
-          }
-        })
-      ].join('\n');
-      
-      // Create and download file
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `activity-${activeTab}-${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast({
-        title: "Succès",
-        description: "Données exportées avec succès",
-      });
-    } catch (err) {
-      console.error("Error exporting data:", err);
-      toast({
-        title: "Erreur",
-        description: "Erreur lors de l'exportation des données",
-        variant: "destructive"
-      });
-    }
-  };
+      if (activeTab === 'daily') {
+        // Utiliser les nouveaux endpoints backend
+        const params: any = {
+          page: 1,
+          limit: 50
+        };
+        
+        if (filters.startDate) params.date_from = filters.startDate;
+        if (filters.endDate) params.date_to = filters.endDate;
+        if (filters.activityType !== 'all') params.activity_type = filters.activityType;
+        if (filters.searchTerm) params.search_term = filters.searchTerm;
 
-  console.log("useUserActivityLogState: Returning state", { 
-    activeTab, 
-    activitiesCount: activities.length,
-    filteredActivitiesCount: filteredActivities.length,
-    statsCount: stats.length,
-    isLoading, 
-    error 
-  });
+        const response = await fullApiService.request('/admin/audit/logs', {
+          method: 'GET',
+        });
+        
+        // Transformer les données pour correspondre au format attendu
+        const activities = response.data?.logs?.map((log: any) => ({
+          id: log.id,
+          activity_type: log.action,
+          category: log.resource_type || 'Système',
+          count: 1,
+          timestamp_day: new Date(log.created_at).toISOString().split('T')[0]
+        })) || [];
+        
+        setFilteredActivities(activities);
+      } else {
+        // Récupérer les statistiques d'utilisation
+        const response = await fullApiService.getUsageStatistics({
+          period: '30d'
+        });
+        
+        const statsData = response.data?.feature_usage ? 
+          Object.entries(response.data.feature_usage).map(([key, value]: [string, any]) => ({
+            activity_type: key,
+            total_count: value.total || 0,
+            percentage: value.percentage || 0
+          })) : [];
+        
+        setStats(statsData);
+      }
+    } catch (err) {
+      console.error('Error fetching activity data:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
+      
+      // Données de fallback pour éviter les erreurs d'affichage
+      if (activeTab === 'daily') {
+        setFilteredActivities([]);
+      } else {
+        setStats([]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeTab, filters]);
+
+  const handleDateRangeChange = useCallback((range: { from?: Date; to?: Date }) => {
+    setFilters(prev => ({
+      ...prev,
+      startDate: range.from ? range.from.toISOString().split('T')[0] : '',
+      endDate: range.to ? range.to.toISOString().split('T')[0] : '',
+    }));
+  }, []);
+
+  const handleExport = useCallback(async () => {
+    try {
+      const reportType = activeTab === 'daily' ? 'activity_logs' : 'usage_statistics';
+      const response = await fullApiService.generateReport(
+        reportType,
+        { filters, period: '30d' },
+        'csv'
+      );
+      
+      if (response.data?.download_url) {
+        window.open(response.data.download_url, '_blank');
+      }
+    } catch (err) {
+      console.error('Error exporting data:', err);
+      setError('Erreur lors de l\'export des données');
+    }
+  }, [activeTab, filters]);
+
+  useEffect(() => {
+    fetchActivityData();
+  }, [fetchActivityData]);
 
   return {
     activeTab,
     setActiveTab,
-    activities,
     filteredActivities,
     stats,
     isLoading,
@@ -202,6 +138,7 @@ export const useUserActivityLogState = (): UseUserActivityLogStateResult => {
     filters,
     setFilters,
     handleDateRangeChange,
-    handleExport
+    handleExport,
+    refreshData: fetchActivityData
   };
 };
