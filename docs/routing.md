@@ -7,8 +7,7 @@ Le système de routage d'EmotionsCare est maintenant **unifié et sans doublons*
 
 ## 🗂️ Architecture
 
-### Fichiers principaux
-- `src/router/buildUnifiedRoutes.ts` - Configuration centrale des routes
+- `src/router/buildUnifiedRoutes.tsx` - Configuration centrale des routes
 - `src/api/routes.ts` - API de gestion du manifeste
 - `public/routes-manifest.json` - Manifeste public des routes
 - `scripts/routes-audit.ts` - Script d'audit automatique
@@ -78,7 +77,7 @@ export default NouvelePage;
 
 ### 2. Ajouter au manifeste
 ```typescript
-// Dans src/router/buildUnifiedRoutes.ts
+// Dans src/router/buildUnifiedRoutes.tsx
 
 // 1. Importer le composant
 const NouvelePage = lazy(() => import('../pages/NouvelePage'));
