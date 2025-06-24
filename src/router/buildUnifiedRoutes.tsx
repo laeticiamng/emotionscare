@@ -1,17 +1,19 @@
-import React, { lazy, Suspense } from 'react';
-import { Navigate, RouteObject } from 'react-router-dom';
+
+import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import B2BLayout from '@/layouts/B2BLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UniversalErrorBoundary from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
-// Définition des pages lazy-loaded
+// Pages publiques
 const ImmersiveHome = lazy(() => import('@/pages/ImmersiveHome'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 const Point20Page = lazy(() => import('@/pages/Point20Page'));
-const B2COnboardingPage = lazy(() => import('@/pages/B2COnboardingPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
+// Pages B2C
 const B2CLoginPage = lazy(() => import('@/pages/b2c/B2CLoginPage'));
 const B2CRegisterPage = lazy(() => import('@/pages/b2c/B2CRegisterPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
@@ -24,6 +26,7 @@ const B2CGamificationPage = lazy(() => import('@/pages/b2c/B2CGamificationPage')
 const B2CSocialPage = lazy(() => import('@/pages/b2c/B2CSocialPage'));
 const B2CSettingsPage = lazy(() => import('@/pages/b2c/B2CSettingsPage'));
 
+// Pages B2B User
 const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/B2BUserLoginPage'));
 const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/B2BUserRegisterPage'));
 const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/B2BUserDashboardPage'));
@@ -31,6 +34,7 @@ const B2BUserScanPage = lazy(() => import('@/pages/b2b/user/B2BUserScanPage'));
 const B2BUserCoachPage = lazy(() => import('@/pages/b2b/user/B2BUserCoachPage'));
 const B2BUserMusicPage = lazy(() => import('@/pages/b2b/user/B2BUserMusicPage'));
 
+// Pages B2B Admin
 const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/B2BAdminLoginPage'));
 const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/B2BAdminDashboardPage'));
 const TeamsPage = lazy(() => import('@/pages/b2b/admin/TeamsPage'));
@@ -46,6 +50,7 @@ const AccessibilityPage = lazy(() => import('@/pages/b2b/admin/AccessibilityPage
 const InnovationPage = lazy(() => import('@/pages/b2b/admin/InnovationPage'));
 const FeedbackPage = lazy(() => import('@/pages/b2b/admin/FeedbackPage'));
 
+// Pages émotionnelles avancées
 const BossLevelGritPage = lazy(() => import('@/pages/emotional/BossLevelGritPage'));
 const MoodMixerPage = lazy(() => import('@/pages/emotional/MoodMixerPage'));
 const AmbitionArcadePage = lazy(() => import('@/pages/emotional/AmbitionArcadePage'));
@@ -57,21 +62,24 @@ const BubbleBeatPage = lazy(() => import('@/pages/emotional/BubbleBeatPage'));
 const ScreenSilkBreakPage = lazy(() => import('@/pages/emotional/ScreenSilkBreakPage'));
 const VRGalactiquePage = lazy(() => import('@/pages/emotional/VRGalactiquePage'));
 
+// Pages analytics
 const InstantGlowPage = lazy(() => import('@/pages/analytics/InstantGlowPage'));
 const WeeklyBarsPage = lazy(() => import('@/pages/analytics/WeeklyBarsPage'));
 const HeatmapVibesPage = lazy(() => import('@/pages/analytics/HeatmapVibesPage'));
 const BreathworkPage = lazy(() => import('@/pages/analytics/BreathworkPage'));
 
+// Pages settings
 const PrivacyTogglesPage = lazy(() => import('@/pages/settings/PrivacyTogglesPage'));
 const ExportCSVPage = lazy(() => import('@/pages/settings/ExportCSVPage'));
 const AccountDeletePage = lazy(() => import('@/pages/settings/AccountDeletePage'));
 const ProfileSettingsPage = lazy(() => import('@/pages/settings/ProfileSettingsPage'));
 const ActivityHistoryPage = lazy(() => import('@/pages/settings/ActivityHistoryPage'));
 
+// Pages support
 const HelpCenterPage = lazy(() => import('@/pages/support/HelpCenterPage'));
 const HealthCheckBadgePage = lazy(() => import('@/pages/support/HealthCheckBadgePage'));
 
-export function buildUnifiedRoutes(): RouteObject[] {
+export function buildUnifiedRoutes() {
   return [
     // Routes publiques
     {
@@ -96,7 +104,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     },
     {
       path: '/onboarding',
-      element: <B2COnboardingPage />,
+      element: <OnboardingPage />,
       errorElement: <UniversalErrorBoundary />
     },
 
@@ -164,7 +172,8 @@ export function buildUnifiedRoutes(): RouteObject[] {
           element: <B2CSettingsPage />,
           errorElement: <UniversalErrorBoundary />
         }
-      ]
+      ],
+      errorElement: <UniversalErrorBoundary />
     },
 
     // Routes B2B User
@@ -206,7 +215,8 @@ export function buildUnifiedRoutes(): RouteObject[] {
           element: <B2BUserMusicPage />,
           errorElement: <UniversalErrorBoundary />
         }
-      ]
+      ],
+      errorElement: <UniversalErrorBoundary />
     },
 
     // Routes B2B Admin
@@ -264,11 +274,6 @@ export function buildUnifiedRoutes(): RouteObject[] {
           errorElement: <UniversalErrorBoundary />
         },
         {
-          path: 'privacy',
-          element: <PrivacyPage />,
-          errorElement: <UniversalErrorBoundary />
-        },
-        {
           path: 'audit',
           element: <AuditPage />,
           errorElement: <UniversalErrorBoundary />
@@ -279,16 +284,54 @@ export function buildUnifiedRoutes(): RouteObject[] {
           errorElement: <UniversalErrorBoundary />
         },
         {
-          path: 'innovation',
-          element: <InnovationPage />,
-          errorElement: <UniversalErrorBoundary />
-        },
-        {
           path: 'feedback',
           element: <FeedbackPage />,
           errorElement: <UniversalErrorBoundary />
         }
-      ]
+      ],
+      errorElement: <UniversalErrorBoundary />
+    },
+
+    // Routes communes fonctionnelles
+    {
+      path: '/scan',
+      element: <Navigate to="/b2c/scan" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/music',
+      element: <Navigate to="/b2c/music" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/coach',
+      element: <Navigate to="/b2c/coach" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/journal',
+      element: <Navigate to="/b2c/journal" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/vr',
+      element: <Navigate to="/b2c/vr" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/preferences',
+      element: <Navigate to="/b2c/settings" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/gamification',
+      element: <Navigate to="/b2c/gamification" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/social-cocon',
+      element: <Navigate to="/b2c/social-cocon" replace />,
+      errorElement: <UniversalErrorBoundary />
     },
 
     // Routes modules émotionnels
@@ -365,7 +408,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       errorElement: <UniversalErrorBoundary />
     },
 
-    // Routes settings/privacy
+    // Routes settings
     {
       path: '/privacy-toggles',
       element: <PrivacyTogglesPage />,
@@ -404,76 +447,63 @@ export function buildUnifiedRoutes(): RouteObject[] {
       errorElement: <UniversalErrorBoundary />
     },
 
-    // Route 404
+    // Routes admin
+    {
+      path: '/teams',
+      element: <Navigate to="/b2b/admin/teams" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/reports',
+      element: <Navigate to="/b2b/admin/reports" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/events',
+      element: <Navigate to="/b2b/admin/events" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/optimisation',
+      element: <Navigate to="/b2b/admin/optimisation" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/settings',
+      element: <Navigate to="/b2b/admin/settings" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/notifications',
+      element: <Navigate to="/b2b/admin/notifications" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/security',
+      element: <Navigate to="/b2b/admin/security" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/audit',
+      element: <Navigate to="/b2b/admin/audit" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/accessibility',
+      element: <Navigate to="/b2b/admin/accessibility" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+    {
+      path: '/feedback',
+      element: <Navigate to="/b2b/admin/feedback" replace />,
+      errorElement: <UniversalErrorBoundary />
+    },
+
+    // Route catch-all
     {
       path: '*',
-      element: <Navigate to="/" replace />
+      element: <Navigate to="/" replace />,
+      errorElement: <UniversalErrorBoundary />
     }
   ];
-}
-
-// Export pour les tests
-export const ROUTE_MANIFEST = [
-  '/',
-  '/choose-mode',
-  '/onboarding',
-  '/b2b/selection',
-  '/b2c/login',
-  '/b2c/register',
-  '/b2b/user/login',
-  '/b2b/user/register',
-  '/b2b/admin/login',
-  '/b2c/dashboard',
-  '/b2b/user/dashboard',
-  '/b2b/admin/dashboard',
-  '/scan',
-  '/music',
-  '/coach',
-  '/journal',
-  '/vr',
-  '/preferences',
-  '/gamification',
-  '/social-cocon',
-  '/boss-level-grit',
-  '/mood-mixer',
-  '/ambition-arcade',
-  '/bounce-back-battle',
-  '/story-synth-lab',
-  '/flash-glow',
-  '/ar-filters',
-  '/bubble-beat',
-  '/screen-silk-break',
-  '/vr-galactique',
-  '/instant-glow',
-  '/weekly-bars',
-  '/heatmap-vibes',
-  '/breathwork',
-  '/privacy-toggles',
-  '/export-csv',
-  '/account/delete',
-  '/health-check-badge',
-  '/help-center',
-  '/profile-settings',
-  '/activity-history',
-  '/teams',
-  '/reports',
-  '/events',
-  '/optimisation',
-  '/settings',
-  '/notifications',
-  '/security',
-  '/audit',
-  '/accessibility',
-  '/feedback'
-];
-
-export function validateRoutesManifest() {
-  const routes = ROUTE_MANIFEST;
-  const uniqueRoutes = new Set(routes);
-  
-  return {
-    valid: routes.length === uniqueRoutes.size && routes.length === 52,
-    errors: routes.length !== uniqueRoutes.size ? ['Duplicate routes found'] : 
-             routes.length !== 52 ? [`Expected 52 routes, found ${routes.length}`] : []
-  };
 }
