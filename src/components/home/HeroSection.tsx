@@ -1,72 +1,59 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Heart, Brain, Users } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 text-white py-32 overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:50px_50px]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm font-medium mb-8">
-            <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-            Plus de 15,000 professionnels nous font confiance
+    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      <div className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center space-x-4">
+              <Heart className="h-12 w-12 text-blue-600" />
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
+                EmotionsCare
+              </h1>
+              <Brain className="h-12 w-12 text-blue-600" />
+            </div>
           </div>
           
-          <h1 className="text-6xl md:text-7xl font-bold mb-8 leading-tight">
-            Transformez votre
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent block">
-              bien-être émotionnel
-            </span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl mb-12 text-white/90 max-w-3xl mx-auto leading-relaxed">
-            La première plateforme IA dédiée aux professionnels de santé pour 
-            gérer le stress, prévenir le burnout et cultiver la résilience émotionnelle.
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+            La plateforme de bien-être émotionnel dédiée aux professionnels de santé
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Button 
-              size="lg" 
-              className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-xl"
-              asChild
-            >
-              <Link to="/choose-mode">
-                Commencer gratuitement
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            
-            <Button 
-              size="lg" 
-              variant="ghost" 
-              className="text-white border-white/30 hover:bg-white/10 px-8 py-4 text-lg"
-              asChild
-            >
-              <Link to="/browsing">
-                <Play className="mr-2 h-5 w-5" />
-                Voir la démo
-              </Link>
+          <p className="text-lg text-gray-700 mb-12 max-w-3xl mx-auto">
+            Découvrez une solution complète avec IA Coach, scan émotionnel, musicothérapie et suivi personnalisé 
+            pour prendre soin de votre santé mentale au quotidien.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link to="/choose-mode">
+              <Button size="lg" className="px-8 py-4 text-lg bg-blue-600 hover:bg-blue-700">
+                Commencer maintenant
+              </Button>
+            </Link>
+            <Button variant="outline" size="lg" className="px-8 py-4 text-lg">
+              En savoir plus
             </Button>
           </div>
           
-          <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400">94%</div>
-              <div className="text-sm text-white/70">Réduction du stress</div>
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="flex flex-col items-center">
+              <Users className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="font-semibold text-gray-900">Pour les professionnels</h3>
+              <p className="text-gray-600">Adapté aux besoins spécifiques du secteur médical</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">15K+</div>
-              <div className="text-sm text-white/70">Utilisateurs actifs</div>
+            <div className="flex flex-col items-center">
+              <Brain className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="font-semibold text-gray-900">IA Avancée</h3>
+              <p className="text-gray-600">Coach personnel intelligent et analyse émotionnelle</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">24/7</div>
-              <div className="text-sm text-white/70">Support IA</div>
+            <div className="flex flex-col items-center">
+              <Heart className="h-8 w-8 text-blue-600 mb-3" />
+              <h3 className="font-semibold text-gray-900">Suivi Personnel</h3>
+              <p className="text-gray-600">Tableaux de bord et insights personnalisés</p>
             </div>
           </div>
         </div>
