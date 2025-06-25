@@ -1,187 +1,101 @@
 
-/**
- * Audit complet des 52 routes officielles
- * Vérification de la présence, accessibilité et fonctionnalité
- */
+import { ROUTES_MANIFEST } from '@/router/buildUnifiedRoutes';
 
-export interface RouteAuditItem {
-  id: number;
-  path: string;
+export interface RouteAuditData {
+  route: string;
   name: string;
-  category: 'public' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'feature' | 'gamification' | 'privacy';
   requiresAuth: boolean;
-  requiresRole?: string;
-  isAccessible: boolean;
-  hasContent: boolean;
-  loadTime: number;
-  status: 'success' | 'warning' | 'error';
-  errorMessage?: string;
-  lastChecked: Date;
+  category: string;
+  description: string;
 }
 
-export const OFFICIAL_ROUTES_LIST: Omit<RouteAuditItem, 'isAccessible' | 'hasContent' | 'loadTime' | 'status' | 'lastChecked'>[] = [
+export const COMPLETE_ROUTES_AUDIT: RouteAuditData[] = [
   // Routes publiques
-  { id: 1, path: '/', name: 'Home', category: 'public', requiresAuth: false },
-  { id: 2, path: '/choose-mode', name: 'Choose Mode', category: 'public', requiresAuth: false },
-  { id: 3, path: '/onboarding', name: 'Onboarding', category: 'public', requiresAuth: false },
-  { id: 4, path: '/b2b/selection', name: 'B2B Selection', category: 'public', requiresAuth: false },
+  { route: '/', name: 'home', requiresAuth: false, category: 'Public', description: 'Page d\'accueil principale' },
+  { route: '/choose-mode', name: 'chooseMode', requiresAuth: false, category: 'Public', description: 'Sélection du mode utilisateur' },
+  { route: '/auth', name: 'auth', requiresAuth: false, category: 'Public', description: 'Page d\'authentification' },
   
-  // Routes d'authentification B2C
-  { id: 5, path: '/b2c/login', name: 'B2C Login', category: 'b2c', requiresAuth: false },
-  { id: 6, path: '/b2c/register', name: 'B2C Register', category: 'b2c', requiresAuth: false },
-  { id: 7, path: '/b2c/dashboard', name: 'B2C Dashboard', category: 'b2c', requiresAuth: true, requiresRole: 'b2c' },
+  // Routes B2C
+  { route: '/b2c/login', name: 'b2cLogin', requiresAuth: false, category: 'B2C Auth', description: 'Connexion B2C' },
+  { route: '/b2c/register', name: 'b2cRegister', requiresAuth: false, category: 'B2C Auth', description: 'Inscription B2C' },
+  { route: '/b2c/dashboard', name: 'b2cDashboard', requiresAuth: true, category: 'B2C', description: 'Tableau de bord B2C' },
   
-  // Routes d'authentification B2B
-  { id: 8, path: '/b2b/user/login', name: 'B2B User Login', category: 'b2b_user', requiresAuth: false },
-  { id: 9, path: '/b2b/user/register', name: 'B2B User Register', category: 'b2b_user', requiresAuth: false },
-  { id: 10, path: '/b2b/user/dashboard', name: 'B2B User Dashboard', category: 'b2b_user', requiresAuth: true, requiresRole: 'b2b_user' },
-  { id: 11, path: '/b2b/admin/login', name: 'B2B Admin Login', category: 'b2b_admin', requiresAuth: false },
-  { id: 12, path: '/b2b/admin/dashboard', name: 'B2B Admin Dashboard', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 13, path: '/b2b', name: 'B2B Main', category: 'public', requiresAuth: false },
+  // Routes B2B Selection
+  { route: '/b2b/selection', name: 'b2bSelection', requiresAuth: false, category: 'B2B', description: 'Sélection du type B2B' },
   
-  // Fonctionnalités principales
-  { id: 14, path: '/scan', name: 'Emotion Scan', category: 'feature', requiresAuth: true },
-  { id: 15, path: '/music', name: 'Music Therapy', category: 'feature', requiresAuth: true },
-  { id: 16, path: '/coach', name: 'AI Coach', category: 'feature', requiresAuth: true },
-  { id: 17, path: '/journal', name: 'Digital Journal', category: 'feature', requiresAuth: true },
-  { id: 18, path: '/vr', name: 'VR Experiences', category: 'feature', requiresAuth: true },
-  { id: 19, path: '/preferences', name: 'User Preferences', category: 'feature', requiresAuth: true },
+  // Routes B2B User
+  { route: '/b2b/user/login', name: 'b2bUserLogin', requiresAuth: false, category: 'B2B Auth', description: 'Connexion utilisateur B2B' },
+  { route: '/b2b/user/register', name: 'b2bUserRegister', requiresAuth: false, category: 'B2B Auth', description: 'Inscription utilisateur B2B' },
+  { route: '/b2b/user/dashboard', name: 'b2bUserDashboard', requiresAuth: true, category: 'B2B User', description: 'Tableau de bord utilisateur B2B' },
   
-  // Gamification
-  { id: 20, path: '/gamification', name: 'Gamification Hub', category: 'gamification', requiresAuth: true },
-  { id: 21, path: '/social-cocon', name: 'Social Cocon', category: 'gamification', requiresAuth: true },
-  { id: 22, path: '/boss-level-grit', name: 'Boss Level Grit', category: 'gamification', requiresAuth: true },
-  { id: 23, path: '/mood-mixer', name: 'Mood Mixer', category: 'gamification', requiresAuth: true },
-  { id: 24, path: '/ambition-arcade', name: 'Ambition Arcade', category: 'gamification', requiresAuth: true },
-  { id: 25, path: '/bounce-back-battle', name: 'Bounce Back Battle', category: 'gamification', requiresAuth: true },
-  { id: 26, path: '/story-synth-lab', name: 'Story Synth Lab', category: 'gamification', requiresAuth: true },
-  { id: 27, path: '/flash-glow', name: 'Flash Glow', category: 'gamification', requiresAuth: true },
-  { id: 28, path: '/ar-filters', name: 'AR Filters', category: 'gamification', requiresAuth: true },
-  { id: 29, path: '/bubble-beat', name: 'Bubble Beat', category: 'gamification', requiresAuth: true },
-  { id: 30, path: '/screen-silk-break', name: 'Screen Silk Break', category: 'gamification', requiresAuth: true },
-  { id: 31, path: '/vr-galactique', name: 'VR Galactique', category: 'gamification', requiresAuth: true },
-  { id: 32, path: '/instant-glow', name: 'Instant Glow', category: 'gamification', requiresAuth: true },
-  { id: 33, path: '/weekly-bars', name: 'Weekly Bars', category: 'feature', requiresAuth: true },
-  { id: 34, path: '/heatmap-vibes', name: 'Heatmap Vibes', category: 'feature', requiresAuth: true },
-  { id: 35, path: '/breathwork', name: 'Breathwork', category: 'feature', requiresAuth: true },
+  // Routes B2B Admin
+  { route: '/b2b/admin/login', name: 'b2bAdminLogin', requiresAuth: false, category: 'B2B Auth', description: 'Connexion admin B2B' },
+  { route: '/b2b/admin/dashboard', name: 'b2bAdminDashboard', requiresAuth: true, category: 'B2B Admin', description: 'Tableau de bord admin B2B' },
   
-  // Privacy & Account
-  { id: 36, path: '/privacy-toggles', name: 'Privacy Toggles', category: 'privacy', requiresAuth: true },
-  { id: 37, path: '/export-csv', name: 'Export CSV', category: 'privacy', requiresAuth: true },
-  { id: 38, path: '/account/delete', name: 'Account Deletion', category: 'privacy', requiresAuth: true },
-  { id: 39, path: '/health-check-badge', name: 'Health Check Badge', category: 'feature', requiresAuth: true },
-  { id: 40, path: '/notifications', name: 'Notifications', category: 'feature', requiresAuth: true },
-  { id: 41, path: '/help-center', name: 'Help Center', category: 'public', requiresAuth: false },
-  { id: 42, path: '/profile-settings', name: 'Profile Settings', category: 'feature', requiresAuth: true },
-  { id: 43, path: '/activity-history', name: 'Activity History', category: 'feature', requiresAuth: true },
-  { id: 44, path: '/feedback', name: 'Feedback', category: 'feature', requiresAuth: true },
+  // Routes communes fonctionnelles
+  { route: '/scan', name: 'scan', requiresAuth: true, category: 'Features', description: 'Scanner d\'émotions' },
+  { route: '/music', name: 'music', requiresAuth: true, category: 'Features', description: 'Thérapie musicale' },
+  { route: '/coach', name: 'coach', requiresAuth: true, category: 'Features', description: 'Coach virtuel' },
+  { route: '/journal', name: 'journal', requiresAuth: true, category: 'Features', description: 'Journal émotionnel' },
+  { route: '/vr', name: 'vr', requiresAuth: true, category: 'Features', description: 'Réalité virtuelle' },
+  { route: '/preferences', name: 'preferences', requiresAuth: true, category: 'Settings', description: 'Préférences utilisateur' },
+  { route: '/gamification', name: 'gamification', requiresAuth: true, category: 'Features', description: 'Système de gamification' },
+  { route: '/social-cocon', name: 'socialCocon', requiresAuth: true, category: 'Features', description: 'Cocon social' },
   
-  // Admin uniquement
-  { id: 45, path: '/teams', name: 'Teams Management', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 46, path: '/reports', name: 'Reports & Analytics', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 47, path: '/events', name: 'Events Management', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 48, path: '/optimisation', name: 'System Optimization', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 49, path: '/settings', name: 'System Settings', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 50, path: '/security', name: 'Security Management', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 51, path: '/audit', name: 'System Audit', category: 'b2b_admin', requiresAuth: true, requiresRole: 'b2b_admin' },
-  { id: 52, path: '/accessibility', name: 'Accessibility Options', category: 'public', requiresAuth: false },
+  // Routes administrateur
+  { route: '/teams', name: 'teams', requiresAuth: true, category: 'Admin', description: 'Gestion des équipes' },
+  { route: '/reports', name: 'reports', requiresAuth: true, category: 'Admin', description: 'Rapports et analyses' },
+  { route: '/events', name: 'events', requiresAuth: true, category: 'Admin', description: 'Gestion des événements' },
+  { route: '/optimisation', name: 'optimisation', requiresAuth: true, category: 'Admin', description: 'Optimisation système' },
+  { route: '/settings', name: 'settings', requiresAuth: true, category: 'Admin', description: 'Paramètres système' },
+  
+  // Routes légales
+  { route: '/terms', name: 'terms', requiresAuth: false, category: 'Legal', description: 'Conditions d\'utilisation' },
+  { route: '/privacy', name: 'privacy', requiresAuth: false, category: 'Legal', description: 'Politique de confidentialité' },
+  { route: '/contact', name: 'contact', requiresAuth: false, category: 'Legal', description: 'Contact' },
+  { route: '/about', name: 'about', requiresAuth: false, category: 'Legal', description: 'À propos' },
+  { route: '/pricing', name: 'pricing', requiresAuth: false, category: 'Legal', description: 'Tarification' },
+  { route: '/features', name: 'features', requiresAuth: false, category: 'Legal', description: 'Fonctionnalités' },
+  { route: '/faq', name: 'faq', requiresAuth: false, category: 'Legal', description: 'Questions fréquentes' },
+  
+  // Routes spécialisées
+  { route: '/onboarding', name: 'onboarding', requiresAuth: true, category: 'Onboarding', description: 'Processus d\'intégration' },
+  { route: '/complete-audit', name: 'completeAudit', requiresAuth: true, category: 'Admin', description: 'Audit complet des routes' },
+  { route: '/notifications', name: 'notifications', requiresAuth: true, category: 'Features', description: 'Centre de notifications' },
 ];
 
-export class CompleteRoutesAuditor {
-  private results: RouteAuditItem[] = [];
+export function validateAllRoutes() {
+  const manifestRoutes = Object.values(ROUTES_MANIFEST);
+  const auditRoutes = COMPLETE_ROUTES_AUDIT.map(r => r.route);
   
-  async auditRoute(routeConfig: typeof OFFICIAL_ROUTES_LIST[0]): Promise<RouteAuditItem> {
-    const startTime = performance.now();
-    
-    try {
-      // Simulation de test de route (en production, on ferait un vrai test HTTP)
-      const isAccessible = await this.testRouteAccessibility(routeConfig.path);
-      const hasContent = await this.checkRouteContent(routeConfig.path);
-      const loadTime = performance.now() - startTime;
-      
-      const status: RouteAuditItem['status'] = 
-        !isAccessible ? 'error' : 
-        !hasContent ? 'warning' : 
-        'success';
-      
-      return {
-        ...routeConfig,
-        isAccessible,
-        hasContent,
-        loadTime,
-        status,
-        errorMessage: !isAccessible ? 'Route non accessible' : !hasContent ? 'Contenu manquant' : undefined,
-        lastChecked: new Date()
-      };
-    } catch (error) {
-      return {
-        ...routeConfig,
-        isAccessible: false,
-        hasContent: false,
-        loadTime: performance.now() - startTime,
-        status: 'error',
-        errorMessage: error instanceof Error ? error.message : 'Erreur inconnue',
-        lastChecked: new Date()
-      };
-    }
-  }
+  const missingInAudit = manifestRoutes.filter(route => !auditRoutes.includes(route));
+  const missingInManifest = auditRoutes.filter(route => !manifestRoutes.includes(route));
   
-  private async testRouteAccessibility(path: string): Promise<boolean> {
-    // Simulation - en production, on testerait la navigation réelle
-    try {
-      // Test basique de navigation
-      window.history.pushState({}, '', path);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  
-  private async checkRouteContent(path: string): Promise<boolean> {
-    // Simulation - en production, on vérifierait le contenu DOM
-    return Math.random() > 0.1; // 90% de chance d'avoir du contenu
-  }
-  
-  async auditAllRoutes(): Promise<RouteAuditItem[]> {
-    console.log('🔍 Début de l\'audit complet des 52 routes...');
-    
-    const auditPromises = OFFICIAL_ROUTES_LIST.map(route => this.auditRoute(route));
-    this.results = await Promise.all(auditPromises);
-    
-    return this.results;
-  }
-  
-  getAuditSummary() {
-    const total = this.results.length;
-    const success = this.results.filter(r => r.status === 'success').length;
-    const warnings = this.results.filter(r => r.status === 'warning').length;
-    const errors = this.results.filter(r => r.status === 'error').length;
-    const avgLoadTime = this.results.reduce((sum, r) => sum + r.loadTime, 0) / total;
-    
-    return {
-      total,
-      success,
-      warnings,
-      errors,
-      avgLoadTime,
-      successRate: (success / total) * 100,
-      overallStatus: errors === 0 ? (warnings === 0 ? 'excellent' : 'good') : 'needs-attention'
-    };
-  }
-  
-  getRoutesByCategory() {
-    const categories = {} as Record<string, RouteAuditItem[]>;
-    
-    this.results.forEach(route => {
-      if (!categories[route.category]) {
-        categories[route.category] = [];
-      }
-      categories[route.category].push(route);
-    });
-    
-    return categories;
-  }
+  return {
+    totalManifest: manifestRoutes.length,
+    totalAudit: auditRoutes.length,
+    missingInAudit,
+    missingInManifest,
+    isComplete: missingInAudit.length === 0 && missingInManifest.length === 0
+  };
 }
 
-export const completeRoutesAuditor = new CompleteRoutesAuditor();
+export function getRoutesByCategory() {
+  const categories = COMPLETE_ROUTES_AUDIT.reduce((acc, route) => {
+    if (!acc[route.category]) {
+      acc[route.category] = [];
+    }
+    acc[route.category].push(route);
+    return acc;
+  }, {} as Record<string, RouteAuditData[]>);
+  
+  return categories;
+}
+
+export function getAuthRequiredRoutes() {
+  return COMPLETE_ROUTES_AUDIT.filter(route => route.requiresAuth);
+}
+
+export function getPublicRoutes() {
+  return COMPLETE_ROUTES_AUDIT.filter(route => !route.requiresAuth);
+}

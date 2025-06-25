@@ -2,9 +2,9 @@
 import React from 'react';
 import CompleteRoutesAuditInterface from '@/components/admin/CompleteRoutesAuditInterface';
 
-const CompleteAuditPage = () => {
+const CompleteAuditPage: React.FC = () => {
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="min-h-screen bg-background">
       <CompleteRoutesAuditInterface />
     </div>
   );

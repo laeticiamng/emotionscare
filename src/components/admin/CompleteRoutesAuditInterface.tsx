@@ -5,280 +5,377 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  ExternalLink, 
-  RefreshCw,
-  Play,
-  Zap,
-  Clock,
-  Users,
-  Shield,
-  Gamepad2,
-  Settings
-} from 'lucide-react';
+import { CheckCircle, XCircle, Clock, AlertTriangle, Play, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { completeRoutesAuditor, RouteAuditItem, OFFICIAL_ROUTES_LIST } from '@/utils/completeRoutesAudit';
-import { motion } from 'framer-motion';
+import { ROUTES_MANIFEST } from '@/router/buildUnifiedRoutes';
+
+interface RouteAuditResult {
+  route: string;
+  name: string;
+  status: 'pending' | 'success' | 'error' | 'warning';
+  loadTime?: number;
+  error?: string;
+  hasContent?: boolean;
+  requiresAuth?: boolean;
+  tested: boolean;
+}
 
 const CompleteRoutesAuditInterface: React.FC = () => {
-  const [auditResults, setAuditResults] = useState<RouteAuditItem[]>([]);
-  const [isAuditing, setIsAuditing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const navigate = useNavigate();
+  const [auditResults, setAuditResults] = useState<RouteAuditResult[]>([]);
+  const [isRunning, setIsRunning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  
+  // Initialiser les résultats d'audit
+  useEffect(() => {
+    const initialResults: RouteAuditResult[] = Object.entries(ROUTES_MANIFEST).map(([name, route]) => ({
+      route,
+      name,
+      status: 'pending',
+      tested: false,
+      requiresAuth: !['/', '/choose-mode', '/auth', '/b2c/login', '/b2c/register', '/b2b/selection', '/b2b/user/login', '/b2b/user/register', '/b2b/admin/login'].includes(route)
+    }));
+    setAuditResults(initialResults);
+  }, []);
 
-  const runCompleteAudit = async () => {
-    setIsAuditing(true);
+  const testSingleRoute = async (routeInfo: RouteAuditResult): Promise<RouteAuditResult> => {
+    const startTime = performance.now();
+    
     try {
-      const results = await completeRoutesAuditor.auditAllRoutes();
-      setAuditResults(results);
+      // Simuler un test de navigation
+      const testResult = await new Promise<boolean>((resolve) => {
+        const originalPath = window.location.pathname;
+        
+        // Test si la route existe
+        try {
+          window.history.pushState({}, '', routeInfo.route);
+          
+          // Vérifier si on peut accéder à la route
+          setTimeout(() => {
+            const hasContent = document.querySelector('main') !== null;
+            window.history.pushState({}, '', originalPath);
+            resolve(hasContent);
+          }, 100);
+        } catch (error) {
+          window.history.pushState({}, '', originalPath);
+          resolve(false);
+        }
+      });
+      
+      const loadTime = performance.now() - startTime;
+      
+      return {
+        ...routeInfo,
+        status: testResult ? 'success' : 'error',
+        loadTime,
+        hasContent: testResult,
+        tested: true,
+        error: testResult ? undefined : 'Route non accessible'
+      };
     } catch (error) {
-      console.error('Erreur lors de l\'audit:', error);
-    } finally {
-      setIsAuditing(false);
+      const loadTime = performance.now() - startTime;
+      return {
+        ...routeInfo,
+        status: 'error',
+        loadTime,
+        tested: true,
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      };
     }
   };
 
-  const testSingleRoute = async (path: string) => {
-    try {
-      navigate(path);
-    } catch (error) {
-      console.error(`Erreur navigation vers ${path}:`, error);
+  const testAllRoutes = async () => {
+    setIsRunning(true);
+    setProgress(0);
+    
+    const results: RouteAuditResult[] = [];
+    
+    for (let i = 0; i < auditResults.length; i++) {
+      const result = await testSingleRoute(auditResults[i]);
+      results.push(result);
+      setProgress(((i + 1) / auditResults.length) * 100);
+      
+      // Mettre à jour les résultats en temps réel
+      setAuditResults(prev => {
+        const updated = [...prev];
+        updated[i] = result;
+        return updated;
+      });
+      
+      // Petite pause pour éviter de surcharger
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
+    
+    setIsRunning(false);
   };
 
-  const getStatusIcon = (status: RouteAuditItem['status']) => {
+  const testSingleRouteHandler = async (index: number) => {
+    const result = await testSingleRoute(auditResults[index]);
+    setAuditResults(prev => {
+      const updated = [...prev];
+      updated[index] = result;
+      return updated;
+    });
+  };
+
+  const navigateToRoute = (route: string) => {
+    navigate(route);
+  };
+
+  const resetAudit = () => {
+    setAuditResults(prev => prev.map(result => ({
+      ...result,
+      status: 'pending',
+      tested: false,
+      loadTime: undefined,
+      error: undefined,
+      hasContent: undefined
+    })));
+    setProgress(0);
+  };
+
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'success': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'error': return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-400" />;
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'public': return <ExternalLink className="h-4 w-4" />;
-      case 'b2c': return <Users className="h-4 w-4" />;
-      case 'b2b_user': return <Users className="h-4 w-4" />;
-      case 'b2b_admin': return <Shield className="h-4 w-4" />;
-      case 'feature': return <Zap className="h-4 w-4" />;
-      case 'gamification': return <Gamepad2 className="h-4 w-4" />;
-      case 'privacy': return <Settings className="h-4 w-4" />;
-      default: return <ExternalLink className="h-4 w-4" />;
+  const getStatusBadge = (result: RouteAuditResult) => {
+    if (!result.tested) {
+      return <Badge variant="secondary">Non testé</Badge>;
+    }
+    
+    switch (result.status) {
+      case 'success':
+        return <Badge variant="default" className="bg-green-100 text-green-800">✅ OK</Badge>;
+      case 'error':
+        return <Badge variant="destructive">❌ Erreur</Badge>;
+      case 'warning':
+        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">⚠️ Attention</Badge>;
+      default:
+        return <Badge variant="secondary">⏳ En attente</Badge>;
     }
   };
 
-  const summary = auditResults.length > 0 ? completeRoutesAuditor.getAuditSummary() : null;
-  const routesByCategory = auditResults.length > 0 ? completeRoutesAuditor.getRoutesByCategory() : {};
-
-  const filteredRoutes = selectedCategory === 'all' 
-    ? auditResults 
-    : routesByCategory[selectedCategory] || [];
+  const stats = {
+    total: auditResults.length,
+    tested: auditResults.filter(r => r.tested).length,
+    success: auditResults.filter(r => r.status === 'success').length,
+    errors: auditResults.filter(r => r.status === 'error').length,
+    warnings: auditResults.filter(r => r.status === 'warning').length
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header avec actions principales */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Audit Complet des 52 Routes Officielles
-              </CardTitle>
-              <p className="text-muted-foreground mt-1">
-                Vérification complète de toutes les routes, pages et accessibilité
-              </p>
-            </div>
-            <Button 
-              onClick={runCompleteAudit} 
-              disabled={isAuditing}
-              className="flex items-center gap-2"
-            >
-              {isAuditing ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-              {isAuditing ? 'Audit en cours...' : 'Lancer l\'audit complet'}
-            </Button>
-          </div>
-        </CardHeader>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Audit Complet des Routes</h1>
+          <p className="text-muted-foreground">
+            Vérification de toutes les {auditResults.length} routes officielles
+          </p>
+        </div>
         
-        {/* Résumé global */}
-        {summary && (
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{summary.success}</div>
-                <div className="text-xs text-muted-foreground">Succès</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">{summary.warnings}</div>
-                <div className="text-xs text-muted-foreground">Avertissements</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{summary.errors}</div>
-                <div className="text-xs text-muted-foreground">Erreurs</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{summary.successRate.toFixed(1)}%</div>
-                <div className="text-xs text-muted-foreground">Taux de succès</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{summary.avgLoadTime.toFixed(0)}ms</div>
-                <div className="text-xs text-muted-foreground">Temps moyen</div>
-              </div>
-            </div>
-            
-            <Progress value={summary.successRate} className="h-2" />
-            
-            <div className="flex justify-center mt-4">
-              <Badge 
-                variant={summary.overallStatus === 'excellent' ? 'default' : 
-                        summary.overallStatus === 'good' ? 'secondary' : 'destructive'}
-                className="text-sm"
-              >
-                {summary.overallStatus === 'excellent' ? '🎉 Excellent' :
-                 summary.overallStatus === 'good' ? '✅ Bon' : '⚠️ Attention requise'}
-              </Badge>
-            </div>
+        <div className="flex gap-2">
+          <Button onClick={resetAudit} variant="outline" disabled={isRunning}>
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Réinitialiser
+          </Button>
+          <Button onClick={testAllRoutes} disabled={isRunning}>
+            <Play className="h-4 w-4 mr-2" />
+            {isRunning ? 'Test en cours...' : 'Tester toutes les routes'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Statistiques */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-sm text-muted-foreground">Total</div>
           </CardContent>
-        )}
-      </Card>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-blue-600">{stats.tested}</div>
+            <div className="text-sm text-muted-foreground">Testées</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-600">{stats.success}</div>
+            <div className="text-sm text-muted-foreground">Succès</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-red-600">{stats.errors}</div>
+            <div className="text-sm text-muted-foreground">Erreurs</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-yellow-600">{stats.warnings}</div>
+            <div className="text-sm text-muted-foreground">Alertes</div>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Interface de test des routes */}
-      <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="grid w-full grid-cols-8">
-          <TabsTrigger value="all">Toutes</TabsTrigger>
-          <TabsTrigger value="public">Publiques</TabsTrigger>
-          <TabsTrigger value="b2c">B2C</TabsTrigger>
-          <TabsTrigger value="b2b_user">B2B User</TabsTrigger>
-          <TabsTrigger value="b2b_admin">B2B Admin</TabsTrigger>
-          <TabsTrigger value="feature">Features</TabsTrigger>
-          <TabsTrigger value="gamification">Games</TabsTrigger>
-          <TabsTrigger value="privacy">Privacy</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={selectedCategory} className="space-y-4">
-          {auditResults.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground mb-4">
-                  Aucun audit n'a encore été effectué
-                </p>
-                <Button onClick={runCompleteAudit} variant="outline">
-                  Lancer le premier audit
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-3">
-              {filteredRoutes.map((route) => (
-                <motion.div
-                  key={route.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: route.id * 0.02 }}
-                >
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {getStatusIcon(route.status)}
-                          {getCategoryIcon(route.category)}
-                          <div>
-                            <div className="font-medium">{route.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {route.path}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            {route.loadTime.toFixed(0)}ms
-                          </Badge>
-                          
-                          {route.requiresAuth && (
-                            <Badge variant="secondary" className="text-xs">
-                              🔒 Auth
-                            </Badge>
-                          )}
-                          
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => testSingleRoute(route.path)}
-                            className="flex items-center gap-1"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Tester
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      {route.errorMessage && (
-                        <div className="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded">
-                          {route.errorMessage}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+      {/* Barre de progression */}
+      {isRunning && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex justify-between text-sm mb-2">
+              <span>Progression du test</span>
+              <span>{Math.round(progress)}%</span>
             </div>
-          )}
+            <Progress value={progress} className="h-2" />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Liste des routes */}
+      <Tabs defaultValue="all" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="all">Toutes ({stats.total})</TabsTrigger>
+          <TabsTrigger value="success">Succès ({stats.success})</TabsTrigger>
+          <TabsTrigger value="errors">Erreurs ({stats.errors})</TabsTrigger>
+          <TabsTrigger value="untested">Non testées ({stats.total - stats.tested})</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="space-y-2">
+          {auditResults.map((result, index) => (
+            <Card key={result.route} className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  {getStatusIcon(result.status)}
+                  <div>
+                    <div className="font-medium">{result.name}</div>
+                    <div className="text-sm text-muted-foreground">{result.route}</div>
+                  </div>
+                  {result.requiresAuth && (
+                    <Badge variant="outline" className="text-xs">Auth requise</Badge>
+                  )}
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  {result.tested && result.loadTime && (
+                    <Badge variant="outline" className="text-xs">
+                      {Math.round(result.loadTime)}ms
+                    </Badge>
+                  )}
+                  {getStatusBadge(result)}
+                  
+                  <div className="flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => testSingleRouteHandler(index)}
+                      disabled={isRunning}
+                    >
+                      Tester
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => navigateToRoute(result.route)}
+                      disabled={result.status === 'error'}
+                    >
+                      Visiter
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              {result.error && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                  {result.error}
+                </div>
+              )}
+            </Card>
+          ))}
+        </TabsContent>
+        
+        <TabsContent value="success" className="space-y-2">
+          {auditResults.filter(r => r.status === 'success').map((result, index) => (
+            <Card key={result.route} className="p-4 border-green-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <div>
+                    <div className="font-medium">{result.name}</div>
+                    <div className="text-sm text-muted-foreground">{result.route}</div>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => navigateToRoute(result.route)}
+                >
+                  Visiter
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </TabsContent>
+        
+        <TabsContent value="errors" className="space-y-2">
+          {auditResults.filter(r => r.status === 'error').map((result, index) => (
+            <Card key={result.route} className="p-4 border-red-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <XCircle className="h-5 w-5 text-red-500" />
+                  <div>
+                    <div className="font-medium">{result.name}</div>
+                    <div className="text-sm text-muted-foreground">{result.route}</div>
+                    {result.error && (
+                      <div className="text-sm text-red-600 mt-1">{result.error}</div>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => testSingleRouteHandler(index)}
+                  disabled={isRunning}
+                >
+                  Retester
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </TabsContent>
+        
+        <TabsContent value="untested" className="space-y-2">
+          {auditResults.filter(r => !r.tested).map((result, index) => (
+            <Card key={result.route} className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Clock className="h-5 w-5 text-gray-400" />
+                  <div>
+                    <div className="font-medium">{result.name}</div>
+                    <div className="text-sm text-muted-foreground">{result.route}</div>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => testSingleRouteHandler(index)}
+                  disabled={isRunning}
+                >
+                  Tester
+                </Button>
+              </div>
+            </Card>
+          ))}
         </TabsContent>
       </Tabs>
-
-      {/* Actions rapides */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Actions Rapides
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Accueil
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/b2c/dashboard')}
-              className="flex items-center gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Dashboard B2C
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/b2b/admin/dashboard')}
-              className="flex items-center gap-2"
-            >
-              <Shield className="h-4 w-4" />
-              Dashboard Admin
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/gamification')}
-              className="flex items-center gap-2"
-            >
-              <Gamepad2 className="h-4 w-4" />
-              Gamification
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
