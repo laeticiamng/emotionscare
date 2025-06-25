@@ -6,13 +6,21 @@ import BreadcrumbNav from './BreadcrumbNav';
 
 const OptimizedLayout: React.FC = () => {
   React.useEffect(() => {
-    // Optimisation des polices avec protection
-    if (typeof document !== 'undefined' && 'fonts' in document) {
-      document.fonts.ready.then(() => {
-        console.log('✅ Fonts loaded');
-      }).catch((error) => {
-        console.log('Fonts loading failed', error);
-      });
+    console.log('✅ OptimizedLayout mounted');
+    
+    // Optimisation des polices avec protection renforcée
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      try {
+        if ('fonts' in document && document.fonts) {
+          document.fonts.ready.then(() => {
+            console.log('✅ Fonts loaded successfully');
+          }).catch((error) => {
+            console.log('⚠️ Fonts loading failed:', error);
+          });
+        }
+      } catch (error) {
+        console.log('⚠️ Font loading setup failed:', error);
+      }
     }
   }, []);
 

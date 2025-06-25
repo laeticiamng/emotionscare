@@ -17,59 +17,65 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ className = '' }) => {
   const location = useLocation();
   
   const getBreadcrumbs = (): BreadcrumbItem[] => {
-    const pathSegments = location.pathname.split('/').filter(Boolean);
-    
-    if (pathSegments.length === 0) {
+    try {
+      const pathSegments = location.pathname.split('/').filter(Boolean);
+      
+      if (pathSegments.length === 0) {
+        return [{ label: 'Accueil', path: '/', current: true }];
+      }
+      
+      const breadcrumbs: BreadcrumbItem[] = [
+        { label: 'Accueil', path: '/' }
+      ];
+      
+      let currentPath = '';
+      pathSegments.forEach((segment, index) => {
+        currentPath += `/${segment}`;
+        
+        const pageNames: Record<string, string> = {
+          'scan': 'Scan Émotionnel',
+          'music': 'Musicothérapie',
+          'journal': 'Journal',
+          'coach': 'Coach IA',
+          'vr': 'Réalité Virtuelle',
+          'preferences': 'Préférences',
+          'gamification': 'Gamification',
+          'social-cocon': 'Social Cocon',
+          'profile': 'Profil',
+          'notifications': 'Notifications',
+          'support': 'Support',
+          'security': 'Sécurité',
+          'stats': 'Statistiques',
+          'b2c': 'Espace Personnel',
+          'b2b-selection': 'Espace Entreprise',
+          'boss-level-grit': 'Boss Level Grit',
+          'bounce-back-battle': 'Bounce Back Battle',
+          'story-synth-lab': 'Story Synth Lab',
+          'screen-silk-break': 'Screen Silk Break',
+          'flash-glow': 'Flash Glow'
+        };
+        
+        breadcrumbs.push({
+          label: pageNames[segment] || segment.charAt(0).toUpperCase() + segment.slice(1),
+          path: currentPath,
+          current: index === pathSegments.length - 1
+        });
+      });
+      
+      return breadcrumbs;
+    } catch (error) {
+      console.error('Error in getBreadcrumbs:', error);
       return [{ label: 'Accueil', path: '/', current: true }];
     }
-    
-    const breadcrumbs: BreadcrumbItem[] = [
-      { label: 'Accueil', path: '/' }
-    ];
-    
-    let currentPath = '';
-    pathSegments.forEach((segment, index) => {
-      currentPath += `/${segment}`;
-      
-      const pageNames: Record<string, string> = {
-        'scan': 'Scan Émotionnel',
-        'music': 'Musicothérapie',
-        'journal': 'Journal',
-        'coach': 'Coach IA',
-        'vr': 'Réalité Virtuelle',
-        'preferences': 'Préférences',
-        'gamification': 'Gamification',
-        'social-cocon': 'Social Cocon',
-        'profile': 'Profil',
-        'notifications': 'Notifications',
-        'support': 'Support',
-        'security': 'Sécurité',
-        'stats': 'Statistiques',
-        'b2c': 'Espace Personnel',
-        'b2b-selection': 'Espace Entreprise',
-        'boss-level-grit': 'Boss Level Grit',
-        'bounce-back-battle': 'Bounce Back Battle',
-        'story-synth-lab': 'Story Synth Lab',
-        'screen-silk-break': 'Screen Silk Break',
-        'flash-glow': 'Flash Glow'
-      };
-      
-      breadcrumbs.push({
-        label: pageNames[segment] || segment.charAt(0).toUpperCase() + segment.slice(1),
-        path: currentPath,
-        current: index === pathSegments.length - 1
-      });
-    });
-    
-    return breadcrumbs;
   };
   
   const breadcrumbs = getBreadcrumbs();
   
   if (breadcrumbs.length <= 1) return null;
   
-  const combineClasses = (base: string, additional: string) => {
-    return additional ? `${base} ${additional}` : base;
+  // Fonction sécurisée pour combiner les classes
+  const combineClasses = (...classes: (string | undefined | null)[]): string => {
+    return classes.filter(Boolean).join(' ');
   };
   
   return (

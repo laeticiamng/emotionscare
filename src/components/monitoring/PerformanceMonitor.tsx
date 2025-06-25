@@ -9,41 +9,61 @@ const PerformanceMonitor: React.FC = () => {
   });
 
   React.useEffect(() => {
-    // Surveillance des performances
-    const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      entries.forEach((entry) => {
-        if (entry.entryType === 'navigation') {
-          setMetrics(prev => ({
-            ...prev,
-            loadTime: Math.round(entry.duration)
-          }));
-        }
-      });
-    });
+    if (typeof window === 'undefined' || typeof performance === 'undefined') {
+      return;
+    }
 
     try {
-      observer.observe({ entryTypes: ['navigation', 'measure'] });
-    } catch (error) {
-      console.log('Performance Observer not supported:', error);
-    }
+      // Surveillance des performances avec protection d'erreurs
+      if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+          try {
+            const entries = list.getEntries();
+            entries.forEach((entry) => {
+              if (entry.entryType === 'navigation') {
+                setMetrics(prev => ({
+                  ...prev,
+                  loadTime: Math.round(entry.duration)
+                }));
+              }
+            });
+          } catch (error) {
+            console.log('⚠️ Performance entries processing failed:', error);
+          }
+        });
 
-    // Mesure de la mémoire si disponible
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      setMetrics(prev => ({
-        ...prev,
-        memoryUsage: Math.round(memory.usedJSHeapSize / 1024 / 1024)
-      }));
-    }
+        try {
+          observer.observe({ entryTypes: ['navigation', 'measure'] });
+        } catch (error) {
+          console.log('⚠️ Performance Observer setup failed:', error);
+        }
 
-    return () => {
-      try {
-        observer.disconnect();
-      } catch (error) {
-        console.log('Observer disconnect failed:', error);
+        // Mesure de la mémoire si disponible
+        try {
+          if ('memory' in performance) {
+            const memory = (performance as any).memory;
+            if (memory && memory.usedJSHeapSize) {
+              setMetrics(prev => ({
+                ...prev,
+                memoryUsage: Math.round(memory.usedJSHeapSize / 1024 / 1024)
+              }));
+            }
+          }
+        } catch (error) {
+          console.log('⚠️ Memory measurement failed:', error);
+        }
+
+        return () => {
+          try {
+            observer.disconnect();
+          } catch (error) {
+            console.log('⚠️ Observer disconnect failed:', error);
+          }
+        };
       }
-    };
+    } catch (error) {
+      console.log('⚠️ Performance monitoring setup failed:', error);
+    }
   }, []);
 
   if (process.env.NODE_ENV !== 'development') {

@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-// Optimisations spécifiques pour mobile
+// Optimisations spécifiques pour mobile avec protection d'erreurs
 export const mobileBreakpoints = {
   sm: '640px',
   md: '768px',
@@ -23,42 +23,62 @@ export const mobileGrid = {
   features: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
 } as const;
 
-// Hook pour détecter la taille d'écran
+// Hook pour détecter la taille d'écran avec protection d'erreurs
 export const useScreenSize = () => {
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   
   React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const checkScreenSize = () => {
-      const width = window.innerWidth;
-      if (width < 768) {
-        setScreenSize('mobile');
-      } else if (width < 1024) {
-        setScreenSize('tablet');
-      } else {
-        setScreenSize('desktop');
+      try {
+        const width = window.innerWidth;
+        if (width < 768) {
+          setScreenSize('mobile');
+        } else if (width < 1024) {
+          setScreenSize('tablet');
+        } else {
+          setScreenSize('desktop');
+        }
+      } catch (error) {
+        console.log('⚠️ Screen size detection failed:', error);
       }
     };
     
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
     
-    return () => window.removeEventListener('resize', checkScreenSize);
+    try {
+      window.addEventListener('resize', checkScreenSize);
+      return () => window.removeEventListener('resize', checkScreenSize);
+    } catch (error) {
+      console.log('⚠️ Resize listener setup failed:', error);
+    }
   }, []);
   
   return screenSize;
 };
 
-// Optimisation des images pour mobile
+// Optimisation des images pour mobile avec validation
 export const getOptimizedImageSrc = (src: string, screenSize: 'mobile' | 'tablet' | 'desktop') => {
-  if (!src) return '';
+  if (!src || typeof src !== 'string') {
+    console.log('⚠️ Invalid image src provided:', src);
+    return '';
+  }
   
-  const sizeMap = {
-    mobile: 'w-400',
-    tablet: 'w-800', 
-    desktop: 'w-1200'
-  };
-  
-  return src.includes('lovable-uploads') 
-    ? `${src}?${sizeMap[screenSize]}`
-    : src;
+  try {
+    const sizeMap = {
+      mobile: 'w-400',
+      tablet: 'w-800', 
+      desktop: 'w-1200'
+    };
+    
+    return src.includes('lovable-uploads') 
+      ? `${src}?${sizeMap[screenSize]}`
+      : src;
+  } catch (error) {
+    console.log('⚠️ Image optimization failed:', error);
+    return src;
+  }
 };
