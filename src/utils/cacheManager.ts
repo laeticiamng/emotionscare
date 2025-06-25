@@ -1,3 +1,4 @@
+import React from 'react';
 
 interface CacheItem<T> {
   data: T;
@@ -62,6 +63,15 @@ class CacheManager {
   // Vider complètement le cache
   clear(): void {
     this.cache.clear();
+  }
+
+  // Méthodes ajoutées pour corriger les imports
+  clearAll(): void {
+    this.clear();
+  }
+
+  getGlobalStats() {
+    return this.getStats();
   }
 
   // Obtenir les statistiques du cache

@@ -1,68 +1,77 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface PerformanceMetrics {
-  fcp?: number; // First Contentful Paint
-  lcp?: number; // Largest Contentful Paint
-  cls?: number; // Cumulative Layout Shift
-  fid?: number; // First Input Delay
+  fcp: number;
+  lcp: number;
+  cls: number;
+  fid: number;
   renderTime: number;
   memoryUsage: number;
+  bundleSize: number;
 }
 
 export const usePerformanceMonitor = () => {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    fcp: 0,
+    lcp: 0,
+    cls: 0,
+    fid: 0,
     renderTime: 0,
     memoryUsage: 0,
+    bundleSize: 0,
   });
 
-  // Mesurer les Web Vitals
-  const measureWebVitals = useCallback(() => {
-    if ('performance' in window) {
-      // Mesurer FCP et LCP
-      const observer = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry) => {
-          if (entry.entryType === 'paint' && entry.name === 'first-contentful-paint') {
-            setMetrics(prev => ({ ...prev, fcp: entry.startTime }));
-          }
-          if (entry.entryType === 'largest-contentful-paint') {
-            setMetrics(prev => ({ ...prev, lcp: entry.startTime }));
+  useEffect(() => {
+    // Mesurer les Web Vitals
+    const measureWebVitals = () => {
+      if ('performance' in window) {
+        // First Contentful Paint
+        const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
+        if (fcpEntry) {
+          setMetrics(prev => ({ ...prev, fcp: fcpEntry.startTime }));
+        }
+
+        // Largest Contentful Paint
+        const observer = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1];
+          if (lastEntry) {
+            setMetrics(prev => ({ ...prev, lcp: lastEntry.startTime }));
           }
         });
-      });
 
-      observer.observe({ entryTypes: ['paint', 'largest-contentful-paint'] });
+        try {
+          observer.observe({ entryTypes: ['largest-contentful-paint'] });
+        } catch (e) {
+          console.warn('LCP observer not supported');
+        }
 
-      // Mesurer la mémoire si disponible
-      if ('memory' in performance) {
-        const memoryInfo = (performance as any).memory;
-        const memoryUsage = (memoryInfo.usedJSHeapSize / memoryInfo.totalJSHeapSize) * 100;
-        setMetrics(prev => ({ ...prev, memoryUsage }));
+        // Memory usage (approximation)
+        if ('memory' in performance) {
+          const memory = (performance as any).memory;
+          const memoryUsage = (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100;
+          setMetrics(prev => ({ ...prev, memoryUsage }));
+        }
+
+        // Render time approximation
+        const renderStart = performance.now();
+        requestAnimationFrame(() => {
+          const renderEnd = performance.now();
+          setMetrics(prev => ({ ...prev, renderTime: renderEnd - renderStart }));
+        });
       }
-    }
-  }, []);
-
-  // Mesurer le temps de rendu
-  const measureRenderTime = useCallback(() => {
-    const startTime = performance.now();
-    
-    requestAnimationFrame(() => {
-      const endTime = performance.now();
-      const renderTime = endTime - startTime;
-      setMetrics(prev => ({ ...prev, renderTime }));
-    });
-  }, []);
-
-  useEffect(() => {
-    measureWebVitals();
-    measureRenderTime();
-
-    // Nettoyer l'observer au démontage
-    return () => {
-      // Observer sera nettoyé automatiquement
     };
-  }, [measureWebVitals, measureRenderTime]);
+
+    measureWebVitals();
+
+    // Mesure périodique
+    const interval = setInterval(measureWebVitals, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return metrics;
 };

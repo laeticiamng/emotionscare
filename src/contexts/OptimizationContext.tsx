@@ -44,7 +44,7 @@ export const OptimizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     // Mettre à jour les statistiques du cache périodiquement
     const updateCacheStats = () => {
-      setCacheStats(cacheManager.getGlobalStats());
+      setCacheStats(cacheManager.getStats());
     };
 
     updateCacheStats();
@@ -67,8 +67,8 @@ export const OptimizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const clearCache = () => {
-    cacheManager.clearAll();
-    setCacheStats(cacheManager.getGlobalStats());
+    cacheManager.clear();
+    setCacheStats(cacheManager.getStats());
   };
 
   return (

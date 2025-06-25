@@ -1,161 +1,98 @@
 
-import { cacheManager } from './cacheManager';
-import { lazy } from 'react';
+// Utilitaires d'optimisation des performances
 
-// Lazy loading intelligent des composants
-export const lazyLoadComponent = (importFn: () => Promise<any>, chunkName?: string) => {
-  return lazy(async () => {
-    const cacheKey = `component_${chunkName || 'unknown'}`;
-    
-    // Vérifier si le composant est en cache
-    const cached = cacheManager.getStaticContent(cacheKey);
-    if (cached) {
-      return cached;
+export const measureWebVitals = async (): Promise<{[key: string]: number}> => {
+  const vitals: {[key: string]: number} = {};
+
+  if (typeof window !== 'undefined' && 'performance' in window) {
+    // First Contentful Paint
+    const fcpEntries = performance.getEntriesByName('first-contentful-paint');
+    if (fcpEntries.length > 0) {
+      vitals.fcp = fcpEntries[0].startTime;
     }
 
-    try {
-      const module = await importFn();
-      cacheManager.setStaticContent(cacheKey, module);
-      return module;
-    } catch (error) {
-      console.error(`Failed to load component ${chunkName}:`, error);
-      throw error;
+    // Navigation timing
+    const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (navEntries.length > 0) {
+      const nav = navEntries[0];
+      vitals.domContentLoaded = nav.domContentLoadedEventEnd - nav.domContentLoadedEventStart;
+      vitals.loadComplete = nav.loadEventEnd - nav.loadEventStart;
     }
-  });
+
+    // Memory (si disponible)
+    if ('memory' in performance) {
+      const memory = (performance as any).memory;
+      vitals.memoryPressure = memory.usedJSHeapSize / 1024 / 1024; // MB
+    }
+  }
+
+  return vitals;
 };
 
-// Préchargement des ressources critiques
-export const preloadCriticalResources = async () => {
+export const preloadCriticalResources = async (): Promise<void> => {
+  // Précharger les ressources critiques
   const criticalResources = [
-    '/images/logo.png',
-    '/fonts/main.woff2',
-    '/sounds/notification.mp3'
+    '/index.css',
+    '/favicon.ico'
   ];
 
-  const preloadPromises = criticalResources.map(resource => {
-    return new Promise<void>((resolve) => {
-      if (resource.endsWith('.png') || resource.endsWith('.jpg') || resource.endsWith('.webp')) {
-        const img = new Image();
-        img.onload = img.onerror = () => resolve();
-        img.src = resource;
-      } else if (resource.endsWith('.woff2') || resource.endsWith('.woff')) {
-        const font = new FontFace('MainFont', `url(${resource})`);
-        font.load().then(() => {
-          document.fonts.add(font);
-          resolve();
-        }).catch(() => resolve());
-      } else if (resource.endsWith('.mp3')) {
-        const audio = new Audio();
-        audio.oncanplaythrough = audio.onerror = () => resolve();
-        audio.src = resource;
-      } else {
-        resolve();
-      }
+  const promises = criticalResources.map(resource => {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = resource;
+      link.as = resource.endsWith('.css') ? 'style' : 'image';
+      link.onload = () => resolve(resource);
+      link.onerror = () => reject(new Error(`Failed to preload ${resource}`));
+      document.head.appendChild(link);
     });
   });
 
-  await Promise.allSettled(preloadPromises);
+  try {
+    await Promise.all(promises);
+    console.log('✅ Critical resources preloaded');
+  } catch (error) {
+    console.warn('⚠️ Some resources failed to preload:', error);
+  }
 };
 
-// Mesure des Web Vitals
-export const measureWebVitals = (): Promise<{[key: string]: number}> => {
-  return new Promise((resolve) => {
-    const vitals: {[key: string]: number} = {};
-    
-    // First Contentful Paint
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry.name === 'first-contentful-paint') {
-          vitals.fcp = entry.startTime;
-        }
-      }
-    }).observe({ entryTypes: ['paint'] });
-
-    // Largest Contentful Paint
-    new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1];
-      vitals.lcp = lastEntry.startTime;
-    }).observe({ entryTypes: ['largest-contentful-paint'] });
-
-    // Cumulative Layout Shift
-    let clsValue = 0;
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (!(entry as any).hadRecentInput) {
-          clsValue += (entry as any).value;
-        }
-      }
-      vitals.cls = clsValue;
-    }).observe({ entryTypes: ['layout-shift'] });
-
-    // First Input Delay
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        vitals.fid = (entry as any).processingStart - entry.startTime;
-      }
-    }).observe({ entryTypes: ['first-input'] });
-
-    // Résoudre après 3 secondes ou quand toutes les métriques sont collectées
-    setTimeout(() => {
-      resolve(vitals);
-    }, 3000);
-  });
-};
-
-// Optimisation des images avec intersection observer
-export const createImageObserver = (callback: (entry: IntersectionObserverEntry) => void) => {
-  if (!('IntersectionObserver' in window)) {
+// Optimisation du lazy loading
+export const createIntersectionObserver = (callback: IntersectionObserverCallback) => {
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
     return null;
   }
 
-  return new IntersectionObserver((entries) => {
-    entries.forEach(callback);
-  }, {
-    root: null,
+  return new IntersectionObserver(callback, {
     rootMargin: '50px',
     threshold: 0.1
   });
 };
 
-// Bundle analyzer leger
-export const analyzeBundleSize = () => {
-  if (process.env.NODE_ENV === 'development') {
-    const scripts = Array.from(document.scripts);
-    const totalSize = scripts.reduce((size, script) => {
-      if (script.src && script.src.includes('/src/')) {
-        // Estimation de la taille (approximation)
-        return size + (script.innerHTML?.length || 1024);
-      }
-      return size;
-    }, 0);
-
-    console.log(`📦 Estimated bundle size: ${(totalSize / 1024).toFixed(2)} KB`);
-  }
+// Debounce pour optimiser les événements
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout;
+  
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 };
 
-// Performance budget checker
-export const checkPerformanceBudget = (metrics: {[key: string]: number}) => {
-  const budgets = {
-    fcp: 1500, // 1.5s
-    lcp: 2500, // 2.5s
-    cls: 0.1,  // 0.1
-    fid: 100   // 100ms
-  };
-
-  const violations: string[] = [];
-
-  Object.entries(budgets).forEach(([metric, budget]) => {
-    if (metrics[metric] && metrics[metric] > budget) {
-      violations.push(`${metric.toUpperCase()}: ${metrics[metric]}ms > ${budget}ms`);
+// Throttle pour limiter la fréquence d'exécution
+export const throttle = <T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): ((...args: Parameters<T>) => void) => {
+  let inThrottle: boolean;
+  
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
     }
-  });
-
-  if (violations.length > 0) {
-    console.warn('⚠️ Performance budget violations:', violations);
-  } else {
-    console.log('✅ All performance budgets met!');
-  }
-
-  return violations.length === 0;
+  };
 };
