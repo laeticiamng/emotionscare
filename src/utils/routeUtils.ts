@@ -1,9 +1,10 @@
 
-// Routes unifiées - Point 11 COMPLÉTÉ À 100%
+// Routes unifiées - AUDIT COMPLET CORRIGÉ
 export const UNIFIED_ROUTES = {
   // Routes publiques
   HOME: '/',
   CHOOSE_MODE: '/choose-mode',
+  AUTH: '/auth',
   B2B_SELECTION: '/b2b/selection',
   
   // Routes d'authentification - UNIQUES
@@ -99,9 +100,11 @@ export const validateUniqueRoutes = (): boolean => {
   
   if (routes.length !== uniqueRoutes.size) {
     console.error('🚨 ERREUR CRITIQUE: Doublons de routes détectés!');
+    console.error('Routes en doublon:', routes.filter((route, index) => routes.indexOf(route) !== index));
     return false;
   }
   
+  console.log('✅ Toutes les routes sont uniques:', routes.length, 'routes validées');
   return true;
 };
 

@@ -1,6 +1,6 @@
 
 import { RouteObject } from 'react-router-dom';
-import { homeRoutes } from './routes/homeRoutes'; // Nouvelle importation
+import { homeRoutes } from './routes/homeRoutes';
 import { b2bRedirectRoutes } from './routes/b2bRedirectRoutes';
 import { b2bRoutes } from './routes/b2bRoutes';
 import { b2cRoutes } from './routes/b2cRoutes';
@@ -36,8 +36,11 @@ export const ROUTES_MANIFEST = {
   b2c: '/b2c',
   b2b: '/b2b',
   b2bSelection: '/b2b/selection',
+  b2bUserLogin: '/b2b/user/login',
+  b2bAdminLogin: '/b2b/admin/login',
+  b2bUserDashboard: '/b2b/user/dashboard',
+  b2bAdminDashboard: '/b2b/admin/dashboard',
   b2cDashboard: '/b2c/dashboard',
-  b2bDashboard: '/b2b/dashboard',
   coachDashboard: '/coach/dashboard',
   notifications: '/notifications',
   settings: '/settings',
@@ -48,11 +51,11 @@ export const ROUTES_MANIFEST = {
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
-    ...homeRoutes, // Ajout des routes d'accueil en premier
+    ...homeRoutes,
     ...authRoutes,
-    ...b2cRoutes,
     ...b2bRedirectRoutes,
     ...b2bRoutes,
+    ...b2cRoutes,
     ...coachRoutes,
     ...notificationRoutes,
     ...onboardingRoutes,
@@ -77,7 +80,6 @@ export const getRoutePath = (route: keyof typeof ROUTES_MANIFEST): string => {
   return ROUTES_MANIFEST[route];
 };
 
-// Validation des routes uniques
 export function validateRoutesManifest() {
   const routes = Object.values(ROUTES_MANIFEST);
   const uniqueRoutes = new Set(routes);
