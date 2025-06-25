@@ -1,5 +1,6 @@
 
 import { RouteObject } from 'react-router-dom';
+import { b2bRedirectRoutes } from './routes/b2bRedirectRoutes';
 import { b2bRoutes } from './routes/b2bRoutes';
 import { b2cRoutes } from './routes/b2cRoutes';
 import { authRoutes } from './routes/authRoutes';
@@ -29,6 +30,9 @@ export const ROUTES_MANIFEST = {
   features: '/features',
   faq: '/faq',
   onboarding: '/onboarding',
+  b2c: '/b2c',
+  b2b: '/b2b',
+  b2bSelection: '/b2b/selection',
   b2cDashboard: '/b2c/dashboard',
   b2bDashboard: '/b2b/dashboard',
   coachDashboard: '/coach/dashboard',
@@ -43,6 +47,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
   return [
     ...authRoutes,
     ...b2cRoutes,
+    ...b2bRedirectRoutes, // Ajout des routes de redirection B2B
     ...b2bRoutes,
     ...coachRoutes,
     ...notificationRoutes,
@@ -53,7 +58,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...emotionRoutes,
     ...journalRoutes,
     ...rhRoutes,
-    ...optimizedRoutes, // Routes optimisées avec lazy loading
+    ...optimizedRoutes,
   ];
 }
 
@@ -67,3 +72,26 @@ export const getRoutePath = (route: keyof typeof ROUTES_MANIFEST): string => {
   }
   return ROUTES_MANIFEST[route];
 };
+
+// Validation des routes uniques
+export function validateRoutesManifest() {
+  const routes = Object.values(ROUTES_MANIFEST);
+  const uniqueRoutes = new Set(routes);
+  
+  return {
+    valid: routes.length === uniqueRoutes.size,
+    totalRoutes: routes.length,
+    uniqueRoutes: uniqueRoutes.size,
+    errors: routes.length !== uniqueRoutes.size ? ['Duplicate routes detected'] : []
+  };
+}
+
+export type RouteManifestEntry = {
+  path: string;
+  name: keyof typeof ROUTES_MANIFEST;
+};
+
+export const ROUTE_MANIFEST: RouteManifestEntry[] = Object.entries(ROUTES_MANIFEST).map(([name, path]) => ({
+  name: name as keyof typeof ROUTES_MANIFEST,
+  path
+}));
