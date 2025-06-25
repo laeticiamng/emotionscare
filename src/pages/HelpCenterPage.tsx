@@ -1,331 +1,354 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { 
-  HelpCircle, 
-  MessageSquare, 
-  Search, 
-  Book, 
-  Video, 
-  Phone,
-  Mail,
-  Clock,
-  CheckCircle
-} from 'lucide-react';
-import { useHelpBot } from '@/hooks/useHelpBot';
-import ActionButton from '@/components/buttons/ActionButton';
-import { toast } from 'sonner';
-
-interface FAQItem {
-  id: string;
-  question: string;
-  answer: string;
-  category: string;
-  helpful: number;
-}
+import { Search, HelpCircle, Book, MessageCircle, Phone, Mail, Video, FileText } from 'lucide-react';
 
 const HelpCenterPage: React.FC = () => {
-  const { messages, isLoading, sendMessage, clearConversation } = useHelpBot();
-  const [userMessage, setUserMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showChat, setShowChat] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+    category: 'general'
+  });
 
-  const handleSendMessage = async () => {
-    if (!userMessage.trim()) return;
-    
-    const response = await sendMessage(userMessage);
-    setUserMessage('');
-    
-    if (response) {
-      toast.success('Réponse reçue !', {
-        description: `Confiance: ${Math.round(response.confidence * 100)}%`
-      });
+  const faqItems = [
+    {
+      category: 'Démarrage',
+      items: [
+        {
+          question: 'Comment commencer avec EmotionsCare ?',
+          answer: 'Créez votre compte, suivez le processus d\'onboarding et explorez les différents modules disponibles. Nous recommandons de commencer par un scan émotionnel pour établir votre baseline.'
+        },
+        {
+          question: 'Quelles sont les différentes fonctionnalités disponibles ?',
+          answer: 'EmotionsCare propose un scan émotionnel, de la musicothérapie, des expériences VR, un journal personnel, un coach IA, et des outils de gamification pour améliorer votre bien-être.'
+        }
+      ]
+    },
+    {
+      category: 'Compte et sécurité',
+      items: [
+        {
+          question: 'Comment protéger mon compte ?',
+          answer: 'Activez l\'authentification à deux facteurs, utilisez un mot de passe fort, et vérifiez régulièrement les alertes de connexion dans vos paramètres de sécurité.'
+        },
+        {
+          question: 'Mes données sont-elles sécurisées ?',
+          answer: 'Oui, toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et vous gardez le contrôle total sur vos informations personnelles.'
+        }
+      ]
+    },
+    {
+      category: 'Utilisation',
+      items: [
+        {
+          question: 'Comment fonctionne le scan émotionnel ?',
+          answer: 'Le scan émotionnel utilise l\'IA pour analyser votre état émotionnel à travers différents indicateurs. Les résultats vous aident à mieux comprendre votre bien-être et recevoir des recommandations personnalisées.'
+        },
+        {
+          question: 'Puis-je utiliser EmotionsCare sur mobile ?',
+          answer: 'Oui, EmotionsCare est entièrement responsive et fonctionne parfaitement sur tous les appareils mobiles et tablettes.'
+        }
+      ]
     }
-  };
+  ];
 
-  const handleAskQuestion = () => {
-    setShowChat(true);
-    toast.info('Assistant IA activé', {
-      description: 'Posez votre question ci-dessous'
+  const guides = [
+    {
+      title: 'Guide de démarrage rapide',
+      description: 'Découvrez les bases d\'EmotionsCare en 5 minutes',
+      icon: Book,
+      duration: '5 min',
+      type: 'guide'
+    },
+    {
+      title: 'Optimiser son bien-être au travail',
+      description: 'Conseils pour les professionnels de santé',
+      icon: Video,
+      duration: '15 min',
+      type: 'video'
+    },
+    {
+      title: 'Utiliser la musicothérapie',
+      description: 'Guide complet des fonctionnalités audio',
+      icon: FileText,
+      duration: '8 min',
+      type: 'guide'
+    },
+    {
+      title: 'Paramètres de confidentialité',
+      description: 'Gérer vos données personnelles',
+      icon: Book,
+      duration: '3 min',
+      type: 'guide'
+    }
+  ];
+
+  const contactOptions = [
+    {
+      title: 'Chat en direct',
+      description: 'Assistance immédiate avec notre équipe',
+      icon: MessageCircle,
+      available: true,
+      responseTime: 'Réponse en moins de 5 min'
+    },
+    {
+      title: 'Support téléphonique',
+      description: 'Appelez-nous pour une aide personnalisée',
+      icon: Phone,
+      available: true,
+      responseTime: 'Lun-Ven 9h-18h'
+    },
+    {
+      title: 'Email',
+      description: 'Envoyez-nous vos questions détaillées',
+      icon: Mail,
+      available: true,
+      responseTime: 'Réponse sous 24h'
+    }
+  ];
+
+  const filteredFaq = faqItems.map(category => ({
+    ...category,
+    items: category.items.filter(item =>
+      searchQuery === '' ||
+      item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.answer.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(category => category.items.length > 0);
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simuler l'envoi
+    console.log('Contact form submitted:', contactForm);
+    setContactForm({
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
+      category: 'general'
     });
   };
 
-  const faqCategories = [
-    {
-      name: 'Démarrage',
-      icon: Book,
-      color: 'bg-blue-100 text-blue-800',
-      items: [
-        {
-          id: '1',
-          question: 'Comment commencer mon premier scan d\'émotion ?',
-          answer: 'Rendez-vous sur la page Scanner, cliquez sur "Scanner mon humeur" et suivez les instructions à l\'écran.',
-          category: 'Démarrage',
-          helpful: 45
-        },
-        {
-          id: '2',
-          question: 'Que signifient les couleurs dans mon tableau de bord ?',
-          answer: 'Les couleurs représentent différents états émotionnels : bleu pour le calme, vert pour l\'énergie positive, etc.',
-          category: 'Démarrage',
-          helpful: 32
-        }
-      ]
-    },
-    {
-      name: 'Fonctionnalités',
-      icon: Video,
-      color: 'bg-green-100 text-green-800',
-      items: [
-        {
-          id: '3',
-          question: 'Comment utiliser la VR Galactique ?',
-          answer: 'Accédez à l\'espace VR, choisissez votre environnement et lancez une session immersive.',
-          category: 'Fonctionnalités',
-          helpful: 28
-        },
-        {
-          id: '4',
-          question: 'Puis-je personnaliser mes recommandations musicales ?',
-          answer: 'Oui, allez dans Préférences > Musique pour ajuster vos goûts musicaux.',
-          category: 'Fonctionnalités',
-          helpful: 38
-        }
-      ]
-    }
-  ];
-
-  const quickActions = [
-    {
-      title: 'Guides vidéo',
-      description: 'Tutoriels étape par étape',
-      icon: Video,
-      action: () => toast.info('Guides vidéo à venir')
-    },
-    {
-      title: 'Contact support',
-      description: 'Contactez notre équipe',
-      icon: Phone,
-      action: () => toast.info('Support: contact@emotionscare.com')
-    },
-    {
-      title: 'Documentation',
-      description: 'Guide complet',
-      icon: Book,
-      action: () => toast.info('Documentation complète à venir')
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4" data-testid="page-root">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <HelpCircle className="w-8 h-8 text-blue-600" />
-                Centre d'aide
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Trouvez des réponses à vos questions ou contactez notre assistant IA
-              </p>
-            </div>
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="text-center mb-12">
+          <HelpCircle className="h-16 w-16 text-blue-600 mx-auto mb-4" />
+          <h1 className="text-4xl font-bold mb-4">Centre d'aide</h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            Trouvez les réponses à vos questions ou contactez notre équipe support
+          </p>
+          
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Rechercher dans l'aide..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
           </div>
+        </div>
 
-          {/* Action principale */}
-          <Card className="mb-8 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <MessageSquare className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">Assistant IA instantané</h3>
-                    <p className="text-gray-600">
-                      Posez vos questions à notre IA spécialisée dans le bien-être
-                    </p>
-                  </div>
-                </div>
-                
-                <ActionButton
-                  onClick={handleAskQuestion}
-                  icon={<MessageSquare className="w-5 h-5" />}
-                  variant="primary"
-                  size="lg"
-                >
-                  Poser une question
-                </ActionButton>
-              </div>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="faq" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="faq">FAQ</TabsTrigger>
+            <TabsTrigger value="guides">Guides</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="status">Statut</TabsTrigger>
+          </TabsList>
 
-          {/* Chat Interface */}
-          {showChat && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Assistant IA</span>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={clearConversation}
-                    >
-                      Nouvelle conversation
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowChat(false)}
-                    >
-                      Fermer
-                    </Button>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-4 max-h-96 overflow-y-auto">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          message.role === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        }`}
-                      >
-                        <p className="text-sm">{message.content}</p>
-                        <span className="text-xs opacity-70">
-                          {message.timestamp.toLocaleTimeString('fr-FR')}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-100 text-gray-900 px-4 py-2 rounded-lg">
+          <TabsContent value="faq" className="space-y-6">
+            <div className="grid gap-6">
+              {filteredFaq.map((category, categoryIndex) => (
+                <Card key={categoryIndex}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Badge variant="outline">{category.category}</Badge>
+                      {category.items.length} questions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      {category.items.map((item, itemIndex) => (
+                        <AccordionItem key={itemIndex} value={`item-${categoryIndex}-${itemIndex}`}>
+                          <AccordionTrigger className="text-left">
+                            {item.question}
+                          </AccordionTrigger>
+                          <AccordionContent className="text-muted-foreground">
+                            {item.answer}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredFaq.length === 0 && searchQuery && (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Aucun résultat trouvé</h3>
+                  <p className="text-muted-foreground">
+                    Essayez avec d'autres mots-clés ou contactez notre support
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="guides" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {guides.map((guide, index) => (
+                <Card key={index} className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <guide.icon className="h-8 w-8 text-blue-600 mt-1" />
+                      <div className="space-y-2">
+                        <h3 className="font-semibold">{guide.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {guide.description}
+                        </p>
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                          <Badge variant="outline">{guide.type}</Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {guide.duration}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-                
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Tapez votre question..."
-                    value={userMessage}
-                    onChange={(e) => setUserMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  />
-                  <Button 
-                    onClick={handleSendMessage}
-                    disabled={!userMessage.trim() || isLoading}
-                  >
-                    Envoyer
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          {quickActions.map((action, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={action.action}>
-              <CardContent className="p-6 text-center">
-                <action.icon className="w-8 h-8 mx-auto mb-3 text-blue-600" />
-                <h3 className="font-semibold mb-2">{action.title}</h3>
-                <p className="text-sm text-gray-600">{action.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+          <TabsContent value="contact" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {contactOptions.map((option, index) => (
+                <Card key={index} className="text-center">
+                  <CardContent className="p-6">
+                    <option.icon className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                    <h3 className="font-semibold mb-2">{option.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {option.description}
+                    </p>
+                    <p className="text-xs text-green-600 font-medium mb-4">
+                      {option.responseTime}
+                    </p>
+                    <Button 
+                      variant={option.available ? "default" : "outline"}
+                      disabled={!option.available}
+                      className="w-full"
+                    >
+                      {option.available ? 'Contacter' : 'Bientôt disponible'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-        {/* FAQ Sections */}
-        <div className="space-y-6">
-          {faqCategories.map((category, categoryIndex) => (
-            <Card key={categoryIndex}>
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                  <category.icon className="w-6 h-6" />
-                  {category.name}
-                  <Badge className={category.color}>
-                    {category.items.length} article{category.items.length > 1 ? 's' : ''}
-                  </Badge>
-                </CardTitle>
+                <CardTitle>Formulaire de contact</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {category.items.map((item) => (
-                    <div key={item.id} className="border-l-4 border-blue-200 pl-4">
-                      <h4 className="font-medium mb-2">{item.question}</h4>
-                      <p className="text-gray-600 text-sm mb-2">{item.answer}</p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" />
-                          {item.helpful} personnes aidées
-                        </span>
-                      </div>
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Nom</label>
+                      <Input
+                        value={contactForm.name}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                        required
+                      />
                     </div>
-                  ))}
-                </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <Input
+                        type="email"
+                        value={contactForm.email}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Sujet</label>
+                    <Input
+                      value={contactForm.subject}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Message</label>
+                    <Textarea
+                      rows={4}
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full">
+                    Envoyer le message
+                  </Button>
+                </form>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          </TabsContent>
 
-        {/* Contact Support */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <Mail className="w-6 h-6" />
-              Besoin d'aide supplémentaire ?
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-2">Contactez-nous</h4>
-                <p className="text-gray-600 text-sm mb-4">
-                  Notre équipe support est disponible pour vous aider
-                </p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    support@emotionscare.com
+          <TabsContent value="status" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statut des services</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  { service: 'Application principale', status: 'operational', uptime: '99.9%' },
+                  { service: 'Scan émotionnel', status: 'operational', uptime: '99.8%' },
+                  { service: 'Musicothérapie', status: 'operational', uptime: '99.9%' },
+                  { service: 'Expériences VR', status: 'maintenance', uptime: '98.5%' },
+                  { service: 'API Coach', status: 'operational', uptime: '99.7%' }
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${
+                        item.status === 'operational' ? 'bg-green-500' :
+                        item.status === 'maintenance' ? 'bg-yellow-500' : 'bg-red-500'
+                      }`} />
+                      <span className="font-medium">{item.service}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Badge variant={
+                        item.status === 'operational' ? 'default' :
+                        item.status === 'maintenance' ? 'secondary' : 'destructive'
+                      }>
+                        {item.status === 'operational' ? 'Opérationnel' :
+                         item.status === 'maintenance' ? 'Maintenance' : 'Incident'}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">{item.uptime}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    Lun-Ven 9h-18h
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold mb-2">Ressources utiles</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• Guide de démarrage rapide</li>
-                  <li>• Documentation technique</li>
-                  <li>• Webinaires de formation</li>
-                  <li>• Communauté d'utilisateurs</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
