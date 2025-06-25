@@ -1,402 +1,400 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Sparkles, Image, Wand2, Share2, Download, Play } from 'lucide-react';
+import { BookOpen, Sparkles, Share2, Heart, Star, Pen, Users, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const StorySynthLabPage = () => {
-  const [storyPrompt, setStoryPrompt] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('');
-  const [selectedTone, setSelectedTone] = useState('');
-  const [generatedStory, setGeneratedStory] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
+const StorySynthLabPage: React.FC = () => {
+  const [currentStory, setCurrentStory] = useState('');
+  const [storyTitle, setStoryTitle] = useState('');
+  const [selectedPrompt, setSelectedPrompt] = useState<string | null>(null);
 
-  const genres = [
-    'Aventure', 'Fantasy', 'Science-Fiction', 'Romance', 'Mystère', 
-    'Thriller', 'Comédie', 'Drame', 'Histoire vraie', 'Fable'
-  ];
-
-  const tones = [
-    'Inspirant', 'Mystérieux', 'Humoristique', 'Dramatique', 
-    'Romantique', 'Aventureux', 'Réfléchi', 'Énergique'
-  ];
-
-  const storyTemplates = [
+  const storyPrompts = [
     {
-      title: "Le Héros Inattendu",
-      description: "Une personne ordinaire découvre des pouvoirs extraordinaires",
-      genre: "Aventure",
-      preview: "Dans une petite ville tranquille, Marie, bibliothécaire de 32 ans, découvre qu'elle peut..."
+      id: 'overcome-fear',
+      title: 'Surmonter une Peur',
+      description: 'Racontez comment vous avez fait face à l\'une de vos plus grandes peurs',
+      icon: Heart,
+      color: 'from-red-500 to-pink-500',
+      questions: [
+        'Quelle était cette peur et depuis quand l\'aviez-vous ?',
+        'Quel élément déclencheur vous a poussé à l\'affronter ?',
+        'Quelles stratégies avez-vous utilisées ?',
+        'Comment vous sentez-vous maintenant que vous l\'avez surmontée ?'
+      ]
     },
     {
-      title: "L'Île Mystérieuse", 
-      description: "Exploration d'une île cachée aux secrets anciens",
-      genre: "Mystère",
-      preview: "Le bateau s'échoue sur une île qui n'apparaît sur aucune carte. Les arbres murmurent..."
+      id: 'moment-resilience',
+      title: 'Moment de Résilience',
+      description: 'Partagez un moment où vous avez rebondi après un échec',
+      icon: TrendingUp,
+      color: 'from-green-500 to-emerald-500',
+      questions: [
+        'Quel était cet échec et comment l\'avez-vous vécu ?',
+        'Qu\'avez-vous appris de cette expérience ?',
+        'Quelles ressources internes avez-vous découvertes ?',
+        'En quoi cela vous a-t-il rendu plus fort ?'
+      ]
     },
     {
-      title: "Voyage dans le Temps",
-      description: "Un voyage accidentel vers une époque différente",
-      genre: "Science-Fiction", 
-      preview: "L'expérience tourne mal et soudain, les rues pavées remplacent l'asphalte moderne..."
+      id: 'transformation',
+      title: 'Transformation Personnelle',
+      description: 'Décrivez une période de changement majeur dans votre vie',
+      icon: Sparkles,
+      color: 'from-purple-500 to-blue-500',
+      questions: [
+        'Qu\'est-ce qui a déclenché ce changement ?',
+        'Quels obstacles avez-vous rencontrés ?',
+        'Comment avez-vous navigué cette transition ?',
+        'Qui êtes-vous devenu grâce à cette transformation ?'
+      ]
+    },
+    {
+      id: 'kindness-impact',
+      title: 'Acte de Bienveillance',
+      description: 'Partagez un moment où la gentillesse a eu un impact profond',
+      icon: Heart,
+      color: 'from-yellow-500 to-orange-500',
+      questions: [
+        'Décrivez cet acte de bienveillance (donné ou reçu)',
+        'Quel était le contexte de cette situation ?',
+        'Comment cela vous a-t-il affecté émotionnellement ?',
+        'Qu\'avez-vous appris sur la nature humaine ?'
+      ]
     }
   ];
 
-  const recentStories = [
+  const featuredStories = [
     {
-      title: "La Clé du Temps",
-      genre: "Fantasy",
-      createdAt: "Il y a 2h",
-      length: "850 mots",
-      rating: 4.5
+      title: 'Le Jour où J\'ai Quitté mon Job Toxique',
+      author: 'Marie L.',
+      excerpt: 'Après des mois d\'épuisement, j\'ai finalement trouvé le courage de partir. Voici comment j\'ai reconstruit ma vie...',
+      likes: 234,
+      comments: 45,
+      category: 'Transformation',
+      readTime: '5 min'
     },
     {
-      title: "Robot et Humanité",
-      genre: "Science-Fiction",
-      createdAt: "Hier",
-      length: "1200 mots", 
-      rating: 4.8
+      title: 'Ma Bataille Contre l\'Anxiété Sociale',
+      author: 'Thomas R.',
+      excerpt: 'De l\'évitement total aux présentations publiques : mon parcours pour surmonter ma peur des autres...',
+      likes: 189,
+      comments: 67,
+      category: 'Peur',
+      readTime: '7 min'
     },
     {
-      title: "Le Jardin Secret",
-      genre: "Drame",
-      createdAt: "Il y a 3 jours",
-      length: "950 mots",
-      rating: 4.2
+      title: 'Quand un Étranger a Changé ma Vie',
+      author: 'Sophie M.',
+      excerpt: 'Une simple conversation dans le métro qui a transformé ma perspective sur la solitude et la connexion humaine...',
+      likes: 312,
+      comments: 89,
+      category: 'Bienveillance',
+      readTime: '4 min'
     }
   ];
 
-  const generateStory = async () => {
-    if (!storyPrompt.trim() || !selectedGenre) return;
-    
-    setIsGenerating(true);
-    
-    // Simulation de génération (remplacer par appel API réel)
-    setTimeout(() => {
-      const sampleStory = `# ${storyPrompt}
-
-Dans un monde où ${selectedGenre.toLowerCase()} rencontre l'imagination, votre histoire commence...
-
-**Chapitre 1: Le Commencement**
-
-${storyPrompt} - cette simple phrase allait changer le cours de l'histoire. Marie regardait par la fenêtre de son appartement parisien, ne se doutant pas que sa vie ordinaire était sur le point de basculer dans l'extraordinaire.
-
-La pluie tambourinait contre les carreaux, créant des motifs hypnotiques qui semblaient former des symboles mystérieux. Était-ce son imagination qui lui jouait des tours, ou y avait-il vraiment quelque chose de différent dans cette soirée d'octobre ?
-
-**Choix 1:** 
-A) Sortir sous la pluie pour examiner les symboles de plus près
-B) Fermer les rideaux et préparer une tasse de thé
-C) Prendre une photo des motifs sur la vitre
-
-Soudain, son téléphone vibra. Un message d'un numéro inconnu : "Le temps est venu. Rendez-vous au café de la rue Saint-Antoine à minuit. Venez seule."
-
-**Chapitre 2: La Révélation**
-
-Le café était étrangement désert pour un vendredi soir. Seule une silhouette encapuchonnée était assise dans le fond, près de la fenêtre. Marie hésita un instant avant de s'approcher.
-
-"Vous cherchez des réponses", dit la voix sous la capuche. "Et moi, j'ai des questions. Nous pouvons nous entraider."
-
-L'histoire continue de se déployer, mêlant mystère et aventure, guidée par vos choix et votre imagination...
-
-**Fin du Chapitre 2**
-
-*Que se passe-t-il ensuite ? C'est à vous de décider...*`;
-      
-      setGeneratedStory(sampleStory);
-      setIsGenerating(false);
-    }, 3000);
-  };
+  const writingTips = [
+    {
+      title: 'Soyez Authentique',
+      description: 'Partagez votre vérité, même si elle est imparfaite. L\'authenticité touche plus que la perfection.'
+    },
+    {
+      title: 'Montrez, Ne Dites Pas',
+      description: 'Utilisez des détails sensoriels et des émotions concrètes pour immerger le lecteur.'
+    },
+    {
+      title: 'Trouvez la Leçon',
+      description: 'Chaque expérience porte un enseignement. Qu\'avez-vous appris de cette situation ?'
+    },
+    {
+      title: 'Gardez l\'Espoir',
+      description: 'Même dans les moments sombres, montrez comment vous avez trouvé la lumière.'
+    }
+  ];
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 text-white">
-      <div className="container mx-auto px-4 py-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <Badge variant="secondary" className="mb-4 bg-purple-600">
-            <BookOpen className="h-4 w-4 mr-2" />
-            Story Synth Lab
-          </Badge>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Créez Vos Histoires Interactives
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Transformez vos idées en récits captivants grâce à l'intelligence artificielle et votre créativité.
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center justify-center mb-6">
+              <BookOpen className="h-12 w-12 text-indigo-600 mr-4" />
+              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Story Synth Lab
+              </h1>
+            </div>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Transformez vos expériences en histoires inspirantes. Partagez votre parcours de résilience 
+              et inspirez d'autres personnes sur leur chemin de guérison.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-2xl font-bold text-indigo-600">2,847</div>
+                <div className="text-sm text-gray-600">Histoires Partagées</div>
+              </div>
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-2xl font-bold text-purple-600">15,692</div>
+                <div className="text-sm text-gray-600">Lectures</div>
+              </div>
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-2xl font-bold text-pink-600">892</div>
+                <div className="text-sm text-gray-600">Auteurs Actifs</div>
+              </div>
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-2xl font-bold text-orange-600">4.9/5</div>
+                <div className="text-sm text-gray-600">Impact Moyen</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-        <Tabs defaultValue="create" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800">
-            <TabsTrigger value="create" className="data-[state=active]:bg-purple-600">
-              Créer
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="data-[state=active]:bg-purple-600">
-              Modèles
-            </TabsTrigger>
-            <TabsTrigger value="library" className="data-[state=active]:bg-purple-600">
-              Bibliothèque
-            </TabsTrigger>
-            <TabsTrigger value="share" className="data-[state=active]:bg-purple-600">
-              Partager
-            </TabsTrigger>
-          </TabsList>
+      {/* Main Content */}
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <Tabs defaultValue="write" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
+              <TabsTrigger value="write">Écrire</TabsTrigger>
+              <TabsTrigger value="discover">Découvrir</TabsTrigger>
+              <TabsTrigger value="community">Communauté</TabsTrigger>
+              <TabsTrigger value="tips">Conseils</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="create" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Wand2 className="h-5 w-5 text-purple-400" />
-                    Générateur d'Histoire
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Décrivez votre idée et laissez l'IA créer votre histoire
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-300 mb-2 block">
-                      Votre idée d'histoire
-                    </label>
-                    <Textarea
-                      placeholder="Ex: Une detective découvre que son partenaire cache un secret surnaturel..."
-                      value={storyPrompt}
-                      onChange={(e) => setStoryPrompt(e.target.value)}
-                      className="bg-slate-700 border-slate-600 text-white"
-                      rows={4}
-                    />
+            <TabsContent value="write" className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Story Prompts */}
+                <div className="lg:col-span-1 space-y-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Prompts d'Inspiration</h2>
+                  <div className="space-y-4">
+                    {storyPrompts.map((prompt, index) => (
+                      <motion.div
+                        key={prompt.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: index * 0.1 }}
+                      >
+                        <Card 
+                          className={`cursor-pointer transition-all duration-300 ${
+                            selectedPrompt === prompt.id 
+                              ? 'ring-2 ring-indigo-500 shadow-lg' 
+                              : 'hover:shadow-md'
+                          }`}
+                          onClick={() => setSelectedPrompt(prompt.id)}
+                        >
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center">
+                              <div className={`w-8 h-8 bg-gradient-to-r ${prompt.color} rounded-full flex items-center justify-center mr-3`}>
+                                <prompt.icon className="h-4 w-4 text-white" />
+                              </div>
+                              <CardTitle className="text-lg">{prompt.title}</CardTitle>
+                            </div>
+                            <CardDescription>{prompt.description}</CardDescription>
+                          </CardHeader>
+                        </Card>
+                      </motion.div>
+                    ))}
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-300 mb-2 block">
-                        Genre
-                      </label>
-                      <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Choisir un genre" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genres.map((genre) => (
-                            <SelectItem key={genre} value={genre}>
-                              {genre}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-gray-300 mb-2 block">
-                        Ton
-                      </label>
-                      <Select value={selectedTone} onValueChange={setSelectedTone}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                          <SelectValue placeholder="Choisir un ton" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {tones.map((tone) => (
-                            <SelectItem key={tone} value={tone}>
-                              {tone}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-300 mb-2 block">
-                      Image d'inspiration (optionnel)
-                    </label>
-                    <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center">
-                      <Image className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-400">
-                        Glissez une image ou cliquez pour parcourir
-                      </p>
-                      <Input type="file" className="hidden" accept="image/*" />
-                    </div>
-                  </div>
-
-                  <Button 
-                    onClick={generateStory}
-                    disabled={!storyPrompt.trim() || !selectedGenre || isGenerating}
-                    className="w-full bg-purple-600 hover:bg-purple-700"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                        Génération en cours...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Générer l'Histoire
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-pink-400" />
-                    Histoire Générée
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Votre récit interactif apparaîtra ici
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {generatedStory ? (
+                {/* Writing Area */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="bg-white rounded-lg shadow-sm p-6">
                     <div className="space-y-4">
-                      <div className="bg-slate-700/50 rounded-lg p-4 max-h-96 overflow-y-auto">
-                        <div className="prose prose-invert max-w-none text-sm">
-                          {generatedStory.split('\n').map((line, index) => (
-                            <p key={index} className="mb-2 text-gray-300">
-                              {line}
-                            </p>
-                          ))}
+                      <Input
+                        placeholder="Titre de votre histoire..."
+                        value={storyTitle}
+                        onChange={(e) => setStoryTitle(e.target.value)}
+                        className="text-xl font-semibold border-none shadow-none p-0 focus-visible:ring-0"
+                      />
+                      
+                      {selectedPrompt && (
+                        <div className="bg-indigo-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-indigo-900 mb-2">Questions pour vous guider :</h4>
+                          <ul className="space-y-1">
+                            {storyPrompts
+                              .find(p => p.id === selectedPrompt)
+                              ?.questions.map((question, index) => (
+                                <li key={index} className="text-sm text-indigo-700">
+                                  • {question}
+                                </li>
+                              ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      <Textarea
+                        placeholder="Commencez à écrire votre histoire ici... Laissez vos émotions et vos expériences guider vos mots."
+                        value={currentStory}
+                        onChange={(e) => setCurrentStory(e.target.value)}
+                        className="min-h-[400px] border-none shadow-none resize-none focus-visible:ring-0"
+                      />
+
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <div className="text-sm text-gray-500">
+                          {currentStory.length} caractères • {Math.ceil(currentStory.length / 1000)} min de lecture
+                        </div>
+                        <div className="space-x-2">
+                          <Button variant="outline">Sauvegarder</Button>
+                          <Button className="bg-gradient-to-r from-indigo-600 to-purple-600">
+                            <Share2 className="h-4 w-4 mr-2" />
+                            Publier
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Play className="h-4 w-4 mr-2" />
-                          Lire
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Share2 className="h-4 w-4 mr-2" />
-                          Partager
-                        </Button>
-                      </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-12 text-gray-400">
-                      <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>Votre histoire apparaîtra ici après génération</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
 
-          <TabsContent value="templates" className="space-y-4">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {storyTemplates.map((template, index) => (
-                <motion.div
-                  key={template.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="bg-slate-800/50 border-slate-700 hover:border-purple-500 transition-colors cursor-pointer">
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <Badge className="bg-purple-600 text-white">
-                          {template.genre}
-                        </Badge>
-                      </div>
-                      <CardTitle className="text-white">{template.title}</CardTitle>
-                      <CardDescription className="text-gray-400">
-                        {template.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-slate-700/50 rounded p-3 mb-4">
-                        <p className="text-sm text-gray-300 italic">
-                          "{template.preview}"
-                        </p>
-                      </div>
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                        Utiliser ce modèle
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="library" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white">Mes Histoires</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Retrouvez toutes vos créations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentStories.map((story, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                          <BookOpen className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-white">{story.title}</h4>
-                          <div className="flex items-center gap-4 text-sm text-gray-400">
-                            <span>{story.genre}</span>
-                            <span>{story.length}</span>
-                            <span>{story.createdAt}</span>
+            <TabsContent value="discover" className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Histoires Inspirantes</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {featuredStories.map((story, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                        <CardHeader>
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge variant="outline">{story.category}</Badge>
+                            <span className="text-sm text-gray-500">{story.readTime}</span>
                           </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          <span className="text-yellow-400">★</span>
-                          <span className="text-sm text-gray-300">{story.rating}</span>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          Ouvrir
-                        </Button>
-                      </div>
-                    </div>
+                          <CardTitle className="text-lg line-clamp-2">{story.title}</CardTitle>
+                          <CardDescription className="text-sm text-gray-600">
+                            Par {story.author}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-gray-700 text-sm line-clamp-3 mb-4">
+                            {story.excerpt}
+                          </p>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <div className="flex items-center space-x-4">
+                              <span className="flex items-center">
+                                <Heart className="h-4 w-4 mr-1 text-red-500" />
+                                {story.likes}
+                              </span>
+                              <span className="flex items-center">
+                                <BookOpen className="h-4 w-4 mr-1" />
+                                {story.comments}
+                              </span>
+                            </div>
+                            <Button variant="ghost" size="sm">Lire</Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </TabsContent>
 
-          <TabsContent value="share" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white">Partagez Vos Créations</CardTitle>
-                <CardDescription className="text-gray-400">
-                  Faites découvrir vos histoires à la communauté
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center py-12">
-                <Share2 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  Fonctionnalité bientôt disponible
-                </h3>
-                <p className="text-gray-400 mb-6">
-                  Vous pourrez bientôt partager vos histoires avec d'autres créateurs
-                </p>
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  M'informer du lancement
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+            <TabsContent value="community" className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Users className="h-5 w-5 mr-2 text-indigo-600" />
+                      Événements Communautaires
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="border-l-4 border-indigo-500 pl-4">
+                      <h4 className="font-semibold">Atelier d'Écriture Thérapeutique</h4>
+                      <p className="text-sm text-gray-600">Dimanche 15 Dec • 14h-16h</p>
+                      <p className="text-sm">Rejoignez-nous pour un atelier guidé sur l'écriture comme outil de guérison.</p>
+                    </div>
+                    <div className="border-l-4 border-purple-500 pl-4">
+                      <h4 className="font-semibold">Cercle de Partage</h4>
+                      <p className="text-sm text-gray-600">Mercredi 18 Dec • 19h-20h30</p>
+                      <p className="text-sm">Espace sécurisé pour partager vos histoires en petit groupe.</p>
+                    </div>
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h4 className="font-semibold">Défi 30 Jours d'Écriture</h4>
+                      <p className="text-sm text-gray-600">Janvier 2024</p>
+                      <p className="text-sm">Un prompt par jour pour explorer différents aspects de votre parcours.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Star className="h-5 w-5 mr-2 text-yellow-500" />
+                      Auteurs du Mois
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {[
+                      { name: 'Claire M.', stories: 12, impact: 4.9 },
+                      { name: 'Ahmed K.', stories: 8, impact: 4.8 },
+                      { name: 'Lucie R.', stories: 15, impact: 4.7 }
+                    ].map((author, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <div className="font-semibold">{author.name}</div>
+                          <div className="text-sm text-gray-600">{author.stories} histoires</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center text-yellow-500">
+                            <Star className="h-4 w-4 mr-1" />
+                            {author.impact}
+                          </div>
+                          <div className="text-xs text-gray-500">Impact moyen</div>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tips" className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Conseils d'Écriture Thérapeutique</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {writingTips.map((tip, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <Card className="h-full">
+                        <CardHeader>
+                          <CardTitle className="flex items-center">
+                            <Pen className="h-5 w-5 mr-2 text-indigo-600" />
+                            {tip.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-gray-700">{tip.description}</p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
     </div>
   );
 };

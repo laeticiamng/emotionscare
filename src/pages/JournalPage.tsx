@@ -1,195 +1,218 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
-import { BookOpen, Plus, Search, Heart, Brain, Star, TrendingUp } from 'lucide-react';
-import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface JournalEntry {
-  id: number;
-  date: string;
-  title: string;
-  content: string;
-  mood: string;
-  tags: string[];
-  moodScore: number;
-}
+import { BookOpen, Pen, Search, Calendar, Heart, Star, TrendingUp, Mic } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const JournalPage: React.FC = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [newEntry, setNewEntry] = useState({ title: '', content: '', mood: 'Neutre', tags: '' });
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [newEntry, setNewEntry] = useState('');
+  const [entryTitle, setEntryTitle] = useState('');
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isWriting, setIsWriting] = useState(false);
 
-  const moodOptions = [
-    { name: 'Excellent', color: 'bg-green-500', score: 5 },
-    { name: 'Bien', color: 'bg-blue-500', score: 4 },
-    { name: 'Neutre', color: 'bg-gray-500', score: 3 },
-    { name: 'Difficile', color: 'bg-orange-500', score: 2 },
-    { name: 'Très difficile', color: 'bg-red-500', score: 1 }
+  const moods = [
+    { emoji: '😊', name: 'Joyeux', color: 'bg-yellow-100 text-yellow-800' },
+    { emoji: '😌', name: 'Calme', color: 'bg-blue-100 text-blue-800' },
+    { emoji: '😴', name: 'Fatigué', color: 'bg-gray-100 text-gray-800' },
+    { emoji: '😟', name: 'Anxieux', color: 'bg-orange-100 text-orange-800' },
+    { emoji: '😢', name: 'Triste', color: 'bg-red-100 text-red-800' },
+    { emoji: '🤔', name: 'Pensif', color: 'bg-purple-100 text-purple-800' },
+    { emoji: '😤', name: 'Frustré', color: 'bg-red-100 text-red-800' },
+    { emoji: '🥳', name: 'Excité', color: 'bg-green-100 text-green-800' }
   ];
 
-  const mockEntries: JournalEntry[] = [
+  const journalEntries = [
     {
       id: 1,
-      date: '2024-01-15',
-      title: 'Journée productive au travail',
-      content: 'Aujourd\'hui j\'ai réussi à terminer tous mes projets en cours. Je me sens accompli et satisfait de mes résultats.',
-      mood: 'Bien',
-      tags: ['travail', 'productivité', 'satisfaction'],
-      moodScore: 4
+      title: 'Une journée productive',
+      content: 'Aujourd\'hui j\'ai réussi à terminer tous mes projets en cours. Je me sens accompli et fier de mes efforts. La méditation matinale m\'a vraiment aidé à rester focus.',
+      date: '2024-12-15',
+      time: '18:30',
+      mood: { emoji: '😊', name: 'Joyeux' },
+      tags: ['travail', 'productivité', 'méditation'],
+      wordCount: 156
     },
     {
       id: 2,
-      date: '2024-01-14',
-      title: 'Moment de stress',
-      content: 'J\'ai ressenti beaucoup de pression aujourd\'hui. Heureusement, les exercices de respiration m\'ont aidé.',
-      mood: 'Difficile',
-      tags: ['stress', 'respiration', 'gestion'],
-      moodScore: 2
+      title: 'Réflexions sur le changement',
+      content: 'Je traverse une période de transition importante dans ma vie. Parfois c\'est effrayant, mais je sais que c\'est nécessaire pour grandir. L\'incertitude fait partie du processus.',
+      date: '2024-12-14',
+      time: '21:15',
+      mood: { emoji: '🤔', name: 'Pensif' },
+      tags: ['réflexion', 'changement', 'croissance'],
+      wordCount: 203
     },
     {
       id: 3,
-      date: '2024-01-13',
-      title: 'Belle soirée en famille',
-      content: 'Nous avons passé une merveilleuse soirée ensemble. Ces moments sont précieux.',
-      mood: 'Excellent',
-      tags: ['famille', 'bonheur', 'gratitude'],
-      moodScore: 5
+      title: 'Gratitude du soir',
+      content: 'Trois choses pour lesquelles je suis reconnaissant aujourd\'hui : ma santé, ma famille, et ce délicieux café du matin qui a lancé ma journée parfaitement.',
+      date: '2024-12-13',
+      time: '22:00',
+      mood: { emoji: '😌', name: 'Calme' },
+      tags: ['gratitude', 'famille', 'bien-être'],
+      wordCount: 134
     }
   ];
 
-  useEffect(() => {
-    setEntries(mockEntries);
-  }, []);
+  const journalPrompts = [
+    'Qu\'est-ce qui m\'a rendu heureux aujourd\'hui ?',
+    'Quel défi ai-je surmonté récemment ?',
+    'Comment puis-je prendre soin de moi demain ?',
+    'Quelle leçon ai-je apprise cette semaine ?',
+    'Pour quoi suis-je reconnaissant en ce moment ?',
+    'Qu\'est-ce qui me préoccupe et comment puis-je l\'aborder ?'
+  ];
 
-  const handleSaveEntry = () => {
-    if (!newEntry.title || !newEntry.content) {
-      toast.error('Veuillez remplir le titre et le contenu');
-      return;
-    }
-
-    const mood = moodOptions.find(m => m.name === newEntry.mood) || moodOptions[2];
-    const entry: JournalEntry = {
-      id: Date.now(),
-      date: selectedDate.toISOString().split('T')[0],
-      title: newEntry.title,
-      content: newEntry.content,
-      mood: newEntry.mood,
-      tags: newEntry.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      moodScore: mood.score
-    };
-
-    setEntries([entry, ...entries]);
-    setNewEntry({ title: '', content: '', mood: 'Neutre', tags: '' });
-    setIsWriting(false);
-    toast.success('Entrée sauvegardée avec succès !');
+  const stats = {
+    totalEntries: 47,
+    streakDays: 12,
+    averageWords: 178,
+    mostFrequentMood: 'Calme'
   };
 
-  const filteredEntries = entries.filter(entry =>
+  const filteredEntries = journalEntries.filter(entry =>
     entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     entry.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const averageMood = entries.length > 0 
-    ? entries.reduce((sum, entry) => sum + entry.moodScore, 0) / entries.length 
-    : 0;
-
-  const getMoodTrend = () => {
-    if (entries.length < 2) return 'stable';
-    const recent = entries.slice(0, 3).reduce((sum, entry) => sum + entry.moodScore, 0) / 3;
-    const older = entries.slice(3, 6).reduce((sum, entry) => sum + entry.moodScore, 0) / 3;
-    if (recent > older) return 'up';
-    if (recent < older) return 'down';
-    return 'stable';
+  const saveEntry = () => {
+    if (newEntry.trim() && selectedMood) {
+      // Logique de sauvegarde ici
+      setNewEntry('');
+      setEntryTitle('');
+      setSelectedMood(null);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 p-4" data-testid="journal-page">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Journal Émotionnel</h1>
-          <p className="text-xl text-gray-600">Suivez votre parcours émotionnel au quotidien</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Journal Personnel</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Explorez vos pensées, suivez vos émotions et cultivez votre bien-être intérieur
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Statistiques */}
-          <div className="lg:col-span-1 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Aperçu</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-orange-600 mb-1">
-                    {averageMood.toFixed(1)}/5
+        <Tabs defaultValue="write" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
+            <TabsTrigger value="write">Écrire</TabsTrigger>
+            <TabsTrigger value="entries">Mes Entrées</TabsTrigger>
+            <TabsTrigger value="prompts">Inspiration</TabsTrigger>
+            <TabsTrigger value="stats">Statistiques</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="write">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <Card className="max-w-4xl mx-auto">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Pen className="h-5 w-5 mr-2" />
+                    Nouvelle Entrée
+                  </CardTitle>
+                  <CardDescription>
+                    Prenez un moment pour réfléchir et noter vos pensées
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Title */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Titre (optionnel)</label>
+                    <Input
+                      placeholder="Donnez un titre à votre entrée..."
+                      value={entryTitle}
+                      onChange={(e) => setEntryTitle(e.target.value)}
+                    />
                   </div>
-                  <p className="text-sm text-gray-600">Humeur moyenne</p>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Entrées totales</span>
-                    <span className="font-medium">{entries.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm">Cette semaine</span>
-                    <span className="font-medium">5</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Tendance</span>
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className={`h-4 w-4 ${
-                        getMoodTrend() === 'up' ? 'text-green-500' : 
-                        getMoodTrend() === 'down' ? 'text-red-500' : 'text-gray-500'
-                      }`} />
-                      <span className="text-sm font-medium">
-                        {getMoodTrend() === 'up' ? 'Amélioration' : 
-                         getMoodTrend() === 'down' ? 'En baisse' : 'Stable'}
-                      </span>
+
+                  {/* Mood Selection */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3">Comment vous sentez-vous ?</label>
+                    <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                      {moods.map((mood) => (
+                        <button
+                          key={mood.name}
+                          onClick={() => setSelectedMood(mood.name)}
+                          className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                            selectedMood === mood.name
+                              ? 'border-orange-500 bg-orange-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="text-2xl mb-1">{mood.emoji}</div>
+                          <div className="text-xs">{mood.name}</div>
+                        </button>
+                      ))}
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Calendrier</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(date) => date && setSelectedDate(date)}
-                  className="rounded-md border"
-                />
-              </CardContent>
-            </Card>
-          </div>
+                  {/* Content */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Vos pensées</label>
+                    <Textarea
+                      placeholder="Écrivez librement vos pensées, émotions, ou réflexions du jour..."
+                      value={newEntry}
+                      onChange={(e) => setNewEntry(e.target.value)}
+                      className="min-h-[300px] resize-none"
+                    />
+                    <div className="flex justify-between text-sm text-gray-500 mt-2">
+                      <span>{newEntry.length} caractères</span>
+                      <span>{newEntry.trim().split(' ').filter(word => word.length > 0).length} mots</span>
+                    </div>
+                  </div>
 
-          {/* Contenu Principal */}
-          <div className="lg:col-span-3 space-y-6">
-            <Tabs defaultValue="entries" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="entries">Mes Entrées</TabsTrigger>
-                <TabsTrigger value="write">Écrire</TabsTrigger>
-                <TabsTrigger value="insights">Insights</TabsTrigger>
-              </TabsList>
+                  {/* Actions */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm">
+                        <Mic className="h-4 w-4 mr-2" />
+                        Dicter
+                      </Button>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" onClick={() => {
+                        setNewEntry('');
+                        setEntryTitle('');
+                        setSelectedMood(null);
+                      }}>
+                        Effacer
+                      </Button>
+                      <Button 
+                        onClick={saveEntry}
+                        disabled={!newEntry.trim() || !selectedMood}
+                        className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                      >
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        Sauvegarder
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
 
-              <TabsContent value="entries" className="space-y-4">
-                {/* Barre de recherche */}
-                <div className="flex items-center gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <TabsContent value="entries">
+            <div className="space-y-6">
+              {/* Search */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       placeholder="Rechercher dans vos entrées..."
                       value={searchTerm}
@@ -197,198 +220,162 @@ const JournalPage: React.FC = () => {
                       className="pl-10"
                     />
                   </div>
-                  <Button onClick={() => setIsWriting(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nouvelle entrée
-                  </Button>
-                </div>
+                </CardContent>
+              </Card>
 
-                {/* Liste des entrées */}
-                <div className="space-y-4">
-                  <AnimatePresence>
-                    {filteredEntries.map((entry) => (
-                      <motion.div
-                        key={entry.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                      >
-                        <Card className="hover:shadow-md transition-shadow">
-                          <CardHeader>
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <CardTitle className="text-lg">{entry.title}</CardTitle>
-                                <p className="text-sm text-gray-600">{entry.date}</p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Badge 
-                                  className={`${moodOptions.find(m => m.name === entry.mood)?.color || 'bg-gray-500'} text-white`}
-                                >
-                                  {entry.mood}
-                                </Badge>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-gray-700 mb-4">{entry.content}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {entry.tags.map((tag, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  #{tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-
-                {filteredEntries.length === 0 && (
-                  <Card>
-                    <CardContent className="text-center py-12">
-                      <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600">
-                        {searchTerm ? 'Aucune entrée trouvée pour cette recherche.' : 'Aucune entrée pour le moment. Commencez à écrire !'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-
-              <TabsContent value="write" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5" />
-                      Nouvelle Entrée
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Titre</label>
-                      <Input
-                        placeholder="Donnez un titre à votre entrée..."
-                        value={newEntry.title}
-                        onChange={(e) => setNewEntry({...newEntry, title: e.target.value})}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Comment vous sentez-vous ?</label>
-                      <div className="flex flex-wrap gap-2">
-                        {moodOptions.map((mood) => (
-                          <Button
-                            key={mood.name}
-                            variant={newEntry.mood === mood.name ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setNewEntry({...newEntry, mood: mood.name})}
-                            className={newEntry.mood === mood.name ? `${mood.color} text-white` : ''}
-                          >
-                            {mood.name}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Votre réflexion</label>
-                      <Textarea
-                        placeholder="Exprimez vos pensées, sentiments et expériences..."
-                        rows={8}
-                        value={newEntry.content}
-                        onChange={(e) => setNewEntry({...newEntry, content: e.target.value})}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Tags (séparés par des virgules)</label>
-                      <Input
-                        placeholder="travail, famille, stress, bonheur..."
-                        value={newEntry.tags}
-                        onChange={(e) => setNewEntry({...newEntry, tags: e.target.value})}
-                      />
-                    </div>
-
-                    <div className="flex gap-4">
-                      <Button onClick={handleSaveEntry} className="bg-orange-600 hover:bg-orange-700">
-                        <Heart className="mr-2 h-4 w-4" />
-                        Sauvegarder
-                      </Button>
-                      <Button variant="outline" onClick={() => setNewEntry({ title: '', content: '', mood: 'Neutre', tags: '' })}>
-                        Effacer
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="insights" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Brain className="h-5 w-5" />
-                        Patterns Émotionnels
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm text-gray-600 mb-2">Émotions les plus fréquentes</p>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span>Bien</span>
-                              <span className="font-medium">40%</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Neutre</span>
-                              <span className="font-medium">30%</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Excellent</span>
-                              <span className="font-medium">20%</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Difficile</span>
-                              <span className="font-medium">10%</span>
+              {/* Entries */}
+              <div className="space-y-4">
+                {filteredEntries.map((entry, index) => (
+                  <motion.div
+                    key={entry.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="text-2xl mr-3">{entry.mood.emoji}</div>
+                            <div>
+                              <CardTitle className="text-lg">{entry.title}</CardTitle>
+                              <CardDescription>
+                                {entry.date} à {entry.time} • {entry.wordCount} mots
+                              </CardDescription>
                             </div>
                           </div>
+                          <Badge className={moods.find(m => m.name === entry.mood.name)?.color}>
+                            {entry.mood.name}
+                          </Badge>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-gray-700 mb-4 line-clamp-3">
+                          {entry.content}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-wrap gap-1">
+                            {entry.tags.map((tag, tagIndex) => (
+                              <Badge key={tagIndex} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          <Button variant="ghost" size="sm">
+                            Lire plus
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Star className="h-5 w-5" />
-                        Recommandations
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="p-3 bg-blue-50 rounded-lg">
-                          <p className="text-sm font-medium text-blue-800">Continuez à écrire !</p>
-                          <p className="text-xs text-blue-600">Une pratique régulière améliore votre bien-être</p>
+          <TabsContent value="prompts">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Star className="h-5 w-5 mr-2 text-yellow-500" />
+                    Prompts d'Écriture
+                  </CardTitle>
+                  <CardDescription>
+                    Des questions pour vous inspirer et approfondir votre réflexion
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {journalPrompts.map((prompt, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200"
+                      >
+                        <p className="text-gray-800 mb-3">{prompt}</p>
+                        <Button size="sm" variant="outline" className="w-full">
+                          Écrire sur ce sujet
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="stats">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <TrendingUp className="h-5 w-5 mr-2" />
+                    Statistiques d'Écriture
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-4 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">{stats.totalEntries}</div>
+                        <div className="text-sm text-gray-600">Entrées Total</div>
+                      </div>
+                      <div className="text-center p-4 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">{stats.streakDays}</div>
+                        <div className="text-sm text-gray-600">Jours Consécutifs</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-4 bg-purple-50 rounded-lg">
+                        <div className="text-2xl font-bold text-purple-600">{stats.averageWords}</div>
+                        <div className="text-sm text-gray-600">Mots en Moyenne</div>
+                      </div>
+                      <div className="text-center p-4 bg-orange-50 rounded-lg">
+                        <div className="text-lg font-bold text-orange-600">{stats.mostFrequentMood}</div>
+                        <div className="text-sm text-gray-600">Humeur Fréquente</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Heart className="h-5 w-5 mr-2 text-red-500" />
+                    Évolution Émotionnelle
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {moods.slice(0, 5).map((mood, index) => (
+                      <div key={mood.name} className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <span className="text-xl mr-2">{mood.emoji}</span>
+                          <span className="text-sm">{mood.name}</span>
                         </div>
-                        <div className="p-3 bg-green-50 rounded-lg">
-                          <p className="text-sm font-medium text-green-800">Explorez vos émotions</p>
-                          <p className="text-xs text-green-600">Identifiez les déclencheurs positifs</p>
-                        </div>
-                        <div className="p-3 bg-purple-50 rounded-lg">
-                          <p className="text-sm font-medium text-purple-800">Partagez avec un proche</p>
-                          <p className="text-xs text-purple-600">Le partage renforce les liens sociaux</p>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full"
+                              style={{ width: `${Math.random() * 100}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm text-gray-600 w-10">
+                            {Math.floor(Math.random() * 30)}%
+                          </span>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
