@@ -1,86 +1,36 @@
-import { RouteObject } from 'react-router-dom';
-import { homeRoutes } from './routes/homeRoutes';
-import { b2bRedirectRoutes } from './routes/b2bRedirectRoutes';
-import { b2bRoutes } from './routes/b2bRoutes';
-import { b2cRoutes } from './routes/b2cRoutes';
-import { authRoutes } from './routes/authRoutes';
-import { coachRoutes } from './routes/coachRoutes';
-import { notificationRoutes } from './routes/notificationRoutes';
-import { onboardingRoutes } from './routes/onboardingRoutes';
-import { legalRoutes } from './routes/legalRoutes';
-import { settingsRoutes } from './routes/settingsRoutes';
-import { wellnessRoutes } from './routes/wellnessRoutes';
-import { emotionRoutes } from './routes/emotionRoutes';
-import { journalRoutes } from './routes/journalRoutes';
-import { rhRoutes } from './routes/rhRoutes';
-import { optimizedRoutes } from './routes/lazyRoutes';
-import { featureRoutes } from './routes/featureRoutes';
-import { adminRoutes } from './routes/adminRoutes';
-import { auditCompleteRoutes } from './routes/auditCompleteRoutes';
 
+import { RouteObject } from 'react-router-dom';
+import { unifiedRoutes } from './routes/unifiedRoutes';
+import { OFFICIAL_ROUTES } from '@/routesManifest';
+
+// Export de tous les manifestes de routes pour compatibilité
 export const ROUTES_MANIFEST = {
-  home: '/',
-  chooseMode: '/choose-mode',
-  auth: '/auth',
-  login: '/login',
-  register: '/register',
-  forgotPassword: '/forgot-password',
-  resetPassword: '/reset-password',
-  logout: '/logout',
-  terms: '/terms',
-  privacy: '/privacy',
-  contact: '/contact',
-  about: '/about',
-  pricing: '/pricing',
-  features: '/features',
-  faq: '/faq',
-  onboarding: '/onboarding',
-  b2c: '/b2c',
-  b2cLogin: '/b2c/login',
-  b2cRegister: '/b2c/register',
-  b2cDashboard: '/b2c/dashboard',
-  b2b: '/b2b',
-  b2bSelection: '/b2b/selection',
-  b2bUserLogin: '/b2b/user/login',
-  b2bUserRegister: '/b2b/user/register',
-  b2bAdminLogin: '/b2b/admin/login',
-  b2bUserDashboard: '/b2b/user/dashboard',
-  b2bAdminDashboard: '/b2b/admin/dashboard',
-  coachDashboard: '/coach/dashboard',
-  notifications: '/notifications',
-  settings: '/settings',
-  wellness: '/wellness',
-  emotions: '/emotions',
-  music: '/music',
-  coach: '/coach',
-  journal: '/journal',
-  teams: '/teams',
-  reports: '/reports',
-  events: '/events',
-  optimisation: '/optimisation',
+  home: OFFICIAL_ROUTES.HOME,
+  chooseMode: OFFICIAL_ROUTES.CHOOSE_MODE,
+  b2cLogin: OFFICIAL_ROUTES.B2C_LOGIN,
+  b2cRegister: OFFICIAL_ROUTES.B2C_REGISTER,
+  b2cDashboard: OFFICIAL_ROUTES.B2C_DASHBOARD,
+  b2b: OFFICIAL_ROUTES.B2B,
+  b2bSelection: OFFICIAL_ROUTES.B2B_SELECTION,
+  b2bUserLogin: OFFICIAL_ROUTES.B2B_USER_LOGIN,
+  b2bUserRegister: OFFICIAL_ROUTES.B2B_USER_REGISTER,
+  b2bUserDashboard: OFFICIAL_ROUTES.B2B_USER_DASHBOARD,
+  b2bAdminLogin: OFFICIAL_ROUTES.B2B_ADMIN_LOGIN,
+  b2bAdminDashboard: OFFICIAL_ROUTES.B2B_ADMIN_DASHBOARD,
+  scan: OFFICIAL_ROUTES.SCAN,
+  music: OFFICIAL_ROUTES.MUSIC,
+  coach: OFFICIAL_ROUTES.COACH,
+  journal: OFFICIAL_ROUTES.JOURNAL,
+  preferences: OFFICIAL_ROUTES.PREFERENCES,
+  teams: OFFICIAL_ROUTES.TEAMS,
+  reports: OFFICIAL_ROUTES.REPORTS,
+  events: OFFICIAL_ROUTES.EVENTS,
+  optimisation: OFFICIAL_ROUTES.OPTIMISATION,
+  settings: OFFICIAL_ROUTES.SETTINGS,
 } as const;
 
 export function buildUnifiedRoutes(): RouteObject[] {
-  return [
-    ...homeRoutes,
-    ...authRoutes,
-    ...b2bRedirectRoutes,
-    ...b2bRoutes,
-    ...b2cRoutes,
-    ...coachRoutes,
-    ...notificationRoutes,
-    ...onboardingRoutes,
-    ...legalRoutes,
-    ...settingsRoutes,
-    ...wellnessRoutes,
-    ...emotionRoutes,
-    ...journalRoutes,
-    ...rhRoutes,
-    ...optimizedRoutes,
-    ...featureRoutes,
-    ...adminRoutes,
-    ...auditCompleteRoutes,
-  ];
+  return unifiedRoutes;
 }
 
 export function validateRoute(route: string): route is keyof typeof ROUTES_MANIFEST {
