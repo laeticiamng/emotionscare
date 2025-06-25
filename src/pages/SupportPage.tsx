@@ -1,349 +1,370 @@
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { 
+  HelpCircle, 
+  MessageCircle, 
+  Phone, 
+  Mail, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle,
+  Book,
+  Video,
+  Search
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { MessageCircle, FileText, HelpCircle, Send } from 'lucide-react';
-import Shell from '@/Shell';
-
-const contactFormSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  email: z.string().email('Veuillez entrer une adresse e-mail valide'),
-  subject: z.string().min(5, 'Le sujet doit contenir au moins 5 caractères'),
-  message: z.string().min(10, 'Le message doit contenir au moins 10 caractères'),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
+import { motion } from 'framer-motion';
 
 const SupportPage: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  
-  const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      subject: '',
-      message: '',
-    },
+  const [ticketForm, setTicketForm] = useState({
+    subject: '',
+    category: '',
+    priority: 'medium',
+    description: ''
   });
-  
-  const onSubmit = async (data: ContactFormValues) => {
-    try {
-      setIsSubmitting(true);
-      // Simuler l'envoi d'un message
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Form data:', data);
-      setIsSubmitted(true);
-      toast.success('Message envoyé avec succès. Nous vous répondrons prochainement.');
-    } catch (error) {
-      console.error('Erreur d\'envoi:', error);
-      toast.error('Une erreur est survenue lors de l\'envoi du message');
-    } finally {
-      setIsSubmitting(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const faqs = [
+    {
+      question: "Comment commencer avec EmotionsCare ?",
+      answer: "Après votre inscription, nous vous recommandons de commencer par un scan émotionnel pour établir votre profil de base. Ensuite, explorez les différentes fonctionnalités comme le journal, la musicothérapie et les sessions VR selon vos besoins."
+    },
+    {
+      question: "Mes données sont-elles sécurisées ?",
+      answer: "Absolument. Nous utilisons un chiffrement de niveau militaire pour protéger vos données. Toutes les informations personnelles sont anonymisées et nous respectons strictement le RGPD. Vous avez un contrôle total sur vos données."
+    },
+    {
+      question: "Comment fonctionne le coach IA ?",
+      answer: "Notre coach IA analyse vos données émotionnelles, vos activités et vos préférences pour vous proposer des recommandations personnalisées. Il apprend de vos interactions pour s'améliorer continuellement."
+    },
+    {
+      question: "Puis-je utiliser EmotionsCare sans casque VR ?",
+      answer: "Oui ! La réalité virtuelle est une fonctionnalité optionnelle. Vous pouvez profiter pleinement d'EmotionsCare avec le journal, la musicothérapie, le coach IA et toutes les autres fonctionnalités."
+    },
+    {
+      question: "Comment annuler mon abonnement ?",
+      answer: "Vous pouvez annuler votre abonnement à tout moment depuis vos paramètres de compte. L'annulation prend effet à la fin de votre période de facturation actuelle."
+    },
+    {
+      question: "L'application fonctionne-t-elle hors ligne ?",
+      answer: "Certaines fonctionnalités comme le journal et la consultation de vos données fonctionnent hors ligne. Cependant, le coach IA et les sessions VR nécessitent une connexion internet."
     }
-  };
-  
-  const resetForm = () => {
-    setIsSubmitted(false);
-    form.reset();
-  };
-  
-  const faqItems = [
-    {
-      question: 'Comment puis-je créer un compte ?',
-      answer: 'Vous pouvez créer un compte en cliquant sur le bouton "S\'inscrire" en haut à droite de la page d\'accueil. Suivez ensuite les instructions pour compléter votre inscription.',
-    },
-    {
-      question: 'Comment fonctionne le journal émotionnel ?',
-      answer: 'Le journal émotionnel vous permet d\'enregistrer quotidiennement vos émotions et de suivre leur évolution au fil du temps. Vous pouvez ajouter des entrées, ajouter des notes et visualiser vos tendances émotionnelles via des graphiques.',
-    },
-    {
-      question: 'Est-ce que mes données sont sécurisées ?',
-      answer: 'Oui, la protection de vos données est notre priorité. Toutes les informations sont cryptées et nous ne partageons jamais vos données avec des tiers sans votre consentement explicite.',
-    },
-    {
-      question: 'Comment puis-je réinitialiser mon mot de passe ?',
-      answer: 'Vous pouvez réinitialiser votre mot de passe en cliquant sur "Mot de passe oublié ?" sur la page de connexion. Un e-mail avec les instructions de réinitialisation vous sera envoyé.',
-    },
-    {
-      question: 'Puis-je utiliser l\'application sur mobile ?',
-      answer: 'Oui, notre application est conçue de manière responsive et fonctionne sur tous les appareils, y compris les smartphones et tablettes. Une application mobile native sera également bientôt disponible.',
-    },
-    {
-      question: 'Comment puis-je supprimer mon compte ?',
-      answer: 'Pour supprimer votre compte, accédez à vos paramètres de profil et cliquez sur "Supprimer mon compte". Veuillez noter que cette action est irréversible et que toutes vos données seront définitivement supprimées.',
-    },
   ];
-  
+
+  const tutorials = [
+    {
+      title: "Premiers pas avec EmotionsCare",
+      duration: "5 min",
+      type: "video",
+      description: "Découvrez les fonctionnalités principales"
+    },
+    {
+      title: "Utiliser le scanner émotionnel",
+      duration: "3 min",
+      type: "guide",
+      description: "Guide complet du scan émotionnel"
+    },
+    {
+      title: "Maximiser votre bien-être avec la VR",
+      duration: "7 min",
+      type: "video",
+      description: "Techniques avancées de relaxation VR"
+    },
+    {
+      title: "Interpréter vos statistiques",
+      duration: "4 min",
+      type: "guide",
+      description: "Comprendre vos données de bien-être"
+    }
+  ];
+
+  const handleSubmitTicket = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success('Votre demande a été envoyée. Nous vous répondrons sous 24h.');
+    setTicketForm({ subject: '', category: '', priority: 'medium', description: '' });
+  };
+
+  const filteredFaqs = faqs.filter(faq => 
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <Shell>
-      <div className="container py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Centre d'assistance</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Nous sommes là pour vous aider. Consultez notre FAQ ou contactez-nous directement.
-            </p>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-8"
+      >
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="p-3 bg-primary/10 rounded-full">
+              <HelpCircle className="h-8 w-8 text-primary" />
+            </div>
           </div>
-          
-          <Tabs defaultValue="contact" className="max-w-4xl mx-auto">
-            <TabsList className="grid grid-cols-3 mb-8">
-              <TabsTrigger value="contact" className="flex items-center gap-2">
-                <MessageCircle className="h-4 w-4" />
-                <span>Contact</span>
-              </TabsTrigger>
-              <TabsTrigger value="faq" className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" />
-                <span>FAQ</span>
-              </TabsTrigger>
-              <TabsTrigger value="docs" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span>Documentation</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="contact" className="space-y-6">
-              <div className="bg-card rounded-lg border shadow-sm p-6">
-                {!isSubmitted ? (
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nom</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Jean Dupont" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input placeholder="email@exemple.com" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
-                      <FormField
-                        control={form.control}
-                        name="subject"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Sujet</FormLabel>
-                            <FormControl>
-                              <Input placeholder="En quoi pouvons-nous vous aider ?" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="message"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Message</FormLabel>
-                            <FormControl>
-                              <textarea
-                                className="flex min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                placeholder="Décrivez votre problème ou question en détail..."
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <div className="flex justify-end">
-                        <Button 
-                          type="submit" 
-                          disabled={isSubmitting}
-                          className="flex items-center gap-2"
-                        >
-                          {isSubmitting ? 'Envoi en cours...' : (
-                            <>
-                              <Send className="h-4 w-4" />
-                              Envoyer le message
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                ) : (
-                  <motion.div 
-                    className="text-center py-10"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary h-8 w-8"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">Message envoyé</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.
-                    </p>
-                    <Button onClick={resetForm}>Envoyer un nouveau message</Button>
-                  </motion.div>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-card rounded-lg border p-6 text-center">
-                  <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <MessageCircle className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-medium mb-2">Chat en direct</h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    Discutez avec notre équipe d'assistance en temps réel.
-                  </p>
-                  <Button variant="outline" size="sm">
-                    Démarrer le chat
-                  </Button>
+          <h1 className="text-4xl font-bold">Centre d'aide</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Trouvez rapidement les réponses à vos questions ou contactez notre équipe support
+          </p>
+        </div>
+
+        {/* Contact rapide */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6 text-center">
+              <MessageCircle className="h-8 w-8 mx-auto mb-3 text-blue-500" />
+              <h3 className="font-semibold mb-2">Chat en direct</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Réponse immédiate
+              </p>
+              <Button size="sm" className="w-full">Commencer le chat</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6 text-center">
+              <Mail className="h-8 w-8 mx-auto mb-3 text-green-500" />
+              <h3 className="font-semibold mb-2">Email</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Réponse sous 24h
+              </p>
+              <Button size="sm" variant="outline" className="w-full">
+                support@emotionscare.com
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6 text-center">
+              <Phone className="h-8 w-8 mx-auto mb-3 text-purple-500" />
+              <h3 className="font-semibold mb-2">Téléphone</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Lun-Ven 9h-18h
+              </p>
+              <Button size="sm" variant="outline" className="w-full">
+                +33 1 23 45 67 89
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="faq" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="faq">FAQ</TabsTrigger>
+            <TabsTrigger value="guides">Guides & Tutoriels</TabsTrigger>
+            <TabsTrigger value="contact">Nous contacter</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="faq" className="space-y-6">
+            {/* Barre de recherche */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Rechercher dans la FAQ..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
-                
-                <div className="bg-card rounded-lg border p-6 text-center">
-                  <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  </div>
-                  <h3 className="font-medium mb-2">Téléphone</h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    Du lundi au vendredi, de 9h à 18h.
-                  </p>
-                  <Button variant="outline" size="sm">
-                    +33 1 23 45 67 89
-                  </Button>
-                </div>
-                
-                <div className="bg-card rounded-lg border p-6 text-center">
-                  <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                  </div>
-                  <h3 className="font-medium mb-2">Email</h3>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    Nous répondons généralement sous 24h.
-                  </p>
-                  <Button variant="outline" size="sm">
-                    support@emotionscare.com
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="faq">
-              <div className="bg-card rounded-lg border shadow-sm p-6">
-                <h2 className="text-2xl font-bold mb-6">Questions fréquemment posées</h2>
-                
-                <Accordion type="single" collapsible className="w-full">
-                  {faqItems.map((item, index) => (
+              </CardContent>
+            </Card>
+
+            {/* FAQ */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Questions fréquemment posées</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Accordion type="single" collapsible className="space-y-2">
+                  {filteredFaqs.map((faq, index) => (
                     <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger>{item.question}</AccordionTrigger>
-                      <AccordionContent>
-                        <p>{item.answer}</p>
+                      <AccordionTrigger className="text-left">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground">
+                        {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
                   ))}
                 </Accordion>
-                
-                <div className="mt-8 p-4 bg-muted rounded-lg text-center">
-                  <p className="text-muted-foreground mb-2">
-                    Vous ne trouvez pas la réponse à votre question ?
-                  </p>
-                  <Button onClick={() => document.querySelector('[data-value="contact"]')?.click()}>
-                    Contactez-nous
-                  </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="guides" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Guides et Tutoriels</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {tutorials.map((tutorial, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    >
+                      <div className="flex items-start gap-3">
+                        {tutorial.type === 'video' ? (
+                          <Video className="h-6 w-6 text-red-500 mt-1" />
+                        ) : (
+                          <Book className="h-6 w-6 text-blue-500 mt-1" />
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold mb-1">{tutorial.title}</h3>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {tutorial.description}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {tutorial.duration}
+                            </Badge>
+                            <Badge variant="outline">{tutorial.type}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="contact" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Formulaire de contact */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Créer un ticket de support</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmitTicket} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Sujet</Label>
+                      <Input
+                        id="subject"
+                        value={ticketForm.subject}
+                        onChange={(e) => setTicketForm({...ticketForm, subject: e.target.value})}
+                        placeholder="Décrivez brièvement votre problème"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="category">Catégorie</Label>
+                        <select
+                          id="category"
+                          value={ticketForm.category}
+                          onChange={(e) => setTicketForm({...ticketForm, category: e.target.value})}
+                          className="w-full p-2 border rounded-md"
+                          required
+                        >
+                          <option value="">Sélectionner...</option>
+                          <option value="technical">Problème technique</option>
+                          <option value="billing">Facturation</option>
+                          <option value="account">Compte utilisateur</option>
+                          <option value="feature">Demande de fonctionnalité</option>
+                          <option value="other">Autre</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="priority">Priorité</Label>
+                        <select
+                          id="priority"
+                          value={ticketForm.priority}
+                          onChange={(e) => setTicketForm({...ticketForm, priority: e.target.value})}
+                          className="w-full p-2 border rounded-md"
+                        >
+                          <option value="low">Faible</option>
+                          <option value="medium">Moyenne</option>
+                          <option value="high">Élevée</option>
+                          <option value="urgent">Urgente</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description détaillée</Label>
+                      <Textarea
+                        id="description"
+                        value={ticketForm.description}
+                        onChange={(e) => setTicketForm({...ticketForm, description: e.target.value})}
+                        placeholder="Décrivez votre problème en détail..."
+                        rows={4}
+                        required
+                      />
+                    </div>
+
+                    <Button type="submit" className="w-full">
+                      Envoyer la demande
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+
+              {/* Informations de contact */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Horaires du support</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>Lundi - Vendredi: 9h00 - 18h00</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>Samedi: 10h00 - 16h00</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>Dimanche: Fermé</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Temps de réponse</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span>Chat en direct</span>
+                      <Badge variant="secondary">Immédiat</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Email</span>
+                      <Badge variant="outline">24h</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Ticket urgent</span>
+                      <Badge variant="destructive">2h</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </TabsContent>
-            
-            <TabsContent value="docs">
-              <div className="bg-card rounded-lg border shadow-sm p-6">
-                <h2 className="text-2xl font-bold mb-6">Documentation</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
-                    <h3 className="font-medium mb-2">Guide de démarrage</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Apprenez les bases de l'application et comment configurer votre compte.
-                    </p>
-                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
-                  </div>
-                  
-                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
-                    <h3 className="font-medium mb-2">Fonctionnalités du journal</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Découvrez comment tirer le meilleur parti de votre journal émotionnel.
-                    </p>
-                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
-                  </div>
-                  
-                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
-                    <h3 className="font-medium mb-2">Graphiques et analyses</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Comprendre les graphiques et suivre votre évolution émotionnelle.
-                    </p>
-                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
-                  </div>
-                  
-                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
-                    <h3 className="font-medium mb-2">Paramètres de confidentialité</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Tout sur la protection de vos données et les options de confidentialité.
-                    </p>
-                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
-                  </div>
-                </div>
-                
-                <div className="flex justify-center">
-                  <Button variant="outline">Voir toute la documentation</Button>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
-      </div>
-    </Shell>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
+    </div>
   );
 };
 

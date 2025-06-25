@@ -17,6 +17,13 @@ import JournalPage from '@/pages/JournalPage';
 import CoachPage from '@/pages/CoachPage';
 import VRPage from '@/pages/VRPage';
 
+// Nouvelles pages critiques
+import ProfilePage from '@/pages/ProfilePage';
+import NotificationsPage from '@/pages/NotificationsPage';
+import SupportPage from '@/pages/SupportPage';
+import SecurityPage from '@/pages/SecurityPage';
+import StatsPage from '@/pages/StatsPage';
+
 // Pages spécialisées
 import B2CPage from '@/pages/B2CPage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
@@ -36,6 +43,11 @@ export const ROUTE_MANIFEST = [
   '/preferences',
   '/gamification',
   '/social-cocon',
+  '/profile',
+  '/notifications',
+  '/support',
+  '/security',
+  '/stats',
   '/b2c',
   '/b2b-selection',
   '/boss-level-grit',
@@ -86,6 +98,26 @@ export function buildUnifiedRoutes(): RouteObject[] {
         {
           path: 'social-cocon',
           element: <SocialCoconPage />
+        },
+        {
+          path: 'profile',
+          element: <ProfilePage />
+        },
+        {
+          path: 'notifications',
+          element: <NotificationsPage />
+        },
+        {
+          path: 'support',
+          element: <SupportPage />
+        },
+        {
+          path: 'security',
+          element: <SecurityPage />
+        },
+        {
+          path: 'stats',
+          element: <StatsPage />
         },
         {
           path: 'b2c',
