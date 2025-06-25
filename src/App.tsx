@@ -1,12 +1,12 @@
 
-import React, { Suspense } from 'react';
+import React, { Suspense, startTransition } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
 
-console.log('🚀 App component rendering - VERSION UNIFIÉE ROUTER AVEC PROVIDERS...');
+console.log('🚀 App component rendering - VERSION UNIFIÉE CORRIGÉE...');
 
-// Loader avec data-testid pour les tests
+// Loader optimisé avec transition
 const UniversalLoader = () => (
   <div 
     data-testid="page-loading" 
@@ -15,22 +15,23 @@ const UniversalLoader = () => (
     <div className="text-center space-y-4">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
       <p className="text-lg font-medium">Chargement EmotionsCare...</p>
-      <p className="text-sm text-muted-foreground">Initialisation du router unifié</p>
+      <p className="text-sm text-muted-foreground">Initialisation sécurisée</p>
     </div>
   </div>
 );
 
 function App() {
-  console.log('🚀 App function called - Router unifié avec providers');
+  console.log('🚀 App function called - Router corrigé');
   
   React.useEffect(() => {
-    console.log('🚀 App mounted - VERSION ROUTER UNIFIÉ AVEC PROVIDERS');
+    console.log('🚀 App mounted - VERSION CORRIGÉE');
     console.log('🚀 Current location:', window.location.href);
-    console.log('🚀 Router object:', router);
     
-    // Log de navigation pour debug
+    // Utilisation de startTransition pour les changements de route
     const handleRouteChange = () => {
-      console.info('%c[Route] mounted', 'color:lime', window.location.pathname);
+      startTransition(() => {
+        console.info('%c[Route] mounted', 'color:lime', window.location.pathname);
+      });
     };
     
     window.addEventListener('popstate', handleRouteChange);
@@ -45,7 +46,10 @@ function App() {
   return (
     <UniversalErrorBoundary>
       <Suspense fallback={<UniversalLoader />}>
-        <RouterProvider router={router} />
+        <RouterProvider 
+          router={router}
+          fallbackElement={<UniversalLoader />}
+        />
       </Suspense>
     </UniversalErrorBoundary>
   );

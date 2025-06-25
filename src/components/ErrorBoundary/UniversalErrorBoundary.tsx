@@ -1,117 +1,103 @@
 
-import React from 'react';
+import React, { Component, ErrorInfo, ReactNode, startTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
-interface ErrorBoundaryState {
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
   hasError: boolean;
-  error?: Error;
-  errorInfo?: React.ErrorInfo;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
-interface UniversalErrorBoundaryProps {
-  children?: React.ReactNode;
-  fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
-}
+export class UniversalErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+    error: null,
+    errorInfo: null
+  };
 
-class UniversalErrorBoundary extends React.Component<
-  UniversalErrorBoundaryProps,
-  ErrorBoundaryState
-> {
-  constructor(props: UniversalErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false };
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    this.setState({ error, errorInfo });
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('UniversalErrorBoundary caught an error:', error, errorInfo);
+    this.setState({
+      hasError: true,
+      error,
+      errorInfo
+    });
   }
 
-  resetError = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+  private handleReset = (): void => {
+    startTransition(() => {
+      this.setState({
+        hasError: false,
+        error: null,
+        errorInfo: null
+      });
+      // Recharger la page de manière sécurisée
+      window.location.reload();
+    });
   };
 
-  goHome = () => {
-    window.location.href = '/';
-  };
-
-  reload = () => {
-    window.location.reload();
-  };
-
-  render() {
+  public render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
+        return this.props.fallback;
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <AlertTriangle className="h-12 w-12 text-destructive" />
               </div>
-              <CardTitle className="text-xl">Une erreur s'est produite</CardTitle>
+              <CardTitle>Oops! Quelque chose s'est mal passé</CardTitle>
             </CardHeader>
-            <CardContent className="text-center space-y-6">
-              <p className="text-muted-foreground">
-                Nous nous excusons pour la gêne occasionnée. L'application a rencontré une erreur inattendue.
+            <CardContent className="text-center space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Une erreur inattendue s'est produite. Nous nous excusons pour la gêne.
               </p>
               
               {this.state.error && (
-                <details className="text-xs text-left bg-muted p-3 rounded-md">
-                  <summary className="cursor-pointer font-medium mb-2">
+                <details className="text-xs text-left bg-muted p-3 rounded">
+                  <summary className="cursor-pointer font-medium">
                     Détails techniques
                   </summary>
-                  <div className="space-y-2">
-                    <div>
-                      <strong>Erreur:</strong>
-                      <pre className="mt-1 whitespace-pre-wrap break-words">
-                        {this.state.error.message}
-                      </pre>
-                    </div>
-                    {this.state.error.stack && (
-                      <div>
-                        <strong>Stack trace:</strong>
-                        <pre className="mt-1 whitespace-pre-wrap break-words text-xs">
-                          {this.state.error.stack}
-                        </pre>
-                      </div>
+                  <pre className="mt-2 whitespace-pre-wrap overflow-auto max-h-32">
+                    {this.state.error.message}
+                    {this.state.errorInfo?.componentStack && (
+                      <>
+                        {'\n\nComponent Stack:'}
+                        {this.state.errorInfo.componentStack}
+                      </>
                     )}
-                  </div>
+                  </pre>
                 </details>
               )}
-
-              <div className="flex flex-col gap-3">
-                <Button onClick={this.resetError} className="w-full">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Réessayer
-                </Button>
-                <Button onClick={this.reload} variant="outline" className="w-full">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Recharger la page
-                </Button>
-                <Button onClick={this.goHome} variant="secondary" className="w-full">
-                  <Home className="h-4 w-4 mr-2" />
-                  Retour à l'accueil
-                </Button>
-              </div>
+              
+              <Button 
+                onClick={this.handleReset} 
+                className="w-full"
+                variant="default"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Réessayer
+              </Button>
             </CardContent>
           </Card>
         </div>
       );
     }
 
-    return this.props.children || null;
+    return this.props.children;
   }
 }
-
-export default UniversalErrorBoundary;
