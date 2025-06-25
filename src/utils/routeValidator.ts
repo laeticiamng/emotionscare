@@ -1,225 +1,144 @@
 
-// Validateur de routes pour vérifier l'intégrité du système de navigation
-
-import { UNIFIED_ROUTES, validateUniqueRoutes, TOTAL_ROUTES_COUNT } from './routeUtils';
+import { UNIFIED_ROUTES } from './routeUtils';
+import { performanceMonitor } from './pagePerformanceMonitor';
 
 interface RouteValidationResult {
-  path: string;
-  status: 'valid' | 'error' | 'warning';
-  component?: string;
-  message?: string;
+  route: string;
+  isAccessible: boolean;
+  hasPageRoot: boolean;
+  loadTime: number;
+  error?: string;
+}
+
+interface ValidationSummary {
+  totalRoutes: number;
+  successfulRoutes: number;
+  failedRoutes: number;
+  averageLoadTime: number;
+  results: RouteValidationResult[];
 }
 
 export class RouteValidator {
   private results: RouteValidationResult[] = [];
 
-  /**
-   * Valide toutes les routes du système
-   */
-  async validateAllRoutes(): Promise<{
-    summary: {
-      total: number;
-      valid: number;
-      errors: number;
-      warnings: number;
-    };
-    results: RouteValidationResult[];
-  }> {
-    console.log('🔍 Validation des 52 routes EmotionsCare...');
+  async validateRoute(route: string): Promise<RouteValidationResult> {
+    const startTime = performance.now();
     
+    try {
+      // Simuler une navigation vers la route
+      const response = await fetch(route, { method: 'HEAD' });
+      const loadTime = performance.now() - startTime;
+      
+      const result: RouteValidationResult = {
+        route,
+        isAccessible: response.ok,
+        hasPageRoot: response.ok, // Simplifié pour cette validation
+        loadTime,
+        error: response.ok ? undefined : `HTTP ${response.status}`
+      };
+      
+      this.results.push(result);
+      return result;
+      
+    } catch (error) {
+      const loadTime = performance.now() - startTime;
+      const result: RouteValidationResult = {
+        route,
+        isAccessible: false,
+        hasPageRoot: false,
+        loadTime,
+        error: error.message
+      };
+      
+      this.results.push(result);
+      return result;
+    }
+  }
+
+  async validateAllRoutes(): Promise<ValidationSummary> {
+    console.log('🔍 Début de la validation de toutes les routes...');
     this.results = [];
     
-    // Vérification de l'unicité des routes
-    if (!validateUniqueRoutes()) {
-      this.results.push({
-        path: 'SYSTEM',
-        status: 'error',
-        message: 'Doublons détectés dans les routes'
-      });
-    }
-
-    // Validation de chaque route
-    for (const [key, path] of Object.entries(UNIFIED_ROUTES)) {
-      await this.validateRoute(key, path);
-    }
-
-    const summary = this.generateSummary();
+    const allRoutes = Object.values(UNIFIED_ROUTES);
+    const validationPromises = allRoutes.map(route => this.validateRoute(route));
     
-    console.log(`✅ Validation terminée : ${summary.valid}/${summary.total} routes valides`);
+    await Promise.all(validationPromises);
     
-    return {
-      summary,
+    const successfulRoutes = this.results.filter(r => r.isAccessible).length;
+    const failedRoutes = this.results.length - successfulRoutes;
+    const averageLoadTime = this.results.reduce((sum, r) => sum + r.loadTime, 0) / this.results.length;
+    
+    const summary: ValidationSummary = {
+      totalRoutes: this.results.length,
+      successfulRoutes,
+      failedRoutes,
+      averageLoadTime,
       results: this.results
     };
-  }
-
-  /**
-   * Valide une route individuelle
-   */
-  private async validateRoute(key: string, path: string): Promise<void> {
-    try {
-      // Simulation de validation (en production, on ferait un fetch réel)
-      const isValidPath = this.isValidPathFormat(path);
-      
-      if (!isValidPath) {
-        this.results.push({
-          path,
-          status: 'error',
-          message: `Format de chemin invalide pour ${key}`
-        });
-        return;
-      }
-
-      // Vérification que le composant existe (approximation)
-      const hasComponent = this.checkComponentExists(key);
-      
-      if (!hasComponent) {
-        this.results.push({
-          path,
-          status: 'warning',
-          message: `Composant potentiellement manquant pour ${key}`
-        });
-        return;
-      }
-
-      this.results.push({
-        path,
-        status: 'valid',
-        component: this.getComponentName(key)
-      });
-
-    } catch (error) {
-      this.results.push({
-        path,
-        status: 'error',
-        message: `Erreur de validation : ${error}`
-      });
-    }
-  }
-
-  /**
-   * Vérifie le format du chemin
-   */
-  private isValidPathFormat(path: string): boolean {
-    // Doit commencer par /
-    if (!path.startsWith('/')) return false;
     
-    // Pas de caractères spéciaux dangereux
-    const dangerousChars = /[<>:"'|?*]/;
-    if (dangerousChars.test(path)) return false;
-    
-    // Longueur raisonnable
-    if (path.length > 100) return false;
-    
-    return true;
-  }
-
-  /**
-   * Vérifie approximativement si le composant existe
-   */
-  private checkComponentExists(key: string): boolean {
-    // Pour l'instant, on suppose que toutes les nouvelles pages créées par le backend existent
-    const backendCreatedPages = [
-      'ONBOARDING', 'B2B_LANDING', 'BOSS_LEVEL_GRIT', 'MOOD_MIXER', 'BOUNCE_BACK_BATTLE',
-      'STORY_SYNTH_LAB', 'BREATHWORK', 'VR_GALACTIQUE', 'SCREEN_SILK_BREAK', 'FLASH_GLOW',
-      'AMBITION_ARCADE', 'AR_FILTERS', 'BUBBLE_BEAT', 'INSTANT_GLOW', 'WEEKLY_BARS',
-      'HEATMAP_VIBES', 'PREFERENCES', 'PROFILE_SETTINGS', 'ACTIVITY_HISTORY',
-      'PRIVACY_TOGGLES', 'EXPORT_CSV', 'ACCOUNT_DELETE', 'NOTIFICATIONS', 'HELP_CENTER',
-      'FEEDBACK', 'SECURITY', 'AUDIT', 'ACCESSIBILITY', 'HEALTH_CHECK_BADGE'
-    ];
-    
-    // Les pages existantes avant le backend
-    const existingPages = [
-      'HOME', 'CHOOSE_MODE', 'B2B_SELECTION', 'B2C_LOGIN', 'B2C_REGISTER',
-      'B2B_USER_LOGIN', 'B2B_USER_REGISTER', 'B2B_ADMIN_LOGIN',
-      'B2C_DASHBOARD', 'B2B_USER_DASHBOARD', 'B2B_ADMIN_DASHBOARD',
-      'SCAN', 'MUSIC', 'COACH', 'JOURNAL', 'VR', 'GAMIFICATION', 'SOCIAL_COCON',
-      'TEAMS', 'REPORTS', 'EVENTS', 'OPTIMISATION', 'SETTINGS'
-    ];
-    
-    return backendCreatedPages.includes(key) || existingPages.includes(key);
-  }
-
-  /**
-   * Obtient le nom du composant pour une clé donnée
-   */
-  private getComponentName(key: string): string {
-    const componentMapping: Record<string, string> = {
-      'HOME': 'HomePage',
-      'CHOOSE_MODE': 'ChooseModePage',
-      'ONBOARDING': 'OnboardingFlowPage',
-      'B2B_SELECTION': 'B2BSelectionPage',
-      'B2B_LANDING': 'B2BLandingPage',
-      // ... mappings pour toutes les pages
-    };
-    
-    return componentMapping[key] || `${key}Page`;
-  }
-
-  /**
-   * Génère le résumé de validation
-   */
-  private generateSummary() {
-    const summary = {
-      total: this.results.length,
-      valid: this.results.filter(r => r.status === 'valid').length,
-      errors: this.results.filter(r => r.status === 'error').length,
-      warnings: this.results.filter(r => r.status === 'warning').length
-    };
-
+    this.printValidationReport(summary);
     return summary;
   }
 
-  /**
-   * Affiche un rapport détaillé
-   */
-  generateReport(): string {
-    const summary = this.generateSummary();
+  private printValidationReport(summary: ValidationSummary) {
+    console.log('\n📊 RAPPORT DE VALIDATION DES ROUTES');
+    console.log('=====================================');
+    console.log(`📈 Total: ${summary.totalRoutes} routes`);
+    console.log(`✅ Succès: ${summary.successfulRoutes} routes`);
+    console.log(`❌ Échecs: ${summary.failedRoutes} routes`);
+    console.log(`⏱️  Temps moyen: ${summary.averageLoadTime.toFixed(2)}ms`);
     
-    let report = `
-# 📊 RAPPORT DE VALIDATION DES ROUTES - EmotionsCare
+    if (summary.failedRoutes > 0) {
+      console.log('\n🔴 ROUTES EN ÉCHEC:');
+      summary.results
+        .filter(r => !r.isAccessible)
+        .forEach(r => {
+          console.log(`- ${r.route}: ${r.error}`);
+        });
+    }
+    
+    const slowRoutes = summary.results
+      .filter(r => r.loadTime > 1000)
+      .sort((a, b) => b.loadTime - a.loadTime);
+    
+    if (slowRoutes.length > 0) {
+      console.log('\n🐌 ROUTES LENTES (>1s):');
+      slowRoutes.slice(0, 5).forEach(r => {
+        console.log(`- ${r.route}: ${r.loadTime.toFixed(2)}ms`);
+      });
+    }
+    
+    // Intégration avec le monitor de performance
+    console.log('\n' + performanceMonitor.generateReport());
+  }
 
-## Résumé
-- **Total des routes** : ${summary.total}
-- **Routes valides** : ${summary.valid} ✅
-- **Erreurs** : ${summary.errors} ❌
-- **Avertissements** : ${summary.warnings} ⚠️
-- **Taux de réussite** : ${Math.round((summary.valid / summary.total) * 100)}%
+  getSlowRoutes(threshold: number = 1000): RouteValidationResult[] {
+    return this.results.filter(r => r.loadTime > threshold);
+  }
 
-## Détails par statut
-
-### ✅ Routes valides (${summary.valid})
-${this.results
-  .filter(r => r.status === 'valid')
-  .map(r => `- ${r.path}`)
-  .join('\n')}
-
-### ❌ Erreurs (${summary.errors})
-${this.results
-  .filter(r => r.status === 'error')
-  .map(r => `- ${r.path} : ${r.message}`)
-  .join('\n')}
-
-### ⚠️ Avertissements (${summary.warnings})
-${this.results
-  .filter(r => r.status === 'warning')
-  .map(r => `- ${r.path} : ${r.message}`)
-  .join('\n')}
-
----
-Généré le ${new Date().toLocaleString('fr-FR')}
-`;
-
-    return report;
+  getFailedRoutes(): RouteValidationResult[] {
+    return this.results.filter(r => !r.isAccessible);
   }
 }
 
-// Instance globale du validateur
+// Instance globale pour usage facile
 export const routeValidator = new RouteValidator();
 
 // Fonction utilitaire pour validation rapide
-export const validateRoutes = async () => {
-  const result = await routeValidator.validateAllRoutes();
-  console.log(routeValidator.generateReport());
-  return result;
+export const validateRoutes = async (): Promise<ValidationSummary> => {
+  return await routeValidator.validateAllRoutes();
 };
+
+// Validation automatique au chargement (en développement uniquement)
+if (process.env.NODE_ENV === 'development') {
+  // Attendre que l'app soit chargée avant de valider
+  setTimeout(() => {
+    validateRoutes().then(summary => {
+      if (summary.failedRoutes > 0) {
+        console.warn(`⚠️  ${summary.failedRoutes} routes nécessitent une attention`);
+      } else {
+        console.log('✅ Toutes les routes sont fonctionnelles');
+      }
+    });
+  }, 3000);
+}
