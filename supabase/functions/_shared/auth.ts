@@ -1,5 +1,9 @@
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { logAccess } from './logging.ts';
+
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+const supabase = createClient(supabaseUrl, anonKey);
 
 export async function validateJwt(req: Request) {
   const authHeader = req.headers.get('authorization');
@@ -7,10 +11,6 @@ export async function validateJwt(req: Request) {
     throw new Error('unauthorized');
   }
   const jwt = authHeader.slice(7);
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-  );
   const { data: { user }, error } = await supabase.auth.getUser(jwt);
   if (error || !user) throw new Error('unauthorized');
   return user;
@@ -29,39 +29,6 @@ export async function assertJwt(req: Request) {
     role: getClaim(user, 'role'),
     user_agent,
   };
-}
-
-export async function authorizeRole(req: Request, allowedRoles: string[]) {
-  try {
-    const claims = await assertJwt(req);
-    if (!claims.role || !allowedRoles.includes(claims.role)) {
-      await logAccess({
-        user_id: claims.user_hash,
-        role: claims.role,
-        route: new URL(req.url).pathname,
-        action: 'access',
-        result: 'denied',
-        user_agent: claims.user_agent,
-      });
-
-import { verify } from 'https://deno.land/x/djwt@v2.9/mod.ts';
-import { hash as argonHash } from 'https://deno.land/x/argon2@0.11.0/mod.ts';
-import { logUnauthorizedAccess } from './auth-middleware.ts';
-
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-const supabase = createClient(supabaseUrl, anonKey);
-const pepper = Deno.env.get('SUPA_PEPPER') ?? '';
-
-export async function validateJwtOrThrow(jwt: string): Promise<string> {
-  const secret = Deno.env.get('JWT_SECRET') ?? '';
-  const { payload } = await verify(jwt, secret, 'HS256');
-  if (!payload.sub) throw new Error('invalid jwt');
-  return payload.sub as string;
-}
-
-export async function hashUser(sub: string): Promise<string> {
-  return await argonHash(sub + pepper, { type: 'argon2id', salt: new TextEncoder().encode(pepper) });
 }
 
 export async function authorizeRole(req: Request, allowedRoles: string[]) {
@@ -85,15 +52,39 @@ export async function authorizeRole(req: Request, allowedRoles: string[]) {
       await logUnauthorizedAccess(req, 'invalid role');
       return { user: null, status: 403 };
     }
-    return { user: claims, status: 200 };
-  } catch (_e) {
-    await logAccess({
-      user_id: null,
-      route: new URL(req.url).pathname,
-      action: 'access',
-      result: 'denied',
-      user_agent: req.headers.get('user-agent') || '',
-    });
+
+    return { user, status: 200 };
+  } catch (error) {
+    await logUnauthorizedAccess(req, 'auth error');
     return { user: null, status: 401 };
+  }
+}
+
+export async function logUnauthorizedAccess(req: Request, reason: string) {
+  const ip = req.headers.get('x-forwarded-for') || 'unknown';
+  const userAgent = req.headers.get('user-agent') || 'unknown';
+  const timestamp = new Date().toISOString();
+  
+  console.warn(`[SECURITY] Accès non autorisé: ${reason}`, {
+    ip,
+    userAgent,
+    timestamp,
+    url: req.url
+  });
+
+  // Log to database if needed
+  try {
+    await supabase
+      .from('access_logs')
+      .insert({
+        ip_address: ip,
+        user_agent: userAgent,
+        route: new URL(req.url).pathname,
+        action: 'unauthorized_access',
+        reason: reason,
+        timestamp: timestamp
+      });
+  } catch (dbError) {
+    console.error('Failed to log unauthorized access:', dbError);
   }
 }
