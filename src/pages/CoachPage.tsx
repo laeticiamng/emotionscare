@@ -1,90 +1,123 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, Bot } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft, Bot } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CoachPage: React.FC = () => {
-  const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([
+  const navigate = useNavigate();
+  const [message, setMessage] = React.useState('');
+  const [messages, setMessages] = React.useState([
     {
       type: 'bot',
-      message: 'Bonjour ! Je suis votre coach virtuel. Comment puis-je vous aider aujourd\'hui ?',
-      time: '10:30'
+      content: 'Bonjour ! Je suis votre coach virtuel. Comment puis-je vous aider aujourd\'hui ?'
     }
   ]);
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    
-    setChatHistory(prev => [...prev, {
-      type: 'user',
-      message: message,
-      time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    }]);
-    
-    setTimeout(() => {
-      setChatHistory(prev => [...prev, {
-        type: 'bot',
-        message: 'Je comprends votre situation. Voici quelques conseils personnalisés...',
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-      }]);
-    }, 1000);
-    
-    setMessage('');
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      setMessages(prev => [...prev, 
+        { type: 'user', content: message },
+        { type: 'bot', content: 'Merci pour votre message. Je comprends vos préoccupations et je suis là pour vous accompagner.' }
+      ]);
+      setMessage('');
+    }
   };
 
+  const quickQuestions = [
+    "Comment gérer le stress ?",
+    "Techniques de respiration",
+    "Améliorer mon sommeil",
+    "Gérer mes émotions"
+  ];
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="container mx-auto max-w-4xl">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <MessageCircle className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Coach Virtuel</h1>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            onClick={() => navigate('/b2c/dashboard')}
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <MessageCircle className="h-8 w-8 text-blue-500" />
+              Coach Virtuel
+            </h1>
+            <p className="text-gray-600 mt-2">Assistance personnalisée disponible 24h/24</p>
           </div>
-          <p className="text-muted-foreground">
-            Votre accompagnateur personnel pour le bien-être émotionnel
-          </p>
         </div>
 
-        <Card className="h-[600px] flex flex-col">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
-              Conversation avec votre coach
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col">
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-              {chatHistory.map((chat, index) => (
-                <div key={index} className={`flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-lg p-3 ${
-                    chat.type === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted'
-                  }`}>
-                    <p>{chat.message}</p>
-                    <p className="text-xs opacity-70 mt-1">{chat.time}</p>
+        <div className="grid gap-6">
+          <Card className="h-96">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                Conversation
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col h-full">
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        msg.type === 'user'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-200 text-gray-800'
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="flex gap-2">
-              <Input
-                placeholder="Tapez votre message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                className="flex-1"
-              />
-              <Button onClick={sendMessage}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Tapez votre message..."
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+                <Button onClick={handleSendMessage}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Questions Rapides</CardTitle>
+              <CardDescription>
+                Cliquez sur une question pour commencer la conversation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {quickQuestions.map((question) => (
+                  <Button
+                    key={question}
+                    variant="outline"
+                    onClick={() => setMessage(question)}
+                    className="text-left justify-start"
+                  >
+                    {question}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

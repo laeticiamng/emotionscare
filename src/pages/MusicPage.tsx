@@ -1,53 +1,64 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Play, Pause, SkipForward, SkipBack } from 'lucide-react';
+import { Music, Play, Pause, ArrowLeft, Volume2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MusicPage: React.FC = () => {
-  const musicRecommendations = [
-    { title: "Calm Meditation", genre: "Ambient", duration: "10:30" },
-    { title: "Focus Flow", genre: "Lo-fi", duration: "8:45" },
-    { title: "Energy Boost", genre: "Upbeat", duration: "6:20" }
+  const navigate = useNavigate();
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  const playlists = [
+    { name: 'Détente', description: 'Musiques apaisantes pour la relaxation', mood: 'calm' },
+    { name: 'Motivation', description: 'Énergisez votre journée', mood: 'energetic' },
+    { name: 'Focus', description: 'Musiques pour la concentration', mood: 'focused' },
+    { name: 'Sommeil', description: 'Sons doux pour s\'endormir', mood: 'sleepy' }
   ];
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="container mx-auto max-w-4xl">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Music className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Musique Thérapeutique</h1>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            onClick={() => navigate('/b2c/dashboard')}
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Music className="h-8 w-8 text-purple-500" />
+              Musicothérapie
+            </h1>
+            <p className="text-gray-600 mt-2">Musique adaptée à votre humeur du moment</p>
           </div>
-          <p className="text-muted-foreground">
-            Musiques personnalisées selon votre état émotionnel
-          </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Lecteur Audio</CardTitle>
+              <CardTitle>Lecteur Musical</CardTitle>
+              <CardDescription>
+                Contrôles de lecture pour votre musique thérapeutique
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center space-y-4">
-                <div className="w-48 h-48 mx-auto bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
-                  <Music className="h-24 w-24 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold">Musique Relaxante</h3>
-                  <p className="text-muted-foreground">Séance de méditation - 12:30</p>
-                </div>
-                <div className="flex items-center justify-center gap-4">
-                  <Button variant="outline" size="icon">
-                    <SkipBack className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" className="h-12 w-12">
-                    <Play className="h-6 w-6" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <SkipForward className="h-4 w-4" />
-                  </Button>
+              <div className="flex items-center justify-center gap-4 p-8">
+                <Button
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  size="lg"
+                  className="rounded-full h-16 w-16"
+                >
+                  {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Volume2 className="h-5 w-5" />
+                  <div className="w-24 h-2 bg-gray-200 rounded-full">
+                    <div className="w-1/2 h-full bg-purple-500 rounded-full"></div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -55,23 +66,26 @@ const MusicPage: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recommandations</CardTitle>
+              <CardTitle>Playlists Recommandées</CardTitle>
+              <CardDescription>
+                Sélections musicales basées sur votre profil émotionnel
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {musicRecommendations.map((track, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <Button variant="ghost" size="icon">
-                        <Play className="h-4 w-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {playlists.map((playlist) => (
+                  <Card key={playlist.name} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">{playlist.name}</CardTitle>
+                      <CardDescription>{playlist.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button variant="outline" size="sm" className="w-full">
+                        <Play className="h-4 w-4 mr-2" />
+                        Écouter
                       </Button>
-                      <div>
-                        <p className="font-medium">{track.title}</p>
-                        <p className="text-sm text-muted-foreground">{track.genre}</p>
-                      </div>
-                    </div>
-                    <span className="text-sm text-muted-foreground">{track.duration}</span>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             </CardContent>

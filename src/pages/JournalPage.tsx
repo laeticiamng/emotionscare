@@ -1,71 +1,108 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Calendar, BookOpen } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { BookOpen, Plus, ArrowLeft, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const JournalPage: React.FC = () => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [entry, setEntry] = React.useState('');
+  const [entries, setEntries] = React.useState([
+    {
+      id: 1,
+      date: '2024-12-25',
+      content: 'Première entrée dans mon journal émotionnel...',
+      mood: '😊'
+    }
+  ]);
+
+  const handleSaveEntry = () => {
+    if (entry.trim()) {
+      const newEntry = {
+        id: entries.length + 1,
+        date: new Date().toISOString().split('T')[0],
+        content: entry,
+        mood: '😊'
+      };
+      setEntries(prev => [newEntry, ...prev]);
+      setEntry('');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="container mx-auto max-w-6xl">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Journal Personnel</h1>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            onClick={() => navigate('/b2c/dashboard')}
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <BookOpen className="h-8 w-8 text-green-500" />
+              Journal Émotionnel
+            </h1>
+            <p className="text-gray-600 mt-2">Suivez votre évolution quotidienne</p>
           </div>
-          <p className="text-muted-foreground">
-            Exprimez vos pensées et suivez votre évolution émotionnelle
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Nouvelle entrée
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Créer
-                </Button>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Nouvelle Entrée
               </CardTitle>
+              <CardDescription>
+                Exprimez vos pensées et émotions du jour
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Comment vous sentez-vous aujourd'hui ?
-                </label>
-                <Textarea 
-                  placeholder="Décrivez votre journée, vos émotions, vos pensées..."
-                  rows={6}
-                  className="w-full"
+            <CardContent>
+              <div className="space-y-4">
+                <Textarea
+                  value={entry}
+                  onChange={(e) => setEntry(e.target.value)}
+                  placeholder="Comment vous sentez-vous aujourd'hui ? Que s'est-il passé dans votre journée ?"
+                  className="min-h-32"
                 />
+                <Button onClick={handleSaveEntry} className="w-full">
+                  Sauvegarder l'entrée
+                </Button>
               </div>
-              <Button className="w-full">Sauvegarder l'entrée</Button>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Entrées récentes</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Entrées Précédentes
+              </CardTitle>
+              <CardDescription>
+                Relisez vos réflexions passées
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">Excellente journée</h3>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Aujourd'hui
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    Journée très productive au travail, je me sens satisfait...
-                  </p>
-                </div>
+                {entries.map((journalEntry) => (
+                  <Card key={journalEntry.id} className="border-l-4 border-l-green-400">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">{journalEntry.date}</span>
+                        <span className="text-lg">{journalEntry.mood}</span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700">{journalEntry.content}</p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </CardContent>
           </Card>

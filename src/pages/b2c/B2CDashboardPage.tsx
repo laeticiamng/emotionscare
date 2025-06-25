@@ -1,117 +1,136 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Music, Brain, Calendar, Settings, LogOut } from 'lucide-react';
+import { Heart, Music, MessageCircle, BookOpen, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const B2CDashboardPage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Déconnexion réussie');
+    navigate('/');
+  };
+
+  const modules = [
+    {
+      id: 'scan',
+      title: 'Scan Émotionnel',
+      description: 'Analysez votre état émotionnel',
+      icon: Heart,
+      buttonText: 'Démarrer',
+      buttonColor: 'bg-pink-500 hover:bg-pink-600',
+      path: '/emotions',
+      action: () => navigate('/emotions')
+    },
+    {
+      id: 'music',
+      title: 'Musicothérapie',
+      description: 'Musique adaptée à votre humeur',
+      icon: Music,
+      buttonText: 'Écouter',
+      buttonColor: 'bg-purple-500 hover:bg-purple-600',
+      path: '/music',
+      action: () => navigate('/music')
+    },
+    {
+      id: 'coach',
+      title: 'Coach Virtuel',
+      description: 'Assistance personnalisée 24h/24',
+      icon: MessageCircle,
+      buttonText: 'Discuter',
+      buttonColor: 'bg-blue-500 hover:bg-blue-600',
+      path: '/coach',
+      action: () => navigate('/coach')
+    },
+    {
+      id: 'journal',
+      title: 'Journal Émotionnel',
+      description: 'Suivez votre évolution quotidienne',
+      icon: BookOpen,
+      buttonText: 'Ouvrir',
+      buttonColor: 'bg-green-500 hover:bg-green-600',
+      path: '/journal',
+      action: () => navigate('/journal')
+    },
+    {
+      id: 'preferences',
+      title: 'Préférences',
+      description: 'Personnalisez votre expérience',
+      icon: Settings,
+      buttonText: 'Configurer',
+      buttonColor: 'bg-gray-500 hover:bg-gray-600',
+      path: '/settings',
+      action: () => navigate('/settings')
+    }
+  ];
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Tableau de Bord Particulier
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Bienvenue {user?.email}
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord Particulier</h1>
+            <p className="text-gray-600 mt-2">Bienvenue</p>
           </div>
-          <Button variant="outline" onClick={logout}>
-            <LogOut className="h-4 w-4 mr-2" />
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
             Déconnexion
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-pink-500" />
-                Scan Émotionnel
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Analysez votre état émotionnel
-              </p>
-              <Button className="w-full bg-pink-500 hover:bg-pink-600">
-                Démarrer
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Music className="h-5 w-5 text-purple-500" />
-                Musicothérapie
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Musique adaptée à votre humeur
-              </p>
-              <Button className="w-full bg-purple-500 hover:bg-purple-600">
-                Écouter
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-blue-500" />
-                Coach Virtuel
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Assistance personnalisée 24h/24
-              </p>
-              <Button className="w-full bg-blue-500 hover:bg-blue-600">
-                Discuter
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-green-500" />
-                Journal Émotionnel
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Suivez votre évolution quotidienne
-              </p>
-              <Button className="w-full bg-green-500 hover:bg-green-600">
-                Ouvrir
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-gray-500" />
-                Préférences
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Personnalisez votre expérience
-              </p>
-              <Button className="w-full" variant="outline">
-                Configurer
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Modules Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {modules.map((module) => (
+            <Card key={module.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader className="text-center pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 rounded-full bg-gray-100">
+                    <module.icon className="h-8 w-8 text-gray-700" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl">{module.title}</CardTitle>
+                <CardDescription className="text-gray-600">
+                  {module.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <Button
+                  onClick={module.action}
+                  className={`w-full text-white ${module.buttonColor}`}
+                >
+                  {module.buttonText}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+
+        {/* Quick Stats or Welcome Message */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Bienvenue sur EmotionsCare</CardTitle>
+            <CardDescription>
+              Votre plateforme de bien-être émotionnel personnalisée
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              Explorez nos différents modules pour améliorer votre bien-être quotidien.
+              Chaque outil est conçu pour vous accompagner dans votre parcours de développement personnel.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

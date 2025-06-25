@@ -15,6 +15,7 @@ import { emotionRoutes } from './routes/emotionRoutes';
 import { journalRoutes } from './routes/journalRoutes';
 import { rhRoutes } from './routes/rhRoutes';
 import { optimizedRoutes } from './routes/lazyRoutes';
+import { featureRoutes } from './routes/featureRoutes';
 
 export const ROUTES_MANIFEST = {
   home: '/',
@@ -48,6 +49,8 @@ export const ROUTES_MANIFEST = {
   settings: '/settings',
   wellness: '/wellness',
   emotions: '/emotions',
+  music: '/music',
+  coach: '/coach',
   journal: '/journal',
 } as const;
 
@@ -68,6 +71,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...journalRoutes,
     ...rhRoutes,
     ...optimizedRoutes,
+    ...featureRoutes,
   ];
 }
 
