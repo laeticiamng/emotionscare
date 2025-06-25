@@ -2,17 +2,17 @@ import React from 'react';
 import UnifiedShell from '@/components/unified/UnifiedShell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
-const OnboardingFlowPage: React.FC = () => {
+const InstantGlowWidgetPage: React.FC = () => {
   return (
     <div data-testid="page-root" className="min-h-screen bg-background">
       <UnifiedShell>
         <div className="container mx-auto px-4 py-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Parcours d'intégration EmotionsCare</h1>
-              <p className="text-muted-foreground">Découvrez votre espace personnalisé étape par étape</p>
+              <h1 className="text-3xl font-bold tracking-tight">Instant Glow Widget</h1>
+              <p className="text-muted-foreground">Feedback instantané de votre état émotionnel</p>
             </div>
             <Badge variant="secondary">En développement</Badge>
           </div>
@@ -20,26 +20,26 @@ const OnboardingFlowPage: React.FC = () => {
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <UserPlus className="h-5 w-5" /> Parcours d'intégration
+                <Sparkles className="h-5 w-5" /> Instant Glow Widget
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
                 Cette page est en cours de développement. 
-                Suivez les étapes pour configurer votre compte.
+                Obtenez un retour d'humeur en temps réel.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-2">Configuration du profil</h3>
+                  <h3 className="font-medium mb-2">Indicateur d'humeur temps réel</h3>
                   <p className="text-sm text-muted-foreground">À implémenter</p>
                 </div>
                 <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-2">Préférences émotionnelles</h3>
+                  <h3 className="font-medium mb-2">Widget personnalisable</h3>
                   <p className="text-sm text-muted-foreground">À implémenter</p>
                 </div>
                 <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-2">Première évaluation</h3>
+                  <h3 className="font-medium mb-2">Alertes de bien-être</h3>
                   <p className="text-sm text-muted-foreground">À implémenter</p>
                 </div>
               </div>
@@ -51,4 +51,4 @@ const OnboardingFlowPage: React.FC = () => {
   );
 };
 
-export default OnboardingFlowPage;
+export default InstantGlowWidgetPage;
