@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { authorizeRole } from '../_shared/auth.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,31 +13,23 @@ serve(async (req) => {
   }
 
   try {
-    const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
     const { userId, emotionResult } = await req.json();
 
     if (!userId || !emotionResult) {
-      return new Response(
-        JSON.stringify({ error: 'UserId and emotionResult are required' }),
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      throw new Error('UserId and emotionResult are required');
     }
 
-    // Calculate points based on emotion intensity and confidence
+    // Calculer les points basés sur l'intensité et la confiance émotionnelle
     const basePoints = Math.round(emotionResult.intensity * 10);
     const confidenceBonus = Math.round(emotionResult.confidence * 5);
     const totalPoints = basePoints + confidenceBonus;
 
-    // Simulate gamification processing
+    // Simuler le processus de gamification
     const gamificationUpdate = {
       userId,
       pointsEarned: totalPoints,
@@ -50,7 +41,7 @@ serve(async (req) => {
       badges: []
     };
 
-    // Check for streak milestones and badge achievements
+    // Vérifier les jalons de streak et les réalisations de badge
     if (totalPoints >= 50) {
       gamificationUpdate.badges.push('High Intensity Scan');
     }
@@ -59,11 +50,25 @@ serve(async (req) => {
       gamificationUpdate.badges.push('Confident Analysis');
     }
 
-    // Simulate positive emotion bonus
+    // Bonus pour les émotions positives
     const positiveEmotions = ['joy', 'happiness', 'contentment', 'excitement', 'gratitude'];
     if (positiveEmotions.includes(emotionResult.emotion.toLowerCase())) {
       gamificationUpdate.pointsEarned += 5;
       gamificationUpdate.badges.push('Positive Vibes');
+    }
+
+    // Enregistrer les badges dans Supabase si applicable
+    if (gamificationUpdate.badges.length > 0) {
+      for (const badgeName of gamificationUpdate.badges) {
+        await supabase
+          .from('badges')
+          .insert({
+            user_id: userId,
+            name: badgeName,
+            description: `Obtenu pour: ${emotionResult.emotion}`,
+            image_url: `/badges/${badgeName.toLowerCase().replace(/\s+/g, '-')}.png`
+          });
+      }
     }
 
     return new Response(

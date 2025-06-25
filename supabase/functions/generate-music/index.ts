@@ -14,8 +14,27 @@ serve(async (req) => {
   try {
     const { prompt, emotion, duration = 60 } = await req.json();
 
-    // Simulation de la génération de musique
-    // En production, vous intégreriez une vraie API de génération musicale
+    const musicApiKey = Deno.env.get('MUSIC_API_KEY');
+    if (!musicApiKey) {
+      // Simulation si pas de clé API
+      const mockResponse = {
+        title: `Musique ${emotion || 'personnalisée'} - ${prompt.slice(0, 30)}...`,
+        audioUrl: `/audio/generated-${Date.now()}.mp3`,
+        duration: duration,
+        emotion: emotion,
+        description: prompt,
+        generated_at: new Date().toISOString()
+      };
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      return new Response(
+        JSON.stringify(mockResponse),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Ici, vous intégrez votre vraie API de génération musicale
     const musicResponse = {
       title: `Musique ${emotion || 'personnalisée'} - ${prompt.slice(0, 30)}...`,
       audioUrl: `/audio/generated-${Date.now()}.mp3`,
@@ -24,9 +43,6 @@ serve(async (req) => {
       description: prompt,
       generated_at: new Date().toISOString()
     };
-
-    // Simuler un délai de génération
-    await new Promise(resolve => setTimeout(resolve, 2000));
 
     return new Response(
       JSON.stringify(musicResponse),
