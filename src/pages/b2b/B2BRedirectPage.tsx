@@ -1,24 +1,32 @@
 
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { useAuth } from '@/contexts/AuthContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
-/**
- * Page de redirection automatique pour /b2b vers /b2b/selection
- * Corrige l'erreur 404 sur la route /b2b
- */
 const B2BRedirectPage: React.FC = () => {
-  useEffect(() => {
-    console.log('🔄 Redirection automatique /b2b → /b2b/selection');
-  }, []);
+  const { isAuthenticated, isLoading } = useAuth();
 
-  return (
-    <div data-testid="page-root">
-      <LoadingAnimation text="Redirection vers l'espace entreprise..." />
-      <Navigate to={UNIFIED_ROUTES.B2B_SELECTION} replace />
-    </div>
-  );
+  useEffect(() => {
+    console.log('B2BRedirectPage mounted:', { isAuthenticated, isLoading });
+  }, [isAuthenticated, isLoading]);
+
+  // Afficher un loader pendant la vérification de l'authentification
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <LoadingAnimation text="Redirection en cours..." />
+      </div>
+    );
+  }
+
+  // Si l'utilisateur est déjà authentifié, le rediriger vers son dashboard approprié
+  if (isAuthenticated) {
+    return <Navigate to="/b2b/user/dashboard" replace />;
+  }
+
+  // Sinon, rediriger vers la page de sélection B2B
+  return <Navigate to="/b2b/selection" replace />;
 };
 
 export default B2BRedirectPage;
