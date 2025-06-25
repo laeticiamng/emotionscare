@@ -2,7 +2,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface BreadcrumbItem {
   label: string;
@@ -10,7 +9,11 @@ interface BreadcrumbItem {
   current?: boolean;
 }
 
-const BreadcrumbNav: React.FC<{ className?: string }> = ({ className }) => {
+interface BreadcrumbNavProps {
+  className?: string;
+}
+
+const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ className = '' }) => {
   const location = useLocation();
   
   const getBreadcrumbs = (): BreadcrumbItem[] => {
@@ -65,8 +68,11 @@ const BreadcrumbNav: React.FC<{ className?: string }> = ({ className }) => {
   
   if (breadcrumbs.length <= 1) return null;
   
+  const baseClasses = 'flex items-center space-x-2 text-sm text-muted-foreground mb-6';
+  const combinedClasses = className ? `${baseClasses} ${className}` : baseClasses;
+  
   return (
-    <nav className={cn('flex items-center space-x-2 text-sm text-muted-foreground mb-6', className)}>
+    <nav className={combinedClasses}>
       <div className="flex items-center space-x-2">
         {breadcrumbs.map((breadcrumb, index) => (
           <React.Fragment key={breadcrumb.path}>

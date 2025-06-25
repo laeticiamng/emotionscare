@@ -1,75 +1,60 @@
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React from 'react';
 
-interface PerformanceMetrics {
-  loadTime: number;
-  renderTime: number;
-  memoryUsage: number;
-  fps: number;
-}
+const PerformanceMonitor: React.FC = () => {
+  const [metrics, setMetrics] = React.useState({
+    renderTime: 0,
+    memoryUsage: 0,
+    loadTime: 0
+  });
 
-const PerformanceMonitor: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
-  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
-
-  useEffect(() => {
-    if (!enabled || process.env.NODE_ENV !== 'development') return;
-
-    const measurePerformance = () => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      const memory = (performance as any).memory;
-
-      setMetrics({
-        loadTime: navigation.loadEventEnd - navigation.loadEventStart,
-        renderTime: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
-        memoryUsage: memory ? Math.round(memory.usedJSHeapSize / 1024 / 1024) : 0,
-        fps: 60 // Simplified - would need more complex measurement for real FPS
+  React.useEffect(() => {
+    // Surveillance des performances
+    const observer = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      entries.forEach((entry) => {
+        if (entry.entryType === 'navigation') {
+          setMetrics(prev => ({
+            ...prev,
+            loadTime: Math.round(entry.duration)
+          }));
+        }
       });
+    });
+
+    try {
+      observer.observe({ entryTypes: ['navigation', 'measure'] });
+    } catch (error) {
+      console.log('Performance Observer not supported:', error);
+    }
+
+    // Mesure de la mémoire si disponible
+    if ('memory' in performance) {
+      const memory = (performance as any).memory;
+      setMetrics(prev => ({
+        ...prev,
+        memoryUsage: Math.round(memory.usedJSHeapSize / 1024 / 1024)
+      }));
+    }
+
+    return () => {
+      try {
+        observer.disconnect();
+      } catch (error) {
+        console.log('Observer disconnect failed:', error);
+      }
     };
+  }, []);
 
-    measurePerformance();
-    const interval = setInterval(measurePerformance, 5000);
-
-    return () => clearInterval(interval);
-  }, [enabled]);
-
-  if (!enabled || !metrics || process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'development') {
     return null;
   }
 
-  const getPerformanceStatus = (value: number, thresholds: [number, number]) => {
-    if (value < thresholds[0]) return 'good';
-    if (value < thresholds[1]) return 'warning';
-    return 'poor';
-  };
-
   return (
-    <Card className="fixed bottom-4 right-4 w-64 z-50 bg-background/95 backdrop-blur">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Performance Monitor</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-xs">Load Time:</span>
-          <Badge variant={getPerformanceStatus(metrics.loadTime, [1000, 3000]) === 'good' ? 'default' : 'destructive'}>
-            {metrics.loadTime.toFixed(0)}ms
-          </Badge>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs">Render Time:</span>
-          <Badge variant={getPerformanceStatus(metrics.renderTime, [500, 1500]) === 'good' ? 'default' : 'destructive'}>
-            {metrics.renderTime.toFixed(0)}ms
-          </Badge>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs">Memory:</span>
-          <Badge variant={getPerformanceStatus(metrics.memoryUsage, [50, 100]) === 'good' ? 'default' : 'destructive'}>
-            {metrics.memoryUsage}MB
-          </Badge>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-50">
+      <div>Load: {metrics.loadTime}ms</div>
+      <div>Memory: {metrics.memoryUsage}MB</div>
+    </div>
   );
 };
 

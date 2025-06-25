@@ -3,18 +3,23 @@ import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import BreadcrumbNav from './BreadcrumbNav';
-import PerformanceMonitor from '@/components/monitoring/PerformanceMonitor';
 import { preloadCriticalResources } from '@/utils/performanceOptimizer';
 
 const OptimizedLayout: React.FC = () => {
   React.useEffect(() => {
     // Préchargement des ressources critiques
-    preloadCriticalResources();
+    try {
+      preloadCriticalResources();
+    } catch (error) {
+      console.log('Preload resources failed:', error);
+    }
     
     // Optimisation des polices
     if ('fonts' in document) {
       document.fonts.ready.then(() => {
         console.log('✅ Fonts loaded');
+      }).catch(() => {
+        console.log('Fonts loading failed');
       });
     }
   }, []);
@@ -28,7 +33,6 @@ const OptimizedLayout: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        {/* Améliorations d'espacement mobile */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           <BreadcrumbNav />
           
@@ -40,8 +44,6 @@ const OptimizedLayout: React.FC = () => {
             <Outlet />
           </Suspense>
         </div>
-        
-        {process.env.NODE_ENV === 'development' && <PerformanceMonitor />}
       </div>
     </>
   );

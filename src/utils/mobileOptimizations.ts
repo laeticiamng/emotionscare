@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 // Optimisations spécifiques pour mobile
 export const mobileBreakpoints = {
   sm: '640px',
@@ -48,6 +50,8 @@ export const useScreenSize = () => {
 
 // Optimisation des images pour mobile
 export const getOptimizedImageSrc = (src: string, screenSize: 'mobile' | 'tablet' | 'desktop') => {
+  if (!src) return '';
+  
   const sizeMap = {
     mobile: 'w-400',
     tablet: 'w-800', 
