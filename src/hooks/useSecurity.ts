@@ -1,7 +1,6 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLocation } from 'react-router-dom';
 
 interface SecurityMetrics {
   securityScore: number;
@@ -10,7 +9,7 @@ interface SecurityMetrics {
   complianceLevel: 'high' | 'medium' | 'low';
 }
 
-interface AccessEvent {
+interface AccessRecord {
   page: string;
   timestamp: string;
   success: boolean;
@@ -19,98 +18,76 @@ interface AccessEvent {
 }
 
 export const useSecurity = () => {
-  const { user, isAuthenticated } = useAuth();
-  const location = useLocation();
-  const [accessHistory, setAccessHistory] = useState<AccessEvent[]>([]);
+  const { user } = useAuth();
   const [metrics, setMetrics] = useState<SecurityMetrics>({
     securityScore: 85,
     lastLogin: new Date().toISOString(),
     eventsCount: 0,
     complianceLevel: 'high'
   });
+  const [accessHistory, setAccessHistory] = useState<AccessRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const logAccess = useCallback((page: string, success: boolean, reason?: string) => {
-    const event: AccessEvent = {
+  const logAccess = (page: string, success: boolean, reason?: string) => {
+    const record: AccessRecord = {
       page,
       timestamp: new Date().toISOString(),
       success,
-      userRole: user?.role || user?.user_metadata?.role || 'anonymous',
+      userRole: user?.role || 'unknown',
       reason
     };
-
-    setAccessHistory(prev => [event, ...prev.slice(0, 49)]); // Garder 50 derniers événements
+    
+    setAccessHistory(prev => [record, ...prev.slice(0, 99)]);
     setMetrics(prev => ({
       ...prev,
       eventsCount: prev.eventsCount + 1
     }));
+  };
 
-    // Log pour développement
-    if (import.meta.env.DEV) {
-      console.log(`[SECURITY] ${success ? 'Access granted' : 'Access denied'} for ${page}`, event);
-    }
-  }, [user]);
-
-  const exportSecurityData = useCallback(async () => {
+  const exportSecurityData = async () => {
     setLoading(true);
     try {
       const data = {
-        user: user?.id || 'anonymous',
-        accessHistory,
         metrics,
+        accessHistory,
         exportDate: new Date().toISOString()
       };
-
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json'
+      });
+      
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `security-data-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Erreur lors de l\'export des données de sécurité:', error);
     } finally {
       setLoading(false);
     }
-  }, [user, accessHistory, metrics]);
+  };
 
-  const requestDataDeletion = useCallback(async () => {
+  const requestDataDeletion = async () => {
     setLoading(true);
     try {
-      // Simuler une requête de suppression
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulation de suppression
       setAccessHistory([]);
       setMetrics(prev => ({ ...prev, eventsCount: 0 }));
-      console.log('Données de sécurité supprimées');
-    } catch (error) {
-      console.error('Erreur lors de la suppression des données:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const updateSecurityPreferences = useCallback(async (preferences: Record<string, boolean>) => {
+  const updateSecurityPreferences = async (preferences: Record<string, boolean>) => {
     setLoading(true);
     try {
-      // Simuler une mise à jour des préférences
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log('Préférences de sécurité mises à jour:', preferences);
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des préférences:', error);
+      // Simulation de mise à jour
+      console.log('Security preferences updated:', preferences);
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  // Enregistrer automatiquement les accès aux pages
-  useEffect(() => {
-    if (isAuthenticated) {
-      logAccess(location.pathname, true);
-    }
-  }, [location.pathname, isAuthenticated, logAccess]);
+  };
 
   return {
     logAccess,

@@ -1,11 +1,20 @@
 
-import { trackEvent } from './analyticsUtils';
+interface TrackEventOptions {
+  properties?: Record<string, any>;
+  anonymous?: boolean;
+}
 
-/**
- * Wrapper legacy pour la compatibilité
- */
-export const postAnalyticsEvent = async (eventData: any): Promise<void> => {
-  return trackEvent(eventData.event, eventData.data);
+export const trackEvent = (eventName: string, options: TrackEventOptions = {}) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('📊 Analytics Event:', eventName, options);
+  }
+  
+  // En production, intégrer avec votre service d'analytics
+  // Par exemple: analytics.track(eventName, options.properties);
 };
 
-export { trackEvent };
+export const trackPageView = (page: string) => {
+  trackEvent('page_view', {
+    properties: { page }
+  });
+};

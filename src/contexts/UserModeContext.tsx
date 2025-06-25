@@ -1,7 +1,7 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type UserMode = 'b2c' | 'b2b-user' | 'b2b-admin' | 'guest';
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
 
 interface UserModeContextType {
   userMode: UserMode;
@@ -11,31 +11,43 @@ interface UserModeContextType {
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-interface UserModeProviderProps {
-  children: ReactNode;
-}
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserMode>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>('guest');
-  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    // Récupérer le mode utilisateur depuis le localStorage
+    const savedMode = localStorage.getItem('userMode') as UserMode;
+    if (savedMode) {
+      setUserMode(savedMode);
+    }
+    setIsLoading(false);
+  }, []);
 
-  const value: UserModeContextType = {
-    userMode,
-    setUserMode,
-    isLoading,
+  const handleSetUserMode = (mode: UserMode) => {
+    setUserMode(mode);
+    if (mode) {
+      localStorage.setItem('userMode', mode);
+    } else {
+      localStorage.removeItem('userMode');
+    }
   };
 
   return (
-    <UserModeContext.Provider value={value}>
+    <UserModeContext.Provider value={{
+      userMode,
+      setUserMode: handleSetUserMode,
+      isLoading
+    }}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = (): UserModeContextType => {
+export const useUserMode = () => {
   const context = useContext(UserModeContext);
   if (!context) {
-    throw new Error('useUserMode must be used within a UserModeProvider');
+    throw new Error('useUserMode must be used within UserModeProvider');
   }
   return context;
 };

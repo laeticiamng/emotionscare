@@ -68,11 +68,12 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ className = '' }) => {
   
   if (breadcrumbs.length <= 1) return null;
   
-  const baseClasses = 'flex items-center space-x-2 text-sm text-muted-foreground mb-6';
-  const combinedClasses = className ? `${baseClasses} ${className}` : baseClasses;
+  const combineClasses = (base: string, additional: string) => {
+    return additional ? `${base} ${additional}` : base;
+  };
   
   return (
-    <nav className={combinedClasses}>
+    <nav className={combineClasses('flex items-center space-x-2 text-sm text-muted-foreground mb-6', className)}>
       <div className="flex items-center space-x-2">
         {breadcrumbs.map((breadcrumb, index) => (
           <React.Fragment key={breadcrumb.path}>

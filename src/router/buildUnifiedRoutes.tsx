@@ -4,6 +4,7 @@ import { RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import OptimizedLayout from '@/components/layout/OptimizedLayout';
 import ProtectedLayout from '@/components/ProtectedLayout';
+import AuthGuard from '@/components/auth/AuthGuard';
 
 // Pages principales
 import HomePage from '@/pages/HomePage';
@@ -62,7 +63,11 @@ export function buildUnifiedRoutes(): RouteObject[] {
   return [
     {
       path: '/',
-      element: <OptimizedLayout />,
+      element: (
+        <AuthGuard>
+          <OptimizedLayout />
+        </AuthGuard>
+      ),
       children: [
         {
           index: true,
