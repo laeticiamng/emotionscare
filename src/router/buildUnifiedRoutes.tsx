@@ -1,3 +1,4 @@
+
 import { RouteObject } from 'react-router-dom';
 import { b2bRoutes } from './routes/b2bRoutes';
 import { b2cRoutes } from './routes/b2cRoutes';
@@ -62,7 +63,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...emotionRoutes,
     ...journalRoutes,
     ...rhRoutes,
-    ...debugRoutes, // Add debug routes only in development
+    ...debugRoutes,
   ];
 }
 
