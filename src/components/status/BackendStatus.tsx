@@ -3,7 +3,30 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { useBackendStatus } from '@/hooks/useBackendStatus';
+
+// Hook simplifié pour éviter les erreurs d'import
+const useBackendStatus = () => {
+  const [isConnected, setIsConnected] = React.useState<boolean | null>(null);
+  const [lastCheck, setLastCheck] = React.useState<Date | null>(null);
+
+  const refetch = React.useCallback(async () => {
+    try {
+      // Test de connexion simple
+      const response = await fetch('/api/health', { method: 'HEAD' });
+      setIsConnected(response.ok);
+      setLastCheck(new Date());
+    } catch (error) {
+      setIsConnected(false);
+      setLastCheck(new Date());
+    }
+  }, []);
+
+  React.useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  return { isConnected, lastCheck, refetch };
+};
 
 const BackendStatus: React.FC = () => {
   const { isConnected, lastCheck, refetch } = useBackendStatus();

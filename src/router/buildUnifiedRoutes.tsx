@@ -2,7 +2,6 @@
 import { RouteObject } from 'react-router-dom';
 import { b2bRoutes } from './routes/b2bRoutes';
 import { b2cRoutes } from './routes/b2cRoutes';
-import { adminRoutes } from './routes/adminRoutes';
 import { authRoutes } from './routes/authRoutes';
 import { coachRoutes } from './routes/coachRoutes';
 import { notificationRoutes } from './routes/notificationRoutes';
@@ -31,29 +30,19 @@ export const ROUTES_MANIFEST = {
   onboarding: '/onboarding',
   b2cDashboard: '/b2c/dashboard',
   b2bDashboard: '/b2b/dashboard',
-  adminDashboard: '/admin/dashboard',
   coachDashboard: '/coach/dashboard',
   notifications: '/notifications',
   settings: '/settings',
   wellness: '/wellness',
   emotions: '/emotions',
   journal: '/journal',
-  debug: '/debug',
 } as const;
-
-const debugRoutes: RouteObject[] = import.meta.env.MODE === 'development' ? [
-  {
-    path: ROUTES_MANIFEST.debug,
-    lazy: () => import('@/pages/DebugPage').then(module => ({ Component: module.default })),
-  }
-] : [];
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
     ...authRoutes,
     ...b2cRoutes,
     ...b2bRoutes,
-    ...adminRoutes,
     ...coachRoutes,
     ...notificationRoutes,
     ...onboardingRoutes,
@@ -63,7 +52,6 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...emotionRoutes,
     ...journalRoutes,
     ...rhRoutes,
-    ...debugRoutes,
   ];
 }
 
