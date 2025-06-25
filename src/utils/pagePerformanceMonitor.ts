@@ -1,3 +1,4 @@
+
 interface PerformanceMetrics {
   route: string;
   loadTime: number;
@@ -13,7 +14,10 @@ class PagePerformanceMonitor {
     '/b2b', '/vr-galactique', '/mood-mixer', '/help-center', '/audit',
     // Phase 3
     '/boss-level-grit', '/bounce-back-battle', '/story-synth-lab', 
-    '/screen-silk-break', '/flash-glow'
+    '/screen-silk-break', '/flash-glow',
+    // Phase 4
+    '/ambition-arcade', '/ar-filters', '/bubble-beat', '/instant-glow',
+    '/weekly-bars', '/heatmap-vibes', '/privacy-toggles', '/export-csv'
   ];
 
   recordPageLoad(route: string, loadTime: number) {
@@ -71,7 +75,7 @@ class PagePerformanceMonitor {
 
     let report = '📊 RAPPORT PERFORMANCE PAGES ENRICHIES\n';
     report += '=====================================\n';
-    report += `📈 Pages enrichies surveillées: ${totalPages}/15\n`;
+    report += `📈 Pages enrichies surveillées: ${totalPages}/23\n`;
     report += `⚡ Temps de chargement moyen: ${avgLoadTime.toFixed(0)}ms\n`;
     report += `🚀 Pages rapides (<2s): ${fastPages}/${totalPages} (${Math.round(fastPages/totalPages*100)}%)\n\n`;
 
@@ -79,7 +83,8 @@ class PagePerformanceMonitor {
     const phases = {
       'Phase 1': this.enrichedPages.slice(0, 5),
       'Phase 2': this.enrichedPages.slice(5, 10), 
-      'Phase 3': this.enrichedPages.slice(10, 15)
+      'Phase 3': this.enrichedPages.slice(10, 15),
+      'Phase 4': this.enrichedPages.slice(15, 23)
     };
 
     Object.entries(phases).forEach(([phase, pages]) => {
