@@ -3,178 +3,132 @@ interface CacheItem<T> {
   data: T;
   timestamp: number;
   ttl: number;
-  accessCount: number;
-  lastAccess: number;
 }
 
-class LRUCache<T> {
-  private cache = new Map<string, CacheItem<T>>();
-  private maxSize: number;
-  private defaultTTL: number;
+class CacheManager {
+  private cache = new Map<string, CacheItem<any>>();
+  private maxSize = 100;
 
-  constructor(maxSize = 100, defaultTTL = 5 * 60 * 1000) { // 5 minutes par défaut
-    this.maxSize = maxSize;
-    this.defaultTTL = defaultTTL;
-  }
-
-  set(key: string, data: T, ttl = this.defaultTTL): void {
-    // Supprimer l'ancienne entrée si elle existe
-    if (this.cache.has(key)) {
-      this.cache.delete(key);
-    }
-
-    // Si le cache est plein, supprimer l'élément le moins récemment utilisé
+  // Ajouter un élément au cache
+  set<T>(key: string, data: T, ttlMinutes: number = 5): void {
+    // Nettoyer le cache si trop volumineux
     if (this.cache.size >= this.maxSize) {
-      const lruKey = this.findLRU();
-      if (lruKey) {
-        this.cache.delete(lruKey);
-      }
+      this.cleanup();
     }
 
-    const now = Date.now();
     this.cache.set(key, {
       data,
-      timestamp: now,
-      ttl,
-      accessCount: 1,
-      lastAccess: now
+      timestamp: Date.now(),
+      ttl: ttlMinutes * 60 * 1000, // Convertir en millisecondes
     });
   }
 
-  get(key: string): T | null {
+  // Récupérer un élément du cache
+  get<T>(key: string): T | null {
     const item = this.cache.get(key);
-    if (!item) return null;
-
-    const now = Date.now();
     
+    if (!item) {
+      return null;
+    }
+
     // Vérifier si l'élément a expiré
-    if (now - item.timestamp > item.ttl) {
+    if (Date.now() - item.timestamp > item.ttl) {
       this.cache.delete(key);
       return null;
     }
 
-    // Mettre à jour les statistiques d'accès
-    item.accessCount++;
-    item.lastAccess = now;
-
-    return item.data;
+    return item.data as T;
   }
 
-  has(key: string): boolean {
-    return this.get(key) !== null;
-  }
-
+  // Supprimer un élément du cache
   delete(key: string): boolean {
     return this.cache.delete(key);
   }
 
+  // Nettoyer les éléments expirés
+  cleanup(): void {
+    const now = Date.now();
+    const keysToDelete: string[] = [];
+
+    this.cache.forEach((item, key) => {
+      if (now - item.timestamp > item.ttl) {
+        keysToDelete.push(key);
+      }
+    });
+
+    keysToDelete.forEach(key => this.cache.delete(key));
+  }
+
+  // Vider complètement le cache
   clear(): void {
     this.cache.clear();
   }
 
-  size(): number {
-    return this.cache.size;
-  }
-
-  private findLRU(): string | null {
-    let lruKey: string | null = null;
-    let oldestTime = Date.now();
-
-    for (const [key, item] of this.cache.entries()) {
-      if (item.lastAccess < oldestTime) {
-        oldestTime = item.lastAccess;
-        lruKey = key;
-      }
-    }
-
-    return lruKey;
-  }
-
+  // Obtenir les statistiques du cache
   getStats() {
-    const items = Array.from(this.cache.values());
     return {
       size: this.cache.size,
       maxSize: this.maxSize,
-      hitRate: items.reduce((sum, item) => sum + item.accessCount, 0),
-      averageAge: items.length > 0 
-        ? items.reduce((sum, item) => sum + (Date.now() - item.timestamp), 0) / items.length 
-        : 0
-    };
-  }
-}
-
-// Cache Manager avec différents types de cache
-class CacheManager {
-  private apiCache = new LRUCache<any>(50, 2 * 60 * 1000); // 2 minutes pour l'API
-  private imageCache = new LRUCache<string>(200, 30 * 60 * 1000); // 30 minutes pour les images
-  private userCache = new LRUCache<any>(20, 15 * 60 * 1000); // 15 minutes pour les données utilisateur
-  private staticCache = new LRUCache<any>(100, 60 * 60 * 1000); // 1 heure pour le contenu statique
-
-  // API Cache
-  setApiData(key: string, data: any, ttl?: number): void {
-    this.apiCache.set(key, data, ttl);
-  }
-
-  getApiData(key: string): any | null {
-    return this.apiCache.get(key);
-  }
-
-  // Image Cache
-  setImage(url: string, data: string): void {
-    this.imageCache.set(url, data);
-  }
-
-  getImage(url: string): string | null {
-    return this.imageCache.get(url);
-  }
-
-  // User Data Cache
-  setUserData(userId: string, data: any): void {
-    this.userCache.set(userId, data);
-  }
-
-  getUserData(userId: string): any | null {
-    return this.userCache.get(userId);
-  }
-
-  // Static Content Cache
-  setStaticContent(key: string, data: any): void {
-    this.staticCache.set(key, data);
-  }
-
-  getStaticContent(key: string): any | null {
-    return this.staticCache.get(key);
-  }
-
-  // Méthodes utilitaires
-  clearAll(): void {
-    this.apiCache.clear();
-    this.imageCache.clear();
-    this.userCache.clear();
-    this.staticCache.clear();
-  }
-
-  getGlobalStats() {
-    return {
-      api: this.apiCache.getStats(),
-      images: this.imageCache.getStats(),
-      user: this.userCache.getStats(),
-      static: this.staticCache.getStats()
+      keys: Array.from(this.cache.keys()),
     };
   }
 
-  // Préchargement intelligent basé sur les patterns d'utilisation
-  preloadCriticalData(keys: string[]): Promise<void[]> {
-    const promises = keys.map(async (key) => {
-      if (!this.apiCache.has(key)) {
-        // Simuler le chargement de données critiques
-        await new Promise(resolve => setTimeout(resolve, 10));
-      }
-    });
-
-    return Promise.all(promises);
+  // Précharger des données critiques
+  async preload(key: string, dataLoader: () => Promise<any>, ttlMinutes: number = 10) {
+    try {
+      const data = await dataLoader();
+      this.set(key, data, ttlMinutes);
+      console.log(`✅ Preloaded cache for: ${key}`);
+    } catch (error) {
+      console.error(`❌ Failed to preload cache for: ${key}`, error);
+    }
   }
 }
 
+// Instance globale du cache
 export const cacheManager = new CacheManager();
-export { LRUCache };
+
+// Hook React pour utiliser le cache
+export const useCache = <T>(key: string, dataLoader: () => Promise<T>, ttlMinutes: number = 5) => {
+  const [data, setData] = React.useState<T | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<Error | null>(null);
+
+  React.useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Vérifier le cache d'abord
+        const cachedData = cacheManager.get<T>(key);
+        if (cachedData) {
+          setData(cachedData);
+          setLoading(false);
+          return;
+        }
+
+        // Charger les données si pas en cache
+        const freshData = await dataLoader();
+        cacheManager.set(key, freshData, ttlMinutes);
+        setData(freshData);
+      } catch (err) {
+        setError(err as Error);
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [key, ttlMinutes]);
+
+  const refetch = React.useCallback(async () => {
+    cacheManager.delete(key);
+    const freshData = await dataLoader();
+    cacheManager.set(key, freshData, ttlMinutes);
+    setData(freshData);
+  }, [key, dataLoader, ttlMinutes]);
+
+  return { data, loading, error, refetch };
+};

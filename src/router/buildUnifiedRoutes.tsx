@@ -12,6 +12,7 @@ import { wellnessRoutes } from './routes/wellnessRoutes';
 import { emotionRoutes } from './routes/emotionRoutes';
 import { journalRoutes } from './routes/journalRoutes';
 import { rhRoutes } from './routes/rhRoutes';
+import { optimizedRoutes } from './routes/lazyRoutes';
 
 export const ROUTES_MANIFEST = {
   home: '/',
@@ -52,6 +53,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...emotionRoutes,
     ...journalRoutes,
     ...rhRoutes,
+    ...optimizedRoutes, // Routes optimisées avec lazy loading
   ];
 }
 
