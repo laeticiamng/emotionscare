@@ -2,72 +2,102 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Users, Building2, ArrowLeft } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Building2, Users, ArrowLeft } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background" data-testid="page-root">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-12">
-        <div className="mb-6">
-          <Link to="/">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Retour à l'accueil
-            </Button>
-          </Link>
-        </div>
-
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Choisissez votre profil</h1>
-          <p className="text-lg text-muted-foreground">
-            Sélectionnez le type d'accès qui vous correspond
+        {/* Header */}
+        <div className="mb-8">
+          <Button asChild variant="ghost" className="mb-4">
+            <Link to="/">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Link>
+          </Button>
+          <h1 className="text-3xl font-bold text-center mb-4">
+            Choisissez votre mode d'accès
+          </h1>
+          <p className="text-center text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            EmotionsCare propose deux parcours adaptés à vos besoins
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="text-center">
-              <Heart className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <CardTitle>Particulier (B2C)</CardTitle>
+        {/* Mode Selection */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* B2C Card */}
+          <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-6">
+              <Heart className="h-16 w-16 text-blue-600 mx-auto mb-4" />
+              <CardTitle className="text-2xl">Particulier (B2C)</CardTitle>
+              <CardDescription className="text-lg">
+                Parcours personnel de bien-être émotionnel
+              </CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground mb-6">
-                Accès complet à la plateforme de bien-être émotionnel
-              </p>
-              <Link to="/b2c/login" className="block">
-                <Button className="w-full">Continuer</Button>
-              </Link>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold">Fonctionnalités incluses :</h4>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li>• Scan émotionnel personnel</li>
+                  <li>• Journal de bord interactif</li>
+                  <li>• Coach IA personnalisé</li>
+                  <li>• Musique thérapeutique</li>
+                  <li>• Exercices de relaxation VR</li>
+                </ul>
+              </div>
+              <Button asChild className="w-full" size="lg">
+                <Link to="/b2c/login">
+                  Accéder à l'espace particulier
+                </Link>
+              </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="text-center">
-              <Users className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <CardTitle>Collaborateur</CardTitle>
+          {/* B2B Card */}
+          <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-6">
+              <Building2 className="h-16 w-16 text-green-600 mx-auto mb-4" />
+              <CardTitle className="text-2xl">Entreprise (B2B)</CardTitle>
+              <CardDescription className="text-lg">
+                Solutions pour équipes et organisations
+              </CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground mb-6">
-                Employé d'une entreprise partenaire
-              </p>
-              <Link to="/b2b/user/login" className="block">
-                <Button variant="outline" className="w-full">Continuer</Button>
-              </Link>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold">Fonctionnalités incluses :</h4>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li>• Tableau de bord RH</li>
+                  <li>• Analytics d'équipe</li>
+                  <li>• Gestion multi-utilisateurs</li>
+                  <li>• Rapports personnalisés</li>
+                  <li>• Support dédié</li>
+                </ul>
+              </div>
+              <Button asChild className="w-full" size="lg">
+                <Link to="/b2b/selection">
+                  Accéder à l'espace entreprise
+                </Link>
+              </Button>
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="text-center">
-              <Building2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <CardTitle>Administrateur RH</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground mb-6">
-                Gestion et suivi des équipes
+        {/* Info Section */}
+        <div className="text-center mt-12">
+          <Card className="max-w-xl mx-auto">
+            <CardContent className="p-6">
+              <Users className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Besoin d'aide ?</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Notre équipe est là pour vous accompagner dans le choix de la solution la plus adaptée.
               </p>
-              <Link to="/b2b/admin/login" className="block">
-                <Button variant="secondary" className="w-full">Continuer</Button>
-              </Link>
+              <Button asChild variant="outline">
+                <Link to="/contact">
+                  Nous contacter
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

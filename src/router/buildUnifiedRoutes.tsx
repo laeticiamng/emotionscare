@@ -1,5 +1,6 @@
 
 import { RouteObject } from 'react-router-dom';
+import { homeRoutes } from './routes/homeRoutes'; // Nouvelle importation
 import { b2bRedirectRoutes } from './routes/b2bRedirectRoutes';
 import { b2bRoutes } from './routes/b2bRoutes';
 import { b2cRoutes } from './routes/b2cRoutes';
@@ -17,6 +18,8 @@ import { optimizedRoutes } from './routes/lazyRoutes';
 
 export const ROUTES_MANIFEST = {
   home: '/',
+  chooseMode: '/choose-mode',
+  auth: '/auth',
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
@@ -45,9 +48,10 @@ export const ROUTES_MANIFEST = {
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
+    ...homeRoutes, // Ajout des routes d'accueil en premier
     ...authRoutes,
     ...b2cRoutes,
-    ...b2bRedirectRoutes, // Ajout des routes de redirection B2B
+    ...b2bRedirectRoutes,
     ...b2bRoutes,
     ...coachRoutes,
     ...notificationRoutes,
