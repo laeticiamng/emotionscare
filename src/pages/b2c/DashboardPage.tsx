@@ -1,91 +1,90 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { 
   Heart, 
+  Brain, 
   Music, 
-  Scan, 
+  Camera, 
   MessageCircle, 
   Gamepad2, 
-  VrHeadset,
+  Headphones,
   BookOpen,
   Settings 
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
-const B2CDashboardPage: React.FC = () => {
-  const modules = [
-    { name: 'Journal', icon: BookOpen, path: '/journal', color: 'text-blue-500' },
-    { name: 'Scan émotionnel', icon: Scan, path: '/scan', color: 'text-green-500' },
-    { name: 'Thérapie musicale', icon: Music, path: '/music', color: 'text-purple-500' },
-    { name: 'Coach IA', icon: MessageCircle, path: '/coach', color: 'text-orange-500' },
-    { name: 'Expérience VR', icon: VrHeadset, path: '/vr', color: 'text-cyan-500' },
-    { name: 'Gamification', icon: Gamepad2, path: '/gamification', color: 'text-red-500' },
-  ];
-
+const DashboardPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background" data-testid="page-root">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Tableau de bord personnel</h1>
-          <p className="text-muted-foreground">Bienvenue dans votre espace bien-être EmotionsCare</p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6" data-testid="page-root">
+      
+      
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Votre espace bien-être personnalisé
+          </h1>
+          <p className="text-xl text-gray-600">
+            Découvrez des outils innovants pour améliorer votre santé mentale
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {modules.map((module) => (
-            <Link key={module.name} to={module.path}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                <CardHeader className="text-center">
-                  <module.icon className={`h-12 w-12 mx-auto mb-4 ${module.color}`} />
-                  <CardTitle>{module.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <Button variant="outline" className="w-full">
-                    Accéder
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <Heart className="w-12 h-12 text-pink-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Scanner d'émotions</h3>
+            <p className="text-gray-600 mb-4">Analysez votre humeur en temps réel</p>
+            <button className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors">
+              Commencer
+            </button>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-6 w-6 text-red-500" />
-              Résumé de votre bien-être
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-500">85%</div>
-                <div className="text-sm text-muted-foreground">Score de bien-être</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-500">12</div>
-                <div className="text-sm text-muted-foreground">Entrées journal</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-500">7</div>
-                <div className="text-sm text-muted-foreground">Jours consécutifs</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <Music className="w-12 h-12 text-blue-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Musicothérapie</h3>
+            <p className="text-gray-600 mb-4">Musique adaptée à votre état d'esprit</p>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+              Écouter
+            </button>
+          </div>
 
-        <div className="mt-8 text-center">
-          <Link to="/settings">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Paramètres
-            </Button>
-          </Link>
+          <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <Brain className="w-12 h-12 text-purple-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Coach IA</h3>
+            <p className="text-gray-600 mb-4">Accompagnement personnalisé</p>
+            <button className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
+              Discuter
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <Headphones className="w-12 h-12 text-green-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">VR Thérapie</h3>
+            <p className="text-gray-600 mb-4">Expériences immersives apaisantes</p>
+            <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+              Explorer
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <Gamepad2 className="w-12 h-12 text-orange-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Jeux thérapeutiques</h3>
+            <p className="text-gray-600 mb-4">Mini-jeux pour le bien-être</p>
+            <button className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors">
+              Jouer
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <BookOpen className="w-12 h-12 text-indigo-500 mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Journal numérique</h3>
+            <p className="text-gray-600 mb-4">Exprimez vos pensées</p>
+            <button className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors">
+              Écrire
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default B2CDashboardPage;
+export default DashboardPage;
