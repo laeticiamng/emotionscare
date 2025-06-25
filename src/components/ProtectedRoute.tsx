@@ -7,11 +7,13 @@ import { Loader2 } from 'lucide-react';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
+  allowedRoles?: string[];
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
-  requiredRole 
+  requiredRole,
+  allowedRoles = []
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
@@ -26,13 +28,24 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    // Redirection vers la page d'authentification
-    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+    // Sauvegarder la route demandée pour redirection après connexion
+    const redirectPath = location.pathname + location.search;
+    return <Navigate to="/choose-mode" state={{ from: redirectPath }} replace />;
   }
 
-  // Si un rôle spécifique est requis, vérifier si l'utilisateur l'a
-  if (requiredRole && user && user.role !== requiredRole) {
-    return <Navigate to="/unauthorized" replace />;
+  // Vérification des rôles si spécifiés
+  const rolesToCheck = requiredRole ? [requiredRole] : allowedRoles;
+  if (rolesToCheck.length > 0 && user) {
+    const userRole = user.role || user.user_metadata?.role;
+    if (!rolesToCheck.includes(userRole)) {
+      // Rediriger vers le dashboard approprié selon le rôle
+      const dashboardMap: Record<string, string> = {
+        'b2c': '/b2c/dashboard',
+        'b2b_user': '/b2b/user/dashboard', 
+        'b2b_admin': '/b2b/admin/dashboard'
+      };
+      return <Navigate to={dashboardMap[userRole] || '/choose-mode'} replace />;
+    }
   }
 
   return <>{children}</>;
