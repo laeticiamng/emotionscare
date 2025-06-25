@@ -5,65 +5,65 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Heart, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
-const B2CRegisterPage: React.FC = () => {
+const B2CRegisterPage = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    firstName: '',
+    lastName: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
-    }
-
     if (formData.password !== formData.confirmPassword) {
       toast.error('Les mots de passe ne correspondent pas');
       return;
     }
 
     setIsLoading(true);
+    
     try {
       // Simuler l'inscription
       await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Inscription réussie !');
-      navigate('/b2c/login');
+      
+      toast.success('Inscription réussie ! Redirection vers la connexion...');
+      
+      setTimeout(() => {
+        navigate('/b2c/login');
+      }, 1500);
     } catch (error) {
-      toast.error('Erreur lors de l'inscription');
+      toast.error('Erreur lors de l\'inscription');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4" data-testid="page-root">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Heart className="h-12 w-12 text-pink-500" />
-          </div>
-          <CardTitle className="text-2xl">Inscription Particulier</CardTitle>
-          <p className="text-gray-600 dark:text-gray-300">
-            Créez votre compte gratuit
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            Inscription Particulier
+          </CardTitle>
+          <p className="text-gray-600 mt-2">
+            Créez votre compte pour accéder à votre espace personnel
           </p>
         </CardHeader>
+        
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -72,9 +72,10 @@ const B2CRegisterPage: React.FC = () => {
                 <Input
                   id="firstName"
                   name="firstName"
+                  type="text"
                   value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="Jean"
+                  onChange={handleInputChange}
+                  placeholder="Votre prénom"
                   required
                 />
               </div>
@@ -83,13 +84,15 @@ const B2CRegisterPage: React.FC = () => {
                 <Input
                   id="lastName"
                   name="lastName"
+                  type="text"
                   value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Dupont"
+                  onChange={handleInputChange}
+                  placeholder="Votre nom"
                   required
                 />
               </div>
             </div>
+
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -97,11 +100,12 @@ const B2CRegisterPage: React.FC = () => {
                 name="email"
                 type="email"
                 value={formData.email}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 placeholder="votre@email.com"
                 required
               />
             </div>
+
             <div>
               <Label htmlFor="password">Mot de passe</Label>
               <Input
@@ -109,11 +113,13 @@ const B2CRegisterPage: React.FC = () => {
                 name="password"
                 type="password"
                 value={formData.password}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 placeholder="••••••••"
                 required
+                minLength={6}
               />
             </div>
+
             <div>
               <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
               <Input
@@ -121,40 +127,36 @@ const B2CRegisterPage: React.FC = () => {
                 name="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 placeholder="••••••••"
                 required
+                minLength={6}
               />
             </div>
+
             <Button 
               type="submit" 
-              className="w-full bg-pink-500 hover:bg-pink-600"
+              className="w-full" 
               disabled={isLoading}
             >
-              {isLoading ? 'Inscription...' : 'S\'inscrire'}
+              {isLoading ? 'Inscription en cours...' : 'S\'inscrire'}
             </Button>
           </form>
-          
-          <div className="mt-6 text-center space-y-2">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/b2c/login')}
-              className="text-pink-600 hover:text-pink-700"
-            >
-              Déjà un compte ? Se connecter
-            </Button>
-            <br />
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Retour à l'accueil
-            </Button>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Déjà un compte ?{' '}
+              <Button
+                variant="link"
+                onClick={() => navigate('/b2c/login')}
+                className="p-0 text-blue-600 hover:text-blue-500"
+              >
+                Se connecter
+              </Button>
+            </p>
           </div>
         </CardContent>
-      </CardContent>
+      </Card>
     </div>
   );
 };
