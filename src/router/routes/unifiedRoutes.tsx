@@ -1,349 +1,339 @@
-
-import { lazy } from 'react';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { RouteObject } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import HomePage from '@/pages/HomePage';
+import B2BAdminDashboardPage from '@/pages/b2b/admin/dashboard/B2BAdminDashboardPage';
+import B2BAdminLoginPage from '@/pages/b2b/admin/login/B2BAdminLoginPage';
+import B2BPage from '@/pages/b2b/B2BPage';
+import B2BSelectionPage from '@/pages/b2b/B2BSelectionPage';
+import B2BUserDashboardPage from '@/pages/b2b/user/dashboard/B2BUserDashboardPage';
+import B2BUserLoginPage from '@/pages/b2b/user/login/B2BUserLoginPage';
+import B2CRegisterPage from '@/pages/b2c/register/B2CRegisterPage';
+import B2CLoginPage from '@/pages/b2c/login/B2CLoginPage';
+import B2CDashboardPage from '@/pages/b2c/dashboard/B2CDashboardPage';
 import ChooseModePage from '@/pages/ChooseModePage';
-
-// Lazy loading pour les pages existantes
-const B2CLoginPage = lazy(() => import('@/pages/b2c/LoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/b2c/RegisterPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/b2c/DashboardPage'));
-
-const B2BSelectionPage = lazy(() => import('@/pages/b2b/B2BSelectionPage'));
-const B2BUserLoginPage = lazy(() => import('@/pages/b2b/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/B2BUserRegisterPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/B2BUserDashboard'));
-const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/B2BAdminLoginPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/B2BAdminDashboard'));
-
-const ScanPage = lazy(() => import('@/pages/ScanPage'));
-const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
-const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
-const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
-const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
-const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
-
-const VRPage = lazy(() => import('@/pages/VRPage'));
-const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
-const TeamsPage = lazy(() => import('@/pages/TeamsPage'));
-const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
-const EventsPage = lazy(() => import('@/pages/EventsPage'));
-const OptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
-const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
-
-// Stub components pour les pages manquantes
-const StubPage = ({ title }: { title: string }) => (
-  <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-6">
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">{title}</h1>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
-          Page en cours de développement - {title}
-        </p>
-      </div>
-    </div>
-  </div>
-);
+import HomePage from '@/pages/HomePage';
+import ScanPage from '@/pages/ScanPage';
+import MusicTherapyPage from '@/pages/MusicTherapyPage';
+import FlashGlowPage from '@/pages/FlashGlowPage';
+import BossLevelGritPage from '@/pages/BossLevelGritPage';
+import MoodMixerPage from '@/pages/MoodMixerPage';
+import BounceBackBattlePage from '@/pages/BounceBackBattlePage';
+import BreathworkPage from '@/pages/BreathworkPage';
+import InstantGlowPage from '@/pages/InstantGlowPage';
+import VRSessionViewPage from '@/pages/VRSessionViewPage';
+import VRGalactiquePage from '@/pages/VRGalactiquePage';
+import ScreenSilkBreakPage from '@/pages/ScreenSilkBreakPage';
+import StorySynthLabPage from '@/pages/StorySynthLabPage';
+import ARFiltersPage from '@/pages/ARFiltersPage';
+import BubbleBeatPage from '@/pages/BubbleBeatPage';
+import AmbitionArcadePage from '@/pages/AmbitionArcadePage';
+import GamificationPage from '@/pages/GamificationPage';
+import WeeklyBarsPage from '@/pages/WeeklyBarsPage';
+import HeatmapVibesPage from '@/pages/HeatmapVibesPage';
+import OnboardingPage from '@/pages/OnboardingPage';
+import PreferencesPage from '@/pages/PreferencesPage';
+import SocialCoconPage from '@/pages/SocialCoconPage';
+import ProfileSettingsPage from '@/pages/ProfileSettingsPage';
+import ActivityHistoryPage from '@/pages/ActivityHistoryPage';
+import NotificationsPage from '@/pages/NotificationsPage';
+import FeedbackPage from '@/pages/FeedbackPage';
+import AccountDeletePage from '@/pages/AccountDeletePage';
+import ExportCsvPage from '@/pages/ExportCsvPage';
+import PrivacyTogglesPage from '@/pages/PrivacyTogglesPage';
+import HealthCheckBadgePage from '@/pages/HealthCheckBadgePage';
+import TeamsPage from '@/pages/TeamsPage';
+import ReportsPage from '@/pages/ReportsPage';
+import EventsPage from '@/pages/EventsPage';
+import OptimisationPage from '@/pages/OptimisationPage';
+import SettingsPage from '@/pages/SettingsPage';
+import SecurityPage from '@/pages/SecurityPage';
+import AuditPage from '@/pages/AuditPage';
+import AccessibilityPage from '@/pages/AccessibilityPage';
+import InnovationPage from '@/pages/InnovationPage';
+import HelpCenterPage from '@/pages/HelpCenterPage';
+import B2BUserRegisterPage from '@/pages/b2b/user/register/B2BUserRegisterPage';
+import B2BAdminRegisterPage from '@/pages/b2b/admin/register/B2BAdminRegisterPage';
+import JournalPage from '@/pages/JournalPage';
+import CoachChatPage from '@/pages/CoachChatPage';
+import AuditTicketP0Page from '@/pages/AuditTicketP0Page';
 
 export const unifiedRoutes: RouteObject[] = [
-  // Routes principales
   {
     path: '/',
     element: <HomePage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/choose-mode',
     element: <ChooseModePage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes B2C
+  {
+    path: '/b2c',
+    element: <B2CLoginPage />,
+    errorElement: <ErrorBoundary />,
+  },
   {
     path: '/b2c/login',
     element: <B2CLoginPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2c/register',
     element: <B2CRegisterPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2c/dashboard',
-    element: (
-      <ProtectedRoute requiredRole="b2c">
-        <B2CDashboardPage />
-      </ProtectedRoute>
-    ),
+    element: <B2CDashboardPage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes B2B
   {
     path: '/b2b',
-    element: <StubPage title="B2B Landing" />,
+    element: <B2BPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2b/selection',
     element: <B2BSelectionPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2b/user/login',
     element: <B2BUserLoginPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2b/user/register',
     element: <B2BUserRegisterPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2b/user/dashboard',
-    element: (
-      <ProtectedRoute requiredRole="b2b_user">
-        <B2BUserDashboardPage />
-      </ProtectedRoute>
-    ),
+    element: <B2BUserDashboardPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2b/admin/login',
     element: <B2BAdminLoginPage />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: '/b2b/admin/register',
+    element: <B2BAdminRegisterPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/b2b/admin/dashboard',
-    element: (
-      <ProtectedRoute requiredRole="b2b_admin">
-        <B2BAdminDashboardPage />
-      </ProtectedRoute>
-    ),
+    element: <B2BAdminDashboardPage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes mesure & adaptation
   {
     path: '/scan',
-    element: (
-      <ProtectedRoute>
-        <ScanPage />
-      </ProtectedRoute>
-    ),
+    element: <ScanPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/music',
-    element: (
-      <ProtectedRoute>
-        <MusicPage />
-      </ProtectedRoute>
-    ),
+    element: <MusicTherapyPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/flash-glow',
-    element: (
-      <ProtectedRoute>
-        <FlashGlowPage />
-      </ProtectedRoute>
-    ),
+    element: <FlashGlowPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/boss-level-grit',
-    element: (
-      <ProtectedRoute>
-        <BossLevelGritPage />
-      </ProtectedRoute>
-    ),
+    element: <BossLevelGritPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/mood-mixer',
-    element: (
-      <ProtectedRoute>
-        <MoodMixerPage />
-      </ProtectedRoute>
-    ),
+    element: <MoodMixerPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/bounce-back-battle',
-    element: (
-      <ProtectedRoute>
-        <BounceBackBattlePage />
-      </ProtectedRoute>
-    ),
+    element: <BounceBackBattlePage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/breathwork',
-    element: (
-      <ProtectedRoute>
-        <BreathworkPage />
-      </ProtectedRoute>
-    ),
+    element: <BreathworkPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/instant-glow',
-    element: (
-      <ProtectedRoute>
-        <InstantGlowPage />
-      </ProtectedRoute>
-    ),
+    element: <InstantGlowPage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes immersives
   {
     path: '/vr',
-    element: (
-      <ProtectedRoute>
-        <VRPage />
-      </ProtectedRoute>
-    ),
+    element: <VRSessionViewPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/vr-galactique',
-    element: <StubPage title="VR Galactique" />,
+    element: <VRGalactiquePage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/screen-silk-break',
-    element: <StubPage title="Screen Silk Break" />,
+    element: <ScreenSilkBreakPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/story-synth-lab',
-    element: <StubPage title="Story Synth Lab" />,
+    element: <StorySynthLabPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/ar-filters',
-    element: <StubPage title="AR Filters" />,
+    element: <ARFiltersPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/bubble-beat',
-    element: <StubPage title="Bubble Beat" />,
+    element: <BubbleBeatPage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes ambition & progression
   {
     path: '/ambition-arcade',
-    element: <StubPage title="Ambition Arcade" />,
+    element: <AmbitionArcadePage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/gamification',
-    element: <StubPage title="Gamification" />,
+    element: <GamificationPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/weekly-bars',
-    element: <StubPage title="Weekly Bars" />,
+    element: <WeeklyBarsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/heatmap-vibes',
-    element: <StubPage title="Heatmap Vibes" />,
+    element: <HeatmapVibesPage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes espaces utilisateur
   {
     path: '/onboarding',
-    element: <StubPage title="Onboarding" />,
+    element: <OnboardingPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/preferences',
-    element: (
-      <ProtectedRoute>
-        <PreferencesPage />
-      </ProtectedRoute>
-    ),
+    element: <PreferencesPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/social-cocon',
-    element: <StubPage title="Social Cocon" />,
+    element: <SocialCoconPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/profile-settings',
-    element: <StubPage title="Profile Settings" />,
+    element: <ProfileSettingsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/activity-history',
-    element: <StubPage title="Activity History" />,
+    element: <ActivityHistoryPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/notifications',
-    element: <StubPage title="Notifications" />,
+    element: <NotificationsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/feedback',
-    element: <StubPage title="Feedback" />,
+    element: <FeedbackPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
-    path: '/account/delete',
-    element: <StubPage title="Account Delete" />,
+    path: '/account-delete',
+    element: <AccountDeletePage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/export-csv',
-    element: <StubPage title="Export CSV" />,
+    element: <ExportCsvPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/privacy-toggles',
-    element: <StubPage title="Privacy Toggles" />,
+    element: <PrivacyTogglesPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/health-check-badge',
-    element: <StubPage title="Health Check Badge" />,
+    element: <HealthCheckBadgePage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Routes B2B espaces
   {
     path: '/teams',
-    element: (
-      <ProtectedRoute allowedRoles={['b2b_user', 'b2b_admin']}>
-        <TeamsPage />
-      </ProtectedRoute>
-    ),
+    element: <TeamsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/reports',
-    element: (
-      <ProtectedRoute allowedRoles={['b2b_admin']}>
-        <ReportsPage />
-      </ProtectedRoute>
-    ),
+    element: <ReportsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/events',
-    element: (
-      <ProtectedRoute allowedRoles={['b2b_user', 'b2b_admin']}>
-        <EventsPage />
-      </ProtectedRoute>
-    ),
+    element: <EventsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/optimisation',
-    element: (
-      <ProtectedRoute allowedRoles={['b2b_admin']}>
-        <OptimisationPage />
-      </ProtectedRoute>
-    ),
+    element: <OptimisationPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/settings',
-    element: (
-      <ProtectedRoute>
-        <SettingsPage />
-      </ProtectedRoute>
-    ),
+    element: <SettingsPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/security',
-    element: <StubPage title="Security" />,
+    element: <SecurityPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/audit',
-    element: <StubPage title="Audit" />,
+    element: <AuditPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/accessibility',
-    element: <StubPage title="Accessibility" />,
+    element: <AccessibilityPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/innovation',
-    element: <StubPage title="Innovation" />,
+    element: <InnovationPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: '/help-center',
-    element: <StubPage title="Help Center" />,
+    element: <HelpCenterPage />,
+    errorElement: <ErrorBoundary />,
   },
-
-  // Route de fallback pour 404
   {
-    path: '*',
-    element: <StubPage title="Page non trouvée" />,
+    path: '/journal',
+    element: <JournalPage />,
+    errorElement: <ErrorBoundary />,
   },
+  {
+    path: '/coach',
+    element: <CoachChatPage />,
+    errorElement: <ErrorBoundary />,
+  },
+    {
+      path: '/audit-ticket-p0',
+      element: <AuditTicketP0Page />
+    },
 ];
