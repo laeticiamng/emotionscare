@@ -1,7 +1,7 @@
 
 import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import SecureRouteGuard from '@/components/security/SecureRouteGuard';
 
 const TeamsPage = lazy(() => import('@/pages/TeamsPage'));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
@@ -12,33 +12,33 @@ export const adminRoutes: RouteObject[] = [
   {
     path: '/teams',
     element: (
-      <ProtectedRoute requiredRole="b2b_admin">
+      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
         <TeamsPage />
-      </ProtectedRoute>
+      </SecureRouteGuard>
     ),
   },
   {
     path: '/reports',
     element: (
-      <ProtectedRoute requiredRole="b2b_admin">
+      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
         <ReportsPage />
-      </ProtectedRoute>
+      </SecureRouteGuard>
     ),
   },
   {
     path: '/events',
     element: (
-      <ProtectedRoute requiredRole="b2b_admin">
+      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
         <EventsPage />
-      </ProtectedRoute>
+      </SecureRouteGuard>
     ),
   },
   {
     path: '/optimisation',
     element: (
-      <ProtectedRoute requiredRole="b2b_admin">
+      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
         <OptimisationPage />
-      </ProtectedRoute>
+      </SecureRouteGuard>
     ),
   },
 ];

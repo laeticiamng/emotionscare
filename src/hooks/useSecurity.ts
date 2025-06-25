@@ -1,6 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 interface SecurityMetrics {
   securityScore: number;
@@ -9,7 +10,7 @@ interface SecurityMetrics {
   complianceLevel: 'high' | 'medium' | 'low';
 }
 
-interface AccessAttempt {
+interface AccessEvent {
   page: string;
   timestamp: string;
   success: boolean;
@@ -18,47 +19,49 @@ interface AccessAttempt {
 }
 
 export const useSecurity = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
+  const [accessHistory, setAccessHistory] = useState<AccessEvent[]>([]);
   const [metrics, setMetrics] = useState<SecurityMetrics>({
-    securityScore: 95,
+    securityScore: 85,
     lastLogin: new Date().toISOString(),
-    eventsCount: 12,
+    eventsCount: 0,
     complianceLevel: 'high'
   });
-  const [accessHistory, setAccessHistory] = useState<AccessAttempt[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const logAccess = (page: string, success: boolean, reason?: string) => {
-    if (!user) return;
-
-    const attempt: AccessAttempt = {
+  const logAccess = useCallback((page: string, success: boolean, reason?: string) => {
+    const event: AccessEvent = {
       page,
       timestamp: new Date().toISOString(),
       success,
-      userRole: user.role,
+      userRole: user?.role || user?.user_metadata?.role || 'anonymous',
       reason
     };
 
-    setAccessHistory(prev => [attempt, ...prev.slice(0, 49)]); // Garder les 50 derniers
-    
-    // Simuler l'envoi au backend
-    console.log('Access logged:', attempt);
-  };
+    setAccessHistory(prev => [event, ...prev.slice(0, 49)]); // Garder 50 derniers événements
+    setMetrics(prev => ({
+      ...prev,
+      eventsCount: prev.eventsCount + 1
+    }));
 
-  const exportSecurityData = async () => {
+    // Log pour développement
+    if (import.meta.env.DEV) {
+      console.log(`[SECURITY] ${success ? 'Access granted' : 'Access denied'} for ${page}`, event);
+    }
+  }, [user]);
+
+  const exportSecurityData = useCallback(async () => {
     setLoading(true);
     try {
-      // Simuler l'export des données de sécurité
       const data = {
-        user: user?.id,
+        user: user?.id || 'anonymous',
         accessHistory,
         metrics,
         exportDate: new Date().toISOString()
       };
 
-      const blob = new Blob([JSON.stringify(data, null, 2)], { 
-        type: 'application/json' 
-      });
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -67,51 +70,55 @@ export const useSecurity = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      console.log('Security data exported');
     } catch (error) {
-      console.error('Error exporting security data:', error);
+      console.error('Erreur lors de l\'export des données de sécurité:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, accessHistory, metrics]);
 
-  const requestDataDeletion = async () => {
+  const requestDataDeletion = useCallback(async () => {
     setLoading(true);
     try {
-      // Simuler la demande de suppression
-      console.log('Data deletion requested for user:', user?.id);
-      // Ici on ferait un appel API réel
+      // Simuler une requête de suppression
       await new Promise(resolve => setTimeout(resolve, 1000));
+      setAccessHistory([]);
+      setMetrics(prev => ({ ...prev, eventsCount: 0 }));
+      console.log('Données de sécurité supprimées');
     } catch (error) {
-      console.error('Error requesting data deletion:', error);
+      console.error('Erreur lors de la suppression des données:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateSecurityPreferences = async (preferences: Record<string, boolean>) => {
+  const updateSecurityPreferences = useCallback(async (preferences: Record<string, boolean>) => {
     setLoading(true);
     try {
-      // Simuler la mise à jour des préférences
-      console.log('Security preferences updated:', preferences);
+      // Simuler une mise à jour des préférences
       await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('Préférences de sécurité mises à jour:', preferences);
     } catch (error) {
-      console.error('Error updating security preferences:', error);
+      console.error('Erreur lors de la mise à jour des préférences:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Enregistrer automatiquement les accès aux pages
+  useEffect(() => {
+    if (isAuthenticated) {
+      logAccess(location.pathname, true);
+    }
+  }, [location.pathname, isAuthenticated, logAccess]);
 
   return {
-    metrics,
-    accessHistory,
-    loading,
     logAccess,
     exportSecurityData,
     requestDataDeletion,
-    updateSecurityPreferences
+    updateSecurityPreferences,
+    metrics,
+    accessHistory,
+    loading
   };
 };
-
-export default useSecurity;
