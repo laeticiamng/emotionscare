@@ -1,121 +1,95 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Heart, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Heart, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const OnboardingPage: React.FC = () => {
+const B2COnboardingPage: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
+  const totalSteps = 3;
 
-  const steps = [
-    {
-      title: 'Bienvenue sur EmotionsCare',
-      description: 'Votre plateforme de bien-être émotionnel personnalisée',
-      content: 'Nous sommes ravis de vous accompagner dans votre parcours de développement personnel et de bien-être émotionnel.'
-    },
-    {
-      title: 'Découvrez nos modules',
-      description: 'Des outils puissants pour votre équilibre',
-      content: 'Journal émotionnel, musicothérapie, scanner émotionnel, coach IA et bien plus encore vous attendent.'
-    },
-    {
-      title: 'Personnalisez votre expérience',
-      description: 'Adaptez la plateforme à vos besoins',
-      content: 'Configurez vos préférences pour une expérience sur mesure qui évolue avec vous.'
-    },
-    {
-      title: 'Prêt à commencer',
-      description: 'Votre voyage vers le bien-être commence maintenant',
-      content: 'Explorez votre tableau de bord et découvrez tous les outils à votre disposition.'
-    }
-  ];
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
       navigate('/b2c/dashboard');
     }
   };
 
-  const handlePrevious = () => {
-    if (currentStep > 0) {
+  const prevStep = () => {
+    if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
+  const progress = (currentStep / totalSteps) * 100;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-2xl"
-      >
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center" data-testid="page-root">
+      <div className="w-full max-w-2xl p-4">
         <Card>
           <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <Heart className="h-12 w-12 text-pink-500" />
-            </div>
-            <div className="flex justify-center space-x-2 mb-4">
-              {steps.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-3 h-3 rounded-full ${
-                    index <= currentStep ? 'bg-pink-500' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-            <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
-            <CardDescription>{steps[currentStep].description}</CardDescription>
+            <Heart className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <CardTitle>Bienvenue dans EmotionsCare</CardTitle>
+            <Progress value={progress} className="mt-4" />
+            <p className="text-sm text-muted-foreground mt-2">
+              Étape {currentStep} sur {totalSteps}
+            </p>
           </CardHeader>
-          <CardContent className="text-center space-y-6">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-              className="text-gray-600 dark:text-gray-300"
-            >
-              {steps[currentStep].content}
-            </motion.div>
+          <CardContent>
+            {currentStep === 1 && (
+              <div className="text-center space-y-4">
+                <h3 className="text-xl font-semibold">Découvrez vos outils de bien-être</h3>
+                <p className="text-muted-foreground">
+                  EmotionsCare vous accompagne dans votre parcours de bien-être émotionnel 
+                  avec des outils personnalisés et intelligents.
+                </p>
+              </div>
+            )}
 
-            <div className="flex justify-between pt-6">
-              <Button
-                onClick={handlePrevious}
-                variant="outline"
-                disabled={currentStep === 0}
+            {currentStep === 2 && (
+              <div className="text-center space-y-4">
+                <h3 className="text-xl font-semibold">Vos données sont protégées</h3>
+                <p className="text-muted-foreground">
+                  Nous respectons votre vie privée. Toutes vos données sont chiffrées 
+                  et vous gardez le contrôle total sur vos informations personnelles.
+                </p>
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <div className="text-center space-y-4">
+                <h3 className="text-xl font-semibold">Prêt à commencer ?</h3>
+                <p className="text-muted-foreground">
+                  Votre voyage vers un meilleur bien-être émotionnel commence maintenant. 
+                  Explorez nos modules et trouvez ce qui vous convient le mieux.
+                </p>
+              </div>
+            )}
+
+            <div className="flex justify-between mt-8">
+              <Button 
+                variant="outline" 
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className="flex items-center gap-2"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" />
                 Précédent
               </Button>
-
-              <Button
-                onClick={handleNext}
-                className="bg-pink-500 hover:bg-pink-600"
-              >
-                {currentStep === steps.length - 1 ? (
-                  <>
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Commencer
-                  </>
-                ) : (
-                  <>
-                    Suivant
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
+              <Button onClick={nextStep} className="flex items-center gap-2">
+                {currentStep === totalSteps ? 'Commencer' : 'Suivant'}
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 };
 
-export default OnboardingPage;
+export default B2COnboardingPage;

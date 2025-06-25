@@ -1,62 +1,78 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Brain } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { MessageCircle, Bot, Heart } from 'lucide-react';
 
-const CoachPage: React.FC = () => {
-  const navigate = useNavigate();
-
+const B2BUserCoachPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background" data-testid="page-root">
       <div className="container mx-auto px-4 py-8">
-        <Button
-          onClick={() => navigate('/b2b/user/dashboard')}
-          variant="ghost"
-          className="mb-8"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour au tableau de bord
-        </Button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Coach IA</h1>
+          <p className="text-muted-foreground">Votre accompagnateur personnalisé en bien-être émotionnel</p>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <Brain className="h-12 w-12 text-purple-500" />
-            </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Coach IA Professionnel
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              Votre accompagnateur dans l'environnement de travail
-            </p>
-          </div>
-
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Assistant Professionnel</CardTitle>
-              <CardDescription className="text-center">
-                Fonctionnalité en cours de développement
-              </CardDescription>
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="text-center">
+              <MessageCircle className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <CardTitle>Chat en direct</CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Coach spécialisé pour le bien-être au travail
-                </p>
-              </div>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground mb-4">
+                Discutez avec votre coach IA
+              </p>
+              <Button className="w-full">
+                Démarrer une conversation
+              </Button>
             </CardContent>
           </Card>
-        </motion.div>
+
+          <Card>
+            <CardHeader className="text-center">
+              <Bot className="h-12 w-12 text-green-500 mx-auto mb-4" />
+              <CardTitle>Exercices guidés</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground mb-4">
+                Exercices personnalisés
+              </p>
+              <Button variant="outline" className="w-full">
+                Voir les exercices
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="text-center">
+              <Heart className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <CardTitle>Suivi émotionnel</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground mb-4">
+                Analyse de vos progrès
+              </p>
+              <Button variant="secondary" className="w-full">
+                Voir mon suivi
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Dernières conversations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-center py-8">
+              Aucune conversation pour le moment. Commencez dès maintenant !
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
-export default CoachPage;
+export default B2BUserCoachPage;

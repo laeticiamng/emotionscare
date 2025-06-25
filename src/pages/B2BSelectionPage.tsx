@@ -1,63 +1,74 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Shield } from 'lucide-react';
+import { Users, Building2, ArrowLeft } from 'lucide-react';
 
 const B2BSelectionPage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background flex items-center justify-center">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background" data-testid="page-root">
+      <div className="container mx-auto px-4 py-12">
+        <div className="mb-6">
+          <Link to="/choose-mode">
+            <Button variant="ghost" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Button>
+          </Link>
+        </div>
+
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-6">Espace Entreprise</h1>
-          <p className="text-xl text-muted-foreground">
-            Choisissez votre type d'accès à la plateforme
+          <h1 className="text-4xl font-bold mb-4">Espace Professionnel</h1>
+          <p className="text-lg text-muted-foreground">
+            Choisissez votre type d'accès professionnel
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/user/login')}>
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Users className="h-8 w-8 text-green-600" />
-              </div>
-              <CardTitle className="text-2xl">Collaborateur</CardTitle>
+              <Users className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+              <CardTitle>Collaborateur</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-muted-foreground mb-6">
-                Accès collaborateur pour gérer votre bien-être au travail
+                Accès employé aux outils de bien-être de votre entreprise
               </p>
-              <Button className="w-full bg-green-500 hover:bg-green-600">
-                Connexion Collaborateur
-              </Button>
+              <ul className="text-sm text-muted-foreground mb-6 space-y-2">
+                <li>• Outils personnels de bien-être</li>
+                <li>• Suivi individuel</li>
+                <li>• Contenu adapté au travail</li>
+              </ul>
+              <Link to="/b2b/user/login" className="block">
+                <Button className="w-full">
+                  Accès Collaborateur
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/admin/login')}>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <Shield className="h-8 w-8 text-purple-600" />
-              </div>
-              <CardTitle className="text-2xl">Administration</CardTitle>
+              <Building2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <CardTitle>Administrateur RH</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-muted-foreground mb-6">
-                Tableau de bord administrateur pour gérer votre organisation
+                Tableau de bord complet pour la gestion des équipes
               </p>
-              <Button variant="outline" className="w-full border-purple-500 text-purple-600 hover:bg-purple-50">
-                Connexion Admin
-              </Button>
+              <ul className="text-sm text-muted-foreground mb-6 space-y-2">
+                <li>• Analytics et rapports</li>
+                <li>• Gestion des équipes</li>
+                <li>• Outils d'administration</li>
+              </ul>
+              <Link to="/b2b/admin/login" className="block">
+                <Button variant="secondary" className="w-full">
+                  Accès Administrateur
+                </Button>
+              </Link>
             </CardContent>
           </Card>
-        </div>
-
-        <div className="text-center mt-8">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            ← Retour à l'accueil
-          </Button>
         </div>
       </div>
     </div>

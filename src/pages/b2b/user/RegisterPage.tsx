@@ -1,238 +1,116 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Users, Mail, Lock, User, Building, Briefcase, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, ArrowLeft } from 'lucide-react';
 
 const B2BUserRegisterPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { register } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    name: '',
-    organizationCode: '',
-    department: '',
-    position: '',
-    acceptTerms: false
+    firstName: '',
+    lastName: '',
+    company: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
-    }
-    
-    if (!formData.acceptTerms) {
-      toast.error('Veuillez accepter les conditions d\'utilisation');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      await register(formData.email, formData.password, formData.name, 'b2b_user', {
-        organizationCode: formData.organizationCode,
-        department: formData.department,
-        position: formData.position
-      });
-      toast.success('Inscription réussie ! Bienvenue dans votre organisation');
-      navigate('/b2b/user/dashboard');
-    } catch (error) {
-      toast.error('Erreur lors de l\'inscription. Vérifiez votre code organisation.');
-    } finally {
-      setIsLoading(false);
-    }
+    setLoading(true);
+    // TODO: Implement registration logic
+    console.log('B2B User Register:', formData);
+    setLoading(false);
   };
 
-  const updateFormData = (field: string, value: any) => {
+  const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="h-8 w-8 text-green-600" />
-          </div>
-          <CardTitle className="text-2xl text-green-700">Rejoindre votre organisation</CardTitle>
-          <CardDescription>
-            Créez votre compte collaborateur EmotionsCare
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="organizationCode">Code organisation</Label>
-              <div className="relative">
-                <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="organizationCode"
-                  type="text"
-                  placeholder="CODE_ENTREPRISE"
-                  value={formData.organizationCode}
-                  onChange={(e) => updateFormData('organizationCode', e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 flex items-center justify-center" data-testid="page-root">
+      <div className="w-full max-w-md p-4">
+        <Link to="/b2b/user/login" className="inline-flex items-center gap-2 mb-6 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" />
+          Déjà un compte ?
+        </Link>
 
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Votre nom"
-                  value={formData.name}
-                  onChange={(e) => updateFormData('name', e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email professionnel</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@entreprise.com"
-                  value={formData.email}
-                  onChange={(e) => updateFormData('email', e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="department">Département</Label>
-                <Select onValueChange={(value) => updateFormData('department', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="it">IT</SelectItem>
-                    <SelectItem value="hr">RH</SelectItem>
-                    <SelectItem value="finance">Finance</SelectItem>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="sales">Ventes</SelectItem>
-                    <SelectItem value="operations">Opérations</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="position">Poste</Label>
-                <div className="relative">
-                  <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <Card>
+          <CardHeader className="text-center">
+            <Users className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+            <CardTitle>Inscription Collaborateur</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName">Prénom</Label>
                   <Input
-                    id="position"
-                    type="text"
-                    placeholder="Votre poste"
-                    value={formData.position}
-                    onChange={(e) => updateFormData('position', e.target.value)}
-                    className="pl-10"
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={(e) => handleChange('firstName', e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Nom</Label>
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={(e) => handleChange('lastName', e.target.value)}
+                    required
                   />
                 </div>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <div>
+                <Label htmlFor="company">Entreprise</Label>
                 <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => updateFormData('password', e.target.value)}
-                  className="pl-10 pr-10"
+                  id="company"
+                  value={formData.company}
+                  onChange={(e) => handleChange('company', e.target.value)}
                   required
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </Button>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <div>
+                <Label htmlFor="email">Email professionnel</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="••••••••"
                   value={formData.confirmPassword}
-                  onChange={(e) => updateFormData('confirmPassword', e.target.value)}
-                  className="pl-10"
+                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
                   required
                 />
               </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="terms"
-                checked={formData.acceptTerms}
-                onCheckedChange={(checked) => updateFormData('acceptTerms', checked)}
-              />
-              <Label htmlFor="terms" className="text-sm">
-                J'accepte les conditions d'utilisation de l'organisation
-              </Label>
-            </div>
-
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={isLoading}>
-              {isLoading ? 'Inscription...' : 'Rejoindre l\'organisation'}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              Déjà un compte ?{' '}
-              <Link to="/b2b/user/login" className="text-green-600 hover:underline">
-                Se connecter
-              </Link>
-            </p>
-            <p className="text-sm">
-              <Link to="/b2b/selection" className="text-gray-500 hover:underline">
-                Retour à la sélection B2B
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Inscription...' : 'Créer mon compte'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

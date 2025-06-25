@@ -1,62 +1,66 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Scan } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { Scan, Camera, Mic } from 'lucide-react';
 
-const ScanPage: React.FC = () => {
-  const navigate = useNavigate();
-
+const B2BUserScanPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background" data-testid="page-root">
       <div className="container mx-auto px-4 py-8">
-        <Button
-          onClick={() => navigate('/b2b/user/dashboard')}
-          variant="ghost"
-          className="mb-8"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour au tableau de bord
-        </Button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Scan Émotionnel</h1>
+          <p className="text-muted-foreground">Analysez votre état émotionnel actuel</p>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <Scan className="h-12 w-12 text-blue-500" />
-            </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              Scanner Émotionnel B2B
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              Analysez votre état émotionnel professionnel
-            </p>
-          </div>
-
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Analyse Professionnelle</CardTitle>
-              <CardDescription className="text-center">
-                Fonctionnalité en cours de développement
-              </CardDescription>
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card>
+            <CardHeader className="text-center">
+              <Camera className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <CardTitle>Analyse Faciale</CardTitle>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Scanner optimisé pour le contexte professionnel
-                </p>
-              </div>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground mb-6">
+                Utilisez votre caméra pour analyser vos expressions faciales
+              </p>
+              <Button className="w-full">
+                Commencer l'analyse
+              </Button>
             </CardContent>
           </Card>
-        </motion.div>
+
+          <Card>
+            <CardHeader className="text-center">
+              <Mic className="h-12 w-12 text-green-500 mx-auto mb-4" />
+              <CardTitle>Analyse Vocale</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground mb-6">
+                Analysez votre état émotionnel à travers votre voix
+              </p>
+              <Button variant="outline" className="w-full">
+                Enregistrer un échantillon
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Scan className="h-6 w-6" />
+              Historique des analyses
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-center py-8">
+              Aucune analyse effectuée pour le moment
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
-export default ScanPage;
+export default B2BUserScanPage;
