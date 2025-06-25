@@ -2,6 +2,7 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
+import OptimizedLayout from '@/components/layout/OptimizedLayout';
 import ProtectedLayout from '@/components/ProtectedLayout';
 
 // Pages principales
@@ -61,7 +62,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
   return [
     {
       path: '/',
-      element: <Layout />,
+      element: <OptimizedLayout />,
       children: [
         {
           index: true,
