@@ -16,6 +16,7 @@ import { rhRoutes } from './routes/rhRoutes';
 import { optimizedRoutes } from './routes/lazyRoutes';
 import { featureRoutes } from './routes/featureRoutes';
 import { adminRoutes } from './routes/adminRoutes';
+import { auditCompleteRoutes } from './routes/auditCompleteRoutes';
 
 export const ROUTES_MANIFEST = {
   home: '/',
@@ -78,6 +79,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...optimizedRoutes,
     ...featureRoutes,
     ...adminRoutes,
+    ...auditCompleteRoutes,
   ];
 }
 
