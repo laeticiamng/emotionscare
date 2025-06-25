@@ -2,28 +2,21 @@
 import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { OFFICIAL_ROUTES } from '@/routesManifest';
+import HomePage from '@/pages/HomePage';
+import ChooseModePage from '@/pages/ChooseModePage';
 
-// Import lazy des pages existantes
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+// Lazy loading pour les pages existantes
+const B2CLoginPage = lazy(() => import('@/pages/b2c/LoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/b2c/RegisterPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/b2c/DashboardPage'));
 
-// Import des pages B2C
-const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2BSelectionPage = lazy(() => import('@/pages/b2b/B2BSelectionPage'));
+const B2BUserLoginPage = lazy(() => import('@/pages/b2b/B2BUserLoginPage'));
+const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/B2BUserRegisterPage'));
+const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/B2BUserDashboard'));
+const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/B2BAdminLoginPage'));
+const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/B2BAdminDashboard'));
 
-// Import des pages B2B
-const B2BPage = lazy(() => import('@/pages/B2BPage'));
-const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
-const B2BUserLoginPage = lazy(() => import('@/pages/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/B2BUserRegisterPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
-const B2BAdminLoginPage = lazy(() => import('@/pages/B2BAdminLoginPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
-
-// Import des pages fonctionnelles
 const ScanPage = lazy(() => import('@/pages/ScanPage'));
 const MusicPage = lazy(() => import('@/pages/MusicPage'));
 const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
@@ -33,74 +26,50 @@ const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
 const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
 const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
 
-// Pages VR et immersives
 const VRPage = lazy(() => import('@/pages/VRPage'));
-const VRGalactiquePage = lazy(() => import('@/pages/VRGalactiquePage'));
-const ScreenSilkBreakPage = lazy(() => import('@/pages/ScreenSilkBreakPage'));
-const StorySynthLabPage = lazy(() => import('@/pages/StorySynthLabPage'));
-const ARFiltersPage = lazy(() => import('@/pages/ARFiltersPage'));
-const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
-
-// Pages ambition et progression
-const AmbitionArcadePage = lazy(() => import('@/pages/AmbitionArcadePage'));
-const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const WeeklyBarsPage = lazy(() => import('@/pages/WeeklyBarsPage'));
-const HeatmapVibesPage = lazy(() => import('@/pages/HeatmapVibesPage'));
-
-// Pages utilisateur
 const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
-const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
-const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
-const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
-const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
-const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
-const AccountDeletePage = lazy(() => import('@/pages/AccountDeletePage'));
-const ExportCSVPage = lazy(() => import('@/pages/ExportCSVPage'));
-const PrivacyTogglesPage = lazy(() => import('@/pages/PrivacyTogglesPage'));
-const HealthCheckBadgePage = lazy(() => import('@/pages/HealthCheckBadgePage'));
-
-// Pages B2B admin
 const TeamsPage = lazy(() => import('@/pages/TeamsPage'));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
 const EventsPage = lazy(() => import('@/pages/EventsPage'));
 const OptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
-const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
-const AuditPage = lazy(() => import('@/pages/AuditPage'));
-const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
-const InnovationPage = lazy(() => import('@/pages/InnovationPage'));
-const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 
-// Pages utilitaires
-const CoachPage = lazy(() => import('@/pages/CoachPage'));
-const JournalPage = lazy(() => import('@/pages/JournalPage'));
+// Stub components pour les pages manquantes
+const StubPage = ({ title }: { title: string }) => (
+  <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-6">
+    <div className="max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">{title}</h1>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <p className="text-gray-600 dark:text-gray-300 text-lg">
+          Page en cours de développement - {title}
+        </p>
+      </div>
+    </div>
+  </div>
+);
 
 export const unifiedRoutes: RouteObject[] = [
-  // Routes publiques
+  // Routes principales
   {
-    path: OFFICIAL_ROUTES.HOME,
+    path: '/',
     element: <HomePage />,
   },
   {
-    path: OFFICIAL_ROUTES.CHOOSE_MODE,
+    path: '/choose-mode',
     element: <ChooseModePage />,
-  },
-  {
-    path: OFFICIAL_ROUTES.ONBOARDING,
-    element: <OnboardingPage />,
   },
 
   // Routes B2C
   {
-    path: OFFICIAL_ROUTES.B2C_LOGIN,
+    path: '/b2c/login',
     element: <B2CLoginPage />,
   },
   {
-    path: OFFICIAL_ROUTES.B2C_REGISTER,
+    path: '/b2c/register',
     element: <B2CRegisterPage />,
   },
   {
-    path: OFFICIAL_ROUTES.B2C_DASHBOARD,
+    path: '/b2c/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2c">
         <B2CDashboardPage />
@@ -110,23 +79,23 @@ export const unifiedRoutes: RouteObject[] = [
 
   // Routes B2B
   {
-    path: OFFICIAL_ROUTES.B2B,
-    element: <B2BPage />,
+    path: '/b2b',
+    element: <StubPage title="B2B Landing" />,
   },
   {
-    path: OFFICIAL_ROUTES.B2B_SELECTION,
+    path: '/b2b/selection',
     element: <B2BSelectionPage />,
   },
   {
-    path: OFFICIAL_ROUTES.B2B_USER_LOGIN,
+    path: '/b2b/user/login',
     element: <B2BUserLoginPage />,
   },
   {
-    path: OFFICIAL_ROUTES.B2B_USER_REGISTER,
+    path: '/b2b/user/register',
     element: <B2BUserRegisterPage />,
   },
   {
-    path: OFFICIAL_ROUTES.B2B_USER_DASHBOARD,
+    path: '/b2b/user/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2b_user">
         <B2BUserDashboardPage />
@@ -134,11 +103,11 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.B2B_ADMIN_LOGIN,
+    path: '/b2b/admin/login',
     element: <B2BAdminLoginPage />,
   },
   {
-    path: OFFICIAL_ROUTES.B2B_ADMIN_DASHBOARD,
+    path: '/b2b/admin/dashboard',
     element: (
       <ProtectedRoute requiredRole="b2b_admin">
         <B2BAdminDashboardPage />
@@ -146,9 +115,9 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
 
-  // Routes mesure & adaptation immédiate
+  // Routes mesure & adaptation
   {
-    path: OFFICIAL_ROUTES.SCAN,
+    path: '/scan',
     element: (
       <ProtectedRoute>
         <ScanPage />
@@ -156,7 +125,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.MUSIC,
+    path: '/music',
     element: (
       <ProtectedRoute>
         <MusicPage />
@@ -164,7 +133,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.FLASH_GLOW,
+    path: '/flash-glow',
     element: (
       <ProtectedRoute>
         <FlashGlowPage />
@@ -172,7 +141,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.BOSS_LEVEL_GRIT,
+    path: '/boss-level-grit',
     element: (
       <ProtectedRoute>
         <BossLevelGritPage />
@@ -180,7 +149,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.MOOD_MIXER,
+    path: '/mood-mixer',
     element: (
       <ProtectedRoute>
         <MoodMixerPage />
@@ -188,7 +157,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.BOUNCE_BACK_BATTLE,
+    path: '/bounce-back-battle',
     element: (
       <ProtectedRoute>
         <BounceBackBattlePage />
@@ -196,7 +165,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.BREATHWORK,
+    path: '/breathwork',
     element: (
       <ProtectedRoute>
         <BreathworkPage />
@@ -204,7 +173,7 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
   {
-    path: OFFICIAL_ROUTES.INSTANT_GLOW,
+    path: '/instant-glow',
     element: (
       <ProtectedRoute>
         <InstantGlowPage />
@@ -212,29 +181,169 @@ export const unifiedRoutes: RouteObject[] = [
     ),
   },
 
-  // Routes communes
+  // Routes immersives
   {
-    path: OFFICIAL_ROUTES.COACH,
+    path: '/vr',
     element: (
       <ProtectedRoute>
-        <CoachPage />
+        <VRPage />
       </ProtectedRoute>
     ),
   },
   {
-    path: OFFICIAL_ROUTES.JOURNAL,
-    element: (
-      <ProtectedRoute>
-        <JournalPage />
-      </ProtectedRoute>
-    ),
+    path: '/vr-galactique',
+    element: <StubPage title="VR Galactique" />,
   },
   {
-    path: OFFICIAL_ROUTES.PREFERENCES,
+    path: '/screen-silk-break',
+    element: <StubPage title="Screen Silk Break" />,
+  },
+  {
+    path: '/story-synth-lab',
+    element: <StubPage title="Story Synth Lab" />,
+  },
+  {
+    path: '/ar-filters',
+    element: <StubPage title="AR Filters" />,
+  },
+  {
+    path: '/bubble-beat',
+    element: <StubPage title="Bubble Beat" />,
+  },
+
+  // Routes ambition & progression
+  {
+    path: '/ambition-arcade',
+    element: <StubPage title="Ambition Arcade" />,
+  },
+  {
+    path: '/gamification',
+    element: <StubPage title="Gamification" />,
+  },
+  {
+    path: '/weekly-bars',
+    element: <StubPage title="Weekly Bars" />,
+  },
+  {
+    path: '/heatmap-vibes',
+    element: <StubPage title="Heatmap Vibes" />,
+  },
+
+  // Routes espaces utilisateur
+  {
+    path: '/onboarding',
+    element: <StubPage title="Onboarding" />,
+  },
+  {
+    path: '/preferences',
     element: (
       <ProtectedRoute>
         <PreferencesPage />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: '/social-cocon',
+    element: <StubPage title="Social Cocon" />,
+  },
+  {
+    path: '/profile-settings',
+    element: <StubPage title="Profile Settings" />,
+  },
+  {
+    path: '/activity-history',
+    element: <StubPage title="Activity History" />,
+  },
+  {
+    path: '/notifications',
+    element: <StubPage title="Notifications" />,
+  },
+  {
+    path: '/feedback',
+    element: <StubPage title="Feedback" />,
+  },
+  {
+    path: '/account/delete',
+    element: <StubPage title="Account Delete" />,
+  },
+  {
+    path: '/export-csv',
+    element: <StubPage title="Export CSV" />,
+  },
+  {
+    path: '/privacy-toggles',
+    element: <StubPage title="Privacy Toggles" />,
+  },
+  {
+    path: '/health-check-badge',
+    element: <StubPage title="Health Check Badge" />,
+  },
+
+  // Routes B2B espaces
+  {
+    path: '/teams',
+    element: (
+      <ProtectedRoute allowedRoles={['b2b_user', 'b2b_admin']}>
+        <TeamsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/reports',
+    element: (
+      <ProtectedRoute allowedRoles={['b2b_admin']}>
+        <ReportsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/events',
+    element: (
+      <ProtectedRoute allowedRoles={['b2b_user', 'b2b_admin']}>
+        <EventsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/optimisation',
+    element: (
+      <ProtectedRoute allowedRoles={['b2b_admin']}>
+        <OptimisationPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/settings',
+    element: (
+      <ProtectedRoute>
+        <SettingsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/security',
+    element: <StubPage title="Security" />,
+  },
+  {
+    path: '/audit',
+    element: <StubPage title="Audit" />,
+  },
+  {
+    path: '/accessibility',
+    element: <StubPage title="Accessibility" />,
+  },
+  {
+    path: '/innovation',
+    element: <StubPage title="Innovation" />,
+  },
+  {
+    path: '/help-center',
+    element: <StubPage title="Help Center" />,
+  },
+
+  // Route de fallback pour 404
+  {
+    path: '*',
+    element: <StubPage title="Page non trouvée" />,
   },
 ];
