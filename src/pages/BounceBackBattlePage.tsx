@@ -1,303 +1,335 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { useMood } from '@/hooks/useMood';
-import { Shield, Swords, Heart, TrendingUp, Award } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Shield, Zap, Heart, Target, Play, Pause, RotateCcw, Volume2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const BounceBackBattlePage: React.FC = () => {
-  const { mood, updateMood, isLoading } = useMood();
-  const [currentBattle, setCurrentBattle] = useState<any>(null);
-  const [resilenceScore, setResilienceScore] = useState(75);
-  const [battleHistory, setBattleHistory] = useState([
-    { name: 'Défi Matinal', result: 'victory', points: 50 },
-    { name: 'Stress Management', result: 'victory', points: 75 },
-    { name: 'Motivation Boost', result: 'partial', points: 25 }
-  ]);
+const BounceBackBattlePage = () => {
+  const [currentScenario, setCurrentScenario] = useState(null);
+  const [resilienceScore, setResilienceScore] = useState(75);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sessionTime, setSessionTime] = useState(0);
+  const [heartRate, setHeartRate] = useState(72);
 
-  // Batailles adaptées selon l'humeur
-  const getBattlesByMood = () => {
-    if (!mood) return defaultBattles;
-    
-    const { valence } = mood;
-    
-    if (valence < 30) {
-      return battles.filter(b => b.type === 'recovery');
-    } else if (valence > 70) {
-      return battles.filter(b => b.type === 'growth');
-    } else {
-      return battles.filter(b => b.type === 'balanced');
-    }
-  };
-
-  const battles = [
+  const scenarios = [
     {
-      id: 'morning-resilience',
-      name: 'Résilience Matinale',
-      description: 'Commencez la journée avec confiance malgré les défis',
-      type: 'recovery',
-      difficulty: 2,
-      duration: 10,
-      reward: 100,
-      color: 'from-green-400 to-emerald-500',
-      icon: <Heart className="h-5 w-5" />
+      id: 1,
+      title: "Critique au Travail",
+      description: "Votre manager critique publiquement votre présentation",
+      difficulty: "Facile",
+      duration: "5 min",
+      category: "Professionnel",
+      completed: true,
+      score: 85
     },
     {
-      id: 'stress-warrior',
-      name: 'Guerrier Anti-Stress',
-      description: 'Transformez le stress en force motrice',
-      type: 'balanced',
-      difficulty: 3,
-      duration: 15,
-      reward: 150,
-      color: 'from-blue-400 to-indigo-500',
-      icon: <Shield className="h-5 w-5" />
+      id: 2,
+      title: "Rejet Social",
+      description: "Exclusion d'un groupe ou d'une activité sociale",
+      difficulty: "Moyen", 
+      duration: "8 min",
+      category: "Social",
+      completed: false,
+      score: null
     },
     {
-      id: 'peak-performance',
-      name: 'Performance Optimale',
-      description: 'Dépassez vos limites et atteignez l\'excellence',
-      type: 'growth',
-      difficulty: 4,
-      duration: 25,
-      reward: 250,
-      color: 'from-purple-400 to-pink-500',
-      icon: <TrendingUp className="h-5 w-5" />
+      id: 3,
+      title: "Échec Personnel",
+      description: "Un projet important sur lequel vous travailliez échoue",
+      difficulty: "Difficile",
+      duration: "12 min",
+      category: "Personnel",
+      completed: false,
+      score: null
     }
   ];
 
-  const defaultBattles = battles;
-  const availableBattles = getBattlesByMood();
+  const techniques = [
+    {
+      name: "Respiration 4-7-8",
+      description: "Technique de respiration pour gérer le stress",
+      icon: <Heart className="h-5 w-5 text-red-500" />
+    },
+    {
+      name: "Recadrage Cognitif",
+      description: "Changer la perspective sur la situation",
+      icon: <Target className="h-5 w-5 text-blue-500" />
+    },
+    {
+      name: "Auto-Compassion",
+      description: "Traiter ses erreurs avec bienveillance",
+      icon: <Shield className="h-5 w-5 text-green-500" />
+    }
+  ];
 
-  const [battleProgress, setBattleProgress] = useState(0);
-  const [battlePhase, setBattlePhase] = useState<'preparation' | 'battle' | 'victory'>('preparation');
-
-  const startBattle = (battle: any) => {
-    setCurrentBattle(battle);
-    setBattlePhase('battle');
-    setBattleProgress(0);
-    
-    // Simulation de progression de bataille
-    const interval = setInterval(() => {
-      setBattleProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setBattlePhase('victory');
-          completeBattle(battle);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 500);
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'Facile': return 'bg-green-500';
+      case 'Moyen': return 'bg-yellow-500';
+      case 'Difficile': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
   };
 
-  const completeBattle = (battle: any) => {
-    setResilienceScore(prev => Math.min(100, prev + 5));
-    setBattleHistory(prev => [
-      { name: battle.name, result: 'victory', points: battle.reward },
-      ...prev.slice(0, 4)
-    ]);
-    
-    // Améliorer l'humeur après une victoire
-    if (mood) {
-      updateMood({
-        valence: Math.min(100, mood.valence + 10),
-        arousal: mood.arousal,
-        timestamp: Date.now()
-      });
+  useEffect(() => {
+    let interval;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setSessionTime(prev => prev + 1);
+        setHeartRate(prev => prev + Math.floor(Math.random() * 6) - 3);
+      }, 1000);
     }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
-    setTimeout(() => {
-      setCurrentBattle(null);
-      setBattlePhase('preparation');
-      setBattleProgress(0);
-    }, 3000);
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startScenario = (scenario) => {
+    setCurrentScenario(scenario);
+    setSessionTime(0);
+    setIsPlaying(true);
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Swords className="h-8 w-8 text-blue-500" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Bounce Back Battle
-            </h1>
-          </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Transformez les défis en victoires et renforcez votre résilience
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 text-white">
+      <div className="container mx-auto px-4 py-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <Badge variant="secondary" className="mb-4 bg-blue-600">
+            <Shield className="h-4 w-4 mr-2" />
+            Bounce Back Battle
+          </Badge>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            Forge Your Resilience
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Entraînez-vous à surmonter les défis grâce à des simulations immersives et des techniques de résilience éprouvées.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Stats de résilience */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <Shield className="h-8 w-8 text-blue-500" />
-                <Badge variant="secondary" className="bg-blue-100 text-blue-600">
-                  Niveau {Math.floor(resilenceScore / 10)}
-                </Badge>
+        <div className="grid lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 flex items-center justify-center">
+                <Shield className="h-8 w-8 text-white" />
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Score de Résilience</span>
-                  <span className="font-medium">{resilenceScore}/100</span>
-                </div>
-                <Progress value={resilenceScore} className="h-2" />
+              <CardTitle className="text-white">Score de Résilience</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-400 mb-2">{resilienceScore}/100</div>
+                <Progress value={resilienceScore} className="mb-2" />
+                <p className="text-sm text-gray-400">Niveau: Intermédiaire</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-6 text-center">
-              <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-yellow-600">
-                {battleHistory.filter(b => b.result === 'victory').length}
-              </div>
-              <div className="text-sm text-gray-600">Victoires</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-6 text-center">
-              <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-green-600">
-                {battleHistory.reduce((sum, battle) => sum + battle.points, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Points totaux</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Bataille en cours */}
-        {currentBattle && (
-          <Card className="mb-8 bg-white/70 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
-            <CardHeader className={`bg-gradient-to-r ${currentBattle.color} text-white`}>
-              <CardTitle className="flex items-center gap-2">
-                {currentBattle.icon}
-                {currentBattle.name}
-                {battlePhase === 'battle' && (
-                  <Badge variant="secondary" className="bg-white/20 text-white ml-auto">
-                    En cours...
-                  </Badge>
-                )}
-                {battlePhase === 'victory' && (
-                  <Badge variant="secondary" className="bg-white/20 text-white ml-auto">
-                    🏆 Victoire !
-                  </Badge>
-                )}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Heart className="h-5 w-5 text-red-400" />
+                Monitoring
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <p className="text-gray-600">{currentBattle.description}</p>
-                
-                {battlePhase === 'battle' && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Progression de la bataille</span>
-                      <span>{battleProgress}%</span>
-                    </div>
-                    <Progress value={battleProgress} className="h-3" />
-                  </div>
-                )}
-
-                {battlePhase === 'victory' && (
-                  <div className="text-center p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
-                    <Award className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-green-600 mb-2">
-                      Bataille remportée !
-                    </h3>
-                    <p className="text-green-600">
-                      +{currentBattle.reward} points • +5 résilience
-                    </p>
-                  </div>
-                )}
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Rythme cardiaque</span>
+                <span className="text-red-400 font-semibold">{heartRate} bpm</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Stress Level</span>
+                <span className="text-yellow-400 font-semibold">Modéré</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Session</span>
+                <span className="text-blue-400 font-semibold">{formatTime(sessionTime)}</span>
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Grille des batailles disponibles */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {availableBattles.map((battle) => (
-            <Card 
-              key={battle.id}
-              className="group hover:scale-105 transition-all duration-300 bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl overflow-hidden"
-            >
-              <CardHeader className={`bg-gradient-to-r ${battle.color} text-white`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {battle.icon}
-                    <CardTitle className="text-lg">{battle.name}</CardTitle>
-                  </div>
-                  <div className="flex gap-1">
-                    {Array.from({ length: battle.difficulty }).map((_, i) => (
-                      <div key={i} className="w-2 h-2 bg-white rounded-full"></div>
-                    ))}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <p className="text-gray-600 mb-4">{battle.description}</p>
-                <div className="flex justify-between items-center mb-4">
-                  <Badge variant="outline" className="bg-gray-50">
-                    {battle.duration} min
-                  </Badge>
-                  <Badge variant="outline" className="bg-yellow-50 text-yellow-600">
-                    +{battle.reward} pts
-                  </Badge>
-                </div>
-                <Button
-                  onClick={() => startBattle(battle)}
-                  disabled={currentBattle?.id === battle.id}
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
-                >
-                  {currentBattle?.id === battle.id ? 'En bataille...' : 'Commencer la bataille'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Target className="h-5 w-5 text-green-400" />
+                Progrès
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Scénarios complétés</span>
+                <span className="text-white font-semibold">12/25</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Taux de réussite</span>
+                <span className="text-green-400 font-semibold">76%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Série actuelle</span>
+                <span className="text-blue-400 font-semibold">5 jours</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Zap className="h-5 w-5 text-yellow-400" />
+                Contrôles
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                onClick={() => setIsPlaying(!isPlaying)}
+                data-testid="start-challenge"
+              >
+                {isPlaying ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                {isPlaying ? 'Pause' : 'Démarrer'}
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => setSessionTime(0)}>
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reset
+              </Button>
+              <Button variant="outline" className="w-full">
+                <Volume2 className="h-4 w-4 mr-2" />
+                Audio Guide
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Historique des batailles */}
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-yellow-500" />
-              Historique des Batailles
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {battleHistory.map((battle, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      battle.result === 'victory' ? 'bg-green-500' :
-                      battle.result === 'partial' ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}></div>
-                    <span className="font-medium">{battle.name}</span>
-                  </div>
-                  <Badge variant="outline" className="bg-white/50">
-                    +{battle.points} pts
-                  </Badge>
-                </div>
+        <Tabs defaultValue="scenarios" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
+            <TabsTrigger value="scenarios" className="data-[state=active]:bg-blue-600">
+              Scénarios
+            </TabsTrigger>
+            <TabsTrigger value="techniques" className="data-[state=active]:bg-blue-600">
+              Techniques
+            </TabsTrigger>
+            <TabsTrigger value="history" className="data-[state=active]:bg-blue-600">
+              Historique
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="scenarios" className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {scenarios.map((scenario, index) => (
+                <motion.div
+                  key={scenario.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="bg-slate-800/50 border-slate-700 hover:border-blue-500 transition-colors h-full">
+                    <CardHeader>
+                      <div className="flex items-start justify-between mb-2">
+                        <Badge className={`${getDifficultyColor(scenario.difficulty)} text-white`}>
+                          {scenario.difficulty}
+                        </Badge>
+                        <Badge variant="outline" className="text-gray-400">
+                          {scenario.category}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-white text-lg">{scenario.title}</CardTitle>
+                      <CardDescription className="text-gray-400">
+                        {scenario.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-400">Durée: {scenario.duration}</span>
+                          {scenario.completed && (
+                            <span className="text-green-400">Score: {scenario.score}%</span>
+                          )}
+                        </div>
+                        <Button 
+                          className={`w-full ${
+                            scenario.completed 
+                              ? 'bg-green-600 hover:bg-green-700' 
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                          onClick={() => startScenario(scenario)}
+                        >
+                          {scenario.completed ? 'Refaire' : 'Commencer'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
 
-        {mood && (
-          <div className="mt-8 text-center">
-            <Badge variant="outline" className="bg-white/50">
-              Batailles adaptées à votre état émotionnel
-            </Badge>
-          </div>
-        )}
+          <TabsContent value="techniques" className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {techniques.map((technique, index) => (
+                <motion.div
+                  key={technique.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="bg-slate-800/50 border-slate-700 hover:border-blue-500 transition-colors">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        {technique.icon}
+                        <CardTitle className="text-white">{technique.name}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-gray-400 mb-4">
+                        {technique.description}
+                      </CardDescription>
+                      <Button variant="outline" className="w-full">
+                        Apprendre
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-4">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Dernières Sessions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    { date: "Aujourd'hui", scenario: "Critique au Travail", score: 85, duration: "4:32" },
+                    { date: "Hier", scenario: "Conflit Familial", score: 78, duration: "6:15" },
+                    { date: "2 jours", scenario: "Échec d'Entretien", score: 92, duration: "5:48" }
+                  ].map((session, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                      <div>
+                        <div className="font-semibold text-white">{session.scenario}</div>
+                        <div className="text-sm text-gray-400">{session.date} • {session.duration}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-blue-400">{session.score}%</div>
+                        <div className="text-sm text-gray-400">Score</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

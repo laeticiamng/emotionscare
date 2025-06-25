@@ -1,198 +1,405 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useMood } from '@/hooks/useMood';
-import { Play, Pause, Sparkles, Zap, Heart } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Zap, Sparkles, Timer, Target, Play, Pause, RotateCcw, Volume2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const FlashGlowPage: React.FC = () => {
-  const { mood, isLoading } = useMood();
-  const [currentExercise, setCurrentExercise] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [timer, setTimer] = useState(0);
+const FlashGlowPage = () => {
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [sessionType, setSessionType] = useState('energy');
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [glowIntensity, setGlowIntensity] = useState(0);
+  const [dailyStreak, setDailyStreak] = useState(12);
+  const [sessionCount, setSessionCount] = useState(3);
 
-  // Adapter les exercices selon l'humeur
-  const getExercisesByMood = () => {
-    if (!mood) return defaultExercises;
-    
-    const { valence, arousal } = mood;
-    
-    if (valence < 30) {
-      return exercises.filter(ex => ex.category === 'energizing');
-    } else if (arousal > 70) {
-      return exercises.filter(ex => ex.category === 'calming');
-    } else {
-      return exercises.filter(ex => ex.category === 'balanced');
-    }
-  };
-
-  const exercises = [
+  const sessionTypes = [
     {
-      id: 'breath-rainbow',
-      name: 'Respiration Arc-en-ciel',
-      category: 'calming',
-      duration: 180,
-      color: 'from-pink-400 to-purple-500',
-      description: 'Respirez en suivant les couleurs de l\'arc-en-ciel',
-      icon: <Heart className="h-5 w-5" />
-    },
-    {
-      id: 'micro-dance',
-      name: 'Micro-Danse Énergisante',
-      category: 'energizing', 
-      duration: 120,
-      color: 'from-orange-400 to-red-500',
-      description: 'Mouvements rapides pour booster votre énergie',
+      id: 'energy',
+      name: 'Energy Boost',
+      duration: 3,
+      description: 'Réveil instantané et boost d\'énergie',
+      color: 'bg-yellow-500',
       icon: <Zap className="h-5 w-5" />
     },
     {
-      id: 'glow-meditation',
-      name: 'Méditation Lumineuse',
-      category: 'balanced',
-      duration: 300,
-      color: 'from-blue-400 to-cyan-500',
-      description: 'Visualisation de lumière apaisante',
+      id: 'focus',
+      name: 'Focus Flash',
+      duration: 5,
+      description: 'Concentration maximale en quelques minutes',
+      color: 'bg-blue-500',
+      icon: <Target className="h-5 w-5" />
+    },
+    {
+      id: 'calm',
+      name: 'Instant Calm',
+      duration: 2,
+      description: 'Apaisement rapide du stress',
+      color: 'bg-green-500',
       icon: <Sparkles className="h-5 w-5" />
+    },
+    {
+      id: 'confidence',
+      name: 'Confidence Surge',
+      duration: 4,
+      description: 'Boost de confiance avant un défi',
+      color: 'bg-purple-500',
+      icon: <Zap className="h-5 w-5" />
     }
   ];
 
-  const defaultExercises = exercises;
+  const recentSessions = [
+    { type: 'Energy Boost', time: '08:30', effect: 'Excellent', duration: '3 min' },
+    { type: 'Focus Flash', time: '14:15', effect: 'Très bon', duration: '5 min' },
+    { type: 'Instant Calm', time: '18:45', effect: 'Bon', duration: '2 min' }
+  ];
+
+  const achievements = [
+    { name: 'Flash Master', progress: 85, total: 100, unlocked: false },
+    { name: 'Série de Feu', progress: 12, total: 15, unlocked: false },
+    { name: 'Glow Guru', progress: 100, total: 100, unlocked: true },
+    { name: 'Speed Demon', progress: 67, total: 50, unlocked: true }
+  ];
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && timer > 0) {
+    let interval;
+    if (isSessionActive && timeRemaining > 0) {
       interval = setInterval(() => {
-        setTimer(prev => {
+        setTimeRemaining(prev => {
           if (prev <= 1) {
-            setIsPlaying(false);
+            setIsSessionActive(false);
+            setGlowIntensity(100);
+            setTimeout(() => setGlowIntensity(0), 2000);
             return 0;
           }
           return prev - 1;
         });
+        
+        // Effet glow pendant la session
+        setGlowIntensity(prev => Math.min(prev + 2, 90));
       }, 1000);
+    } else if (!isSessionActive) {
+      setGlowIntensity(0);
     }
+    
     return () => clearInterval(interval);
-  }, [isPlaying, timer]);
+  }, [isSessionActive, timeRemaining]);
 
-  const startExercise = (exercise: any) => {
-    setCurrentExercise(exercise.id);
-    setTimer(exercise.duration);
-    setIsPlaying(true);
+  const startSession = () => {
+    const selectedSession = sessionTypes.find(s => s.id === sessionType);
+    setTimeRemaining(selectedSession.duration * 60);
+    setIsSessionActive(true);
+    setGlowIntensity(10);
   };
 
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
+  const pauseSession = () => {
+    setIsSessionActive(!isSessionActive);
   };
 
-  const formatTime = (seconds: number) => {
+  const resetSession = () => {
+    setIsSessionActive(false);
+    setTimeRemaining(0);
+    setGlowIntensity(0);
+  };
+
+  const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const availableExercises = getExercisesByMood();
+  const selectedSessionType = sessionTypes.find(s => s.id === sessionType);
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-purple-500" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Flash Glow
-            </h1>
-          </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Exercices flash personnalisés pour illuminer votre journée en quelques minutes
-          </p>
-          
-          {mood && (
-            <div className="mt-4 flex justify-center gap-2">
-              <Badge variant="outline" className="bg-white/50">
-                Humeur adaptée
-              </Badge>
-              <Badge variant="outline" className="bg-gradient-to-r from-purple-100 to-pink-100">
-                {availableExercises.length} exercices disponibles
-              </Badge>
-            </div>
-          )}
-        </div>
+    <div 
+      data-testid="page-root" 
+      className="min-h-screen bg-gradient-to-br from-slate-900 to-orange-900 text-white relative overflow-hidden"
+      style={{
+        background: `radial-gradient(circle at center, 
+          rgba(255, 165, 0, ${glowIntensity / 200}) 0%, 
+          rgba(30, 41, 59, 1) 50%, 
+          rgba(15, 23, 42, 1) 100%)`
+      }}
+    >
+      {/* Effet Glow Global */}
+      <div 
+        className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
+        style={{
+          background: `radial-gradient(circle at center, 
+            rgba(255, 215, 0, ${glowIntensity / 300}) 0%, 
+            transparent 70%)`,
+          opacity: glowIntensity / 100
+        }}
+      />
 
-        {/* Exercice en cours */}
-        {currentExercise && (
-          <Card className="mb-8 bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <div className="text-6xl font-bold text-purple-600 mb-2">
-                  {formatTime(timer)}
-                </div>
-                <div className="flex justify-center gap-4">
-                  <Button
-                    onClick={togglePlayPause}
-                    size="lg"
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                  >
-                    {isPlaying ? <Pause className="h-5 w-5 mr-2" /> : <Play className="h-5 w-5 mr-2" />}
-                    {isPlaying ? 'Pause' : 'Reprendre'}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setCurrentExercise(null);
-                      setIsPlaying(false);
-                      setTimer(0);
-                    }}
-                    variant="outline"
-                    size="lg"
-                  >
-                    Arrêter
-                  </Button>
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <Badge variant="secondary" className="mb-4 bg-orange-600">
+            <Zap className="h-4 w-4 mr-2" />
+            Flash Glow
+          </Badge>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+            Transformation Instantanée
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Séances ultra-rapides pour un changement d'état immédiat. Énergie, focus ou calme en quelques minutes.
+          </p>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-slate-800/50 border-slate-700 lg:col-span-2">
+            <CardHeader className="text-center">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center relative">
+                <div 
+                  className="absolute inset-0 rounded-full animate-pulse"
+                  style={{
+                    background: `radial-gradient(circle, rgba(255, 215, 0, ${glowIntensity / 100}) 0%, transparent 70%)`,
+                    transform: `scale(${1 + glowIntensity / 200})`
+                  }}
+                />
+                <div className="relative z-10">
+                  {isSessionActive ? (
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-white">{formatTime(timeRemaining)}</div>
+                      <div className="text-sm text-yellow-200">{selectedSessionType?.name}</div>
+                    </div>
+                  ) : (
+                    selectedSessionType?.icon && (
+                      <div className="text-white text-4xl">
+                        {selectedSessionType.icon}
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
+              <CardTitle className="text-white text-2xl">Session Flash</CardTitle>
+              <CardDescription className="text-gray-400">
+                {selectedSessionType?.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {sessionTypes.map((type) => (
+                  <Button
+                    key={type.id}
+                    variant={sessionType === type.id ? "default" : "outline"}
+                    className={`h-auto p-3 flex flex-col gap-2 ${
+                      sessionType === type.id ? type.color : ''
+                    }`}
+                    onClick={() => setSessionType(type.id)}
+                    disabled={isSessionActive}
+                  >
+                    <div className="text-lg">{type.icon}</div>
+                    <div className="text-xs font-medium">{type.name}</div>
+                    <div className="text-xs opacity-75">{type.duration}min</div>
+                  </Button>
+                ))}
+              </div>
+              
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  onClick={isSessionActive ? pauseSession : startSession}
+                  className="bg-orange-600 hover:bg-orange-700 px-8"
+                  data-testid="flash-action"
+                >
+                  {isSessionActive ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                  {isSessionActive ? 'Pause' : 'Flash Start'}
+                </Button>
+                {isSessionActive && (
+                  <Button variant="outline" onClick={resetSession}>
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset
+                  </Button>
+                )}
+                <Button variant="outline">
+                  <Volume2 className="h-4 w-4 mr-2" />
+                  Audio
+                </Button>
+              </div>
+
+              {isSessionActive && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Intensité Glow</span>
+                    <span className="text-orange-400">{Math.round(glowIntensity)}%</span>
+                  </div>
+                  <Progress value={glowIntensity} className="h-2" />
+                </div>
+              )}
             </CardContent>
           </Card>
-        )}
 
-        {/* Grille d'exercices */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {availableExercises.map((exercise) => (
-            <Card 
-              key={exercise.id}
-              className="group hover:scale-105 transition-all duration-300 bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl overflow-hidden"
-            >
-              <CardHeader className={`bg-gradient-to-r ${exercise.color} text-white relative`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {exercise.icon}
-                    <CardTitle className="text-lg">{exercise.name}</CardTitle>
-                  </div>
-                  <Badge variant="secondary" className="bg-white/20 text-white">
-                    {Math.floor(exercise.duration / 60)}min
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <p className="text-gray-600 mb-4">
-                  {exercise.description}
-                </p>
-                <Button
-                  onClick={() => startExercise(exercise)}
-                  disabled={currentExercise === exercise.id}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                >
-                  {currentExercise === exercise.id ? 'En cours...' : 'Commencer'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Timer className="h-5 w-5 text-orange-400" />
+                Stats Aujourd'hui
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Sessions Flash</span>
+                <span className="text-white font-semibold">{sessionCount}/5</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Temps total</span>
+                <span className="text-orange-400 font-semibold">12 min</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Série quotidienne</span>
+                <span className="text-green-400 font-semibold">{dailyStreak} jours</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Efficacité</span>
+                <span className="text-blue-400 font-semibold">94%</span>
+              </div>
+              <Progress value={(sessionCount / 5) * 100} className="mt-4" />
+              <p className="text-xs text-gray-400 text-center">
+                {5 - sessionCount} sessions restantes pour l'objectif quotidien
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
-        {isLoading && (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div>
-            <p className="text-gray-500 mt-2">Adaptation à votre humeur...</p>
-          </div>
-        )}
+        <Tabs defaultValue="history" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
+            <TabsTrigger value="history" className="data-[state=active]:bg-orange-600">
+              Historique
+            </TabsTrigger>
+            <TabsTrigger value="achievements" className="data-[state=active]:bg-orange-600">
+              Succès
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="data-[state=active]:bg-orange-600">
+              Insights
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="history" className="space-y-4">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Sessions d'Aujourd'hui</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {recentSessions.map((session, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                        <div>
+                          <div className="font-medium text-white">{session.type}</div>
+                          <div className="text-sm text-gray-400">{session.time} • {session.duration}</div>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className={`${
+                        session.effect === 'Excellent' ? 'text-green-400 border-green-400' :
+                        session.effect === 'Très bon' ? 'text-blue-400 border-blue-400' :
+                        'text-yellow-400 border-yellow-400'
+                      }`}>
+                        {session.effect}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="achievements" className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              {achievements.map((achievement, index) => (
+                <Card key={index} className={`bg-slate-800/50 border-slate-700 ${
+                  achievement.unlocked ? 'border-orange-500' : ''
+                }`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-white">{achievement.name}</h4>
+                      {achievement.unlocked && (
+                        <Badge className="bg-orange-600">
+                          <Sparkles className="h-3 w-3 mr-1" />
+                          Débloqué
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Progression</span>
+                        <span className="text-white">
+                          {achievement.progress}/{achievement.total}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={(achievement.progress / achievement.total) * 100} 
+                        className="h-2"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-4">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Analyse de Performance</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 bg-green-600/20 border border-green-600 rounded-lg">
+                    <h4 className="font-semibold text-green-400 mb-2">🚀 Excellent rythme !</h4>
+                    <p className="text-sm text-gray-300">
+                      Votre régularité Flash Glow s'améliore de 23% cette semaine
+                    </p>
+                  </div>
+                  <div className="p-4 bg-blue-600/20 border border-blue-600 rounded-lg">
+                    <h4 className="font-semibold text-blue-400 mb-2">⏰ Meilleur moment</h4>
+                    <p className="text-sm text-gray-300">
+                      Vos sessions de 14h-16h montrent 94% d'efficacité
+                    </p>
+                  </div>
+                  <div className="p-4 bg-purple-600/20 border border-purple-600 rounded-lg">
+                    <h4 className="font-semibold text-purple-400 mb-2">🎯 Recommandation</h4>
+                    <p className="text-sm text-gray-300">
+                      Essayez "Focus Flash" avant vos réunions importantes
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Tendances</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      { label: 'Lundi', sessions: 4, efficiency: 88 },
+                      { label: 'Mardi', sessions: 5, efficiency: 92 },
+                      { label: 'Mercredi', sessions: 3, efficiency: 85 },
+                      { label: 'Jeudi', sessions: 6, efficiency: 96 },
+                      { label: 'Vendredi', sessions: 4, efficiency: 90 }
+                    ].map((day, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                        <div className="font-medium text-white">{day.label}</div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="text-orange-400">{day.sessions} sessions</span>
+                          <span className="text-green-400">{day.efficiency}% efficace</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
