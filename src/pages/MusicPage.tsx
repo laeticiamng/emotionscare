@@ -1,76 +1,83 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Music, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Music, Play, Pause, SkipForward, SkipBack } from 'lucide-react';
 
 const MusicPage: React.FC = () => {
+  const musicRecommendations = [
+    { title: "Calm Meditation", genre: "Ambient", duration: "10:30" },
+    { title: "Focus Flow", genre: "Lo-fi", duration: "8:45" },
+    { title: "Energy Boost", genre: "Upbeat", duration: "6:20" }
+  ];
+
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Musicothérapie</h1>
-        <Button>
-          <Music className="w-4 h-4 mr-2" />
-          Nouvelle playlist
-        </Button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sessions d'écoute</CardTitle>
-            <Music className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">127</div>
-            <p className="text-xs text-muted-foreground">Cette semaine</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Temps d'écoute</CardTitle>
-            <Volume2 className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24h</div>
-            <p className="text-xs text-muted-foreground">Ce mois</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Playlists actives</CardTitle>
-            <Play className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Personnalisées</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Amélioration humeur</CardTitle>
-            <Music className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+34%</div>
-            <p className="text-xs text-muted-foreground">Après écoute</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Lecteur musical thérapeutique</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Interface de musicothérapie interactive en cours de développement
+    <div className="min-h-screen bg-background p-6">
+      <div className="container mx-auto max-w-4xl">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <Music className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold">Musique Thérapeutique</h1>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-muted-foreground">
+            Musiques personnalisées selon votre état émotionnel
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Lecteur Audio</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-4">
+                <div className="w-48 h-48 mx-auto bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
+                  <Music className="h-24 w-24 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Musique Relaxante</h3>
+                  <p className="text-muted-foreground">Séance de méditation - 12:30</p>
+                </div>
+                <div className="flex items-center justify-center gap-4">
+                  <Button variant="outline" size="icon">
+                    <SkipBack className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" className="h-12 w-12">
+                    <Play className="h-6 w-6" />
+                  </Button>
+                  <Button variant="outline" size="icon">
+                    <SkipForward className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Recommandations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {musicRecommendations.map((track, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                    <div className="flex items-center gap-3">
+                      <Button variant="ghost" size="icon">
+                        <Play className="h-4 w-4" />
+                      </Button>
+                      <div>
+                        <p className="font-medium">{track.title}</p>
+                        <p className="text-sm text-muted-foreground">{track.genre}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-muted-foreground">{track.duration}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

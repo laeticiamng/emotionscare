@@ -1,76 +1,76 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, PenTool, Calendar, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus, Calendar, BookOpen } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const JournalPage: React.FC = () => {
+  const { user } = useAuth();
+
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Journal personnel</h1>
-        <Button>
-          <PenTool className="w-4 h-4 mr-2" />
-          Nouvelle entrée
-        </Button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Entrées écrites</CardTitle>
-            <BookOpen className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">Total</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Série actuelle</CardTitle>
-            <Calendar className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">Jours consécutifs</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Humeur moyenne</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">7.8/10</div>
-            <p className="text-xs text-muted-foreground">Cette semaine</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Progression</CardTitle>
-            <PenTool className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+15%</div>
-            <p className="text-xs text-muted-foreground">Bien-être</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Mes entrées de journal</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Interface de journal personnel avec analyses d'humeur en cours de développement
+    <div className="min-h-screen bg-background p-6">
+      <div className="container mx-auto max-w-6xl">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <BookOpen className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold">Journal Personnel</h1>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-muted-foreground">
+            Exprimez vos pensées et suivez votre évolution émotionnelle
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Nouvelle entrée
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Créer
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Comment vous sentez-vous aujourd'hui ?
+                </label>
+                <Textarea 
+                  placeholder="Décrivez votre journée, vos émotions, vos pensées..."
+                  rows={6}
+                  className="w-full"
+                />
+              </div>
+              <Button className="w-full">Sauvegarder l'entrée</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Entrées récentes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium">Excellente journée</h3>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      Aujourd'hui
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    Journée très productive au travail, je me sens satisfait...
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
