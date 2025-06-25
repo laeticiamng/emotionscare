@@ -1,4 +1,3 @@
-
 import { RouteObject } from 'react-router-dom';
 import { homeRoutes } from './routes/homeRoutes';
 import { b2bRedirectRoutes } from './routes/b2bRedirectRoutes';
@@ -16,6 +15,7 @@ import { journalRoutes } from './routes/journalRoutes';
 import { rhRoutes } from './routes/rhRoutes';
 import { optimizedRoutes } from './routes/lazyRoutes';
 import { featureRoutes } from './routes/featureRoutes';
+import { adminRoutes } from './routes/adminRoutes';
 
 export const ROUTES_MANIFEST = {
   home: '/',
@@ -41,6 +41,7 @@ export const ROUTES_MANIFEST = {
   b2b: '/b2b',
   b2bSelection: '/b2b/selection',
   b2bUserLogin: '/b2b/user/login',
+  b2bUserRegister: '/b2b/user/register',
   b2bAdminLogin: '/b2b/admin/login',
   b2bUserDashboard: '/b2b/user/dashboard',
   b2bAdminDashboard: '/b2b/admin/dashboard',
@@ -52,6 +53,10 @@ export const ROUTES_MANIFEST = {
   music: '/music',
   coach: '/coach',
   journal: '/journal',
+  teams: '/teams',
+  reports: '/reports',
+  events: '/events',
+  optimisation: '/optimisation',
 } as const;
 
 export function buildUnifiedRoutes(): RouteObject[] {
@@ -72,6 +77,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
     ...rhRoutes,
     ...optimizedRoutes,
     ...featureRoutes,
+    ...adminRoutes,
   ];
 }
 

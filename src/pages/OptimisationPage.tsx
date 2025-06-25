@@ -1,97 +1,209 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Settings, Zap, Database, Globe } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp, Target, Lightbulb, ArrowLeft, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const OptimisationPage: React.FC = () => {
-  const optimizationMetrics = [
-    { label: "Performance générale", value: 85, status: "Bon" },
-    { label: "Utilisation mémoire", value: 62, status: "Modéré" },
-    { label: "Temps de réponse", value: 91, status: "Excellent" },
-    { label: "Disponibilité", value: 99, status: "Excellent" }
+  const navigate = useNavigate();
+
+  const optimizations = [
+    {
+      title: 'Étendre les pratiques de l\'équipe Développement',
+      description: 'L\'équipe Dev a un excellent score de bien-être (8.1/10). Identifier et déployer leurs bonnes pratiques.',
+      impact: 'high',
+      effort: 'medium',
+      status: 'recommended',
+      benefits: ['Amélioration globale du bien-être', 'Réduction du stress', 'Meilleure productivité']
+    },
+    {
+      title: 'Optimiser les horaires de méditation',
+      description: 'Analyser les créneaux les plus fréquentés pour optimiser l\'offre de sessions.',
+      impact: 'medium',
+      effort: 'low',
+      status: 'in_progress',
+      benefits: ['Meilleure participation', 'Optimisation des ressources']
+    },
+    {
+      title: 'Programme de mentorat inter-équipes',
+      description: 'Créer des binômes entre équipes performantes et celles en difficulté.',
+      impact: 'high',
+      effort: 'high',
+      status: 'planned',
+      benefits: ['Transfert de connaissances', 'Cohésion d\'équipe', 'Amélioration continue']
+    },
+    {
+      title: 'Personnalisation des recommandations IA',
+      description: 'Améliorer l\'algorithme de recommandation basé sur les données comportementales.',
+      impact: 'medium',
+      effort: 'high',
+      status: 'research',
+      benefits: ['Recommandations plus pertinentes', 'Meilleur engagement']
+    }
   ];
 
+  const quickWins = [
+    {
+      title: 'Rappels de pause automatiques',
+      description: 'Implémenter des notifications pour encourager les micro-pauses',
+      timeToImplement: '1 semaine'
+    },
+    {
+      title: 'Dashboard personnalisé',
+      description: 'Permettre aux utilisateurs de personnaliser leur tableau de bord',
+      timeToImplement: '2 semaines'
+    },
+    {
+      title: 'Feedback instantané',
+      description: 'Ajouter des enquêtes courtes après chaque session',
+      timeToImplement: '1 semaine'
+    }
+  ];
+
+  const getImpactBadge = (impact: string) => {
+    switch (impact) {
+      case 'high':
+        return <Badge className="bg-green-100 text-green-800">Impact élevé</Badge>;
+      case 'medium':
+        return <Badge className="bg-yellow-100 text-yellow-800">Impact moyen</Badge>;
+      case 'low':
+        return <Badge className="bg-gray-100 text-gray-800">Impact faible</Badge>;
+      default:
+        return <Badge variant="secondary">Inconnu</Badge>;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'recommended':
+        return <Badge className="bg-blue-100 text-blue-800">Recommandé</Badge>;
+      case 'in_progress':
+        return <Badge className="bg-purple-100 text-purple-800">En cours</Badge>;
+      case 'planned':
+        return <Badge className="bg-orange-100 text-orange-800">Planifié</Badge>;
+      case 'research':
+        return <Badge className="bg-gray-100 text-gray-800">En étude</Badge>;
+      default:
+        return <Badge variant="secondary">Inconnu</Badge>;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="container mx-auto max-w-6xl">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Settings className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Optimisation Système</h1>
+    <div data-testid="page-root" className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Optimisation continue</h1>
+            <p className="text-gray-600">Améliorez en permanence le bien-être de votre organisation</p>
           </div>
-          <p className="text-muted-foreground">
-            Surveillez et optimisez les performances de la plateforme
-          </p>
+          <Button onClick={() => navigate('/b2b/admin/dashboard')} variant="outline">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour au tableau de bord
+          </Button>
         </div>
 
-        <div className="grid gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {optimizationMetrics.map((metric, index) => (
-              <Card key={index}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">{metric.label}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="text-2xl font-bold">{metric.value}%</div>
-                    <Progress value={metric.value} className="w-full" />
-                    <div className={`text-xs px-2 py-1 rounded-full inline-block ${
-                      metric.status === 'Excellent' ? 'bg-green-100 text-green-800' :
-                      metric.status === 'Bon' ? 'bg-blue-100 text-blue-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {metric.status}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5" />
-                  Actions d'optimisation
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
-                  <Database className="h-4 w-4 mr-2" />
-                  Optimiser la base de données
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Nettoyer le cache
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Analyse des performances
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommandations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 text-sm">
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="font-medium text-blue-800">Cache optimisé</p>
-                    <p className="text-blue-600">Le cache a été optimisé récemment</p>
-                  </div>
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="font-medium text-yellow-800">Surveillance requise</p>
-                    <p className="text-yellow-600">L'utilisation mémoire nécessite une attention</p>
+        {/* Quick Wins */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Lightbulb className="h-5 w-5 mr-2" />
+              Actions rapides (Quick Wins)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {quickWins.map((win, index) => (
+                <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
+                  <h3 className="font-semibold mb-2">{win.title}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{win.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">{win.timeToImplement}</span>
+                    <Button size="sm">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Implémenter
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Optimizations */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Target className="h-5 w-5 mr-2" />
+              Opportunités d'optimisation
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {optimizations.map((opt, index) => (
+                <div key={index} className="p-6 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold text-lg">{opt.title}</h3>
+                        {getImpactBadge(opt.impact)}
+                        {getStatusBadge(opt.status)}
+                      </div>
+                      <p className="text-gray-600 mb-4">{opt.description}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h4 className="font-medium mb-2">Bénéfices attendus :</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {opt.benefits.map((benefit, bIndex) => (
+                        <Badge key={bIndex} variant="outline" className="text-xs">
+                          {benefit}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">
+                      Effort requis: <span className="font-medium">{opt.effort === 'high' ? 'Élevé' : opt.effort === 'medium' ? 'Moyen' : 'Faible'}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        Analyser
+                      </Button>
+                      <Button size="sm">
+                        Mettre en œuvre
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Actions rapides</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-3">
+                <Button onClick={() => navigate('/teams')}>
+                  Analyser les équipes
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/reports')}>
+                  Générer un rapport d'optimisation
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/events')}>
+                  Planifier une session d'amélioration
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

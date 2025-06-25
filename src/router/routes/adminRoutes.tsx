@@ -1,7 +1,6 @@
 
 import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-import SecureRouteGuard from '@/components/security/SecureRouteGuard';
 
 const TeamsPage = lazy(() => import('@/pages/TeamsPage'));
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
@@ -11,34 +10,18 @@ const OptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
 export const adminRoutes: RouteObject[] = [
   {
     path: '/teams',
-    element: (
-      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
-        <TeamsPage />
-      </SecureRouteGuard>
-    ),
+    element: <TeamsPage />,
   },
   {
-    path: '/reports',
-    element: (
-      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
-        <ReportsPage />
-      </SecureRouteGuard>
-    ),
+    path: '/reports',  
+    element: <ReportsPage />,
   },
   {
     path: '/events',
-    element: (
-      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
-        <EventsPage />
-      </SecureRouteGuard>
-    ),
+    element: <EventsPage />,
   },
   {
     path: '/optimisation',
-    element: (
-      <SecureRouteGuard allowedRoles={['b2b_admin', 'admin']}>
-        <OptimisationPage />
-      </SecureRouteGuard>
-    ),
+    element: <OptimisationPage />,
   },
 ];
