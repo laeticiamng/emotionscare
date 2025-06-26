@@ -1,3 +1,4 @@
+
 import React, { lazy, Suspense } from 'react';
 import { createRoutesFromElements, Route } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -11,7 +12,6 @@ import AuthPage from '@/pages/AuthPage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import TestPage from '@/pages/TestPage';
-import Point20 from '@/pages/Point20';
 import UnifiedRouteGuard from '@/components/routing/UnifiedRouteGuard';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
 
@@ -100,10 +100,7 @@ export const buildUnifiedRoutes = () => {
 
       {/* Test Routes - Development Only */}
       {import.meta.env.MODE === 'development' && (
-        <>
-          <Route path="/test" element={<TestPage />} />
-          <Route path="/point20" element={<Point20 />} />
-        </>
+        <Route path="/test" element={<TestPage />} />
       )}
       
       <Route path="*" element={<NotFoundPage />} />
