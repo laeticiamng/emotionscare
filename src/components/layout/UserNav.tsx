@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useNavigate } from 'react-router-dom';
-import { User, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { User, Settings, HelpCircle, LogOut, Bell } from 'lucide-react';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 
 const UserNav: React.FC = () => {
@@ -64,10 +63,15 @@ const UserNav: React.FC = () => {
           <User className="mr-2 h-4 w-4" />
           <span>Profil</span>
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/notifications')}>
+          <Bell className="mr-2 h-4 w-4" />
+          <span>Notifications</span>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Paramètres</span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/help')}>
           <HelpCircle className="mr-2 h-4 w-4" />
           <span>Aide</span>
