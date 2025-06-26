@@ -1,188 +1,243 @@
-import { lazy } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
-import { homeRoutes } from './routes/homeRoutes';
-import { userRoutes } from './routes/userRoutes';
+import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
+import { B2CLoginPage, B2CRegisterPage, B2CDashboardPage, B2COnboardingPage, B2CJournalPage, B2CMusicPage, B2CScanPage, B2CCoachPage, B2CVRPage, B2CGamificationPage, B2CSocialPage, B2CSettingsPage } from '@/utils/lazyComponents';
+import { B2BUserLoginPage, B2BUserRegisterPage, B2BUserDashboardPage, B2BUserScanPage, B2BUserCoachPage, B2BUserMusicPage } from '@/utils/lazyComponents';
+import { B2BAdminLoginPage, B2BAdminDashboardPage } from '@/utils/lazyComponents';
+import { ImmersiveHome, MeditationPage, LazyPageWrapper } from '@/utils/unifiedLazyRoutes';
+import ChooseModePage from '@/pages/ChooseModePage';
+import B2BSelectionPage from '@/pages/b2b/B2BSelectionPage';
+import AuthPage from '@/pages/AuthPage';
 
-// Lazy load pages
-const ScanPage = lazy(() => import('@/pages/ScanPage'));
-const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const CoachPage = lazy(() => import('@/pages/CoachPage'));
-const JournalPage = lazy(() => import('@/pages/JournalPage'));
-const VRPage = lazy(() => import('@/pages/VRPage'));
-const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
-const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+// Pages manquantes à ajouter
+const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
+const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
+const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
+const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
 const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage'));
-const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
-const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
-
-// B2C Pages
-const B2CLoginPage = lazy(() => import('@/pages/b2c/LoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/b2c/RegisterPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/b2c/DashboardPage'));
-
-// B2B Pages
-const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/LoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/RegisterPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/DashboardPage'));
-const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/LoginPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/DashboardPage'));
-
-// Add new lazy loaded pages
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
-const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
-const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
-const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
-    // Home routes
-    ...homeRoutes,
-    
-    // User routes (B2C, B2B)
-    ...userRoutes,
-    
-    // B2C routes
     {
-      path: '/b2c/login',
-      element: <B2CLoginPage />,
+      path: '/',
+      element: <AuthPage />,
     },
     {
-      path: '/b2c/register',
-      element: <B2CRegisterPage />,
+      path: '/choose-mode',
+      element: <ChooseModePage />,
     },
-    {
-      path: '/b2c/dashboard',
-      element: <B2CDashboardPage />,
-    },
-    
-    // B2B Selection
     {
       path: '/b2b/selection',
       element: <B2BSelectionPage />,
     },
-    
-    // B2B User routes
+    {
+      path: '/b2c/login',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CLoginPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/b2c/register',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CRegisterPage />
+        </Suspense>
+      ),
+    },
     {
       path: '/b2b/user/login',
-      element: <B2BUserLoginPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2BUserLoginPage />
+        </Suspense>
+      ),
     },
     {
       path: '/b2b/user/register',
-      element: <B2BUserRegisterPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2BUserRegisterPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/b2b/admin/login',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2BAdminLoginPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/b2c/dashboard',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />} >
+          <B2CDashboardPage />
+        </Suspense>
+      ),
     },
     {
       path: '/b2b/user/dashboard',
-      element: <B2BUserDashboardPage />,
-    },
-    
-    // B2B Admin routes
-    {
-      path: '/b2b/admin/login',
-      element: <B2BAdminLoginPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2BUserDashboardPage />
+        </Suspense>
+      ),
     },
     {
       path: '/b2b/admin/dashboard',
-      element: <B2BAdminDashboardPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2BAdminDashboardPage />
+        </Suspense>
+      ),
     },
-    
-    // Feature routes
     {
       path: '/scan',
-      element: <ScanPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CScanPage />
+        </Suspense>
+      ),
     },
     {
       path: '/music',
-      element: <MusicPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CMusicPage />
+        </Suspense>
+      ),
     },
     {
       path: '/coach',
-      element: <CoachPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CCoachPage />
+        </Suspense>
+      ),
     },
     {
       path: '/journal',
-      element: <JournalPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CJournalPage />
+        </Suspense>
+      ),
     },
     {
       path: '/vr',
-      element: <VRPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CVRPage />
+        </Suspense>
+      ),
     },
     {
       path: '/preferences',
-      element: <PreferencesPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSettingsPage />
+        </Suspense>
+      ),
     },
     {
       path: '/gamification',
-      element: <GamificationPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CGamificationPage />
+        </Suspense>
+      ),
     },
     {
       path: '/social-cocon',
-      element: <SocialCoconPage />,
-    },
-    
-    // New feature routes
-    {
-      path: '/breathwork',
-      element: <BreathworkPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSocialPage />
+        </Suspense>
+      ),
     },
     {
-      path: '/onboarding',
-      element: <OnboardingPage />,
+      path: '/teams',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSettingsPage />
+        </Suspense>
+      ),
     },
     {
-      path: '/flash-glow',
-      element: <FlashGlowPage />,
+      path: '/reports',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSettingsPage />
+        </Suspense>
+      ),
     },
     {
-      path: '/profile-settings',
-      element: <ProfileSettingsPage />,
-    },
-    
-    // System routes
+      path: '/events',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSettingsPage />
+        </Suspense>
+      ),
     {
-      path: '/auth/callback',
-      element: <AuthCallbackPage />,
+      path: '/optimisation',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSettingsPage />
+        </Suspense>
+      ),
     },
     {
-      path: '/reset-password',
-      element: <ResetPasswordPage />,
+      path: '/settings',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2CSettingsPage />
+        </Suspense>
+      ),
     },
-    
-    // Catch all 404
+
+    // Nouvelles routes ajoutées
     {
-      path: '*',
-      element: <NotFoundPage />,
-    }
+      path: '/boss-level-grit',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <BossLevelGritPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/mood-mixer',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <MoodMixerPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/bounce-back-battle',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <BounceBackBattlePage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/instant-glow',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <InstantGlowPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/social-cocon',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <SocialCoconPage />
+        </Suspense>
+      ),
+    },
   ];
 }
-
-// Export route manifest for testing
-export const ROUTE_MANIFEST = [
-  '/',
-  '/choose-mode',
-  '/auth',
-  '/onboarding',
-  '/b2c/login',
-  '/b2c/register',
-  '/b2c/dashboard',
-  '/b2b/selection',
-  '/b2b/user/login',
-  '/b2b/user/register',
-  '/b2b/user/dashboard',
-  '/b2b/admin/login',
-  '/b2b/admin/dashboard',
-  '/scan',
-  '/music',
-  '/coach',
-  '/journal',
-  '/vr',
-  '/preferences',
-  '/gamification',
-  '/social-cocon',
-  '/breathwork',
-  '/flash-glow',
-  '/profile-settings',
-  '/auth/callback',
-  '/reset-password'
-];

@@ -2,369 +2,209 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  MessageCircle, 
-  Heart, 
-  Share2, 
-  Plus, 
-  Search,
-  Filter,
-  Send,
-  Shield,
-  UserPlus,
-  Calendar,
-  MapPin,
-  Star,
-  Smile,
-  Camera,
-  Lock
-} from 'lucide-react';
-
-interface Post {
-  id: string;
-  author: string;
-  avatar: string;
-  content: string;
-  mood: string;
-  timestamp: string;
-  likes: number;
-  comments: number;
-  isAnonymous: boolean;
-  tags: string[];
-}
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  participants: number;
-  maxParticipants: number;
-  location: string;
-  type: 'online' | 'offline';
-}
-
-interface Group {
-  id: string;
-  name: string;
-  description: string;
-  members: number;
-  category: string;
-  isPrivate: boolean;
-  image: string;
-}
+import { Users, Heart, MessageCircle, Shield, Send, Plus } from 'lucide-react';
 
 const SocialCoconPage: React.FC = () => {
-  const [newPost, setNewPost] = useState('');
-  const [selectedMood, setSelectedMood] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState('general');
 
-  const posts: Post[] = [
+  const groups = [
+    { id: 'general', name: 'Général', members: 142, color: 'bg-blue-100 text-blue-800' },
+    { id: 'meditation', name: 'Méditation', members: 89, color: 'bg-purple-100 text-purple-800' },
+    { id: 'motivation', name: 'Motivation', members: 156, color: 'bg-orange-100 text-orange-800' },
+    { id: 'support', name: 'Entraide', members: 203, color: 'bg-green-100 text-green-800' }
+  ];
+
+  const messages = [
     {
-      id: '1',
-      author: 'Marie',
-      avatar: '/api/placeholder/40/40',
-      content: 'Aujourd\'hui j\'ai réussi ma première session de méditation de 20 minutes ! Je me sens tellement plus calme. Merci à tous ceux qui m\'ont encouragée ✨',
-      mood: 'happy',
-      timestamp: '2h',
+      id: 1,
+      author: 'Utilisateur Anonyme',
+      content: 'Merci pour vos conseils hier, ça m\'a vraiment aidé à surmonter ma journée difficile. 💙',
+      time: '2 min',
       likes: 12,
-      comments: 3,
-      isAnonymous: false,
-      tags: ['méditation', 'accomplissement']
+      responses: 3
     },
     {
-      id: '2',
-      author: 'Utilisateur anonyme',
-      avatar: '/api/placeholder/40/40',
-      content: 'Quelqu\'un d\'autre a-t-il du mal à dormir à cause de l\'anxiété ? J\'aimerais avoir des conseils pour mieux gérer mes nuits difficiles.',
-      mood: 'anxious',
-      timestamp: '4h',
-      likes: 8,
-      comments: 7,
-      isAnonymous: true,
-      tags: ['anxiété', 'sommeil', 'conseils']
+      id: 2,
+      author: 'Ami Bienveillant',
+      content: 'Je partage une technique de respiration qui m\'aide beaucoup : 4 secondes d\'inspiration, 4 secondes de pause, 4 secondes d\'expiration. Simple mais efficace !',
+      time: '15 min',
+      likes: 28,
+      responses: 7
     },
     {
-      id: '3',
-      author: 'Pierre',
-      avatar: '/api/placeholder/40/40',
-      content: 'Partage de ma playlist zen du moment 🎵 Ces musiques m\'aident vraiment à me détendre après une journée stressante. N\'hésitez pas à me dire ce que vous en pensez !',
-      mood: 'relaxed',
-      timestamp: '6h',
-      likes: 15,
-      comments: 5,
-      isAnonymous: false,
-      tags: ['musique', 'détente', 'partage']
+      id: 3,
+      author: 'Compagnon de Route',
+      content: 'Qui d\'autre trouve que les matins sont les plus difficiles ? J\'aimerais des conseils pour bien commencer la journée.',
+      time: '1h',
+      likes: 19,
+      responses: 15
     }
   ];
-
-  const events: Event[] = [
-    {
-      id: '1',
-      title: 'Méditation guidée en groupe',
-      description: 'Session de méditation collective pour débutants et confirmés',
-      date: '2024-01-20 18:00',
-      participants: 8,
-      maxParticipants: 15,
-      location: 'En ligne',
-      type: 'online'
-    },
-    {
-      id: '2',
-      title: 'Atelier gestion du stress',
-      description: 'Techniques pratiques pour mieux gérer le stress quotidien',
-      date: '2024-01-25 14:00',
-      participants: 12,
-      maxParticipants: 20,
-      location: 'Paris, France',
-      type: 'offline'
-    },
-    {
-      id: '3',
-      title: 'Cercle de partage',
-      description: 'Espace bienveillant pour partager ses expériences',
-      date: '2024-01-22 19:30',
-      participants: 6,
-      maxParticipants: 10,
-      location: 'En ligne',
-      type: 'online'
-    }
-  ];
-
-  const groups: Group[] = [
-    {
-      id: '1',
-      name: 'Anxiété et Sérénité',
-      description: 'Groupe de soutien pour les personnes vivant avec l\'anxiété',
-      members: 247,
-      category: 'Support',
-      isPrivate: true,
-      image: '/api/placeholder/60/60'
-    },
-    {
-      id: '2',
-      name: 'Méditation Quotidienne',
-      description: 'Pratiquons la méditation ensemble chaque jour',
-      members: 189,
-      category: 'Pratique',
-      isPrivate: false,
-      image: '/api/placeholder/60/60'
-    },
-    {
-      id: '3',
-      name: 'Parents Zen',
-      description: 'Concilier parentalité et bien-être mental',
-      members: 156,
-      category: 'Thématique',
-      isPrivate: false,
-      image: '/api/placeholder/60/60'
-    }
-  ];
-
-  const handlePostSubmit = () => {
-    if (newPost.trim()) {
-      // Simulate posting
-      setNewPost('');
-      setSelectedMood('');
-      setIsAnonymous(false);
-    }
-  };
-
-  const getMoodColor = (mood: string) => {
-    switch (mood) {
-      case 'happy': return 'bg-green-100 text-green-800';
-      case 'sad': return 'bg-blue-100 text-blue-800';
-      case 'anxious': return 'bg-yellow-100 text-yellow-800';
-      case 'relaxed': return 'bg-purple-100 text-purple-800';
-      case 'stressed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getMoodLabel = (mood: string) => {
-    switch (mood) {
-      case 'happy': return 'Joyeux';
-      case 'sad': return 'Triste';
-      case 'anxious': return 'Anxieux';
-      case 'relaxed': return 'Détendu';
-      case 'stressed': return 'Stressé';
-      default: return mood;
-    }
-  };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-100 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6" data-testid="page-root">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-pink-100 rounded-full">
-              <Users className="h-8 w-8 text-pink-600" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Social Cocoon</h1>
-              <p className="text-gray-600">Communauté bienveillante pour votre bien-être</p>
-            </div>
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <Badge className="bg-blue-100 text-blue-800 px-4 py-2">
+              <Users className="w-4 h-4 mr-2" />
+              Communauté Bienveillante
+            </Badge>
           </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-            <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-blue-900">Espace sécurisé et bienveillant</h3>
-              <p className="text-sm text-blue-800">
-                Tous les échanges sont modérés. Respectez la confidentialité et la bienveillance.
-              </p>
-            </div>
-          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Social Cocoon
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Un espace sécurisé et anonyme pour partager, écouter et grandir ensemble dans la bienveillance
+          </p>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="feed" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="feed">Fil d'actualité</TabsTrigger>
-            <TabsTrigger value="groups">Groupes</TabsTrigger>
-            <TabsTrigger value="events">Événements</TabsTrigger>
-            <TabsTrigger value="resources">Ressources</TabsTrigger>
-          </TabsList>
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-white/80 backdrop-blur-sm border-blue-200">
+            <CardContent className="p-6 text-center">
+              <Users className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+              <div className="text-2xl font-bold text-blue-600">590</div>
+              <div className="text-sm text-muted-foreground">Membres actifs</div>
+            </CardContent>
+          </Card>
 
-          {/* Feed Tab */}
-          <TabsContent value="feed" className="space-y-6">
-            {/* Create Post */}
-            <Card>
+          <Card className="bg-white/80 backdrop-blur-sm border-purple-200">
+            <CardContent className="p-6 text-center">
+              <MessageCircle className="w-8 h-8 mx-auto mb-2 text-purple-600" />
+              <div className="text-2xl font-bold text-purple-600">1,247</div>
+              <div className="text-sm text-muted-foreground">Messages échangés</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
+            <CardContent className="p-6 text-center">
+              <Heart className="w-8 h-8 mx-auto mb-2 text-pink-600" />
+              <div className="text-2xl font-bold text-pink-600">3,891</div>
+              <div className="text-sm text-muted-foreground">Cœurs partagés</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-green-200">
+            <CardContent className="p-6 text-center">
+              <Shield className="w-8 h-8 mx-auto mb-2 text-green-600" />
+              <div className="text-2xl font-bold text-green-600">100%</div>
+              <div className="text-sm text-muted-foreground">Sécurité garantie</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar - Groups */}
+          <div className="lg:col-span-1">
+            <Card className="bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="h-5 w-5" />
-                  Partager votre expérience
+                <CardTitle className="flex items-center justify-between">
+                  <span>Groupes</span>
+                  <Button size="sm" variant="outline">
+                    <Plus className="w-4 h-4" />
+                  </Button>
                 </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {groups.map((group) => (
+                  <div
+                    key={group.id}
+                    className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                      selectedGroup === group.id
+                        ? 'bg-blue-100 border-2 border-blue-300'
+                        : 'bg-gray-50 hover:bg-gray-100'
+                    }`}
+                    onClick={() => setSelectedGroup(group.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{group.name}</span>
+                      <Badge className={group.color}>{group.members}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Community Guidelines */}
+            <Card className="bg-white/80 backdrop-blur-sm mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Shield className="w-5 h-5 mr-2 text-green-600" />
+                  Règles du Cocoon
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li>• Respect et bienveillance</li>
+                  <li>• Anonymat préservé</li>
+                  <li>• Pas de jugement</li>
+                  <li>• Écoute active</li>
+                  <li>• Confidentialité absolue</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* New Message */}
+            <Card className="bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>Partager avec la communauté</CardTitle>
                 <CardDescription>
-                  Exprimez-vous en toute sécurité avec la communauté
+                  Votre message sera publié de façon anonyme et bienveillante
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Textarea
-                  placeholder="Partagez vos pensées, vos victoires, vos défis... La communauté est là pour vous écouter et vous soutenir."
-                  value={newPost}
-                  onChange={(e) => setNewPost(e.target.value)}
-                  rows={3}
+                  placeholder="Que souhaitez-vous partager avec la communauté ? Vos expériences, questions ou encouragements sont les bienvenus..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  className="min-h-[120px]"
                 />
-                
-                <div className="flex flex-wrap gap-2">
-                  <p className="text-sm text-gray-600 w-full mb-2">Comment vous sentez-vous ?</p>
-                  {['happy', 'relaxed', 'anxious', 'sad', 'stressed'].map((mood) => (
-                    <Button
-                      key={mood}
-                      variant={selectedMood === mood ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedMood(mood)}
-                      className="text-xs"
-                    >
-                      <Smile className="h-3 w-3 mr-1" />
-                      {getMoodLabel(mood)}
-                    </Button>
-                  ))}
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={isAnonymous}
-                        onChange={(e) => setIsAnonymous(e.target.checked)}
-                        className="rounded"
-                      />
-                      <Lock className="h-4 w-4" />
-                      Publier anonymement
-                    </label>
-                    <Button variant="outline" size="sm">
-                      <Camera className="h-4 w-4 mr-2" />
-                      Photo
-                    </Button>
+                <div className="flex justify-between items-center">
+                  <div className="flex space-x-2">
+                    <Badge variant="outline">Anonyme</Badge>
+                    <Badge variant="outline" className="text-green-600">Sécurisé</Badge>
                   </div>
-                  <Button onClick={handlePostSubmit} disabled={!newPost.trim()}>
-                    <Send className="h-4 w-4 mr-2" />
-                    Publier
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Send className="w-4 h-4 mr-2" />
+                    Partager
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Search and Filter */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="Rechercher dans les posts..."
-                      className="w-full"
-                    />
-                  </div>
-                  <Button variant="outline">
-                    <Search className="h-4 w-4 mr-2" />
-                    Rechercher
-                  </Button>
-                  <Button variant="outline">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filtrer
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Posts */}
+            {/* Messages Feed */}
             <div className="space-y-4">
-              {posts.map((post) => (
-                <Card key={post.id} className="hover:shadow-lg transition-shadow">
+              {messages.map((message) => (
+                <Card key={message.id} className="bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-300">
                   <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarImage src={post.avatar} />
-                        <AvatarFallback>
-                          {post.isAnonymous ? '?' : post.author.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      
+                    <div className="flex items-start space-x-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-medium">
-                            {post.isAnonymous ? 'Utilisateur anonyme' : post.author}
-                          </h3>
-                          <span className="text-sm text-gray-500">• {post.timestamp}</span>
-                          {post.mood && (
-                            <Badge className={getMoodColor(post.mood)}>
-                              {getMoodLabel(post.mood)}
-                            </Badge>
-                          )}
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className="font-medium text-gray-800">{message.author}</span>
+                          <Badge variant="outline" className="text-xs">Anonyme</Badge>
+                          <span className="text-sm text-muted-foreground">• {message.time}</span>
                         </div>
-                        
-                        <p className="text-gray-700 mb-3 leading-relaxed">{post.content}</p>
-                        
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {post.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        
-                        <div className="flex items-center gap-6 text-sm text-gray-600">
-                          <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-red-600">
-                            <Heart className="h-4 w-4" />
-                            {post.likes}
+                        <p className="text-gray-700 mb-4">{message.content}</p>
+                        <div className="flex items-center space-x-4">
+                          <Button variant="ghost" size="sm" className="text-pink-600 hover:text-pink-700">
+                            <Heart className="w-4 h-4 mr-1" />
+                            {message.likes}
                           </Button>
-                          <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-blue-600">
-                            <MessageCircle className="h-4 w-4" />
-                            {post.comments}
-                          </Button>
-                          <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:text-green-600">
-                            <Share2 className="h-4 w-4" />
-                            Partager
+                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            {message.responses}
                           </Button>
                         </div>
                       </div>
@@ -373,155 +213,15 @@ const SocialCoconPage: React.FC = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
 
-          {/* Groups Tab */}
-          <TabsContent value="groups" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Groupes de soutien</h2>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Créer un groupe
+            {/* Load More */}
+            <div className="text-center">
+              <Button variant="outline" className="w-full md:w-auto">
+                Charger plus de messages
               </Button>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {groups.map((group) => (
-                <Card key={group.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={group.image} />
-                        <AvatarFallback>{group.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          {group.name}
-                          {group.isPrivate && <Lock className="h-4 w-4 text-gray-500" />}
-                        </CardTitle>
-                        <CardDescription>{group.description}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">{group.members} membres</span>
-                        <Badge variant="secondary">{group.category}</Badge>
-                      </div>
-                      <Button className="w-full">
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Rejoindre
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Events Tab */}
-          <TabsContent value="events" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Événements à venir</h2>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Créer un événement
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {events.map((event) => (
-                <Card key={event.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{event.title}</CardTitle>
-                    <CardDescription>{event.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(event.date).toLocaleString('fr-FR')}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="h-4 w-4" />
-                        {event.location}
-                        <Badge variant={event.type === 'online' ? 'secondary' : 'outline'}>
-                          {event.type === 'online' ? 'En ligne' : 'Présentiel'}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Users className="h-4 w-4" />
-                        {event.participants}/{event.maxParticipants} participants
-                      </div>
-                      <Button className="w-full">
-                        Participer
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Resources Tab */}
-          <TabsContent value="resources" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-yellow-500" />
-                    Ressources populaires
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <h4 className="font-medium">Guide de la méditation</h4>
-                      <p className="text-sm text-gray-600">Techniques de base pour débuter</p>
-                    </div>
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <h4 className="font-medium">Gestion de l'anxiété</h4>
-                      <p className="text-sm text-gray-600">Stratégies pratiques au quotidien</p>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <h4 className="font-medium">Sommeil réparateur</h4>
-                      <p className="text-sm text-gray-600">Améliorer la qualité de votre sommeil</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-green-500" />
-                    Aide et support
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                      <h4 className="font-medium text-red-800">Urgence</h4>
-                      <p className="text-sm text-red-700">Numéros d'urgence et ressources immédiates</p>
-                      <Button size="sm" className="mt-2 bg-red-600 hover:bg-red-700">
-                        Accéder
-                      </Button>
-                    </div>
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <h4 className="font-medium">Professionnels</h4>
-                      <p className="text-sm text-gray-600">Trouver un thérapeute près de chez vous</p>
-                    </div>
-                    <div className="p-3 bg-yellow-50 rounded-lg">
-                      <h4 className="font-medium">Lignes d'écoute</h4>
-                      <p className="text-sm text-gray-600">Soutien téléphonique gratuit</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );
