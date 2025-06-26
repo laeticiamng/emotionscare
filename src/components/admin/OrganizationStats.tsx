@@ -35,4 +35,5 @@ const OrganizationStats: React.FC = () => {
   );
 };
 
+export { OrganizationStats };
 export default OrganizationStats;
