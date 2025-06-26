@@ -1,11 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/stores/useAuthStore';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
-// Routes publiques autorisées - définition stricte selon le ticket
+// Routes publiques autorisées selon les spécifications
 const PUBLIC_ROUTES = [
   '/',
   '/choose-mode',
@@ -23,24 +23,79 @@ interface AuthGuardProps {
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const location = useLocation();
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const { userMode, isLoading: modeLoading } = useUserMode();
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { 
+    isAuthenticated, 
+    isLoading, 
+    setSession, 
+    setLoading, 
+    initialize,
+    refreshSession 
+  } = useAuthStore();
 
   useEffect(() => {
-    console.log('🔐 AuthGuard check:', {
-      path: location.pathname,
-      isAuthenticated,
-      isLoading,
-      userMode,
-      modeLoading
-    });
-  }, [location.pathname, isAuthenticated, isLoading, userMode, modeLoading]);
+    let mounted = true;
 
-  // Chargement en cours
-  if (isLoading || modeLoading) {
+    const initializeAuth = async () => {
+      if (!mounted) return;
+
+      try {
+        await initialize();
+        
+        // Setup auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (!mounted) return;
+
+            console.log('🔐 Auth state change:', event, !!session);
+            
+            switch (event) {
+              case 'SIGNED_IN':
+              case 'TOKEN_REFRESHED':
+                setSession(session);
+                break;
+              case 'SIGNED_OUT':
+                setSession(null);
+                break;
+              case 'PASSWORD_RECOVERY':
+              case 'USER_UPDATED':
+                if (session) setSession(session);
+                break;
+            }
+          }
+        );
+
+        if (mounted) {
+          setIsInitialized(true);
+        }
+
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('❌ Auth initialization failed:', error);
+        if (mounted) {
+          setLoading(false);
+          setIsInitialized(true);
+        }
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, [initialize, setSession, setLoading]);
+
+  // Affichage du loading pendant l'initialisation (max 500ms selon specs)
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingAnimation text="Vérification de l'authentification..." size="lg" />
+        <LoadingAnimation 
+          text="Vérification de l'authentification..." 
+          size="lg" 
+        />
       </div>
     );
   }

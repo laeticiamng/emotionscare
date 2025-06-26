@@ -1,57 +1,46 @@
 
-import React, { Suspense, startTransition } from 'react';
+import React, { Suspense } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
-import { UniversalErrorBoundary } from '@/components/ErrorBoundary/UniversalErrorBoundary';
+import { router } from '@/router';
+import AuthProvider from '@/components/auth/AuthProvider';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { Toaster } from '@/components/ui/sonner';
+import './App.css';
 
-console.log('🚀 App component rendering - VERSION UNIFIÉE CORRIGÉE...');
-
-// Loader optimisé avec transition
-const UniversalLoader = () => (
-  <div 
-    data-testid="page-loading" 
-    className="min-h-screen bg-background flex items-center justify-center"
-  >
-    <div className="text-center space-y-4">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-      <p className="text-lg font-medium">Chargement EmotionsCare...</p>
-      <p className="text-sm text-muted-foreground">Initialisation sécurisée</p>
-    </div>
-  </div>
-);
+// Configuration du client React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: (failureCount, error: any) => {
+        // Ne pas retry si l'erreur est liée à l'authentification
+        if (error?.status === 401 || error?.status === 403) {
+          return false;
+        }
+        return failureCount < 3;
+      }
+    }
+  }
+});
 
 function App() {
-  console.log('🚀 App function called - Router corrigé');
-  
-  React.useEffect(() => {
-    console.log('🚀 App mounted - VERSION CORRIGÉE');
-    console.log('🚀 Current location:', window.location.href);
-    
-    // Utilisation de startTransition pour les changements de route
-    const handleRouteChange = () => {
-      startTransition(() => {
-        console.info('%c[Route] mounted', 'color:lime', window.location.pathname);
-      });
-    };
-    
-    window.addEventListener('popstate', handleRouteChange);
-    handleRouteChange(); // Log initial
-    
-    return () => {
-      console.log('🚀 App unmounted');
-      window.removeEventListener('popstate', handleRouteChange);
-    };
-  }, []);
-
   return (
-    <UniversalErrorBoundary>
-      <Suspense fallback={<UniversalLoader />}>
-        <RouterProvider 
-          router={router}
-          fallbackElement={<UniversalLoader />}
-        />
-      </Suspense>
-    </UniversalErrorBoundary>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-background">
+              <LoadingAnimation text="Initialisation de l'application..." size="lg" />
+            </div>
+          }>
+            <RouterProvider router={router} />
+          </Suspense>
+          <Toaster />
+        </AuthProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 
