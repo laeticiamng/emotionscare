@@ -3,7 +3,7 @@ import React, { lazy, Suspense } from 'react';
 import { createRoutesFromElements, Route } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { routes as b2bRoutes } from './routes/b2bRoutes';
-import { routes as b2cRoutes } from './routes/b2cRoutes';
+import { b2cRoutes } from './routes/b2cRoutes';
 import { optimizedRoutes } from './routes/lazyRoutes';
 import { UNIFIED_ROUTES } from '@/utils/routeUtils';
 import HomePage from '@/pages/HomePage';
