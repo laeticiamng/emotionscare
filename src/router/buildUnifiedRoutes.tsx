@@ -1,4 +1,3 @@
-
 import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
 import { homeRoutes } from './routes/homeRoutes';
@@ -29,6 +28,12 @@ const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/RegisterPage'));
 const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/DashboardPage'));
 const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/LoginPage'));
 const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/DashboardPage'));
+
+// Add new lazy loaded pages
+const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
+const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
@@ -116,6 +121,24 @@ export function buildUnifiedRoutes(): RouteObject[] {
       element: <SocialCoconPage />,
     },
     
+    // New feature routes
+    {
+      path: '/breathwork',
+      element: <BreathworkPage />,
+    },
+    {
+      path: '/onboarding',
+      element: <OnboardingPage />,
+    },
+    {
+      path: '/flash-glow',
+      element: <FlashGlowPage />,
+    },
+    {
+      path: '/profile-settings',
+      element: <ProfileSettingsPage />,
+    },
+    
     // System routes
     {
       path: '/auth/callback',
@@ -139,6 +162,7 @@ export const ROUTE_MANIFEST = [
   '/',
   '/choose-mode',
   '/auth',
+  '/onboarding',
   '/b2c/login',
   '/b2c/register',
   '/b2c/dashboard',
@@ -156,6 +180,9 @@ export const ROUTE_MANIFEST = [
   '/preferences',
   '/gamification',
   '/social-cocon',
+  '/breathwork',
+  '/flash-glow',
+  '/profile-settings',
   '/auth/callback',
   '/reset-password'
 ];
