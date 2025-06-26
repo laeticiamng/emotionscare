@@ -1,135 +1,238 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Save, Settings, Bell, Music, Eye, Palette, Volume2, Moon, Sun } from 'lucide-react';
-import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Palette, 
+  Volume2, 
+  Eye, 
+  Shield, 
+  Bell, 
+  Globe, 
+  Monitor,
+  Smartphone,
+  Moon,
+  Sun,
+  VolumeX,
+  Settings,
+  User,
+  Lock,
+  Accessibility,
+  Zap,
+  Heart,
+  Brain
+} from 'lucide-react';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
+import { useToast } from '@/hooks/use-toast';
 
 const PreferencesPage: React.FC = () => {
-  const [preferences, setPreferences] = useState({
-    notifications: true,
-    emailAlerts: false,
-    soundEffects: true,
-    musicAutoplay: true,
-    theme: 'system',
-    language: 'fr',
-    volume: [70],
-    animationSpeed: [1],
-    dataCollection: true,
-    shareProgress: false,
-    publicProfile: false
-  });
+  const { preferences, updatePreferences, theme, fontSize, language } = useUserPreferences();
+  const { toast } = useToast();
+  
+  const [localPreferences, setLocalPreferences] = useState(preferences);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  const handleSave = () => {
-    // Sauvegarder les préférences
-    toast.success('Préférences sauvegardées avec succès !');
+  const handlePreferenceChange = (key: string, value: any) => {
+    const updated = { ...localPreferences, [key]: value };
+    setLocalPreferences(updated);
+    setHasChanges(true);
   };
 
-  const updatePreference = (key: string, value: any) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+  const handleNestedPreferenceChange = (section: string, key: string, value: any) => {
+    const updated = {
+      ...localPreferences,
+      [section]: {
+        ...localPreferences[section as keyof typeof localPreferences],
+        [key]: value
+      }
+    };
+    setLocalPreferences(updated);
+    setHasChanges(true);
+  };
+
+  const savePreferences = async () => {
+    try {
+      await updatePreferences(localPreferences);
+      setHasChanges(false);
+      toast({
+        title: "Préférences sauvegardées",
+        description: "Vos paramètres ont été mis à jour avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les préférences.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetPreferences = () => {
+    setLocalPreferences(preferences);
+    setHasChanges(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20" data-testid="page-root">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-8"
-        >
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center gap-3">
-              <Settings className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Préférences
-              </h1>
-            </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Personnalisez votre expérience EmotionsCare selon vos besoins
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Préférences</h1>
+            <p className="text-muted-foreground">
+              Personnalisez votre expérience EmotionsCare
             </p>
           </div>
+          
+          {hasChanges && (
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={resetPreferences}>
+                Annuler
+              </Button>
+              <Button onClick={savePreferences}>
+                Sauvegarder
+              </Button>
+            </div>
+          )}
+        </div>
 
-          <div className="grid gap-6">
-            {/* Notifications */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-primary" />
-                  <CardTitle>Notifications</CardTitle>
-                </div>
-                <CardDescription>
-                  Gérez vos notifications et alertes
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="notifications" className="text-sm font-medium">
-                    Notifications push
-                  </Label>
-                  <Switch
-                    id="notifications"
-                    checked={preferences.notifications}
-                    onCheckedChange={(checked) => updatePreference('notifications', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="email-alerts" className="text-sm font-medium">
-                    Alertes par email
-                  </Label>
-                  <Switch
-                    id="email-alerts"
-                    checked={preferences.emailAlerts}
-                    onCheckedChange={(checked) => updatePreference('emailAlerts', checked)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+        <Tabs defaultValue="appearance" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="appearance" className="flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              Apparence
+            </TabsTrigger>
+            <TabsTrigger value="accessibility" className="flex items-center gap-2">
+              <Accessibility className="h-4 w-4" />
+              Accessibilité
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Confidentialité
+            </TabsTrigger>
+            <TabsTrigger value="wellness" className="flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              Bien-être
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Interface et Thème */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Palette className="h-5 w-5 text-primary" />
-                  <CardTitle>Interface & Thème</CardTitle>
-                </div>
-                <CardDescription>
-                  Personnalisez l'apparence de l'application
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Thème</Label>
-                    <Select value={preferences.theme} onValueChange={(value) => updatePreference('theme', value)}>
+          {/* Appearance Tab */}
+          <TabsContent value="appearance" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="h-5 w-5" />
+                    Thème et apparence
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">Thème</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { value: 'light', label: 'Clair', icon: Sun },
+                        { value: 'dark', label: 'Sombre', icon: Moon },
+                        { value: 'system', label: 'Auto', icon: Monitor }
+                      ].map((themeOption) => {
+                        const Icon = themeOption.icon;
+                        return (
+                          <Button
+                            key={themeOption.value}
+                            variant={localPreferences.theme === themeOption.value ? 'default' : 'outline'}
+                            onClick={() => handlePreferenceChange('theme', themeOption.value)}
+                            className="flex flex-col items-center gap-2 h-auto py-4"
+                          >
+                            <Icon className="h-5 w-5" />
+                            <span className="text-sm">{themeOption.label}</span>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">Taille de police</label>
+                    <Select 
+                      value={localPreferences.fontSize || 'medium'}
+                      onValueChange={(value) => handlePreferenceChange('fontSize', value)}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="light">
-                          <div className="flex items-center gap-2">
-                            <Sun className="h-4 w-4" />
-                            Clair
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="dark">
-                          <div className="flex items-center gap-2">
-                            <Moon className="h-4 w-4" />
-                            Sombre
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="system">Système</SelectItem>
+                        <SelectItem value="small">Petite</SelectItem>
+                        <SelectItem value="medium">Moyenne</SelectItem>
+                        <SelectItem value="large">Grande</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Langue</Label>
-                    <Select value={preferences.language} onValueChange={(value) => updatePreference('language', value)}>
+
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">Police de caractère</label>
+                    <Select 
+                      value={localPreferences.fontFamily || 'sans'}
+                      onValueChange={(value) => handlePreferenceChange('fontFamily', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sans">Sans-serif</SelectItem>
+                        <SelectItem value="serif">Serif</SelectItem>
+                        <SelectItem value="mono">Monospace</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Volume2 className="h-5 w-5" />
+                    Audio et effets
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Effets sonores</h4>
+                      <p className="text-sm text-muted-foreground">Sons d'interface et notifications</p>
+                    </div>
+                    <Switch 
+                      checked={localPreferences.soundEffects !== false}
+                      onCheckedChange={(checked) => handlePreferenceChange('soundEffects', checked)}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Vibrations</h4>
+                      <p className="text-sm text-muted-foreground">Retour haptique sur mobile</p>
+                    </div>
+                    <Switch 
+                      checked={localPreferences.vibration !== false}
+                      onCheckedChange={(checked) => handlePreferenceChange('vibration', checked)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">Langue</label>
+                    <Select 
+                      value={localPreferences.language || 'fr'}
+                      onValueChange={(value) => handlePreferenceChange('language', value)}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -137,130 +240,296 @@ const PreferencesPage: React.FC = () => {
                         <SelectItem value="fr">Français</SelectItem>
                         <SelectItem value="en">English</SelectItem>
                         <SelectItem value="es">Español</SelectItem>
+                        <SelectItem value="de">Deutsch</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">
-                    Vitesse des animations ({preferences.animationSpeed[0]}x)
-                  </Label>
-                  <Slider
-                    value={preferences.animationSpeed}
-                    onValueChange={(value) => updatePreference('animationSpeed', value)}
-                    max={2}
-                    min={0.5}
-                    step={0.1}
-                    className="w-full"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-            {/* Audio et Musique */}
+          {/* Accessibility Tab */}
+          <TabsContent value="accessibility" className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Music className="h-5 w-5 text-primary" />
-                  <CardTitle>Audio & Musique</CardTitle>
-                </div>
-                <CardDescription>
-                  Configurez les paramètres audio
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Accessibility className="h-5 w-5" />
+                  Options d'accessibilité
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="sound-effects" className="text-sm font-medium">
-                    Effets sonores
-                  </Label>
-                  <Switch
-                    id="sound-effects"
-                    checked={preferences.soundEffects}
-                    onCheckedChange={(checked) => updatePreference('soundEffects', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="music-autoplay" className="text-sm font-medium">
-                    Lecture automatique
-                  </Label>
-                  <Switch
-                    id="music-autoplay"
-                    checked={preferences.musicAutoplay}
-                    onCheckedChange={(checked) => updatePreference('musicAutoplay', checked)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium flex items-center gap-2">
-                    <Volume2 className="h-4 w-4" />
-                    Volume général ({preferences.volume[0]}%)
-                  </Label>
-                  <Slider
-                    value={preferences.volume}
-                    onValueChange={(value) => updatePreference('volume', value)}
-                    max={100}
-                    min={0}
-                    step={1}
-                    className="w-full"
-                  />
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Contraste élevé</h4>
+                        <p className="text-sm text-muted-foreground">Améliore la lisibilité</p>
+                      </div>
+                      <Switch 
+                        checked={localPreferences.accessibility?.highContrast || false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('accessibility', 'highContrast', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Réduire les animations</h4>
+                        <p className="text-sm text-muted-foreground">Limite les effets de mouvement</p>
+                      </div>
+                      <Switch 
+                        checked={localPreferences.accessibility?.reduceMotion || false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('accessibility', 'reduceMotion', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Texte agrandi</h4>
+                        <p className="text-sm text-muted-foreground">Augmente la taille du texte</p>
+                      </div>
+                      <Switch 
+                        checked={localPreferences.accessibility?.largeText || false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('accessibility', 'largeText', checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Lecteur d'écran</h4>
+                        <p className="text-sm text-muted-foreground">Optimisé pour les lecteurs d'écran</p>
+                      </div>
+                      <Switch 
+                        checked={localPreferences.accessibility?.screenReader || false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('accessibility', 'screenReader', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Navigation clavier</h4>
+                        <p className="text-sm text-muted-foreground">Navigation complète au clavier</p>
+                      </div>
+                      <Switch 
+                        checked={localPreferences.accessibility?.keyboardNavigation || false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('accessibility', 'keyboardNavigation', checked)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Confidentialité */}
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Méthodes de notification</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Notifications push</h4>
+                      <p className="text-sm text-muted-foreground">Dans l'application</p>
+                    </div>
+                    <Switch 
+                      checked={localPreferences.notifications?.push !== false}
+                      onCheckedChange={(checked) => handleNestedPreferenceChange('notifications', 'push', checked)}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Notifications email</h4>
+                      <p className="text-sm text-muted-foreground">Résumés par email</p>
+                    </div>
+                    <Switch 
+                      checked={localPreferences.notifications?.email !== false}
+                      onCheckedChange={(checked) => handleNestedPreferenceChange('notifications', 'email', checked)}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Notifications dans l'app</h4>
+                      <p className="text-sm text-muted-foreground">Alertes visuelles</p>
+                    </div>
+                    <Switch 
+                      checked={localPreferences.notifications?.inApp !== false}
+                      onCheckedChange={(checked) => handleNestedPreferenceChange('notifications', 'inApp', checked)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Types de notifications</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[
+                    { key: 'security', label: 'Sécurité', description: 'Alertes importantes' },
+                    { key: 'achievements', label: 'Récompenses', description: 'Badges et progrès' },
+                    { key: 'reminders', label: 'Rappels', description: 'Sessions et exercices' },
+                    { key: 'social', label: 'Social', description: 'Messages et interactions' },
+                    { key: 'system', label: 'Système', description: 'Mises à jour' }
+                  ].map((type) => (
+                    <div key={type.key} className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">{type.label}</h4>
+                        <p className="text-sm text-muted-foreground">{type.description}</p>
+                      </div>
+                      <Switch 
+                        checked={localPreferences.notifications?.types?.[type.key as keyof typeof localPreferences.notifications.types] !== false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('notifications', `types.${type.key}`, checked)}
+                      />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Privacy Tab */}
+          <TabsContent value="privacy" className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Eye className="h-5 w-5 text-primary" />
-                  <CardTitle>Confidentialité</CardTitle>
-                </div>
-                <CardDescription>
-                  Gérez vos données et votre confidentialité
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Paramètres de confidentialité
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="data-collection" className="text-sm font-medium">
-                    Collecte de données d'usage
-                  </Label>
-                  <Switch
-                    id="data-collection"
-                    checked={preferences.dataCollection}
-                    onCheckedChange={(checked) => updatePreference('dataCollection', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="share-progress" className="text-sm font-medium">
-                    Partager mes progrès
-                  </Label>
-                  <Switch
-                    id="share-progress"
-                    checked={preferences.shareProgress}
-                    onCheckedChange={(checked) => updatePreference('shareProgress', checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="public-profile" className="text-sm font-medium">
-                    Profil public
-                  </Label>
-                  <Switch
-                    id="public-profile"
-                    checked={preferences.publicProfile}
-                    onCheckedChange={(checked) => updatePreference('publicProfile', checked)}
-                  />
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Visibilité du profil</h4>
+                      <Select 
+                        value={typeof localPreferences.privacy === 'object' ? localPreferences.privacy?.profileVisibility || 'private' : 'private'}
+                        onValueChange={(value) => handleNestedPreferenceChange('privacy', 'profileVisibility', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="private">Privé</SelectItem>
+                          <SelectItem value="friends">Amis uniquement</SelectItem>
+                          <SelectItem value="public">Public</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Collecte de données</h4>
+                        <p className="text-sm text-muted-foreground">Amélioration du service</p>
+                      </div>
+                      <Switch 
+                        checked={typeof localPreferences.privacy === 'object' ? localPreferences.privacy?.dataCollection !== false : false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('privacy', 'dataCollection', checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Analytics</h4>
+                        <p className="text-sm text-muted-foreground">Données d'utilisation anonymes</p>
+                      </div>
+                      <Switch 
+                        checked={typeof localPreferences.privacy === 'object' ? localPreferences.privacy?.analytics !== false : false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('privacy', 'analytics', checked)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Marketing</h4>
+                        <p className="text-sm text-muted-foreground">Communications marketing</p>
+                      </div>
+                      <Switch 
+                        checked={typeof localPreferences.privacy === 'object' ? localPreferences.privacy?.marketing !== false : false}
+                        onCheckedChange={(checked) => handleNestedPreferenceChange('privacy', 'marketing', checked)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </TabsContent>
 
-          <Separator />
+          {/* Wellness Tab */}
+          <TabsContent value="wellness" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-5 w-5" />
+                    Objectifs de bien-être
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Rappels quotidiens</label>
+                    <div className="space-y-2">
+                      {['Méditation', 'Scan émotionnel', 'Journal', 'Exercices de respiration'].map((activity) => (
+                        <div key={activity} className="flex items-center justify-between">
+                          <span className="text-sm">{activity}</span>
+                          <Switch defaultChecked />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <div className="flex justify-center">
-            <Button onClick={handleSave} size="lg" className="px-8">
-              <Save className="h-4 w-4 mr-2" />
-              Sauvegarder les préférences
-            </Button>
-          </div>
-        </motion.div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5" />
+                    Préférences IA
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Recommandations personnalisées</h4>
+                      <p className="text-sm text-muted-foreground">Basées sur vos habitudes</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Coach IA proactif</h4>
+                      <p className="text-sm text-muted-foreground">Suggestions automatiques</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">Sensibilité des recommandations</label>
+                    <Slider
+                      defaultValue={[70]}
+                      max={100}
+                      step={10}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                      <span>Conservateur</span>
+                      <span>Adaptatif</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
