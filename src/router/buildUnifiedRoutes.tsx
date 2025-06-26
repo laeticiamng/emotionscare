@@ -1,35 +1,64 @@
-import React, { lazy, Suspense } from 'react';
+
+import React, { Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
-import { B2CLoginPage, B2CRegisterPage, B2CDashboardPage, B2COnboardingPage, B2CJournalPage, B2CMusicPage, B2CScanPage, B2CCoachPage, B2CVRPage, B2CGamificationPage, B2CSocialPage, B2CSettingsPage } from '@/utils/lazyComponents';
-import { B2BUserLoginPage, B2BUserRegisterPage, B2BUserDashboardPage, B2BUserScanPage, B2BUserCoachPage, B2BUserMusicPage } from '@/utils/lazyComponents';
-import { B2BAdminLoginPage, B2BAdminDashboardPage } from '@/utils/lazyComponents';
-import { ImmersiveHome, MeditationPage, LazyPageWrapper } from '@/utils/unifiedLazyRoutes';
-import ChooseModePage from '@/pages/ChooseModePage';
-import B2BSelectionPage from '@/pages/b2b/B2BSelectionPage';
-import AuthPage from '@/pages/AuthPage';
 
-// Pages manquantes à ajouter
-const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
-const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
-const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
-const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
-const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
+// Lazy imports pour toutes les pages
+const HomePage = React.lazy(() => import('@/pages/HomePage'));
+const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
+const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
+const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
+const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
+const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
+const VRPage = React.lazy(() => import('@/pages/VRPage'));
+const BreathworkPage = React.lazy(() => import('@/pages/BreathworkPage'));
+const OnboardingPage = React.lazy(() => import('@/pages/OnboardingPage'));
+const FlashGlowPage = React.lazy(() => import('@/pages/FlashGlowPage'));
+const ProfileSettingsPage = React.lazy(() => import('@/pages/ProfileSettingsPage'));
+const BossLevelGritPage = React.lazy(() => import('@/pages/BossLevelGritPage'));
+const MoodMixerPage = React.lazy(() => import('@/pages/MoodMixerPage'));
+const BounceBackBattlePage = React.lazy(() => import('@/pages/BounceBackBattlePage'));
+const InstantGlowPage = React.lazy(() => import('@/pages/InstantGlowPage'));
+const SocialCoconPage = React.lazy(() => import('@/pages/SocialCoconPage'));
+
+// Auth Pages
+const B2CLoginPage = React.lazy(() => import('@/pages/auth/B2CLoginPage'));
+const B2CRegisterPage = React.lazy(() => import('@/pages/auth/B2CRegisterPage'));
+const B2BSelectionPage = React.lazy(() => import('@/pages/auth/B2BSelectionPage'));
+const B2BUserLoginPage = React.lazy(() => import('@/pages/auth/B2BUserLoginPage'));
+const B2BUserRegisterPage = React.lazy(() => import('@/pages/auth/B2BUserRegisterPage'));
+const B2BAdminLoginPage = React.lazy(() => import('@/pages/auth/B2BAdminLoginPage'));
+
+// Dashboard Pages
+const B2CDashboardPage = React.lazy(() => import('@/pages/dashboard/B2CDashboardPage'));
+const B2BUserDashboardPage = React.lazy(() => import('@/pages/dashboard/B2BUserDashboardPage'));
+const B2BAdminDashboardPage = React.lazy(() => import('@/pages/dashboard/B2BAdminDashboardPage'));
+
+// Feature Pages
+const PreferencesPage = React.lazy(() => import('@/pages/PreferencesPage'));
+const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
 
 export function buildUnifiedRoutes(): RouteObject[] {
   return [
+    // Routes publiques
     {
       path: '/',
-      element: <AuthPage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <HomePage />
+        </Suspense>
+      ),
     },
     {
       path: '/choose-mode',
-      element: <ChooseModePage />,
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <ChooseModePage />
+        </Suspense>
+      ),
     },
-    {
-      path: '/b2b/selection',
-      element: <B2BSelectionPage />,
-    },
+    
+    // Routes d'authentification
     {
       path: '/b2c/login',
       element: (
@@ -43,6 +72,14 @@ export function buildUnifiedRoutes(): RouteObject[] {
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
           <B2CRegisterPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/b2b/selection',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <B2BSelectionPage />
         </Suspense>
       ),
     },
@@ -70,10 +107,12 @@ export function buildUnifiedRoutes(): RouteObject[] {
         </Suspense>
       ),
     },
+    
+    // Routes de tableau de bord
     {
       path: '/b2c/dashboard',
       element: (
-        <Suspense fallback={<ComponentLoadingFallback />} >
+        <Suspense fallback={<ComponentLoadingFallback />}>
           <B2CDashboardPage />
         </Suspense>
       ),
@@ -94,11 +133,13 @@ export function buildUnifiedRoutes(): RouteObject[] {
         </Suspense>
       ),
     },
+    
+    // Routes de fonctionnalités principales
     {
       path: '/scan',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CScanPage />
+          <ScanPage />
         </Suspense>
       ),
     },
@@ -106,7 +147,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/music',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CMusicPage />
+          <MusicPage />
         </Suspense>
       ),
     },
@@ -114,7 +155,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/coach',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CCoachPage />
+          <CoachPage />
         </Suspense>
       ),
     },
@@ -122,7 +163,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/journal',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CJournalPage />
+          <JournalPage />
         </Suspense>
       ),
     },
@@ -130,7 +171,31 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/vr',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CVRPage />
+          <VRPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/breathwork',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <BreathworkPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/onboarding',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <OnboardingPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/flash-glow',
+      element: (
+        <Suspense fallback={<ComponentLoadingFallback />}>
+          <FlashGlowPage />
         </Suspense>
       ),
     },
@@ -138,7 +203,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/preferences',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSettingsPage />
+          <PreferencesPage />
         </Suspense>
       ),
     },
@@ -146,7 +211,7 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/gamification',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CGamificationPage />
+          <GamificationPage />
         </Suspense>
       ),
     },
@@ -154,51 +219,20 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: '/social-cocon',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSocialPage />
+          <SocialCoconPage />
         </Suspense>
       ),
     },
     {
-      path: '/teams',
+      path: '/profile-settings',
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSettingsPage />
+          <ProfileSettingsPage />
         </Suspense>
       ),
     },
-    {
-      path: '/reports',
-      element: (
-        <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSettingsPage />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/events',
-      element: (
-        <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSettingsPage />
-        </Suspense>
-      ),
-    {
-      path: '/optimisation',
-      element: (
-        <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSettingsPage />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/settings',
-      element: (
-        <Suspense fallback={<ComponentLoadingFallback />}>
-          <B2CSettingsPage />
-        </Suspense>
-      ),
-    },
-
-    // Nouvelles routes ajoutées
+    
+    // Routes de jeux et activités
     {
       path: '/boss-level-grit',
       element: (
@@ -228,14 +262,6 @@ export function buildUnifiedRoutes(): RouteObject[] {
       element: (
         <Suspense fallback={<ComponentLoadingFallback />}>
           <InstantGlowPage />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/social-cocon',
-      element: (
-        <Suspense fallback={<ComponentLoadingFallback />}>
-          <SocialCoconPage />
         </Suspense>
       ),
     },
