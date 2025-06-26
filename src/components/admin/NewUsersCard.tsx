@@ -59,4 +59,5 @@ const NewUsersCard: React.FC = () => {
   );
 };
 
+export { NewUsersCard };
 export default NewUsersCard;
