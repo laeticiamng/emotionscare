@@ -1,272 +1,248 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Heart, Clock, TrendingUp, Play, Shuffle, Repeat } from 'lucide-react';
-import MusicPlayer from '@/components/music/MusicPlayer';
-import EnhancedMusicRecommendations from '@/components/music/EnhancedMusicRecommendations';
-import MoodBasedRecommendations from '@/components/music/MoodBasedRecommendations';
-import { useToast } from '@/hooks/use-toast';
+import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Heart, Brain } from 'lucide-react';
+import { motion } from 'framer-motion';
+import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
 
 const MusicPage: React.FC = () => {
-  const { toast } = useToast();
-  const [currentMood, setCurrentMood] = useState('calm');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(0);
+  const [mood, setMood] = useState('calm');
 
-  // Mock listening history
-  const listeningHistory = [
-    { title: 'Sérénité Matinale', artist: 'Ambient Dreams', duration: '4:20', date: '2024-01-15' },
-    { title: 'Focus Flow', artist: 'Concentration', duration: '5:15', date: '2024-01-15' },
-    { title: 'Énergie Positive', artist: 'Motivation', duration: '3:45', date: '2024-01-14' },
+  const playlists = [
+    {
+      id: 'calm',
+      name: 'Détente & Sérénité',
+      description: 'Musiques apaisantes pour la relaxation',
+      mood: 'calm',
+      color: 'bg-blue-500',
+      tracks: ['Océan Paisible', 'Forêt Enchantée', 'Méditation Douce']
+    },
+    {
+      id: 'energetic',
+      name: 'Énergie & Motivation',
+      description: 'Rythmes entraînants pour se dynamiser',
+      mood: 'energetic',
+      color: 'bg-red-500',
+      tracks: ['Réveil Matinal', 'Force Intérieure', 'Élan Créatif']
+    },
+    {
+      id: 'focus',
+      name: 'Concentration & Focus',
+      description: 'Sons pour améliorer la productivité',
+      mood: 'focus',
+      color: 'bg-green-500',
+      tracks: ['Ondes Binaurales', 'Pluie Douce', 'Café Studieux']
+    },
+    {
+      id: 'happy',
+      name: 'Joie & Bonheur',
+      description: 'Mélodies pour égayer votre journée',
+      mood: 'happy',
+      color: 'bg-yellow-500',
+      tracks: ['Sourire du Matin', 'Danse des Émotions', 'Rayons de Soleil']
+    }
   ];
 
-  // Mock favorites
-  const favorites = [
-    { title: 'Calme Profond', artist: 'Relaxation Masters', duration: '6:30' },
-    { title: 'Méditation Guidée', artist: 'Mindfulness', duration: '10:00' },
-    { title: 'Pluie Apaisante', artist: 'Nature Sounds', duration: '12:00' },
-  ];
-
-  const weeklyStats = {
-    totalListeningTime: '12h 30min',
-    favoriteGenre: 'Ambient',
-    mostPlayedArtist: 'Relaxation Masters',
-    streakDays: 7
-  };
-
-  const handlePlayMusic = (title: string) => {
-    setIsPlaying(true);
-    toast({
-      title: 'Lecture en cours',
-      description: `Lecture de "${title}"`,
-    });
-  };
+  const currentPlaylist = playlists.find(p => p.mood === mood) || playlists[0];
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Musique Adaptative</h1>
-          <p className="text-muted-foreground">
-            Découvrez une musique personnalisée selon votre état émotionnel
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <motion.div 
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4">
+            <Music className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            Musicothérapie Adaptative
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Musique personnalisée basée sur votre état émotionnel
           </p>
-        </div>
-        <div className="mt-4 sm:mt-0 flex gap-2">
-          <Button variant="outline" size="sm">
-            <Shuffle className="mr-2 h-4 w-4" />
-            Lecture aléatoire
-          </Button>
-          <Button variant="outline" size="sm">
-            <Repeat className="mr-2 h-4 w-4" />
-            Répéter
-          </Button>
-        </div>
-      </div>
+        </motion.div>
 
-      <Tabs defaultValue="player" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="player">Lecteur</TabsTrigger>
-          <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
-          <TabsTrigger value="favorites">Favoris</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
-          <TabsTrigger value="stats">Statistiques</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="player" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <MusicPlayer />
-            </div>
-            <div className="space-y-4">
-              <Card>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Music Player */}
+          <div className="lg:col-span-2">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="mb-6">
                 <CardHeader>
-                  <CardTitle className="text-lg">Contrôles Rapides</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-purple-500" />
+                    Lecture en cours
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button 
-                    className="w-full" 
-                    onClick={() => handlePlayMusic('Mix du jour')}
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    Mix du jour
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handlePlayMusic('Relaxation Express')}
-                  >
-                    <Heart className="mr-2 h-4 w-4" />
-                    Relaxation Express
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => handlePlayMusic('Focus & Concentration')}
-                  >
-                    <Music className="mr-2 h-4 w-4" />
-                    Focus & Concentration
-                  </Button>
+                <CardContent>
+                  <div className="text-center mb-6">
+                    <div className="w-32 h-32 mx-auto bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mb-4">
+                      <Music className="h-16 w-16 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-1">
+                      {currentPlaylist.tracks[currentTrack]}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {currentPlaylist.name}
+                    </p>
+                  </div>
+
+                  {/* Visualizer */}
+                  <div className="mb-6">
+                    <EnhancedMusicVisualizer
+                      intensity={0.7}
+                      volume={isPlaying ? 0.6 : 0}
+                      height={120}
+                      showControls={true}
+                      mood={mood}
+                    />
+                  </div>
+
+                  {/* Controls */}
+                  <div className="flex items-center justify-center gap-4 mb-4">
+                    <Button variant="outline" size="icon">
+                      <SkipBack className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    >
+                      {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                    </Button>
+                    <Button variant="outline" size="icon">
+                      <SkipForward className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <span>2:34</span>
+                    <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full w-1/3"></div>
+                    </div>
+                    <span>5:42</span>
+                  </div>
                 </CardContent>
               </Card>
-            </div>
-          </div>
-        </TabsContent>
+            </motion.div>
 
-        <TabsContent value="recommendations" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <EnhancedMusicRecommendations currentMood={currentMood} />
-            <MoodBasedRecommendations mood={currentMood} />
+            {/* Playlist */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Playlist actuelle</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {currentPlaylist.tracks.map((track, index) => (
+                      <div 
+                        key={index}
+                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                          index === currentTrack 
+                            ? 'bg-purple-100 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700' 
+                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                        onClick={() => setCurrentTrack(index)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${index === currentTrack ? 'bg-purple-500' : 'bg-gray-300'}`}></div>
+                            <span className={index === currentTrack ? 'font-semibold text-purple-700 dark:text-purple-300' : ''}>{track}</span>
+                          </div>
+                          {index === currentTrack && (
+                            <div className="flex items-center gap-1 text-purple-500">
+                              <Volume2 className="h-4 w-4" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-        </TabsContent>
 
-        <TabsContent value="favorites" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-red-500" />
-                Mes Favoris
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {favorites.map((track, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-10 w-10 rounded-full bg-primary/10 hover:bg-primary/20"
-                      onClick={() => handlePlayMusic(track.title)}
-                    >
-                      <Play className="h-4 w-4" />
-                    </Button>
-                    <div className="flex-1">
-                      <h4 className="font-medium">{track.title}</h4>
-                      <p className="text-sm text-muted-foreground">{track.artist}</p>
-                    </div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {track.duration}
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <Heart className="h-4 w-4 text-red-500 fill-current" />
+          {/* Mood Selection */}
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-green-500" />
+                    Choisir votre humeur
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {playlists.map((playlist) => (
+                      <div
+                        key={playlist.id}
+                        className={`p-4 rounded-lg cursor-pointer transition-all ${
+                          mood === playlist.mood
+                            ? 'ring-2 ring-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                            : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                        onClick={() => setMood(playlist.mood)}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className={`w-4 h-4 rounded-full ${playlist.color}`}></div>
+                          <h4 className="font-medium">{playlist.name}</h4>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{playlist.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Emotional State */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>État émotionnel</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <div className="text-4xl mb-2">😌</div>
+                    <p className="font-semibold text-lg mb-1">Détendu</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      Musique adaptée à votre état
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Scanner à nouveau
                     </Button>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Historique d'Écoute
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {listeningHistory.map((track, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg border">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-10 w-10 rounded-full bg-primary/10 hover:bg-primary/20"
-                      onClick={() => handlePlayMusic(track.title)}
-                    >
-                      <Play className="h-4 w-4" />
-                    </Button>
-                    <div className="flex-1">
-                      <h4 className="font-medium">{track.title}</h4>
-                      <p className="text-sm text-muted-foreground">{track.artist}</p>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {new Date(track.date).toLocaleDateString('fr-FR')}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {track.duration}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="stats" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Temps d'écoute</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{weeklyStats.totalListeningTime}</div>
-                <p className="text-xs text-muted-foreground">
-                  Cette semaine
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Genre favori</CardTitle>
-                <Music className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{weeklyStats.favoriteGenre}</div>
-                <p className="text-xs text-muted-foreground">
-                  Le plus écouté
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Artiste préféré</CardTitle>
-                <Heart className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-truncate">{weeklyStats.mostPlayedArtist}</div>
-                <p className="text-xs text-muted-foreground">
-                  Cette semaine
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Série</CardTitle>
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{weeklyStats.streakDays} jours</div>
-                <p className="text-xs text-muted-foreground">
-                  Écoute quotidienne
-                </p>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Insights Musicaux</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="font-medium">Tendances découvertes</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li>• Vous préférez la musique relaxante en fin de journée</li>
-                  <li>• Votre concentration améliore avec la musique ambient</li>
-                  <li>• Les mornings nécessitent des mélodies plus énergiques</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };
