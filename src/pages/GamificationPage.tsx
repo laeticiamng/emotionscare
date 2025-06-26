@@ -1,385 +1,288 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate } from 'react-router-dom';
-import { Trophy, Star, Zap, Target, Gift, Crown, Award, Timer, ArrowLeft } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'sonner';
-
-interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ComponentType<any>;
-  points: number;
-  unlocked: boolean;
-  progress: number;
-  maxProgress: number;
-  category: 'daily' | 'weekly' | 'milestone' | 'special';
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  reward: number;
-  timeLeft: string;
-  progress: number;
-  maxProgress: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-}
+import { 
+  Trophy, 
+  Star, 
+  Award, 
+  Target, 
+  Flame, 
+  Crown, 
+  Medal,
+  Calendar,
+  TrendingUp
+} from 'lucide-react';
 
 const GamificationPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [userLevel, setUserLevel] = useState(5);
-  const [totalPoints, setTotalPoints] = useState(1250);
-  const [currentStreak, setCurrentStreak] = useState(7);
-  const [nextLevelPoints] = useState(1500);
+  const userStats = {
+    level: 12,
+    xp: 2840,
+    xpToNext: 3200,
+    streakDays: 15,
+    totalBadges: 8,
+    completedChallenges: 23
+  };
 
-  const achievements: Achievement[] = [
+  const badges = [
     {
-      id: 'first-scan',
-      title: 'Premier Scan',
-      description: 'Effectuer votre premier scan émotionnel',
-      icon: Trophy,
-      points: 50,
-      unlocked: true,
-      progress: 1,
-      maxProgress: 1,
-      category: 'milestone'
-    },
-    {
-      id: 'music-lover',
-      title: 'Mélomane',
-      description: 'Écouter 60 minutes de musicothérapie',
+      id: 1,
+      name: 'Premier Scan',
+      description: 'Réalisez votre premier scan émotionnel',
       icon: Star,
-      points: 100,
-      unlocked: true,
-      progress: 60,
-      maxProgress: 60,
-      category: 'milestone'
+      color: 'text-yellow-500',
+      earned: true,
+      earnedDate: '2024-01-15'
     },
     {
-      id: 'journal-keeper',
-      title: 'Gardien du Journal',
-      description: 'Écrire 10 entrées dans votre journal',
-      icon: Award,
-      points: 150,
-      unlocked: false,
-      progress: 7,
-      maxProgress: 10,
-      category: 'milestone'
+      id: 2,
+      name: 'Mélomane',
+      description: 'Écoutez 50 sessions de musicothérapie',
+      icon: Medal,
+      color: 'text-purple-500',
+      earned: true,
+      earnedDate: '2024-01-20'
     },
     {
-      id: 'vr-explorer',
-      title: 'Explorateur VR',
-      description: 'Compléter 5 sessions de réalité virtuelle',
+      id: 3,
+      name: 'Régularité',
+      description: 'Utilisez l\'app 7 jours consécutifs',
+      icon: Flame,
+      color: 'text-red-500',
+      earned: true,
+      earnedDate: '2024-01-25'
+    },
+    {
+      id: 4,
+      name: 'Explorateur VR',
+      description: 'Terminez 10 expériences VR',
       icon: Crown,
-      points: 200,
-      unlocked: false,
-      progress: 2,
-      maxProgress: 5,
-      category: 'milestone'
+      color: 'text-blue-500',
+      earned: false
     },
     {
-      id: 'weekly-warrior',
-      title: 'Guerrier Hebdomadaire',
-      description: 'Utiliser EmotionsCare 7 jours consécutifs',
-      icon: Zap,
-      points: 300,
-      unlocked: true,
-      progress: 7,
-      maxProgress: 7,
-      category: 'weekly'
+      id: 5,
+      name: 'Maître Coach',
+      description: 'Conversez 100 fois avec le coach IA',
+      icon: Trophy,
+      color: 'text-green-500',
+      earned: false
+    },
+    {
+      id: 6,
+      name: 'Écrivain',
+      description: 'Rédigez 30 entrées de journal',
+      icon: Award,
+      color: 'text-indigo-500',
+      earned: false
     }
   ];
 
-  const challenges: Challenge[] = [
+  const challenges = [
     {
-      id: 'daily-meditation',
-      title: 'Méditation Quotidienne',
-      description: 'Effectuer une session de méditation VR',
-      reward: 25,
-      timeLeft: '14h 32m',
-      progress: 0,
-      maxProgress: 1,
-      difficulty: 'easy'
+      id: 1,
+      title: 'Semaine Zen',
+      description: 'Réalisez un scan émotionnel chaque jour pendant 7 jours',
+      progress: 5,
+      total: 7,
+      reward: '500 XP',
+      type: 'weekly'
     },
     {
-      id: 'emotion-tracker',
-      title: 'Suivi Émotionnel',
-      description: 'Scanner vos émotions 3 fois aujourd\'hui',
-      reward: 50,
-      timeLeft: '14h 32m',
+      id: 2,
+      title: 'Musicothérapie Intensive',
+      description: 'Écoutez 5 sessions de musicothérapie cette semaine',
+      progress: 3,
+      total: 5,
+      reward: '300 XP',
+      type: 'weekly'
+    },
+    {
+      id: 3,
+      title: 'Explorateur Virtuel',
+      description: 'Terminez 3 expériences VR différentes',
       progress: 1,
-      maxProgress: 3,
-      difficulty: 'medium'
-    },
-    {
-      id: 'music-marathon',
-      title: 'Marathon Musical',
-      description: 'Écouter 2 heures de musicothérapie cette semaine',
-      reward: 100,
-      timeLeft: '3j 14h',
-      progress: 45,
-      maxProgress: 120,
-      difficulty: 'hard'
+      total: 3,
+      reward: '1000 XP',
+      type: 'monthly'
     }
   ];
-
-  const levelProgress = ((totalPoints % 250) / 250) * 100;
-
-  const handleClaimReward = (challengeId: string) => {
-    const challenge = challenges.find(c => c.id === challengeId);
-    if (challenge && challenge.progress >= challenge.maxProgress) {
-      toast.success(`Récompense réclamée ! +${challenge.reward} points`);
-      setTotalPoints(prev => prev + challenge.reward);
-    } else {
-      toast.info('Défi non terminé');
-    }
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return 'bg-green-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'hard': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div data-testid="page-root" className="min-h-screen bg-gray-50 p-4">
+      <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
-        >
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate('/')}
-              data-testid="back-button"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Trophy className="h-8 w-8 text-yellow-500" />
-                Gamification
-              </h1>
-              <p className="text-gray-600">Gagnez des points et débloquez des récompenses</p>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Récompenses & Progression</h1>
+          <p className="text-gray-600">
+            Suivez vos accomplissements et débloquez de nouveaux badges
+          </p>
+        </div>
+
+        {/* User Level Card */}
+        <Card className="mb-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                  <Crown className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold">Niveau {userStats.level}</h2>
+                  <p className="opacity-90">Maître du Bien-être</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">{userStats.xp} XP</div>
+                <div className="opacity-90">
+                  {userStats.xpToNext - userStats.xp} XP jusqu'au niveau suivant
+                </div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <Progress 
+                value={(userStats.xp / userStats.xpToNext) * 100} 
+                className="h-3 bg-white/20"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <Flame className="h-8 w-8 text-red-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-red-600">{userStats.streakDays}</div>
+              <div className="text-gray-600">Jours consécutifs</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6 text-center">
+              <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-yellow-600">{userStats.totalBadges}</div>
+              <div className="text-gray-600">Badges obtenus</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6 text-center">
+              <Target className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-green-600">{userStats.completedChallenges}</div>
+              <div className="text-gray-600">Défis complétés</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Badges Section */}
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Badges & Achievements</h2>
+            <div className="grid grid-cols-1 gap-4">
+              {badges.map((badge) => {
+                const IconComponent = badge.icon;
+                return (
+                  <Card 
+                    key={badge.id} 
+                    className={`${badge.earned ? 'bg-white' : 'bg-gray-100 opacity-60'} hover:shadow-md transition-shadow`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                          badge.earned ? 'bg-gray-100' : 'bg-gray-200'
+                        }`}>
+                          <IconComponent className={`h-6 w-6 ${badge.earned ? badge.color : 'text-gray-400'}`} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{badge.name}</h3>
+                          <p className="text-sm text-gray-600">{badge.description}</p>
+                          {badge.earned && badge.earnedDate && (
+                            <p className="text-xs text-green-600 mt-1">
+                              Obtenu le {new Date(badge.earnedDate).toLocaleDateString('fr-FR')}
+                            </p>
+                          )}
+                        </div>
+                        {badge.earned && (
+                          <Badge className="bg-green-100 text-green-800">
+                            Obtenu
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
-        </motion.div>
 
-        {/* Stats Overview */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
-        >
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">{userLevel}</div>
-              <div className="text-sm text-gray-600">Niveau</div>
-              <Progress value={levelProgress} className="mt-2" />
-              <div className="text-xs text-gray-500 mt-1">
-                {totalPoints % 250}/250 XP
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">{totalPoints}</div>
-              <div className="text-sm text-gray-600">Points Total</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">{currentStreak}</div>
-              <div className="text-sm text-gray-600">Jours Consécutifs</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {achievements.filter(a => a.unlocked).length}
-              </div>
-              <div className="text-sm text-gray-600">Succès Débloqués</div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="achievements" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="achievements" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              Succès
-            </TabsTrigger>
-            <TabsTrigger value="challenges" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Défis
-            </TabsTrigger>
-            <TabsTrigger value="rewards" className="flex items-center gap-2">
-              <Gift className="h-4 w-4" />
-              Récompenses
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Achievements */}
-          <TabsContent value="achievements">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {achievements.map((achievement, index) => (
-                <motion.div
-                  key={achievement.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  data-testid={`achievement-${achievement.id}`}
-                >
-                  <Card className={`h-full ${achievement.unlocked ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200' : 'opacity-75'}`}>
-                    <CardHeader className="text-center">
-                      <div className={`mx-auto p-3 rounded-full ${achievement.unlocked ? 'bg-yellow-500' : 'bg-gray-400'} text-white w-fit`}>
-                        <achievement.icon className="h-6 w-6" />
+          {/* Challenges Section */}
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Défis Actifs</h2>
+            <div className="space-y-6">
+              {challenges.map((challenge) => (
+                <Card key={challenge.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{challenge.title}</CardTitle>
+                        <CardDescription>{challenge.description}</CardDescription>
                       </div>
-                      <CardTitle className="text-lg">{achievement.title}</CardTitle>
-                      <CardDescription>{achievement.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Progression</span>
-                          <Badge variant={achievement.unlocked ? "default" : "secondary"}>
-                            {achievement.points} pts
-                          </Badge>
-                        </div>
-                        <Progress 
-                          value={(achievement.progress / achievement.maxProgress) * 100} 
-                          className="h-2"
-                        />
-                        <div className="text-xs text-gray-500 text-center">
-                          {achievement.progress}/{achievement.maxProgress}
-                        </div>
+                      <Badge variant={challenge.type === 'weekly' ? 'default' : 'secondary'}>
+                        {challenge.type === 'weekly' ? 'Hebdomadaire' : 'Mensuel'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span>Progression</span>
+                        <span>{challenge.progress}/{challenge.total}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                      <Progress value={(challenge.progress / challenge.total) * 100} />
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Récompense: {challenge.reward}</span>
+                        {challenge.progress === challenge.total ? (
+                          <Button size="sm">Réclamer</Button>
+                        ) : (
+                          <Button size="sm" variant="outline">Continuer</Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          </TabsContent>
 
-          {/* Challenges */}
-          <TabsContent value="challenges">
-            <div className="space-y-4">
-              {challenges.map((challenge, index) => (
-                <motion.div
-                  key={challenge.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  data-testid={`challenge-${challenge.id}`}
-                >
-                  <Card>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold">{challenge.title}</h3>
-                            <Badge className={`${getDifficultyColor(challenge.difficulty)} text-white`}>
-                              {challenge.difficulty}
-                            </Badge>
-                            <Badge variant="outline">
-                              <Timer className="h-3 w-3 mr-1" />
-                              {challenge.timeLeft}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-600 mb-3">{challenge.description}</p>
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span>Progression</span>
-                              <span>{challenge.progress}/{challenge.maxProgress}</span>
-                            </div>
-                            <Progress 
-                              value={(challenge.progress / challenge.maxProgress) * 100} 
-                              className="h-2"
-                            />
-                          </div>
-                        </div>
-                        <div className="ml-6 text-center">
-                          <div className="text-2xl font-bold text-yellow-600 mb-2">
-                            +{challenge.reward}
-                          </div>
-                          <Button
-                            size="sm"
-                            disabled={challenge.progress < challenge.maxProgress}
-                            onClick={() => handleClaimReward(challenge.id)}
-                          >
-                            {challenge.progress >= challenge.maxProgress ? 'Réclamer' : 'En cours'}
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Rewards */}
-          <TabsContent value="rewards">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { id: 'theme-unlock', title: 'Thème Premium', cost: 500, description: 'Débloquer des thèmes exclusifs', available: true },
-                { id: 'vr-content', title: 'Contenu VR Bonus', cost: 750, description: 'Environnements VR supplémentaires', available: true },
-                { id: 'music-library', title: 'Bibliothèque Étendue', cost: 1000, description: 'Accès à plus de musiques', available: false },
-                { id: 'ai-coach-pro', title: 'Coach IA Pro', cost: 1250, description: 'Fonctionnalités avancées du coach', available: false },
-                { id: 'analytics-plus', title: 'Analytics Plus', cost: 1500, description: 'Analyses détaillées de progression', available: false },
-                { id: 'exclusive-badge', title: 'Badge Exclusif', cost: 2000, description: 'Badge de statut premium', available: false }
-              ].map((reward, index) => (
-                <motion.div
-                  key={reward.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  data-testid={`reward-${reward.id}`}
-                >
-                  <Card className={`h-full ${reward.available ? '' : 'opacity-60'}`}>
-                    <CardHeader className="text-center">
-                      <div className={`mx-auto p-3 rounded-full ${reward.available ? 'bg-purple-500' : 'bg-gray-400'} text-white w-fit`}>
-                        <Gift className="h-6 w-6" />
-                      </div>
-                      <CardTitle className="text-lg">{reward.title}</CardTitle>
-                      <CardDescription>{reward.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <div className="text-2xl font-bold text-purple-600 mb-4">
-                        {reward.cost} pts
-                      </div>
-                      <Button
-                        className="w-full"
-                        disabled={!reward.available || totalPoints < reward.cost}
-                      >
-                        {reward.available ? 'Échanger' : 'Bientôt disponible'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+            {/* Leaderboard Preview */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Classement cette semaine
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-2 bg-yellow-50 rounded">
+                    <span className="font-medium">🥇 Vous</span>
+                    <span className="font-bold">2,840 XP</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2">
+                    <span>🥈 Sarah M.</span>
+                    <span>2,720 XP</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2">
+                    <span>🥉 Marc L.</span>
+                    <span>2,650 XP</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

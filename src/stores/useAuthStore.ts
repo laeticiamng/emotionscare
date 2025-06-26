@@ -13,6 +13,8 @@ interface AuthState {
   setSession: (session: Session | null) => void;
   setLoading: (loading: boolean) => void;
   refreshSession: () => Promise<boolean>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
 }
@@ -37,6 +39,47 @@ export const useAuthStore = create<AuthState>()(
 
       setLoading: (loading: boolean) => {
         set({ isLoading: loading });
+      },
+
+      signIn: async (email: string, password: string) => {
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (error) {
+            return { error };
+          }
+          
+          get().setSession(data.session);
+          return { error: null };
+        } catch (error) {
+          return { error };
+        }
+      },
+
+      signUp: async (email: string, password: string) => {
+        try {
+          const redirectUrl = `${window.location.origin}/`;
+          
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: redirectUrl
+            }
+          });
+          
+          if (error) {
+            return { error };
+          }
+          
+          get().setSession(data.session);
+          return { error: null };
+        } catch (error) {
+          return { error };
+        }
       },
 
       refreshSession: async (): Promise<boolean> => {

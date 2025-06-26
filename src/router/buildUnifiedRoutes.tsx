@@ -1,44 +1,56 @@
 
-import React, { lazy, Suspense } from 'react';
+import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
-import AuthGuard from '@/components/auth/AuthGuard';
 import OptimizedLayout from '@/components/layout/OptimizedLayout';
-import LoadingAnimation from '@/components/ui/loading-animation';
+import AuthGuard from '@/components/auth/AuthGuard';
 
-// Lazy loading des pages avec protection renforcée
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const B2CLoginPage = lazy(() => import('@/pages/b2c/B2CLoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/b2c/B2CRegisterPage'));
-const B2BUserLoginPage = lazy(() => import('@/pages/b2b/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/B2BUserRegisterPage'));
-const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/B2BAdminLoginPage'));
-const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
+// Import des pages
+const HomePage = React.lazy(() => import('@/pages/HomePage'));
+const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
+const B2BSelectionPage = React.lazy(() => import('@/pages/B2BSelectionPage'));
+const B2CLoginPage = React.lazy(() => import('@/pages/auth/B2CLoginPage'));
+const B2CRegisterPage = React.lazy(() => import('@/pages/auth/B2CRegisterPage'));
+const B2CDashboardPage = React.lazy(() => import('@/pages/dashboards/B2CDashboardPage'));
+const HelpCenterPage = React.lazy(() => import('@/pages/HelpCenterPage'));
+const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
+const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
+const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
+const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
+const VRPage = React.lazy(() => import('@/pages/VRPage'));
+const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
 
-// Pages protégées
-const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
-const B2BUserDashboard = lazy(() => import('@/pages/b2b/B2BUserDashboard'));
-const B2BAdminDashboard = lazy(() => import('@/pages/b2b/B2BAdminDashboard'));
-const ScanPage = lazy(() => import('@/pages/ScanPage'));
-const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const CoachPage = lazy(() => import('@/pages/CoachPage'));
-const JournalPage = lazy(() => import('@/pages/JournalPage'));
-const VRPage = lazy(() => import('@/pages/VRPage'));
-const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
-const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
-
-// Wrapper pour le Suspense avec loading
-const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Suspense fallback={
-    <div className="min-h-screen flex items-center justify-center">
-      <LoadingAnimation text="Chargement..." size="lg" />
+// 404 Page
+const NotFoundPage = () => (
+  <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-gray-900 mb-4">404 - Page introuvable</h1>
+      <p className="text-gray-600 mb-8">La page que vous recherchez n'existe pas.</p>
+      <a href="/" className="text-blue-600 hover:text-blue-700 underline">
+        Retour à l'accueil
+      </a>
     </div>
-  }>
-    {children}
-  </Suspense>
+  </div>
 );
+
+// Manifeste des routes pour les tests
+export const ROUTE_MANIFEST = [
+  '/',
+  '/choose-mode',
+  '/b2c/login',
+  '/b2c/register',
+  '/b2c/dashboard',
+  '/b2b/selection',
+  '/b2b/user/login',
+  '/b2b/user/register',
+  '/b2b/admin/login',
+  '/scan',
+  '/music',
+  '/coach',
+  '/journal',
+  '/vr',
+  '/gamification',
+  '/help-center'
+];
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
   return [
@@ -50,181 +62,84 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         </AuthGuard>
       ),
       children: [
-        // Routes publiques (whitelist)
         {
           index: true,
-          element: (
-            <SuspenseWrapper>
-              <HomePage />
-            </SuspenseWrapper>
-          )
+          element: <HomePage />
         },
         {
           path: 'choose-mode',
-          element: (
-            <SuspenseWrapper>
-              <ChooseModePage />
-            </SuspenseWrapper>
-          )
+          element: <ChooseModePage />
         },
-        {
-          path: 'help-center',
-          element: (
-            <SuspenseWrapper>
-              <HelpCenterPage />
-            </SuspenseWrapper>
-          )
-        },
-
-        // Routes d'authentification B2C (publiques)
         {
           path: 'b2c/login',
-          element: (
-            <SuspenseWrapper>
-              <B2CLoginPage />
-            </SuspenseWrapper>
-          )
+          element: <B2CLoginPage />
         },
         {
           path: 'b2c/register',
-          element: (
-            <SuspenseWrapper>
-              <B2CRegisterPage />
-            </SuspenseWrapper>
-          )
+          element: <B2CRegisterPage />
         },
-
-        // Routes d'authentification B2B (publiques)
+        {
+          path: 'b2c/dashboard',
+          element: <B2CDashboardPage />
+        },
+        {
+          path: 'b2b/selection',
+          element: <B2BSelectionPage />
+        },
         {
           path: 'b2b/user/login',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserLoginPage />
-            </SuspenseWrapper>
-          )
+          element: <div data-testid="page-root" className="p-8 text-center">
+            <h1 className="text-2xl font-bold mb-4">Connexion Collaborateur B2B</h1>
+            <p>Page en construction - Utilisez l'espace particulier pour tester l'application</p>
+          </div>
         },
         {
           path: 'b2b/user/register',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserRegisterPage />
-            </SuspenseWrapper>
-          )
+          element: <div data-testid="page-root" className="p-8 text-center">
+            <h1 className="text-2xl font-bold mb-4">Inscription Collaborateur B2B</h1>
+            <p>Page en construction - Utilisez l'espace particulier pour tester l'application</p>
+          </div>
         },
         {
           path: 'b2b/admin/login',
-          element: (
-            <SuspenseWrapper>
-              <B2BAdminLoginPage />
-            </SuspenseWrapper>
-          )
+          element: <div data-testid="page-root" className="p-8 text-center">
+            <h1 className="text-2xl font-bold mb-4">Connexion Administrateur B2B</h1>
+            <p>Page en construction - Utilisez l'espace particulier pour tester l'application</p>
+          </div>
         },
-
-        // Toutes les autres routes sont PROTÉGÉES par AuthGuard
-        // Dashboards
-        {
-          path: 'b2c/dashboard',
-          element: (
-            <SuspenseWrapper>
-              <B2CDashboardPage />
-            </SuspenseWrapper>
-          )
-        },
-        {
-          path: 'b2b/user/dashboard',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserDashboard />
-            </SuspenseWrapper>
-          )
-        },
-        {
-          path: 'b2b/admin/dashboard',
-          element: (
-            <SuspenseWrapper>
-              <B2BAdminDashboard />
-            </SuspenseWrapper>
-          )
-        },
-
-        // Fonctionnalités communes (TOUTES PROTÉGÉES)
         {
           path: 'scan',
-          element: (
-            <SuspenseWrapper>
-              <ScanPage />
-            </SuspenseWrapper>
-          )
+          element: <ScanPage />
         },
         {
           path: 'music',
-          element: (
-            <SuspenseWrapper>
-              <MusicPage />
-            </SuspenseWrapper>
-          )
+          element: <MusicPage />
         },
         {
           path: 'coach',
-          element: (
-            <SuspenseWrapper>
-              <CoachPage />
-            </SuspenseWrapper>
-          )
+          element: <CoachPage />
         },
         {
           path: 'journal',
-          element: (
-            <SuspenseWrapper>
-              <JournalPage />
-            </SuspenseWrapper>
-          )
+          element: <JournalPage />
         },
         {
           path: 'vr',
-          element: (
-            <SuspenseWrapper>
-              <VRPage />
-            </SuspenseWrapper>
-          )
-        },
-        {
-          path: 'preferences',
-          element: (
-            <SuspenseWrapper>
-              <PreferencesPage />
-            </SuspenseWrapper>
-          )
+          element: <VRPage />
         },
         {
           path: 'gamification',
-          element: (
-            <SuspenseWrapper>
-              <GamificationPage />
-            </SuspenseWrapper>
-          )
+          element: <GamificationPage />
         },
         {
-          path: 'social-cocon',
-          element: (
-            <SuspenseWrapper>
-              <SocialCoconPage />
-            </SuspenseWrapper>
-          )
+          path: 'help-center',
+          element: <HelpCenterPage />
         },
-
-        // Redirections pour compatibilité
         {
-          path: 'b2b',
-          element: <Navigate to="/b2b/user/login" replace />
+          path: '*',
+          element: <NotFoundPage />
         }
       ]
-    },
-
-    // Route catch-all pour les 404
-    {
-      path: '*',
-      element: <Navigate to="/" replace />
     }
   ];
 };
