@@ -10,7 +10,12 @@ const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
 const B2BSelectionPage = React.lazy(() => import('@/pages/B2BSelectionPage'));
 const B2CLoginPage = React.lazy(() => import('@/pages/auth/B2CLoginPage'));
 const B2CRegisterPage = React.lazy(() => import('@/pages/auth/B2CRegisterPage'));
+const B2BUserLoginPage = React.lazy(() => import('@/pages/auth/B2BUserLoginPage'));
+const B2BUserRegisterPage = React.lazy(() => import('@/pages/auth/B2BUserRegisterPage'));
+const B2BAdminLoginPage = React.lazy(() => import('@/pages/auth/B2BAdminLoginPage'));
 const B2CDashboardPage = React.lazy(() => import('@/pages/dashboards/B2CDashboardPage'));
+const B2BUserDashboardPage = React.lazy(() => import('@/pages/dashboards/B2BUserDashboardPage'));
+const B2BAdminDashboardPage = React.lazy(() => import('@/pages/dashboards/B2BAdminDashboardPage'));
 const HelpCenterPage = React.lazy(() => import('@/pages/HelpCenterPage'));
 const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
 const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
@@ -18,6 +23,9 @@ const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
 const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
 const VRPage = React.lazy(() => import('@/pages/VRPage'));
 const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
+const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
+const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
+const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
 
 // 404 Page
 const NotFoundPage = () => (
@@ -42,13 +50,18 @@ export const ROUTE_MANIFEST = [
   '/b2b/selection',
   '/b2b/user/login',
   '/b2b/user/register',
+  '/b2b/user/dashboard',
   '/b2b/admin/login',
+  '/b2b/admin/dashboard',
   '/scan',
   '/music',
   '/coach',
   '/journal',
   '/vr',
   '/gamification',
+  '/profile',
+  '/settings',
+  '/notifications',
   '/help-center'
 ];
 
@@ -88,24 +101,23 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         },
         {
           path: 'b2b/user/login',
-          element: <div data-testid="page-root" className="p-8 text-center">
-            <h1 className="text-2xl font-bold mb-4">Connexion Collaborateur B2B</h1>
-            <p>Page en construction - Utilisez l'espace particulier pour tester l'application</p>
-          </div>
+          element: <B2BUserLoginPage />
         },
         {
           path: 'b2b/user/register',
-          element: <div data-testid="page-root" className="p-8 text-center">
-            <h1 className="text-2xl font-bold mb-4">Inscription Collaborateur B2B</h1>
-            <p>Page en construction - Utilisez l'espace particulier pour tester l'application</p>
-          </div>
+          element: <B2BUserRegisterPage />
+        },
+        {
+          path: 'b2b/user/dashboard',
+          element: <B2BUserDashboardPage />
         },
         {
           path: 'b2b/admin/login',
-          element: <div data-testid="page-root" className="p-8 text-center">
-            <h1 className="text-2xl font-bold mb-4">Connexion Administrateur B2B</h1>
-            <p>Page en construction - Utilisez l'espace particulier pour tester l'application</p>
-          </div>
+          element: <B2BAdminLoginPage />
+        },
+        {
+          path: 'b2b/admin/dashboard',
+          element: <B2BAdminDashboardPage />
         },
         {
           path: 'scan',
@@ -130,6 +142,18 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         {
           path: 'gamification',
           element: <GamificationPage />
+        },
+        {
+          path: 'profile',
+          element: <ProfilePage />
+        },
+        {
+          path: 'settings',
+          element: <SettingsPage />
+        },
+        {
+          path: 'notifications',
+          element: <NotificationsPage />
         },
         {
           path: 'help-center',

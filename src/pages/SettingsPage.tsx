@@ -1,391 +1,451 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Settings, User, Shield, Database, Trash2, Download, Upload } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Settings, 
+  Bell, 
+  Shield, 
+  Palette, 
+  Globe, 
+  Volume2,
+  Monitor,
+  Moon,
+  Sun,
+  Save,
+  Trash2
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 const SettingsPage: React.FC = () => {
-  const { toast } = useToast();
-  const [profile, setProfile] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    profession: 'Médecin',
-    hospital: 'Hôpital Central',
-    phone: '+33 1 23 45 67 89'
-  });
-
-  const [security, setSecurity] = useState({
+  const [settings, setSettings] = useState({
+    // Notifications
+    emailNotifications: true,
+    pushNotifications: false,
+    reminderNotifications: true,
+    weeklyReports: true,
+    
+    // Apparence
+    theme: 'system',
+    fontSize: 'medium',
+    colorScheme: 'blue',
+    
+    // Confidentialité
+    dataSharing: false,
+    analytics: true,
+    cookiePreferences: 'essential',
+    
+    // Audio
+    soundEffects: true,
+    backgroundMusic: false,
+    volume: 70,
+    
+    // Langue
+    language: 'fr',
+    timezone: 'Europe/Paris',
+    
+    // Sécurité
     twoFactorAuth: false,
-    loginAlerts: true,
-    sessionTimeout: 30,
-    dataEncryption: true
+    sessionTimeout: '30'
   });
 
-  const [dataSettings, setDataSettings] = useState({
-    autoBackup: true,
-    dataRetention: 365,
-    anonymousAnalytics: false,
-    exportFormat: 'json'
-  });
-
-  const handleProfileSave = () => {
-    toast({
-      title: "Profil mis à jour",
-      description: "Vos informations ont été sauvegardées avec succès.",
-    });
+  const handleSettingChange = (key: string, value: any) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSecuritySave = () => {
-    toast({
-      title: "Paramètres de sécurité mis à jour",
-      description: "Vos paramètres de sécurité ont été sauvegardés.",
-    });
+  const handleSave = () => {
+    // Simulation de sauvegarde
+    toast.success('Paramètres sauvegardés avec succès !');
   };
 
-  const handleExportData = () => {
-    // Simuler l'export de données
-    toast({
-      title: "Export en cours",
-      description: "Vos données sont en cours de préparation pour le téléchargement.",
-    });
-  };
-
-  const handleImportData = () => {
-    toast({
-      title: "Import réussi",
-      description: "Vos données ont été importées avec succès.",
-    });
-  };
-
-  const handleDeleteAccount = () => {
-    toast({
-      title: "Compte supprimé",
-      description: "Votre compte a été supprimé définitivement.",
-      variant: "destructive"
-    });
+  const handleReset = () => {
+    toast.success('Paramètres réinitialisés aux valeurs par défaut');
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center gap-3 mb-8">
-          <Settings className="h-8 w-8 text-blue-600" />
-          <div>
-            <h1 className="text-3xl font-bold">Paramètres</h1>
-            <p className="text-muted-foreground">Gérez votre compte et vos préférences</p>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100 p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <div className="flex items-center justify-center space-x-3">
+            <Settings className="h-8 w-8 text-blue-600" />
+            <h1 className="text-4xl font-bold text-gray-900">Paramètres</h1>
           </div>
-        </div>
+          <p className="text-xl text-gray-600">
+            Personnalisez votre expérience EmotionsCare
+          </p>
+        </motion.div>
 
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Profil
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Sécurité
-            </TabsTrigger>
-            <TabsTrigger value="data" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              Données
-            </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <Trash2 className="h-4 w-4" />
-              Compte
-            </TabsTrigger>
+        <Tabs defaultValue="general" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="general">Général</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="appearance">Apparence</TabsTrigger>
+            <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+            <TabsTrigger value="security">Sécurité</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile" className="space-y-6">
+          {/* General Settings */}
+          <TabsContent value="general">
             <Card>
               <CardHeader>
-                <CardTitle>Informations personnelles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Prénom</Label>
-                    <Input
-                      id="firstName"
-                      value={profile.firstName}
-                      onChange={(e) => setProfile(prev => ({ ...prev, firstName: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Nom</Label>
-                    <Input
-                      id="lastName"
-                      value={profile.lastName}
-                      onChange={(e) => setProfile(prev => ({ ...prev, lastName: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="profession">Profession</Label>
-                    <Input
-                      id="profession"
-                      value={profile.profession}
-                      onChange={(e) => setProfile(prev => ({ ...prev, profession: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="hospital">Établissement</Label>
-                    <Input
-                      id="hospital"
-                      value={profile.hospital}
-                      onChange={(e) => setProfile(prev => ({ ...prev, hospital: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input
-                    id="phone"
-                    value={profile.phone}
-                    onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
-                  />
-                </div>
-
-                <Button onClick={handleProfileSave}>
-                  Sauvegarder le profil
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="security" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Paramètres de sécurité</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Paramètres Généraux
+                </CardTitle>
+                <CardDescription>
+                  Configuration de base de l'application
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">Authentification à deux facteurs</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Sécurisez votre compte avec la 2FA
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="language">Langue</Label>
+                    <Select value={settings.language} onValueChange={(value) => handleSettingChange('language', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fr">Français</SelectItem>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="es">Español</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Switch
-                    checked={security.twoFactorAuth}
-                    onCheckedChange={(checked) => setSecurity(prev => ({ ...prev, twoFactorAuth: checked }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">Alertes de connexion</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Être notifié des nouvelles connexions
-                    </p>
-                  </div>
-                  <Switch
-                    checked={security.loginAlerts}
-                    onCheckedChange={(checked) => setSecurity(prev => ({ ...prev, loginAlerts: checked }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="sessionTimeout">Délai d'expiration de session (minutes)</Label>
-                  <Input
-                    id="sessionTimeout"
-                    type="number"
-                    value={security.sessionTimeout}
-                    onChange={(e) => setSecurity(prev => ({ ...prev, sessionTimeout: parseInt(e.target.value) || 30 }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">Chiffrement des données</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Chiffrer toutes les données sensibles
-                    </p>
-                  </div>
-                  <Switch
-                    checked={security.dataEncryption}
-                    onCheckedChange={(checked) => setSecurity(prev => ({ ...prev, dataEncryption: checked }))}
-                  />
-                </div>
-
-                <div className="pt-4 space-y-4">
-                  <Button onClick={handleSecuritySave}>
-                    Sauvegarder les paramètres de sécurité
-                  </Button>
                   
-                  <div className="p-4 bg-yellow-50 rounded-lg">
-                    <h4 className="font-medium text-yellow-800 mb-2">Changement de mot de passe</h4>
-                    <p className="text-sm text-yellow-700 mb-3">
-                      Pour votre sécurité, changez régulièrement votre mot de passe
-                    </p>
-                    <Button variant="outline" size="sm">
-                      Changer le mot de passe
-                    </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="timezone">Fuseau horaire</Label>
+                    <Select value={settings.timezone} onValueChange={(value) => handleSettingChange('timezone', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Europe/Paris">Europe/Paris</SelectItem>
+                        <SelectItem value="Europe/London">Europe/London</SelectItem>
+                        <SelectItem value="America/New_York">America/New_York</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Audio Settings */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Volume2 className="h-5 w-5" />
+                    Audio
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="soundEffects">Effets sonores</Label>
+                        <p className="text-sm text-gray-600">Sons d'interface et de feedback</p>
+                      </div>
+                      <Switch
+                        id="soundEffects"
+                        checked={settings.soundEffects}
+                        onCheckedChange={(checked) => handleSettingChange('soundEffects', checked)}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="backgroundMusic">Musique d'ambiance</Label>
+                        <p className="text-sm text-gray-600">Musique de fond pendant les sessions</p>
+                      </div>
+                      <Switch
+                        id="backgroundMusic"
+                        checked={settings.backgroundMusic}
+                        onCheckedChange={(checked) => handleSettingChange('backgroundMusic', checked)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="volume">Volume général: {settings.volume}%</Label>
+                      <Input
+                        id="volume"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.volume}
+                        onChange={(e) => handleSettingChange('volume', parseInt(e.target.value))}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="data" className="space-y-6">
+          {/* Notifications */}
+          <TabsContent value="notifications">
             <Card>
               <CardHeader>
-                <CardTitle>Gestion des données</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Notifications
+                </CardTitle>
+                <CardDescription>
+                  Gérez vos préférences de notifications
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">Sauvegarde automatique</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Sauvegarder automatiquement vos données
-                    </p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="emailNotifications">Notifications par email</Label>
+                      <p className="text-sm text-gray-600">Recevez des emails pour les mises à jour importantes</p>
+                    </div>
+                    <Switch
+                      id="emailNotifications"
+                      checked={settings.emailNotifications}
+                      onCheckedChange={(checked) => handleSettingChange('emailNotifications', checked)}
+                    />
                   </div>
-                  <Switch
-                    checked={dataSettings.autoBackup}
-                    onCheckedChange={(checked) => setDataSettings(prev => ({ ...prev, autoBackup: checked }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dataRetention">Durée de conservation (jours)</Label>
-                  <Input
-                    id="dataRetention"
-                    type="number"
-                    value={dataSettings.dataRetention}
-                    onChange={(e) => setDataSettings(prev => ({ ...prev, dataRetention: parseInt(e.target.value) || 365 }))}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">Analytics anonymes</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Partager des données anonymisées pour améliorer l'app
-                    </p>
-                  </div>
-                  <Switch
-                    checked={dataSettings.anonymousAnalytics}
-                    onCheckedChange={(checked) => setDataSettings(prev => ({ ...prev, anonymousAnalytics: checked }))}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleExportData}
-                    className="flex items-center gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Exporter mes données
-                  </Button>
                   
-                  <Button
-                    variant="outline"
-                    onClick={handleImportData}
-                    className="flex items-center gap-2"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Importer des données
-                  </Button>
-                </div>
-
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-2">RGPD et confidentialité</h4>
-                  <p className="text-sm text-blue-700 mb-3">
-                    Vous avez le droit d'accéder, de modifier ou de supprimer vos données personnelles
-                  </p>
-                  <Button variant="outline" size="sm">
-                    Voir mes droits RGPD
-                  </Button>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="pushNotifications">Notifications push</Label>
+                      <p className="text-sm text-gray-600">Notifications sur votre appareil</p>
+                    </div>
+                    <Switch
+                      id="pushNotifications"
+                      checked={settings.pushNotifications}
+                      onCheckedChange={(checked) => handleSettingChange('pushNotifications', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="reminderNotifications">Rappels de session</Label>
+                      <p className="text-sm text-gray-600">Rappels pour vos sessions de bien-être</p>
+                    </div>
+                    <Switch
+                      id="reminderNotifications"
+                      checked={settings.reminderNotifications}
+                      onCheckedChange={(checked) => handleSettingChange('reminderNotifications', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="weeklyReports">Rapports hebdomadaires</Label>
+                      <p className="text-sm text-gray-600">Résumé de votre activité</p>
+                    </div>
+                    <Switch
+                      id="weeklyReports"
+                      checked={settings.weeklyReports}
+                      onCheckedChange={(checked) => handleSettingChange('weeklyReports', checked)}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="account" className="space-y-6">
+          {/* Appearance */}
+          <TabsContent value="appearance">
             <Card>
               <CardHeader>
-                <CardTitle>Gestion du compte</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Apparence
+                </CardTitle>
+                <CardDescription>
+                  Personnalisez l'apparence de l'interface
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h3 className="font-medium mb-2">Désactivation temporaire</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Désactivez temporairement votre compte. Vous pourrez le réactiver à tout moment.
-                  </p>
-                  <Button variant="outline">
-                    Désactiver temporairement
-                  </Button>
-                </div>
-
-                <div className="p-4 bg-red-50 rounded-lg">
-                  <h3 className="font-medium text-red-800 mb-2">Zone de danger</h3>
-                  <p className="text-sm text-red-700 mb-4">
-                    La suppression de votre compte est définitive et irréversible. 
-                    Toutes vos données seront perdues.
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="theme">Thème</Label>
+                    <Select value={settings.theme} onValueChange={(value) => handleSettingChange('theme', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">
+                          <div className="flex items-center gap-2">
+                            <Sun className="h-4 w-4" />
+                            Clair
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="dark">
+                          <div className="flex items-center gap-2">
+                            <Moon className="h-4 w-4" />
+                            Sombre
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="system">
+                          <div className="flex items-center gap-2">
+                            <Monitor className="h-4 w-4" />
+                            Système
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" className="flex items-center gap-2">
-                        <Trash2 className="h-4 w-4" />
-                        Supprimer définitivement mon compte
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Cette action ne peut pas être annulée. Cela supprimera définitivement votre
-                          compte et toutes vos données de nos serveurs.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDeleteAccount}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          Oui, supprimer définitivement
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <div className="space-y-2">
+                    <Label htmlFor="fontSize">Taille de police</Label>
+                    <Select value={settings.fontSize} onValueChange={(value) => handleSettingChange('fontSize', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="small">Petite</SelectItem>
+                        <SelectItem value="medium">Moyenne</SelectItem>
+                        <SelectItem value="large">Grande</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="colorScheme">Palette de couleurs</Label>
+                    <Select value={settings.colorScheme} onValueChange={(value) => handleSettingChange('colorScheme', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="blue">Bleu</SelectItem>
+                        <SelectItem value="green">Vert</SelectItem>
+                        <SelectItem value="purple">Violet</SelectItem>
+                        <SelectItem value="orange">Orange</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-2">Besoin d'aide ?</h4>
-                  <p className="text-sm text-blue-700 mb-3">
-                    Notre équipe support est là pour vous aider avec toutes vos questions
-                  </p>
-                  <Button variant="outline" size="sm">
-                    Contacter le support
-                  </Button>
+          {/* Privacy */}
+          <TabsContent value="privacy">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Confidentialité
+                </CardTitle>
+                <CardDescription>
+                  Contrôlez vos données et votre vie privée
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="dataSharing">Partage de données</Label>
+                      <p className="text-sm text-gray-600">Partager des données anonymisées pour améliorer le service</p>
+                    </div>
+                    <Switch
+                      id="dataSharing"
+                      checked={settings.dataSharing}
+                      onCheckedChange={(checked) => handleSettingChange('dataSharing', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="analytics">Analytics</Label>
+                      <p className="text-sm text-gray-600">Permettre la collecte de données d'usage</p>
+                    </div>
+                    <Switch
+                      id="analytics"
+                      checked={settings.analytics}
+                      onCheckedChange={(checked) => handleSettingChange('analytics', checked)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="cookiePreferences">Préférences cookies</Label>
+                    <Select value={settings.cookiePreferences} onValueChange={(value) => handleSettingChange('cookiePreferences', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="essential">Essentiels uniquement</SelectItem>
+                        <SelectItem value="functional">Fonctionnels</SelectItem>
+                        <SelectItem value="all">Tous</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security */}
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Sécurité
+                </CardTitle>
+                <CardDescription>
+                  Paramètres de sécurité de votre compte
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="twoFactorAuth">Authentification à deux facteurs</Label>
+                      <p className="text-sm text-gray-600">Sécurité renforcée pour votre compte</p>
+                    </div>
+                    <Switch
+                      id="twoFactorAuth"
+                      checked={settings.twoFactorAuth}
+                      onCheckedChange={(checked) => handleSettingChange('twoFactorAuth', checked)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="sessionTimeout">Expiration de session (minutes)</Label>
+                    <Select value={settings.sessionTimeout} onValueChange={(value) => handleSettingChange('sessionTimeout', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="15">15 minutes</SelectItem>
+                        <SelectItem value="30">30 minutes</SelectItem>
+                        <SelectItem value="60">1 heure</SelectItem>
+                        <SelectItem value="120">2 heures</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={handleReset} className="text-red-600 hover:text-red-700">
+            <Trash2 className="h-4 w-4 mr-2" />
+            Réinitialiser
+          </Button>
+          <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+            <Save className="h-4 w-4 mr-2" />
+            Sauvegarder
+          </Button>
+        </div>
       </div>
     </div>
   );

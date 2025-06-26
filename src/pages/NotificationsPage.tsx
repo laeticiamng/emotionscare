@@ -1,22 +1,35 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bell, Settings, Trash2, Check, AlertCircle, Heart, Trophy, MessageSquare } from 'lucide-react';
+import { 
+  Bell, 
+  Check, 
+  X, 
+  Trash2, 
+  Settings, 
+  Heart, 
+  Trophy, 
+  MessageSquare, 
+  Calendar,
+  Info,
+  AlertTriangle,
+  CheckCircle,
+  Filter
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface Notification {
   id: string;
-  type: 'success' | 'info' | 'warning' | 'achievement';
+  type: 'info' | 'success' | 'warning' | 'achievement';
   title: string;
   message: string;
   time: string;
   read: boolean;
-  icon: React.ComponentType<{ className?: string }>;
+  category: 'system' | 'coach' | 'achievement' | 'reminder';
 }
 
 const NotificationsPage: React.FC = () => {
@@ -25,65 +38,105 @@ const NotificationsPage: React.FC = () => {
       id: '1',
       type: 'achievement',
       title: 'Nouveau badge obtenu !',
-      message: 'Félicitations ! Vous avez obtenu le badge "Régulier" pour 30 jours consécutifs.',
-      time: 'Il y a 2 heures',
+      message: 'Félicitations ! Vous avez débloqué le badge "Méditant Régulier" pour 30 jours consécutifs.',
+      time: '2h',
       read: false,
-      icon: Trophy
+      category: 'achievement'
     },
     {
       id: '2',
       type: 'info',
-      title: 'Session VR recommandée',
-      message: 'Votre coach IA vous recommande une session de relaxation en forêt.',
-      time: 'Il y a 4 heures',
+      title: 'Rappel de session',
+      message: 'Il est temps pour votre session de bien-être quotidienne. Votre coach vous attend !',
+      time: '4h',
       read: false,
-      icon: Heart
+      category: 'reminder'
     },
     {
       id: '3',
       type: 'success',
-      title: 'Objectif atteint',
-      message: 'Vous avez atteint votre objectif de bien-être hebdomadaire !',
-      time: 'Hier',
+      title: 'Scan émotionnel complété',
+      message: 'Excellent travail ! Votre scan émotionnel d\'aujourd\'hui montre une amélioration de 15%.',
+      time: '6h',
       read: true,
-      icon: Check
+      category: 'system'
     },
     {
       id: '4',
+      type: 'warning',
+      title: 'Niveau de stress élevé détecté',
+      message: 'Votre dernier scan indique un niveau de stress élevé. Prenez quelques minutes pour vous détendre.',
+      time: '1j',
+      read: false,
+      category: 'coach'
+    },
+    {
+      id: '5',
       type: 'info',
-      title: 'Nouveau message',
-      message: 'Vous avez reçu une réponse dans le Social Cocoon.',
-      time: 'Il y a 2 jours',
+      title: 'Nouvelle fonctionnalité',
+      message: 'Découvrez notre nouveau module de réalité virtuelle pour la méditation immersive !',
+      time: '2j',
       read: true,
-      icon: MessageSquare
+      category: 'system'
     }
   ]);
 
-  const [settings, setSettings] = useState({
-    pushNotifications: true,
-    emailNotifications: true,
-    weeklyReports: true,
-    achievements: true,
-    socialUpdates: true,
-    coachRecommendations: true
-  });
+  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'achievement':
+        return <Trophy className="h-5 w-5 text-yellow-500" />;
+      case 'success':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+      default:
+        return <Info className="h-5 w-5 text-blue-500" />;
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    toast.success('Toutes les notifications marquées comme lues');
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'achievement':
+        return <Trophy className="h-4 w-4" />;
+      case 'coach':
+        return <MessageSquare className="h-4 w-4" />;
+      case 'reminder':
+        return <Calendar className="h-4 w-4" />;
+      default:
+        return <Bell className="h-4 w-4" />;
+    }
+  };
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev =>
+      prev.map(notif =>
+        notif.id === id ? { ...notif, read: true } : notif
+      )
+    );
+    toast.success('Notification marquée comme lue');
+  };
+
+  const markAsUnread = (id: string) => {
+    setNotifications(prev =>
+      prev.map(notif =>
+        notif.id === id ? { ...notif, read: false } : notif
+      )
+    );
+    toast.success('Notification marquée comme non lue');
   };
 
   const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
     toast.success('Notification supprimée');
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notif => ({ ...notif, read: true }))
+    );
+    toast.success('Toutes les notifications marquées comme lues');
   };
 
   const clearAll = () => {
@@ -91,253 +144,178 @@ const NotificationsPage: React.FC = () => {
     toast.success('Toutes les notifications supprimées');
   };
 
-  const getNotificationColor = (type: string) => {
-    switch (type) {
-      case 'success': return 'border-green-500 bg-green-50';
-      case 'achievement': return 'border-yellow-500 bg-yellow-50';
-      case 'warning': return 'border-orange-500 bg-orange-50';
-      default: return 'border-blue-500 bg-blue-50';
-    }
-  };
+  const filteredNotifications = notifications.filter(notif => {
+    if (filter === 'unread') return !notif.read;
+    if (filter === 'read') return notif.read;
+    return true;
+  });
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Bell className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold">Notifications</h1>
-              <p className="text-muted-foreground">
-                {unreadCount > 0 ? `${unreadCount} notification${unreadCount > 1 ? 's' : ''} non lue${unreadCount > 1 ? 's' : ''}` : 'Aucune nouvelle notification'}
-              </p>
-            </div>
-          </div>
-          {unreadCount > 0 && (
-            <Badge variant="destructive" className="px-3 py-1">
-              {unreadCount}
-            </Badge>
-          )}
-        </div>
-
-        <Tabs defaultValue="notifications" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="notifications">
-              Notifications
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <div className="flex items-center justify-center space-x-3">
+            <div className="relative">
+              <Bell className="h-8 w-8 text-blue-600" />
               {unreadCount > 0 && (
-                <Badge variant="secondary" className="ml-2 px-2 py-0 text-xs">
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-red-500">
                   {unreadCount}
                 </Badge>
               )}
-            </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Settings className="h-4 w-4 mr-2" />
-              Paramètres
-            </TabsTrigger>
-          </TabsList>
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900">Notifications</h1>
+          </div>
+          <p className="text-xl text-gray-600">
+            Restez informé de vos progrès et activités
+          </p>
+        </motion.div>
 
-          <TabsContent value="notifications" className="space-y-4">
-            {notifications.length > 0 && (
-              <div className="flex gap-2">
-                <Button onClick={markAllAsRead} variant="outline" size="sm">
+        {/* Action Bar */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium">Filtrer:</span>
+                </div>
+                <Tabs value={filter} onValueChange={(value: any) => setFilter(value)}>
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="all">Toutes ({notifications.length})</TabsTrigger>
+                    <TabsTrigger value="unread">Non lues ({unreadCount})</TabsTrigger>
+                    <TabsTrigger value="read">Lues ({notifications.length - unreadCount})</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm" onClick={markAllAsRead}>
                   <Check className="h-4 w-4 mr-2" />
                   Tout marquer comme lu
                 </Button>
-                <Button onClick={clearAll} variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={clearAll} className="text-red-600">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Tout supprimer
                 </Button>
               </div>
-            )}
+            </div>
+          </CardContent>
+        </Card>
 
-            <AnimatePresence>
-              {notifications.length === 0 ? (
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <Bell className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium mb-2">Aucune notification</h3>
-                    <p className="text-muted-foreground">
-                      Vous êtes à jour ! Les nouvelles notifications apparaîtront ici.
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-3">
-                  {notifications.map((notification) => (
-                    <motion.div
-                      key={notification.id}
-                      layout
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      className={`border-l-4 p-4 rounded-lg ${getNotificationColor(notification.type)} ${
-                        !notification.read ? 'bg-opacity-100' : 'bg-opacity-50'
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-full ${
-                          notification.type === 'success' ? 'bg-green-500' :
-                          notification.type === 'achievement' ? 'bg-yellow-500' :
-                          notification.type === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
-                        }`}>
-                          <notification.icon className="h-4 w-4 text-white" />
-                        </div>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className={`font-semibold ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                                {notification.title}
-                              </h3>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {notification.message}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-2">
-                                {notification.time}
-                              </p>
-                            </div>
-                            
-                            <div className="flex gap-1">
-                              {!notification.read && (
-                                <Button
-                                  onClick={() => markAsRead(notification.id)}
-                                  size="sm"
-                                  variant="ghost"
-                                >
-                                  <Check className="h-4 w-4" />
-                                </Button>
-                              )}
-                              <Button
-                                onClick={() => deleteNotification(notification.id)}
-                                size="sm"
-                                variant="ghost"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </AnimatePresence>
-          </TabsContent>
-
-          <TabsContent value="settings">
+        {/* Notifications List */}
+        <div className="space-y-4">
+          {filteredNotifications.length === 0 ? (
             <Card>
-              <CardHeader>
-                <CardTitle>Préférences de notification</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Notifications push</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Recevoir des notifications en temps réel
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.pushNotifications}
-                      onCheckedChange={(checked) => 
-                        setSettings(prev => ({ ...prev, pushNotifications: checked }))
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Notifications email</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Recevoir un résumé par email
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.emailNotifications}
-                      onCheckedChange={(checked) => 
-                        setSettings(prev => ({ ...prev, emailNotifications: checked }))
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Rapports hebdomadaires</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Résumé de vos progrès chaque semaine
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.weeklyReports}
-                      onCheckedChange={(checked) => 
-                        setSettings(prev => ({ ...prev, weeklyReports: checked }))
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Réalisations et badges</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Notifications pour les nouveaux badges
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.achievements}
-                      onCheckedChange={(checked) => 
-                        setSettings(prev => ({ ...prev, achievements: checked }))
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Mises à jour sociales</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Notifications du Social Cocoon
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.socialUpdates}
-                      onCheckedChange={(checked) => 
-                        setSettings(prev => ({ ...prev, socialUpdates: checked }))
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Recommandations du coach</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Suggestions personnalisées de votre coach IA
-                      </p>
-                    </div>
-                    <Switch
-                      checked={settings.coachRecommendations}
-                      onCheckedChange={(checked) => 
-                        setSettings(prev => ({ ...prev, coachRecommendations: checked }))
-                      }
-                    />
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={() => toast.success('Paramètres sauvegardés')}
-                  className="w-full"
-                >
-                  Sauvegarder les préférences
-                </Button>
+              <CardContent className="p-8 text-center">
+                <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Aucune notification
+                </h3>
+                <p className="text-gray-600">
+                  {filter === 'unread' ? 'Toutes vos notifications ont été lues' : 
+                   filter === 'read' ? 'Aucune notification lue' : 
+                   'Vous n\'avez pas encore de notifications'}
+                </p>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </motion.div>
+          ) : (
+            filteredNotifications.map((notification, index) => (
+              <motion.div
+                key={notification.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className={`hover:shadow-lg transition-all ${!notification.read ? 'ring-2 ring-blue-200' : ''}`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-4 flex-1">
+                        <div className="flex-shrink-0">
+                          {getTypeIcon(notification.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className={`font-semibold ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                              {notification.title}
+                            </h3>
+                            {!notification.read && (
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                Nouveau
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              {getCategoryIcon(notification.category)}
+                              <span className="capitalize">{notification.category}</span>
+                            </Badge>
+                          </div>
+                          <p className={`text-sm mb-2 ${!notification.read ? 'text-gray-900' : 'text-gray-600'}`}>
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            il y a {notification.time}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 ml-4">
+                        {notification.read ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => markAsUnread(notification.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => markAsRead(notification.id)}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteNotification(notification.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))
+          )}
+        </div>
+
+        {/* Settings Link */}
+        <Card>
+          <CardContent className="p-6 text-center">
+            <Settings className="h-8 w-8 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Gérer les préférences de notifications
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Personnalisez quand et comment vous souhaitez être notifié
+            </p>
+            <Button variant="outline">
+              <Settings className="h-4 w-4 mr-2" />
+              Paramètres de notifications
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
