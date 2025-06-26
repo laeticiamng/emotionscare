@@ -2,349 +2,228 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, TrendingUp, Target, Download, Filter, Search } from 'lucide-react';
-import { EmotionScanForm } from '@/components/scan';
-import { UnifiedEmotionCheckin } from '@/components/scan';
-import { EmotionTrendChart } from '@/components/scan/EmotionTrendChart';
-import { EmotionResult } from '@/types/emotion';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { toast } from 'sonner';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { Activity, Brain, TrendingUp, Calendar, Users, Award, Target, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { EmotionResult } from '@/types';
+import ScanTabContent from '@/components/scan/ScanTabContent';
+import ScanPageHeader from '@/components/scan/ScanPageHeader';
+import HistoryTabContent from '@/components/scan/HistoryTabContent';
+import EmotionHistory from '@/components/scan/EmotionHistory';
+import EmotionTrendChart from '@/components/scan/EmotionTrendChart';
 
 const ScanPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { userMode } = useUserMode();
+  const [activeTab, setActiveTab] = useState('scan');
   const [showScanForm, setShowScanForm] = useState(false);
-  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
-  const [filteredHistory, setFilteredHistory] = useState<EmotionResult[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [emotionFilter, setEmotionFilter] = useState('all');
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
-  const [loading, setLoading] = useState(false);
+  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
+  const [scanStats, setScanStats] = useState({
+    totalScans: 45,
+    weeklyScans: 12,
+    averageScore: 78,
+    streakDays: 7,
+    improvement: 15
+  });
 
-  // Données de démonstration
-  const mockScanHistory: EmotionResult[] = [
-    {
-      id: '1',
-      userId: 'user1',
-      timestamp: new Date('2024-01-15'),
-      overallMood: 'positive',
-      emotions: [{ emotion: 'happy', confidence: 0.85, intensity: 0.8 }],
-      dominantEmotion: 'happy',
-      confidence: 0.85,
-      source: 'text',
-      recommendations: ['Continuer cette énergie positive']
-    },
-    {
-      id: '2',
-      userId: 'user1',
-      timestamp: new Date('2024-01-14'),
-      overallMood: 'neutral',
-      emotions: [{ emotion: 'calm', confidence: 0.75, intensity: 0.6 }],
-      dominantEmotion: 'calm',
-      confidence: 0.75,
-      source: 'facial',
-      recommendations: ['Moment de détente recommandé']
-    },
-    {
-      id: '3',
-      userId: 'user1',
-      timestamp: new Date('2024-01-13'),
-      overallMood: 'negative',
-      emotions: [{ emotion: 'stressed', confidence: 0.70, intensity: 0.7 }],
-      dominantEmotion: 'stressed',
-      confidence: 0.70,
-      source: 'voice',
-      recommendations: ['Exercices de respiration', 'Pause recommandée']
-    }
+  // Données pour les graphiques
+  const trendData = [
+    { date: '01/01', score: 65, mood: 'Neutre' },
+    { date: '02/01', score: 72, mood: 'Positif' },
+    { date: '03/01', score: 68, mood: 'Calme' },
+    { date: '04/01', score: 85, mood: 'Joyeux' },
+    { date: '05/01', score: 78, mood: 'Serein' },
+    { date: '06/01', score: 82, mood: 'Confiant' },
+    { date: '07/01', score: 88, mood: 'Épanoui' },
   ];
 
-  const chartData = mockScanHistory.map(scan => ({
-    date: scan.timestamp.toLocaleDateString(),
-    score: scan.confidence * 100,
-    emotion: scan.dominantEmotion
-  }));
+  const weeklyData = [
+    { day: 'Lun', scans: 3, avgScore: 75 },
+    { day: 'Mar', scans: 2, avgScore: 82 },
+    { day: 'Mer', scans: 4, avgScore: 78 },
+    { day: 'Jeu', scans: 1, avgScore: 71 },
+    { day: 'Ven', scans: 3, avgScore: 85 },
+    { day: 'Sam', scans: 2, avgScore: 79 },
+    { day: 'Dim', scans: 1, avgScore: 88 },
+  ];
 
   const emotionDistribution = [
-    { name: 'Heureux', value: 35, color: '#22c55e' },
-    { name: 'Calme', value: 25, color: '#3b82f6' },
-    { name: 'Stressé', value: 20, color: '#ef4444' },
-    { name: 'Neutre', value: 20, color: '#94a3b8' }
+    { emotion: 'Joie', count: 15, percentage: 33 },
+    { emotion: 'Calme', count: 12, percentage: 27 },
+    { emotion: 'Confiance', count: 8, percentage: 18 },
+    { emotion: 'Sérénité', count: 6, percentage: 13 },
+    { emotion: 'Optimisme', count: 4, percentage: 9 },
   ];
-
-  const weeklyProgress = [
-    { day: 'Lun', scans: 3, mood: 7.5 },
-    { day: 'Mar', scans: 2, mood: 6.8 },
-    { day: 'Mer', scans: 4, mood: 8.2 },
-    { day: 'Jeu', scans: 1, mood: 5.5 },
-    { day: 'Ven', scans: 5, mood: 8.8 },
-    { day: 'Sam', scans: 2, mood: 7.2 },
-    { day: 'Dim', scans: 3, mood: 7.8 }
-  ];
-
-  useEffect(() => {
-    setScanHistory(mockScanHistory);
-    setFilteredHistory(mockScanHistory);
-  }, []);
-
-  useEffect(() => {
-    let filtered = scanHistory;
-
-    if (searchTerm) {
-      filtered = filtered.filter(scan =>
-        scan.dominantEmotion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        scan.source.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (emotionFilter !== 'all') {
-      filtered = filtered.filter(scan => scan.dominantEmotion === emotionFilter);
-    }
-
-    if (dateRange?.from && dateRange?.to) {
-      filtered = filtered.filter(scan =>
-        scan.timestamp >= dateRange.from && scan.timestamp <= dateRange.to
-      );
-    }
-
-    setFilteredHistory(filtered);
-  }, [searchTerm, emotionFilter, dateRange, scanHistory]);
 
   const handleScanComplete = (result: EmotionResult) => {
-    setScanHistory(prev => [result, ...prev]);
+    setEmotionHistory(prev => [result, ...prev]);
     setShowScanForm(false);
-    toast.success('Scan émotionnel complété avec succès !');
+    setScanStats(prev => ({
+      ...prev,
+      totalScans: prev.totalScans + 1,
+      weeklyScans: prev.weeklyScans + 1
+    }));
   };
 
-  const exportData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const dataStr = JSON.stringify(filteredHistory, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const exportFileDefaultName = 'scan-history.json';
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      setLoading(false);
-      toast.success('Données exportées avec succès !');
-    }, 1000);
+  const getFormattedPath = (path: string) => {
+    if (userMode === 'b2b_user') return `/b2b/user/${path}`;
+    if (userMode === 'b2b_admin') return `/b2b/admin/${path}`;
+    return `/b2c/${path}`;
   };
 
-  const averageScore = filteredHistory.reduce((acc, scan) => acc + scan.confidence, 0) / filteredHistory.length || 0;
-  const totalScans = filteredHistory.length;
-  const positiveScans = filteredHistory.filter(scan => scan.overallMood === 'positive').length;
-  const improvementRate = positiveScans / totalScans * 100 || 0;
+  useEffect(() => {
+    // Simuler le chargement de l'historique
+    const mockHistory: EmotionResult[] = [
+      {
+        id: '1',
+        emotion: 'Joie',
+        score: 85,
+        confidence: 0.9,
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        text: 'Excellente journée de travail, très productif',
+        source: 'text'
+      },
+      {
+        id: '2',
+        emotion: 'Calme',
+        score: 78,
+        confidence: 0.8,
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        text: 'Session de méditation très apaisante',
+        source: 'voice'
+      },
+      {
+        id: '3',
+        emotion: 'Confiance',
+        score: 82,
+        confidence: 0.85,
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        text: 'Présentation réussie devant l\'équipe',
+        source: 'text'
+      }
+    ];
+    setEmotionHistory(mockHistory);
+  }, []);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Scan Émotionnel</h1>
-          <p className="text-muted-foreground">Analysez et suivez votre état émotionnel</p>
-        </div>
-        <Button onClick={() => setShowScanForm(true)} className="bg-gradient-to-r from-blue-500 to-purple-600">
-          Nouveau Scan
-        </Button>
-      </div>
+    <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <ScanPageHeader 
+        showScanForm={showScanForm}
+        activeTab={activeTab}
+        setShowScanForm={setShowScanForm}
+      />
 
-      {/* Statistiques de performance */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Statistiques en bref */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Target className="h-5 w-5 text-blue-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Score Moyen</p>
-                <p className="text-2xl font-bold">{(averageScore * 100).toFixed(1)}%</p>
-              </div>
-            </div>
-            <Progress value={averageScore * 100} className="mt-2" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-green-500" />
+            <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Scans</p>
-                <p className="text-2xl font-bold">{totalScans}</p>
+                <p className="text-2xl font-bold">{scanStats.totalScans}</p>
               </div>
+              <Activity className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-purple-500" />
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Taux Positif</p>
-                <p className="text-2xl font-bold">{improvementRate.toFixed(1)}%</p>
+                <p className="text-sm text-muted-foreground">Cette semaine</p>
+                <p className="text-2xl font-bold">{scanStats.weeklyScans}</p>
               </div>
+              <Calendar className="h-8 w-8 text-green-500" />
             </div>
-            <Progress value={improvementRate} className="mt-2" />
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Download className="h-5 w-5 text-orange-500" />
+            <div className="flex items-center justify-between">
               <div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={exportData}
-                  disabled={loading}
-                  className="w-full"
-                >
-                  {loading ? 'Export...' : 'Exporter'}
-                </Button>
+                <p className="text-sm text-muted-foreground">Score moyen</p>
+                <p className="text-2xl font-bold">{scanStats.averageScore}%</p>
               </div>
+              <Target className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Série</p>
+                <p className="text-2xl font-bold">{scanStats.streakDays} jours</p>
+              </div>
+              <Zap className="h-8 w-8 text-orange-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Progression</p>
+                <p className="text-2xl font-bold text-green-600">+{scanStats.improvement}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="scan" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="scan">Nouveau Scan</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="insights">Insights IA</TabsTrigger>
+          <TabsTrigger value="trends">Tendances</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="scan" className="space-y-4">
-          {showScanForm ? (
-            <EmotionScanForm
-              onComplete={handleScanComplete}
-              onClose={() => setShowScanForm(false)}
-            />
-          ) : (
-            <UnifiedEmotionCheckin />
-          )}
+        <TabsContent value="scan" className="space-y-6">
+          <ScanTabContent 
+            showScanForm={showScanForm}
+            setShowScanForm={setShowScanForm}
+            onScanComplete={handleScanComplete}
+          />
         </TabsContent>
 
-        <TabsContent value="history" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Filtres et Recherche</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Recherche</label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Rechercher..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Émotion</label>
-                  <Select value={emotionFilter} onValueChange={setEmotionFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Toutes les émotions" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes</SelectItem>
-                      <SelectItem value="happy">Heureux</SelectItem>
-                      <SelectItem value="calm">Calme</SelectItem>
-                      <SelectItem value="stressed">Stressé</SelectItem>
-                      <SelectItem value="sad">Triste</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Période</label>
-                  <DatePickerWithRange
-                    date={dateRange}
-                    onDateChange={setDateRange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Actions</label>
-                  <Button variant="outline" onClick={() => {
-                    setSearchTerm('');
-                    setEmotionFilter('all');
-                    setDateRange(undefined);
-                  }}>
-                    <Filter className="h-4 w-4 mr-2" />
-                    Réinitialiser
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Historique des Scans ({filteredHistory.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredHistory.map((scan) => (
-                  <div key={scan.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">
-                          {scan.timestamp.toLocaleDateString()}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {scan.timestamp.toLocaleTimeString()}
-                        </p>
-                      </div>
-                      <div>
-                        <Badge variant="outline" className="mb-1">
-                          {scan.dominantEmotion}
-                        </Badge>
-                        <p className="text-sm text-muted-foreground">
-                          Confiance: {(scan.confidence * 100).toFixed(1)}%
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant={scan.overallMood === 'positive' ? 'default' : 
-                                   scan.overallMood === 'negative' ? 'destructive' : 'secondary'}>
-                        {scan.overallMood}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Source: {scan.source}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="history" className="space-y-6">
+          <HistoryTabContent emotionHistory={emotionHistory} />
+          <EmotionHistory history={emotionHistory} />
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-4">
+        <TabsContent value="analytics" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Tendance Émotionnelle</CardTitle>
+                <CardTitle>Tendance Émotionnelle (7 jours)</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData}>
+                  <LineChart data={trendData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="score" stroke="#8884d8" strokeWidth={2} />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip 
+                      formatter={(value) => [`${value}%`, 'Score']}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="score" 
+                      stroke="#8884d8" 
+                      strokeWidth={3}
+                      dot={{ fill: '#8884d8', strokeWidth: 2, r: 6 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -354,86 +233,111 @@ const ScanPage: React.FC = () => {
               <CardHeader>
                 <CardTitle>Distribution des Émotions</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={emotionDistribution}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {emotionDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="col-span-full">
-              <CardHeader>
-                <CardTitle>Activité Hebdomadaire</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={weeklyProgress}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Bar yAxisId="left" dataKey="scans" fill="#8884d8" name="Nombre de scans" />
-                    <Bar yAxisId="right" dataKey="mood" fill="#82ca9d" name="Humeur moyenne" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <CardContent className="space-y-4">
+                {emotionDistribution.map((item, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">{item.emotion}</span>
+                      <Badge variant="secondary">{item.count} fois</Badge>
+                    </div>
+                    <Progress value={item.percentage} className="h-2" />
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
 
-        <TabsContent value="insights" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Insights IA Personnalisés</CardTitle>
+              <CardTitle>Activité Hebdomadaire</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                <h4 className="font-semibold text-blue-900">Tendance Positive Détectée</h4>
-                <p className="text-blue-800">
-                  Votre humeur s'améliore de 15% cette semaine. Continuez vos pratiques actuelles !
-                </p>
-              </div>
-
-              <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-                <h4 className="font-semibold text-green-900">Recommandation Musicale</h4>
-                <p className="text-green-800">
-                  Basé sur vos scans, des playlists relaxantes pourraient vous aider les matins.
-                </p>
-              </div>
-
-              <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
-                <h4 className="font-semibold text-orange-900">Optimisation Suggérée</h4>
-                <p className="text-orange-800">
-                  Vos scans montrent plus de stress les jeudis. Programmez une pause détente ce jour-là.
-                </p>
-              </div>
-
-              <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-                <h4 className="font-semibold text-purple-900">Objectif Personnalisé</h4>
-                <p className="text-purple-800">
-                  Objectif: Atteindre 85% de scans positifs ce mois. Actuel: {improvementRate.toFixed(1)}%
-                </p>
-                <Progress value={improvementRate} className="mt-2" />
-              </div>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={weeklyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="scans" fill="#8884d8" name="Nombre de scans" />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="trends" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Analyse des Tendances</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EmotionTrendChart data={emotionHistory} height={400} />
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Insights IA</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">📈 Progression Positive</h4>
+                    <p className="text-sm text-blue-700">
+                      Votre bien-être émotionnel s'améliore de 15% ce mois-ci. Continuez vos bonnes habitudes !
+                    </p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <h4 className="font-semibold text-green-800 mb-2">🎯 Objectif Atteint</h4>
+                    <p className="text-sm text-green-700">
+                      Félicitations ! Vous avez maintenu une série de 7 jours de scans quotidiens.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-purple-50 rounded-lg">
+                    <h4 className="font-semibold text-purple-800 mb-2">💡 Recommandation</h4>
+                    <p className="text-sm text-purple-700">
+                      Vos pics de joie sont souvent le matin. Planifiez vos tâches importantes à ce moment !
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Actions Recommandées</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate(getFormattedPath('music'))}
+                  >
+                    <Brain className="mr-2 h-4 w-4" />
+                    Session Musicothérapie
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate(getFormattedPath('coach'))}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Consulter le Coach IA
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate(getFormattedPath('journal'))}
+                  >
+                    <Award className="mr-2 h-4 w-4" />
+                    Écrire dans le Journal
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
