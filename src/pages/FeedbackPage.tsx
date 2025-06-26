@@ -1,432 +1,374 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Star, Lightbulb, Bug, Heart, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { 
+  MessageSquare, 
+  Star, 
+  Send, 
+  ThumbsUp, 
+  ThumbsDown, 
+  Lightbulb, 
+  Bug, 
+  Heart,
+  TrendingUp,
+  Users,
+  CheckCircle,
+  Clock
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 
+interface FeedbackItem {
+  id: string;
+  type: 'bug' | 'feature' | 'improvement' | 'compliment';
+  title: string;
+  description: string;
+  rating: number;
+  status: 'new' | 'in-progress' | 'resolved';
+  date: string;
+  upvotes: number;
+}
+
 const FeedbackPage: React.FC = () => {
+  const [feedbackType, setFeedbackType] = useState('general');
+  const [rating, setRating] = useState(5);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [email, setEmail] = useState('');
+  const [anonymous, setAnonymous] = useState(false);
   const { toast } = useToast();
-  const [feedbackForm, setFeedbackForm] = useState({
-    type: 'general',
-    rating: '',
-    title: '',
-    description: '',
-    email: '',
-    category: '',
-    urgency: 'medium'
-  });
 
-  const [suggestionForm, setSuggestionForm] = useState({
-    title: '',
-    description: '',
-    category: 'feature',
-    impact: 'medium',
-    email: ''
-  });
-
-  const recentFeedback = [
+  const recentFeedback: FeedbackItem[] = [
     {
       id: '1',
-      type: 'suggestion',
-      title: 'Améliorer la navigation mobile',
+      type: 'feature',
+      title: 'Notifications personnalisées',
+      description: 'Possibilité de personnaliser les horaires de notification',
+      rating: 4,
       status: 'in-progress',
-      votes: 23,
-      date: '2024-01-15'
+      date: '2024-01-10',
+      upvotes: 12
     },
     {
       id: '2',
-      type: 'bug',
-      title: 'Problème de synchronisation VR',
+      type: 'improvement',
+      title: 'Interface plus intuitive',
+      description: 'Simplifier la navigation dans les paramètres',
+      rating: 5,
       status: 'resolved',
-      votes: 8,
-      date: '2024-01-14'
+      date: '2024-01-08',
+      upvotes: 8
     },
     {
       id: '3',
-      type: 'feature',
-      title: 'Mode sombre pour l\'interface',
-      status: 'planned',
-      votes: 45,
-      date: '2024-01-13'
+      type: 'bug',
+      title: 'Problème de synchronisation',
+      description: 'Les données ne se synchronisent pas toujours',
+      rating: 3,
+      status: 'new',
+      date: '2024-01-12',
+      upvotes: 5
     }
   ];
 
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Feedback submitted:', feedbackForm);
+  const handleSubmitFeedback = () => {
+    if (!title.trim() || !description.trim()) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir le titre et la description.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
-      title: "Merci pour votre retour !",
-      description: "Votre feedback a été envoyé avec succès.",
+      title: "Feedback envoyé !",
+      description: "Merci pour votre retour. Nous l'examinerons rapidement.",
     });
-    setFeedbackForm({
-      type: 'general',
-      rating: '',
-      title: '',
-      description: '',
-      email: '',
-      category: '',
-      urgency: 'medium'
-    });
+
+    // Reset form
+    setTitle('');
+    setDescription('');
+    setEmail('');
+    setRating(5);
+    setFeedbackType('general');
+    setAnonymous(false);
   };
 
-  const handleSuggestionSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Suggestion submitted:', suggestionForm);
-    toast({
-      title: "Suggestion envoyée !",
-      description: "Merci pour votre idée, nous l'étudierons attentivement.",
-    });
-    setSuggestionForm({
-      title: '',
-      description: '',
-      category: 'feature',
-      impact: 'medium',
-      email: ''
-    });
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'bug':
+        return <Bug className="h-4 w-4 text-red-500" />;
+      case 'feature':
+        return <Lightbulb className="h-4 w-4 text-yellow-500" />;
+      case 'improvement':
+        return <TrendingUp className="h-4 w-4 text-blue-500" />;
+      case 'compliment':
+        return <Heart className="h-4 w-4 text-pink-500" />;
+      default:
+        return <MessageSquare className="h-4 w-4 text-gray-500" />;
+    }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'new':
+        return 'bg-blue-100 text-blue-800';
+      case 'in-progress':
+        return 'bg-yellow-100 text-yellow-800';
       case 'resolved':
         return 'bg-green-100 text-green-800';
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'planned':
-        return 'bg-yellow-100 text-yellow-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'resolved':
-        return 'Résolu';
-      case 'in-progress':
-        return 'En cours';
-      case 'planned':
-        return 'Planifié';
-      default:
-        return 'Nouveau';
-    }
-  };
-
   return (
     <div data-testid="page-root" className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="text-center mb-12">
-          <MessageSquare className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold mb-4">Feedback & Suggestions</h1>
-          <p className="text-xl text-muted-foreground">
-            Aidez-nous à améliorer EmotionsCare avec vos retours
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Centre de Feedback</h1>
+          <p className="text-muted-foreground text-lg">
+            Votre avis nous aide à améliorer EmotionsCare
           </p>
         </div>
 
-        <Tabs defaultValue="feedback" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="feedback" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Feedback
-            </TabsTrigger>
-            <TabsTrigger value="suggestions" className="flex items-center gap-2">
-              <Lightbulb className="h-4 w-4" />
-              Suggestions
-            </TabsTrigger>
-            <TabsTrigger value="community" className="flex items-center gap-2">
-              <Heart className="h-4 w-4" />
-              Communauté
-            </TabsTrigger>
+        {/* Statistiques */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <MessageSquare className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">247</div>
+              <div className="text-sm text-muted-foreground">Retours reçus</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">89%</div>
+              <div className="text-sm text-muted-foreground">Problèmes résolus</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Clock className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">2.3j</div>
+              <div className="text-sm text-muted-foreground">Temps de réponse moyen</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Users className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+              <div className="text-2xl font-bold">4.8/5</div>
+              <div className="text-sm text-muted-foreground">Satisfaction moyenne</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="submit" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="submit">Nouveau Feedback</TabsTrigger>
+            <TabsTrigger value="history">Historique</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="feedback" className="space-y-6">
+          <TabsContent value="submit" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5" />
                   Partagez votre expérience
                 </CardTitle>
+                <CardDescription>
+                  Votre feedback nous aide à améliorer la plateforme
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleFeedbackSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Type de feedback</Label>
-                      <Select 
-                        value={feedbackForm.type} 
-                        onValueChange={(value) => setFeedbackForm(prev => ({ ...prev, type: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="general">Général</SelectItem>
-                          <SelectItem value="bug">Signaler un bug</SelectItem>
-                          <SelectItem value="feature">Demande de fonctionnalité</SelectItem>
-                          <SelectItem value="ui">Interface utilisateur</SelectItem>
-                          <SelectItem value="performance">Performance</SelectItem>
-                        </SelectContent>
-                      </Select>
+              <CardContent className="space-y-6">
+                {/* Type de feedback */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium">Type de feedback</Label>
+                  <RadioGroup value={feedbackType} onValueChange={setFeedbackType}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="general" id="general" />
+                      <Label htmlFor="general">Commentaire général</Label>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label>Catégorie</Label>
-                      <Select 
-                        value={feedbackForm.category} 
-                        onValueChange={(value) => setFeedbackForm(prev => ({ ...prev, category: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez une catégorie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="scan">Scan émotionnel</SelectItem>
-                          <SelectItem value="music">Musicothérapie</SelectItem>
-                          <SelectItem value="vr">Réalité virtuelle</SelectItem>
-                          <SelectItem value="coach">Coach IA</SelectItem>
-                          <SelectItem value="dashboard">Tableau de bord</SelectItem>
-                          <SelectItem value="mobile">Application mobile</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="bug" id="bug" />
+                      <Label htmlFor="bug">Signaler un problème</Label>
                     </div>
-                  </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="feature" id="feature" />
+                      <Label htmlFor="feature">Demande de fonctionnalité</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="improvement" id="improvement" />
+                      <Label htmlFor="improvement">Suggestion d'amélioration</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
 
-                  <div className="space-y-3">
-                    <Label>Évaluation globale</Label>
-                    <RadioGroup 
-                      value={feedbackForm.rating} 
-                      onValueChange={(value) => setFeedbackForm(prev => ({ ...prev, rating: value }))}
-                      className="flex items-center space-x-6"
-                    >
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <div key={rating} className="flex items-center space-x-2">
-                          <RadioGroupItem value={rating.toString()} id={`rating-${rating}`} />
-                          <Label htmlFor={`rating-${rating}`} className="flex items-center cursor-pointer">
-                            {[...Array(rating)].map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                            <span className="ml-2">{rating}</span>
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
+                {/* Évaluation */}
+                <div className="space-y-3">
+                  <Label className="text-base font-medium">Évaluation globale</Label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        className="p-1"
+                      >
+                        <Star
+                          className={`h-6 w-6 ${
+                            star <= rating
+                              ? 'text-yellow-400 fill-current'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      {rating}/5 étoiles
+                    </span>
                   </div>
+                </div>
 
+                {/* Titre */}
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-base font-medium">
+                    Titre
+                  </Label>
+                  <Input
+                    id="title"
+                    placeholder="Résumez votre feedback en quelques mots"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-base font-medium">
+                    Description détaillée
+                  </Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Décrivez votre expérience, problème ou suggestion..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+
+                {/* Email (optionnel) */}
+                {!anonymous && (
                   <div className="space-y-2">
-                    <Label>Titre</Label>
+                    <Label htmlFor="email" className="text-base font-medium">
+                      Email (optionnel)
+                    </Label>
                     <Input
-                      value={feedbackForm.title}
-                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Résumé de votre feedback"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Description détaillée</Label>
-                    <Textarea
-                      value={feedbackForm.description}
-                      onChange={(e) => setFeedbackForm(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Décrivez votre expérience, les problèmes rencontrés ou vos suggestions..."
-                      rows={4}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Email (optionnel)</Label>
-                      <Input
-                        type="email"
-                        value={feedbackForm.email}
-                        onChange={(e) => setFeedbackForm(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder="Pour un suivi de votre feedback"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Urgence</Label>
-                      <Select 
-                        value={feedbackForm.urgency} 
-                        onValueChange={(value) => setFeedbackForm(prev => ({ ...prev, urgency: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">Faible</SelectItem>
-                          <SelectItem value="medium">Moyenne</SelectItem>
-                          <SelectItem value="high">Élevée</SelectItem>
-                          <SelectItem value="critical">Critique</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Envoyer le feedback
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="suggestions" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5" />
-                  Proposez une amélioration
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSuggestionSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label>Titre de la suggestion</Label>
-                    <Input
-                      value={suggestionForm.title}
-                      onChange={(e) => setSuggestionForm(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Résumé de votre idée"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Description détaillée</Label>
-                    <Textarea
-                      value={suggestionForm.description}
-                      onChange={(e) => setSuggestionForm(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Expliquez votre idée, comment elle améliorerait l'expérience utilisateur..."
-                      rows={4}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Catégorie</Label>
-                      <Select 
-                        value={suggestionForm.category} 
-                        onValueChange={(value) => setSuggestionForm(prev => ({ ...prev, category: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="feature">Nouvelle fonctionnalité</SelectItem>
-                          <SelectItem value="improvement">Amélioration existante</SelectItem>
-                          <SelectItem value="ui">Interface utilisateur</SelectItem>
-                          <SelectItem value="integration">Intégration</SelectItem>
-                          <SelectItem value="accessibility">Accessibilité</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Impact estimé</Label>
-                      <Select 
-                        value={suggestionForm.impact} 
-                        onValueChange={(value) => setSuggestionForm(prev => ({ ...prev, impact: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">Faible</SelectItem>
-                          <SelectItem value="medium">Moyen</SelectItem>
-                          <SelectItem value="high">Élevé</SelectItem>
-                          <SelectItem value="critical">Critique</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Email (optionnel)</Label>
-                    <Input
+                      id="email"
                       type="email"
-                      value={suggestionForm.email}
-                      onChange={(e) => setSuggestionForm(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="Pour vous tenir informé du statut"
+                      placeholder="votre.email@exemple.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
+                    <p className="text-sm text-muted-foreground">
+                      Pour vous tenir informé du suivi de votre feedback
+                    </p>
                   </div>
+                )}
 
-                  <Button type="submit" className="w-full">
-                    Proposer la suggestion
-                  </Button>
-                </form>
+                {/* Anonymat */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="anonymous"
+                    checked={anonymous}
+                    onCheckedChange={(checked) => setAnonymous(checked as boolean)}
+                  />
+                  <Label htmlFor="anonymous" className="text-sm">
+                    Envoyer ce feedback de manière anonyme
+                  </Label>
+                </div>
+
+                <Button onClick={handleSubmitFeedback} className="w-full">
+                  <Send className="mr-2 h-4 w-4" />
+                  Envoyer le feedback
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="community" className="space-y-6">
-            <div className="grid gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Feedback récent de la communauté</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {recentFeedback.map((item) => (
-                    <div key={item.id} className="p-4 border rounded-lg">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          {item.type === 'bug' && <Bug className="h-4 w-4 text-red-500" />}
-                          {item.type === 'suggestion' && <Lightbulb className="h-4 w-4 text-yellow-500" />}
-                          {item.type === 'feature' && <Star className="h-4 w-4 text-blue-500" />}
-                          <h3 className="font-semibold">{item.title}</h3>
+          <TabsContent value="history" className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Feedback récent de la communauté</h3>
+              
+              {recentFeedback.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          {getTypeIcon(item.type)}
+                          <div>
+                            <h4 className="font-semibold">{item.title}</h4>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                          </div>
                         </div>
                         <Badge className={getStatusColor(item.status)}>
-                          {getStatusText(item.status)}
+                          {item.status === 'new' && 'Nouveau'}
+                          {item.status === 'in-progress' && 'En cours'}
+                          {item.status === 'resolved' && 'Résolu'}
                         </Badge>
                       </div>
-                      <div className="flex items-center justify-between">
+                      
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < item.rating
+                                    ? 'text-yellow-400 fill-current'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {item.date}
+                          </span>
+                        </div>
+                        
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                            <ThumbsUp className="h-3 w-3" />
-                            {item.votes}
+                          <Button variant="ghost" size="sm">
+                            <ThumbsUp className="h-4 w-4 mr-1" />
+                            {item.upvotes}
                           </Button>
                           <Button variant="ghost" size="sm">
-                            <ThumbsDown className="h-3 w-3" />
+                            <ThumbsDown className="h-4 w-4" />
                           </Button>
                         </div>
-                        <span className="text-sm text-muted-foreground">{item.date}</span>
                       </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Statistiques communautaires</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">156</div>
-                      <div className="text-sm text-muted-foreground">Suggestions soumises</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">43</div>
-                      <div className="text-sm text-muted-foreground">Fonctionnalités ajoutées</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">89</div>
-                      <div className="text-sm text-muted-foreground">Bugs corrigés</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-purple-600">4.7</div>
-                      <div className="text-sm text-muted-foreground">Note moyenne</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </TabsContent>
         </Tabs>

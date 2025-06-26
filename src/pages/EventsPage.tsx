@@ -1,223 +1,232 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Users, ArrowLeft, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { Calendar, Clock, MapPin, Users, Plus, Search, Filter } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  attendees: number;
+  maxAttendees: number;
+  category: 'workshop' | 'webinar' | 'team-building' | 'formation';
+  status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
+}
 
 const EventsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    date: '',
-    time: '',
-    description: '',
-    budget: ''
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const events = [
+  const events: Event[] = [
     {
-      title: 'Session de débriefing - Équipe Marketing',
-      date: '2024-01-20',
+      id: '1',
+      title: 'Atelier Gestion du Stress',
+      description: 'Formation pratique sur les techniques de gestion du stress en milieu professionnel',
+      date: '2024-01-15',
       time: '14:00',
-      participants: 12,
-      status: 'planned',
-      type: 'intervention'
+      location: 'Salle de conférence A',
+      attendees: 12,
+      maxAttendees: 20,
+      category: 'workshop',
+      status: 'scheduled'
     },
     {
-      title: 'Atelier de méditation collective',
-      date: '2024-01-22',
-      time: '12:00',
-      participants: 25,
-      status: 'planned',
-      type: 'wellness'
-    },
-    {
-      title: 'Formation gestion du stress',
+      id: '2',
+      title: 'Webinaire Bien-être Mental',
+      description: 'Conférence en ligne sur l\'importance de la santé mentale au travail',
       date: '2024-01-18',
+      time: '10:00',
+      location: 'En ligne',
+      attendees: 45,
+      maxAttendees: 100,
+      category: 'webinar',
+      status: 'scheduled'
+    },
+    {
+      id: '3',
+      title: 'Team Building Créatif',
+      description: 'Activité de cohésion d\'équipe axée sur la créativité et la collaboration',
+      date: '2024-01-12',
       time: '09:00',
-      participants: 18,
-      status: 'completed',
-      type: 'training'
+      location: 'Espace créatif',
+      attendees: 8,
+      maxAttendees: 15,
+      category: 'team-building',
+      status: 'completed'
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success('Événement planifié avec succès');
-    setShowForm(false);
-    setFormData({ title: '', date: '', time: '', description: '', budget: '' });
+  const filteredEvents = events.filter(event => {
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const getCategoryLabel = (category: string) => {
+    const labels = {
+      workshop: 'Atelier',
+      webinar: 'Webinaire',
+      'team-building': 'Team Building',
+      formation: 'Formation'
+    };
+    return labels[category as keyof typeof labels] || category;
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'planned':
-        return <Badge className="bg-blue-100 text-blue-800">Planifié</Badge>;
-      case 'completed':
-        return <Badge className="bg-green-100 text-green-800">Terminé</Badge>;
-      default:
-        return <Badge variant="secondary">Inconnu</Badge>;
-    }
-  };
-
-  const getTypeBadge = (type: string) => {
-    switch (type) {
-      case 'intervention':
-        return <Badge variant="destructive">Intervention</Badge>;
-      case 'wellness':
-        return <Badge className="bg-purple-100 text-purple-800">Bien-être</Badge>;
-      case 'training':
-        return <Badge className="bg-orange-100 text-orange-800">Formation</Badge>;
-      default:
-        return <Badge variant="secondary">Autre</Badge>;
-    }
+  const getStatusColor = (status: string) => {
+    const colors = {
+      scheduled: 'bg-blue-100 text-blue-800',
+      ongoing: 'bg-green-100 text-green-800',
+      completed: 'bg-gray-100 text-gray-800',
+      cancelled: 'bg-red-100 text-red-800'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Gestion des événements</h1>
-            <p className="text-gray-600">Planifiez et gérez les activités de bien-être</p>
+            <h1 className="text-3xl font-bold tracking-tight">Gestion des Événements</h1>
+            <p className="text-muted-foreground">
+              Organisez et participez aux événements de bien-être
+            </p>
+          </div>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouvel Événement
+          </Button>
+        </div>
+
+        {/* Filtres et Recherche */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher un événement..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => setShowForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Nouvel événement
+            <Button
+              variant={selectedCategory === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory('all')}
+              size="sm"
+            >
+              Tous
             </Button>
-            <Button onClick={() => navigate('/b2b/admin/dashboard')} variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
+            <Button
+              variant={selectedCategory === 'workshop' ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory('workshop')}
+              size="sm"
+            >
+              Ateliers
+            </Button>
+            <Button
+              variant={selectedCategory === 'webinar' ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory('webinar')}
+              size="sm"
+            >
+              Webinaires
+            </Button>
+            <Button
+              variant={selectedCategory === 'team-building' ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory('team-building')}
+              size="sm"
+            >
+              Team Building
             </Button>
           </div>
         </div>
 
-        {showForm && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Planifier un nouvel événement</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="title">Titre de l'événement</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      placeholder="Nom de l'activité"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="budget">Budget maximum (€)</Label>
-                    <Input
-                      id="budget"
-                      type="number"
-                      value={formData.budget}
-                      onChange={(e) => setFormData({...formData, budget: e.target.value})}
-                      placeholder="Budget en euros"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="date">Date</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({...formData, date: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="time">Heure</Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={formData.time}
-                      onChange={(e) => setFormData({...formData, time: e.target.value})}
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Décrivez l'activité..."
-                    className="h-24"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button type="submit">
-                    Planifier l'événement
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                    Annuler
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
-              Événements planifiés
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {events.map((event, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold">{event.title}</h3>
-                      {getStatusBadge(event.status)}
-                      {getTypeBadge(event.type)}
+        {/* Liste des Événements */}
+        <div className="grid gap-6">
+          {filteredEvents.map((event, index) => (
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        {event.title}
+                        <Badge variant="secondary">
+                          {getCategoryLabel(event.category)}
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription>{event.description}</CardDescription>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {event.date}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {event.time}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
-                        {event.participants} participants
-                      </div>
+                    <Badge className={getStatusColor(event.status)}>
+                      {event.status === 'scheduled' && 'Programmé'}
+                      {event.status === 'ongoing' && 'En cours'}
+                      {event.status === 'completed' && 'Terminé'}
+                      {event.status === 'cancelled' && 'Annulé'}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{event.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{event.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{event.location}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
-                      Détails
-                    </Button>
-                    {event.status === 'planned' && (
-                      <Button size="sm">
-                        Modifier
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">
+                        {event.attendees}/{event.maxAttendees} participants
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        Détails
                       </Button>
-                    )}
+                      {event.status === 'scheduled' && (
+                        <Button size="sm">
+                          Participer
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {filteredEvents.length === 0 && (
+          <div className="text-center py-12">
+            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Aucun événement trouvé</h3>
+            <p className="text-muted-foreground">
+              Essayez de modifier vos critères de recherche ou créez un nouvel événement.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

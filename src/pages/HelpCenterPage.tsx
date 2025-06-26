@@ -1,417 +1,402 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
 import { 
-  HelpCircle, 
-  MessageSquare, 
-  FileText, 
-  Video, 
-  Mail, 
+  Search, 
+  Book, 
+  MessageCircle, 
   Phone, 
-  Clock,
-  Search,
-  Book,
-  Users,
-  Lightbulb,
-  AlertCircle
+  Mail, 
+  Video, 
+  FileText, 
+  HelpCircle,
+  ExternalLink,
+  Star,
+  ThumbsUp,
+  Clock
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+
+interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  helpful: number;
+}
+
+interface Tutorial {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  category: string;
+  videoUrl?: string;
+}
 
 const HelpCenterPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [supportForm, setSupportForm] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-    category: 'general'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const faqItems: FAQItem[] = [
+    {
+      id: '1',
+      question: 'Comment commencer à utiliser EmotionsCare ?',
+      answer: 'Pour commencer, créez votre compte, complétez votre profil, puis explorez le scanner émotionnel pour votre première analyse. Notre coach IA vous guidera pas à pas.',
+      category: 'getting-started',
+      helpful: 24
+    },
+    {
+      id: '2',
+      question: 'Le scanner émotionnel est-il précis ?',
+      answer: 'Notre scanner utilise des algorithmes avancés d\'IA pour analyser vos réponses et données biométriques. La précision s\'améliore avec l\'utilisation régulière et vos retours.',
+      category: 'features',
+      helpful: 18
+    },
+    {
+      id: '3',
+      question: 'Mes données sont-elles sécurisées ?',
+      answer: 'Absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons strictement le RGPD et ne partageons jamais vos informations personnelles.',
+      category: 'privacy',
+      helpful: 32
+    },
+    {
+      id: '4',
+      question: 'Comment fonctionne la musicothérapie adaptative ?',
+      answer: 'Notre système analyse votre état émotionnel actuel et sélectionne automatiquement des musiques thérapeutiques adaptées à vos besoins du moment.',
+      category: 'features',
+      helpful: 15
+    }
+  ];
+
+  const tutorials: Tutorial[] = [
+    {
+      id: '1',
+      title: 'Premiers pas avec EmotionsCare',
+      description: 'Guide complet pour débuter sur la plateforme',
+      duration: '5 min',
+      difficulty: 'beginner',
+      category: 'getting-started'
+    },
+    {
+      id: '2',
+      title: 'Utiliser le scanner émotionnel',
+      description: 'Comment effectuer votre première analyse émotionnelle',
+      duration: '3 min',
+      difficulty: 'beginner',
+      category: 'features'
+    },
+    {
+      id: '3',
+      title: 'Configurer vos préférences',
+      description: 'Personnaliser votre expérience selon vos besoins',
+      duration: '4 min',
+      difficulty: 'intermediate',
+      category: 'settings'
+    },
+    {
+      id: '4',
+      title: 'Tableau de bord avancé',
+      description: 'Exploiter toutes les fonctionnalités analytics',
+      duration: '8 min',
+      difficulty: 'advanced',
+      category: 'analytics'
+    }
+  ];
+
+  const filteredFAQ = faqItems.filter(item => {
+    const matchesSearch = item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.answer.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const faqItems = [
-    {
-      id: 'account',
-      question: 'Comment créer mon compte EmotionsCare ?',
-      answer: 'Pour créer votre compte, cliquez sur "Créer un compte" depuis la page d\'accueil, choisissez votre espace (Personnel ou Entreprise), puis remplissez le formulaire d\'inscription avec vos informations.'
-    },
-    {
-      id: 'scan',
-      question: 'Comment fonctionne le scan émotionnel ?',
-      answer: 'Le scan émotionnel utilise l\'IA pour analyser vos réponses à un questionnaire rapide et déterminer votre état émotionnel actuel. Il vous propose ensuite des recommandations personnalisées.'
-    },
-    {
-      id: 'music',
-      question: 'Puis-je utiliser la musicothérapie sans casque ?',
-      answer: 'Oui, la musicothérapie fonctionne avec vos haut-parleurs, mais nous recommandons l\'utilisation d\'un casque pour une expérience optimale et immersive.'
-    },
-    {
-      id: 'coach',
-      question: 'Le coach IA est-il disponible 24h/24 ?',
-      answer: 'Oui, votre coach IA personnel est disponible à tout moment. Il s\'adapte à votre emploi du temps et à vos besoins émotionnels en temps réel.'
-    },
-    {
-      id: 'data',
-      question: 'Mes données personnelles sont-elles sécurisées ?',
-      answer: 'Absolument. Nous utilisons un chiffrement de niveau bancaire et respectons strictement le RGPD. Vos données ne sont jamais partagées avec des tiers sans votre consentement explicite.'
-    },
-    {
-      id: 'subscription',
-      question: 'Comment fonctionne l\'abonnement ?',
-      answer: 'EmotionsCare propose différents plans selon vos besoins. Vous pouvez commencer avec un essai gratuit, puis choisir l\'abonnement qui vous convient le mieux.'
-    }
-  ];
+  const filteredTutorials = tutorials.filter(tutorial => {
+    const matchesSearch = tutorial.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tutorial.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || tutorial.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-  const guides = [
-    {
-      title: 'Guide de démarrage rapide',
-      description: 'Apprenez les bases d\'EmotionsCare en 5 minutes',
-      duration: '5 min',
-      type: 'Débutant',
-      icon: Book
-    },
-    {
-      title: 'Optimiser son scan émotionnel',
-      description: 'Conseils pour des résultats plus précis',
-      duration: '8 min',
-      type: 'Intermédiaire',
-      icon: Lightbulb
-    },
-    {
-      title: 'Utilisation avancée du coach IA',
-      description: 'Tirez le maximum de votre coach personnel',
-      duration: '12 min',
-      type: 'Avancé',
-      icon: Users
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner':
+        return 'bg-green-100 text-green-800';
+      case 'intermediate':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'advanced':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
-  ];
-
-  const handleSupportSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!supportForm.name || !supportForm.email || !supportForm.message) {
-      toast.error('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
-    // Simulation d'envoi
-    toast.success('Votre demande a été envoyée ! Nous vous répondrons sous 24h.');
-    setSupportForm({
-      name: '',
-      email: '',
-      subject: '',
-      message: '',
-      category: 'general'
-    });
   };
 
-  const filteredFAQ = faqItems.filter(item =>
-    item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.answer.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Centre d'aide
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            Trouvez rapidement les réponses à vos questions ou contactez notre équipe support
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Centre d'Aide</h1>
+          <p className="text-muted-foreground text-lg">
+            Trouvez les réponses à vos questions et apprenez à utiliser EmotionsCare
           </p>
+        </div>
 
-          {/* Search Bar */}
-          <div className="max-w-md mx-auto relative">
+        {/* Barre de recherche */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              type="text"
               placeholder="Rechercher dans l'aide..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-12 text-base"
             />
-            <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
           </div>
         </div>
 
-        <Tabs defaultValue="faq" className="max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="faq">FAQ</TabsTrigger>
-            <TabsTrigger value="guides">Guides</TabsTrigger>
+        {/* Actions rapides */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="pt-6 text-center">
+              <MessageCircle className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+              <h3 className="font-semibold">Chat en direct</h3>
+              <p className="text-sm text-muted-foreground">Support instantané</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="pt-6 text-center">
+              <Mail className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <h3 className="font-semibold">Email</h3>
+              <p className="text-sm text-muted-foreground">support@emotionscare.com</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="pt-6 text-center">
+              <Phone className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <h3 className="font-semibold">Téléphone</h3>
+              <p className="text-sm text-muted-foreground">+33 1 23 45 67 89</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="pt-6 text-center">
+              <Video className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+              <h3 className="font-semibold">Démo</h3>
+              <p className="text-sm text-muted-foreground">Session personnalisée</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Contenu principal */}
+        <Tabs defaultValue="faq" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="faq">Questions fréquentes</TabsTrigger>
+            <TabsTrigger value="tutorials">Tutoriels</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
-            <TabsTrigger value="status">Statut</TabsTrigger>
           </TabsList>
 
-          {/* FAQ Tab */}
           <TabsContent value="faq" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <HelpCircle className="h-5 w-5 mr-2" />
-                  Questions fréquentes
-                </CardTitle>
-                <CardDescription>
-                  Trouvez rapidement les réponses aux questions les plus courantes
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible className="space-y-2">
-                  {filteredFAQ.map((item) => (
-                    <AccordionItem key={item.id} value={item.id}>
-                      <AccordionTrigger className="text-left">
-                        {item.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-600">
-                        {item.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+            {/* Filtres catégories */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button
+                variant={selectedCategory === 'all' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('all')}
+                size="sm"
+              >
+                Toutes
+              </Button>
+              <Button
+                variant={selectedCategory === 'getting-started' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('getting-started')}
+                size="sm"
+              >
+                Premiers pas
+              </Button>
+              <Button
+                variant={selectedCategory === 'features' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('features')}
+                size="sm"
+              >
+                Fonctionnalités
+              </Button>
+              <Button
+                variant={selectedCategory === 'privacy' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('privacy')}
+                size="sm"
+              >
+                Confidentialité
+              </Button>
+            </div>
 
-                {filteredFAQ.length === 0 && searchQuery && (
-                  <div className="text-center py-8">
-                    <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">
-                      Aucun résultat trouvé pour "{searchQuery}"
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSearchQuery('')}
-                      className="mt-4"
-                    >
-                      Effacer la recherche
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <Accordion type="single" collapsible className="space-y-4">
+              {filteredFAQ.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <AccordionItem value={item.id} className="border rounded-lg px-6">
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center gap-3 text-left">
+                        <HelpCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                        <span>{item.question}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-4">
+                      <p className="text-muted-foreground mb-4">{item.answer}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <ThumbsUp className="h-4 w-4 text-green-500" />
+                          <span className="text-sm text-muted-foreground">
+                            {item.helpful} personnes ont trouvé cela utile
+                          </span>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          Cela vous aide-t-il ?
+                        </Button>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
           </TabsContent>
 
-          {/* Guides Tab */}
-          <TabsContent value="guides" className="space-y-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {guides.map((guide, index) => {
-                const IconComponent = guide.icon;
-                return (
-                  <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer">
-                    <CardHeader>
-                      <div className="flex items-center justify-between mb-2">
-                        <IconComponent className="h-8 w-8 text-blue-600" />
-                        <Badge variant="outline">{guide.type}</Badge>
+          <TabsContent value="tutorials" className="space-y-6">
+            <div className="grid gap-6">
+              {filteredTutorials.map((tutorial, index) => (
+                <motion.div
+                  key={tutorial.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex gap-4">
+                          <div className="bg-blue-100 p-3 rounded-lg">
+                            <Video className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-2">{tutorial.title}</h3>
+                            <p className="text-muted-foreground mb-3">{tutorial.description}</p>
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm">{tutorial.duration}</span>
+                              </div>
+                              <Badge className={getDifficultyColor(tutorial.difficulty)}>
+                                {tutorial.difficulty}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <Button>
+                          Voir le tutoriel
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </Button>
                       </div>
-                      <CardTitle className="text-lg">{guide.title}</CardTitle>
-                      <CardDescription>{guide.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {guide.duration}
-                      </div>
-                      <Button className="w-full mt-4" variant="outline">
-                        <Video className="h-4 w-4 mr-2" />
-                        Voir le guide
-                      </Button>
                     </CardContent>
                   </Card>
-                );
-              })}
+                </motion.div>
+              ))}
             </div>
           </TabsContent>
 
-          {/* Contact Tab */}
           <TabsContent value="contact" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Contact Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MessageSquare className="h-5 w-5 mr-2" />
-                    Contacter le support
-                  </CardTitle>
+                  <CardTitle>Contacter le Support</CardTitle>
                   <CardDescription>
-                    Décrivez votre problème et nous vous répondrons rapidement
+                    Notre équipe est là pour vous aider
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSupportSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <MessageCircle className="h-5 w-5 text-blue-500" />
                       <div>
-                        <Label htmlFor="name">Nom *</Label>
-                        <Input
-                          id="name"
-                          value={supportForm.name}
-                          onChange={(e) => setSupportForm({...supportForm, name: e.target.value})}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={supportForm.email}
-                          onChange={(e) => setSupportForm({...supportForm, email: e.target.value})}
-                          required
-                        />
+                        <h4 className="font-medium">Chat en direct</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Disponible 24h/24, 7j/7
+                        </p>
                       </div>
                     </div>
-
-                    <div>
-                      <Label htmlFor="category">Catégorie</Label>
-                      <select
-                        id="category"
-                        value={supportForm.category}
-                        onChange={(e) => setSupportForm({...supportForm, category: e.target.value})}
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                      >
-                        <option value="general">Question générale</option>
-                        <option value="technical">Problème technique</option>
-                        <option value="billing">Facturation</option>
-                        <option value="feature">Demande de fonctionnalité</option>
-                      </select>
+                    
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-green-500" />
+                      <div>
+                        <h4 className="font-medium">Email</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Réponse sous 24h
+                        </p>
+                      </div>
                     </div>
-
-                    <div>
-                      <Label htmlFor="subject">Sujet</Label>
-                      <Input
-                        id="subject"
-                        value={supportForm.subject}
-                        onChange={(e) => setSupportForm({...supportForm, subject: e.target.value})}
-                      />
+                    
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-orange-500" />
+                      <div>
+                        <h4 className="font-medium">Téléphone</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Lun-Ven 9h-18h
+                        </p>
+                      </div>
                     </div>
-
-                    <div>
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
-                        value={supportForm.message}
-                        onChange={(e) => setSupportForm({...supportForm, message: e.target.value})}
-                        placeholder="Décrivez votre problème en détail..."
-                        className="min-h-[120px]"
-                        required
-                      />
-                    </div>
-
-                    <Button type="submit" className="w-full">
-                      Envoyer la demande
-                    </Button>
-                  </form>
+                  </div>
                 </CardContent>
               </Card>
 
-              {/* Contact Options */}
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Autres moyens de contact</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium">Email</p>
-                        <p className="text-sm text-gray-600">support@emotionscare.com</p>
-                        <p className="text-xs text-gray-500">Réponse sous 24h</p>
-                      </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Ressources Utiles</CardTitle>
+                  <CardDescription>
+                    Documentation et guides complémentaires
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-5 w-5 text-purple-500" />
+                      <span>Guide d'utilisation complet</span>
                     </div>
-
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium">Téléphone</p>
-                        <p className="text-sm text-gray-600">+33 1 23 45 67 89</p>
-                        <p className="text-xs text-gray-500">Lun-Ven 9h-18h</p>
-                      </div>
+                    <Button variant="ghost" size="sm">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Book className="h-5 w-5 text-indigo-500" />
+                      <span>Documentation API</span>
                     </div>
-
-                    <div className="flex items-center space-x-3">
-                      <MessageSquare className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <p className="font-medium">Chat en direct</p>
-                        <p className="text-sm text-gray-600">Disponible dans l'app</p>
-                        <p className="text-xs text-gray-500">Réponse immédiate</p>
-                      </div>
+                    <Button variant="ghost" size="sm">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Star className="h-5 w-5 text-yellow-500" />
+                      <span>Meilleures pratiques</span>
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Ressources utiles</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <Button variant="outline" className="w-full justify-start">
-                        <FileText className="h-4 w-4 mr-2" />
-                        Documentation API
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Video className="h-4 w-4 mr-2" />
-                        Tutoriels vidéo
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Users className="h-4 w-4 mr-2" />
-                        Communauté
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    <Button variant="ghost" size="sm">
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </TabsContent>
-
-          {/* Status Tab */}
-          <TabsContent value="status" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <div className="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
-                  Statut des services
-                </CardTitle>
-                <CardDescription>
-                  État en temps réel de nos services
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    { name: 'Application web', status: 'operational', uptime: '99.9%' },
-                    { name: 'API Coach IA', status: 'operational', uptime: '99.8%' },
-                    { name: 'Scan émotionnel', status: 'operational', uptime: '99.9%' },
-                    { name: 'Musicothérapie', status: 'operational', uptime: '100%' },
-                    { name: 'Base de données', status: 'operational', uptime: '99.9%' }
-                  ].map((service, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center">
-                        <div className={`h-2 w-2 rounded-full mr-3 ${
-                          service.status === 'operational' ? 'bg-green-500' : 'bg-red-500'
-                        }`}></div>
-                        <span className="font-medium">{service.name}</span>
-                      </div>
-                      <div className="text-right">
-                        <Badge variant="outline" className="text-green-700 border-green-200">
-                          Opérationnel
-                        </Badge>
-                        <p className="text-xs text-gray-500 mt-1">Uptime: {service.uptime}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">Maintenance programmée</h4>
-                  <p className="text-sm text-blue-700">
-                    Aucune maintenance prévue dans les 7 prochains jours.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>

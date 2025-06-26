@@ -1,210 +1,406 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Target, Lightbulb, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  TrendingUp, 
+  Users, 
+  Clock, 
+  Target, 
+  Zap, 
+  BarChart3, 
+  Settings, 
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
+  Info
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+
+interface OptimizationMetric {
+  id: string;
+  name: string;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  trend: 'up' | 'down' | 'stable';
+  status: 'good' | 'warning' | 'critical';
+}
+
+interface OptimizationSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  impact: 'high' | 'medium' | 'low';
+  effort: 'high' | 'medium' | 'low';
+  category: 'performance' | 'engagement' | 'wellness' | 'productivity';
+}
 
 const OptimisationPage: React.FC = () => {
-  const navigate = useNavigate();
+  const [isOptimizing, setIsOptimizing] = useState(false);
 
-  const optimizations = [
+  const metrics: OptimizationMetric[] = [
     {
-      title: 'Étendre les pratiques de l\'équipe Développement',
-      description: 'L\'équipe Dev a un excellent score de bien-être (8.1/10). Identifier et déployer leurs bonnes pratiques.',
+      id: '1',
+      name: 'Taux d\'engagement',
+      currentValue: 78,
+      targetValue: 85,
+      unit: '%',
+      trend: 'up',
+      status: 'good'
+    },
+    {
+      id: '2',
+      name: 'Temps de réponse moyen',
+      currentValue: 1.2,
+      targetValue: 1.0,
+      unit: 's',
+      trend: 'down',
+      status: 'warning'
+    },
+    {
+      id: '3',
+      name: 'Score de bien-être',
+      currentValue: 7.3,
+      targetValue: 8.0,
+      unit: '/10',
+      trend: 'up',
+      status: 'good'
+    },
+    {
+      id: '4',
+      name: 'Rétention utilisateurs',
+      currentValue: 85,
+      targetValue: 90,
+      unit: '%',
+      trend: 'stable',
+      status: 'warning'
+    }
+  ];
+
+  const suggestions: OptimizationSuggestion[] = [
+    {
+      id: '1',
+      title: 'Optimiser les notifications push',
+      description: 'Personnaliser les horaires d\'envoi selon les préférences utilisateur',
       impact: 'high',
       effort: 'medium',
-      status: 'recommended',
-      benefits: ['Amélioration globale du bien-être', 'Réduction du stress', 'Meilleure productivité']
+      category: 'engagement'
     },
     {
-      title: 'Optimiser les horaires de méditation',
-      description: 'Analyser les créneaux les plus fréquentés pour optimiser l\'offre de sessions.',
+      id: '2',
+      title: 'Améliorer les temps de chargement',
+      description: 'Mise en cache des ressources fréquemment utilisées',
       impact: 'medium',
-      effort: 'low',
-      status: 'in_progress',
-      benefits: ['Meilleure participation', 'Optimisation des ressources']
+      effort: 'high',
+      category: 'performance'
     },
     {
-      title: 'Programme de mentorat inter-équipes',
-      description: 'Créer des binômes entre équipes performantes et celles en difficulté.',
+      id: '3',
+      title: 'Programme de fidélisation',
+      description: 'Système de points et récompenses pour l\'engagement régulier',
       impact: 'high',
       effort: 'high',
-      status: 'planned',
-      benefits: ['Transfert de connaissances', 'Cohésion d\'équipe', 'Amélioration continue']
+      category: 'engagement'
     },
     {
-      title: 'Personnalisation des recommandations IA',
-      description: 'Améliorer l\'algorithme de recommandation basé sur les données comportementales.',
+      id: '4',
+      title: 'Sessions de méditation courtes',
+      description: 'Proposer des sessions de 5 minutes pour les pauses rapides',
       impact: 'medium',
-      effort: 'high',
-      status: 'research',
-      benefits: ['Recommandations plus pertinentes', 'Meilleur engagement']
+      effort: 'low',
+      category: 'wellness'
     }
   ];
 
-  const quickWins = [
-    {
-      title: 'Rappels de pause automatiques',
-      description: 'Implémenter des notifications pour encourager les micro-pauses',
-      timeToImplement: '1 semaine'
-    },
-    {
-      title: 'Dashboard personnalisé',
-      description: 'Permettre aux utilisateurs de personnaliser leur tableau de bord',
-      timeToImplement: '2 semaines'
-    },
-    {
-      title: 'Feedback instantané',
-      description: 'Ajouter des enquêtes courtes après chaque session',
-      timeToImplement: '1 semaine'
-    }
-  ];
+  const runOptimization = () => {
+    setIsOptimizing(true);
+    setTimeout(() => {
+      setIsOptimizing(false);
+    }, 3000);
+  };
 
-  const getImpactBadge = (impact: string) => {
-    switch (impact) {
-      case 'high':
-        return <Badge className="bg-green-100 text-green-800">Impact élevé</Badge>;
-      case 'medium':
-        return <Badge className="bg-yellow-100 text-yellow-800">Impact moyen</Badge>;
-      case 'low':
-        return <Badge className="bg-gray-100 text-gray-800">Impact faible</Badge>;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'good':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case 'critical':
+        return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
-        return <Badge variant="secondary">Inconnu</Badge>;
+        return <Info className="h-4 w-4 text-blue-500" />;
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'recommended':
-        return <Badge className="bg-blue-100 text-blue-800">Recommandé</Badge>;
-      case 'in_progress':
-        return <Badge className="bg-purple-100 text-purple-800">En cours</Badge>;
-      case 'planned':
-        return <Badge className="bg-orange-100 text-orange-800">Planifié</Badge>;
-      case 'research':
-        return <Badge className="bg-gray-100 text-gray-800">En étude</Badge>;
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
       default:
-        return <Badge variant="secondary">Inconnu</Badge>;
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Optimisation continue</h1>
-            <p className="text-gray-600">Améliorez en permanence le bien-être de votre organisation</p>
+            <h1 className="text-3xl font-bold tracking-tight">Optimisation Système</h1>
+            <p className="text-muted-foreground">
+              Analysez et optimisez les performances de votre plateforme
+            </p>
           </div>
-          <Button onClick={() => navigate('/b2b/admin/dashboard')} variant="outline">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour au tableau de bord
+          <Button onClick={runOptimization} disabled={isOptimizing}>
+            {isOptimizing ? (
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Zap className="mr-2 h-4 w-4" />
+            )}
+            {isOptimizing ? 'Optimisation...' : 'Lancer l\'optimisation'}
           </Button>
         </div>
 
-        {/* Quick Wins */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Lightbulb className="h-5 w-5 mr-2" />
-              Actions rapides (Quick Wins)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {quickWins.map((win, index) => (
-                <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
-                  <h3 className="font-semibold mb-2">{win.title}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{win.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{win.timeToImplement}</span>
-                    <Button size="sm">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Implémenter
-                    </Button>
-                  </div>
-                </div>
+        <Tabs defaultValue="metrics" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="metrics">Métriques</TabsTrigger>
+            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="settings">Paramètres</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="metrics" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {metrics.map((metric, index) => (
+                <motion.div
+                  key={metric.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-sm font-medium">
+                          {metric.name}
+                        </CardTitle>
+                        {getStatusIcon(metric.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-bold">
+                            {metric.currentValue}{metric.unit}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            / {metric.targetValue}{metric.unit}
+                          </span>
+                        </div>
+                        
+                        <Progress 
+                          value={(metric.currentValue / metric.targetValue) * 100}
+                          className="h-2"
+                        />
+                        
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-muted-foreground">Progression</span>
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="h-3 w-3 text-green-500" />
+                            <span className="text-green-500">
+                              {Math.round((metric.currentValue / metric.targetValue) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
 
-        {/* Optimizations */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Target className="h-5 w-5 mr-2" />
-              Opportunités d'optimisation
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {optimizations.map((opt, index) => (
-                <div key={index} className="p-6 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{opt.title}</h3>
-                        {getImpactBadge(opt.impact)}
-                        {getStatusBadge(opt.status)}
+          <TabsContent value="suggestions" className="space-y-6">
+            <div className="grid gap-4">
+              {suggestions.map((suggestion, index) => (
+                <motion.div
+                  key={suggestion.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{suggestion.title}</CardTitle>
+                          <CardDescription>{suggestion.description}</CardDescription>
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge className={getImpactColor(suggestion.impact)}>
+                            Impact {suggestion.impact}
+                          </Badge>
+                          <Badge variant="outline">
+                            Effort {suggestion.effort}
+                          </Badge>
+                        </div>
                       </div>
-                      <p className="text-gray-600 mb-4">{opt.description}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between items-center">
+                        <Badge variant="secondary">
+                          {suggestion.category}
+                        </Badge>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            Plus d'infos
+                          </Button>
+                          <Button size="sm">
+                            Implémenter
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="performance" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Performance Globale
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span>Score global</span>
+                      <span className="font-semibold">87/100</span>
                     </div>
+                    <Progress value={87} className="h-3" />
+                    
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">98%</div>
+                        <div className="text-sm text-muted-foreground">Disponibilité</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">1.2s</div>
+                        <div className="text-sm text-muted-foreground">Temps de réponse</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Utilisation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span>Utilisateurs actifs</span>
+                      <span className="font-semibold">1,247</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Sessions moyennes/jour</span>
+                      <span className="font-semibold">3.2</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Durée moyenne session</span>
+                      <span className="font-semibold">12m 34s</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Paramètres d'Optimisation
+                </CardTitle>
+                <CardDescription>
+                  Configurez les paramètres d'optimisation automatique
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Optimisation automatique</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Lancer l'optimisation automatiquement chaque nuit
+                      </p>
+                    </div>
+                    <Button variant="outline">Configurer</Button>
                   </div>
                   
-                  <div className="mb-4">
-                    <h4 className="font-medium mb-2">Bénéfices attendus :</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {opt.benefits.map((benefit, bIndex) => (
-                        <Badge key={bIndex} variant="outline" className="text-xs">
-                          {benefit}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">
-                      Effort requis: <span className="font-medium">{opt.effort === 'high' ? 'Élevé' : opt.effort === 'medium' ? 'Moyen' : 'Faible'}</span>
+                    <div>
+                      <h4 className="font-medium">Notifications d'alertes</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Recevoir des alertes en cas de problème de performance
+                      </p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                        Analyser
-                      </Button>
-                      <Button size="sm">
-                        Mettre en œuvre
-                      </Button>
+                    <Button variant="outline">Configurer</Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Seuils de performance</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Définir les seuils d'alerte pour les métriques
+                      </p>
                     </div>
+                    <Button variant="outline">Modifier</Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions rapides</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={() => navigate('/teams')}>
-                  Analyser les équipes
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/reports')}>
-                  Générer un rapport d'optimisation
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/events')}>
-                  Planifier une session d'amélioration
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {isOptimizing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50"
+          >
+            <Card className="w-96">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <RefreshCw className="h-12 w-12 text-primary animate-spin mx-auto" />
+                  <h3 className="text-lg font-semibold">Optimisation en cours...</h3>
+                  <p className="text-muted-foreground">
+                    Analyse des performances et application des améliorations
+                  </p>
+                  <Progress value={66} className="w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
     </div>
   );

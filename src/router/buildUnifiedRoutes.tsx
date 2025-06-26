@@ -1,86 +1,86 @@
-
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import { homeRoutes } from './routes/homeRoutes';
+import { authRoutes } from './routes/authRoutes';
+import { userRoutes } from './routes/userRoutes';
+import { securityRoutes } from './routes/securityRoutes';
+import { notificationRoutes } from './routes/notificationRoutes';
+import { accessRoutes } from './routes/accessRoutes';
+import { feedbackRoutes } from './routes/feedbackRoutes';
+import { innovationRoutes } from './routes/innovationRoutes';
+import { privacyRoutes } from './routes/privacyRoutes';
+import { legalRoutes } from './routes/legalRoutes';
+import { scanRoutes } from './routes/scanRoutes';
+import { musicRoutes } from './routes/musicRoutes';
+import { vrRoutes } from './routes/vrRoutes';
+import { gamificationRoutes } from './routes/gamificationRoutes';
+import { onboardingRoutes } from './routes/onboardingRoutes';
+import { b2bRedirectRoutes } from './routes/b2bRedirectRoutes';
+import { coachRoutes } from './routes/coachRoutes';
+import { rhRoutes } from './routes/rhRoutes';
+import { settingsRoutes } from './routes/settingsRoutes';
+import { journalRoutes } from './routes/journalRoutes';
+import { emotionRoutes } from './routes/emotionRoutes';
+import { wellnessRoutes } from './routes/wellnessRoutes';
+import { auditRoutes } from './routes/auditRoutes';
+import { accessibilityRoutes } from './routes/accessibilityRoutes';
+import { reportsRoutes } from './routes/reportsRoutes';
+import { auditCompleteRoutes } from './routes/auditCompleteRoutes';
+import Shell from '@/Shell';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import NotFoundPage from '@/pages/NotFoundPage';
+import B2CLoginPage from '@/pages/B2CLoginPage';
+import B2CRegisterPage from '@/pages/B2CRegisterPage';
+import B2CPage from '@/pages/B2CPage';
+import B2CDashboardPage from '@/pages/B2CDashboardPage';
+import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import B2BUserLoginPage from '@/pages/B2BUserLoginPage';
+import B2BUserRegisterPage from '@/pages/B2BUserRegisterPage';
+import B2BAdminLoginPage from '@/pages/B2BAdminLoginPage';
+import B2BUserDashboardPage from '@/pages/B2BUserDashboardPage';
+import B2BAdminDashboardPage from '@/pages/B2BAdminDashboardPage';
+import ProfilePage from '@/pages/ProfilePage';
+import SettingsPage from '@/pages/SettingsPage';
+import PreferencesPage from '@/pages/PreferencesPage';
+import NotificationsPage from '@/pages/NotificationsPage';
+import SocialCoconPage from '@/pages/SocialCoconPage';
+import BreathworkPage from '@/pages/BreathworkPage';
+import ARFiltersPage from '@/pages/ARFiltersPage';
+import EventsPage from '@/pages/EventsPage';
+import OptimisationPage from '@/pages/OptimisationPage';
+import HelpCenterPage from '@/pages/HelpCenterPage';
+import FeedbackPage from '@/pages/FeedbackPage';
 
-// Lazy loading des pages
-const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
-const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
+interface RouteDefinition {
+  path: string;
+  component: string;
+}
 
-// Pages B2C
-const B2CHomePage = React.lazy(() => import('@/pages/b2c/B2CHomePage'));
-const B2CLoginPage = React.lazy(() => import('@/pages/b2c/B2CLoginPage'));
-const B2CRegisterPage = React.lazy(() => import('@/pages/b2c/B2CRegisterPage'));
-const B2CDashboardPage = React.lazy(() => import('@/pages/b2c/B2CDashboardPage'));
-
-// Pages B2B
-const B2BSelectionPage = React.lazy(() => import('@/pages/b2b/B2BSelectionPage'));
-const B2BUserLoginPage = React.lazy(() => import('@/pages/b2b/B2BUserLoginPage'));
-const B2BUserRegisterPage = React.lazy(() => import('@/pages/b2b/B2BUserRegisterPage'));
-const B2BAdminLoginPage = React.lazy(() => import('@/pages/b2b/B2BAdminLoginPage'));
-const B2BUserDashboard = React.lazy(() => import('@/pages/b2b/B2BUserDashboard'));
-const B2BAdminDashboard = React.lazy(() => import('@/pages/b2b/B2BAdminDashboard'));
-
-// Pages de fonctionnalités
-const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
-const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
-const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
-const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
-const VRPage = React.lazy(() => import('@/pages/VRPage'));
-const MeditationPage = React.lazy(() => import('@/pages/MeditationPage'));
-const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
-const PreferencesPage = React.lazy(() => import('@/pages/PreferencesPage'));
-const SocialCoconPage = React.lazy(() => import('@/pages/SocialCoconPage'));
-const BreathworkPage = React.lazy(() => import('@/pages/features/BreathworkPage'));
-const ARFiltersPage = React.lazy(() => import('@/pages/features/ARFiltersPage'));
-
-// Pages d'administration
-const TeamsPage = React.lazy(() => import('@/pages/admin/TeamsPage'));
-const ReportsPage = React.lazy(() => import('@/pages/admin/ReportsPage'));
-
-// Pages système
-const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
-const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
-const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
-const SecurityPage = React.lazy(() => import('@/pages/SecurityPage'));
-const AccessibilityPage = React.lazy(() => import('@/pages/AccessibilityPage'));
-const SystemAuditPage = React.lazy(() => import('@/pages/SystemAuditPage'));
-const InnovationLabPage = React.lazy(() => import('@/pages/InnovationLabPage'));
-const PrivacyDashboardPage = React.lazy(() => import('@/pages/PrivacyDashboardPage'));
-const HelpCenterPage = React.lazy(() => import('@/pages/HelpCenterPage'));
-
-// Page 404
-const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
-
-// Wrapper pour Suspense avec ErrorBoundary
-const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ErrorBoundary>
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingAnimation text="Chargement..." />
-      </div>
-    }>
-      {children}
-    </Suspense>
-  </ErrorBoundary>
-);
-
+// Manifest complet de toutes les routes - 40 pages
 export const ROUTE_MANIFEST = [
+  // Pages publiques (3)
   '/',
   '/choose-mode',
   '/auth',
+
+  // Pages d'authentification B2C (3)
   '/b2c',
   '/b2c/login',
   '/b2c/register',
-  '/b2c/dashboard',
+
+  // Pages B2B (5)
   '/b2b/selection',
   '/b2b/user/login',
   '/b2b/user/register',
-  '/b2b/user/dashboard',
   '/b2b/admin/login',
+
+  // Dashboards (3)
+  '/b2c/dashboard',
+  '/b2b/user/dashboard',
   '/b2b/admin/dashboard',
+
+  // Fonctionnalités principales (8)
   '/scan',
   '/music',
   '/coach',
@@ -88,200 +88,418 @@ export const ROUTE_MANIFEST = [
   '/vr',
   '/meditation',
   '/gamification',
-  '/preferences',
-  '/social-cocon',
   '/breathwork',
-  '/ar-filters',
+
+  // Pages utilisateur (5)
+  '/profile',
+  '/settings', 
+  '/preferences',
+  '/notifications',
+  '/social-cocon',
+
+  // Pages administration (4)
   '/teams',
   '/reports',
-  '/profile',
-  '/settings',
-  '/notifications',
+  '/events',
+  '/optimisation',
+
+  // Pages système et support (6)
   '/security',
-  '/accessibility',
   '/audit',
+  '/accessibility',
   '/innovation',
-  '/privacy',
-  '/help-center'
+  '/privacy-toggles',
+  '/ar-filters',
+
+  // Pages support et feedback (4)
+  '/help-center',
+  '/feedback',
+  '/complete-audit',
+  '/access-diagnostic'
 ];
 
-export const validateRoutesManifest = () => {
-  const duplicates = ROUTE_MANIFEST.filter((route, index) => 
-    ROUTE_MANIFEST.indexOf(route) !== index
-  );
-  
-  return {
-    valid: duplicates.length === 0,
-    errors: duplicates.length > 0 ? [`Duplicate routes found: ${duplicates.join(', ')}`] : []
-  };
-};
-
 export function buildUnifiedRoutes(): RouteObject[] {
-  const routes: RouteObject[] = [
-    // Routes publiques
+  return [
     {
       path: '/',
-      element: <PageWrapper><HomePage /></PageWrapper>
+      element: (
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingAnimation text="Chargement de la page d'accueil..." />}>
+            <Shell>
+              <React.Suspense fallback={<LoadingAnimation text="Chargement..." />}>
+                {homeRoutes[0].element}
+              </React.Suspense>
+            </Shell>
+          </Suspense>
+        </ErrorBoundary>
+      ),
+      children: homeRoutes,
     },
     {
       path: '/choose-mode',
-      element: <PageWrapper><ChooseModePage /></PageWrapper>
+      element: (
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingAnimation text="Chargement de la page de choix du mode..." />}>
+            <Shell>
+              <React.Suspense fallback={<LoadingAnimation text="Chargement..." />}>
+                {homeRoutes[1].element}
+              </React.Suspense>
+            </Shell>
+          </Suspense>
+        </ErrorBoundary>
+      ),
     },
     {
       path: '/auth',
-      element: <PageWrapper><AuthPage /></PageWrapper>
+      element: (
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingAnimation text="Chargement de la page d'authentification..." />}>
+            <Shell>
+              <React.Suspense fallback={<LoadingAnimation text="Chargement..." />}>
+                {homeRoutes[2].element}
+              </React.Suspense>
+            </Shell>
+          </Suspense>
+        </ErrorBoundary>
+      ),
     },
-
-    // Routes B2C
     {
       path: '/b2c',
-      element: <PageWrapper><B2CHomePage /></PageWrapper>
+      element: <B2CPage />,
     },
     {
       path: '/b2c/login',
-      element: <PageWrapper><B2CLoginPage /></PageWrapper>
+      element: <B2CLoginPage />,
     },
     {
       path: '/b2c/register',
-      element: <PageWrapper><B2CRegisterPage /></PageWrapper>
-    },
-    {
-      path: '/b2c/dashboard',
-      element: <PageWrapper><B2CDashboardPage /></PageWrapper>
-    },
-
-    // Routes B2B
-    {
-      path: '/b2b',
-      element: <PageWrapper><B2BSelectionPage /></PageWrapper>
+      element: <B2CRegisterPage />,
     },
     {
       path: '/b2b/selection',
-      element: <PageWrapper><B2BSelectionPage /></PageWrapper>
+      element: <B2BSelectionPage />,
     },
     {
       path: '/b2b/user/login',
-      element: <PageWrapper><B2BUserLoginPage /></PageWrapper>
+      element: <B2BUserLoginPage />,
     },
     {
       path: '/b2b/user/register',
-      element: <PageWrapper><B2BUserRegisterPage /></PageWrapper>
-    },
-    {
-      path: '/b2b/user/dashboard',
-      element: <PageWrapper><B2BUserDashboard /></PageWrapper>
+      element: <B2BUserRegisterPage />,
     },
     {
       path: '/b2b/admin/login',
-      element: <PageWrapper><B2BAdminLoginPage /></PageWrapper>
+      element: <B2BAdminLoginPage />,
+    },
+    {
+      path: '/b2c/dashboard',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement du tableau de bord..." />}>
+          <Shell>
+            <B2CDashboardPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/b2b/user/dashboard',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement du tableau de bord utilisateur..." />}>
+          <Shell>
+            <B2BUserDashboardPage />
+          </Shell>
+        </Suspense>
+      ),
     },
     {
       path: '/b2b/admin/dashboard',
-      element: <PageWrapper><B2BAdminDashboard /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement du tableau de bord administrateur..." />}>
+          <Shell>
+            <B2BAdminDashboardPage />
+          </Shell>
+        </Suspense>
+      ),
     },
-
-    // Routes de fonctionnalités
-    {
-      path: '/scan',
-      element: <PageWrapper><ScanPage /></PageWrapper>
-    },
-    {
-      path: '/music',
-      element: <PageWrapper><MusicPage /></PageWrapper>
-    },
-    {
-      path: '/coach',
-      element: <PageWrapper><CoachPage /></PageWrapper>
-    },
-    {
-      path: '/journal',
-      element: <PageWrapper><JournalPage /></PageWrapper>
-    },
-    {
-      path: '/vr',
-      element: <PageWrapper><VRPage /></PageWrapper>
-    },
-    {
-      path: '/meditation',
-      element: <PageWrapper><MeditationPage /></PageWrapper>
-    },
-    {
-      path: '/gamification',
-      element: <PageWrapper><GamificationPage /></PageWrapper>
-    },
-    {
-      path: '/preferences',
-      element: <PageWrapper><PreferencesPage /></PageWrapper>
-    },
-    {
-      path: '/social-cocon',
-      element: <PageWrapper><SocialCoconPage /></PageWrapper>
-    },
-    {
-      path: '/breathwork',
-      element: <PageWrapper><BreathworkPage /></PageWrapper>
-    },
-    {
-      path: '/ar-filters',
-      element: <PageWrapper><ARFiltersPage /></PageWrapper>
-    },
-
-    // Routes d'administration
-    {
-      path: '/teams',
-      element: <PageWrapper><TeamsPage /></PageWrapper>
-    },
-    {
-      path: '/reports',
-      element: <PageWrapper><ReportsPage /></PageWrapper>
-    },
-
-    // Routes système
     {
       path: '/profile',
-      element: <PageWrapper><ProfilePage /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement du profil..." />}>
+          <Shell>
+            <ProfilePage />
+          </Shell>
+        </Suspense>
+      ),
     },
     {
       path: '/settings',
-      element: <PageWrapper><SettingsPage /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement des paramètres..." />}>
+          <Shell>
+            <SettingsPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/preferences',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement des préférences..." />}>
+          <Shell>
+            <PreferencesPage />
+          </Shell>
+        </Suspense>
+      ),
     },
     {
       path: '/notifications',
-      element: <PageWrapper><NotificationsPage /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement des notifications..." />}>
+          <Shell>
+            <NotificationsPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/social-cocon',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de l'espace social..." />}>
+          <Shell>
+            <SocialCoconPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/breathwork',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement des exercices de respiration..." />}>
+          <Shell>
+            <BreathworkPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/ar-filters',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement des filtres AR..." />}>
+          <Shell>
+            <ARFiltersPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/scan',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement du scanner..." />}>
+          <Shell>
+            {scanRoutes[0].element}
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/music',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la musicothérapie..." />}>
+          <Shell>
+            {musicRoutes[0].element}
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/vr',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la VR..." />}>
+          <Shell>
+            {vrRoutes[0].element}
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/meditation',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la méditation..." />}>
+          <Shell>
+            {vrRoutes[1].element}
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/gamification',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la gamification..." />}>
+          <Shell>
+            <GamificationPage />
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/teams',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la gestion des équipes..." />} >
+          <Shell>
+            <div>Teams</div>
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/reports',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement des rapports..." />} >
+          <Shell>
+            <div>Reports</div>
+          </Shell>
+        </Suspense>
+      ),
     },
     {
       path: '/security',
-      element: <PageWrapper><SecurityPage /></PageWrapper>
-    },
-    {
-      path: '/accessibility',
-      element: <PageWrapper><AccessibilityPage /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la sécurité..." />} >
+          <Shell>
+            {securityRoutes[0].element}
+          </Shell>
+        </Suspense>
+      ),
     },
     {
       path: '/audit',
-      element: <PageWrapper><SystemAuditPage /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de l'audit..." />} >
+          <Shell>
+            <div>Audit</div>
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/accessibility',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de l'accessibilité..." />} >
+          <Shell>
+            <div>Accessibility</div>
+          </Shell>
+        </Suspense>
+      ),
     },
     {
       path: '/innovation',
-      element: <PageWrapper><InnovationLabPage /></PageWrapper>
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de l'innovation..." />} >
+          <Shell>
+            <div>Innovation</div>
+          </Shell>
+        </Suspense>
+      ),
     },
     {
-      path: '/privacy',
-      element: <PageWrapper><PrivacyDashboardPage /></PageWrapper>
+      path: '/privacy-toggles',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de la confidentialité..." />} >
+          <Shell>
+            <div>Privacy Toggles</div>
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/complete-audit',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement de l'audit complet..." />} >
+          <Shell>
+            <div>Complete Audit</div>
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/access-diagnostic',
+      element: (
+        <Suspense fallback={<LoadingAnimation text="Chargement du diagnostic d'accès..." />} >
+          <Shell>
+            <div>Access Diagnostic</div>
+          </Shell>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/events',
+      element: (
+        <ProtectedRoute>
+          <EventsPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/optimisation',
+      element: (
+        <ProtectedRoute>
+          <OptimisationPage />
+        </ProtectedRoute>
+      ),
     },
     {
       path: '/help-center',
-      element: <PageWrapper><HelpCenterPage /></PageWrapper>
+      element: <HelpCenterPage />,
     },
-
-    // Route 404 - doit être en dernier
+    {
+      path: '/feedback',
+      element: (
+        <ProtectedRoute>
+          <FeedbackPage />
+        </ProtectedRoute>
+      ),
+    },
     {
       path: '*',
-      element: <PageWrapper><NotFoundPage /></PageWrapper>
-    }
+      element: (
+        <ErrorBoundary>
+          <Shell>
+            <NotFoundPage />
+          </Shell>
+        </ErrorBoundary>
+      ),
+    },
   ];
-
-  return routes;
 }
 
-export default buildUnifiedRoutes;
+// Validation automatique de la cohérence du manifeste
+export const validateRoutesManifest = (): { valid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+  
+  // Vérifier que chaque route du manifeste a une définition dans buildUnifiedRoutes
+  ROUTE_MANIFEST.forEach(route => {
+    const routeExists = buildUnifiedRoutes().some(r => r.path === route);
+    if (!routeExists) {
+      errors.push(`Route "${route}" du manifeste n'est pas définie dans buildUnifiedRoutes`);
+    }
+  });
+  
+  // Vérifier qu'il n'y a pas de routes orphelines dans buildUnifiedRoutes
+  buildUnifiedRoutes().forEach(route => {
+    if (route.path) {
+      const routeInManifest = ROUTE_MANIFEST.includes(route.path);
+      if (!routeInManifest) {
+        errors.push(`Route "${route.path}" définie dans buildUnifiedRoutes n'est pas dans le manifeste`);
+      }
+    }
+  });
+  
+  if (new Set(ROUTE_MANIFEST).size !== ROUTE_MANIFEST.length) {
+    errors.push('Le manifeste contient des routes dupliquées');
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors: errors
+  };
+};
