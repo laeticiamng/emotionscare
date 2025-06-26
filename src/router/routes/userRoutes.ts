@@ -1,17 +1,24 @@
 
+import React from 'react';
 import { RouteObject } from 'react-router-dom';
 
 export const userRoutes: RouteObject[] = [
   {
     path: '/login',
-    element: <div data-testid="page-root"><h1>Login général - Page en construction</h1></div>,
+    element: React.createElement('div', { 'data-testid': 'page-root' }, 
+      React.createElement('h1', null, 'Login général - Page en construction')
+    ),
   },
   {
     path: '/reset-password',
-    element: <div data-testid="page-root"><h1>Reset Password - Page en construction</h1></div>,
+    element: React.createElement('div', { 'data-testid': 'page-root' }, 
+      React.createElement('h1', null, 'Reset Password - Page en construction')
+    ),
   },
   {
     path: '/auth/callback',
-    element: <div data-testid="page-root"><h1>Auth Callback - Page en construction</h1></div>,
+    element: React.createElement('div', { 'data-testid': 'page-root' }, 
+      React.createElement('h1', null, 'Auth Callback - Page en construction')
+    ),
   },
 ];
