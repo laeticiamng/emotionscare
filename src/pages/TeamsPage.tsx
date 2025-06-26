@@ -1,613 +1,365 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Users, 
-  Plus, 
-  Search, 
-  Filter,
-  MoreVertical,
-  Edit,
-  Trash2,
-  UserPlus,
-  Mail,
-  Phone,
-  Calendar,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Target,
-  BarChart3,
-  Settings,
-  Crown,
-  Shield,
-  User
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import TeamMoodTimeline from '@/components/scan/TeamMoodTimeline';
-
-interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'manager' | 'employee';
-  department: string;
-  status: 'active' | 'inactive' | 'pending';
-  joinDate: string;
-  lastActivity: string;
-  moodScore: number;
-  avatar?: string;
-}
-
-interface Team {
-  id: string;
-  name: string;
-  description: string;
-  department: string;
-  managerId: string;
-  members: TeamMember[];
-  createdAt: string;
-  status: 'active' | 'inactive';
-  moodAverage: number;
-}
+import { Users, Plus, Settings, TrendingUp, AlertCircle, CheckCircle, UserPlus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const TeamsPage: React.FC = () => {
-  const [teams, setTeams] = useState<Team[]>([
+  const { toast } = useToast();
+
+  const teams = [
     {
-      id: '1',
-      name: 'Équipe Marketing',
-      description: 'Responsable de la stratégie marketing et communication',
-      department: 'Marketing',
-      managerId: '1',
-      status: 'active',
-      moodAverage: 7.8,
-      createdAt: '2024-01-15',
-      members: [
-        {
-          id: '1',
-          name: 'Sophie Martin',
-          email: 'sophie.martin@company.com',
-          role: 'manager',
-          department: 'Marketing',
-          status: 'active',
-          joinDate: '2024-01-15',
-          lastActivity: '2024-01-20',
-          moodScore: 8.2
-        },
-        {
-          id: '2',
-          name: 'Thomas Dubois',
-          email: 'thomas.dubois@company.com',
-          role: 'employee',
-          department: 'Marketing',
-          status: 'active',
-          joinDate: '2024-01-18',
-          lastActivity: '2024-01-20',
-          moodScore: 7.5
-        },
-        {
-          id: '3',
-          name: 'Julie Moreau',
-          email: 'julie.moreau@company.com',
-          role: 'employee',
-          department: 'Marketing',
-          status: 'pending',
-          joinDate: '2024-01-20',
-          lastActivity: '2024-01-20',
-          moodScore: 7.8
-        }
-      ]
+      id: 1,
+      name: "Service Urgences",
+      members: 24,
+      avgWellbeing: 78,
+      trend: 5,
+      status: "good",
+      lastScan: "Il y a 2h",
+      manager: "Dr. Martin",
+      riskLevel: "Faible"
     },
     {
-      id: '2',
-      name: 'Équipe Développement',
-      description: 'Développement de produits et solutions techniques',
-      department: 'IT',
-      managerId: '4',
-      status: 'active',
-      moodAverage: 8.1,
-      createdAt: '2024-01-10',
-      members: [
-        {
-          id: '4',
-          name: 'Pierre Laurent',
-          email: 'pierre.laurent@company.com',
-          role: 'manager',
-          department: 'IT',
-          status: 'active',
-          joinDate: '2024-01-10',
-          lastActivity: '2024-01-20',
-          moodScore: 8.5
-        },
-        {
-          id: '5',
-          name: 'Marie Petit',
-          email: 'marie.petit@company.com',
-          role: 'employee',
-          department: 'IT',
-          status: 'active',
-          joinDate: '2024-01-12',
-          lastActivity: '2024-01-19',
-          moodScore: 7.8
-        }
-      ]
+      id: 2,
+      name: "Équipe Chirurgie",
+      members: 18,
+      avgWellbeing: 65,
+      trend: -8,
+      status: "attention",
+      lastScan: "Il y a 4h",
+      manager: "Dr. Laurent",
+      riskLevel: "Moyen"
+    },
+    {
+      id: 3,
+      name: "Personnel Administration",
+      members: 32,
+      avgWellbeing: 82,
+      trend: 12,
+      status: "excellent",
+      lastScan: "Il y a 1h",
+      manager: "Marie Dubois",
+      riskLevel: "Très faible"
     }
-  ]);
+  ];
 
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterDepartment, setFilterDepartment] = useState('all');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin': return <Crown className="h-4 w-4" />;
-      case 'manager': return <Shield className="h-4 w-4" />;
-      default: return <User className="h-4 w-4" />;
+  const teamMembers = [
+    {
+      id: 1,
+      name: "Dr. Sarah Martin",
+      role: "Chef de service",
+      wellbeing: 85,
+      lastActive: "Maintenant",
+      status: "online",
+      riskScore: 15
+    },
+    {
+      id: 2,
+      name: "Infirmier Paul",
+      role: "Infirmier senior",
+      wellbeing: 72,
+      lastActive: "Il y a 1h",
+      status: "away",
+      riskScore: 28
+    },
+    {
+      id: 3,
+      name: "Julie Moreau",
+      role: "Secrétaire médicale",
+      wellbeing: 90,
+      lastActive: "Il y a 30min",
+      status: "online",
+      riskScore: 8
+    },
+    {
+      id: 4,
+      name: "Dr. Marc Durand",
+      role: "Médecin",
+      wellbeing: 58,
+      lastActive: "Il y a 3h",
+      status: "offline",
+      riskScore: 42
     }
-  };
+  ];
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin': return 'text-purple-600 bg-purple-100';
-      case 'manager': return 'text-blue-600 bg-blue-100';
-      default: return 'text-gray-600 bg-gray-100';
+  const interventions = [
+    {
+      id: 1,
+      type: "Alerte",
+      title: "Niveau de stress élevé détecté",
+      team: "Service Urgences",
+      severity: "high",
+      time: "Il y a 30min",
+      suggestion: "Organiser une session de debriefing"
+    },
+    {
+      id: 2,
+      type: "Recommandation",
+      title: "Amélioration continue observée",
+      team: "Administration",
+      severity: "low",
+      time: "Il y a 2h",
+      suggestion: "Maintenir les pratiques actuelles"
     }
+  ];
+
+  const analytics = {
+    totalEmployees: 186,
+    activeToday: 134,
+    avgTeamWellbeing: 75,
+    riskAlerts: 3,
+    monthlyImprovement: 8.5
   };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'text-green-600 bg-green-100';
-      case 'inactive': return 'text-red-600 bg-red-100';
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getMoodColor = (score: number) => {
-    if (score >= 8) return 'text-green-600';
-    if (score >= 6) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
-  const filteredTeams = teams.filter(team => {
-    const matchesSearch = team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         team.department.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = filterDepartment === 'all' || team.department === filterDepartment;
-    return matchesSearch && matchesDepartment;
-  });
-
-  const departments = [...new Set(teams.map(team => team.department))];
 
   return (
-    <div className="container mx-auto py-6 space-y-6" data-testid="page-root">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div className="flex items-center space-x-3">
-          <Users className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold">Gestion des Équipes</h1>
-            <p className="text-muted-foreground">Organisez et suivez vos équipes</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6" data-testid="page-root">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Gestion des Équipes</h1>
+          <p className="text-gray-600">Tableau de bord du bien-être organisationnel</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-gradient-to-r from-blue-500 to-purple-500">
-          <Plus className="h-4 w-4 mr-2" />
-          Nouvelle Équipe
-        </Button>
-      </motion.div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="teams">Équipes</TabsTrigger>
-          <TabsTrigger value="members">Membres</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+        {/* Analytics globales */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{analytics.totalEmployees}</div>
+              <p className="text-sm text-gray-600">Employés totaux</p>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">{analytics.activeToday}</div>
+              <p className="text-sm text-gray-600">Actifs aujourd'hui</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">{analytics.avgTeamWellbeing}%</div>
+              <p className="text-sm text-gray-600">Bien-être moyen</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">{analytics.riskAlerts}</div>
+              <p className="text-sm text-gray-600">Alertes actives</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <TrendingUp className="h-6 w-6 text-green-500 mr-1" />
+                <span className="text-3xl font-bold text-green-600">+{analytics.monthlyImprovement}%</span>
+              </div>
+              <p className="text-sm text-gray-600">Amélioration mensuelle</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="teams" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="teams">Équipes</TabsTrigger>
+            <TabsTrigger value="members">Membres</TabsTrigger>
+            <TabsTrigger value="interventions">Interventions</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="teams" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Vue d'ensemble des équipes</h2>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Créer une équipe
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teams.map((team) => (
+                <Card key={team.id} className={team.status === 'attention' ? 'border-orange-200 bg-orange-50' : ''}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{team.name}</CardTitle>
+                      <Badge 
+                        variant={team.status === 'excellent' ? 'default' : team.status === 'attention' ? 'destructive' : 'secondary'}
+                      >
+                        {team.riskLevel}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Bien-être moyen</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{team.avgWellbeing}%</span>
+                        <span className={`text-xs ${team.trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {team.trend >= 0 ? '+' : ''}{team.trend}%
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <Progress value={team.avgWellbeing} className="h-2" />
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Membres</span>
+                        <p className="font-medium">{team.members}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Manager</span>
+                        <p className="font-medium text-xs">{team.manager}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="flex-1">
+                        <Settings className="h-4 w-4 mr-1" />
+                        Gérer
+                      </Button>
+                      <Button size="sm" className="flex-1">
+                        Voir détails
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="members" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Membres de l'équipe</h2>
+              <Button>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Ajouter un membre
+              </Button>
+            </div>
+
             <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Users className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <p className="text-2xl font-bold">{teams.length}</p>
-                    <p className="text-sm text-muted-foreground">Équipes</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <User className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {teams.reduce((acc, team) => acc + team.members.length, 0)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Membres</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5 text-purple-500" />
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {(teams.reduce((acc, team) => acc + team.moodAverage, 0) / teams.length).toFixed(1)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Humeur Moy.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-orange-500" />
-                  <div>
-                    <p className="text-2xl font-bold">
-                      {teams.filter(team => team.status === 'active').length}
-                    </p>
-                    <p className="text-sm text-muted-foreground">Équipes Actives</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Équipes Récentes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {teams.slice(0, 5).map((team) => (
-                    <div key={team.id} className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg cursor-pointer">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                          <Users className="h-5 w-5 text-white" />
+              <CardContent className="p-0">
+                <div className="space-y-0">
+                  {teamMembers.map((member) => (
+                    <div key={member.id} className="flex items-center gap-4 p-4 border-b last:border-b-0 hover:bg-gray-50">
+                      <Avatar>
+                        <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium">{member.name}</h3>
+                          <div className={`w-2 h-2 rounded-full ${
+                            member.status === 'online' ? 'bg-green-500' : 
+                            member.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
+                          }`} />
                         </div>
+                        <p className="text-sm text-gray-600">{member.role}</p>
+                        <p className="text-xs text-gray-500">{member.lastActive}</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-lg font-bold">{member.wellbeing}%</div>
+                        <p className="text-xs text-gray-600">Bien-être</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className={`text-lg font-bold ${
+                          member.riskScore < 20 ? 'text-green-600' : 
+                          member.riskScore < 35 ? 'text-yellow-600' : 'text-red-600'
+                        }`}>
+                          {member.riskScore}
+                        </div>
+                        <p className="text-xs text-gray-600">Score risque</p>
+                      </div>
+                      
+                      <Button size="sm" variant="outline">
+                        Voir profil
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="interventions" className="space-y-6">
+            <h2 className="text-2xl font-bold">Interventions & Recommandations</h2>
+            
+            <div className="space-y-4">
+              {interventions.map((intervention) => (
+                <Card key={intervention.id} className={intervention.severity === 'high' ? 'border-red-200 bg-red-50' : ''}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        {intervention.severity === 'high' ? (
+                          <AlertCircle className="h-6 w-6 text-red-500 mt-1" />
+                        ) : (
+                          <CheckCircle className="h-6 w-6 text-green-500 mt-1" />
+                        )}
                         <div>
-                          <h4 className="font-medium">{team.name}</h4>
-                          <p className="text-sm text-muted-foreground">{team.department}</p>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-medium">{intervention.title}</h3>
+                            <Badge variant={intervention.severity === 'high' ? 'destructive' : 'secondary'}>
+                              {intervention.type}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{intervention.team}</p>
+                          <p className="text-sm text-blue-600">{intervention.suggestion}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <Badge className={getStatusColor(team.status)}>
-                          {team.status}
-                        </Badge>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {team.members.length} membres
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Alertes Équipes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                    <div>
-                      <p className="font-medium text-yellow-800">Équipe Marketing</p>
-                      <p className="text-sm text-yellow-700">Humeur en baisse cette semaine</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium text-blue-800">3 Invitations en attente</p>
-                      <p className="text-sm text-blue-700">Nouveaux membres à valider</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium text-green-800">Objectifs atteints</p>
-                      <p className="text-sm text-green-700">Équipe Dev: 95% de satisfaction</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="teams" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher une équipe..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64"
-                />
-              </div>
-              <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-                <SelectTrigger className="w-48">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Département" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les départements</SelectItem>
-                  {departments.map(dept => (
-                    <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTeams.map((team) => (
-              <motion.div
-                key={team.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <Card className="h-full hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <Badge className={getStatusColor(team.status)}>
-                        {team.status}
-                      </Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setSelectedTeam(team)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <UserPlus className="h-4 w-4 mr-2" />
-                            Ajouter membre
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Supprimer
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                    <CardTitle className="text-lg">{team.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{team.description}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Département</span>
-                        <Badge variant="outline">{team.department}</Badge>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Membres</span>
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-4 w-4" />
-                          <span className="font-medium">{team.members.length}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Humeur moyenne</span>
-                        <span className={`font-bold ${getMoodColor(team.moodAverage)}`}>
-                          {team.moodAverage.toFixed(1)}/10
-                        </span>
-                      </div>
-
-                      <div className="flex -space-x-2">
-                        {team.members.slice(0, 4).map((member, index) => (
-                          <Avatar key={member.id} className="border-2 border-background h-8 w-8">
-                            <AvatarImage src={member.avatar} />
-                            <AvatarFallback className="text-xs">
-                              {member.name.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
-                        {team.members.length > 4 && (
-                          <div className="h-8 w-8 rounded-full bg-muted border-2 border-background flex items-center justify-center">
-                            <span className="text-xs font-medium">+{team.members.length - 4}</span>
-                          </div>
-                        )}
+                        <p className="text-xs text-gray-500">{intervention.time}</p>
+                        <Button size="sm" className="mt-2">
+                          Agir
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
-            ))}
-          </div>
-        </TabsContent>
+              ))}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="members" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tous les Membres</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {teams.flatMap(team => team.members).map((member) => (
-                  <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/20 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <Avatar>
-                        <AvatarImage src={member.avatar} />
-                        <AvatarFallback>
-                          {member.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h4 className="font-medium">{member.name}</h4>
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                          <Mail className="h-3 w-3" />
-                          <span>{member.email}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <Badge className={getRoleColor(member.role)}>
-                        <div className="flex items-center space-x-1">
-                          {getRoleIcon(member.role)}
-                          <span className="capitalize">{member.role}</span>
-                        </div>
-                      </Badge>
-                      <Badge className={getStatusColor(member.status)}>
-                        {member.status}
-                      </Badge>
-                      <div className="text-right">
-                        <p className="font-medium">{member.department}</p>
-                        <p className={`text-sm ${getMoodColor(member.moodScore)}`}>
-                          Humeur: {member.moodScore}/10
-                        </p>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Mail className="h-4 w-4 mr-2" />
-                            Contacter
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Retirer
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+          <TabsContent value="analytics" className="space-y-6">
+            <h2 className="text-2xl font-bold">Analytics Avancées</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Évolution du bien-être par équipe</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center text-gray-500">
+                    Graphique d'évolution temporelle
+                    <br />
+                    (Intégration charts à venir)
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="analytics" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5" />
-                  <span>Performance par Équipe</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {teams.map((team) => (
-                    <div key={team.id} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>{team.name}</span>
-                        <span className={getMoodColor(team.moodAverage)}>
-                          {team.moodAverage.toFixed(1)}/10
-                        </span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                          style={{ width: `${(team.moodAverage / 10) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Évolution de l'Humeur</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TeamMoodTimeline />
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Départements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {departments.map((dept) => {
-                  const deptTeams = teams.filter(team => team.department === dept);
-                  const totalMembers = deptTeams.reduce((acc, team) => acc + team.members.length, 0);
-                  const avgMood = deptTeams.reduce((acc, team) => acc + team.moodAverage, 0) / deptTeams.length;
-
-                  return (
-                    <Card key={dept}>
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">{dept}</h3>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span>Équipes:</span>
-                            <span className="font-medium">{deptTeams.length}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Membres:</span>
-                            <span className="font-medium">{totalMembers}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Humeur Moy.:</span>
-                            <span className={`font-medium ${getMoodColor(avgMood)}`}>
-                              {avgMood.toFixed(1)}/10
-                            </span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Distribution des scores de risque</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center text-gray-500">
+                    Graphique de distribution
+                    <br />
+                    (Intégration charts à venir)
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

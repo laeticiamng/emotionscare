@@ -1,406 +1,425 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  TrendingUp, 
-  Users, 
-  Clock, 
-  Target, 
-  Zap, 
-  BarChart3, 
-  Settings, 
-  RefreshCw,
-  CheckCircle,
-  AlertTriangle,
-  Info
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-
-interface OptimizationMetric {
-  id: string;
-  name: string;
-  currentValue: number;
-  targetValue: number;
-  unit: string;
-  trend: 'up' | 'down' | 'stable';
-  status: 'good' | 'warning' | 'critical';
-}
-
-interface OptimizationSuggestion {
-  id: string;
-  title: string;
-  description: string;
-  impact: 'high' | 'medium' | 'low';
-  effort: 'high' | 'medium' | 'low';
-  category: 'performance' | 'engagement' | 'wellness' | 'productivity';
-}
+import { TrendingUp, Target, Zap, Brain, AlertTriangle, CheckCircle, BarChart3, Settings } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const OptimisationPage: React.FC = () => {
-  const [isOptimizing, setIsOptimizing] = useState(false);
+  const { toast } = useToast();
 
-  const metrics: OptimizationMetric[] = [
+  const optimizationMetrics = {
+    aiAccuracy: 94.7,
+    responseTime: 0.8,
+    userSatisfaction: 89.2,
+    systemUptime: 99.9,
+    dataProcessing: 12.5,
+    costEfficiency: 87.3
+  };
+
+  const recommendations = [
     {
-      id: '1',
-      name: 'Taux d\'engagement',
-      currentValue: 78,
-      targetValue: 85,
-      unit: '%',
-      trend: 'up',
-      status: 'good'
+      id: 1,
+      category: "Performance IA",
+      title: "Optimiser l'algorithme de reconnaissance émotionnelle",
+      description: "Améliorer la précision de détection de 2.3% en affinant les modèles",
+      impact: "Élevé",
+      effort: "Moyen",
+      estimatedGain: "+2.3% précision",
+      status: "En cours",
+      priority: "high"
     },
     {
-      id: '2',
-      name: 'Temps de réponse moyen',
-      currentValue: 1.2,
-      targetValue: 1.0,
-      unit: 's',
-      trend: 'down',
-      status: 'warning'
+      id: 2,
+      category: "Expérience Utilisateur",
+      title: "Réduire le temps de chargement des dashboards",
+      description: "Optimiser les requêtes et implémenter la mise en cache",
+      impact: "Moyen",
+      effort: "Faible",
+      estimatedGain: "-40% temps de chargement",
+      status: "Planifié",
+      priority: "medium"
     },
     {
-      id: '3',
-      name: 'Score de bien-être',
-      currentValue: 7.3,
-      targetValue: 8.0,
-      unit: '/10',
-      trend: 'up',
-      status: 'good'
+      id: 3,
+      category: "Engagement",
+      title: "Personnaliser les notifications selon les préférences",
+      description: "Utiliser l'ML pour optimiser le timing et le contenu des notifications",
+      impact: "Élevé",
+      effort: "Élevé",
+      estimatedGain: "+15% engagement",
+      status: "Recherche",
+      priority: "high"
     },
     {
-      id: '4',
-      name: 'Rétention utilisateurs',
-      currentValue: 85,
-      targetValue: 90,
-      unit: '%',
-      trend: 'stable',
-      status: 'warning'
+      id: 4,
+      category: "Coûts",
+      title: "Optimiser l'utilisation des ressources cloud",
+      description: "Implémenter l'auto-scaling et optimiser les instances",
+      impact: "Moyen",
+      effort: "Moyen",
+      estimatedGain: "-25% coûts infrastructure",
+      status: "Proposé",
+      priority: "low"
     }
   ];
 
-  const suggestions: OptimizationSuggestion[] = [
+  const performanceData = [
     {
-      id: '1',
-      title: 'Optimiser les notifications push',
-      description: 'Personnaliser les horaires d\'envoi selon les préférences utilisateur',
-      impact: 'high',
-      effort: 'medium',
-      category: 'engagement'
+      metric: "Précision IA",
+      current: 94.7,
+      target: 97.0,
+      trend: +1.2,
+      status: "good"
     },
     {
-      id: '2',
-      title: 'Améliorer les temps de chargement',
-      description: 'Mise en cache des ressources fréquemment utilisées',
-      impact: 'medium',
-      effort: 'high',
-      category: 'performance'
+      metric: "Temps de réponse",
+      current: 0.8,
+      target: 0.5,
+      trend: -0.1,
+      status: "improving",
+      unit: "s"
     },
     {
-      id: '3',
-      title: 'Programme de fidélisation',
-      description: 'Système de points et récompenses pour l\'engagement régulier',
-      impact: 'high',
-      effort: 'high',
-      category: 'engagement'
+      metric: "Satisfaction utilisateur",
+      current: 89.2,
+      target: 95.0,
+      trend: +3.1,
+      status: "good",
+      unit: "%"
     },
     {
-      id: '4',
-      title: 'Sessions de méditation courtes',
-      description: 'Proposer des sessions de 5 minutes pour les pauses rapides',
-      impact: 'medium',
-      effort: 'low',
-      category: 'wellness'
+      metric: "Disponibilité système",
+      current: 99.9,
+      target: 99.95,
+      trend: +0.1,
+      status: "excellent",
+      unit: "%"
     }
   ];
 
-  const runOptimization = () => {
-    setIsOptimizing(true);
-    setTimeout(() => {
-      setIsOptimizing(false);
-    }, 3000);
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'good':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'critical':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Info className="h-4 w-4 text-blue-500" />;
+  const experiments = [
+    {
+      id: 1,
+      name: "Test A/B - Interface Scan Émotionnel",
+      description: "Comparaison de 2 designs pour améliorer l'engagement",
+      startDate: "2024-01-15",
+      endDate: "2024-02-15",
+      status: "Actif",
+      participants: 450,
+      conversionA: 67.2,
+      conversionB: 71.8,
+      significance: 0.04
+    },
+    {
+      id: 2,
+      name: "Optimisation Algorithme Recommandations",
+      description: "Test de 3 approches ML pour les suggestions musicales",
+      startDate: "2024-01-20",
+      endDate: "2024-02-10",
+      status: "Terminé",
+      participants: 280,
+      currentAccuracy: 84.5,
+      newAccuracy: 89.1,
+      improvement: 4.6
     }
-  };
+  ];
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const implementRecommendation = (id: number) => {
+    toast({
+      title: "Optimisation planifiée",
+      description: "La recommandation a été ajoutée à la roadmap d'optimisation.",
+    });
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Optimisation Système</h1>
-            <p className="text-muted-foreground">
-              Analysez et optimisez les performances de votre plateforme
-            </p>
-          </div>
-          <Button onClick={runOptimization} disabled={isOptimizing}>
-            {isOptimizing ? (
-              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Zap className="mr-2 h-4 w-4" />
-            )}
-            {isOptimizing ? 'Optimisation...' : 'Lancer l\'optimisation'}
-          </Button>
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-50 p-6" data-testid="page-root">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Optimisation Continue</h1>
+          <p className="text-gray-600">Amélioration des performances et de l'expérience utilisateur</p>
         </div>
 
-        <Tabs defaultValue="metrics" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="metrics">Métriques</TabsTrigger>
-            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+        {/* Métriques clés */}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">{optimizationMetrics.aiAccuracy}%</div>
+              <p className="text-sm text-gray-600">Précision IA</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{optimizationMetrics.responseTime}s</div>
+              <p className="text-sm text-gray-600">Temps réponse</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">{optimizationMetrics.userSatisfaction}%</div>
+              <p className="text-sm text-gray-600">Satisfaction</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-emerald-600 mb-2">{optimizationMetrics.systemUptime}%</div>
+              <p className="text-sm text-gray-600">Disponibilité</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">{optimizationMetrics.dataProcessing}ms</div>
+              <p className="text-sm text-gray-600">Traitement données</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-cyan-600 mb-2">{optimizationMetrics.costEfficiency}%</div>
+              <p className="text-sm text-gray-600">Efficacité coûts</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="recommendations" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="settings">Paramètres</TabsTrigger>
+            <TabsTrigger value="experiments">Expérimentations</TabsTrigger>
+            <TabsTrigger value="automation">Automatisation</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="metrics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {metrics.map((metric, index) => (
-                <motion.div
-                  key={metric.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-center">
-                        <CardTitle className="text-sm font-medium">
-                          {metric.name}
-                        </CardTitle>
-                        {getStatusIcon(metric.status)}
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-bold">
-                            {metric.currentValue}{metric.unit}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            / {metric.targetValue}{metric.unit}
-                          </span>
+          <TabsContent value="recommendations" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Recommandations d'Optimisation</h2>
+              <Button variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                Analyse IA
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {recommendations.map((rec) => (
+                <Card key={rec.id} className={rec.priority === 'high' ? 'border-orange-200 bg-orange-50' : ''}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-lg ${
+                          rec.priority === 'high' ? 'bg-red-100' : 
+                          rec.priority === 'medium' ? 'bg-yellow-100' : 'bg-green-100'
+                        }`}>
+                          {rec.priority === 'high' ? (
+                            <AlertTriangle className="h-6 w-6 text-red-600" />
+                          ) : rec.priority === 'medium' ? (
+                            <Target className="h-6 w-6 text-yellow-600" />
+                          ) : (
+                            <CheckCircle className="h-6 w-6 text-green-600" />
+                          )}
                         </div>
-                        
-                        <Progress 
-                          value={(metric.currentValue / metric.targetValue) * 100}
-                          className="h-2"
-                        />
-                        
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-muted-foreground">Progression</span>
-                          <div className="flex items-center gap-1">
-                            <TrendingUp className="h-3 w-3 text-green-500" />
-                            <span className="text-green-500">
-                              {Math.round((metric.currentValue / metric.targetValue) * 100)}%
-                            </span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-bold text-lg">{rec.title}</h3>
+                            <Badge variant="outline">{rec.category}</Badge>
+                            <Badge variant={rec.status === 'En cours' ? 'default' : 'secondary'}>
+                              {rec.status}
+                            </Badge>
+                          </div>
+                          <p className="text-gray-600 mb-3">{rec.description}</p>
+                          <div className="grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-500">Impact:</span>
+                              <span className="ml-1 font-medium">{rec.impact}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Effort:</span>
+                              <span className="ml-1 font-medium">{rec.effort}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Gain estimé:</span>
+                              <span className="ml-1 font-medium text-green-600">{rec.estimatedGain}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="suggestions" className="space-y-6">
-            <div className="grid gap-4">
-              {suggestions.map((suggestion, index) => (
-                <motion.div
-                  key={suggestion.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                >
-                  <Card>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg">{suggestion.title}</CardTitle>
-                          <CardDescription>{suggestion.description}</CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                          <Badge className={getImpactColor(suggestion.impact)}>
-                            Impact {suggestion.impact}
-                          </Badge>
-                          <Badge variant="outline">
-                            Effort {suggestion.effort}
-                          </Badge>
-                        </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          Détails
+                        </Button>
+                        <Button size="sm" onClick={() => implementRecommendation(rec.id)}>
+                          Implémenter
+                        </Button>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between items-center">
-                        <Badge variant="secondary">
-                          {suggestion.category}
-                        </Badge>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            Plus d'infos
-                          </Button>
-                          <Button size="sm">
-                            Implémenter
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </TabsContent>
 
           <TabsContent value="performance" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    Performance Globale
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Score global</span>
-                      <span className="font-semibold">87/100</span>
-                    </div>
-                    <Progress value={87} className="h-3" />
-                    
-                    <div className="grid grid-cols-2 gap-4 mt-6">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">98%</div>
-                        <div className="text-sm text-muted-foreground">Disponibilité</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">1.2s</div>
-                        <div className="text-sm text-muted-foreground">Temps de réponse</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <h2 className="text-2xl font-bold">Métriques de Performance</h2>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Utilisation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Utilisateurs actifs</span>
-                      <span className="font-semibold">1,247</span>
+            <div className="space-y-6">
+              {performanceData.map((metric, index) => (
+                <Card key={index}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-lg">{metric.metric}</h3>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className={`h-4 w-4 ${metric.trend > 0 ? 'text-green-500' : 'text-red-500'}`} />
+                        <span className={`text-sm ${metric.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {metric.trend > 0 ? '+' : ''}{metric.trend}{metric.unit || '%'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Sessions moyennes/jour</span>
-                      <span className="font-semibold">3.2</span>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span>Actuel: {metric.current}{metric.unit || '%'}</span>
+                        <span>Objectif: {metric.target}{metric.unit || '%'}</span>
+                      </div>
+                      <Progress value={(metric.current / metric.target) * 100} className="h-3" />
+                      <div className="flex justify-between items-center">
+                        <Badge variant={
+                          metric.status === 'excellent' ? 'default' : 
+                          metric.status === 'good' ? 'secondary' : 'destructive'
+                        }>
+                          {metric.status === 'excellent' ? 'Excellent' : 
+                           metric.status === 'good' ? 'Bon' : 
+                           metric.status === 'improving' ? 'En amélioration' : 'À améliorer'}
+                        </Badge>
+                        <span className="text-xs text-gray-500">
+                          {Math.round((metric.current / metric.target) * 100)}% de l'objectif
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Durée moyenne session</span>
-                      <span className="font-semibold">12m 34s</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="settings" className="space-y-6">
+          <TabsContent value="experiments" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Expérimentations A/B</h2>
+              <Button>
+                <Zap className="h-4 w-4 mr-2" />
+                Nouvelle expérimentation
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {experiments.map((exp) => (
+                <Card key={exp.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="font-bold text-lg mb-1">{exp.name}</h3>
+                        <p className="text-gray-600 mb-2">{exp.description}</p>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span>{exp.startDate} → {exp.endDate}</span>
+                          <span>{exp.participants} participants</span>
+                        </div>
+                      </div>
+                      <Badge variant={exp.status === 'Actif' ? 'default' : 'secondary'}>
+                        {exp.status}
+                      </Badge>
+                    </div>
+
+                    {exp.conversionA && (
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <div className="text-sm text-gray-600">Version A</div>
+                          <div className="text-2xl font-bold text-blue-600">{exp.conversionA}%</div>
+                        </div>
+                        <div className="p-3 bg-green-50 rounded-lg">
+                          <div className="text-sm text-gray-600">Version B</div>
+                          <div className="text-2xl font-bold text-green-600">{exp.conversionB}%</div>
+                          <div className="text-xs text-green-700">+{(exp.conversionB - exp.conversionA).toFixed(1)}%</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {exp.improvement && (
+                      <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                        <div className="text-sm text-gray-600">Amélioration mesurée</div>
+                        <div className="text-2xl font-bold text-green-600">+{exp.improvement}%</div>
+                        <div className="text-xs text-gray-600">
+                          De {exp.currentAccuracy}% à {exp.newAccuracy}%
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="automation" className="space-y-6">
+            <h2 className="text-2xl font-bold">Automatisation des Optimisations</h2>
+            
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Settings className="h-5 w-5" />
-                  Paramètres d'Optimisation
+                  Règles d'Optimisation Automatique
                 </CardTitle>
-                <CardDescription>
-                  Configurez les paramètres d'optimisation automatique
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Optimisation automatique</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Lancer l'optimisation automatiquement chaque nuit
-                      </p>
-                    </div>
-                    <Button variant="outline">Configurer</Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">🔄 Auto-scaling</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Ajustement automatique des ressources selon la charge
+                    </p>
+                    <Badge variant="secondary">Actif</Badge>
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Notifications d'alertes</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Recevoir des alertes en cas de problème de performance
-                      </p>
-                    </div>
-                    <Button variant="outline">Configurer</Button>
+
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">🧠 ML Auto-tuning</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Optimisation continue des hyperparamètres IA
+                    </p>
+                    <Badge variant="secondary">Actif</Badge>
                   </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Seuils de performance</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Définir les seuils d'alerte pour les métriques
-                      </p>
-                    </div>
-                    <Button variant="outline">Modifier</Button>
+
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">📊 Alertes Performance</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Notifications automatiques en cas de dégradation
+                    </p>
+                    <Badge variant="secondary">Actif</Badge>
                   </div>
+
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">🚀 Déploiement Graduel</h4>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Rollout automatique des améliorations validées
+                    </p>
+                    <Badge variant="outline">En configuration</Badge>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">💡 Prochaines Automatisations</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• Optimisation automatique des recommandations personnalisées</li>
+                    <li>• Détection proactive des anomalies de bien-être</li>
+                    <li>• Ajustement dynamique des algorithmes selon les feedbacks</li>
+                    <li>• Optimisation énergétique des infrastructures</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-
-        {isOptimizing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50"
-          >
-            <Card className="w-96">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-4">
-                  <RefreshCw className="h-12 w-12 text-primary animate-spin mx-auto" />
-                  <h3 className="text-lg font-semibold">Optimisation en cours...</h3>
-                  <p className="text-muted-foreground">
-                    Analyse des performances et application des améliorations
-                  </p>
-                  <Progress value={66} className="w-full" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
       </div>
     </div>
   );

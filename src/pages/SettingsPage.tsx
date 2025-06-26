@@ -1,786 +1,653 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Settings, 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Globe, 
-  Download,
-  Upload,
-  Smartphone,
-  Mail,
-  Lock,
-  Key,
-  Database,
-  Trash2,
-  AlertTriangle,
-  CheckCircle,
-  Moon,
-  Sun,
-  Monitor,
-  Volume2,
-  Eye,
-  EyeOff,
-  Save,
-  RefreshCw
-} from 'lucide-react';
-import UserSettings from '@/components/settings/UserSettings';
+import { Settings, Shield, Users, Mail, Database, Zap, AlertTriangle, Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const SettingsPage: React.FC = () => {
-  const [settings, setSettings] = useState({
-    // Profil
-    firstName: 'Jean',
-    lastName: 'Dupont',
-    email: 'jean.dupont@example.com',
-    phone: '+33 6 12 34 56 78',
-    bio: 'Passionné par le bien-être et la technologie',
-    avatar: '',
-    
-    // Notifications
+  const { toast } = useToast();
+  
+  const [generalSettings, setGeneralSettings] = useState({
+    companyName: "Hôpital Saint-Martin",
+    defaultLanguage: "fr",
+    timezone: "Europe/Paris",
     emailNotifications: true,
-    pushNotifications: true,
-    smsNotifications: false,
-    weeklyReport: true,
-    moodReminders: true,
-    teamUpdates: true,
-    
-    // Thème
-    theme: 'system',
-    language: 'fr',
-    timezone: 'Europe/Paris',
-    
-    // Confidentialité
-    profileVisibility: 'team',
-    dataSharing: false,
-    analyticsOptIn: true,
-    
-    // Audio
-    soundEffects: true,
-    voiceGuidance: true,
-    musicVolume: 75,
-    
-    // Sécurité
-    twoFactorAuth: false,
-    sessionTimeout: 30,
-    loginAlerts: true
+    maintenanceMode: false,
+    dataRetention: 24,
+    autoBackup: true
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [securitySettings, setSecuritySettings] = useState({
+    twoFactorAuth: true,
+    sessionTimeout: 60,
+    passwordComplexity: "high",
+    loginAttempts: 5,
+    dataEncryption: true,
+    auditLogging: true,
+    ipWhitelist: false
+  });
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    // Simulation de sauvegarde
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
+  const saveSettings = (category: string) => {
+    toast({
+      title: "Paramètres sauvegardés",
+      description: `Les paramètres ${category} ont été mis à jour avec succès.`,
+    });
   };
 
-  const handleExportData = () => {
-    // Logique d'export des données
-    console.log('Export des données utilisateur');
+  const exportData = () => {
+    toast({
+      title: "Export en cours",
+      description: "Les données sont en cours d'exportation. Vous recevrez un email quand c'est prêt.",
+    });
   };
 
-  const handleDeleteAccount = () => {
-    // Logique de suppression de compte
-    console.log('Suppression du compte');
+  const systemStats = {
+    totalUsers: 324,
+    activeUsers: 287,
+    storageUsed: "2.3 GB",
+    lastBackup: "Il y a 2h",
+    systemLoad: 23,
+    uptime: "99.8%"
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6" data-testid="page-root">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div className="flex items-center space-x-3">
-          <Settings className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold">Paramètres</h1>
-            <p className="text-muted-foreground">Personnalisez votre expérience EmotionsCare</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50 p-6" data-testid="page-root">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Paramètres Administrateur</h1>
+          <p className="text-gray-600">Configuration système et paramètres globaux</p>
         </div>
-        <Button onClick={handleSave} disabled={isLoading} className="bg-gradient-to-r from-blue-500 to-purple-500">
-          {isLoading ? (
-            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4 mr-2" />
-          )}
-          Sauvegarder
-        </Button>
-      </motion.div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="appearance">Apparence</TabsTrigger>
-          <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
-          <TabsTrigger value="security">Sécurité</TabsTrigger>
-          <TabsTrigger value="advanced">Avancé</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="profile" className="space-y-6">
+        {/* Stats système */}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6 mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5" />
-                <span>Informations Personnelles</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center space-x-6">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={settings.avatar} />
-                  <AvatarFallback className="text-lg">
-                    {settings.firstName[0]}{settings.lastName[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-2">
-                  <Button variant="outline">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Changer la photo
-                  </Button>
-                  <p className="text-sm text-muted-foreground">
-                    JPG, PNG ou GIF. Taille max: 2MB
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
-                  <Input
-                    id="firstName"
-                    value={settings.firstName}
-                    onChange={(e) => setSettings({...settings, firstName: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
-                  <Input
-                    id="lastName"
-                    value={settings.lastName}
-                    onChange={(e) => setSettings({...settings, lastName: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="email"
-                    type="email"
-                    value={settings.email}
-                    onChange={(e) => setSettings({...settings, email: e.target.value})}
-                    className="flex-1"
-                  />
-                  <Badge variant="outline" className="bg-green-50 text-green-700">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Vérifié
-                  </Badge>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={settings.phone}
-                  onChange={(e) => setSettings({...settings, phone: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  placeholder="Parlez-nous de vous..."
-                  value={settings.bio}
-                  onChange={(e) => setSettings({...settings, bio: e.target.value})}
-                  rows={3}
-                />
-              </div>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{systemStats.totalUsers}</div>
+              <p className="text-sm text-gray-600">Utilisateurs totaux</p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Préférences Régionales</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Langue</Label>
-                  <Select value={settings.language} onValueChange={(value) => setSettings({...settings, language: value})}>
-                    <SelectTrigger>
-                      <Globe className="h-4 w-4 mr-2" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="de">Deutsch</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Fuseau Horaire</Label>
-                  <Select value={settings.timezone} onValueChange={(value) => setSettings({...settings, timezone: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Europe/Paris">Europe/Paris (GMT+1)</SelectItem>
-                      <SelectItem value="Europe/London">Europe/London (GMT+0)</SelectItem>
-                      <SelectItem value="America/New_York">America/New_York (GMT-5)</SelectItem>
-                      <SelectItem value="Asia/Tokyo">Asia/Tokyo (GMT+9)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Bell className="h-5 w-5" />
-                <span>Préférences de Notifications</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Notifications Email</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Recevez des mises à jour par email
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.emailNotifications}
-                    onCheckedChange={(checked) => setSettings({...settings, emailNotifications: checked})}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Notifications Push</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Notifications sur votre appareil
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.pushNotifications}
-                    onCheckedChange={(checked) => setSettings({...settings, pushNotifications: checked})}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Notifications SMS</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Alertes importantes par SMS
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.smsNotifications}
-                    onCheckedChange={(checked) => setSettings({...settings, smsNotifications: checked})}
-                  />
-                </div>
-              </div>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">{systemStats.activeUsers}</div>
+              <p className="text-sm text-gray-600">Utilisateurs actifs</p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Types de Notifications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Rapport Hebdomadaire</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Résumé de votre bien-être chaque semaine
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.weeklyReport}
-                  onCheckedChange={(checked) => setSettings({...settings, weeklyReport: checked})}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Rappels d'Humeur</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Rappels pour enregistrer votre humeur
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.moodReminders}
-                  onCheckedChange={(checked) => setSettings({...settings, moodReminders: checked})}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label>Mises à Jour d'Équipe</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Nouvelles de votre équipe (B2B uniquement)
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.teamUpdates}
-                  onCheckedChange={(checked) => setSettings({...settings, teamUpdates: checked})}
-                />
-              </div>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">{systemStats.storageUsed}</div>
+              <p className="text-sm text-gray-600">Stockage utilisé</p>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="appearance" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Palette className="h-5 w-5" />
-                <span>Thème et Apparence</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <Label>Thème</Label>
-                <div className="grid grid-cols-3 gap-3">
-                  <Card 
-                    className={`p-4 cursor-pointer border-2 transition-colors ${
-                      settings.theme === 'light' ? 'border-primary' : 'border-muted'
-                    }`}
-                    onClick={() => setSettings({...settings, theme: 'light'})}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <Sun className="h-6 w-6" />
-                      <span className="text-sm font-medium">Clair</span>
-                    </div>
-                  </Card>
-                  <Card 
-                    className={`p-4 cursor-pointer border-2 transition-colors ${
-                      settings.theme === 'dark' ? 'border-primary' : 'border-muted'
-                    }`}
-                    onClick={() => setSettings({...settings, theme: 'dark'})}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <Moon className="h-6 w-6" />
-                      <span className="text-sm font-medium">Sombre</span>
-                    </div>
-                  </Card>
-                  <Card 
-                    className={`p-4 cursor-pointer border-2 transition-colors ${
-                      settings.theme === 'system' ? 'border-primary' : 'border-muted'
-                    }`}
-                    onClick={() => setSettings({...settings, theme: 'system'})}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <Monitor className="h-6 w-6" />
-                      <span className="text-sm font-medium">Système</span>
-                    </div>
-                  </Card>
-                </div>
-              </div>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">{systemStats.systemLoad}%</div>
+              <p className="text-sm text-gray-600">Charge système</p>
+            </CardContent>
+          </Card>
 
-              <Separator />
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-3xl font-bold text-emerald-600 mb-2">{systemStats.uptime}</div>
+              <p className="text-sm text-gray-600">Disponibilité</p>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-3">
-                <Label>Volume Audio</Label>
-                <div className="flex items-center space-x-4">
-                  <Volume2 className="h-4 w-4" />
-                  <div className="flex-1">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.musicVolume}
-                      onChange={(e) => setSettings({...settings, musicVolume: parseInt(e.target.value)})}
-                      className="w-full"
+          <Card>
+            <CardContent className="p-6 text-center">
+              <div className="text-lg font-bold text-cyan-600 mb-2">{systemStats.lastBackup}</div>
+              <p className="text-sm text-gray-600">Dernière sauvegarde</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="general" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="general">Général</TabsTrigger>
+            <TabsTrigger value="security">Sécurité</TabsTrigger>
+            <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="data">Données</TabsTrigger>
+            <TabsTrigger value="integrations">Intégrations</TabsTrigger>
+            <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="general" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Paramètres Généraux
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Nom de l'organisation</Label>
+                    <Input 
+                      value={generalSettings.companyName}
+                      onChange={(e) => setGeneralSettings(prev => ({ ...prev, companyName: e.target.value }))}
                     />
                   </div>
-                  <span className="text-sm font-medium w-12">{settings.musicVolume}%</span>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Effets Sonores</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Sons de l'interface utilisateur
-                    </p>
+                  <div className="space-y-2">
+                    <Label>Langue par défaut</Label>
+                    <Select 
+                      value={generalSettings.defaultLanguage} 
+                      onValueChange={(value) => setGeneralSettings(prev => ({ ...prev, defaultLanguage: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fr">Français</SelectItem>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="es">Español</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Switch
-                    checked={settings.soundEffects}
-                    onCheckedChange={(checked) => setSettings({...settings, soundEffects: checked})}
-                  />
-                </div>
 
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Guidage Vocal</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Instructions vocales pour les exercices
-                    </p>
+                  <div className="space-y-2">
+                    <Label>Fuseau horaire</Label>
+                    <Select 
+                      value={generalSettings.timezone} 
+                      onValueChange={(value) => setGeneralSettings(prev => ({ ...prev, timezone: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Europe/Paris">Europe/Paris (GMT+1)</SelectItem>
+                        <SelectItem value="America/New_York">America/New_York (GMT-5)</SelectItem>
+                        <SelectItem value="Asia/Tokyo">Asia/Tokyo (GMT+9)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Switch
-                    checked={settings.voiceGuidance}
-                    onCheckedChange={(checked) => setSettings({...settings, voiceGuidance: checked})}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="privacy" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Shield className="h-5 w-5" />
-                <span>Confidentialité et Données</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Visibilité du Profil</Label>
-                  <Select 
-                    value={settings.profileVisibility} 
-                    onValueChange={(value) => setSettings({...settings, profileVisibility: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="public">Public - Visible par tous</SelectItem>
-                      <SelectItem value="team">Équipe - Visible par votre équipe</SelectItem>
-                      <SelectItem value="private">Privé - Visible par vous seul</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Partage de Données</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Autoriser le partage anonyme pour la recherche
-                    </p>
+                  <div className="space-y-2">
+                    <Label>Rétention des données (mois)</Label>
+                    <Input 
+                      type="number"
+                      value={generalSettings.dataRetention}
+                      onChange={(e) => setGeneralSettings(prev => ({ ...prev, dataRetention: parseInt(e.target.value) }))}
+                    />
                   </div>
-                  <Switch
-                    checked={settings.dataSharing}
-                    onCheckedChange={(checked) => setSettings({...settings, dataSharing: checked})}
-                  />
                 </div>
 
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Analytics</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Nous aider à améliorer l'application
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.analyticsOptIn}
-                    onCheckedChange={(checked) => setSettings({...settings, analyticsOptIn: checked})}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Données</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="space-y-1">
-                  <h4 className="font-medium">Exporter mes Données</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Télécharger toutes vos données personnelles
-                  </p>
-                </div>
-                <Button variant="outline" onClick={handleExportData}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter
-                </Button>
-              </div>
-
-              <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
-                <div className="space-y-1">
-                  <h4 className="font-medium text-red-800">Supprimer mon Compte</h4>
-                  <p className="text-sm text-red-600">
-                    Cette action est irréversible
-                  </p>
-                </div>
-                <Button variant="destructive" onClick={handleDeleteAccount}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Supprimer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Lock className="h-5 w-5" />
-                <span>Sécurité du Compte</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Changer le Mot de Passe</Label>
-                  <div className="space-y-3">
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Mot de passe actuel"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Notifications email</Label>
+                      <p className="text-sm text-muted-foreground">Recevoir les alertes système par email</p>
                     </div>
-                    <Input type="password" placeholder="Nouveau mot de passe" />
-                    <Input type="password" placeholder="Confirmer le nouveau mot de passe" />
-                    <Button className="w-full">
-                      <Key className="h-4 w-4 mr-2" />
-                      Changer le Mot de Passe
+                    <Switch 
+                      checked={generalSettings.emailNotifications}
+                      onCheckedChange={(checked) => setGeneralSettings(prev => ({ ...prev, emailNotifications: checked }))}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Sauvegarde automatique</Label>
+                      <p className="text-sm text-muted-foreground">Sauvegardes quotidiennes automatiques</p>
+                    </div>
+                    <Switch 
+                      checked={generalSettings.autoBackup}
+                      onCheckedChange={(checked) => setGeneralSettings(prev => ({ ...prev, autoBackup: checked }))}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-orange-600">Mode maintenance</Label>
+                      <p className="text-sm text-muted-foreground">Désactiver l'accès pour tous les utilisateurs</p>
+                    </div>
+                    <Switch 
+                      checked={generalSettings.maintenanceMode}
+                      onCheckedChange={(checked) => setGeneralSettings(prev => ({ ...prev, maintenanceMode: checked }))}
+                    />
+                  </div>
+                </div>
+
+                <Button onClick={() => saveSettings('généraux')}>
+                  Sauvegarder les paramètres généraux
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Paramètres de Sécurité
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Timeout de session (minutes)</Label>
+                    <Input 
+                      type="number"
+                      value={securitySettings.sessionTimeout}
+                      onChange={(e) => setSecuritySettings(prev => ({ ...prev, sessionTimeout: parseInt(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Complexité des mots de passe</Label>
+                    <Select 
+                      value={securitySettings.passwordComplexity} 
+                      onValueChange={(value) => setSecuritySettings(prev => ({ ...prev, passwordComplexity: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Faible (8 caractères)</SelectItem>
+                        <SelectItem value="medium">Moyenne (8 chars + symboles)</SelectItem>
+                        <SelectItem value="high">Élevée (12 chars + symboles + maj/min)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Tentatives de connexion max</Label>
+                    <Input 
+                      type="number"
+                      value={securitySettings.loginAttempts}
+                      onChange={(e) => setSecuritySettings(prev => ({ ...prev, loginAttempts: parseInt(e.target.value) }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Authentification à deux facteurs</Label>
+                      <p className="text-sm text-muted-foreground">Obligatoire pour tous les administrateurs</p>
+                    </div>
+                    <Switch 
+                      checked={securitySettings.twoFactorAuth}
+                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ ...prev, twoFactorAuth: checked }))}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Chiffrement des données</Label>
+                      <p className="text-sm text-muted-foreground">Chiffrement AES-256 en transit et au repos</p>
+                    </div>
+                    <Switch 
+                      checked={securitySettings.dataEncryption}
+                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ ...prev, dataEncryption: checked }))}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Journalisation des audits</Label>
+                      <p className="text-sm text-muted-foreground">Enregistrer toutes les actions administratives</p>
+                    </div>
+                    <Switch 
+                      checked={securitySettings.auditLogging}
+                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ ...prev, auditLogging: checked }))}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Liste blanche des IP</Label>
+                      <p className="text-sm text-muted-foreground">Restreindre l'accès à certaines adresses IP</p>
+                    </div>
+                    <Switch 
+                      checked={securitySettings.ipWhitelist}
+                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ ...prev, ipWhitelist: checked }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 bg-red-50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    <h4 className="font-medium text-red-900">Alertes de Sécurité</h4>
+                  </div>
+                  <ul className="text-sm text-red-700 space-y-1">
+                    <li>• 3 tentatives de connexion échouées dans les dernières 24h</li>
+                    <li>• Dernière mise à jour de sécurité: Il y a 3 jours</li>
+                    <li>• Certificat SSL expire dans 45 jours</li>
+                  </ul>
+                </div>
+
+                <Button onClick={() => saveSettings('de sécurité')}>
+                  Sauvegarder les paramètres de sécurité
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Gestion des Utilisateurs
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-blue-600 mb-2">324</div>
+                    <p className="text-sm text-gray-600">Utilisateurs totaux</p>
+                    <Badge variant="secondary" className="mt-2">+12 ce mois</Badge>
+                  </div>
+
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-green-600 mb-2">287</div>
+                    <p className="text-sm text-gray-600">Utilisateurs actifs</p>
+                    <Badge variant="default" className="mt-2">88.6% taux d'activité</Badge>
+                  </div>
+
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">8</div>
+                    <p className="text-sm text-gray-600">Administrateurs</p>
+                    <Badge variant="outline" className="mt-2">Accès complet</Badge>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">Actions rapides</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button variant="outline" className="justify-start">
+                      <Users className="h-4 w-4 mr-2" />
+                      Créer un nouvel utilisateur
+                    </Button>
+                    <Button variant="outline" className="justify-start">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Envoyer invitation de masse
+                    </Button>
+                    <Button variant="outline" className="justify-start">
+                      <Download className="h-4 w-4 mr-2" />
+                      Exporter la liste des utilisateurs
+                    </Button>
+                    <Button variant="outline" className="justify-start">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configurer les rôles
                     </Button>
                   </div>
                 </div>
 
-                <Separator />
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">Politiques d'accès</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• Tous les nouveaux utilisateurs ont accès B2C par défaut</li>
+                    <li>• L'accès B2B Admin nécessite une approbation</li>
+                    <li>• Désactivation automatique après 90 jours d'inactivité</li>
+                    <li>• Révision des accès tous les 6 mois</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Authentification à Deux Facteurs (2FA)</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Sécurité renforcée pour votre compte
-                    </p>
+          <TabsContent value="data" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Gestion des Données
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Sauvegardes</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Dernière sauvegarde:</span>
+                        <span className="text-green-600">Il y a 2h (Succès)</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Prochaine sauvegarde:</span>
+                        <span>Dans 22h</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Taille totale:</span>
+                        <span>2.3 GB</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Créer une sauvegarde maintenant
+                    </Button>
                   </div>
-                  <Switch
-                    checked={settings.twoFactorAuth}
-                    onCheckedChange={(checked) => setSettings({...settings, twoFactorAuth: checked})}
-                  />
-                </div>
 
-                <Separator />
-
-                <div className="space-y-2">
-                  <Label>Délai d'Expiration de Session</Label>
-                  <Select 
-                    value={settings.sessionTimeout.toString()} 
-                    onValueChange={(value) => setSettings({...settings, sessionTimeout: parseInt(value)})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="15">15 minutes</SelectItem>
-                      <SelectItem value="30">30 minutes</SelectItem>
-                      <SelectItem value="60">1 heure</SelectItem>
-                      <SelectItem value="240">4 heures</SelectItem>
-                      <SelectItem value="0">Jamais</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Alertes de Connexion</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Être notifié des nouvelles connexions
-                    </p>
-                  </div>
-                  <Switch
-                    checked={settings.loginAlerts}
-                    onCheckedChange={(checked) => setSettings({...settings, loginAlerts: checked})}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Sessions Actives</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Smartphone className="h-5 w-5 text-green-500" />
-                    <div>
-                      <p className="font-medium">Appareil Actuel</p>
-                      <p className="text-sm text-muted-foreground">Chrome sur Windows • Maintenant</p>
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Conformité RGPD</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span>Consentement utilisateur</span>
+                        <Badge variant="default">100%</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Données anonymisées</span>
+                        <Badge variant="default">Conforme</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Droit à l'oubli</span>
+                        <Badge variant="default">Actif</Badge>
+                      </div>
                     </div>
                   </div>
-                  <Badge variant="outline" className="bg-green-50 text-green-700">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Actif
-                  </Badge>
                 </div>
-                
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Smartphone className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">iPhone</p>
-                      <p className="text-sm text-muted-foreground">Safari • Il y a 2 heures</p>
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">Actions sur les données</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button variant="outline" onClick={exportData}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Exporter toutes les données
+                    </Button>
+                    <Button variant="outline">
+                      <Database className="h-4 w-4 mr-2" />
+                      Nettoyer les données anciennes
+                    </Button>
+                    <Button variant="outline">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Rapport de conformité
+                    </Button>
+                    <Button variant="outline">
+                      <Zap className="h-4 w-4 mr-2" />
+                      Optimiser la base de données
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <h4 className="font-medium text-green-900 mb-2">✅ Statut de la Base de Données</h4>
+                  <ul className="text-sm text-green-700 space-y-1">
+                    <li>• Performance: Optimale (temps de réponse < 100ms)</li>
+                    <li>• Intégrité: 100% des vérifications passées</li>
+                    <li>• Sauvegarde: Automatique quotidienne à 2h du matin</li>
+                    <li>• Chiffrement: AES-256 activé sur toutes les données sensibles</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Intégrations & API
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="font-medium">Intégrations disponibles</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-medium">Microsoft Teams</h5>
+                        <Badge variant="default">Connecté</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">Notifications et rappels bien-être</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-medium">Slack</h5>
+                        <Badge variant="outline">Non configuré</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">Intégration des alertes équipe</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-medium">Google Workspace</h5>
+                        <Badge variant="default">Connecté</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">Synchronisation calendrier</p>
+                    </div>
+
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-medium">SIRH Existant</h5>
+                        <Badge variant="secondary">En cours</Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">Import des données employés</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
-                    Déconnecter
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">API & Webhooks</h4>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Clés API actives:</span>
+                        <span className="font-medium">3</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Webhooks configurés:</span>
+                        <span className="font-medium">5</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Appels API ce mois:</span>
+                        <span className="font-medium">12,547</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Quota restant:</span>
+                        <span className="font-medium text-green-600">87,453</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="outline">
+                    Gérer les clés API
                   </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="advanced" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Database className="h-5 w-5" />
-                <span>Paramètres Avancés</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                <div className="flex items-start space-x-3">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-yellow-800">Attention</h4>
-                    <p className="text-sm text-yellow-700">
-                      Ces paramètres sont destinés aux utilisateurs avancés. 
-                      Modifier ces options peut affecter le fonctionnement de l'application.
-                    </p>
+          <TabsContent value="maintenance" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Maintenance & Monitoring
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-green-600 mb-2">99.8%</div>
+                    <p className="text-sm text-gray-600">Disponibilité</p>
+                    <Badge variant="default" className="mt-2">30 derniers jours</Badge>
+                  </div>
+
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-blue-600 mb-2">23%</div>
+                    <p className="text-sm text-gray-600">Charge CPU</p>
+                    <Badge variant="secondary" className="mt-2">Normale</Badge>
+                  </div>
+
+                  <div className="p-4 border rounded-lg text-center">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">156ms</div>
+                    <p className="text-sm text-gray-600">Temps de réponse</p>
+                    <Badge variant="default" className="mt-2">Optimal</Badge>
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Mode Debug</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Afficher les informations de débogage
-                    </p>
+                <div className="space-y-4">
+                  <h4 className="font-medium">Actions de maintenance</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button variant="outline">
+                      <Zap className="h-4 w-4 mr-2" />
+                      Redémarrer les services
+                    </Button>
+                    <Button variant="outline">
+                      <Database className="h-4 w-4 mr-2" />
+                      Optimiser la base
+                    </Button>
+                    <Button variant="outline">
+                      <Download className="h-4 w-4 mr-2" />
+                      Télécharger les logs
+                    </Button>
+                    <Button variant="outline">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Vider le cache
+                    </Button>
                   </div>
-                  <Switch />
                 </div>
 
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label>Cache Automatique</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Mise en cache des données pour de meilleures performances
-                    </p>
+                <div className="space-y-4">
+                  <h4 className="font-medium">Planification de maintenance</h4>
+                  <div className="p-4 border rounded-lg">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Prochaine maintenance planifiée:</span>
+                        <Badge variant="outline">Dimanche 3h-5h</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Type:</span>
+                        <span className="text-sm font-medium">Mise à jour sécurité</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Durée estimée:</span>
+                        <span className="text-sm font-medium">2 heures</span>
+                      </div>
+                    </div>
                   </div>
-                  <Switch defaultChecked />
                 </div>
 
-                <Separator />
-
-                <div className="space-y-2">
-                  <Label>Serveur API</Label>
-                  <Input placeholder="https://api.emotionscare.com" disabled />
-                  <p className="text-xs text-muted-foreground">
-                    Contactez le support pour modifier cette valeur
-                  </p>
+                <div className="p-4 bg-yellow-50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                    <h4 className="font-medium text-yellow-900">Alertes Système</h4>
+                  </div>
+                  <ul className="text-sm text-yellow-700 space-y-1">
+                    <li>• Mise à jour disponible: EmotionsCare v2.1.3</li>
+                    <li>• Espace disque: 78% utilisé (surveillance recommandée)</li>
+                    <li>• 2 utilisateurs inactifs depuis 90+ jours</li>
+                  </ul>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions Système</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">Vider le Cache</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Supprime les données temporaires
-                  </p>
-                </div>
-                <Button variant="outline">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Vider
-                </Button>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">Synchroniser les Données</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Force la synchronisation avec le serveur
-                  </p>
-                </div>
-                <Button variant="outline">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Synchroniser
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
