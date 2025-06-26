@@ -2,7 +2,7 @@
 import React, { lazy, Suspense } from 'react';
 import { createRoutesFromElements, Route } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { routes as b2bRoutes } from './routes/b2bRoutes';
+import { b2bRoutes } from './routes/b2bRoutes';
 import { b2cRoutes } from './routes/b2cRoutes';
 import { optimizedRoutes } from './routes/lazyRoutes';
 import { UNIFIED_ROUTES } from '@/utils/routeUtils';
@@ -38,17 +38,16 @@ export const buildUnifiedRoutes = () => {
       
       {/* Routes B2C */}
       <Route path="/b2c/*" element={<UnifiedRouteGuard allowedRoles={['b2c']} redirectTo={UNIFIED_ROUTES.B2C_LOGIN} />}>
-        {b2cRoutes}
+        {b2cRoutes.map((route, index) => (
+          <Route key={index} path={route.path} element={route.element} />
+        ))}
       </Route>
       
-      {/* Routes B2B User */}
-      <Route path="/b2b/user/*" element={<UnifiedRouteGuard allowedRoles={['b2b_user']} redirectTo={UNIFIED_ROUTES.B2B_USER_LOGIN} />}>
-        {b2bRoutes.userRoutes}
-      </Route>
-      
-      {/* Routes B2B Admin */}
-      <Route path="/b2b/admin/*" element={<UnifiedRouteGuard allowedRoles={['b2b_admin']} redirectTo={UNIFIED_ROUTES.B2B_ADMIN_LOGIN} />}>
-        {b2bRoutes.adminRoutes}
+      {/* Routes B2B */}
+      <Route path="/b2b/*" element={<UnifiedRouteGuard allowedRoles={['b2b_user', 'b2b_admin']} redirectTo={UNIFIED_ROUTES.B2B_USER_LOGIN} />}>
+        {b2bRoutes.map((route, index) => (
+          <Route key={index} path={route.path} element={route.element} />
+        ))}
       </Route>
 
       {/* Lazy Loaded Routes */}
