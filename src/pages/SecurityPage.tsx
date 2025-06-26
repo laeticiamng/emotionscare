@@ -1,426 +1,393 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { 
   Shield, 
   Key, 
+  Lock, 
   Eye, 
   EyeOff, 
-  Smartphone,
+  Smartphone, 
   AlertTriangle,
   CheckCircle,
   Clock,
-  MapPin,
-  Download
+  Globe,
+  Download,
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 
 const SecurityPage: React.FC = () => {
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [loginNotifications, setLoginNotifications] = useState(true);
+  const [dataEncryption, setDataEncryption] = useState(true);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    current: '',
-    new: '',
-    confirm: ''
-  });
 
-  const [securitySettings, setSecuritySettings] = useState({
-    twoFactorAuth: false,
-    loginNotifications: true,
-    dataEncryption: true,
-    anonymousMode: false,
-    sessionTimeout: '30'
-  });
-
-  const recentSessions = [
+  const securitySettings = [
     {
-      device: 'Chrome sur Windows',
-      location: 'Paris, France',
-      time: 'Maintenant',
-      current: true,
-      ip: '192.168.1.1'
+      id: 'two-factor',
+      title: 'Authentification à deux facteurs',
+      description: 'Ajoutez une couche de sécurité supplémentaire à votre compte',
+      enabled: twoFactorEnabled,
+      onToggle: setTwoFactorEnabled,
+      icon: <Smartphone className="h-5 w-5" />,
+      status: twoFactorEnabled ? 'active' : 'inactive'
     },
     {
-      device: 'Safari sur iPhone',
-      location: 'Paris, France',
-      time: 'Il y a 2 heures',
-      current: false,
-      ip: '192.168.1.2'
+      id: 'login-notifications',
+      title: 'Notifications de connexion',
+      description: 'Recevez des alertes lors de nouvelles connexions',
+      enabled: loginNotifications,
+      onToggle: setLoginNotifications,
+      icon: <AlertTriangle className="h-5 w-5" />,
+      status: loginNotifications ? 'active' : 'inactive'
     },
     {
-      device: 'Chrome sur MacOS',
-      location: 'Lyon, France',
-      time: 'Hier',
-      current: false,
-      ip: '172.16.0.1'
+      id: 'data-encryption',
+      title: 'Chiffrement des données',
+      description: 'Vos données sensibles sont chiffrées end-to-end',
+      enabled: dataEncryption,
+      onToggle: setDataEncryption,
+      icon: <Lock className="h-5 w-5" />,
+      status: 'active'
     }
   ];
 
-  const handlePasswordChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordForm.new !== passwordForm.confirm) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
+  const recentActivity = [
+    {
+      id: '1',
+      action: 'Connexion réussie',
+      device: 'Chrome sur Windows',
+      location: 'Paris, France',
+      timestamp: '2024-01-15 14:30',
+      status: 'success'
+    },
+    {
+      id: '2',
+      action: 'Changement de mot de passe',
+      device: 'Firefox sur macOS',
+      location: 'Lyon, France',
+      timestamp: '2024-01-14 09:15',
+      status: 'success'
+    },
+    {
+      id: '3',
+      action: 'Tentative de connexion échouée',
+      device: 'Safari sur iOS',
+      location: 'Marseille, France',
+      timestamp: '2024-01-13 18:45',
+      status: 'warning'
     }
-    toast.success('Mot de passe modifié avec succès');
-    setPasswordForm({ current: '', new: '', confirm: '' });
+  ];
+
+  const handlePasswordChange = () => {
+    toast.success('Mot de passe mis à jour avec succès');
   };
 
-  const handleExportData = () => {
-    toast.success('Export des données en cours... Vous recevrez un email avec le lien de téléchargement.');
+  const handleTwoFactorSetup = () => {
+    if (!twoFactorEnabled) {
+      toast.info('Configuration de l\'authentification à deux facteurs...');
+      // Simulation de l'activation
+      setTimeout(() => {
+        setTwoFactorEnabled(true);
+        toast.success('Authentification à deux facteurs activée !');
+      }, 2000);
+    } else {
+      toast.warning('Authentification à deux facteurs désactivée');
+      setTwoFactorEnabled(false);
+    }
   };
 
-  const handleDeleteAccount = () => {
-    toast.error('Cette action nécessite une confirmation par email. Vérifiez votre boîte mail.');
+  const exportSecurityData = () => {
+    toast.success('Export des données de sécurité initié');
   };
 
-  const terminateSession = (index: number) => {
-    toast.success('Session terminée avec succès');
+  const deleteAccount = () => {
+    toast.error('Fonctionnalité de suppression de compte - confirmation requise');
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        <div className="flex items-center gap-3">
-          <Shield className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold">Sécurité et Confidentialité</h1>
-            <p className="text-muted-foreground">Gérez la sécurité de votre compte et vos données personnelles</p>
-          </div>
-        </div>
-
-        {/* Statut de sécurité */}
-        <Card className="border-green-200 bg-green-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-6 w-6 text-green-600" />
-              <div>
-                <h3 className="font-semibold text-green-800">Compte sécurisé</h3>
-                <p className="text-sm text-green-700">
-                  Toutes les mesures de sécurité recommandées sont activées
-                </p>
-              </div>
-              <Badge className="ml-auto bg-green-600">Excellent</Badge>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Shield className="h-8 w-8 text-blue-600" />
             </div>
-          </CardContent>
-        </Card>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Sécurité & Confidentialité
+            </h1>
+          </div>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Gérez vos paramètres de sécurité et protégez votre compte avec des mesures de protection avancées.
+          </p>
+        </motion.div>
 
-        <Tabs defaultValue="password" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="password">Mot de passe</TabsTrigger>
-            <TabsTrigger value="security">Sécurité</TabsTrigger>
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="password" className="space-y-4">
-            <Card>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Security Settings */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Security Status Overview */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5" />
-                  Changer le mot de passe
+                  <Shield className="h-5 w-5 text-green-600" />
+                  État de la Sécurité
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg mb-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                    <div>
+                      <h3 className="font-medium text-green-800">Compte Sécurisé</h3>
+                      <p className="text-sm text-green-600">Toutes les mesures de sécurité sont activées</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800">85% Sécurisé</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <Lock className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <h4 className="font-medium text-blue-800">Chiffrement</h4>
+                    <p className="text-sm text-blue-600">AES-256</p>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <Key className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                    <h4 className="font-medium text-purple-800">2FA</h4>
+                    <p className="text-sm text-purple-600">{twoFactorEnabled ? 'Activé' : 'Désactivé'}</p>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <Globe className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                    <h4 className="font-medium text-orange-800">Sessions</h4>
+                    <p className="text-sm text-orange-600">2 actives</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Password Change */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="h-5 w-5 text-blue-600" />
+                  Changer le Mot de Passe
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="current-password">Mot de passe actuel</Label>
+                    <label className="text-sm font-medium text-gray-700">Mot de passe actuel</label>
                     <div className="relative">
                       <Input
-                        id="current-password"
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={passwordForm.current}
-                        onChange={(e) => setPasswordForm({...passwordForm, current: e.target.value})}
-                        required
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        placeholder="Mot de passe actuel"
                       />
                       <Button
-                        type="button"
                         variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        size="sm"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                       >
                         {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                    <label className="text-sm font-medium text-gray-700">Nouveau mot de passe</label>
                     <div className="relative">
                       <Input
-                        id="new-password"
-                        type={showNewPassword ? "text" : "password"}
-                        value={passwordForm.new}
-                        onChange={(e) => setPasswordForm({...passwordForm, new: e.target.value})}
-                        required
+                        type={showNewPassword ? 'text' : 'password'}
+                        placeholder="Nouveau mot de passe"
                       />
                       <Button
-                        type="button"
                         variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        size="sm"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
                         onClick={() => setShowNewPassword(!showNewPassword)}
                       >
                         {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirmer le nouveau mot de passe</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      value={passwordForm.confirm}
-                      onChange={(e) => setPasswordForm({...passwordForm, confirm: e.target.value})}
-                      required
-                    />
-                  </div>
-
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <h4 className="font-medium mb-2">Exigences du mot de passe :</h4>
-                    <ul className="text-sm space-y-1 text-muted-foreground">
-                      <li>• Au moins 8 caractères</li>
-                      <li>• Une lettre majuscule et une minuscule</li>
-                      <li>• Au moins un chiffre</li>
-                      <li>• Un caractère spécial (!@#$%^&*)</li>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-gray-600">
+                    <p>Le mot de passe doit contenir :</p>
+                    <ul className="list-disc list-inside text-xs mt-1 space-y-1">
+                      <li>Au moins 8 caractères</li>
+                      <li>Une majuscule et une minuscule</li>
+                      <li>Un chiffre et un caractère spécial</li>
                     </ul>
                   </div>
-
-                  <Button type="submit" className="w-full">
-                    Changer le mot de passe
+                  <Button onClick={handlePasswordChange} className="bg-blue-600 hover:bg-blue-700">
+                    Mettre à jour
                   </Button>
-                </form>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="security" className="space-y-4">
-            <Card>
+            {/* Security Settings */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Paramètres de sécurité</CardTitle>
+                <CardTitle>Paramètres de Sécurité</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Authentification à deux facteurs (2FA)</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Ajoutez une couche de sécurité supplémentaire avec votre téléphone
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={securitySettings.twoFactorAuth}
-                      onCheckedChange={(checked) => 
-                        setSecuritySettings(prev => ({ ...prev, twoFactorAuth: checked }))
-                      }
-                    />
-                    {securitySettings.twoFactorAuth && (
-                      <Badge variant="secondary">Activé</Badge>
-                    )}
-                  </div>
-                </div>
-
-                {securitySettings.twoFactorAuth && (
-                  <Card className="bg-muted/50">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Smartphone className="h-5 w-5 text-green-600" />
-                        <div>
-                          <p className="font-medium">Configuré avec l'application Authenticator</p>
-                          <p className="text-sm text-muted-foreground">
-                            Téléphone se terminant par ****23
-                          </p>
-                        </div>
-                        <Button variant="outline" size="sm" className="ml-auto">
-                          Modifier
-                        </Button>
+                {securitySettings.map((setting) => (
+                  <div key={setting.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded-lg ${
+                        setting.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {setting.icon}
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Notifications de connexion</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Recevez un email lors de nouvelles connexions
-                    </p>
+                      <div>
+                        <h3 className="font-medium text-gray-800">{setting.title}</h3>
+                        <p className="text-sm text-gray-600">{setting.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge variant={setting.status === 'active' ? 'default' : 'secondary'}>
+                        {setting.status === 'active' ? 'Actif' : 'Inactif'}
+                      </Badge>
+                      <Switch
+                        checked={setting.enabled}
+                        onCheckedChange={setting.id === 'two-factor' ? handleTwoFactorSetup : setting.onToggle}
+                      />
+                    </div>
                   </div>
-                  <Switch
-                    checked={securitySettings.loginNotifications}
-                    onCheckedChange={(checked) => 
-                      setSecuritySettings(prev => ({ ...prev, loginNotifications: checked }))
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Chiffrement des données</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Chiffrement de bout en bout de vos données sensibles
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={securitySettings.dataEncryption}
-                      disabled
-                    />
-                    <Badge>Obligatoire</Badge>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="session-timeout">Expiration de session (minutes)</Label>
-                  <select
-                    id="session-timeout"
-                    value={securitySettings.sessionTimeout}
-                    onChange={(e) => setSecuritySettings(prev => ({ ...prev, sessionTimeout: e.target.value }))}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="15">15 minutes</option>
-                    <option value="30">30 minutes</option>
-                    <option value="60">1 heure</option>
-                    <option value="120">2 heures</option>
-                    <option value="0">Jamais</option>
-                  </select>
-                </div>
+                ))}
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="sessions" className="space-y-4">
-            <Card>
+            {/* Recent Activity */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Sessions actives</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-gray-600" />
+                  Activité Récente
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentSessions.map((session, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-muted rounded-lg">
-                          <Smartphone className="h-4 w-4" />
+                  {recentActivity.map((activity) => (
+                    <div key={activity.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-full ${
+                          activity.status === 'success' ? 'bg-green-100' : 
+                          activity.status === 'warning' ? 'bg-yellow-100' : 'bg-red-100'
+                        }`}>
+                          {activity.status === 'success' ? (
+                            <CheckCircle className={`h-4 w-4 ${
+                              activity.status === 'success' ? 'text-green-600' : 
+                              activity.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                            }`} />
+                          ) : (
+                            <AlertTriangle className={`h-4 w-4 ${
+                              activity.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                            }`} />
+                          )}
                         </div>
                         <div>
-                          <p className="font-medium">{session.device}</p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {session.location}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {session.time}
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground">IP: {session.ip}</p>
+                          <h4 className="font-medium text-gray-800">{activity.action}</h4>
+                          <p className="text-sm text-gray-600">{activity.device} • {activity.location}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {session.current ? (
-                          <Badge variant="secondary">Session actuelle</Badge>
-                        ) : (
-                          <Button
-                            onClick={() => terminateSession(index)}
-                            variant="outline"
-                            size="sm"
-                          >
-                            Terminer
-                          </Button>
-                        )}
+                      <div className="text-right">
+                        <p className="text-sm text-gray-500">{activity.timestamp}</p>
+                        <Badge variant={
+                          activity.status === 'success' ? 'default' : 
+                          activity.status === 'warning' ? 'secondary' : 'destructive'
+                        }>
+                          {activity.status === 'success' ? 'Succès' : 
+                           activity.status === 'warning' ? 'Attention' : 'Échec'}
+                        </Badge>
                       </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
 
-          <TabsContent value="privacy" className="space-y-4">
-            <Card>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle>Gestion des données</CardTitle>
+                <CardTitle className="text-lg">Actions Rapides</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Mode anonyme</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Vos interactions sociales seront complètement anonymes
-                    </p>
-                  </div>
-                  <Switch
-                    checked={securitySettings.anonymousMode}
-                    onCheckedChange={(checked) => 
-                      setSecuritySettings(prev => ({ ...prev, anonymousMode: checked }))
-                    }
-                  />
-                </div>
+              <CardContent className="space-y-3">
+                <Button variant="outline" className="w-full justify-start" onClick={exportSecurityData}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exporter les données
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <Globe className="h-4 w-4 mr-2" />
+                  Sessions actives
+                </Button>
+                <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer le compte
+                </Button>
+              </CardContent>
+            </Card>
 
-                <div className="border-t pt-6">
-                  <h4 className="font-medium mb-4">Gestion des données personnelles</h4>
-                  <div className="space-y-3">
-                    <Button
-                      onClick={handleExportData}
-                      variant="outline"
-                      className="w-full justify-start"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Exporter mes données (RGPD)
-                    </Button>
-                    
-                    <div className="bg-muted/50 p-4 rounded-lg">
-                      <h5 className="font-medium mb-2">Données collectées :</h5>
-                      <ul className="text-sm space-y-1 text-muted-foreground">
-                        <li>• Données de profil et préférences</li>
-                        <li>• Historique des sessions et activités</li>
-                        <li>• Données émotionnelles anonymisées</li>
-                        <li>• Statistiques d'utilisation</li>
-                      </ul>
-                    </div>
-                  </div>
+            {/* Security Tips */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg">Conseils de Sécurité</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-gray-600">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p>Utilisez un mot de passe unique et complexe</p>
                 </div>
-
-                <div className="border-t pt-6">
-                  <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-                      <div className="flex-1">
-                        <h4 className="font-medium text-red-800 mb-2">Zone de danger</h4>
-                        <p className="text-sm text-red-700 mb-4">
-                          La suppression de votre compte est définitive et irréversible. 
-                          Toutes vos données seront supprimées.
-                        </p>
-                        <Button
-                          onClick={handleDeleteAccount}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          Supprimer définitivement mon compte
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p>Activez l'authentification à deux facteurs</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p>Vérifiez régulièrement votre activité</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p>Ne partagez jamais vos identifiants</p>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </motion.div>
+
+            {/* Contact Support */}
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg">Besoin d'Aide ?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Notre équipe sécurité est là pour vous aider en cas de problème.
+                </p>
+                <Button variant="outline" className="w-full">
+                  Contacter le Support
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
