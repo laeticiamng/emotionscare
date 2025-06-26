@@ -16,6 +16,12 @@ const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage'));
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+
+// B2C Pages
+const B2CLoginPage = lazy(() => import('@/pages/b2c/LoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/b2c/RegisterPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/b2c/DashboardPage'));
 
 // B2B Pages
 const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/LoginPage'));
@@ -31,6 +37,26 @@ export function buildUnifiedRoutes(): RouteObject[] {
     
     // User routes (B2C, B2B)
     ...userRoutes,
+    
+    // B2C routes
+    {
+      path: '/b2c/login',
+      element: <B2CLoginPage />,
+    },
+    {
+      path: '/b2c/register',
+      element: <B2CRegisterPage />,
+    },
+    {
+      path: '/b2c/dashboard',
+      element: <B2CDashboardPage />,
+    },
+    
+    // B2B Selection
+    {
+      path: '/b2b/selection',
+      element: <B2BSelectionPage />,
+    },
     
     // B2B User routes
     {
