@@ -1,43 +1,62 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Heart, Send, Bot, User, Lightbulb, MessageCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Brain, Send, Sparkles, Heart, Lightbulb, Target, MessageCircle, Smile } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
-  id: number;
-  text: string;
+  id: string;
+  content: string;
   sender: 'user' | 'coach';
   timestamp: Date;
+  mood?: string;
 }
 
 const CoachPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: 1,
-      text: "Bonjour ! Je suis votre coach IA personnel. Comment vous sentez-vous aujourd'hui ?",
+      id: '1',
+      content: "Bonjour ! Je suis Emma, votre coach en bien-être émotionnel. Je suis ravie de vous accompagner aujourd'hui. Comment vous sentez-vous en ce moment ?",
       sender: 'coach',
-      timestamp: new Date()
+      timestamp: new Date(),
+      mood: 'welcoming'
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [coachMood, setCoachMood] = useState('welcoming');
 
-  const quickQuestions = [
-    "Comment gérer mon stress ?",
-    "J'ai du mal à dormir",
-    "Je me sens anxieux",
-    "Comment améliorer ma motivation ?"
+  const coachResponses = [
+    "C'est merveilleux d'entendre cela ! Maintenir un état d'esprit positif est essentiel pour votre bien-être.",
+    "Je comprends que vous puissiez vous sentir ainsi. Parlons de ce qui vous préoccupe et trouvons ensemble des solutions.",
+    "Il est tout à fait normal de ressentir cela. Votre ressenti est valide et important.",
+    "Excellente question ! Laissez-moi vous donner quelques conseils personnalisés basés sur votre situation.",
+    "Je suis là pour vous accompagner. Ensemble, nous pouvons surmonter ces défis.",
+    "Votre bien-être est ma priorité. Que puis-je faire pour vous aider davantage aujourd'hui ?",
+    "Bravo pour avoir pris cette initiative ! Prendre soin de soi est un acte de courage.",
+    "Je remarque que vous progressez. C'est formidable de voir votre engagement envers votre bien-être."
   ];
 
-  const handleSendMessage = async () => {
+  const suggestions = [
+    "Comment gérer le stress au travail ?",
+    "Techniques de relaxation rapide",
+    "Améliorer mon sommeil",
+    "Retrouver ma motivation",
+    "Gérer mes émotions",
+    "Exercices de respiration"
+  ];
+
+  const sendMessage = () => {
     if (!inputMessage.trim()) return;
 
     const userMessage: Message = {
-      id: messages.length + 1,
-      text: inputMessage,
+      id: Date.now().toString(),
+      content: inputMessage,
       sender: 'user',
       timestamp: new Date()
     };
@@ -46,244 +65,215 @@ const CoachPage: React.FC = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulation de réponse du coach
+    // Simulate coach response
     setTimeout(() => {
-      const responses = [
-        "Je comprends votre préoccupation. Voici quelques conseils personnalisés pour vous aider...",
-        "C'est tout à fait normal de ressentir cela. Essayons ensemble quelques techniques de relaxation.",
-        "Votre bien-être est important. Je vais vous proposer des exercices adaptés à votre situation.",
-        "Prenons le temps d'analyser cette situation et de trouver des solutions ensemble."
-      ];
-
       const coachResponse: Message = {
-        id: messages.length + 2,
-        text: responses[Math.floor(Math.random() * responses.length)],
+        id: (Date.now() + 1).toString(),
+        content: coachResponses[Math.floor(Math.random() * coachResponses.length)],
         sender: 'coach',
-        timestamp: new Date()
+        timestamp: new Date(),
+        mood: 'supportive'
       };
-
+      
       setMessages(prev => [...prev, coachResponse]);
       setIsTyping(false);
     }, 2000);
   };
 
-  const handleQuickQuestion = (question: string) => {
-    setInputMessage(question);
+  const sendSuggestion = (suggestion: string) => {
+    setInputMessage(suggestion);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div 
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
         >
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4">
-            <Heart className="h-8 w-8 text-white" />
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Brain className="h-8 w-8 text-purple-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Coach IA Emma
+            </h1>
+            <Sparkles className="h-8 w-8 text-pink-600" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Coach IA Personnel
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Votre accompagnement bien-être personnalisé disponible 24h/24
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Votre accompagnatrice personnelle pour le bien-être émotionnel et mental
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Coach Profile */}
+          <div className="lg:col-span-1">
+            <Card className="glass-card sticky top-4">
+              <CardContent className="p-6 text-center">
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-purple-200">
+                    <AvatarImage src="/api/placeholder/96/96" alt="Coach Emma" />
+                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-2xl">
+                      E
+                    </AvatarFallback>
+                  </Avatar>
+                </motion.div>
+                
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Emma</h3>
+                <p className="text-sm text-gray-600 mb-4">Coach en Bien-être Émotionnel</p>
+                
+                <div className="space-y-2 mb-6">
+                  <Badge variant="secondary" className="text-xs">
+                    <Heart className="h-3 w-3 mr-1" /> Empathique
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    <Brain className="h-3 w-3 mr-1" /> IA Avancée
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    <Target className="h-3 w-3 mr-1" /> Personnalisé
+                  </Badge>
+                </div>
+
+                <div className="text-left space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-yellow-500" />
+                    <span className="text-sm">Conseils personnalisés</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm">Écoute active 24/7</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Smile className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">Approche bienveillante</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Chat Interface */}
           <div className="lg:col-span-3">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Card className="h-[600px] flex flex-col">
-                <CardHeader className="flex-shrink-0">
-                  <CardTitle className="flex items-center gap-2">
-                    <Bot className="h-5 w-5 text-rose-500" />
-                    Conversation avec Emma
-                    <div className="ml-auto flex items-center gap-2 text-sm text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      En ligne
-                    </div>
-                  </CardTitle>
-                </CardHeader>
+            <Card className="glass-card h-[600px] flex flex-col">
+              <CardHeader className="border-b">
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-purple-600" />
+                  Conversation avec Emma
+                </CardTitle>
+                <CardDescription>
+                  Partagez vos pensées et recevez des conseils personnalisés
+                </CardDescription>
+              </CardHeader>
 
-                <CardContent className="flex-1 flex flex-col p-0">
-                  {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* Messages */}
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  <AnimatePresence>
                     {messages.map((message) => (
                       <motion.div
                         key={message.id}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className={`flex gap-3 ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
+                        exit={{ opacity: 0, y: -20 }}
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          message.sender === 'coach' 
-                            ? 'bg-rose-500 text-white' 
-                            : 'bg-blue-500 text-white'
-                        }`}>
-                          {message.sender === 'coach' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
-                        </div>
-                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                          message.sender === 'coach'
-                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                            : 'bg-rose-500 text-white'
-                        }`}>
-                          <p className="text-sm">{message.text}</p>
-                          <p className={`text-xs mt-1 ${
-                            message.sender === 'coach' 
-                              ? 'text-gray-500 dark:text-gray-400' 
-                              : 'text-rose-100'
+                        <div className={`max-w-xs lg:max-w-md ${
+                          message.sender === 'user'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                            : 'bg-white border shadow-sm'
+                        } p-4 rounded-2xl`}>
+                          {message.sender === 'coach' && (
+                            <div className="flex items-center gap-2 mb-2">
+                              <Avatar className="w-6 h-6">
+                                <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs">
+                                  E
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm font-medium text-gray-700">Emma</span>
+                            </div>
+                          )}
+                          <p className={`text-sm ${message.sender === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                            {message.content}
+                          </p>
+                          <p className={`text-xs mt-2 ${
+                            message.sender === 'user' ? 'text-purple-100' : 'text-gray-500'
                           }`}>
-                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {message.timestamp.toLocaleTimeString()}
                           </p>
                         </div>
                       </motion.div>
                     ))}
+                  </AnimatePresence>
 
-                    {isTyping && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex gap-3"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center">
-                          <Bot className="h-4 w-4" />
+                  {/* Typing Indicator */}
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-white border shadow-sm p-4 rounded-2xl">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Avatar className="w-6 h-6">
+                            <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs">
+                              E
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium text-gray-700">Emma</span>
                         </div>
-                        <div className="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
-                      </motion.div>
-                    )}
-                  </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </ScrollArea>
 
-                  {/* Input */}
-                  <div className="p-6 border-t bg-gray-50 dark:bg-gray-800/50">
-                    <div className="flex gap-2">
-                      <Input
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        placeholder="Tapez votre message..."
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                        className="flex-1"
-                      />
-                      <Button 
-                        onClick={handleSendMessage}
-                        disabled={!inputMessage.trim() || isTyping}
-                        className="bg-rose-500 hover:bg-rose-600"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+              {/* Suggestions */}
+              <div className="p-4 border-t bg-gray-50">
+                <p className="text-sm text-gray-600 mb-2">Suggestions rapides :</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {suggestions.map((suggestion, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => sendSuggestion(suggestion)}
+                      className="text-xs hover:bg-purple-50 hover:border-purple-300"
+                    >
+                      {suggestion}
+                    </Button>
+                  ))}
+                </div>
+              </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Questions */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <MessageCircle className="h-5 w-5 text-blue-500" />
-                    Questions rapides
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {quickQuestions.map((question, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-left justify-start h-auto p-3 text-xs"
-                        onClick={() => handleQuickQuestion(question)}
-                      >
-                        {question}
-                      </Button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Coach Info */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Lightbulb className="h-5 w-5 text-yellow-500" />
-                    Emma, votre coach
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center space-y-3">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center">
-                      <Bot className="h-8 w-8 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">Emma</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Coach IA spécialisée</p>
-                    </div>
-                    <div className="text-xs text-gray-500 space-y-1">
-                      <p>• Psychologie positive</p>
-                      <p>• Gestion du stress</p>
-                      <p>• Développement personnel</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Session Stats */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Votre progression</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Sessions cette semaine</span>
-                      <span className="font-semibold">5</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Temps total</span>
-                      <span className="font-semibold">2h 15min</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Mood moyen</span>
-                      <span className="font-semibold">7.2/10</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+              {/* Input */}
+              <div className="p-4 border-t">
+                <div className="flex gap-2">
+                  <Input
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    placeholder="Écrivez votre message à Emma..."
+                    className="flex-1"
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  />
+                  <Button 
+                    onClick={sendMessage}
+                    disabled={!inputMessage.trim() || isTyping}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
