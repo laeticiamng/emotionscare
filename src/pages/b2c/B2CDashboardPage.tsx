@@ -1,134 +1,102 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmotionalStatsWidget } from '@/components/dashboard/b2c/widgets/EmotionalStatsWidget';
+import { QuickActionsWidget } from '@/components/dashboard/b2c/widgets/QuickActionsWidget';
+import { GoalsProgressWidget } from '@/components/dashboard/b2c/widgets/GoalsProgressWidget';
+import { RecentActivityWidget } from '@/components/dashboard/b2c/widgets/RecentActivityWidget';
+import { MoodTrendWidget } from '@/components/dashboard/b2c/widgets/MoodTrendWidget';
+import { WeeklyInsightsWidget } from '@/components/dashboard/b2c/widgets/WeeklyInsightsWidget';
+import { PersonalizedRecommendationsWidget } from '@/components/dashboard/b2c/widgets/PersonalizedRecommendationsWidget';
 import { Button } from '@/components/ui/button';
-import { Heart, Music, MessageCircle, BookOpen, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { Bell, Settings, Calendar, Users } from 'lucide-react';
 
 const B2CDashboardPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    toast.success('Déconnexion réussie');
-    navigate('/');
-  };
-
-  const modules = [
-    {
-      id: 'scan',
-      title: 'Scan Émotionnel',
-      description: 'Analysez votre état émotionnel',
-      icon: Heart,
-      buttonText: 'Démarrer',
-      buttonColor: 'bg-pink-500 hover:bg-pink-600',
-      path: '/emotions',
-      action: () => navigate('/emotions')
-    },
-    {
-      id: 'music',
-      title: 'Musicothérapie',
-      description: 'Musique adaptée à votre humeur',
-      icon: Music,
-      buttonText: 'Écouter',
-      buttonColor: 'bg-purple-500 hover:bg-purple-600',
-      path: '/music',
-      action: () => navigate('/music')
-    },
-    {
-      id: 'coach',
-      title: 'Coach Virtuel',
-      description: 'Assistance personnalisée 24h/24',
-      icon: MessageCircle,
-      buttonText: 'Discuter',
-      buttonColor: 'bg-blue-500 hover:bg-blue-600',
-      path: '/coach',
-      action: () => navigate('/coach')
-    },
-    {
-      id: 'journal',
-      title: 'Journal Émotionnel',
-      description: 'Suivez votre évolution quotidienne',
-      icon: BookOpen,
-      buttonText: 'Ouvrir',
-      buttonColor: 'bg-green-500 hover:bg-green-600',
-      path: '/journal',
-      action: () => navigate('/journal')
-    },
-    {
-      id: 'preferences',
-      title: 'Préférences',
-      description: 'Personnalisez votre expérience',
-      icon: Settings,
-      buttonText: 'Configurer',
-      buttonColor: 'bg-gray-500 hover:bg-gray-600',
-      path: '/settings',
-      action: () => navigate('/settings')
-    }
-  ];
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-indigo-900/20">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord Particulier</h1>
-            <p className="text-gray-600 mt-2">Bienvenue</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              Bonjour, Sarah ! 👋
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Voici votre tableau de bord personnel EmotionsCare
+            </p>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <LogOut className="h-4 w-4" />
-            Déconnexion
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Calendar className="h-4 w-4 mr-2" />
+              Planifier
+            </Button>
+            <Button variant="outline" size="sm">
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+            </Button>
+            <Button variant="outline" size="sm">
+              <Settings className="h-4 w-4 mr-2" />
+              Paramètres
+            </Button>
+          </div>
         </div>
 
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((module) => (
-            <Card key={module.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center pb-4">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 rounded-full bg-gray-100">
-                    <module.icon className="h-8 w-8 text-gray-700" />
-                  </div>
-                </div>
-                <CardTitle className="text-xl">{module.title}</CardTitle>
-                <CardDescription className="text-gray-600">
-                  {module.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <Button
-                  onClick={module.action}
-                  className={`w-full text-white ${module.buttonColor}`}
-                >
-                  {module.buttonText}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Quick Status */}
+        <Card className="mb-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold mb-2">État Émotionnel Actuel</h2>
+                <p className="text-blue-100">Calme et Concentré - Score: 82/100</p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold">82%</div>
+                <div className="text-blue-100 text-sm">+7% cette semaine</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            <MoodTrendWidget />
+            <PersonalizedRecommendationsWidget />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            <EmotionalStatsWidget />
+            <QuickActionsWidget />
+            <GoalsProgressWidget />
+          </div>
         </div>
 
-        {/* Quick Stats or Welcome Message */}
+        {/* Bottom Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <WeeklyInsightsWidget />
+          <RecentActivityWidget />
+        </div>
+
+        {/* Community Section */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Bienvenue sur EmotionsCare</CardTitle>
-            <CardDescription>
-              Votre plateforme de bien-être émotionnel personnalisée
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Communauté Bien-être
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">
-              Explorez nos différents modules pour améliorer votre bien-être quotidien.
-              Chaque outil est conçu pour vous accompagner dans votre parcours de développement personnel.
-            </p>
+            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+              <div>
+                <h3 className="font-medium">Rejoignez le Social Cocon</h3>
+                <p className="text-sm text-muted-foreground">
+                  Partagez anonymement avec d'autres personnes dans votre situation
+                </p>
+              </div>
+              <Button>Découvrir</Button>
+            </div>
           </CardContent>
         </Card>
       </div>

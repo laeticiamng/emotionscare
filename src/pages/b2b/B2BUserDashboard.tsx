@@ -1,182 +1,183 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { TeamMoodWidget } from '@/components/dashboard/b2b/widgets/TeamMoodWidget';
+import { TeamObjectivesWidget } from '@/components/dashboard/b2b/widgets/TeamObjectivesWidget';
+import { EmotionalStatsWidget } from '@/components/dashboard/b2c/widgets/EmotionalStatsWidget';
+import { QuickActionsWidget } from '@/components/dashboard/b2c/widgets/QuickActionsWidget';
+import { MoodTrendWidget } from '@/components/dashboard/b2c/widgets/MoodTrendWidget';
 import { 
-  Heart, 
+  Building2, 
   Users, 
   TrendingUp, 
+  MessageCircle, 
   Calendar,
-  Activity,
-  Music,
-  BookOpen,
-  Headphones,
-  Clock,
-  ArrowRight
+  Bell,
+  BarChart3,
+  Shield
 } from 'lucide-react';
 
 const B2BUserDashboard: React.FC = () => {
-  const navigate = useNavigate();
-
-  const stats = [
-    { 
-      title: 'Scans émotionnels', 
-      value: '12', 
-      subtitle: 'Cette semaine', 
-      icon: Heart,
-      action: () => navigate('/emotions')
-    },
-    { 
-      title: 'Séances de coaching', 
-      value: '8', 
-      subtitle: 'Ce mois', 
-      icon: Users,
-      action: () => navigate('/coach')
-    },
-    { 
-      title: 'Bien-être moyen', 
-      value: '7,2/10', 
-      subtitle: '+0,5 par rapport au dernier mois', 
-      icon: TrendingUp
-    },
-    { 
-      title: 'Prochaine séance', 
-      value: '2h', 
-      subtitle: 'Coaching 1:1', 
-      icon: Calendar
-    }
-  ];
-
-  const features = [
-    {
-      title: 'Scan émotionnel',
-      description: 'Analysez votre état émotionnel quotidien',
-      icon: Activity,
-      action: () => navigate('/emotions')
-    },
-    {
-      title: 'Thérapie musicale',
-      description: 'Playlist personnalisée selon votre humeur',
-      icon: Music,
-      action: () => navigate('/music')
-    },
-    {
-      title: 'Personnel du journal',
-      description: 'Suivez votre progression au quotidien',
-      icon: BookOpen,
-      action: () => navigate('/journal')
-    }
-  ];
-
-  const recommendations = [
-    {
-      title: 'Séance de méditation',
-      description: 'Basée sur vos derniers résultats de scan émotionnels',
-      color: 'bg-blue-100 text-blue-800',
-      action: () => navigate('/music')
-    },
-    {
-      title: 'Exercice de respiration',
-      description: 'Pour réduire le stress identifié',
-      color: 'bg-green-100 text-green-800',
-      action: () => navigate('/emotions')
-    },
-    {
-      title: 'Playlist énergisante',
-      description: 'Pour améliorer votre motivation',
-      color: 'bg-purple-100 text-purple-800',
-      action: () => navigate('/music')
-    }
-  ];
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Tableau de bord utilisateur B2B</h1>
-          <p className="text-gray-600">Bienvenue dans votre espace professionnel de bien-être</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Tableau de Bord Collaborateur
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Votre bien-être personnel et celui de votre équipe
+            </p>
+            <div className="flex items-center gap-2 mt-3">
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Building2 className="h-3 w-3" />
+                TechCorp - Équipe Marketing
+              </Badge>
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Users className="h-3 w-3" />
+                12 collaborateurs
+              </Badge>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Calendar className="h-4 w-4 mr-2" />
+              Planning
+            </Button>
+            <Button variant="outline" size="sm">
+              <Bell className="h-4 w-4 mr-2" />
+              Alertes RH
+            </Button>
+          </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <Card 
-              key={index} 
-              className={`cursor-pointer hover:shadow-lg transition-all duration-300 ${stat.action ? 'hover:scale-105' : ''}`}
-              onClick={stat.action}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <stat.icon className="h-8 w-8 text-blue-600" />
-                  {stat.action && <ArrowRight className="h-4 w-4 text-gray-400" />}
+        {/* Status Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm">Mon Score</p>
+                  <p className="text-2xl font-bold">85%</p>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-sm font-medium text-gray-900">{stat.title}</p>
-                  <p className="text-xs text-gray-500">{stat.subtitle}</p>
+                <TrendingUp className="h-8 w-8 text-green-200" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm">Score Équipe</p>
+                  <p className="text-2xl font-bold">78%</p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <Users className="h-8 w-8 text-blue-200" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm">Engagement</p>
+                  <p className="text-2xl font-bold">92%</p>
+                </div>
+                <BarChart3 className="h-8 w-8 text-purple-200" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Fonctionnalités disponibles */}
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Personal Section */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Mon Espace Personnel
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <EmotionalStatsWidget />
+                <QuickActionsWidget />
+              </div>
+            </div>
+            
+            <MoodTrendWidget />
+          </div>
+
+          {/* Team Section */}
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Équipe Marketing
+              </h2>
+              <TeamMoodWidget />
+            </div>
+            
+            <TeamObjectivesWidget />
+          </div>
+        </div>
+
+        {/* Collaboration Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Headphones className="h-5 w-5 mr-2" />
-                Fonctionnalités disponibles
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Messages RH
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {features.map((feature, index) => (
-                <div 
-                  key={index}
-                  className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                  onClick={feature.action}
-                >
-                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <feature.icon className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-gray-900">{feature.title}</h3>
-                    <p className="text-sm text-gray-500">{feature.description}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-gray-400" />
+            <CardContent>
+              <div className="space-y-3">
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <h4 className="font-medium text-sm">Nouvelle enquête bien-être</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Participez à notre enquête mensuelle - 2 minutes
+                  </p>
+                  <Button size="sm" className="mt-2">Participer</Button>
                 </div>
-              ))}
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <h4 className="font-medium text-sm">Atelier gestion du stress</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Inscrivez-vous pour la session du 15 mars
+                  </p>
+                  <Button size="sm" variant="outline" className="mt-2">S'inscrire</Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Recommandations personnalisées */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Clock className="h-5 w-5 mr-2" />
-                Recommandations personnalisées
-              </CardTitle>
+              <CardTitle>Comparaison Anonyme</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {recommendations.map((rec, index) => (
-                <div 
-                  key={index}
-                  className="p-4 rounded-lg border hover:shadow-md cursor-pointer transition-all"
-                  onClick={rec.action}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium">{rec.title}</h3>
-                    <Badge className={rec.color}>Recommandé</Badge>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
-                  <Button size="sm" variant="outline" className="w-full">
-                    Commencer <ArrowRight className="h-3 w-3 ml-1" />
-                  </Button>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Votre score vs équipe</span>
+                  <Badge variant="secondary">+7 points</Badge>
                 </div>
-              ))}
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Votre score vs département</span>
+                  <Badge variant="secondary">+3 points</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Votre score vs entreprise</span>
+                  <Badge variant="secondary">+5 points</Badge>
+                </div>
+                <div className="text-xs text-muted-foreground pt-2 border-t">
+                  <Shield className="inline h-3 w-3 mr-1" />
+                  Données complètement anonymisées
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
