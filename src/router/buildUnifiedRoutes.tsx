@@ -1,169 +1,324 @@
-
-import React from 'react';
-import { RouteObject } from 'react-router-dom';
-import OptimizedLayout from '@/components/layout/OptimizedLayout';
+import { lazy } from 'react';
+import { RouteObject, Navigate } from 'react-router-dom';
+import Layout from '@/components/layout/Layout';
 import AuthGuard from '@/components/auth/AuthGuard';
+import { OFFICIAL_ROUTES } from '@/routesManifest';
 
-// Import des pages
-const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
-const B2BSelectionPage = React.lazy(() => import('@/pages/B2BSelectionPage'));
-const B2CLoginPage = React.lazy(() => import('@/pages/auth/B2CLoginPage'));
-const B2CRegisterPage = React.lazy(() => import('@/pages/auth/B2CRegisterPage'));
-const B2BUserLoginPage = React.lazy(() => import('@/pages/auth/B2BUserLoginPage'));
-const B2BUserRegisterPage = React.lazy(() => import('@/pages/auth/B2BUserRegisterPage'));
-const B2BAdminLoginPage = React.lazy(() => import('@/pages/auth/B2BAdminLoginPage'));
-const B2CDashboardPage = React.lazy(() => import('@/pages/dashboards/B2CDashboardPage'));
-const B2BUserDashboardPage = React.lazy(() => import('@/pages/dashboards/B2BUserDashboardPage'));
-const B2BAdminDashboardPage = React.lazy(() => import('@/pages/dashboards/B2BAdminDashboardPage'));
-const HelpCenterPage = React.lazy(() => import('@/pages/HelpCenterPage'));
-const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
-const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
-const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
-const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
-const VRPage = React.lazy(() => import('@/pages/VRPage'));
-const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
-const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
-const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
-const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
+// Import des pages existantes
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 
-// 404 Page
-const NotFoundPage = () => (
-  <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">404 - Page introuvable</h1>
-      <p className="text-gray-600 mb-8">La page que vous recherchez n'existe pas.</p>
-      <a href="/" className="text-blue-600 hover:text-blue-700 underline">
-        Retour à l'accueil
-      </a>
-    </div>
-  </div>
-);
+// Pages d'authentification
+const B2CLoginPage = lazy(() => import('@/pages/auth/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/auth/B2CRegisterPage'));
+const B2BUserLoginPage = lazy(() => import('@/pages/auth/B2BUserLoginPage'));
+const B2BUserRegisterPage = lazy(() => import('@/pages/auth/B2BUserRegisterPage'));
+const B2BAdminLoginPage = lazy(() => import('@/pages/auth/B2BAdminLoginPage'));
 
-// Manifeste des routes pour les tests
-export const ROUTE_MANIFEST = [
-  '/',
-  '/choose-mode',
-  '/b2c/login',
-  '/b2c/register',
-  '/b2c/dashboard',
-  '/b2b/selection',
-  '/b2b/user/login',
-  '/b2b/user/register',
-  '/b2b/user/dashboard',
-  '/b2b/admin/login',
-  '/b2b/admin/dashboard',
-  '/scan',
-  '/music',
-  '/coach',
-  '/journal',
-  '/vr',
-  '/gamification',
-  '/profile',
-  '/settings',
-  '/notifications',
-  '/help-center'
-];
+// Dashboards
+const B2CDashboardPage = lazy(() => import('@/pages/dashboards/B2CDashboardPage'));
+const B2BUserDashboardPage = lazy(() => import('@/pages/dashboards/B2BUserDashboardPage'));
+const B2BAdminDashboardPage = lazy(() => import('@/pages/dashboards/B2BAdminDashboardPage'));
 
-export const buildUnifiedRoutes = (): RouteObject[] => {
+// Pages fonctionnelles principales
+const ScanPage = lazy(() => import('@/pages/ScanPage'));
+const MusicPage = lazy(() => import('@/pages/MusicPage'));
+const CoachPage = lazy(() => import('@/pages/CoachPage'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const VRPage = lazy(() => import('@/pages/VRPage'));
+const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
+
+// Nouvelles pages complétées
+const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
+const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
+const TeamsPage = lazy(() => import('@/pages/admin/TeamsPage'));
+const ReportsPage = lazy(() => import('@/pages/admin/ReportsPage'));
+const BreathworkPage = lazy(() => import('@/pages/features/BreathworkPage'));
+const ARFiltersPage = lazy(() => import('@/pages/features/ARFiltersPage'));
+
+// Page 404
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+
+export const ROUTE_MANIFEST = Object.values(OFFICIAL_ROUTES);
+
+export function buildUnifiedRoutes(): RouteObject[] {
   return [
     {
       path: '/',
-      element: (
-        <AuthGuard>
-          <OptimizedLayout />
-        </AuthGuard>
-      ),
+      element: <Layout />,
       children: [
-        {
-          index: true,
-          element: <HomePage />
+        // Routes publiques
+        { 
+          path: OFFICIAL_ROUTES.HOME, 
+          element: <HomePage /> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.CHOOSE_MODE, 
+          element: <ChooseModePage /> 
         },
         {
-          path: 'choose-mode',
-          element: <ChooseModePage />
+          path: OFFICIAL_ROUTES.B2B,
+          element: <Navigate to={OFFICIAL_ROUTES.B2B_SELECTION} replace />
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_SELECTION, 
+          element: <B2BSelectionPage /> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.HELP_CENTER, 
+          element: <HelpCenterPage /> 
+        },
+
+        // Pages d'authentification
+        { 
+          path: OFFICIAL_ROUTES.B2C_LOGIN, 
+          element: <B2CLoginPage /> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2C_REGISTER, 
+          element: <B2CRegisterPage /> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_USER_LOGIN, 
+          element: <B2BUserLoginPage /> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_USER_REGISTER, 
+          element: <B2BUserRegisterPage /> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_ADMIN_LOGIN, 
+          element: <B2BAdminLoginPage /> 
+        },
+
+        // Routes protégées - Dashboards
+        {
+          path: OFFICIAL_ROUTES.B2C_DASHBOARD,
+          element: (
+            <AuthGuard>
+              <B2CDashboardPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2c/login',
-          element: <B2CLoginPage />
+          path: OFFICIAL_ROUTES.B2B_USER_DASHBOARD,
+          element: (
+            <AuthGuard>
+              <B2BUserDashboardPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2c/register',
-          element: <B2CRegisterPage />
+          path: OFFICIAL_ROUTES.B2B_ADMIN_DASHBOARD,
+          element: (
+            <AuthGuard>
+              <B2BAdminDashboardPage />
+            </AuthGuard>
+          )
+        },
+
+        // Routes protégées - Fonctionnalités principales
+        {
+          path: OFFICIAL_ROUTES.SCAN,
+          element: (
+            <AuthGuard>
+              <ScanPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2c/dashboard',
-          element: <B2CDashboardPage />
+          path: OFFICIAL_ROUTES.MUSIC,
+          element: (
+            <AuthGuard>
+              <MusicPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2b/selection',
-          element: <B2BSelectionPage />
+          path: '/coach',
+          element: (
+            <AuthGuard>
+              <CoachPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2b/user/login',
-          element: <B2BUserLoginPage />
+          path: '/journal',
+          element: (
+            <AuthGuard>
+              <JournalPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2b/user/register',
-          element: <B2BUserRegisterPage />
+          path: OFFICIAL_ROUTES.VR,
+          element: (
+            <AuthGuard>
+              <VRPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2b/user/dashboard',
-          element: <B2BUserDashboardPage />
+          path: OFFICIAL_ROUTES.GAMIFICATION,
+          element: (
+            <AuthGuard>
+              <GamificationPage />
+            </AuthGuard>
+          )
+        },
+
+        // Routes protégées - Profil et paramètres
+        {
+          path: '/profile',
+          element: (
+            <AuthGuard>
+              <ProfilePage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2b/admin/login',
-          element: <B2BAdminLoginPage />
+          path: OFFICIAL_ROUTES.SETTINGS,
+          element: (
+            <AuthGuard>
+              <SettingsPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'b2b/admin/dashboard',
-          element: <B2BAdminDashboardPage />
+          path: OFFICIAL_ROUTES.NOTIFICATIONS,
+          element: (
+            <AuthGuard>
+              <NotificationsPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'scan',
-          element: <ScanPage />
+          path: OFFICIAL_ROUTES.PREFERENCES,
+          element: (
+            <AuthGuard>
+              <PreferencesPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'music',
-          element: <MusicPage />
+          path: OFFICIAL_ROUTES.SOCIAL_COCON,
+          element: (
+            <AuthGuard>
+              <SocialCoconPage />
+            </AuthGuard>
+          )
+        },
+
+        // Routes protégées - Administration B2B
+        {
+          path: OFFICIAL_ROUTES.TEAMS,
+          element: (
+            <AuthGuard>
+              <TeamsPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'coach',
-          element: <CoachPage />
+          path: OFFICIAL_ROUTES.REPORTS,
+          element: (
+            <AuthGuard>
+              <ReportsPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'journal',
-          element: <JournalPage />
+          path: OFFICIAL_ROUTES.EVENTS,
+          element: (
+            <AuthGuard>
+              <div className="min-h-screen flex items-center justify-center" data-testid="page-root">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">Gestion des Événements</h1>
+                  <p className="text-muted-foreground">Page en cours de développement</p>
+                </div>
+              </div>
+            </AuthGuard>
+          )
         },
         {
-          path: 'vr',
-          element: <VRPage />
+          path: OFFICIAL_ROUTES.OPTIMISATION,
+          element: (
+            <AuthGuard>
+              <div className="min-h-screen flex items-center justify-center" data-testid="page-root">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">Optimisation Système</h1>
+                  <p className="text-muted-foreground">Page en cours de développement</p>
+                </div>
+              </div>
+            </AuthGuard>
+          )
+        },
+
+        // Routes protégées - Fonctionnalités spécialisées
+        {
+          path: OFFICIAL_ROUTES.BREATHWORK,
+          element: (
+            <AuthGuard>
+              <BreathworkPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'gamification',
-          element: <GamificationPage />
+          path: OFFICIAL_ROUTES.AR_FILTERS,
+          element: (
+            <AuthGuard>
+              <ARFiltersPage />
+            </AuthGuard>
+          )
         },
         {
-          path: 'profile',
-          element: <ProfilePage />
+          path: OFFICIAL_ROUTES.MOOD_MIXER,
+          element: (
+            <AuthGuard>
+              <div className="min-h-screen flex items-center justify-center" data-testid="page-root">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">Mélangeur d'Humeurs</h1>
+                  <p className="text-muted-foreground">Fonctionnalité en cours de développement</p>
+                </div>
+              </div>
+            </AuthGuard>
+          )
         },
         {
-          path: 'settings',
-          element: <SettingsPage />
+          path: OFFICIAL_ROUTES.FLASH_GLOW,
+          element: (
+            <AuthGuard>
+              <div className="min-h-screen flex items-center justify-center" data-testid="page-root">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">Flash Glow</h1>
+                  <p className="text-muted-foreground">Expérience flash en cours de développement</p>
+                </div>
+              </div>
+            </AuthGuard>
+          )
         },
         {
-          path: 'notifications',
-          element: <NotificationsPage />
-        },
-        {
-          path: 'help-center',
-          element: <HelpCenterPage />
-        },
-        {
-          path: '*',
-          element: <NotFoundPage />
+          path: OFFICIAL_ROUTES.INSTANT_GLOW,
+          element: (
+            <AuthGuard>
+              <div className="min-h-screen flex items-center justify-center" data-testid="page-root">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">Instant Glow</h1>
+                  <p className="text-muted-foreground">Bien-être instantané en cours de développement</p>
+                </div>
+              </div>
+            </AuthGuard>
+          )
         }
       ]
+    },
+    {
+      path: '*',
+      element: <NotFoundPage />
     }
   ];
-};
+}
