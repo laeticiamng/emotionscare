@@ -73,4 +73,5 @@ const EmotionalHealthOverview: React.FC = () => {
   );
 };
 
+export { EmotionalHealthOverview };
 export default EmotionalHealthOverview;
