@@ -2,6 +2,7 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
+import { combineClasses } from '@/utils/mobileOptimizations';
 
 interface BreadcrumbItem {
   label: string;
@@ -72,11 +73,6 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ className = '' }) => {
   const breadcrumbs = getBreadcrumbs();
   
   if (breadcrumbs.length <= 1) return null;
-  
-  // Fonction sécurisée pour combiner les classes
-  const combineClasses = (...classes: (string | undefined | null)[]): string => {
-    return classes.filter(Boolean).join(' ');
-  };
   
   return (
     <nav className={combineClasses('flex items-center space-x-2 text-sm text-muted-foreground mb-6', className)}>

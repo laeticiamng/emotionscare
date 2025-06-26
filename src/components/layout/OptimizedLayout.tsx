@@ -22,6 +22,15 @@ const OptimizedLayout: React.FC = () => {
         console.log('⚠️ Font loading setup failed:', error);
       }
     }
+
+    // Nettoyage sécurisé des ressources
+    return () => {
+      try {
+        console.log('🧹 OptimizedLayout unmounting');
+      } catch (error) {
+        console.log('⚠️ Cleanup failed:', error);
+      }
+    };
   }, []);
 
   return (

@@ -14,7 +14,7 @@ const PerformanceMonitor: React.FC = () => {
     }
 
     try {
-      // Surveillance des performances avec protection d'erreurs
+      // Surveillance des performances avec protection d'erreurs renforcée
       if ('PerformanceObserver' in window) {
         const observer = new PerformanceObserver((list) => {
           try {
@@ -23,7 +23,7 @@ const PerformanceMonitor: React.FC = () => {
               if (entry.entryType === 'navigation') {
                 setMetrics(prev => ({
                   ...prev,
-                  loadTime: Math.round(entry.duration)
+                  loadTime: Math.round(entry.duration || 0)
                 }));
               }
             });
@@ -42,7 +42,7 @@ const PerformanceMonitor: React.FC = () => {
         try {
           if ('memory' in performance) {
             const memory = (performance as any).memory;
-            if (memory && memory.usedJSHeapSize) {
+            if (memory && typeof memory.usedJSHeapSize === 'number') {
               setMetrics(prev => ({
                 ...prev,
                 memoryUsage: Math.round(memory.usedJSHeapSize / 1024 / 1024)
@@ -55,7 +55,9 @@ const PerformanceMonitor: React.FC = () => {
 
         return () => {
           try {
-            observer.disconnect();
+            if (observer && typeof observer.disconnect === 'function') {
+              observer.disconnect();
+            }
           } catch (error) {
             console.log('⚠️ Observer disconnect failed:', error);
           }
