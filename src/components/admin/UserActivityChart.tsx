@@ -1,40 +1,45 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const mockData = [
-  { day: 'Lun', value: 42 },
-  { day: 'Mar', value: 38 },
-  { day: 'Mer', value: 45 },
-  { day: 'Jeu', value: 50 },
-  { day: 'Ven', value: 37 },
-  { day: 'Sam', value: 18 },
-  { day: 'Dim', value: 12 },
+  { month: 'Jan', users: 400 },
+  { month: 'Fév', users: 300 },
+  { month: 'Mar', users: 500 },
+  { month: 'Avr', users: 450 },
+  { month: 'Mai', users: 600 },
+  { month: 'Jun', users: 550 },
 ];
 
 const UserActivityChart: React.FC = () => {
   return (
-    <div className="w-full h-[200px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={mockData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip 
-            formatter={(value) => [`${value} interactions`, 'Activité']}
-            contentStyle={{ 
-              background: 'var(--background)', 
-              border: '1px solid var(--border)' 
-            }}
-          />
-          <Bar 
-            dataKey="value" 
-            fill="var(--primary)" 
-            radius={[4, 4, 0, 0]} 
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Activité Utilisateurs</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={mockData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line 
+                type="monotone" 
+                dataKey="users" 
+                stroke="#8884d8" 
+                strokeWidth={2}
+                dot={{ fill: '#8884d8' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
+export { UserActivityChart };
 export default UserActivityChart;
