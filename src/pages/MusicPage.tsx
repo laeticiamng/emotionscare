@@ -1,412 +1,426 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipBack, SkipForward, Heart, Music, Headphones, Volume2, Timer } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Switch } from '@/components/ui/switch';
+import { MusicPlayer } from '@/components/audio/MusicPlayer';
+import { EmotionMusicRecommendations } from '@/components/music/EmotionMusicRecommendations';
+import { RecommendedPresets } from '@/components/music/RecommendedPresets';
+import { TrackList } from '@/components/music/TrackList';
+import { MusicMiniPlayer } from '@/components/music/MusicMiniPlayer';
+import { 
+  Music, 
+  Heart, 
+  Play, 
+  Pause, 
+  SkipForward, 
+  SkipBack, 
+  Volume2, 
+  Shuffle, 
+  Repeat,
+  Download,
+  Share2,
+  Settings,
+  TrendingUp,
+  Clock,
+  Star,
+  Headphones,
+  Radio,
+  Disc3
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const MusicPage: React.FC = () => {
+  const { toast } = useToast();
+  const [currentEmotion, setCurrentEmotion] = useState('calm');
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(0);
-  const [volume, setVolume] = useState([75]);
-  const [currentTime, setCurrentTime] = useState(45);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [volume, setVolume] = useState([70]);
+  const [adaptiveMode, setAdaptiveMode] = useState(true);
+  const [personalizedMode, setPersonalizedMode] = useState(true);
   
-  const playlists = [
+  // Mock data for demonstration
+  const [listeningHistory] = useState([
     {
-      id: 'focus',
-      name: 'Focus Profond',
-      description: 'Musiques binaurales pour la concentration',
-      tracks: 24,
-      duration: '2h 15min',
-      color: 'from-blue-500 to-blue-600',
-      icon: '🧠',
-      mood: 'Concentration'
+      id: '1',
+      title: 'Méditation Matinale',
+      artist: 'Zen Collective',
+      duration: 300,
+      emotion: 'calm',
+      playCount: 12,
+      lastPlayed: '2024-01-15',
+      coverUrl: '/images/meditation-cover.jpg'
     },
     {
-      id: 'relax',
-      name: 'Relaxation Totale',
-      description: 'Sons de la nature et mélodies apaisantes',
-      tracks: 18,
-      duration: '1h 45min',
-      color: 'from-green-500 to-green-600',
-      icon: '🌿',
-      mood: 'Détente'
+      id: '2',
+      title: 'Énergie Positive',
+      artist: 'Mindful Beats',
+      duration: 240,
+      emotion: 'energetic',
+      playCount: 8,
+      lastPlayed: '2024-01-14',
+      coverUrl: '/images/energy-cover.jpg'
+    }
+  ]);
+
+  const [emotionalPlaylists] = useState([
+    {
+      id: 'calm-playlist',
+      name: 'Sérénité & Calme',
+      emotion: 'calm',
+      trackCount: 15,
+      duration: '45 min',
+      coverUrl: '/images/calm-playlist.jpg',
+      description: 'Playlist parfaite pour la méditation et la relaxation',
+      isAdaptive: true
     },
     {
-      id: 'energy',
+      id: 'energetic-playlist',
       name: 'Boost d\'Énergie',
-      description: 'Rythmes stimulants pour se motiver',
-      tracks: 32,
-      duration: '2h 30min',
-      color: 'from-orange-500 to-orange-600',
-      icon: '⚡',
-      mood: 'Énergie'
+      emotion: 'energetic',
+      trackCount: 20,
+      duration: '60 min',
+      coverUrl: '/images/energy-playlist.jpg',
+      description: 'Dynamisme et motivation pour votre journée',
+      isAdaptive: true
     },
     {
-      id: 'sleep',
-      name: 'Sommeil Réparateur',
-      description: 'Fréquences pour un endormissement facile',
-      tracks: 12,
-      duration: '1h 20min',
-      color: 'from-purple-500 to-purple-600',
-      icon: '🌙',
-      mood: 'Sommeil'
+      id: 'focus-playlist',
+      name: 'Concentration Profonde',
+      emotion: 'focused',
+      trackCount: 12,
+      duration: '40 min',
+      coverUrl: '/images/focus-playlist.jpg',
+      description: 'Musique instrumentale pour le travail et l\'étude',
+      isAdaptive: false
     }
-  ];
+  ]);
 
-  const currentPlaylist = [
-    {
-      title: 'Onde Alpha - Concentration',
-      artist: 'NeuroMusic Lab',
-      duration: '8:34',
-      category: 'Binaural'
-    },
-    {
-      title: 'Forêt Pluvieuse',
-      artist: 'Nature Sounds',
-      duration: '12:18',
-      category: 'Nature'
-    },
-    {
-      title: 'Méditation Tibétaine',
-      artist: 'Healing Frequencies',
-      duration: '15:42',
-      category: 'Spiritual'
-    },
-    {
-      title: 'Vagues Océaniques',
-      artist: 'Ocean Therapy',
-      duration: '20:00',
-      category: 'Nature'
-    }
-  ];
+  const [musicStats] = useState({
+    totalListeningTime: 1280, // minutes
+    favoriteEmotion: 'calm',
+    streakDays: 12,
+    tracksDiscovered: 47,
+    moodImprovement: 85
+  });
 
-  const moodBasedSuggestions = [
-    { mood: 'Stressé', playlist: 'Relaxation Totale', reason: 'Réduire le stress avec des sons apaisants' },
-    { mood: 'Fatigué', playlist: 'Boost d\'Énergie', reason: 'Stimuler votre énergie naturelle' },
-    { mood: 'Anxieux', playlist: 'Sommeil Réparateur', reason: 'Calmer l\'esprit avec des fréquences douces' },
-    { mood: 'Distrait', playlist: 'Focus Profond', reason: 'Améliorer la concentration avec les battements binauraux' }
-  ];
-
-  const sessionStats = {
-    todaySessions: 3,
-    totalTime: 124, // minutes
-    favoriteMood: 'Relaxation',
-    streakDays: 12
+  const handlePlayTrack = (track: any) => {
+    setCurrentTrack(track);
+    setIsPlaying(true);
+    toast({
+      title: "Lecture démarrée",
+      description: `${track.title} par ${track.artist}`,
+    });
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const handleEmotionChange = (emotion: string) => {
+    setCurrentEmotion(emotion);
+    if (adaptiveMode) {
+      toast({
+        title: "Playlist adaptée",
+        description: `Musique adaptée à votre état : ${emotion}`,
+      });
+    }
+  };
+
+  const handleExportPlaylist = (playlistId: string) => {
+    toast({
+      title: "Export en cours",
+      description: "Votre playlist sera bientôt disponible en téléchargement",
+    });
+  };
+
+  const handleSharePlaylist = (playlistId: string) => {
+    navigator.clipboard.writeText(`https://emotionscare.app/music/playlist/${playlistId}`);
+    toast({
+      title: "Lien copié",
+      description: "Le lien de la playlist a été copié dans le presse-papiers",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Musicothérapie</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Améliorez votre bien-être avec des playlists thérapeutiques personnalisées
-          </p>
-        </motion.div>
-
-        {/* Music Player */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-8"
-        >
-          <Card className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center mr-4">
-                    <Music className="h-8 w-8" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold">{currentPlaylist[currentTrack].title}</h3>
-                    <p className="opacity-80">{currentPlaylist[currentTrack].artist}</p>
-                  </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-indigo-900/20">
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        
+        {/* Header avec lecteur principal */}
+        <Card className="overflow-hidden bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+          <CardContent className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 rounded-full">
+                  <Music className="h-8 w-8" />
                 </div>
-                <Badge className="bg-white/20 text-white">
-                  {currentPlaylist[currentTrack].category}
-                </Badge>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="mb-4">
-                <div className="flex justify-between text-sm mb-2">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{currentPlaylist[currentTrack].duration}</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-2">
-                  <div 
-                    className="bg-white h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(currentTime / 300) * 100}%` }}
-                  ></div>
+                <div>
+                  <h1 className="text-3xl font-bold">Musicothérapie Adaptative</h1>
+                  <p className="text-purple-100 mt-1">
+                    Découvrez la musique qui s'adapte à vos émotions
+                  </p>
                 </div>
               </div>
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                Mode Adaptatif {adaptiveMode ? 'Activé' : 'Désactivé'}
+              </Badge>
+            </div>
 
-              {/* Controls */}
-              <div className="flex items-center justify-center space-x-6 mb-4">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-white hover:bg-white/20"
-                  onClick={() => setCurrentTrack(Math.max(0, currentTrack - 1))}
-                >
-                  <SkipBack className="h-6 w-6" />
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-white hover:bg-white/20 w-12 h-12"
-                  onClick={() => setIsPlaying(!isPlaying)}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-8 w-8" />
-                  ) : (
-                    <Play className="h-8 w-8" />
-                  )}
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-white hover:bg-white/20"
-                  onClick={() => setCurrentTrack(Math.min(currentPlaylist.length - 1, currentTrack + 1))}
-                >
-                  <SkipForward className="h-6 w-6" />
-                </Button>
+            {currentTrack && (
+              <div className="bg-white/10 rounded-lg p-4">
+                <MusicPlayer
+                  autoPlay={isPlaying}
+                  volume={volume[0] / 100}
+                  className="bg-transparent"
+                />
               </div>
+            )}
+          </CardContent>
+        </Card>
 
-              {/* Volume Control */}
-              <div className="flex items-center space-x-3">
-                <Volume2 className="h-5 w-5" />
+        {/* Statistiques et configuration */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-500" />
+                Statistiques d'Écoute
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-purple-600">{musicStats.totalListeningTime}</p>
+                  <p className="text-sm text-muted-foreground">Minutes d'écoute</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-600">{musicStats.streakDays}</p>
+                  <p className="text-sm text-muted-foreground">Jours consécutifs</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{musicStats.tracksDiscovered}</p>
+                  <p className="text-sm text-muted-foreground">Morceaux découverts</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-orange-600">{musicStats.moodImprovement}%</p>
+                  <p className="text-sm text-muted-foreground">Amélioration humeur</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Mode Adaptatif</label>
+                <Switch
+                  checked={adaptiveMode}
+                  onCheckedChange={setAdaptiveMode}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Personnalisation IA</label>
+                <Switch
+                  checked={personalizedMode}
+                  onCheckedChange={setPersonalizedMode}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Volume</label>
                 <Slider
                   value={volume}
                   onValueChange={setVolume}
                   max={100}
                   step={1}
-                  className="flex-1"
+                  className="w-full"
                 />
-                <span className="text-sm w-10">{volume[0]}%</span>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
 
-        <Tabs defaultValue="playlists" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
-            <TabsTrigger value="playlists">Playlists</TabsTrigger>
-            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="stats">Statistiques</TabsTrigger>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-red-500" />
+                État Émotionnel
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-2">
+                {['calm', 'energetic', 'focused', 'creative', 'relaxed', 'motivated'].map((emotion) => (
+                  <Button
+                    key={emotion}
+                    variant={currentEmotion === emotion ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => handleEmotionChange(emotion)}
+                    className="capitalize"
+                  >
+                    {emotion}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">
+                Sélectionnez votre état actuel pour une musique adaptée
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Contenu principal avec onglets */}
+        <Tabs defaultValue="playlists" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="playlists" className="flex items-center gap-2">
+              <Disc3 className="h-4 w-4" />
+              Playlists
+            </TabsTrigger>
+            <TabsTrigger value="recommendations" className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              Recommandations
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Historique
+            </TabsTrigger>
+            <TabsTrigger value="presets" className="flex items-center gap-2">
+              <Radio className="h-4 w-4" />
+              Préréglages
+            </TabsTrigger>
+            <TabsTrigger value="live" className="flex items-center gap-2">
+              <Headphones className="h-4 w-4" />
+              En Direct
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="playlists">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {playlists.map((playlist, index) => (
-                <motion.div
-                  key={playlist.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer">
-                    <CardHeader>
+          <TabsContent value="playlists" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Playlists Émotionnelles</h2>
+              <Button>
+                <Music className="h-4 w-4 mr-2" />
+                Créer une Playlist
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {emotionalPlaylists.map((playlist) => (
+                <Card key={playlist.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="aspect-square bg-gradient-to-br from-purple-400 to-blue-500 rounded-lg mb-4 flex items-center justify-center">
+                      <Music className="h-12 w-12 text-white" />
+                    </div>
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className={`w-12 h-12 bg-gradient-to-r ${playlist.color} rounded-lg flex items-center justify-center mr-4`}>
-                            <span className="text-2xl">{playlist.icon}</span>
-                          </div>
-                          <div>
-                            <CardTitle className="text-lg">{playlist.name}</CardTitle>
-                            <CardDescription>{playlist.description}</CardDescription>
-                          </div>
-                        </div>
-                        <Badge variant="outline">{playlist.mood}</Badge>
+                        <h3 className="font-semibold">{playlist.name}</h3>
+                        {playlist.isAdaptive && (
+                          <Badge variant="secondary">Adaptative</Badge>
+                        )}
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between text-sm text-gray-600 mb-4">
-                        <span>{playlist.tracks} morceaux</span>
+                      <p className="text-sm text-muted-foreground">{playlist.description}</p>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <span>{playlist.trackCount} morceaux</span>
                         <span>{playlist.duration}</span>
                       </div>
-                      <Button className={`w-full bg-gradient-to-r ${playlist.color}`}>
-                        <Play className="h-4 w-4 mr-2" />
-                        Écouter
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                      <div className="flex gap-2 pt-2">
+                        <Button size="sm" onClick={() => handlePlayTrack(playlist)}>
+                          <Play className="h-3 w-3 mr-1" />
+                          Jouer
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleSharePlaylist(playlist.id)}>
+                          <Share2 className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => handleExportPlaylist(playlist.id)}>
+                          <Download className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="suggestions">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Heart className="h-5 w-5 mr-2 text-red-500" />
-                    Recommandations Basées sur Votre Humeur
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {moodBasedSuggestions.map((suggestion, index) => (
-                      <div key={index} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold text-gray-900">Si vous êtes {suggestion.mood.toLowerCase()}</span>
-                          <Badge variant="outline">{suggestion.mood}</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">
-                          Essayez "<strong>{suggestion.playlist}</strong>" - {suggestion.reason}
-                        </p>
-                        <Button size="sm" variant="outline" className="w-full">
-                          <Play className="h-3 w-3 mr-1" />
-                          Écouter Maintenant
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          <TabsContent value="recommendations">
+            <EmotionMusicRecommendations
+              emotion={currentEmotion}
+              autoActivate={adaptiveMode}
+              className="mb-6"
+            />
           </TabsContent>
 
-          <TabsContent value="sessions">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Timer className="h-5 w-5 mr-2" />
-                    Sessions d'Écoute Programmées
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold">Session Focus Matinale</h3>
-                          <p className="text-sm text-gray-600">Tous les jours à 9h00 - 30 minutes</p>
-                        </div>
-                        <Badge className="bg-green-100 text-green-800">Active</Badge>
-                      </div>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold">Pause Relaxation</h3>
-                          <p className="text-sm text-gray-600">Lundi, Mercredi, Vendredi à 15h00 - 15 minutes</p>
-                        </div>
-                        <Badge className="bg-blue-100 text-blue-800">Programmée</Badge>
-                      </div>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibil">Sommeil Réparateur</h3>
-                          <p className="text-sm text-gray-600">Tous les soirs à 22h30 - 45 minutes</p>
-                        </div>
-                        <Badge className="bg-purple-100 text-purple-800">Active</Badge>
-                      </div>
-                    </div>
-                  </div>
-                  <Button className="w-full mt-4">
-                    Créer une Nouvelle Session
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+          <TabsContent value="history" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Historique d'Écoute</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TrackList
+                  tracks={listeningHistory}
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
+                  onTrackSelect={handlePlayTrack}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
 
-          <TabsContent value="stats">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Headphones className="h-5 w-5 mr-2" />
-                    Statistiques d'Écoute
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">{sessionStats.todaySessions}</div>
-                        <div className="text-sm text-gray-600">Sessions Aujourd'hui</div>
-                      </div>
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">{Math.floor(sessionStats.totalTime / 60)}h{sessionStats.totalTime % 60}m</div>
-                        <div className="text-sm text-gray-600">Temps Total</div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-4 bg-purple-50 rounded-lg">
-                        <div className="text-2xl font-bold text-purple-600">{sessionStats.favoriteMood}</div>
-                        <div className="text-sm text-gray-600">Mood Préféré</div>
-                      </div>
-                      <div className="text-center p-4 bg-orange-50 rounded-lg">
-                        <div className="text-2xl font-bold text-orange-600">{sessionStats.streakDays}</div>
-                        <div className="text-sm text-gray-600">Jours Consécutifs</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          <TabsContent value="presets">
+            <RecommendedPresets
+              currentMood={currentEmotion}
+              className="mb-6"
+            />
+          </TabsContent>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Progression du Bien-être</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Réduction du Stress</span>
-                        <span className="font-semibold">73%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-green-500 h-2 rounded-full" style={{ width: '73%' }}></div>
-                      </div>
+          <TabsContent value="live" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Radio className="h-5 w-5 text-red-500" />
+                  Sessions Live & Guidées
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">Méditation Guidée</h3>
+                      <Badge variant="destructive">🔴 Live</Badge>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Amélioration du Focus</span>
-                        <span className="font-semibold">68%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '68%' }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>Qualité du Sommeil</span>
-                        <span className="font-semibold">81%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '81%' }}></div>
-                      </div>
-                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Session de méditation en direct avec accompagnement musical
+                    </p>
+                    <Button size="sm" className="w-full">
+                      Rejoindre (12 participants)
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">Thérapie Sonore</h3>
+                      <Badge variant="secondary">15:30</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Session programmée de thérapie par les sons et vibrations
+                    </p>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Programmer un rappel
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Mini lecteur fixe */}
+        {currentTrack && (
+          <div className="fixed bottom-4 right-4 z-50">
+            <MusicMiniPlayer />
+          </div>
+        )}
       </div>
     </div>
   );
