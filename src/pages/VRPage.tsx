@@ -3,168 +3,160 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { VrHeadset, Play, Clock, Star, Mountain, Waves, TreePine, Home } from 'lucide-react';
+import { Monitor, Play, Clock, Star, Mountain, Waves, TreePine, Home } from 'lucide-react';
 
 const VRPage: React.FC = () => {
-  const vrExperiences = [
-    {
-      id: 1,
-      title: 'Plage Tropicale',
-      description: 'Détendez-vous sur une plage paradisiaque avec le bruit des vagues',
-      duration: '15 min',
-      difficulty: 'Débutant',
-      icon: Waves,
-      color: 'from-blue-400 to-cyan-500',
-      tags: ['Relaxation', 'Océan', 'Méditation']
-    },
-    {
-      id: 2,
-      title: 'Forêt Enchantée',
-      description: 'Promenade apaisante dans une forêt mystique avec sons naturels',
-      duration: '20 min',
-      difficulty: 'Intermédiaire',
-      icon: TreePine,
-      color: 'from-green-400 to-emerald-500',
-      tags: ['Nature', 'Marche', 'Zen']
-    },
-    {
-      id: 3,
-      title: 'Montagne Sacrée',
-      description: 'Méditation guidée au sommet d\'une montagne avec vue panoramique',
-      duration: '25 min',
-      difficulty: 'Avancé',
-      icon: Mountain,
-      color: 'from-purple-400 to-pink-500',
-      tags: ['Méditation', 'Altitude', 'Spirituel']
-    },
-    {
-      id: 4,
-      title: 'Cocon Domestique',
-      description: 'Espace de relaxation personnalisé dans votre salon virtuel',
-      duration: '10 min',
-      difficulty: 'Débutant',
-      icon: Home,
-      color: 'from-orange-400 to-red-500',
-      tags: ['Confort', 'Maison', 'Familier']
-    }
-  ];
-
-  const difficultyColors = {
-    'Débutant': 'bg-green-100 text-green-800',
-    'Intermédiaire': 'bg-yellow-100 text-yellow-800',
-    'Avancé': 'bg-red-100 text-red-800'
-  };
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gray-50 p-4">
-      <div className="container mx-auto max-w-6xl">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full">
-              <VrHeadset className="h-12 w-12 text-white" />
-            </div>
+            <Monitor className="h-16 w-16 text-purple-600" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Réalité Virtuelle</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Explorez des environnements immersifs conçus pour votre bien-être mental et votre relaxation
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Expériences de Réalité Virtuelle
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Plongez dans des environnements immersifs conçus pour votre bien-être émotionnel et mental
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600">12</div>
-              <div className="text-gray-600">Séances terminées</div>
+        {/* Featured VR Experience */}
+        <Card className="mb-8 bg-gradient-to-r from-purple-500 to-blue-600 text-white">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl text-white">Méditation au Coucher du Soleil</CardTitle>
+                <CardDescription className="text-purple-100">
+                  Une expérience immersive de 15 minutes dans un paysage océanique
+                </CardDescription>
+              </div>
+              <Badge variant="secondary" className="bg-white/20 text-white">
+                Recommandé
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>15 min</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-current" />
+                <span>4.8/5</span>
+              </div>
+            </div>
+            <Button className="bg-white text-purple-600 hover:bg-purple-50">
+              <Play className="h-4 w-4 mr-2" />
+              Commencer l'expérience
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* VR Categories */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <Mountain className="h-8 w-8 text-green-600 mb-2" />
+              <CardTitle>Paysages Naturels</CardTitle>
+              <CardDescription>
+                Forêts, montagnes et environnements naturels apaisants
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Explorer (3 expériences)
+              </Button>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600">4h 32min</div>
-              <div className="text-gray-600">Temps total</div>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <Waves className="h-8 w-8 text-blue-600 mb-2" />
+              <CardTitle>Océan & Plages</CardTitle>
+              <CardDescription>
+                Sons des vagues et environnements marins relaxants
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Explorer (4 expériences)
+              </Button>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-purple-600">85%</div>
-              <div className="text-gray-600">Niveau de relaxation</div>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <TreePine className="h-8 w-8 text-emerald-600 mb-2" />
+              <CardTitle>Espaces Zen</CardTitle>
+              <CardDescription>
+                Jardins japonais et espaces de méditation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Explorer (2 expériences)
+              </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* VR Experiences Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {vrExperiences.map((experience) => {
-            const IconComponent = experience.icon;
-            return (
-              <Card key={experience.id} className="hover:shadow-xl transition-all duration-300 overflow-hidden">
-                <div className={`h-32 bg-gradient-to-br ${experience.color} flex items-center justify-center`}>
-                  <IconComponent className="h-16 w-16 text-white" />
+        {/* Recent Sessions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Vos Sessions Récentes</CardTitle>
+            <CardDescription>
+              Reprenez là où vous vous êtes arrêté
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <TreePine className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Forêt de Bambous</h3>
+                    <p className="text-sm text-gray-600">Session de 10 min • Hier</p>
+                  </div>
                 </div>
-                
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl mb-2">{experience.title}</CardTitle>
-                      <CardDescription className="text-base">
-                        {experience.description}
-                      </CardDescription>
-                    </div>
-                    <div className="flex items-center gap-1 text-yellow-500">
-                      <Star className="h-4 w-4 fill-current" />
-                      <span className="text-sm font-medium">4.8</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <Clock className="h-4 w-4" />
-                      <span className="text-sm">{experience.duration}</span>
-                    </div>
-                    <Badge className={difficultyColors[experience.difficulty as keyof typeof difficultyColors]}>
-                      {experience.difficulty}
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {experience.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-                    <Play className="mr-2 h-4 w-4" />
-                    Commencer l'expérience
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                <Button variant="ghost" size="sm">
+                  Continuer
+                </Button>
+              </div>
 
-        {/* Info Section */}
-        <Card className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 border-none">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold mb-4">Besoin d'un casque VR ?</h3>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Nos expériences fonctionnent avec la plupart des casques VR modernes. 
-              Vous pouvez également profiter de certaines expériences sur votre ordinateur ou smartphone.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="outline">
-                Voir les casques compatibles
-              </Button>
-              <Button variant="outline">
-                Mode sans casque
-              </Button>
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-lg flex items-center justify-center">
+                    <Waves className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Plage Tropicale</h3>
+                    <p className="text-sm text-gray-600">Session de 20 min • Il y a 3 jours</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">
+                  Relancer
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Quick Actions */}
+        <div className="flex justify-center gap-4 mt-8">
+          <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+            <Monitor className="h-5 w-5 mr-2" />
+            Nouvelle Session
+          </Button>
+          <Button variant="outline" size="lg">
+            <Home className="h-5 w-5 mr-2" />
+            Retour au Dashboard
+          </Button>
+        </div>
       </div>
     </div>
   );
