@@ -1,373 +1,291 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Calendar, TrendingUp, Download, Bell, PlusCircle } from 'lucide-react';
-import EmotionalCalendar from '@/components/journal/EmotionalCalendar';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BookOpen, Plus, Calendar, Heart, Smile, Meh, Frown, Search, Filter } from 'lucide-react';
+
+interface JournalEntry {
+  id: string;
+  date: string;
+  mood: string;
+  title: string;
+  content: string;
+  tags: string[];
+  moodScore: number;
+}
 
 const JournalPage: React.FC = () => {
-  const { toast } = useToast();
-  const [newEntry, setNewEntry] = useState('');
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
-  // Mock journal entries
-  const journalEntries = [
+  const [entries, setEntries] = useState<JournalEntry[]>([
     {
       id: '1',
       date: '2024-01-15',
-      mood: 'good',
+      mood: 'happy',
       title: 'Journée productive au travail',
-      content: 'Aujourd\'hui a été une excellente journée. J\'ai réussi à terminer tous mes projets et j\'ai reçu des félicitations de mon manager...',
-      tags: ['travail', 'productivité', 'satisfaction']
+      content: 'Aujourd'hui j'ai terminé mon projet important. Je me sens vraiment accompli et fier du travail accompli. L'équipe était très collaborative.',
+      tags: ['travail', 'accomplissement', 'équipe'],
+      moodScore: 8
     },
     {
       id: '2',
       date: '2024-01-14',
-      mood: 'excellent',
-      title: 'Weekend relaxant en famille',
-      content: 'Passé un merveilleux weekend avec ma famille. Nous avons fait une randonnée et j\'ai vraiment apprécié ce moment de déconnexion...',
-      tags: ['famille', 'nature', 'détente']
-    },
-    {
-      id: '3',
-      date: '2024-01-13',
       mood: 'neutral',
-      title: 'Réflexions sur mes objectifs',
-      content: 'Aujourd\'hui j\'ai pris le temps de réfléchir à mes objectifs pour cette année. Il y a certaines choses que je veux améliorer...',
-      tags: ['réflexion', 'objectifs', 'développement']
+      title: 'Week-end tranquille',
+      content: 'Weekend calme à la maison. J'ai lu un bon livre et pris du temps pour moi. Parfois il faut savoir ralentir.',
+      tags: ['détente', 'lecture', 'introspection'],
+      moodScore: 6
     }
-  ];
+  ]);
 
-  // Mock mood statistics
-  const moodStats = {
-    totalEntries: 42,
-    currentStreak: 7,
-    averageMood: 'Bien',
-    improvementTrend: '+12%'
-  };
+  const [showNewEntry, setShowNewEntry] = useState(false);
+  const [newEntry, setNewEntry] = useState({
+    title: '',
+    content: '',
+    moodScore: 5,
+    tags: ''
+  });
 
   const handleSaveEntry = () => {
-    if (!newEntry.trim()) return;
-    
-    toast({
-      title: 'Entrée sauvegardée',
-      description: 'Votre réflexion a été ajoutée à votre journal.',
-    });
-    setNewEntry('');
-  };
-
-  const handleDateSelect = (date: string) => {
-    setSelectedDate(date);
-    toast({
-      title: 'Date sélectionnée',
-      description: `Affichage des entrées du ${new Date(date).toLocaleDateString('fr-FR')}`,
-    });
-  };
-
-  const handleExportData = () => {
-    toast({
-      title: 'Export en cours',
-      description: 'Vos données de journal sont en cours d\'export.',
-    });
-  };
-
-  const handleSetReminder = () => {
-    toast({
-      title: 'Rappel configuré',
-      description: 'Vous recevrez un rappel quotidien à 20h.',
-    });
-  };
-
-  const getMoodColor = (mood: string) => {
-    const colors = {
-      'excellent': 'bg-green-100 text-green-800',
-      'good': 'bg-blue-100 text-blue-800',
-      'neutral': 'bg-yellow-100 text-yellow-800',
-      'bad': 'bg-orange-100 text-orange-800',
-      'terrible': 'bg-red-100 text-red-800'
+    const entry: JournalEntry = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      mood: newEntry.moodScore >= 7 ? 'happy' : newEntry.moodScore >= 4 ? 'neutral' : 'sad',
+      title: newEntry.title,
+      content: newEntry.content,
+      tags: newEntry.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+      moodScore: newEntry.moodScore
     };
-    return colors[mood as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+
+    setEntries([entry, ...entries]);
+    setNewEntry({ title: '', content: '', moodScore: 5, tags: '' });
+    setShowNewEntry(false);
+  };
+
+  const getMoodIcon = (mood: string) => {
+    switch (mood) {
+      case 'happy': return <Smile className="h-5 w-5 text-green-500" />;
+      case 'neutral': return <Meh className="h-5 w-5 text-yellow-500" />;
+      case 'sad': return <Frown className="h-5 w-5 text-red-500" />;
+      default: return <Meh className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
+  const getMoodColor = (score: number) => {
+    if (score >= 7) return 'bg-green-500';
+    if (score >= 4) return 'bg-yellow-500';
+    return 'bg-red-500';
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Journal Émotionnel</h1>
-          <p className="text-muted-foreground">
-            Exprimez vos pensées et suivez votre évolution émotionnelle
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0 flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleSetReminder}>
-            <Bell className="mr-2 h-4 w-4" />
-            Rappels
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportData}>
-            <Download className="mr-2 h-4 w-4" />
-            Exporter
-          </Button>
-        </div>
-      </div>
-
-      <Tabs defaultValue="write" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="write">Écrire</TabsTrigger>
-          <TabsTrigger value="entries">Mes entrées</TabsTrigger>
-          <TabsTrigger value="calendar">Calendrier</TabsTrigger>
-          <TabsTrigger value="stats">Statistiques</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="write" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PlusCircle className="h-5 w-5" />
-                    Nouvelle entrée
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Comment vous sentez-vous aujourd'hui ?</label>
-                    <Textarea
-                      placeholder="Exprimez vos pensées, vos émotions, vos réflexions du jour..."
-                      value={newEntry}
-                      onChange={(e) => setNewEntry(e.target.value)}
-                      className="mt-2 min-h-[200px]"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      {newEntry.length} caractères
-                    </span>
-                    <Button onClick={handleSaveEntry} disabled={!newEntry.trim()}>
-                      Sauvegarder
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-amber-100 rounded-full">
+              <BookOpen className="h-8 w-8 text-amber-600" />
             </div>
-            
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Suggestions d'écriture</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start text-sm h-auto p-3 text-left">
-                    Qu'est-ce qui vous a rendu heureux aujourd'hui ?
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start text-sm h-auto p-3 text-left">
-                    Quel défi avez-vous surmonté récemment ?
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start text-sm h-auto p-3 text-left">
-                    Pour quoi êtes-vous reconnaissant ?
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Votre progression</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Entrées ce mois</span>
-                    <span className="font-medium">15</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Série actuelle</span>
-                    <span className="font-medium">7 jours</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Humeur moyenne</span>
-                    <span className="font-medium">Bien</span>
-                  </div>
-                </CardContent>
-              </Card>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Mon Journal Émotionnel</h1>
+              <p className="text-gray-600">Exprimez vos pensées et suivez votre bien-être</p>
             </div>
           </div>
-        </TabsContent>
 
-        <TabsContent value="entries" className="space-y-6">
-          <Card>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              onClick={() => setShowNewEntry(true)}
+              className="bg-amber-600 hover:bg-amber-700 flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Nouvelle entrée
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Search className="h-4 w-4 mr-2" />
+                Rechercher
+              </Button>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filtrer
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* New Entry Form */}
+        {showNewEntry && (
+          <Card className="mb-8 border-2 border-amber-200">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Mes Entrées Récentes
+                <Plus className="h-5 w-5" />
+                Nouvelle entrée
               </CardTitle>
+              <CardDescription>
+                Prenez quelques minutes pour noter vos pensées et émotions
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {journalEntries.map((entry) => (
-                  <Card key={entry.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-medium">{entry.title}</h3>
-                        <div className="flex items-center gap-2">
-                          <Badge className={`text-xs ${getMoodColor(entry.mood)}`}>
-                            {entry.mood}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(entry.date).toLocaleDateString('fr-FR')}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {entry.content}
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {entry.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="title">Titre de l'entrée</Label>
+                <Input
+                  id="title"
+                  placeholder="Donnez un titre à votre journée..."
+                  value={newEntry.title}
+                  onChange={(e) => setNewEntry({...newEntry, title: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="content">Vos pensées</Label>
+                <Textarea
+                  id="content"
+                  placeholder="Décrivez votre journée, vos émotions, vos réflexions..."
+                  value={newEntry.content}
+                  onChange={(e) => setNewEntry({...newEntry, content: e.target.value})}
+                  rows={5}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="mood">Humeur générale (1-10)</Label>
+                <div className="flex items-center gap-4 mt-2">
+                  <input
+                    type="range"
+                    id="mood"
+                    min="1"
+                    max="10"
+                    value={newEntry.moodScore}
+                    onChange={(e) => setNewEntry({...newEntry, moodScore: parseInt(e.target.value)})}
+                    className="flex-1"
+                  />
+                  <span className="text-lg font-bold w-8 text-center">{newEntry.moodScore}</span>
+                  <div className={`w-4 h-4 rounded-full ${getMoodColor(newEntry.moodScore)}`}></div>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="tags">Tags (séparés par des virgules)</Label>
+                <Input
+                  id="tags"
+                  placeholder="travail, famille, sport, détente..."
+                  value={newEntry.tags}
+                  onChange={(e) => setNewEntry({...newEntry, tags: e.target.value})}
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button onClick={handleSaveEntry} className="bg-amber-600 hover:bg-amber-700">
+                  Sauvegarder
+                </Button>
+                <Button variant="outline" onClick={() => setShowNewEntry(false)}>
+                  Annuler
+                </Button>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        )}
 
-        <TabsContent value="calendar" className="space-y-6">
-          <EmotionalCalendar onDateSelect={handleDateSelect} />
-        </TabsContent>
-
-        <TabsContent value="stats" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total entrées</CardTitle>
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{moodStats.totalEntries}</div>
-                <p className="text-xs text-muted-foreground">
-                  Depuis le début
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Série actuelle</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{moodStats.currentStreak} jours</div>
-                <p className="text-xs text-muted-foreground">
-                  Écriture quotidienne
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Humeur moyenne</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{moodStats.averageMood}</div>
-                <p className="text-xs text-muted-foreground">
-                  Ce mois-ci
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Amélioration</CardTitle>
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{moodStats.improvementTrend}</div>
-                <p className="text-xs text-muted-foreground">
-                  Depuis le mois dernier
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle>Analyse des émotions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Émotions les plus fréquentes</h4>
-                  <div className="space-y-2">
-                    {[
-                      { emotion: 'Sérénité', percentage: 35, color: 'bg-blue-500' },
-                      { emotion: 'Joie', percentage: 28, color: 'bg-green-500' },
-                      { emotion: 'Réflexion', percentage: 22, color: 'bg-purple-500' },
-                      { emotion: 'Motivation', percentage: 15, color: 'bg-orange-500' }
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center gap-4">
-                        <span className="text-sm font-medium w-20">{item.emotion}</span>
-                        <div className="flex-1 bg-muted rounded-full h-2">
-                          <div 
-                            className={`${item.color} h-2 rounded-full transition-all`}
-                            style={{ width: `${item.percentage}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium w-12">{item.percentage}%</span>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-8 w-8 text-amber-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Entrées totales</p>
+                  <p className="text-2xl font-bold">{entries.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Heart className="h-8 w-8 text-red-500" />
+                <div>
+                  <p className="text-sm text-gray-600">Humeur moyenne</p>
+                  <p className="text-2xl font-bold">
+                    {entries.length > 0 
+                      ? (entries.reduce((sum, entry) => sum + entry.moodScore, 0) / entries.length).toFixed(1)
+                      : '0'
+                    }/10
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Calendar className="h-8 w-8 text-blue-500" />
+                <div>
+                  <p className="text-sm text-gray-600">Série actuelle</p>
+                  <p className="text-2xl font-bold">7 jours</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Entries List */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900">Mes entrées récentes</h2>
+          
+          {entries.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune entrée pour le moment</h3>
+                <p className="text-gray-600 mb-4">Commencez à tenir votre journal émotionnel dès aujourd'hui</p>
+                <Button onClick={() => setShowNewEntry(true)} className="bg-amber-600 hover:bg-amber-700">
+                  Créer ma première entrée
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            entries.map((entry) => (
+              <Card key={entry.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      {getMoodIcon(entry.mood)}
+                      <div>
+                        <CardTitle className="text-lg">{entry.title}</CardTitle>
+                        <CardDescription className="flex items-center gap-2 mt-1">
+                          <Calendar className="h-4 w-4" />
+                          {new Date(entry.date).toLocaleDateString('fr-FR', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </CardDescription>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${getMoodColor(entry.moodScore)}`}></div>
+                      <span className="text-sm font-medium">{entry.moodScore}/10</span>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 mb-4 leading-relaxed">{entry.content}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {entry.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        #{tag}
+                      </Badge>
                     ))}
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="insights" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Patterns identifiés</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Tendances découvertes</h4>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>• Vous écrivez principalement le soir après 19h</li>
-                    <li>• Vos entrées sont plus positives en fin de semaine</li>
-                    <li>• Les thèmes récurrents: famille, travail, nature</li>
-                    <li>• Amélioration notable de votre humeur générale</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommandations</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Pour optimiser votre pratique</h4>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>• Essayez l'écriture matinale pour commencer la journée</li>
-                    <li>• Explorez davantage les moments de gratitude</li>
-                    <li>• Ajoutez des photos à vos entrées pour enrichir vos souvenirs</li>
-                    <li>• Définissez des objectifs personnels à suivre</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,343 +1,371 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Camera, Clock, Star, TrendingUp, Users, Settings } from 'lucide-react';
-import VREnvironmentSelector from '@/components/vr/VREnvironmentSelector';
-import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Headphones, 
+  Play, 
+  Pause, 
+  Square, 
+  RotateCcw, 
+  Volume2, 
+  Settings,
+  Timer,
+  Mountain,
+  Waves,
+  TreePine,
+  Sun,
+  Moon,
+  Cloud
+} from 'lucide-react';
+
+interface VRSession {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  type: 'relaxation' | 'meditation' | 'therapy' | 'focus';
+  environment: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  completed: boolean;
+}
 
 const VRPage: React.FC = () => {
-  const { toast } = useToast();
-  const [isSessionActive, setIsSessionActive] = useState(false);
-  const [sessionTime, setSessionTime] = useState(0);
+  const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  // Mock VR session history
-  const sessionHistory = [
+  const vrSessions: VRSession[] = [
     {
       id: '1',
-      environment: 'Forêt Enchantée',
+      title: 'Montagne Zen',
+      description: 'Méditation guidée au sommet d\'une montagne paisible',
       duration: 15,
-      date: '2024-01-15',
-      rating: 5,
-      mood: 'relaxed'
+      type: 'meditation',
+      environment: 'Mountain',
+      icon: Mountain,
+      color: 'bg-blue-500',
+      completed: false
     },
     {
       id: '2',
-      environment: 'Plage au Coucher de Soleil',
+      title: 'Plage Tropicale',
+      description: 'Relaxation profonde au bord de l\'océan',
       duration: 20,
-      date: '2024-01-14',
-      rating: 4,
-      mood: 'peaceful'
+      type: 'relaxation',
+      environment: 'Beach',
+      icon: Waves,
+      color: 'bg-cyan-500',
+      completed: true
     },
     {
       id: '3',
-      environment: 'Montagne Énergisante',
-      duration: 12,
-      date: '2024-01-13',
-      rating: 5,
-      mood: 'energized'
+      title: 'Forêt Enchantée',
+      description: 'Thérapie par la nature en forêt immersive',
+      duration: 25,
+      type: 'therapy',
+      environment: 'Forest',
+      icon: TreePine,
+      color: 'bg-green-500',
+      completed: false
+    },
+    {
+      id: '4',
+      title: 'Lever de Soleil',
+      description: 'Session de concentration avec un lever de soleil',
+      duration: 10,
+      type: 'focus',
+      environment: 'Sunrise',
+      icon: Sun,
+      color: 'bg-orange-500',
+      completed: false
+    },
+    {
+      id: '5',
+      title: 'Nuit Étoilée',
+      description: 'Méditation nocturne sous les étoiles',
+      duration: 30,
+      type: 'meditation',
+      environment: 'Night Sky',
+      icon: Moon,
+      color: 'bg-purple-500',
+      completed: false
+    },
+    {
+      id: '6',
+      title: 'Nuages Flottants',
+      description: 'Relaxation en flottant parmi les nuages',
+      duration: 18,
+      type: 'relaxation',
+      environment: 'Clouds',
+      icon: Cloud,
+      color: 'bg-gray-500',
+      completed: false
     }
   ];
 
-  // Mock VR statistics
-  const vrStats = {
-    totalSessions: 24,
-    totalTime: '6h 30min',
-    averageRating: 4.6,
-    favoriteEnvironment: 'Forêt Enchantée'
+  const startSession = (session: VRSession) => {
+    setCurrentSession(session);
+    setIsPlaying(true);
+    setProgress(0);
+    setDuration(session.duration * 60); // Convert to seconds
+    
+    // Simulate progress
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsPlaying(false);
+          return 100;
+        }
+        return prev + (100 / (session.duration * 60));
+      });
+    }, 1000);
   };
 
-  const handleStartSession = (environment: any) => {
-    setIsSessionActive(true);
-    toast({
-      title: 'Session VR démarrée',
-      description: `Immersion dans "${environment.name}" commencée.`,
-    });
+  const pauseSession = () => {
+    setIsPlaying(false);
   };
 
-  const handleEndSession = () => {
-    setIsSessionActive(false);
-    setSessionTime(0);
-    toast({
-      title: 'Session terminée',
-      description: 'Votre session VR a été enregistrée avec succès.',
-    });
+  const stopSession = () => {
+    setCurrentSession(null);
+    setIsPlaying(false);
+    setProgress(0);
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'meditation': return 'bg-purple-100 text-purple-800';
+      case 'relaxation': return 'bg-blue-100 text-blue-800';
+      case 'therapy': return 'bg-green-100 text-green-800';
+      case 'focus': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'meditation': return 'Méditation';
+      case 'relaxation': return 'Relaxation';
+      case 'therapy': return 'Thérapie';
+      case 'focus': return 'Concentration';
+      default: return type;
+    }
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Réalité Virtuelle</h1>
-          <p className="text-muted-foreground">
-            Immergez-vous dans des environnements apaisants et thérapeutiques
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0 flex gap-2">
-          <Button variant="outline" size="sm">
-            <Settings className="mr-2 h-4 w-4" />
-            Configuration VR
-          </Button>
-          {isSessionActive && (
-            <Badge variant="default" className="animate-pulse">
-              Session active: {formatTime(sessionTime)}
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      {isSessionActive ? (
-        <Card>
-          <CardContent className="p-8">
-            <div className="text-center space-y-4">
-              <div className="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                <Camera className="h-10 w-10 text-primary" />
-              </div>
-              <h2 className="text-2xl font-bold">Session VR en cours</h2>
-              <p className="text-muted-foreground">
-                Profitez pleinement de votre expérience immersive
-              </p>
-              <div className="text-3xl font-mono font-bold text-primary">
-                {formatTime(sessionTime)}
-              </div>
-              <Button 
-                onClick={handleEndSession}
-                variant="outline"
-                size="lg"
-              >
-                Terminer la session
-              </Button>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-indigo-100 rounded-full">
+              <Headphones className="h-8 w-8 text-indigo-600" />
             </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Expériences VR Thérapeutiques</h1>
+              <p className="text-gray-600">Immersion totale pour votre bien-être mental</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Current Session */}
+        {currentSession && (
+          <Card className="mb-8 border-2 border-indigo-200 bg-indigo-50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`p-3 ${currentSession.color} rounded-full`}>
+                    <currentSession.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      {currentSession.title}
+                      {isPlaying && <div className="animate-pulse h-2 w-2 bg-red-500 rounded-full"></div>}
+                    </CardTitle>
+                    <CardDescription>{currentSession.description}</CardDescription>
+                  </div>
+                </div>
+                <Badge className={getTypeColor(currentSession.type)}>
+                  {getTypeLabel(currentSession.type)}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Timer className="h-5 w-5 text-gray-500" />
+                  <span className="text-sm text-gray-600">
+                    {Math.floor((currentSession.duration * 60 * progress) / 100 / 60)}:
+                    {String(Math.floor(((currentSession.duration * 60 * progress) / 100) % 60)).padStart(2, '0')} / 
+                    {currentSession.duration}:00
+                  </span>
+                </div>
+                
+                <Progress value={progress} className="h-2" />
+                
+                <div className="flex items-center gap-2">
+                  {!isPlaying ? (
+                    <Button 
+                      onClick={() => setIsPlaying(true)}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      {progress > 0 ? 'Reprendre' : 'Démarrer'}
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={pauseSession}
+                      className="bg-yellow-600 hover:bg-yellow-700"
+                    >
+                      <Pause className="h-4 w-4 mr-2" />
+                      Pause
+                    </Button>
+                  )}
+                  
+                  <Button onClick={stopSession} variant="outline">
+                    <Square className="h-4 w-4 mr-2" />
+                    Arrêter
+                  </Button>
+                  
+                  <Button onClick={() => setProgress(0)} variant="outline">
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Recommencer
+                  </Button>
+                  
+                  <Button variant="outline" size="icon">
+                    <Volume2 className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button variant="outline" size="icon">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Headphones className="h-8 w-8 text-indigo-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Sessions totales</p>
+                  <p className="text-2xl font-bold">{vrSessions.filter(s => s.completed).length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Timer className="h-8 w-8 text-green-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Temps total</p>
+                  <p className="text-2xl font-bold">2h 45m</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Mountain className="h-8 w-8 text-blue-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Environnement favori</p>
+                  <p className="text-lg font-bold">Montagne</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Sun className="h-8 w-8 text-orange-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Série actuelle</p>
+                  <p className="text-2xl font-bold">5 jours</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Available Sessions */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900">Expériences disponibles</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {vrSessions.map((session) => (
+              <Card key={session.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-3 ${session.color} rounded-full`}>
+                        <session.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{session.title}</CardTitle>
+                        <CardDescription className="flex items-center gap-2 mt-1">
+                          <Timer className="h-4 w-4" />
+                          {session.duration} minutes
+                        </CardDescription>
+                      </div>
+                    </div>
+                    {session.completed && (
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        Terminé
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 mb-4">{session.description}</p>
+                  <div className="flex items-center justify-between">
+                    <Badge className={getTypeColor(session.type)}>
+                      {getTypeLabel(session.type)}
+                    </Badge>
+                    <Button 
+                      onClick={() => startSession(session)}
+                      disabled={currentSession?.id === session.id}
+                      className="bg-indigo-600 hover:bg-indigo-700"
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      {currentSession?.id === session.id ? 'En cours' : 'Démarrer'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Tips */}
+        <Card className="mt-8 bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-lg text-blue-900">💡 Conseils pour une meilleure expérience</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-blue-800">
+              <li>• Trouvez un endroit calme et confortable</li>
+              <li>• Utilisez un casque audio de qualité pour une immersion optimale</li>
+              <li>• Pratiquez régulièrement pour des bénéfices durables</li>
+              <li>• N'hésitez pas à ajuster les paramètres selon vos préférences</li>
+              <li>• Prenez quelques minutes après chaque session pour intégrer l'expérience</li>
+            </ul>
           </CardContent>
         </Card>
-      ) : (
-        <Tabs defaultValue="environments" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="environments">Environnements</TabsTrigger>
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="history">Historique</TabsTrigger>
-            <TabsTrigger value="stats">Statistiques</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="environments" className="space-y-6">
-            <VREnvironmentSelector onSelectEnvironment={handleStartSession} />
-          </TabsContent>
-
-          <TabsContent value="sessions" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Play className="h-5 w-5" />
-                    Sessions Guidées
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    { name: 'Méditation Matinale', duration: '10 min', level: 'Débutant' },
-                    { name: 'Relaxation Profonde', duration: '20 min', level: 'Intermédiaire' },
-                    { name: 'Visualisation Créative', duration: '15 min', level: 'Avancé' }
-                  ].map((session, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">{session.name}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-xs">
-                            {session.level}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {session.duration}
-                          </span>
-                        </div>
-                      </div>
-                      <Button size="sm">
-                        <Play className="h-4 w-4 mr-2" />
-                        Démarrer
-                      </Button>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Sessions Populaires
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    { name: 'Forêt Mystique', participants: 1247, rating: 4.8 },
-                    { name: 'Océan Tranquille', participants: 892, rating: 4.9 },
-                    { name: 'Montagne Zen', participants: 654, rating: 4.7 }
-                  ].map((session, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h4 className="font-medium">{session.name}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Star className="h-3 w-3 text-yellow-500" />
-                            {session.rating}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {session.participants} participants
-                          </span>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        Rejoindre
-                      </Button>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="history" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Historique des Sessions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {sessionHistory.map((session) => (
-                    <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{session.environment}</h4>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {session.duration} min
-                          </span>
-                          <span>{new Date(session.date).toLocaleDateString('fr-FR')}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {session.mood}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < session.rating 
-                                  ? 'text-yellow-500 fill-current' 
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <Button size="sm" variant="ghost">
-                          Rejouer
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="stats" className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sessions totales</CardTitle>
-                  <Play className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{vrStats.totalSessions}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Depuis le début
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Temps total</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{vrStats.totalTime}</div>
-                  <p className="text-xs text-muted-foreground">
-                    D'immersion VR
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Note moyenne</CardTitle>
-                  <Star className="h-4 w-4 text-yellow-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{vrStats.averageRating}/5</div>
-                  <p className="text-xs text-muted-foreground">
-                    Satisfaction
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Environnement favori</CardTitle>
-                  <Camera className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-lg font-bold truncate">{vrStats.favoriteEnvironment}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Le plus utilisé
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Progression et Insights</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Bénéfices observés</h4>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      <li>• Réduction du stress de 25% après les sessions</li>
-                      <li>• Amélioration de la qualité du sommeil</li>
-                      <li>• Augmentation de la concentration</li>
-                      <li>• Meilleure gestion des émotions</li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Recommandations</h4>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      <li>• Essayez les sessions matinales pour plus d'énergie</li>
-                      <li>• Alternez entre différents environnements</li>
-                      <li>• Augmentez progressivement la durée des sessions</li>
-                      <li>• Combinez VR avec de la musique adaptative</li>
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      )}
+      </div>
     </div>
   );
 };
