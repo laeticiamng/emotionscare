@@ -1,225 +1,355 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Heart, MessageCircle, Shield, Send, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Heart, MessageCircle, Share2, Users, Plus, Search, Filter } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const SocialCoconPage: React.FC = () => {
-  const [newMessage, setNewMessage] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('general');
+  const [activeTab, setActiveTab] = useState('feed');
+  const [newPost, setNewPost] = useState('');
 
-  const groups = [
-    { id: 'general', name: 'Général', members: 142, color: 'bg-blue-100 text-blue-800' },
-    { id: 'meditation', name: 'Méditation', members: 89, color: 'bg-purple-100 text-purple-800' },
-    { id: 'motivation', name: 'Motivation', members: 156, color: 'bg-orange-100 text-orange-800' },
-    { id: 'support', name: 'Entraide', members: 203, color: 'bg-green-100 text-green-800' }
-  ];
-
-  const messages = [
+  const posts = [
     {
       id: 1,
-      author: 'Utilisateur Anonyme',
-      content: 'Merci pour vos conseils hier, ça m\'a vraiment aidé à surmonter ma journée difficile. 💙',
-      time: '2 min',
+      author: 'Sophie M.',
+      avatar: '/api/placeholder/40/40',
+      time: '2h',
+      content: 'Aujourd\'hui j\'ai réussi à méditer 20 minutes sans interruption ! 🧘‍♀️ Les petites victoires comptent aussi.',
       likes: 12,
-      responses: 3
+      comments: 3,
+      mood: '😊',
+      category: 'Méditation'
     },
     {
       id: 2,
-      author: 'Ami Bienveillant',
-      content: 'Je partage une technique de respiration qui m\'aide beaucoup : 4 secondes d\'inspiration, 4 secondes de pause, 4 secondes d\'expiration. Simple mais efficace !',
-      time: '15 min',
-      likes: 28,
-      responses: 7
+      author: 'Alex D.',
+      avatar: '/api/placeholder/40/40',
+      time: '4h',
+      content: 'Partage d\'une playlist qui m\'aide vraiment quand je me sens anxieux. La musique peut vraiment transformer notre état d\'esprit 🎵',
+      likes: 8,
+      comments: 5,
+      mood: '🎵',
+      category: 'Musique'
     },
     {
       id: 3,
-      author: 'Compagnon de Route',
-      content: 'Qui d\'autre trouve que les matins sont les plus difficiles ? J\'aimerais des conseils pour bien commencer la journée.',
-      time: '1h',
-      likes: 19,
-      responses: 15
+      author: 'Marie L.',
+      avatar: '/api/placeholder/40/40',
+      time: '6h',
+      content: 'Session de respiration guidée terminée ! Je me sens tellement plus centrée. Qui d\'autre pratique la cohérence cardiaque ?',
+      likes: 15,
+      comments: 7,
+      mood: '🌟',
+      category: 'Respiration'
     }
   ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6" data-testid="page-root">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <Badge className="bg-blue-100 text-blue-800 px-4 py-2">
-              <Users className="w-4 h-4 mr-2" />
-              Communauté Bienveillante
-            </Badge>
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Social Cocoon
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Un espace sécurisé et anonyme pour partager, écouter et grandir ensemble dans la bienveillance
-          </p>
-        </div>
+  const groups = [
+    { name: 'Mindfulness au quotidien', members: 234, category: 'Méditation', color: 'bg-blue-100 text-blue-800' },
+    { name: 'Musicothérapie', members: 156, category: 'Musique', color: 'bg-purple-100 text-purple-800' },
+    { name: 'Gestion du stress', members: 189, category: 'Bien-être', color: 'bg-green-100 text-green-800' },
+    { name: 'Parents zen', members: 98, category: 'Famille', color: 'bg-orange-100 text-orange-800' }
+  ];
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm border-blue-200">
-            <CardContent className="p-6 text-center">
-              <Users className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-              <div className="text-2xl font-bold text-blue-600">590</div>
-              <div className="text-sm text-muted-foreground">Membres actifs</div>
-            </CardContent>
-          </Card>
+  const buddies = [
+    { name: 'Sophie M.', status: 'En ligne', mood: '😊', streak: 7 },
+    { name: 'Alex D.', status: 'Actif il y a 1h', mood: '🎵', streak: 12 },
+    { name: 'Marie L.', status: 'En méditation', mood: '🧘', streak: 5 },
+    { name: 'Tom R.', status: 'En ligne', mood: '⚡', streak: 3 }
+  ];
 
-          <Card className="bg-white/80 backdrop-blur-sm border-purple-200">
-            <CardContent className="p-6 text-center">
-              <MessageCircle className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-              <div className="text-2xl font-bold text-purple-600">1,247</div>
-              <div className="text-sm text-muted-foreground">Messages échangés</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardContent className="p-6 text-center">
-              <Heart className="w-8 h-8 mx-auto mb-2 text-pink-600" />
-              <div className="text-2xl font-bold text-pink-600">3,891</div>
-              <div className="text-sm text-muted-foreground">Cœurs partagés</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-green-200">
-            <CardContent className="p-6 text-center">
-              <Shield className="w-8 h-8 mx-auto mb-2 text-green-600" />
-              <div className="text-2xl font-bold text-green-600">100%</div>
-              <div className="text-sm text-muted-foreground">Sécurité garantie</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar - Groups */}
-          <div className="lg:col-span-1">
-            <Card className="bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Groupes</span>
-                  <Button size="sm" variant="outline">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {groups.map((group) => (
-                  <div
-                    key={group.id}
-                    className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                      selectedGroup === group.id
-                        ? 'bg-blue-100 border-2 border-blue-300'
-                        : 'bg-gray-50 hover:bg-gray-100'
-                    }`}
-                    onClick={() => setSelectedGroup(group.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{group.name}</span>
-                      <Badge className={group.color}>{group.members}</Badge>
-                    </div>
+  const renderFeed = () => (
+    <div className="space-y-6">
+      {/* New Post */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-start space-x-3">
+            <Avatar>
+              <AvatarImage src="/api/placeholder/40/40" />
+              <AvatarFallback>Moi</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 space-y-3">
+              <Textarea
+                placeholder="Partagez votre expérience, vos réussites ou demandez du soutien..."
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
+                className="min-h-[80px] resize-none"
+              />
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-500">Humeur:</span>
+                  <div className="flex space-x-1">
+                    {['😊', '😌', '🤗', '💪', '🌟'].map((emoji) => (
+                      <button key={emoji} className="text-lg hover:scale-110 transition-transform">
+                        {emoji}
+                      </button>
+                    ))}
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </div>
+                <Button disabled={!newPost.trim()}>
+                  Partager
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-            {/* Community Guidelines */}
-            <Card className="bg-white/80 backdrop-blur-sm mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="w-5 h-5 mr-2 text-green-600" />
-                  Règles du Cocoon
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="text-sm space-y-2 text-muted-foreground">
-                  <li>• Respect et bienveillance</li>
-                  <li>• Anonymat préservé</li>
-                  <li>• Pas de jugement</li>
-                  <li>• Écoute active</li>
-                  <li>• Confidentialité absolue</li>
-                </ul>
-              </CardContent>
-            </Card>
+      {/* Posts */}
+      {posts.map((post) => (
+        <motion.div
+          key={post.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <Avatar>
+                  <AvatarImage src={post.avatar} />
+                  <AvatarFallback>{post.author[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">{post.author}</span>
+                      <span className="text-gray-500 text-sm">•</span>
+                      <span className="text-gray-500 text-sm">{post.time}</span>
+                      <Badge variant="secondary" className="text-xs">
+                        {post.category}
+                      </Badge>
+                    </div>
+                    <span className="text-xl">{post.mood}</span>
+                  </div>
+                  <p className="text-gray-700 mb-3">{post.content}</p>
+                  <div className="flex items-center space-x-4 text-gray-500">
+                    <button className="flex items-center space-x-1 hover:text-red-500 transition-colors">
+                      <Heart className="h-4 w-4" />
+                      <span className="text-sm">{post.likes}</span>
+                    </button>
+                    <button className="flex items-center space-x-1 hover:text-blue-500 transition-colors">
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="text-sm">{post.comments}</span>
+                    </button>
+                    <button className="flex items-center space-x-1 hover:text-green-500 transition-colors">
+                      <Share2 className="h-4 w-4" />
+                      <span className="text-sm">Partager</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+  );
+
+  const renderGroups = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Groupes de soutien</h3>
+        <Button size="sm">
+          <Plus className="h-4 w-4 mr-2" />
+          Créer un groupe
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {groups.map((group, index) => (
+          <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h4 className="font-medium">{group.name}</h4>
+                  <p className="text-sm text-gray-600">{group.members} membres</p>
+                </div>
+                <Badge className={group.color}>
+                  {group.category}
+                </Badge>
+              </div>
+              <div className="flex items-center space-x-2 mb-3">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map((i) => (
+                    <Avatar key={i} className="w-6 h-6 border-2 border-white">
+                      <AvatarImage src={`/api/placeholder/24/24`} />
+                      <AvatarFallback className="text-xs">U{i}</AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500">+{group.members - 3} autres</span>
+              </div>
+              <Button variant="outline" size="sm" className="w-full">
+                Rejoindre
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderBuddies = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Vos buddies bien-être</h3>
+        <Button size="sm" variant="outline">
+          <Search className="h-4 w-4 mr-2" />
+          Trouver des buddies
+        </Button>
+      </div>
+      <div className="space-y-3">
+        {buddies.map((buddy, index) => (
+          <Card key={index}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Avatar>
+                    <AvatarImage src="/api/placeholder/40/40" />
+                    <AvatarFallback>{buddy.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">{buddy.name}</span>
+                      <span className="text-lg">{buddy.mood}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">{buddy.status}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <Badge variant="outline">
+                    🔥 {buddy.streak} jours
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full">
+              <Users className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              Social Cocon
+            </h1>
+          </div>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Connectez-vous avec une communauté bienveillante pour partager votre parcours bien-être
+          </p>
+        </motion.div>
+
+        {/* Navigation Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            {[
+              { id: 'feed', label: 'Fil d\'actualité', icon: MessageCircle },
+              { id: 'groups', label: 'Groupes', icon: Users },
+              { id: 'buddies', label: 'Buddies', icon: Heart }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-white text-purple-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3">
+            {activeTab === 'feed' && renderFeed()}
+            {activeTab === 'groups' && renderGroups()}
+            {activeTab === 'buddies' && renderBuddies()}
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* New Message */}
-            <Card className="bg-white/80 backdrop-blur-sm">
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Stats */}
+            <Card>
               <CardHeader>
-                <CardTitle>Partager avec la communauté</CardTitle>
-                <CardDescription>
-                  Votre message sera publié de façon anonyme et bienveillante
-                </CardDescription>
+                <CardTitle className="text-lg">Votre impact</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Textarea
-                  placeholder="Que souhaitez-vous partager avec la communauté ? Vos expériences, questions ou encouragements sont les bienvenus..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  className="min-h-[120px]"
-                />
-                <div className="flex justify-between items-center">
-                  <div className="flex space-x-2">
-                    <Badge variant="outline">Anonyme</Badge>
-                    <Badge variant="outline" className="text-green-600">Sécurisé</Badge>
-                  </div>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Send className="w-4 h-4 mr-2" />
-                    Partager
-                  </Button>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">47</div>
+                  <div className="text-sm text-gray-600">Posts d'encouragement</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-pink-600">128</div>
+                  <div className="text-sm text-gray-600">Personnes aidées</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">12</div>
+                  <div className="text-sm text-gray-600">Buddies actifs</div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Messages Feed */}
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <Card key={message.id} className="bg-white/80 backdrop-blur-sm hover:shadow-md transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="font-medium text-gray-800">{message.author}</span>
-                          <Badge variant="outline" className="text-xs">Anonyme</Badge>
-                          <span className="text-sm text-muted-foreground">• {message.time}</span>
-                        </div>
-                        <p className="text-gray-700 mb-4">{message.content}</p>
-                        <div className="flex items-center space-x-4">
-                          <Button variant="ghost" size="sm" className="text-pink-600 hover:text-pink-700">
-                            <Heart className="w-4 h-4 mr-1" />
-                            {message.likes}
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                            <MessageCircle className="w-4 h-4 mr-1" />
-                            {message.responses}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {/* Community Guidelines */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Règles de la communauté</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex items-start space-x-2">
+                  <Heart className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <span>Bienveillance et respect mutuel</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <MessageCircle className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <span>Partage constructif d'expériences</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Users className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Soutien sans jugement</span>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Load More */}
-            <div className="text-center">
-              <Button variant="outline" className="w-full md:w-auto">
-                Charger plus de messages
-              </Button>
-            </div>
+            {/* Trending Topics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Sujets populaires</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {['#MéditationMatinale', '#GestionStress', '#Gratitude', '#SommeilRéparateur'].map((tag) => (
+                    <Badge key={tag} variant="secondary" className="mr-2 mb-2">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

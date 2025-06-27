@@ -1,220 +1,332 @@
-
-import { Navigate } from 'react-router-dom';
+import React, { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
 import Layout from '@/components/layout/Layout';
-import LoadingAnimation from '@/components/ui/loading-animation';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import PageAccessGuard from '@/components/access/PageAccessGuard';
 
-// Lazy loading des pages principales
+// Lazy load pages
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
-// Pages B2C
-const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+// B2C Pages
+const B2CLoginPage = lazy(() => import('@/pages/b2c/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/b2c/B2CRegisterPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
 
-// Pages B2B User
-const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/B2BUserRegisterPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/B2BUserDashboardPage'));
+// B2B Pages
+const B2BSelectionPage = lazy(() => import('@/pages/b2b/B2BSelectionPage'));
+const B2BUserLoginPage = lazy(() => import('@/pages/b2b/B2BUserLoginPage'));
+const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/B2BAdminLoginPage'));
+const B2BUserDashboard = lazy(() => import('@/pages/b2b/B2BUserDashboard'));
+const B2BAdminDashboard = lazy(() => import('@/pages/b2b/B2BAdminDashboard'));
 
-// Pages B2B Admin
-const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/B2BAdminLoginPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/B2BAdminDashboardPage'));
-
-// Pages de fonctionnalités
+// Feature Pages
 const ScanPage = lazy(() => import('@/pages/ScanPage'));
 const MusicPage = lazy(() => import('@/pages/MusicPage'));
+const VRPage = lazy(() => import('@/pages/VRPage'));
 const CoachPage = lazy(() => import('@/pages/CoachPage'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
-const VRPage = lazy(() => import('@/pages/VRPage'));
 const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const SocialCocoonPage = lazy(() => import('@/pages/SocialCocoonPage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
-const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 
-// Nouvelles pages créées
-const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
-const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
-const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
-const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
-const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
+// New Ambition & Progression Pages
+const AmbitionArcadePage = lazy(() => import('@/pages/AmbitionArcadePage'));
+const WeeklyBarsPage = lazy(() => import('@/pages/WeeklyBarsPage'));
+const HeatmapVibesPage = lazy(() => import('@/pages/HeatmapVibesPage'));
 
-// Nouvelles pages immersives
-const VRGalactiquePage = lazy(() => import('@/pages/VRGalactiquePage'));
-const ScreenSilkBreakPage = lazy(() => import('@/pages/ScreenSilkBreakPage'));
-const StorySynthLabPage = lazy(() => import('@/pages/StorySynthLabPage'));
-const ARFiltersPage = lazy(() => import('@/pages/ARFiltersPage'));
-const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
+// New User Spaces Pages
+const SocialCoconPage = lazy(() => import('@/pages/SocialCoconPage'));
+const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
+const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
 
-// Wrapper pour le Suspense
-const withSuspense = (Component: React.ComponentType) => () => (
-  <Suspense fallback={<LoadingAnimation text="Chargement de la page..." />}>
-    <Component />
-  </Suspense>
-);
+// Admin Pages
+const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
+const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
+const SystemAuditPage = lazy(() => import('@/pages/SystemAuditPage'));
+const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
+const InnovationLabPage = lazy(() => import('@/pages/InnovationLabPage'));
+const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
+const PrivacyDashboardPage = lazy(() => import('@/pages/PrivacyDashboardPage'));
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
+  console.log('🔧 Building unified routes...');
+
   return [
+    // Layout wrapper
     {
       path: '/',
       element: <Layout />,
       children: [
+        // Public routes
         {
           index: true,
-          element: withSuspense(HomePage)(),
+          element: <HomePage />,
         },
         {
           path: 'choose-mode',
-          element: withSuspense(ChooseModePage)(),
+          element: <ChooseModePage />,
+        },
+        {
+          path: 'auth',
+          element: <AuthPage />,
         },
         {
           path: 'onboarding',
-          element: withSuspense(OnboardingPage)(),
+          element: <OnboardingPage />,
         },
 
-        // Routes B2C
+        // B2C Routes
         {
           path: 'b2c/login',
-          element: withSuspense(B2CLoginPage)(),
+          element: <B2CLoginPage />,
         },
         {
           path: 'b2c/register',
-          element: withSuspense(B2CRegisterPage)(),
+          element: <B2CRegisterPage />,
         },
         {
           path: 'b2c/dashboard',
-          element: withSuspense(B2CDashboardPage)(),
+          element: (
+            <ProtectedRoute>
+              <B2CDashboardPage />
+            </ProtectedRoute>
+          ),
         },
 
-        // Routes B2B User
+        // B2B Routes
         {
-          path: 'b2b/user/login',
-          element: withSuspense(B2BUserLoginPage)(),
+          path: 'b2b/selection',
+          element: <B2BSelectionPage />,
         },
         {
-          path: 'b2b/user/register',
-          element: withSuspense(B2BUserRegisterPage)(),
+          path: 'b2b/user/login',
+          element: <B2BUserLoginPage />,
+        },
+        {
+          path: 'b2b/admin/login',
+          element: <B2BAdminLoginPage />,
         },
         {
           path: 'b2b/user/dashboard',
-          element: withSuspense(B2BUserDashboardPage)(),
-        },
-
-        // Routes B2B Admin
-        {
-          path: 'b2b/admin/login',
-          element: withSuspense(B2BAdminLoginPage)(),
+          element: (
+            <ProtectedRoute>
+              <B2BUserDashboard />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'b2b/admin/dashboard',
-          element: withSuspense(B2BAdminDashboardPage)(),
+          element: (
+            <ProtectedRoute allowedRoles={['b2b_admin']}>
+              <B2BAdminDashboard />
+            </ProtectedRoute>
+          ),
         },
 
-        // Routes de fonctionnalités principales
+        // Feature Routes
         {
           path: 'scan',
-          element: withSuspense(ScanPage)(),
+          element: (
+            <ProtectedRoute>
+              <ScanPage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'music',
-          element: withSuspense(MusicPage)(),
-        },
-        {
-          path: 'coach',
-          element: withSuspense(CoachPage)(),
-        },
-        {
-          path: 'journal',
-          element: withSuspense(JournalPage)(),
+          element: (
+            <ProtectedRoute>
+              <MusicPage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'vr',
-          element: withSuspense(VRPage)(),
+          element: (
+            <ProtectedRoute>
+              <VRPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'coach',
+          element: (
+            <ProtectedRoute>
+              <CoachPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'journal',
+          element: (
+            <ProtectedRoute>
+              <JournalPage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'preferences',
-          element: withSuspense(PreferencesPage)(),
+          element: (
+            <ProtectedRoute>
+              <PreferencesPage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'gamification',
-          element: withSuspense(GamificationPage)(),
-        },
-        {
-          path: 'social-cocon',
-          element: withSuspense(SocialCocoonPage)(),
+          element: (
+            <ProtectedRoute>
+              <GamificationPage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: 'notifications',
-          element: withSuspense(NotificationsPage)(),
-        },
-        {
-          path: 'help-center',
-          element: withSuspense(HelpCenterPage)(),
-        },
-
-        // Routes mesure & adaptation immédiate
-        {
-          path: 'flash-glow',
-          element: withSuspense(FlashGlowPage)(),
-        },
-        {
-          path: 'boss-level-grit',
-          element: withSuspense(BossLevelGritPage)(),
-        },
-        {
-          path: 'mood-mixer',
-          element: withSuspense(MoodMixerPage)(),
-        },
-        {
-          path: 'bounce-back-battle',
-          element: withSuspense(BounceBackBattlePage)(),
-        },
-        {
-          path: 'breathwork',
-          element: withSuspense(BreathworkPage)(),
-        },
-        {
-          path: 'instant-glow',
-          element: withSuspense(InstantGlowPage)(),
+          element: (
+            <ProtectedRoute>
+              <PageAccessGuard>
+                <NotificationsPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
         },
 
-        // Routes expériences immersives
+        // New Ambition & Progression routes
         {
-          path: 'vr-galactique',
-          element: withSuspense(VRGalactiquePage)(),
+          path: 'ambition-arcade',
+          element: (
+            <ProtectedRoute>
+              <AmbitionArcadePage />
+            </ProtectedRoute>
+          ),
         },
         {
-          path: 'screen-silk-break',
-          element: withSuspense(ScreenSilkBreakPage)(),
+          path: 'weekly-bars', 
+          element: (
+            <ProtectedRoute>
+              <WeeklyBarsPage />
+            </ProtectedRoute>
+          ),
         },
         {
-          path: 'story-synth-lab',
-          element: withSuspense(StorySynthLabPage)(),
-        },
-        {
-          path: 'ar-filters',
-          element: withSuspense(ARFiltersPage)(),
-        },
-        {
-          path: 'bubble-beat',
-          element: withSuspense(BubbleBeatPage)(),
+          path: 'heatmap-vibes',
+          element: (
+            <ProtectedRoute>
+              <HeatmapVibesPage />
+            </ProtectedRoute>
+          ),
         },
 
-        // Redirections
+        // New User Spaces routes
         {
-          path: 'b2b',
-          element: <Navigate to="/b2b/admin/dashboard" replace />,
+          path: 'social-cocon',
+          element: (
+            <ProtectedRoute>
+              <SocialCoconPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'profile-settings',
+          element: (
+            <ProtectedRoute>
+              <ProfileSettingsPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'activity-history',
+          element: (
+            <ProtectedRoute>
+              <ActivityHistoryPage />
+            </ProtectedRoute>
+          ),
+        },
+
+        // Admin Routes
+        {
+          path: 'reports',
+          element: (
+            <ProtectedRoute>
+              <PageAccessGuard>
+                <ReportsPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'security',
+          element: (
+            <ProtectedRoute>
+              <SecurityPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'audit',
+          element: (
+            <ProtectedRoute allowedRoles={['b2b_admin']}>
+              <PageAccessGuard>
+                <SystemAuditPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'accessibility',
+          element: (
+            <ProtectedRoute>
+              <PageAccessGuard>
+                <AccessibilityPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'innovation',
+          element: (
+            <ProtectedRoute>
+              <PageAccessGuard>
+                <InnovationLabPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'feedback',
+          element: (
+            <ProtectedRoute>
+              <PageAccessGuard>
+                <FeedbackPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'privacy',
+          element: (
+            <ProtectedRoute>
+              <PageAccessGuard>
+                <PrivacyDashboardPage />
+              </PageAccessGuard>
+            </ProtectedRoute>
+          ),
+        },
+
+        // Catch-all route
+        {
+          path: '*',
+          element: <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold mb-4">Page non trouvée</h1>
+              <p className="text-gray-600">Cette route n'existe pas encore.</p>
+            </div>
+          </div>,
         },
       ],
-    },
-    {
-      path: '*',
-      element: <Navigate to="/" replace />,
     },
   ];
 };
