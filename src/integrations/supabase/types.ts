@@ -361,6 +361,66 @@ export type Database = {
         }
         Relationships: []
       }
+      edn_items_immersive: {
+        Row: {
+          audio_ambiance: Json | null
+          created_at: string
+          id: string
+          interaction_config: Json | null
+          item_code: string
+          paroles_musicales: string[] | null
+          pitch_intro: string | null
+          quiz_questions: Json | null
+          reward_messages: Json | null
+          scene_immersive: Json | null
+          slug: string
+          subtitle: string | null
+          tableau_rang_a: Json | null
+          tableau_rang_b: Json | null
+          title: string
+          updated_at: string
+          visual_ambiance: Json | null
+        }
+        Insert: {
+          audio_ambiance?: Json | null
+          created_at?: string
+          id?: string
+          interaction_config?: Json | null
+          item_code: string
+          paroles_musicales?: string[] | null
+          pitch_intro?: string | null
+          quiz_questions?: Json | null
+          reward_messages?: Json | null
+          scene_immersive?: Json | null
+          slug: string
+          subtitle?: string | null
+          tableau_rang_a?: Json | null
+          tableau_rang_b?: Json | null
+          title: string
+          updated_at?: string
+          visual_ambiance?: Json | null
+        }
+        Update: {
+          audio_ambiance?: Json | null
+          created_at?: string
+          id?: string
+          interaction_config?: Json | null
+          item_code?: string
+          paroles_musicales?: string[] | null
+          pitch_intro?: string | null
+          quiz_questions?: Json | null
+          reward_messages?: Json | null
+          scene_immersive?: Json | null
+          slug?: string
+          subtitle?: string | null
+          tableau_rang_a?: Json | null
+          tableau_rang_b?: Json | null
+          title?: string
+          updated_at?: string
+          visual_ambiance?: Json | null
+        }
+        Relationships: []
+      }
       emotions: {
         Row: {
           ai_feedback: string | null
