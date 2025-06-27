@@ -841,6 +841,33 @@ export type Database = {
         }
         Relationships: []
       }
+      page_analytics: {
+        Row: {
+          id: string
+          interactions_count: number | null
+          route_path: string
+          session_duration: number | null
+          timestamp: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          interactions_count?: number | null
+          route_path: string
+          session_duration?: number | null
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          interactions_count?: number | null
+          route_path?: string
+          session_duration?: number | null
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string
@@ -943,6 +970,42 @@ export type Database = {
           id?: string
           is_completed?: boolean | null
           name?: string
+        }
+        Relationships: []
+      }
+      route_metadata: {
+        Row: {
+          category: string
+          completion_percentage: number | null
+          components_used: Json | null
+          created_at: string | null
+          features: Json | null
+          id: string
+          last_updated: string | null
+          page_name: string
+          route_path: string
+        }
+        Insert: {
+          category: string
+          completion_percentage?: number | null
+          components_used?: Json | null
+          created_at?: string | null
+          features?: Json | null
+          id?: string
+          last_updated?: string | null
+          page_name: string
+          route_path: string
+        }
+        Update: {
+          category?: string
+          completion_percentage?: number | null
+          components_used?: Json | null
+          created_at?: string | null
+          features?: Json | null
+          id?: string
+          last_updated?: string | null
+          page_name?: string
+          route_path?: string
         }
         Relationships: []
       }
