@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
-  console.log('App component mounting...');
+  console.log('🚀 App component mounting...');
   
   return (
     <ErrorBoundary>
@@ -29,6 +29,9 @@ const App: React.FC = () => {
                   <div className="text-center">
                     <h1 className="text-2xl font-bold text-red-600 mb-4">Erreur de routage</h1>
                     <p className="text-muted-foreground">Une erreur s'est produite lors du chargement de la page.</p>
+                    <p className="text-xs text-gray-400 mt-2">
+                      Consultez /emergency pour plus de détails
+                    </p>
                   </div>
                 </div>
               }>
