@@ -1,47 +1,48 @@
 
-import React, { Suspense } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider } from 'react-router-dom';
-import { router } from '@/router';
-import AuthProvider from '@/components/auth/AuthProvider';
-import LoadingAnimation from '@/components/ui/loading-animation';
-import { Toaster } from '@/components/ui/sonner';
-import './App.css';
+import { ThemeProvider } from './contexts/ThemeContext';
+import MusicProvider from './contexts/MusicContext';
+import ErrorBoundary from './components/ErrorBoundary';
+import AppRouter from './router/AppRouter';
 
-// Configuration du client React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: (failureCount, error: any) => {
-        // Ne pas retry si l'erreur est liée à l'authentification
-        if (error?.status === 401 || error?.status === 403) {
-          return false;
-        }
-        return failureCount < 3;
-      }
-    }
-  }
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
-function App() {
+const App: React.FC = () => {
+  console.log('App component mounting...');
+  
   return (
-    <HelmetProvider>
+    <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-background">
-              <LoadingAnimation text="Initialisation de l'application..." size="lg" />
-            </div>
-          }>
-            <RouterProvider router={router} />
-          </Suspense>
-          <Toaster />
-        </AuthProvider>
+        <ThemeProvider>
+          <MusicProvider>
+            <BrowserRouter>
+              <div className="min-h-screen bg-background">
+                <ErrorBoundary fallback={
+                  <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                      <h1 className="text-2xl font-bold text-red-600 mb-4">Erreur de routage</h1>
+                      <p className="text-muted-foreground">Une erreur s'est produite lors du chargement de la page.</p>
+                    </div>
+                  </div>
+                }>
+                  <AppRouter />
+                </ErrorBoundary>
+              </div>
+            </BrowserRouter>
+          </MusicProvider>
+        </ThemeProvider>
       </QueryClientProvider>
-    </HelmetProvider>
+    </ErrorBoundary>
   );
-}
+};
 
 export default App;
