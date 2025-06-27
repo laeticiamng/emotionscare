@@ -1,23 +1,23 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/hooks/use-toast';
+import B2CAuthLayout from '@/components/auth/B2CAuthLayout';
 import { 
-  User, 
   Mail, 
   Lock, 
-  ArrowRight, 
   Eye, 
-  EyeOff,
-  Shield,
-  Heart
+  EyeOff, 
+  User 
 } from 'lucide-react';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebook, FaApple } from 'react-icons/fa';
 
 const B2CRegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,220 +29,267 @@ const B2CRegisterPage: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false,
-    acceptNewsletter: false
+    acceptTerms: false
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Erreur",
+        description: "Les mots de passe ne correspondent pas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez accepter les conditions d'utilisation.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Simulation d'inscription
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Inscription réussie !",
+        description: "Votre compte a été créé avec succès. Bienvenue !",
+      });
+      
+      navigate('/b2c/dashboard');
+    } catch (error) {
+      toast({
+        title: "Erreur d'inscription",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
-      return;
-    }
-    if (!formData.acceptTerms) {
-      alert('Vous devez accepter les conditions d\'utilisation');
-      return;
-    }
-    console.log('Inscription avec:', formData);
-    navigate('/b2c/dashboard');
+  const handleSocialLogin = (provider: string) => {
+    toast({
+      title: "Inscription sociale",
+      description: `L'inscription via ${provider} sera bientôt disponible !`,
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-indigo-900 flex items-center justify-center p-4" data-testid="page-root">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
-      >
-        <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-2xl">
-          <CardHeader className="text-center">
-            <Badge className="mb-4 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 w-fit mx-auto">
-              Espace Particulier
-            </Badge>
-            <CardTitle className="text-2xl font-bold">
-              <h1>Inscription Particulier</h1>
-            </CardTitle>
-            <p className="text-slate-600 dark:text-slate-300">
-              Créez votre compte personnel de bien-être
-            </p>
-          </CardHeader>
-          
-          <CardContent>
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input
-                      id="firstName"
-                      type="text"
-                      placeholder="Prénom"
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
+    <B2CAuthLayout
+      title="Inscription Personnelle"
+      subtitle="Créez votre espace de bien-être émotionnel"
+    >
+      <Card className="w-full">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
+          <CardDescription className="text-center">
+            Rejoignez EmotionsCare et prenez soin de votre bien-être
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Boutons d'inscription sociale */}
+          <div className="grid grid-cols-3 gap-3">
+            <Button
+              variant="outline"
+              onClick={() => handleSocialLogin('Google')}
+              className="w-full"
+            >
+              <FcGoogle className="w-4 h-4 mr-2" />
+              Google
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleSocialLogin('Facebook')}
+              className="w-full"
+            >
+              <FaFacebook className="w-4 h-4 mr-2 text-blue-600" />
+              Facebook
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleSocialLogin('Apple')}
+              className="w-full"
+            >
+              <FaApple className="w-4 h-4 mr-2" />
+              Apple
+            </Button>
+          </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input
-                      id="lastName"
-                      type="text"
-                      placeholder="Nom"
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Ou s'inscrire avec
+              </span>
+            </div>
+          </div>
 
+          {/* Formulaire d'inscription */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="firstName">Prénom</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    id="firstName"
+                    type="text"
+                    placeholder="Prénom"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                     className="pl-10"
                     required
                   />
                 </div>
               </div>
-
+              
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="lastName">Nom</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="pl-10 pr-10"
+                    id="lastName"
+                    type="text"
+                    placeholder="Nom"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                    className="pl-10"
                     required
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-slate-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-slate-400" />
-                    )}
-                  </Button>
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-slate-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-slate-400" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="acceptTerms"
-                    checked={formData.acceptTerms}
-                    onCheckedChange={(checked) => handleInputChange('acceptTerms', checked as boolean)}
-                  />
-                  <Label htmlFor="acceptTerms" className="text-sm">
-                    J'accepte les{' '}
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto font-normal text-blue-600 hover:text-blue-700"
-                      onClick={() => navigate('/terms')}
-                    >
-                      conditions d'utilisation
-                    </Button>
-                  </Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="acceptNewsletter"
-                    checked={formData.acceptNewsletter}
-                    onCheckedChange={(checked) => handleInputChange('acceptNewsletter', checked as boolean)}
-                  />
-                  <Label htmlFor="acceptNewsletter" className="text-sm">
-                    Je souhaite recevoir les actualités et conseils bien-être
-                  </Label>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                size="lg"
-              >
-                <Heart className="mr-2 h-4 w-4" />
-                Créer mon compte
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-slate-600 dark:text-slate-300">
-              Déjà un compte ?{' '}
-              <Button
-                variant="link"
-                className="p-0 h-auto font-normal text-blue-600 hover:text-blue-700"
-                onClick={() => navigate('/b2c/login')}
-              >
-                Se connecter
-              </Button>
             </div>
 
-            <div className="mt-4 flex items-center justify-center text-xs text-slate-500">
-              <Shield className="mr-1 h-3 w-3" />
-              Vos données sont sécurisées et protégées
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  className="pl-10 pr-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="pl-10 pr-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="terms"
+                checked={formData.acceptTerms}
+                onCheckedChange={(checked) => 
+                  setFormData(prev => ({ ...prev, acceptTerms: checked as boolean }))
+                }
+              />
+              <Label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                J'accepte les{' '}
+                <Link to="/legal/terms" className="text-primary hover:underline">
+                  conditions d'utilisation
+                </Link>{' '}
+                et la{' '}
+                <Link to="/legal/privacy" className="text-primary hover:underline">
+                  politique de confidentialité
+                </Link>
+              </Label>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              disabled={isLoading}
+            >
+              {isLoading ? "Création du compte..." : "Créer mon compte"}
+            </Button>
+          </form>
+
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">Déjà un compte ? </span>
+            <Link
+              to="/b2c/login"
+              className="text-primary hover:underline font-medium"
+            >
+              Se connecter
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </B2CAuthLayout>
   );
 };
 
