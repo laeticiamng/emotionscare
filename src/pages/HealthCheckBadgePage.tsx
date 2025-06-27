@@ -1,230 +1,321 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Heart, Activity, Brain, Zap, Shield, Award, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Shield, 
+  CheckCircle, 
+  AlertTriangle, 
+  XCircle, 
+  Activity,
+  Server,
+  Database,
+  Wifi,
+  Lock,
+  Eye,
+  Award,
+  Trophy,
+  Star,
+  Target,
+  Zap
+} from 'lucide-react';
 
 const HealthCheckBadgePage: React.FC = () => {
-  const [overallScore, setOverallScore] = useState(0);
-  const [isScanning, setIsScanning] = useState(false);
+  const [activeTab, setActiveTab] = useState('health');
 
-  const healthMetrics = [
+  // Données de santé du système
+  const systemHealth = {
+    overall: 'good',
+    uptime: '99.9%',
+    responseTime: '120ms',
+    services: [
+      { name: 'API Backend', status: 'healthy', icon: Server },
+      { name: 'Base de données', status: 'healthy', icon: Database },
+      { name: 'Réseau', status: 'healthy', icon: Wifi },
+      { name: 'Sécurité', status: 'warning', icon: Lock },
+      { name: 'Monitoring', status: 'healthy', icon: Eye }
+    ]
+  };
+
+  // Badges de santé disponibles
+  const healthBadges = [
     {
-      name: 'Équilibre Émotionnel',
-      score: 85,
-      icon: Heart,
-      color: 'text-red-500',
-      status: 'Excellent',
-      details: 'Gestion du stress optimale, émotions bien régulées'
+      id: 1,
+      name: 'Système Stable',
+      description: 'Maintenir 99%+ d\'uptime pendant 30 jours',
+      icon: '🛡️',
+      earned: true,
+      progress: 100,
+      category: 'stability'
     },
     {
-      name: 'Activité Mentale',
-      score: 78,
-      icon: Brain,
-      color: 'text-purple-500',
-      status: 'Bon',
-      details: 'Concentration stable, créativité active'
+      id: 2,
+      name: 'Performance Pro',
+      description: 'Temps de réponse < 200ms pendant une semaine',
+      icon: '⚡',
+      earned: true,
+      progress: 100,
+      category: 'performance'
     },
     {
-      name: 'Énergie Vitale',
-      score: 92,
-      icon: Zap,
-      color: 'text-yellow-500',
-      status: 'Excellent',
-      details: 'Niveau d\'énergie très élevé, motivation forte'
+      id: 3,
+      name: 'Sécurité Renforcée',
+      description: 'Aucune vulnérabilité critique détectée',
+      icon: '🔒',
+      earned: false,
+      progress: 75,
+      category: 'security'
     },
     {
-      name: 'Activité Physique',
-      score: 67,
-      icon: Activity,
-      color: 'text-green-500',
-      status: 'Modéré',
-      details: 'Exercices réguliers recommandés'
+      id: 4,
+      name: 'Monitoring Master',
+      description: 'Surveillance active 24/7',
+      icon: '👁️',
+      earned: true,
+      progress: 100,
+      category: 'monitoring'
     },
     {
-      name: 'Résilience',
-      score: 89,
-      icon: Shield,
-      color: 'text-blue-500',
-      status: 'Excellent',
-      details: 'Capacité d\'adaptation remarquable'
+      id: 5,
+      name: 'Data Guardian',
+      description: 'Sauvegarde réussie tous les jours',
+      icon: '💾',
+      earned: false,
+      progress: 60,
+      category: 'backup'
+    },
+    {
+      id: 6,
+      name: 'Zero Downtime',
+      description: 'Aucune interruption de service ce mois',
+      icon: '🎯',
+      earned: false,
+      progress: 85,
+      category: 'availability'
     }
   ];
 
-  const badges = [
-    { name: 'Maître du Zen', icon: '🧘', earned: true, date: '2024-06-15' },
-    { name: 'Cœur d\'Or', icon: '💛', earned: true, date: '2024-06-10' },
-    { name: 'Esprit Vif', icon: '🧠', earned: true, date: '2024-06-05' },
-    { name: 'Énergie Pure', icon: '⚡', earned: false, date: null },
-    { name: 'Guerrier Sage', icon: '🛡️', earned: true, date: '2024-06-01' }
-  ];
-
-  useEffect(() => {
-    const avgScore = healthMetrics.reduce((sum, metric) => sum + metric.score, 0) / healthMetrics.length;
-    setOverallScore(Math.round(avgScore));
-  }, []);
-
-  const startHealthScan = () => {
-    setIsScanning(true);
-    setTimeout(() => setIsScanning(false), 3000);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'healthy': return 'text-green-600';
+      case 'warning': return 'text-yellow-600';
+      case 'error': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'healthy': return CheckCircle;
+      case 'warning': return AlertTriangle;
+      case 'error': return XCircle;
+      default: return Activity;
+    }
   };
 
-  const getStatusIcon = (score: number) => {
-    if (score >= 80) return <CheckCircle className="h-4 w-4 text-green-600" />;
-    if (score >= 60) return <Clock className="h-4 w-4 text-yellow-600" />;
-    return <AlertTriangle className="h-4 w-4 text-red-600" />;
+  const getBadgeColor = (category: string) => {
+    switch (category) {
+      case 'stability': return 'bg-blue-100 text-blue-800';
+      case 'performance': return 'bg-green-100 text-green-800';
+      case 'security': return 'bg-red-100 text-red-800';
+      case 'monitoring': return 'bg-purple-100 text-purple-800';
+      case 'backup': return 'bg-orange-100 text-orange-800';
+      case 'availability': return 'bg-indigo-100 text-indigo-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">Bilan de Santé Holistique</h1>
-        <p className="text-xl text-muted-foreground">
-          Votre tableau de bord bien-être complet
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            🏥 Health Check & Badges
+          </h1>
+          <p className="text-xl text-gray-600 mb-6">
+            Surveillez la santé de votre système et débloquez des badges
+          </p>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Score Global */}
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              Score Global
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            >
-              <div className="relative w-32 h-32 mx-auto mb-4">
-                <svg className="transform -rotate-90 w-32 h-32">
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    fill="transparent"
-                    className="text-gray-200"
-                  />
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    fill="transparent"
-                    strokeDasharray={351.86}
-                    strokeDashoffset={351.86 - (351.86 * overallScore) / 100}
-                    className={getScoreColor(overallScore)}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className={`text-3xl font-bold ${getScoreColor(overallScore)}`}>
-                    {overallScore}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-            
-            <Badge variant={overallScore >= 80 ? "default" : overallScore >= 60 ? "secondary" : "destructive"}>
-              {overallScore >= 80 ? "Excellent" : overallScore >= 60 ? "Bon" : "À améliorer"}
-            </Badge>
-            
-            <Button 
-              onClick={startHealthScan}
-              disabled={isScanning}
-              className="w-full mt-4"
-            >
-              {isScanning ? "Analyse en cours..." : "Nouveau Scan"}
-            </Button>
-          </CardContent>
-        </Card>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="health">État du Système</TabsTrigger>
+            <TabsTrigger value="badges">Badges de Santé</TabsTrigger>
+            <TabsTrigger value="achievements">Réalisations</TabsTrigger>
+          </TabsList>
 
-        {/* Métriques Détaillées */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Métriques de Santé</CardTitle>
-            <CardDescription>
-              Analyse détaillée de votre bien-être
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {healthMetrics.map((metric) => (
-                <div key={metric.name} className="flex items-center space-x-4">
-                  <metric.icon className={`h-6 w-6 ${metric.color}`} />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-medium">{metric.name}</span>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(metric.score)}
-                        <span className={`font-bold ${getScoreColor(metric.score)}`}>
-                          {metric.score}%
-                        </span>
-                      </div>
+          <TabsContent value="health" className="space-y-6">
+            {/* Vue d'ensemble de la santé */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-6 w-6 text-green-600" />
+                  État Global du Système
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-600 mb-2">
+                      {systemHealth.uptime}
                     </div>
-                    <Progress value={metric.score} className="h-2 mb-1" />
-                    <p className="text-xs text-muted-foreground">{metric.details}</p>
+                    <p className="text-gray-600">Disponibilité</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-600 mb-2">
+                      {systemHealth.responseTime}
+                    </div>
+                    <p className="text-gray-600">Temps de réponse</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">
+                      5/5
+                    </div>
+                    <p className="text-gray-600">Services actifs</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
-        {/* Badges Gagnés */}
-        <Card className="md:col-span-full">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="h-5 w-5" />
-              Badges de Réalisation
-            </CardTitle>
-            <CardDescription>
-              Vos accomplissements en matière de bien-être
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-5">
-              {badges.map((badge) => (
-                <motion.div
-                  key={badge.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`p-4 rounded-lg border text-center transition-all ${
-                    badge.earned 
-                      ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200' 
-                      : 'bg-gray-50 border-gray-200 opacity-60'
-                  }`}
-                >
-                  <div className="text-4xl mb-2">{badge.icon}</div>
-                  <h3 className="font-medium text-sm mb-1">{badge.name}</3>
-                  {badge.earned ? (
-                    <p className="text-xs text-green-600">
-                      Obtenu le {new Date(badge.date!).toLocaleDateString()}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      Pas encore obtenu
-                    </p>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+            {/* État des services */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Services et Composants</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {systemHealth.services.map((service, index) => {
+                    const StatusIcon = getStatusIcon(service.status);
+                    const ServiceIcon = service.icon;
+                    
+                    return (
+                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <ServiceIcon className="h-6 w-6 text-gray-600" />
+                          <span className="font-medium">{service.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getBadgeColor('monitoring')}>
+                            {service.status}
+                          </Badge>
+                          <StatusIcon className={`h-5 w-5 ${getStatusColor(service.status)}`} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="badges" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-6 w-6 text-yellow-600" />
+                  Badges de Santé Système
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {healthBadges.map((badge) => (
+                    <div 
+                      key={badge.id}
+                      className={`p-6 rounded-lg border-2 transition-all duration-300 ${
+                        badge.earned 
+                          ? 'border-green-300 bg-green-50 shadow-lg' 
+                          : 'border-gray-200 bg-gray-50'
+                      }`}
+                    >
+                      <div className="text-4xl mb-2">{badge.icon}</div>
+                      <h3 className="font-medium text-sm mb-1">{badge.name}</h3>
+                      {badge.earned ? (
+                        <p className="text-xs text-green-600">
+                          ✅ Badge débloqué !
+                        </p>
+                      ) : (
+                        <>
+                          <p className="text-xs text-gray-600 mb-3">
+                            {badge.description}
+                          </p>
+                          <div className="space-y-2">
+                            <Progress value={badge.progress} className="h-2" />
+                            <p className="text-xs text-gray-500">
+                              Progression: {badge.progress}%
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="achievements" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-6 w-6 text-yellow-600" />
+                  Réalisations et Statistiques
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-lg">Statistiques</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span>Badges débloqués</span>
+                        <Badge className="bg-green-100 text-green-800">
+                          3/6
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Jours sans incident</span>
+                        <Badge className="bg-blue-100 text-blue-800">
+                          45
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Score de santé</span>
+                        <Badge className="bg-purple-100 text-purple-800">
+                          8.5/10
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-lg">Prochains Objectifs</h4>
+                    <div className="space-y-3">
+                      <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <p className="text-sm font-medium text-yellow-800">
+                          🎯 Résoudre les alertes de sécurité
+                        </p>
+                        <p className="text-xs text-yellow-600 mt-1">
+                          25% restant pour le badge "Sécurité Renforcée"
+                        </p>
+                      </div>
+                      <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <p className="text-sm font-medium text-orange-800">
+                          💾 Améliorer les sauvegardes
+                        </p>
+                        <p className="text-xs text-orange-600 mt-1">
+                          40% restant pour le badge "Data Guardian"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
