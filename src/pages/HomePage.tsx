@@ -1,134 +1,108 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Users, Shield, Zap } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Rocket, BrainCircuit, HeartHandshake, Music2 } from 'lucide-react';
+import MusicGenerationTest from '@/components/music/MusicGenerationTest';
 
-const HomePage: React.FC = () => {
+export default function HomePage() {
+  const features = [
+    {
+      title: 'Analyse émotionnelle',
+      description: 'Comprenez vos émotions grâce à notre IA avancée.',
+      icon: BrainCircuit,
+    },
+    {
+      title: 'Musique personnalisée',
+      description: 'Laissez la musique vous accompagner selon votre humeur.',
+      icon: Music2,
+    },
+    {
+      title: 'Communauté de soutien',
+      description: 'Partagez et échangez avec une communauté bienveillante.',
+      icon: HeartHandshake,
+    },
+  ];
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            EmotionsCare
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Page d'accueil fonctionnelle - Votre plateforme de bien-être émotionnel au travail
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" data-testid="home-page">
+      <header className="bg-white shadow-md">
+        <div className="container mx-auto py-6 px-4">
+          <h1 className="text-3xl font-bold text-gray-800">EmotionsCare</h1>
+          <p className="text-gray-600 mt-2">Votre allié pour le bien-être émotionnel.</p>
+        </div>
+      </header>
+      
+      <section className="bg-primary/10 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-extrabold text-primary mb-6">Découvrez une nouvelle façon de prendre soin de vous</h2>
+          <p className="text-lg text-gray-700 mb-8">
+            EmotionsCare vous offre des outils personnalisés pour explorer, comprendre et gérer vos émotions au quotidien.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button asChild size="lg" className="text-lg px-8 py-3">
-              <Link to="/choose-mode">Commencer</Link>
+          <Link to="/choose-mode">
+            <Button size="lg">
+              Commencer l'exploration <Rocket className="ml-2 h-5 w-5" />
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-3">
-              <Link to="/about">En savoir plus</Link>
-            </Button>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card>
-              <CardHeader>
-                <Heart className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Bien-être</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Suivi personnalisé de votre état émotionnel
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader>
-                <Users className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Équipe</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Gestion du bien-être de votre équipe
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card>
-              <CardHeader>
-                <Shield className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Sécurisé</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Données protégées et confidentielles
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card>
-              <CardHeader>
-                <Zap className="h-8 w-8 text-primary mb-2" />
-                <CardTitle>Efficace</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Résultats mesurables rapidement
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+          </Link>
         </div>
       </section>
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <Card>
+            <CardHeader>
+              <CardTitle>Bienvenue sur EmotionsCare</CardTitle>
+              <CardDescription>Votre espace personnel pour l'épanouissement émotionnel.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              Explorez nos outils et découvrez comment EmotionsCare peut vous aider à mieux gérer vos émotions et à améliorer votre bien-être général.
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Actions rapides</CardTitle>
+              <CardDescription>Accédez directement à vos fonctionnalités préférées.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <Button asChild>
+                <Link to="/scan">Effectuer une analyse émotionnelle</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/journal">Écrire dans votre journal</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/music">Explorer la musique adaptée</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <h2 className="text-3xl font-bold mb-4">Prêt à commencer ?</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Choisissez votre mode d'utilisation et découvrez EmotionsCare
-          </p>
-          <Button asChild size="lg" className="text-lg px-8 py-3">
-            <Link to="/choose-mode">Choisir mon mode</Link>
-          </Button>
-        </motion.div>
-      </section>
+        {/* Test de génération musicale */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-center mb-8">Test de génération musicale</h2>
+          <MusicGenerationTest />
+        </section>
+
+        <section className="py-12">
+          <h2 className="text-3xl font-bold text-center mb-8">Nos fonctionnalités clés</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <feature.icon className="h-5 w-5" />
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      </main>
     </div>
   );
-};
-
-export default HomePage;
+}
