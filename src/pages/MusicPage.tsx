@@ -2,225 +2,227 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Music, Headphones, Radio, Disc, Play, Settings } from 'lucide-react';
-import MusicPlayerDemo from '@/components/music/MusicPlayerDemo';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { Badge } from '@/components/ui/badge';
+import { Music, Play, Pause, SkipForward, SkipBack, Volume2, ArrowLeft, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const MusicPage: React.FC = () => {
-  const [selectedEmotion, setSelectedEmotion] = useState<string>('calm');
-  const { activateMusicForEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
+  const navigate = useNavigate();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(0);
 
-  const emotions = [
-    { key: 'calm', label: 'Calme', icon: '🧘', color: 'bg-blue-500' },
-    { key: 'happy', label: 'Joyeux', icon: '😊', color: 'bg-yellow-500' },
-    { key: 'energetic', label: 'Énergique', icon: '⚡', color: 'bg-red-500' },
-    { key: 'focused', label: 'Concentré', icon: '🎯', color: 'bg-purple-500' },
-    { key: 'relaxed', label: 'Détendu', icon: '😌', color: 'bg-green-500' }
+  const emotionTracks = [
+    {
+      title: "Sérénité Matinale",
+      artist: "EmotionsCare AI",
+      emotion: "Calme",
+      duration: "4:32",
+      color: "from-blue-400 to-cyan-400"
+    },
+    {
+      title: "Énergie Positive",
+      artist: "EmotionsCare AI", 
+      emotion: "Joie",
+      duration: "3:45",
+      color: "from-yellow-400 to-orange-400"
+    },
+    {
+      title: "Focus Profond",
+      artist: "EmotionsCare AI",
+      emotion: "Concentration",
+      duration: "6:18",
+      color: "from-purple-400 to-pink-400"
+    },
+    {
+      title: "Apaisement Nocturne",
+      artist: "EmotionsCare AI",
+      emotion: "Détente",
+      duration: "5:12",
+      color: "from-indigo-400 to-blue-400"
+    }
   ];
 
-  const handleEmotionSelect = async (emotion: string) => {
-    setSelectedEmotion(emotion);
-    await activateMusicForEmotion({ emotion });
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
-      <div className="container mx-auto px-4 py-8">
-        {/* En-tête */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-              <Music className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Musique Émotionnelle
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            className="mb-6 hover:bg-blue-50"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour
+          </Button>
+
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+              Musique Thérapeutique
             </h1>
+            <p className="text-xl text-gray-600">
+              Musiques personnalisées selon votre état émotionnel
+            </p>
           </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Découvrez une expérience musicale adaptée à vos émotions et votre état d'esprit
-          </p>
-        </div>
 
-        <Tabs defaultValue="player" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
-            <TabsTrigger value="player" className="flex items-center gap-2">
-              <Play className="h-4 w-4" />
-              Lecteur
-            </TabsTrigger>
-            <TabsTrigger value="emotions" className="flex items-center gap-2">
-              <Headphones className="h-4 w-4" />
-              Émotions
-            </TabsTrigger>
-            <TabsTrigger value="library" className="flex items-center gap-2">
-              <Disc className="h-4 w-4" />
-              Bibliothèque
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Réglages
-            </TabsTrigger>
-          </TabsList>
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Lecteur principal */}
+            <div className="lg:col-span-2">
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 mb-6">
+                <CardContent className="p-8">
+                  <div className="text-center mb-8">
+                    <div className={`w-32 h-32 mx-auto rounded-full bg-gradient-to-r ${emotionTracks[currentTrack].color} flex items-center justify-center mb-4`}>
+                      <Music className="h-16 w-16 text-white" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                      {emotionTracks[currentTrack].title}
+                    </h2>
+                    <p className="text-gray-600 mb-4">
+                      {emotionTracks[currentTrack].artist}
+                    </p>
+                    <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                      {emotionTracks[currentTrack].emotion}
+                    </Badge>
+                  </div>
 
-          {/* Onglet Lecteur */}
-          <TabsContent value="player" className="space-y-6">
-            <div className="max-w-4xl mx-auto">
-              <Card className="mb-6">
+                  {/* Barre de progression */}
+                  <div className="mb-6">
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-1/3 transition-all duration-300" />
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>1:23</span>
+                      <span>{emotionTracks[currentTrack].duration}</span>
+                    </div>
+                  </div>
+
+                  {/* Contrôles */}
+                  <div className="flex items-center justify-center gap-4">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => setCurrentTrack(Math.max(0, currentTrack - 1))}
+                    >
+                      <SkipBack className="h-6 w-6" />
+                    </Button>
+                    <Button 
+                      size="lg"
+                      onClick={() => setIsPlaying(!isPlaying)}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-full w-16 h-16"
+                    >
+                      {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => setCurrentTrack(Math.min(emotionTracks.length - 1, currentTrack + 1))}
+                    >
+                      <SkipForward className="h-6 w-6" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 mt-6">
+                    <Volume2 className="h-4 w-4 text-gray-400" />
+                    <div className="w-24 h-1 bg-gray-200 rounded-full">
+                      <div className="w-3/4 h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Playlist */}
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
                 <CardHeader>
-                  <CardTitle className="text-center">Lecteur Musical Principal</CardTitle>
+                  <CardTitle>Playlist Personnalisée</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <MusicPlayerDemo />
+                  <div className="space-y-3">
+                    {emotionTracks.map((track, index) => (
+                      <div 
+                        key={index}
+                        className={`p-4 rounded-xl cursor-pointer transition-all ${
+                          index === currentTrack 
+                            ? 'bg-blue-50 border border-blue-200' 
+                            : 'hover:bg-gray-50'
+                        }`}
+                        onClick={() => setCurrentTrack(index)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${track.color} flex items-center justify-center`}>
+                              <Music className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-800">{track.title}</h4>
+                              <p className="text-sm text-gray-600">{track.artist}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant="secondary" className="mb-1">
+                              {track.emotion}
+                            </Badge>
+                            <p className="text-xs text-gray-500">{track.duration}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
 
-          {/* Onglet Émotions */}
-          <TabsContent value="emotions" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Musique par Émotion</CardTitle>
-                <p className="text-muted-foreground">
-                  Sélectionnez votre état émotionnel pour une expérience musicale personnalisée
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                  {emotions.map((emotion) => (
-                    <Button
-                      key={emotion.key}
-                      variant={selectedEmotion === emotion.key ? "default" : "outline"}
-                      className="p-6 h-auto flex-col gap-3"
-                      onClick={() => handleEmotionSelect(emotion.key)}
-                      disabled={isLoading}
-                    >
-                      <div className={`w-12 h-12 rounded-full ${emotion.color} flex items-center justify-center text-white text-2xl`}>
-                        {emotion.icon}
-                      </div>
-                      <div className="text-center">
-                        <div className="font-medium">{emotion.label}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {getEmotionMusicDescription(emotion.key)}
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-
-                {selectedEmotion && (
-                  <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
-                    <CardContent className="pt-6">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">
-                          Émotion sélectionnée: {emotions.find(e => e.key === selectedEmotion)?.label}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          {getEmotionMusicDescription(selectedEmotion)}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Onglet Bibliothèque */}
-          <TabsContent value="library" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Radio className="h-5 w-5" />
-                  Ma Bibliothèque Musicale
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Music className="h-8 w-8 text-blue-600" />
-                        </div>
-                        <h3 className="font-semibold">Playlists Récentes</h3>
-                        <p className="text-sm text-muted-foreground">Vos dernières écoutes</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Headphones className="h-8 w-8 text-purple-600" />
-                        </div>
-                        <h3 className="font-semibold">Favoris</h3>
-                        <p className="text-sm text-muted-foreground">Vos morceaux préférés</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <Disc className="h-8 w-8 text-green-600" />
-                        </div>
-                        <h3 className="font-semibold">Recommandations</h3>
-                        <p className="text-sm text-muted-foreground">Découvertes personnalisées</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Onglet Réglages */}
-          <TabsContent value="settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Préférences Musicales</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Qualité Audio</label>
-                    <select className="w-full mt-1 p-2 border rounded-md">
-                      <option>Haute qualité (320 kbps)</option>
-                      <option>Qualité normale (128 kbps)</option>
-                      <option>Économie de données (64 kbps)</option>
-                    </select>
+            {/* Recommandations */}
+            <div>
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-red-500" />
+                    Basé sur votre humeur
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 rounded-xl">
+                      <h4 className="font-semibold text-blue-800 mb-2">Humeur détectée</h4>
+                      <p className="text-sm text-blue-700">
+                        Joie (85%) - Énergie positive élevée
+                      </p>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-xl">
+                      <h4 className="font-semibold text-green-800 mb-2">Recommandation</h4>
+                      <p className="text-sm text-green-700">
+                        Musiques énergisantes pour maintenir votre bonne humeur
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium">Transition entre morceaux</label>
-                    <select className="w-full mt-1 p-2 border rounded-md">
-                      <option>Fondu enchaîné (3 secondes)</option>
-                      <option>Fondu enchaîné (5 secondes)</option>
-                      <option>Aucune transition</option>
-                    </select>
-                  </div>
+                </CardContent>
+              </Card>
 
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="adaptive-volume" className="rounded" />
-                    <label htmlFor="adaptive-volume" className="text-sm">
-                      Ajustement automatique du volume selon l'émotion
-                    </label>
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+                <CardHeader>
+                  <CardTitle>Genres Populaires</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['Ambient', 'Lo-Fi', 'Nature', 'Classique', 'Jazz', 'Méditation'].map((genre) => (
+                      <Badge 
+                        key={genre} 
+                        variant="outline" 
+                        className="justify-center py-2 cursor-pointer hover:bg-blue-50"
+                      >
+                        {genre}
+                      </Badge>
+                    ))}
                   </div>
-
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="emotion-detection" className="rounded" defaultChecked />
-                    <label htmlFor="emotion-detection" className="text-sm">
-                      Détection automatique des émotions pour les recommandations
-                    </label>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,154 +1,191 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { BookOpen, Plus, Calendar, Smile, Meh, Frown, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { JournalEntry } from '@/types';
-import { getJournalEntries, deleteJournalEntry } from '@/lib/journalService';
-import JournalPageHeader from '@/components/journal/JournalPageHeader';
-import JournalHeader from '@/components/journal/JournalHeader';
-import JournalTabNavigation from '@/components/journal/JournalTabNavigation';
-import JournalListView from '@/components/journal/JournalListView';
-import JournalStatsCards from '@/components/journal/JournalStatsCards';
-import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, BookOpen } from 'lucide-react';
-import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 const JournalPage: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState<'all' | 'month' | 'week'>('all');
-  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'mood'>('list');
-
-  useEffect(() => {
-    loadJournalEntries();
-  }, [user]);
-
-  const loadJournalEntries = async () => {
-    if (!user) return;
-    
-    try {
-      setLoading(true);
-      const userEntries = await getJournalEntries(user.id);
-      setEntries(userEntries);
-    } catch (error) {
-      console.error('Error loading journal entries:', error);
-      toast.error('Erreur lors du chargement des entrées');
-    } finally {
-      setLoading(false);
+  const [entries, setEntries] = useState([
+    {
+      id: 1,
+      date: '2024-01-15',
+      mood: 'Joyeux',
+      title: 'Belle journée au travail',
+      content: 'Aujourd\'hui a été une journée particulièrement productive. J\'ai terminé mon projet et l\'équipe était très satisfaite.',
+      moodScore: 8
+    },
+    {
+      id: 2,
+      date: '2024-01-14',
+      mood: 'Calme',
+      title: 'Méditation matinale',
+      content: 'Session de méditation de 20 minutes ce matin. Je me sens plus centré et prêt pour la journée.',
+      moodScore: 7
     }
+  ]);
+
+  const [newEntry, setNewEntry] = useState({
+    title: '',
+    content: '',
+    mood: '',
+    moodScore: 5
+  });
+
+  const moodIcons = {
+    'Joyeux': Smile,
+    'Calme': Meh,
+    'Triste': Frown
   };
-
-  const handleDeleteEntry = async (entryId: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    try {
-      await deleteJournalEntry(entryId);
-      setEntries(prev => prev.filter(entry => entry.id !== entryId));
-      toast.success('Entrée supprimée avec succès');
-    } catch (error) {
-      console.error('Error deleting entry:', error);
-      toast.error('Erreur lors de la suppression');
-    }
-  };
-
-  const filterEntriesByPeriod = (entries: JournalEntry[]) => {
-    if (selectedPeriod === 'all') return entries;
-    
-    const now = new Date();
-    const filterDate = new Date();
-    
-    if (selectedPeriod === 'week') {
-      filterDate.setDate(now.getDate() - 7);
-    } else if (selectedPeriod === 'month') {
-      filterDate.setMonth(now.getMonth() - 1);
-    }
-    
-    return entries.filter(entry => new Date(entry.date) >= filterDate);
-  };
-
-  const filteredEntries = filterEntriesByPeriod(entries);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-muted rounded w-64"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-24 bg-muted rounded"></div>
-              ))}
-            </div>
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-32 bg-muted rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <JournalPageHeader 
-          title="Mon Journal"
-          description="Suivez l'évolution de vos émotions et pensées"
-          icon={<BookOpen className="h-5 w-5" />}
-        />
-        
-        <JournalHeader 
-          selectedPeriod={selectedPeriod}
-          setSelectedPeriod={setSelectedPeriod}
-        />
-
-        {/* Statistiques */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <JournalStatsCards />
-        </div>
-
-        <JournalTabNavigation 
-          viewMode={viewMode}
-          onViewChange={setViewMode}
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          {viewMode === 'list' && (
-            <JournalListView 
-              entries={filteredEntries}
-              onDeleteEntry={handleDeleteEntry}
-            />
-          )}
-          
-          {viewMode === 'calendar' && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-center h-64 text-muted-foreground">
-                  <div className="text-center">
-                    <Calendar className="h-12 w-12 mx-auto mb-2" />
-                    <p>Vue calendrier en cours de développement</p>
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            className="mb-6 hover:bg-blue-50"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour
+          </Button>
+
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+              Journal Émotionnel
+            </h1>
+            <p className="text-xl text-gray-600">
+              Suivez votre bien-être quotidien et vos progrès
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Nouvelle entrée */}
+            <div className="lg:col-span-1">
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="h-5 w-5 text-green-500" />
+                    Nouvelle Entrée
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Input
+                    placeholder="Titre de l'entrée"
+                    value={newEntry.title}
+                    onChange={(e) => setNewEntry({...newEntry, title: e.target.value})}
+                  />
+                  
+                  <Textarea
+                    placeholder="Comment vous sentez-vous aujourd'hui ?"
+                    rows={4}
+                    value={newEntry.content}
+                    onChange={(e) => setNewEntry({...newEntry, content: e.target.value})}
+                  />
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Humeur (1-10)</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={newEntry.moodScore}
+                        onChange={(e) => setNewEntry({...newEntry, moodScore: parseInt(e.target.value)})}
+                        className="flex-1"
+                      />
+                      <span className="text-lg font-bold text-blue-600">{newEntry.moodScore}</span>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          
-          {viewMode === 'mood' && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-center h-64 text-muted-foreground">
-                  <div className="text-center">
-                    <BookOpen className="h-12 w-12 mx-auto mb-2" />
-                    <p>Analyse des tendances émotionnelles en cours de développement</p>
+
+                  <Button className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white">
+                    Enregistrer
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Historique des entrées */}
+            <div className="lg:col-span-2">
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-blue-500" />
+                    Mes Entrées
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {entries.map((entry) => (
+                      <motion.div
+                        key={entry.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="font-semibold text-gray-800">{entry.title}</h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <Calendar className="h-4 w-4" />
+                              {new Date(entry.date).toLocaleDateString('fr-FR')}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">{entry.moodScore}/10</span>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              entry.moodScore >= 7 ? 'bg-green-100' : 
+                              entry.moodScore >= 4 ? 'bg-yellow-100' : 'bg-red-100'
+                            }`}>
+                              {entry.moodScore >= 7 ? (
+                                <Smile className="h-4 w-4 text-green-600" />
+                              ) : entry.moodScore >= 4 ? (
+                                <Meh className="h-4 w-4 text-yellow-600" />
+                              ) : (
+                                <Frown className="h-4 w-4 text-red-600" />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-sm leading-relaxed">{entry.content}</p>
+                      </motion.div>
+                    ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </JournalTabNavigation>
+                </CardContent>
+              </Card>
+
+              {/* Statistiques */}
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 mt-6">
+                <CardHeader>
+                  <CardTitle>Aperçu de la Semaine</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-7 gap-2">
+                    {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
+                      <div key={index} className="text-center">
+                        <div className="text-xs text-gray-500 mb-1">{day}</div>
+                        <div className={`w-8 h-8 rounded-full mx-auto flex items-center justify-center text-xs font-medium ${
+                          Math.random() > 0.3 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          {Math.random() > 0.3 ? Math.floor(Math.random() * 3) + 7 : '-'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
