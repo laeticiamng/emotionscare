@@ -1,186 +1,124 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { User, Shield, Building2, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  Shield, 
-  Building2,
-  ArrowRight,
-  CheckCircle,
-  Crown,
-  TrendingUp
-} from 'lucide-react';
 
 const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const roles = [
+  const userTypes = [
     {
-      id: 'user',
-      title: 'Collaborateur',
-      subtitle: 'Accès utilisateur',
-      description: 'Accédez à votre espace personnel avec toutes les fonctionnalités de bien-être émotionnel.',
-      icon: Users,
+      type: 'employee',
+      title: 'Employé / Collaborateur',
+      description: 'Accédez à votre espace personnel de bien-être au travail',
+      icon: User,
       color: 'from-green-500 to-emerald-600',
       features: [
-        'Coach IA personnel',
-        'Scan émotionnel',
-        'Musicothérapie',
-        'Journal privé',
-        'Suivi personnel',
-        'Communauté interne'
+        'Dashboard personnel',
+        'Suivi émotionnel',
+        'Recommandations IA',
+        'Outils de bien-être'
       ],
-      route: '/b2b/user/login'
+      loginRoute: '/b2b/user/login',
+      registerRoute: '/b2b/user/register'
     },
     {
-      id: 'admin',
-      title: 'Administrateur',
-      subtitle: 'Gestion d\'équipe',
-      description: 'Tableau de bord complet pour gérer le bien-être émotionnel de votre organisation.',
+      type: 'admin',
+      title: 'Administrateur / RH',
+      description: 'Gérez le bien-être de vos équipes avec des outils avancés',
       icon: Shield,
-      color: 'from-blue-500 to-indigo-600',
+      color: 'from-blue-500 to-purple-600',
       features: [
-        'Tableau de bord admin',
-        'Analytics d\'équipe',
-        'Gestion des utilisateurs',
+        'Analytics RH complets',
+        'Gestion d\'équipes',
         'Rapports détaillés',
-        'Paramètres organisation',
-        'Support prioritaire'
+        'Configuration avancée'
       ],
-      route: '/b2b/admin/login',
-      premium: true
+      loginRoute: '/b2b/admin/login',
+      registerRoute: '/b2b/admin/register'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center p-6">
-      <div className="container mx-auto max-w-5xl">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
-              <Building2 className="h-8 w-8 text-white" />
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center mb-6">
+            <Building2 className="h-12 w-12 text-blue-600 mr-3" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              EmotionsCare B2B
+            </h1>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Espace Entreprise
-            </span>
-            <br />
-            <span className="text-slate-800 dark:text-slate-100">EmotionsCare</span>
-          </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-            Choisissez votre niveau d'accès pour commencer à améliorer le bien-être émotionnel de votre organisation.
+          <p className="text-xl text-gray-600">
+            Choisissez votre type d'accès pour continuer
           </p>
-        </motion.div>
+        </div>
 
-        {/* Role Selection Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {roles.map((role, index) => (
-            <motion.div
-              key={role.id}
-              initial={{ opacity: 0, x: index === 0 ? -50 : 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-              whileHover={{ 
-                scale: 1.02,
-                transition: { duration: 0.2 }
-              }}
+        <div className="grid gap-8 md:grid-cols-2">
+          {userTypes.map((userType) => (
+            <Card 
+              key={userType.type} 
+              className="hover:shadow-lg transition-shadow duration-300 border-2 hover:border-blue-200"
             >
-              <Card className="h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 relative overflow-hidden">
-                {role.premium && (
-                  <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                    <Crown className="h-3 w-3" />
-                    Premium
-                  </div>
-                )}
-                
-                <CardHeader className="pb-4">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${role.color} flex items-center justify-center mb-4 shadow-lg`}>
-                    <role.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    {role.title}
-                  </CardTitle>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    {role.subtitle}
-                  </p>
-                </CardHeader>
-                
-                <CardContent className="space-y-6">
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                    {role.description}
-                  </p>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      Fonctionnalités incluses :
-                    </h4>
-                    <ul className="space-y-2">
-                      {role.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <Button
-                    size="lg"
-                    onClick={() => navigate(role.route)}
-                    className={`w-full bg-gradient-to-r ${role.color} hover:opacity-90 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105`}
+              <CardHeader className="text-center pb-4">
+                <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${userType.color} flex items-center justify-center mb-4`}>
+                  <userType.icon className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-2xl">{userType.title}</CardTitle>
+                <CardDescription className="text-base">
+                  {userType.description}
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <div>
+                  <h4 className="font-semibold mb-3">Fonctionnalités incluses :</h4>
+                  <ul className="space-y-2">
+                    {userType.features.map((feature) => (
+                      <li key={feature} className="flex items-center text-sm">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button 
+                    onClick={() => navigate(userType.loginRoute)}
+                    className={`w-full bg-gradient-to-r ${userType.color} hover:opacity-90`}
                   >
-                    Accéder en tant que {role.title}
+                    Se Connecter
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate(userType.registerRoute)}
+                    className="w-full"
+                  >
+                    Créer un Compte
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        {/* Additional Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="text-center"
-        >
-          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-8">
-              <div className="flex justify-center mb-4">
-                <TrendingUp className="h-8 w-8 text-blue-500" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-slate-800 dark:text-slate-100">
-                Transformez votre organisation
-              </h3>
-              <p className="text-slate-600 dark:text-slate-300 mb-6">
-                Rejoignez plus de 500 entreprises qui font confiance à EmotionsCare pour améliorer le bien-être de leurs collaborateurs.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="outline" className="bg-white/50 hover:bg-white/80">
-                  Planifier une démo
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate('/choose-mode')}
-                  className="hover:bg-white/10"
-                >
-                  Retour au choix du mode
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        <div className="text-center mt-12">
+          <p className="text-gray-500 mb-4">
+            Vous n'êtes pas sûr ? Contactez votre administrateur RH
+          </p>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+            className="text-blue-600"
+          >
+            ← Retour à l'accueil
+          </Button>
+        </div>
       </div>
     </div>
   );
