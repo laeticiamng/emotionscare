@@ -1,241 +1,327 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Sparkles, Heart, Star } from 'lucide-react';
+import { Camera, Sparkles, Heart, Sun, Moon, Star, Smile, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
 const ARFiltersPage: React.FC = () => {
-  const [selectedFilter, setSelectedFilter] = useState('calme');
-  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const filters = [
+  const emotionFilters = [
     {
-      id: 'calme',
-      name: 'Sérénité',
-      description: 'Aura apaisante bleu clair',
-      color: 'bg-blue-500',
-      emotion: 'Calme'
+      id: 'joy',
+      name: 'Joie Dorée',
+      icon: Sun,
+      color: 'from-yellow-400 to-orange-400',
+      description: 'Rayonnez de bonheur avec des particules dorées',
+      effect: 'golden-sparkles'
     },
     {
-      id: 'joie',
-      name: 'Joie',
-      description: 'Particules dorées scintillantes',
-      color: 'bg-yellow-500',
-      emotion: 'Bonheur'
+      id: 'serenity',
+      name: 'Sérénité Bleue',
+      icon: Moon,
+      color: 'from-blue-400 to-purple-400',
+      description: 'Apaisement avec des vagues lumineuses douces',
+      effect: 'calm-waves'
     },
     {
-      id: 'energie',
-      name: 'Énergie',
-      description: 'Flammes orange dynamiques',
-      color: 'bg-orange-500',
-      emotion: 'Vitalité'
+      id: 'love',
+      name: 'Amour Rose',
+      icon: Heart,
+      color: 'from-pink-400 to-red-400',
+      description: 'Cœurs flottants et aura chaleureuse',
+      effect: 'floating-hearts'
     },
     {
-      id: 'amour',
-      name: 'Amour',
-      description: 'Cœurs roses flottants',
-      color: 'bg-pink-500',
-      emotion: 'Tendresse'
+      id: 'energy',
+      name: 'Énergie Électrique',
+      icon: Zap,
+      color: 'from-green-400 to-cyan-400',
+      description: 'Éclairs d\'énergie et vitalité',
+      effect: 'electric-energy'
     },
     {
-      id: 'concentration',
-      name: 'Focus',
-      description: 'Géométrie violette précise',
-      color: 'bg-purple-500',
-      emotion: 'Concentration'
+      id: 'wonder',
+      name: 'Émerveillement',
+      icon: Star,
+      color: 'from-purple-400 to-pink-400',
+      description: 'Étoiles magiques et éclat mystique',
+      effect: 'magic-stars'
     },
     {
-      id: 'nature',
-      name: 'Nature',
-      description: 'Feuilles vertes dansantes',
-      color: 'bg-green-500',
-      emotion: 'Harmonie'
+      id: 'confidence',
+      name: 'Confiance Solaire',
+      icon: Smile,
+      color: 'from-orange-400 to-yellow-400',
+      description: 'Aura de confiance rayonnante',
+      effect: 'confident-glow'
     }
   ];
 
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setCameraActive(true);
+        toast.success('Caméra activée ! Sélectionnez un filtre émotionnel');
+      }
+    } catch (error) {
+      toast.error('Impossible d\'accéder à la caméra');
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+    setSelectedFilter(null);
+  };
+
+  const applyFilter = (filter: any) => {
+    setSelectedFilter(filter);
+    toast.success(`Filtre "${filter.name}" appliqué !`);
+  };
+
+  const startRecording = () => {
+    setIsRecording(true);
+    toast.success('Enregistrement démarré !');
+    
+    // Simulation d'enregistrement
+    setTimeout(() => {
+      setIsRecording(false);
+      toast.success('Vidéo sauvegardée avec votre filtre émotionnel !');
+    }, 5000);
+  };
+
+  const takePhoto = () => {
+    toast.success('Photo capturée avec votre aura émotionnelle !');
+  };
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50" data-testid="page-root">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <div className="flex items-center justify-center mb-4">
-            <Camera className="h-12 w-12 text-cyan-600 mr-4" />
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Camera className="w-8 h-8 text-indigo-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               AR Filters
             </h1>
-            <Sparkles className="h-12 w-12 text-cyan-600 ml-4" />
+            <Sparkles className="w-8 h-8 text-purple-600" />
           </div>
-          <p className="text-xl text-cyan-700 max-w-3xl mx-auto">
-            Exprimez et renforcez vos émotions avec des filtres de réalité augmentée thérapeutiques
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Transformez vos émotions en filtres de réalité augmentée magiques
           </p>
+          <Badge variant="secondary" className="mt-4 bg-indigo-100 text-indigo-700">
+            Réalité Augmentée Émotionnelle
+          </Badge>
         </motion.div>
 
-        {/* Caméra virtuelle */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-2xl mx-auto mb-8"
-        >
-          <Card className="bg-black/80 border-cyan-200 shadow-xl backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center mb-4 relative overflow-hidden">
-                {isCameraActive ? (
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <Camera className="h-16 w-16 mx-auto mb-4 animate-pulse" />
-                      <p className="text-lg">Caméra active - Filtre: {filters.find(f => f.id === selectedFilter)?.name}</p>
-                      <div className="mt-4 flex justify-center space-x-4">
-                        <Heart className="h-8 w-8 text-pink-400 animate-bounce" />
-                        <Star className="h-8 w-8 text-yellow-400 animate-pulse" />
-                        <Sparkles className="h-8 w-8 text-cyan-400 animate-spin" />
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Zone caméra */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="lg:col-span-2"
+          >
+            <Card className="h-fit">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="w-5 h-5 text-indigo-600" />
+                  Caméra AR
+                  {selectedFilter && (
+                    <Badge className={`ml-2 bg-gradient-to-r ${selectedFilter.color} text-white`}>
+                      {selectedFilter.name}
+                    </Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video mb-4">
+                  {cameraActive ? (
+                    <>
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-full h-full object-cover"
+                      />
+                      {selectedFilter && (
+                        <div className={`absolute inset-0 bg-gradient-to-br ${selectedFilter.color} opacity-20 animate-pulse`} />
+                      )}
+                      {selectedFilter && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="absolute top-4 left-4 text-white font-semibold bg-black/50 px-3 py-1 rounded-full"
+                        >
+                          {selectedFilter.name} actif
+                        </motion.div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-white">
+                      <div className="text-center">
+                        <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg mb-4">Activez votre caméra pour commencer</p>
+                        <Button onClick={startCamera} className="bg-indigo-600 hover:bg-indigo-700">
+                          <Camera className="w-4 h-4 mr-2" />
+                          Démarrer la caméra
+                        </Button>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-gray-400 text-center">
-                    <Camera className="h-16 w-16 mx-auto mb-4" />
-                    <p className="text-lg">Appuyez sur Démarrer pour activer la caméra</p>
+                  )}
+                </div>
+
+                {cameraActive && (
+                  <div className="flex gap-4 justify-center">
+                    <Button
+                      onClick={takePhoto}
+                      variant="outline"
+                      className="border-green-500 text-green-600 hover:bg-green-50"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Photo
+                    </Button>
+                    <Button
+                      onClick={startRecording}
+                      disabled={isRecording}
+                      variant="outline"
+                      className="border-red-500 text-red-600 hover:bg-red-50"
+                    >
+                      {isRecording ? (
+                        <>
+                          <div className="w-4 h-4 mr-2 bg-red-500 rounded-full animate-pulse" />
+                          Enregistrement...
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-4 h-4 mr-2 bg-red-500 rounded-full" />
+                          Vidéo
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={stopCamera}
+                      variant="outline"
+                      className="border-gray-500 text-gray-600 hover:bg-gray-50"
+                    >
+                      Arrêter
+                    </Button>
                   </div>
                 )}
-              </div>
-              <div className="flex justify-center gap-4">
-                <Button
-                  onClick={() => setIsCameraActive(!isCameraActive)}
-                  className={isCameraActive 
-                    ? "bg-red-600 hover:bg-red-700 text-white" 
-                    : "bg-cyan-600 hover:bg-cyan-700 text-white"
-                  }
-                >
-                  {isCameraActive ? 'Arrêter' : 'Démarrer'}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-cyan-600 text-cyan-600 hover:bg-cyan-50"
-                >
-                  📸 Capturer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        {/* Sélection de filtres */}
+          {/* Filtres disponibles */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  Filtres Émotionnels
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {emotionFilters.map((filter) => {
+                    const IconComponent = filter.icon;
+                    return (
+                      <motion.div
+                        key={filter.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          onClick={() => applyFilter(filter)}
+                          variant={selectedFilter?.id === filter.id ? 'default' : 'outline'}
+                          className={`w-full p-4 h-auto justify-start ${
+                            selectedFilter?.id === filter.id
+                              ? `bg-gradient-to-r ${filter.color} text-white hover:opacity-90`
+                              : 'hover:bg-gray-50'
+                          }`}
+                          disabled={!cameraActive}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-full ${
+                              selectedFilter?.id === filter.id 
+                                ? 'bg-white/20' 
+                                : `bg-gradient-to-r ${filter.color}`
+                            }`}>
+                              <IconComponent className={`w-4 h-4 ${
+                                selectedFilter?.id === filter.id ? 'text-white' : 'text-white'
+                              }`} />
+                            </div>
+                            <div className="text-left">
+                              <div className="font-medium">{filter.name}</div>
+                              <div className={`text-xs ${
+                                selectedFilter?.id === filter.id ? 'text-white/80' : 'text-gray-500'
+                              }`}>
+                                {filter.description}
+                              </div>
+                            </div>
+                          </div>
+                        </Button>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {!cameraActive && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      Activez votre caméra pour utiliser les filtres AR
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-8"
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-12 grid md:grid-cols-4 gap-4 max-w-4xl mx-auto"
         >
-          <Card className="bg-white/80 border-cyan-200 shadow-lg backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-cyan-700 text-center">Filtres Émotionnels</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {filters.map((filter) => (
-                  <motion.div
-                    key={filter.id}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedFilter(filter.id)}
-                    className={`cursor-pointer p-4 rounded-lg border-2 transition-all ${
-                      selectedFilter === filter.id
-                        ? 'border-cyan-500 bg-cyan-50'
-                        : 'border-gray-200 bg-white hover:border-cyan-300'
-                    }`}
-                  >
-                    <div className={`w-12 h-12 ${filter.color} rounded-full mx-auto mb-3 flex items-center justify-center`}>
-                      <Sparkles className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-center text-gray-800">{filter.name}</h3>
-                    <p className="text-sm text-gray-600 text-center mt-1">{filter.description}</p>
-                    <Badge className="mt-2 mx-auto block w-fit bg-cyan-100 text-cyan-700">
-                      {filter.emotion}
-                    </Badge>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Options et contrôles */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          <Card className="bg-white/80 border-cyan-200 shadow-lg backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-cyan-700">Personnalisation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-cyan-600">Intensité</label>
-                  <input 
-                    type="range" 
-                    min="10" 
-                    max="100" 
-                    defaultValue="70"
-                    className="w-full mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-cyan-600">Vitesse</label>
-                  <input 
-                    type="range" 
-                    min="1" 
-                    max="10" 
-                    defaultValue="5"
-                    className="w-full mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-cyan-600">Opacité</label>
-                  <input 
-                    type="range" 
-                    min="20" 
-                    max="100" 
-                    defaultValue="80"
-                    className="w-full mt-1"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 border-cyan-200 shadow-lg backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-cyan-700">Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
-                  Enregistrer Vidéo
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-cyan-600 text-cyan-600 hover:bg-cyan-50"
-                >
-                  Partager
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-cyan-600 text-cyan-600 hover:bg-cyan-50"
-                >
-                  Sauvegarder Filtre
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
+            <Camera className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
+            <h4 className="font-semibold text-gray-800 text-sm">Réalité Augmentée</h4>
+          </div>
+          <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
+            <Sparkles className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+            <h4 className="font-semibold text-gray-800 text-sm">Filtres Magiques</h4>
+          </div>
+          <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
+            <Heart className="w-6 h-6 text-pink-600 mx-auto mb-2" />
+            <h4 className="font-semibold text-gray-800 text-sm">Émotions Visuelles</h4>
+          </div>
+          <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
+            <Star className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
+            <h4 className="font-semibf ext-gray-800 text-sm">Expérience Unique</h4>
+          </div>
         </motion.div>
       </div>
     </div>
