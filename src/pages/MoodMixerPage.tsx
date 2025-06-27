@@ -1,230 +1,219 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Palette, Music, Heart, Sparkles, Play, Pause } from 'lucide-react';
+import { Music, Heart, Zap, Headphones, Play, Shuffle } from 'lucide-react';
 
 const MoodMixerPage: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [moodMix, setMoodMix] = useState({
-    energy: [65],
-    calm: [40],
-    joy: [80],
-    focus: [30]
-  });
+  const [energy, setEnergy] = useState([50]);
+  const [emotion, setEmotion] = useState([50]);
+  const [focus, setFocus] = useState([50]);
+  const [currentMix, setCurrentMix] = useState('Équilibre Parfait');
 
-  const togglePlayback = () => setIsPlaying(!isPlaying);
+  const moods = [
+    { name: 'Énergie Pure', color: 'from-red-500 to-orange-500', icon: Zap },
+    { name: 'Zen Profond', color: 'from-blue-500 to-purple-500', icon: Heart },
+    { name: 'Focus Laser', color: 'from-green-500 to-teal-500', icon: Headphones },
+    { name: 'Créativité Flow', color: 'from-purple-500 to-pink-500', icon: Music },
+  ];
+
+  const getMixName = () => {
+    const e = energy[0];
+    const em = emotion[0];
+    const f = focus[0];
+
+    if (e > 80 && em > 70) return 'Explosion de Joie';
+    if (e < 30 && em > 70) return 'Calme Béatitude';
+    if (f > 80 && e > 60) return 'Productivité Maximale';
+    if (em < 30 && e < 30) return 'Reset Complet';
+    return 'Équilibre Personnel';
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-6" data-testid="page-root">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 text-white p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <Badge className="bg-purple-100 text-purple-800 px-4 py-2">
-              <Palette className="w-4 h-4 mr-2" />
-              Mixage Émotionnel
-            </Badge>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <Music className="h-8 w-8 text-purple-400" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Mood Mixer
+            </h1>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Mood Mixer
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Créez votre cocktail émotionnel parfait en ajustant les niveaux d'énergie, de calme, de joie et de focus
+          <p className="text-lg text-slate-300">
+            Créez votre ambiance sonore personnalisée
           </p>
-        </div>
+          <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
+            Adaptation Immédiate
+          </Badge>
+        </motion.div>
 
-        {/* Mood Mixer Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Controls */}
-          <Card className="bg-white/80 backdrop-blur-sm">
+        {/* Contrôles de Mix */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="space-y-6"
+        >
+          <Card className="bg-black/30 border-purple-500/30 backdrop-blur-md">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Palette className="w-5 h-5 mr-2 text-purple-600" />
-                Ajustements Émotionnels
+              <CardTitle className="text-center text-2xl">
+                Mix Actuel: <span className="text-purple-400">{getMixName()}</span>
               </CardTitle>
-              <CardDescription>
-                Personnalisez votre état d'esprit idéal
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-              {/* Energy */}
+              {/* Slider Énergie */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-orange-600">Énergie</label>
-                  <Badge variant="outline" className="text-orange-600">{moodMix.energy[0]}%</Badge>
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-red-400" />
+                    Énergie
+                  </label>
+                  <span className="text-sm text-slate-400">{energy[0]}%</span>
                 </div>
                 <Slider
-                  value={moodMix.energy}
-                  onValueChange={(value) => setMoodMix({...moodMix, energy: value})}
+                  value={energy}
+                  onValueChange={setEnergy}
                   max={100}
                   step={1}
                   className="w-full"
                 />
+                <div className="h-2 rounded-full bg-gradient-to-r from-red-500 to-orange-500 opacity-30"></div>
               </div>
 
-              {/* Calm */}
+              {/* Slider Émotion */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-blue-600">Calme</label>
-                  <Badge variant="outline" className="text-blue-600">{moodMix.calm[0]}%</Badge>
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Heart className="h-4 w-4 text-pink-400" />
+                    Émotion
+                  </label>
+                  <span className="text-sm text-slate-400">{emotion[0]}%</span>
                 </div>
                 <Slider
-                  value={moodMix.calm}
-                  onValueChange={(value) => setMoodMix({...moodMix, calm: value})}
+                  value={emotion}
+                  onValueChange={setEmotion}
                   max={100}
                   step={1}
                   className="w-full"
                 />
+                <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-30"></div>
               </div>
 
-              {/* Joy */}
+              {/* Slider Focus */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-pink-600">Joie</label>
-                  <Badge variant="outline" className="text-pink-600">{moodMix.joy[0]}%</Badge>
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Headphones className="h-4 w-4 text-green-400" />
+                    Focus
+                  </label>
+                  <span className="text-sm text-slate-400">{focus[0]}%</span>
                 </div>
                 <Slider
-                  value={moodMix.joy}
-                  onValueChange={(value) => setMoodMix({...moodMix, joy: value})}
+                  value={focus}
+                  onValueChange={setFocus}
                   max={100}
                   step={1}
                   className="w-full"
                 />
-              </div>
-
-              {/* Focus */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-green-600">Focus</label>
-                  <Badge variant="outline" className="text-green-600">{moodMix.focus[0]}%</Badge>
-                </div>
-                <Slider
-                  value={moodMix.focus}
-                  onValueChange={(value) => setMoodMix({...moodMix, focus: value})}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                />
+                <div className="h-2 rounded-full bg-gradient-to-r from-green-500 to-teal-500 opacity-30"></div>
               </div>
             </CardContent>
           </Card>
+        </motion.div>
 
-          {/* Visualization */}
-          <Card className="bg-white/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
-                Votre Mix Émotionnel
-              </CardTitle>
-              <CardDescription>
-                Visualisation en temps réel de votre état ciblé
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative h-64 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-6 flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="text-6xl">
-                    {moodMix.joy[0] > 70 ? '😊' : 
-                     moodMix.calm[0] > 70 ? '😌' : 
-                     moodMix.energy[0] > 70 ? '⚡' : 
-                     moodMix.focus[0] > 70 ? '🎯' : '🙂'}
-                  </div>
-                  <div className="text-lg font-semibold">
-                    {moodMix.joy[0] > 70 ? 'État Joyeux' : 
-                     moodMix.calm[0] > 70 ? 'État Serein' : 
-                     moodMix.energy[0] > 70 ? 'État Énergique' : 
-                     moodMix.focus[0] > 70 ? 'État Concentré' : 'État Équilibré'}
-                  </div>
-                  <Button onClick={togglePlayback} className="bg-purple-600 hover:bg-purple-700">
-                    {isPlaying ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                    {isPlaying ? 'Pause' : 'Activer le Mix'}
-                  </Button>
-                </div>
+        {/* Presets d'Ambiance */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-4"
+        >
+          <h3 className="text-xl font-semibold text-center">Ambiances Prédéfinies</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {moods.map((mood, index) => {
+              const IconComponent = mood.icon;
+              return (
+                <motion.button
+                  key={mood.name}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`p-4 rounded-xl bg-gradient-to-br ${mood.color} bg-opacity-20 border border-white/20 hover:border-white/40 transition-all`}
+                >
+                  <IconComponent className="h-8 w-8 mx-auto mb-2 text-white" />
+                  <p className="text-sm font-medium text-center">{mood.name}</p>
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Contrôles de Lecture */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-center space-y-6"
+        >
+          <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/30 backdrop-blur-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 w-16 h-16 rounded-full"
+                >
+                  <Play className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-purple-500/50 hover:bg-purple-500/20 w-16 h-16 rounded-full"
+                >
+                  <Shuffle className="h-6 w-6" />
+                </Button>
               </div>
+              <p className="text-slate-300 mt-4">
+                Votre mix personnel est prêt à être diffusé
+              </p>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
-        {/* Presets */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 cursor-pointer">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Music className="w-5 h-5 mr-2 text-orange-600" />
-                Boost Matinal
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm">Énergie</span>
-                  <span className="text-sm font-semibold text-orange-600">90%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Joie</span>
-                  <span className="text-sm font-semibold text-pink-600">80%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Focus</span>
-                  <span className="text-sm font-semibold text-green-600">70%</span>
-                </div>
-              </div>
+        {/* Historique des Mix */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="grid grid-cols-3 gap-4"
+        >
+          <Card className="bg-blue-500/10 border-blue-500/30">
+            <CardContent className="p-4 text-center">
+              <Music className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-blue-400">24</p>
+              <p className="text-sm text-slate-400">Mix Créés</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 cursor-pointer">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Heart className="w-5 h-5 mr-2 text-blue-600" />
-                Détente Profonde
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm">Calme</span>
-                  <span className="text-sm font-semibold text-blue-600">95%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Joie</span>
-                  <span className="text-sm font-semibold text-pink-600">60%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Énergie</span>
-                  <span className="text-sm font-semibold text-orange-600">20%</span>
-                </div>
-              </div>
+          <Card className="bg-purple-500/10 border-purple-500/30">
+            <CardContent className="p-4 text-center">
+              <Heart className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-purple-400">89%</p>
+              <p className="text-sm text-slate-400">Satisfaction</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 cursor-pointer">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-green-600" />
-                Zone de Flow
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm">Focus</span>
-                  <span className="text-sm font-semibold text-green-600">90%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Calme</span>
-                  <span className="text-sm font-semibold text-blue-600">75%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Énergie</span>
-                  <span className="text-sm font-semibold text-orange-600">60%</span>
-                </div>
-              </div>
+          <Card className="bg-green-500/10 border-green-500/30">
+            <CardContent className="p-4 text-center">
+              <Headphones className="h-6 w-6 text-green-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-green-400">2h47</p>
+              <p className="text-sm text-slate-400">Temps Total</p>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

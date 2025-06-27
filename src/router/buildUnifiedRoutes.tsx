@@ -1,260 +1,106 @@
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
-import Layout from '@/components/layout/Layout';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import FullPageLoader from '@/components/FullPageLoader';
 
-// Lazy imports for all pages
-const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
-const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
-const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
+// Lazy loading des pages principales
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const AuthPage = lazy(() => import('@/pages/AuthPage'));
 
-// Feature pages
-const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
-const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
-const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
-const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
-const VRPage = React.lazy(() => import('@/pages/VRPage'));
-const MeditationPage = React.lazy(() => import('@/pages/MeditationPage'));
-const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
-const PreferencesPage = React.lazy(() => import('@/pages/PreferencesPage'));
-const EmotionsPage = React.lazy(() => import('@/pages/EmotionsPage'));
-const NotificationsPage = React.lazy(() => import('@/pages/NotificationsPage'));
+// Pages B2C
+const B2CHomePage = lazy(() => import('@/pages/b2c/B2CHomePage'));
+const B2CLoginPage = lazy(() => import('@/pages/b2c/B2CLoginPage'));
+const B2CRegisterPage = lazy(() => import('@/pages/b2c/B2CRegisterPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/b2c/B2CDashboardPage'));
 
-// B2C pages
-const B2CHomePage = React.lazy(() => import('@/pages/b2c/B2CHomePage'));
-const B2CLoginPage = React.lazy(() => import('@/pages/b2c/B2CLoginPage'));
-const B2CRegisterPage = React.lazy(() => import('@/pages/b2c/B2CRegisterPage'));
-const B2CDashboardPage = React.lazy(() => import('@/pages/b2c/B2CDashboardPage'));
+// Pages B2B
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+const B2BUserLoginPage = lazy(() => import('@/pages/B2BUserLoginPage'));
+const B2BAdminLoginPage = lazy(() => import('@/pages/B2BAdminLoginPage'));
 
-// B2B pages
-const B2BSelectionPage = React.lazy(() => import('@/pages/b2b/B2BSelectionPage'));
-const B2BUserLoginPage = React.lazy(() => import('@/pages/b2b/B2BUserLoginPage'));
-const B2BAdminLoginPage = React.lazy(() => import('@/pages/b2b/B2BAdminLoginPage'));
-const B2BUserDashboard = React.lazy(() => import('@/pages/b2b/B2BUserDashboard'));
-const B2BAdminDashboard = React.lazy(() => import('@/pages/b2b/B2BAdminDashboard'));
+// Pages principales fonctionnalités
+const ScanPage = lazy(() => import('@/pages/ScanPage'));
+const MusicPage = lazy(() => import('@/pages/MusicPage'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const CoachPage = lazy(() => import('@/pages/CoachPage'));
+const VRPage = lazy(() => import('@/pages/VRPage'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 
-// Wrapper component for Suspense
-const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <React.Suspense fallback={<ComponentLoadingFallback />}>
-    {children}
-  </React.Suspense>
+// Pages Mesure & Adaptation Immédiate
+const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
+const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
+const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
+const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
+const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
+const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
+
+// Wrapper pour le Suspense et ErrorBoundary
+const withSuspense = (Component: React.ComponentType) => (
+  <ErrorBoundary>
+    <Suspense fallback={<FullPageLoader />}>
+      <div data-testid="page-root">
+        <Component />
+      </div>
+    </Suspense>
+  </ErrorBoundary>
 );
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
-  console.log('🚀 Building unified routes...');
-  
+  console.log('🏗️ Construction des routes unifiées...');
+
   const routes: RouteObject[] = [
-    {
-      path: '/',
-      element: <Layout />,
-      children: [
-        // Home routes
-        {
-          index: true,
-          element: (
-            <SuspenseWrapper>
-              <HomePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'choose-mode',
-          element: (
-            <SuspenseWrapper>
-              <ChooseModePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'auth',
-          element: (
-            <SuspenseWrapper>
-              <AuthPage />
-            </SuspenseWrapper>
-          ),
-        },
+    // Routes principales
+    { path: '/', element: withSuspense(HomePage) },
+    { path: '/choose-mode', element: withSuspense(ChooseModePage) },
+    { path: '/auth', element: withSuspense(AuthPage) },
 
-        // Feature routes
-        {
-          path: 'scan',
-          element: (
-            <SuspenseWrapper>
-              <ScanPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'music',
-          element: (
-            <SuspenseWrapper>
-              <MusicPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'journal',
-          element: (
-            <SuspenseWrapper>
-              <JournalPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'coach',
-          element: (
-            <SuspenseWrapper>
-              <CoachPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'vr',
-          element: (
-            <SuspenseWrapper>
-              <VRPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'meditation',
-          element: (
-            <SuspenseWrapper>
-              <MeditationPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'gamification',
-          element: (
-            <SuspenseWrapper>
-              <GamificationPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'preferences',
-          element: (
-            <SuspenseWrapper>
-              <PreferencesPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'emotions',
-          element: (
-            <SuspenseWrapper>
-              <EmotionsPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'notifications',
-          element: (
-            <SuspenseWrapper>
-              <NotificationsPage />
-            </SuspenseWrapper>
-          ),
-        },
+    // Routes B2C
+    { path: '/b2c', element: withSuspense(B2CHomePage) },
+    { path: '/b2c/login', element: withSuspense(B2CLoginPage) },
+    { path: '/b2c/register', element: withSuspense(B2CRegisterPage) },
+    { path: '/b2c/dashboard', element: withSuspense(B2CDashboardPage) },
 
-        // B2C routes
-        {
-          path: 'b2c',
-          element: (
-            <SuspenseWrapper>
-              <B2CHomePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2c/login',
-          element: (
-            <SuspenseWrapper>
-              <B2CLoginPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2c/register',
-          element: (
-            <SuspenseWrapper>
-              <B2CRegisterPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2c/dashboard',
-          element: (
-            <SuspenseWrapper>
-              <B2CDashboardPage />
-            </SuspenseWrapper>
-          ),
-        },
+    // Routes B2B
+    { path: '/b2b', element: withSuspense(B2BSelectionPage) },
+    { path: '/b2b/selection', element: withSuspense(B2BSelectionPage) },
+    { path: '/b2b/user/login', element: withSuspense(B2BUserLoginPage) },
+    { path: '/b2b/admin/login', element: withSuspense(B2BAdminLoginPage) },
 
-        // B2B routes
-        {
-          path: 'b2b',
-          element: (
-            <SuspenseWrapper>
-              <B2BSelectionPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b/selection',
-          element: (
-            <SuspenseWrapper>
-              <B2BSelectionPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b/user/login',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserLoginPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b/admin/login',
-          element: (
-            <SuspenseWrapper>
-              <B2BAdminLoginPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b/user/dashboard',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserDashboard />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b/admin/dashboard',
-          element: (
-            <SuspenseWrapper>
-              <B2BAdminDashboard />
-            </SuspenseWrapper>
-          ),
-        },
-      ],
-    },
-    
-    // Catch-all route for 404
-    {
-      path: '*',
+    // Fonctionnalités principales
+    { path: '/scan', element: withSuspense(ScanPage) },
+    { path: '/music', element: withSuspense(MusicPage) },
+    { path: '/journal', element: withSuspense(JournalPage) },
+    { path: '/coach', element: withSuspense(CoachPage) },
+    { path: '/vr', element: withSuspense(VRPage) },
+    { path: '/notifications', element: withSuspense(NotificationsPage) },
+
+    // Mesure & Adaptation Immédiate (6 nouvelles routes)
+    { path: '/flash-glow', element: withSuspense(FlashGlowPage) },
+    { path: '/boss-level-grit', element: withSuspense(BossLevelGritPage) },
+    { path: '/mood-mixer', element: withSuspense(MoodMixerPage) },
+    { path: '/bounce-back-battle', element: withSuspense(BounceBackBattlePage) },
+    { path: '/breathwork', element: withSuspense(BreathworkPage) },
+    { path: '/instant-glow', element: withSuspense(InstantGlowPage) },
+
+    // Route de fallback pour les 404
+    { 
+      path: '*', 
       element: (
-        <SuspenseWrapper>
-          <NotFoundPage />
-        </SuspenseWrapper>
-      ),
-    },
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-blue-900 text-white">
+          <div className="text-center space-y-4">
+            <h1 className="text-6xl font-bold text-red-400">404</h1>
+            <p className="text-xl text-slate-300">Page non trouvée</p>
+            <a href="/" className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+              Retourner à l'accueil
+            </a>
+          </div>
+        </div>
+      )
+    }
   ];
 
-  console.log('✅ Unified routes built successfully:', routes.length, 'routes');
+  console.log(`✅ ${routes.length} routes construites avec succès`);
   return routes;
 };

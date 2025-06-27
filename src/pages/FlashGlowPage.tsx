@@ -1,308 +1,163 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Zap, 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  Sun, 
-  Moon,
-  Palette,
-  Timer
-} from 'lucide-react';
+import { Zap, Play, Pause, RotateCcw, Star } from 'lucide-react';
 
 const FlashGlowPage: React.FC = () => {
   const [isActive, setIsActive] = useState(false);
-  const [intensity, setIntensity] = useState([70]);
-  const [frequency, setFrequency] = useState([8]);
-  const [duration, setDuration] = useState(300); // 5 minutes par défaut
-  const [timeLeft, setTimeLeft] = useState(duration);
-  const [selectedColor, setSelectedColor] = useState('blue');
-  const [currentPhase, setCurrentPhase] = useState<'flash' | 'glow'>('flash');
+  const [intensity, setIntensity] = useState(50);
+  const [glowColor, setGlowColor] = useState('#3b82f6');
 
-  const colors = {
-    blue: { primary: '#3B82F6', secondary: '#93C5FD', name: 'Bleu Apaisant' },
-    green: { primary: '#10B981', secondary: '#6EE7B7', name: 'Vert Naturel' },
-    purple: { primary: '#8B5CF6', secondary: '#C4B5FD', name: 'Violet Créatif' },
-    orange: { primary: '#F59E0B', secondary: '#FCD34D', name: 'Orange Énergisant' },
-    pink: { primary: '#EC4899', secondary: '#F9A8D4', name: 'Rose Douceur' }
-  };
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isActive && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            setIsActive(false);
-            return duration;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isActive, timeLeft, duration]);
-
-  useEffect(() => {
-    if (isActive) {
-      const phaseInterval = setInterval(() => {
-        setCurrentPhase(prev => prev === 'flash' ? 'glow' : 'flash');
-      }, 1000 / frequency[0]);
-      
-      return () => clearInterval(phaseInterval);
-    }
-  }, [isActive, frequency]);
-
-  const toggleSession = () => {
-    setIsActive(!isActive);
-    if (!isActive) {
-      setTimeLeft(duration);
-    }
-  };
-
-  const resetSession = () => {
-    setIsActive(false);
-    setTimeLeft(duration);
-    setCurrentPhase('flash');
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const currentColor = colors[selectedColor as keyof typeof colors];
+  const colors = [
+    { name: 'Bleu Énergie', value: '#3b82f6' },
+    { name: 'Violet Zen', value: '#8b5cf6' },
+    { name: 'Rose Doux', value: '#ec4899' },
+    { name: 'Vert Calme', value: '#10b981' },
+    { name: 'Orange Vivant', value: '#f59e0b' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4" data-testid="page-root">
-      {isActive && (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
         <motion.div
-          className="fixed inset-0 pointer-events-none z-50"
-          style={{
-            background: currentPhase === 'flash' 
-              ? `radial-gradient(circle, ${currentColor.primary}40 0%, transparent 70%)`
-              : `radial-gradient(circle, ${currentColor.secondary}20 0%, transparent 50%)`,
-          }}
-          animate={{
-            opacity: currentPhase === 'flash' ? intensity[0] / 100 : 0.3,
-          }}
-          transition={{
-            duration: 0.1,
-            ease: "easeInOut"
-          }}
-        />
-      )}
-
-      <div className="container mx-auto max-w-4xl relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center space-y-4"
         >
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Flash Glow Therapy
-          </h1>
-          <p className="text-gray-300 text-lg">
-            Thérapie par lumière pulsée pour stimuler le bien-être
+          <div className="flex items-center justify-center gap-3">
+            <Zap className="h-8 w-8 text-yellow-400" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Flash Glow
+            </h1>
+          </div>
+          <p className="text-lg text-slate-300">
+            Thérapie par la lumière instantanée pour booster votre énergie
           </p>
+          <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
+            Adaptation Immédiate
+          </Badge>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Contrôles */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Zap className="h-6 w-6 text-yellow-400" />
-                Contrôles de session
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Sélection de couleur */}
-              <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">
-                  Couleur thérapeutique
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(colors).map(([key, color]) => (
-                    <Button
-                      key={key}
-                      variant={selectedColor === key ? "default" : "outline"}
-                      onClick={() => setSelectedColor(key)}
-                      className="flex items-center gap-2 text-left"
-                      style={{
-                        borderColor: selectedColor === key ? color.primary : undefined,
-                        backgroundColor: selectedColor === key ? `${color.primary}20` : undefined
-                      }}
-                    >
-                      <div 
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: color.primary }}
-                      />
-                      <span className="text-sm">{color.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Intensité */}
-              <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">
-                  Intensité: {intensity[0]}%
-                </label>
-                <Slider
-                  value={intensity}
-                  onValueChange={setIntensity}
-                  max={100}
-                  min={10}
-                  step={5}
-                  className="w-full"
-                />
-              </div>
-
-              {/* Fréquence */}
-              <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">
-                  Fréquence: {frequency[0]} Hz
-                </label>
-                <Slider
-                  value={frequency}
-                  onValueChange={setFrequency}
-                  max={40}
-                  min={1}
-                  step={1}
-                  className="w-full"
-                />
-              </div>
-
-              {/* Durée */}
-              <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">
-                  Durée: {Math.floor(duration / 60)} minutes
-                </label>
-                <div className="flex gap-2">
-                  {[180, 300, 600, 900].map((d) => (
-                    <Button
-                      key={d}
-                      variant={duration === d ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setDuration(d);
-                        setTimeLeft(d);
-                      }}
-                    >
-                      {Math.floor(d / 60)}min
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Contrôles de lecture */}
-              <div className="flex justify-center gap-4 pt-4">
+        {/* Contrôles principaux */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center space-y-6"
+        >
+          <Card className="bg-black/30 border-purple-500/30 backdrop-blur-md">
+            <CardContent className="p-8">
+              <AnimatePresence>
+                {isActive && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 rounded-lg"
+                    style={{
+                      background: `radial-gradient(circle, ${glowColor}20 0%, transparent 70%)`,
+                      animation: `pulse ${3 - intensity / 50}s ease-in-out infinite`,
+                    }}
+                  />
+                )}
+              </AnimatePresence>
+              
+              <div className="relative z-10 space-y-6">
                 <Button
-                  onClick={toggleSession}
+                  onClick={() => setIsActive(!isActive)}
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className={`w-32 h-32 rounded-full text-lg font-bold transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 shadow-2xl' 
+                      : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
+                  }`}
                 >
-                  {isActive ? <Pause className="h-5 w-5 mr-2" /> : <Play className="h-5 w-5 mr-2" />}
-                  {isActive ? 'Pause' : 'Démarrer'}
+                  {isActive ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
                 </Button>
-                <Button
-                  onClick={resetSession}
-                  variant="outline"
-                  size="lg"
-                >
-                  <RotateCcw className="h-5 w-5 mr-2" />
-                  Reset
-                </Button>
+
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium">Intensité: {intensity}%</label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="100"
+                    value={intensity}
+                    onChange={(e) => setIntensity(Number(e.target.value))}
+                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, ${glowColor} 0%, ${glowColor} ${intensity}%, #374151 ${intensity}%, #374151 100%)`
+                    }}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
+        </motion.div>
 
-          {/* Visualisation et informations */}
-          <div className="space-y-6">
-            {/* Timer */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-white mb-2">
-                  {formatTime(timeLeft)}
-                </div>
-                <div className="flex items-center justify-center gap-2 text-gray-400">
-                  <Timer className="h-4 w-4" />
-                  Temps restant
-                </div>
-                {isActive && (
-                  <Badge className="mt-3 bg-green-500/20 text-green-400">
-                    Session active
-                  </Badge>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Visualisation */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Visualisation</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <motion.div
-                  className="w-full h-32 rounded-lg border-2 border-gray-600 flex items-center justify-center"
-                  style={{
-                    background: isActive 
-                      ? `linear-gradient(45deg, ${currentColor.primary}40, ${currentColor.secondary}40)`
-                      : 'transparent'
-                  }}
-                  animate={{
-                    borderColor: isActive ? currentColor.primary : '#4B5563',
-                    boxShadow: isActive && currentPhase === 'flash' 
-                      ? `0 0 30px ${currentColor.primary}60` 
-                      : 'none'
-                  }}
-                >
-                  <div className="text-center text-gray-400">
-                    {isActive ? (
-                      <div>
-                        <div className="text-lg font-semibold text-white">
-                          {currentPhase === 'flash' ? 'Flash' : 'Glow'}
-                        </div>
-                        <div className="text-sm">
-                          {frequency[0]} Hz
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <Sun className="h-8 w-8 mx-auto mb-2" />
-                        <div>Prêt à commencer</div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              </CardContent>
-            </Card>
-
-            {/* Bienfaits */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Bienfaits</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-gray-300 text-sm">
-                  <li>• Stimulation du système nerveux</li>
-                  <li>• Amélioration de l'humeur</li>
-                  <li>• Réduction du stress</li>
-                  <li>• Synchronisation des ondes cérébrales</li>
-                  <li>• Augmentation de la concentration</li>
-                </ul>
-              </CardContent>
-            </Card>
+        {/* Sélection de couleurs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-4"
+        >
+          <h3 className="text-xl font-semibold text-center">Couleurs Thérapeutiques</h3>
+          <div className="grid grid-cols-5 gap-4">
+            {colors.map((color) => (
+              <motion.button
+                key={color.value}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setGlowColor(color.value)}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  glowColor === color.value 
+                    ? 'border-white shadow-lg' 
+                    : 'border-transparent hover:border-slate-400'
+                }`}
+                style={{ backgroundColor: color.value + '40' }}
+              >
+                <div
+                  className="w-8 h-8 rounded-full mx-auto mb-2"
+                  style={{ backgroundColor: color.value }}
+                />
+                <p className="text-xs text-center">{color.name}</p>
+              </motion.button>
+            ))}
           </div>
-        </div>
+        </motion.div>
+
+        {/* Statistiques */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-3 gap-4"
+        >
+          <Card className="bg-blue-500/10 border-blue-500/30">
+            <CardContent className="p-4 text-center">
+              <Star className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-blue-400">42</p>
+              <p className="text-sm text-slate-400">Sessions</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-purple-500/10 border-purple-500/30">
+            <CardContent className="p-4 text-center">
+              <Zap className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-purple-400">85%</p>
+              <p className="text-sm text-slate-400">Énergie</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-green-500/10 border-green-500/30">
+            <CardContent className="p-4 text-center">
+              <RotateCcw className="h-6 w-6 text-green-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-green-400">3min</p>
+              <p className="text-sm text-slate-400">Moyenne</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,161 +1,174 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Target, Zap, Star, ArrowRight } from 'lucide-react';
+import { Trophy, Target, Zap, Crown, Flame } from 'lucide-react';
 
 const BossLevelGritPage: React.FC = () => {
+  const [currentLevel, setCurrentLevel] = useState(7);
+  const [experience, setExperience] = useState(750);
+  const [maxExperience] = useState(1000);
+  const [streak, setStreak] = useState(12);
+
+  const challenges = [
+    { id: 1, title: 'Défi Matinal', description: 'Méditation 10min avant 8h', reward: 150, completed: true },
+    { id: 2, title: 'Hydratation Power', description: 'Boire 2L d\'eau aujourd\'hui', reward: 100, completed: false },
+    { id: 3, title: 'Gratitude Boss', description: 'Noter 3 gratitudes', reward: 200, completed: false },
+    { id: 4, title: 'Mouvement Énergie', description: '30min d\'activité physique', reward: 250, completed: true },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 p-6" data-testid="page-root">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-orange-900 text-white p-6">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <Badge className="bg-orange-100 text-orange-800 px-4 py-2">
-              <Trophy className="w-4 h-4 mr-2" />
-              Niveau Boss
-            </Badge>
+        {/* Header avec Stats Principales */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-6"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <Crown className="h-10 w-10 text-yellow-400" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow-400 via-red-400 to-orange-400 bg-clip-text text-transparent">
+              Boss Level Grit
+            </h1>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            Boss Level Grit
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Développez votre résilience et votre détermination avec des défis progressifs
+          <p className="text-xl text-slate-300">
+            Transformez vos défis en victoires épiques
           </p>
-        </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm border-orange-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Target className="w-4 h-4 mr-2 text-orange-600" />
-                Défis Complétés
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">12/20</div>
-              <Progress value={60} className="mt-2" />
-            </CardContent>
-          </Card>
+          {/* Stats Niveau */}
+          <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
+            <Card className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30">
+              <CardContent className="p-4 text-center">
+                <Trophy className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
+                <p className="text-3xl font-bold text-yellow-400">Niveau {currentLevel}</p>
+                <p className="text-sm text-slate-400">Boss Actuel</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-red-500/20 to-pink-500/20 border-red-500/30">
+              <CardContent className="p-4 text-center">
+                <Flame className="h-8 w-8 text-red-400 mx-auto mb-2" />
+                <p className="text-3xl font-bold text-red-400">{streak}</p>
+                <p className="text-sm text-slate-400">Jours de Suite</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border-purple-500/30">
+              <CardContent className="p-4 text-center">
+                <Zap className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                <p className="text-3xl font-bold text-purple-400">{experience}</p>
+                <p className="text-sm text-slate-400">Points XP</p>
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card className="bg-white/80 backdrop-blur-sm border-red-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Zap className="w-4 h-4 mr-2 text-red-600" />
-                Niveau de Grit
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">Niveau 3</div>
-              <div className="text-sm text-muted-foreground">Expert</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-pink-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Star className="w-4 h-4 mr-2 text-pink-600" />
-                Points Gagnés
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-pink-600">2,450</div>
-              <div className="text-sm text-muted-foreground">+120 aujourd'hui</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-yellow-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Trophy className="w-4 h-4 mr-2 text-yellow-600" />
-                Série Actuelle
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">7 jours</div>
-              <div className="text-sm text-muted-foreground">Record: 12 jours</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Défis Disponibles */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Défi Mental
-                <Badge variant="outline" className="text-orange-600">Difficile</Badge>
-              </CardTitle>
-              <CardDescription>
-                Surmontez 5 obstacles mentaux en 24h
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Progress value={40} />
-              <div className="text-sm text-muted-foreground">2/5 obstacles</div>
-              <Button className="w-full bg-orange-600 hover:bg-orange-700">
-                Continuer <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Endurance Émotionnelle
-                <Badge variant="outline" className="text-red-600">Expert</Badge>
-              </CardTitle>
-              <CardDescription>
-                Maintenez votre équilibre pendant 1 semaine
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Progress value={85} />
-              <div className="text-sm text-muted-foreground">6/7 jours</div>
-              <Button className="w-full bg-red-600 hover:bg-red-700">
-                Finaliser <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Boss Final
-                <Badge variant="outline" className="text-pink-600">Légendaire</Badge>
-              </CardTitle>
-              <CardDescription>
-                Le défi ultime de résilience
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Progress value={0} />
-              <div className="text-sm text-muted-foreground">Débloqué au niveau 5</div>
-              <Button variant="outline" className="w-full" disabled>
-                Bientôt Disponible
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Coach Tips */}
-        <Card className="bg-gradient-to-r from-orange-100 to-red-100 border-orange-200">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Zap className="w-5 h-5 mr-2 text-orange-600" />
-              Conseil du Coach IA
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              "Votre progression est excellente ! Concentrez-vous sur la constance plutôt que sur l'intensité. 
-              Les petites victoires quotidiennes construisent une résilience durable."
+          {/* Barre de Progression */}
+          <div className="max-w-md mx-auto space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Niveau {currentLevel}</span>
+              <span>Niveau {currentLevel + 1}</span>
+            </div>
+            <Progress 
+              value={(experience / maxExperience) * 100} 
+              className="h-3 bg-slate-700"
+            />
+            <p className="text-xs text-slate-400">
+              {experience}/{maxExperience} XP jusqu'au prochain niveau
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
+
+        {/* Défis Quotidiens */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-6"
+        >
+          <h2 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <Target className="h-6 w-6" />
+            Défis Boss du Jour
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {challenges.map((challenge) => (
+              <motion.div
+                key={challenge.id}
+                whileHover={{ scale: 1.02 }}
+                className={`transform transition-all duration-300`}
+              >
+                <Card className={`${
+                  challenge.completed 
+                    ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-500/50' 
+                    : 'bg-black/30 border-slate-600/50 hover:border-orange-500/50'
+                } backdrop-blur-md`}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{challenge.title}</CardTitle>
+                      <Badge 
+                        variant={challenge.completed ? "default" : "secondary"}
+                        className={challenge.completed ? "bg-green-500" : "bg-orange-500"}
+                      >
+                        {challenge.completed ? "Terminé" : `${challenge.reward} XP`}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-slate-300 mb-4">{challenge.description}</p>
+                    <Button 
+                      className={`w-full ${
+                        challenge.completed 
+                          ? 'bg-green-600 hover:bg-green-700' 
+                          : 'bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700'
+                      }`}
+                      disabled={challenge.completed}
+                    >
+                      {challenge.completed ? '✓ Boss Vaincu' : 'Relever le Défi'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Boss Final */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center"
+        >
+          <Card className="bg-gradient-to-br from-red-500/20 via-orange-500/20 to-yellow-500/20 border-orange-500/50 backdrop-blur-md">
+            <CardContent className="p-8">
+              <motion.div
+                animate={{ 
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.05, 1]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Crown className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
+              </motion.div>
+              <h3 className="text-2xl font-bold mb-2">Boss Final de la Semaine</h3>
+              <p className="text-slate-300 mb-6">
+                Complétez tous les défis quotidiens pour débloquer le boss final
+              </p>
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg px-8 py-3"
+              >
+                🔒 Débloquer Boss Final
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,229 +1,256 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Shield, Zap, Heart, Trophy, Target, ArrowUp } from 'lucide-react';
+import { Shield, Zap, Heart, Target, Trophy, ArrowUp } from 'lucide-react';
 
 const BounceBackBattlePage: React.FC = () => {
-  const [resilience, setResilience] = useState(75);
-  const [activeChallenge, setActiveChallenge] = useState(null);
+  const [resilience, setResilience] = useState(65);
+  const [currentChallenge, setCurrentChallenge] = useState(0);
+  const [battlesWon, setBattlesWon] = useState(12);
+  const [isInBattle, setIsInBattle] = useState(false);
+
+  const challenges = [
+    {
+      title: "Défi de l'Échec",
+      description: "Transformez une déception récente en apprentissage",
+      difficulty: "Facile",
+      reward: 150,
+      icon: Target,
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      title: "Bataille du Stress",
+      description: "Surmontez une situation stressante avec calme",
+      difficulty: "Moyen",
+      reward: 250,
+      icon: Shield,
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      title: "Combat de l'Anxiété",
+      description: "Affrontez vos peurs avec courage",
+      difficulty: "Difficile",
+      reward: 400,
+      icon: Heart,
+      color: "from-red-500 to-pink-500"
+    },
+    {
+      title: "Boss Final: Renaissance",
+      description: "Reconstruction complète après un grand défi",
+      difficulty: "Légendaire",
+      reward: 1000,
+      icon: Trophy,
+      color: "from-purple-500 to-yellow-500"
+    }
+  ];
+
+  const startBattle = (index: number) => {
+    setCurrentChallenge(index);
+    setIsInBattle(true);
+  };
+
+  const completeBattle = () => {
+    setIsInBattle(false);
+    setBattlesWon(prev => prev + 1);
+    setResilience(prev => Math.min(100, prev + 5));
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-6" data-testid="page-root">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white p-6">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <Badge className="bg-emerald-100 text-emerald-800 px-4 py-2">
-              <Shield className="w-4 h-4 mr-2" />
-              Bataille de Résilience
-            </Badge>
+        {/* Header Héroïque */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-6"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <Shield className="h-10 w-10 text-blue-400" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Bounce Back Battle
+            </h1>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-            Bounce Back Battle
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Transformez les défis en opportunités et développez votre capacité de rebond
+          <p className="text-xl text-slate-300">
+            Transformez vos défaites en victoires épiques
           </p>
-        </div>
 
-        {/* Resilience Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm border-emerald-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Shield className="w-4 h-4 mr-2 text-emerald-600" />
-                Résilience
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-600">{resilience}%</div>
-              <Progress value={resilience} className="mt-2" />
-              <div className="text-xs text-muted-foreground mt-1">+5% cette semaine</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-teal-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Zap className="w-4 h-4 mr-2 text-teal-600" />
-                Défis Surmontés
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-teal-600">18</div>
-              <div className="text-sm text-muted-foreground">Ce mois-ci</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-cyan-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Heart className="w-4 h-4 mr-2 text-cyan-600" />
-                Force Mentale
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-cyan-600">Niveau 4</div>
-              <div className="text-sm text-muted-foreground">Guerrier</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/80 backdrop-blur-sm border-blue-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Trophy className="w-4 h-4 mr-2 text-blue-600" />
-                Victoires
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">127</div>
-              <div className="text-sm text-muted-foreground">Record personnel</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Active Challenges */}
-        <Card className="bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Target className="w-5 h-5 mr-2 text-emerald-600" />
-              Défis Actifs
-            </CardTitle>
-            <CardDescription>
-              Choisissez votre bataille pour développer votre résilience
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200 hover:shadow-md transition-all duration-300 cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-emerald-100 text-emerald-800">Facile</Badge>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">30 min</div>
-                      <div className="text-xs text-muted-foreground">Durée</div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-semibold mb-2">Défi du Stress Quotidien</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Gérez 3 situations stressantes avec des techniques de respiration
-                  </p>
-                  <Progress value={60} className="mb-2" />
-                  <div className="text-xs text-muted-foreground">2/3 situations gérées</div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200 hover:shadow-md transition-all duration-300 cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-teal-100 text-teal-800">Moyen</Badge>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">1h</div>
-                      <div className="text-xs text-muted-foreground">Durée</div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-semibold mb-2">Bataille de l'Échec</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Transformez un échec récent en apprentissage positif
-                  </p>
-                  <Progress value={0} className="mb-2" />
-                  <div className="text-xs text-muted-foreground">Prêt à commencer</div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 hover:shadow-md transition-all duration-300 cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-cyan-100 text-cyan-800">Difficile</Badge>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">2h</div>
-                      <div className="text-xs text-muted-foreground">Durée</div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-semibold mb-2">Défi de la Critique</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Affrontez et dépassez les critiques constructives
-                  </p>
-                  <Progress value={0} className="mb-2" />
-                  <div className="text-xs text-muted-foreground">Niveau requis: 3</div>
-                </CardContent>
-              </Card>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Resilience Training */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="bg-white/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <ArrowUp className="w-5 h-5 mr-2 text-emerald-600" />
-                Entraînement de Résilience
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Exercices quotidiens</span>
-                  <Badge variant="outline" className="text-emerald-600">3/5 complétés</Badge>
+          {/* Stats de Résilience */}
+          <div className="max-w-2xl mx-auto">
+            <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/30 backdrop-blur-md">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-lg font-semibold">Niveau de Résilience</span>
+                  <Badge className="bg-blue-500">{resilience}%</Badge>
                 </div>
-                <Progress value={60} />
-              </div>
+                <Progress value={resilience} className="h-4 mb-2" />
+                <div className="grid grid-cols-3 gap-4 mt-6">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-blue-400">{battlesWon}</p>
+                    <p className="text-sm text-slate-400">Batailles Gagnées</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-purple-400">Niveau 7</p>
+                    <p className="text-sm text-slate-400">Guerrier</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-pink-400">2,850</p>
+                    <p className="text-sm text-slate-400">Points XP</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.div>
+
+        {/* Battle Arena */}
+        <AnimatePresence mode="wait">
+          {isInBattle ? (
+            <motion.div
+              key="battle"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="text-center space-y-6"
+            >
+              <Card className="bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-500/50 backdrop-blur-md">
+                <CardContent className="p-8">
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 5, -5, 0] 
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity 
+                    }}
+                  >
+                    <Shield className="h-16 w-16 text-red-400 mx-auto mb-4" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold mb-4">
+                    En Combat: {challenges[currentChallenge]?.title}
+                  </h3>
+                  <p className="text-slate-300 mb-6">
+                    {challenges[currentChallenge]?.description}
+                  </p>
+                  <div className="space-y-4">
+                    <Progress value={75} className="h-3" />
+                    <p className="text-sm text-slate-400">Combat en cours...</p>
+                    <Button 
+                      onClick={completeBattle}
+                      size="lg"
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                    >
+                      <Trophy className="h-5 w-5 mr-2" />
+                      Remporter la Bataille
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="challenges"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6"
+            >
+              <h2 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                <Zap className="h-6 w-6" />
+                Défis de Résilience
+              </h2>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Méditation de résilience</span>
-                  <Badge variant="outline" className="text-teal-600">10 min</Badge>
-                </div>
-                <Button variant="outline" className="w-full">
-                  Commencer la session
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {challenges.map((challenge, index) => {
+                  const IconComponent = challenge.icon;
+                  return (
+                    <motion.div
+                      key={index}
+                      whileHover={{ scale: 1.02 }}
+                      className="transform transition-all duration-300"
+                    >
+                      <Card className={`bg-gradient-to-br ${challenge.color} bg-opacity-20 border-white/20 backdrop-blur-md hover:border-white/40`}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              <IconComponent className="h-5 w-5" />
+                              {challenge.title}
+                            </CardTitle>
+                            <Badge 
+                              variant="secondary"
+                              className={`${
+                                challenge.difficulty === 'Facile' ? 'bg-green-500' :
+                                challenge.difficulty === 'Moyen' ? 'bg-yellow-500' :
+                                challenge.difficulty === 'Difficile' ? 'bg-red-500' :
+                                'bg-purple-500'
+                              }`}
+                            >
+                              {challenge.difficulty}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-slate-300 mb-4">{challenge.description}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-slate-400">
+                              Récompense: {challenge.reward} XP
+                            </span>
+                            <Button 
+                              onClick={() => startBattle(index)}
+                              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                            >
+                              Commencer
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Journal de rebond</span>
-                  <Badge variant="outline" className="text-cyan-600">Aujourd'hui</Badge>
-                </div>
-                <Button variant="outline" className="w-full">
-                  Écrire une entrée
-                </Button>
-              </div>
+        {/* Tableau des Records */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        >
+          <Card className="bg-blue-500/10 border-blue-500/30">
+            <CardContent className="p-4 text-center">
+              <ArrowUp className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-blue-400">+18%</p>
+              <p className="text-sm text-slate-400">Résilience</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-100 to-teal-100 border-emerald-200">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Heart className="w-5 h-5 mr-2 text-emerald-600" />
-                Conseil de Résilience
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <blockquote className="text-lg italic text-emerald-800 mb-4">
-                "La résilience n'est pas la capacité d'éviter les tempêtes, 
-                mais d'apprendre à danser sous la pluie."
-              </blockquote>
-              <div className="bg-white/50 rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Technique du jour :</h4>
-                <p className="text-sm text-muted-foreground">
-                  Lorsque vous faites face à un défi, posez-vous cette question : 
-                  "Qu'est-ce que cette situation peut m'apprendre ?" 
-                  Cette simple question transforme l'obstacle en opportunité d'apprentissage.
-                </p>
-              </div>
+          <Card className="bg-green-500/10 border-green-500/30">
+            <CardContent className="p-4 text-center">
+              <Trophy className="h-6 w-6 text-green-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-green-400">12</p>
+              <p className="text-sm text-slate-400">Victoires</p>
             </CardContent>
           </Card>
-        </div>
+          <Card className="bg-purple-500/10 border-purple-500/30">
+            <CardContent className="p-4 text-center">
+              <Shield className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-purple-400">87%</p>
+              <p className="text-sm text-slate-400">Taux de Réussite</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-pink-500/10 border-pink-500/30">
+            <CardContent className="p-4 text-center">
+              <Heart className="h-6 w-6 text-pink-400 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-pink-400">5</p>
+              <p className="text-sm text-slate-400">Série Actuelle</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
