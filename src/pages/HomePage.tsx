@@ -1,228 +1,248 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Heart, Brain, Music, Users, Shield, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Brain, 
+  Music, 
+  BookOpen, 
+  MessageCircle, 
+  Headphones,
+  Heart,
+  Users,
+  Trophy,
+  Settings,
+  Sparkles,
+  Zap,
+  Star
+} from 'lucide-react';
+import AnimatedBackground from '@/components/home/AnimatedBackground';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const features = [
     {
-      icon: Brain,
-      title: 'Analyse Émotionnelle',
-      description: 'Scanner vos émotions en temps réel',
-      path: '/scan',
-      color: 'from-blue-500 to-cyan-500'
+      icon: <Brain className="h-8 w-8" />,
+      title: "Scanner Émotionnel",
+      description: "Analysez vos émotions en temps réel avec l'IA",
+      path: "/scan",
+      color: "from-blue-500 to-cyan-500",
+      badge: "IA"
     },
     {
-      icon: Music,
-      title: 'Musique Thérapeutique',
-      description: 'Musiques personnalisées selon votre humeur',
-      path: '/music',
-      color: 'from-purple-500 to-pink-500'
+      icon: <Music className="h-8 w-8" />,
+      title: "Musicothérapie",
+      description: "Musique adaptative à votre état émotionnel",
+      path: "/music",
+      color: "from-purple-500 to-pink-500",
+      badge: "Adaptative"
     },
     {
-      icon: Heart,
-      title: 'Journal Émotionnel',
-      description: 'Suivez votre bien-être quotidien',
-      path: '/journal',
-      color: 'from-green-500 to-emerald-500'
+      icon: <BookOpen className="h-8 w-8" />,
+      title: "Journal Intelligent",
+      description: "Suivez votre progression avec des insights personnalisés",
+      path: "/journal",
+      color: "from-green-500 to-emerald-500",
+      badge: "Insights"
     },
     {
-      icon: Users,
-      title: 'Coach IA',
-      description: 'Accompagnement personnalisé 24/7',
-      path: '/coach',
-      color: 'from-orange-500 to-red-500'
+      icon: <MessageCircle className="h-8 w-8" />,
+      title: "Coach IA",
+      description: "Accompagnement personnalisé 24/7",
+      path: "/coach",
+      color: "from-orange-500 to-red-500",
+      badge: "24/7"
+    },
+    {
+      icon: <Headphones className="h-8 w-8" />,
+      title: "Réalité Virtuelle",
+      description: "Expériences immersives de bien-être",
+      path: "/vr",
+      color: "from-indigo-500 to-purple-500",
+      badge: "Immersif"
+    },
+    {
+      icon: <Heart className="h-8 w-8" />,
+      title: "Méditation",
+      description: "Sessions guidées personnalisées",
+      path: "/meditation",
+      color: "from-pink-500 to-rose-500",
+      badge: "Guidée"
     }
   ];
 
+  const quickActions = [
+    { icon: <Users className="h-5 w-5" />, title: "Espace Particulier", path: "/b2c", color: "bg-blue-600" },
+    { icon: <Trophy className="h-5 w-5" />, title: "Espace Entreprise", path: "/b2b", color: "bg-purple-600" },
+    { icon: <Settings className="h-5 w-5" />, title: "Préférences", path: "/preferences", color: "bg-green-600" }
+  ];
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 relative overflow-hidden" data-testid="page-root">
+      <AnimatedBackground mood="calm" />
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
+      <div className="relative z-10 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
+            className="mb-8"
           >
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-75"></div>
+                <div className="relative bg-white dark:bg-slate-800 rounded-full p-4">
+                  <Sparkles className="h-12 w-12 text-blue-600" />
+                </div>
+              </div>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
               EmotionsCare
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            
+            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-8 leading-relaxed">
               Votre plateforme de bien-être émotionnel alimentée par l'IA. 
-              Analysez, comprenez et améliorez votre santé mentale avec nos outils innovants.
+              Découvrez, analysez et améliorez votre santé mentale avec des outils innovants.
             </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
-          >
-            <Button 
-              onClick={() => navigate('/choose-mode')} 
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Sparkles className="mr-2 h-5 w-5" />
-              Commencer maintenant
-            </Button>
-            <Button 
-              onClick={() => navigate('/auth')} 
-              variant="outline" 
-              size="lg"
-              className="border-2 border-purple-200 hover:border-purple-400 px-8 py-4 text-lg rounded-xl transition-all duration-300"
-            >
-              Se connecter
-            </Button>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={() => navigate('/choose-mode')}
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-8 py-4 text-lg font-semibold"
+              >
+                <Zap className="mr-2 h-5 w-5" />
+                Commencer l'expérience
+              </Button>
+              
+              <Button 
+                onClick={() => navigate('/auth')}
+                variant="outline"
+                size="lg"
+                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-8 py-4 text-lg font-semibold"
+              >
+                Se connecter
+              </Button>
+            </div>
           </motion.div>
         </div>
-      </section>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-4">
+            {quickActions.map((action, index) => (
+              <motion.div
+                key={action.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Button
+                  onClick={() => navigate(action.path)}
+                  className={`${action.color} hover:opacity-90 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
+                >
+                  {action.icon}
+                  <span className="ml-2">{action.title}</span>
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Features Grid */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Nos Fonctionnalités Principales
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-4">
+              Fonctionnalités Premium
             </h2>
-            <p className="text-xl text-gray-600">
-              Découvrez tous nos outils pour votre bien-être
+            <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Découvrez nos outils innovants conçus pour votre bien-être émotionnel
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                className="group cursor-pointer"
+                onClick={() => navigate(feature.path)}
               >
-                <Card 
-                  className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group border-0 bg-white/60 backdrop-blur-sm"
-                  onClick={() => navigate(feature.path)}
-                >
-                  <CardHeader className="text-center pb-2">
-                    <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className="h-8 w-8 text-white" />
+                <Card className="h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-2xl transition-all duration-300 group-hover:bg-white dark:group-hover:bg-slate-800">
+                  <CardContent className="p-8">
+                    <div className="relative mb-6">
+                      <div className={`absolute -inset-1 bg-gradient-to-r ${feature.color} rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity`}></div>
+                      <div className={`relative bg-gradient-to-r ${feature.color} rounded-2xl p-4 text-white w-fit`}>
+                        {feature.icon}
+                      </div>
+                      <Badge className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 border-0">
+                        {feature.badge}
+                      </Badge>
                     </div>
-                    <CardTitle className="text-xl font-bold text-gray-800">
+                    
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-3">
                       {feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-gray-600 leading-relaxed">
+                    </h3>
+                    
+                    <p className="text-slate-600 dark:text-slate-300 mb-4">
                       {feature.description}
                     </p>
+                    
+                    <div className="flex items-center text-blue-600 font-semibold group-hover:text-purple-600 transition-colors">
+                      <span>Découvrir</span>
+                      <Star className="ml-2 h-4 w-4" />
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Access Modes Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-blue-50 to-purple-50">
-        <div className="max-w-6xl mx-auto">
+      {/* Footer CTA */}
+      <div className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div className="max-w-4xl mx-auto text-center px-4">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
           >
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
-              Choisissez Votre Mode d'Accès
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Prêt à transformer votre bien-être ?
             </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur santé mentale
+            </p>
+            <Button 
+              onClick={() => navigate('/choose-mode')}
+              size="lg"
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              Commencer gratuitement
+            </Button>
           </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-            >
-              <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-                <CardHeader className="text-center">
-                  <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Heart className="h-10 w-10 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-blue-800">
-                    Espace Particulier
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center space-y-4">
-                  <p className="text-gray-700 text-lg leading-relaxed">
-                    Accès individuel pour votre bien-être personnel
-                  </p>
-                  <Button 
-                    onClick={() => navigate('/b2c/login')}
-                    className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-3 rounded-xl"
-                  >
-                    Accès Particulier
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-            >
-              <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-                <CardHeader className="text-center">
-                  <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Users className="h-10 w-10 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-purple-800">
-                    Espace Entreprise
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center space-y-4">
-                  <p className="text-gray-700 text-lg leading-relaxed">
-                    Solution complète pour les organisations
-                  </p>
-                  <Button 
-                    onClick={() => navigate('/b2b/selection')}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl"
-                  >
-                    Accès Entreprise
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
         </div>
-      </section>
-
-      {/* Security Footer */}
-      <section className="py-12 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Shield className="h-8 w-8 text-green-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-800">
-              Sécurité & Confidentialité
-            </h3>
-          </div>
-          <p className="text-gray-600 text-lg">
-            Vos données sont protégées par un chiffrement de niveau bancaire. 
-            Conformité RGPD garantie.
-          </p>
-        </div>
-      </section>
+      </div>
     </div>
   );
 };

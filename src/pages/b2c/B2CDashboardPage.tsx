@@ -1,104 +1,311 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionalStatsWidget } from '@/components/dashboard/b2c/widgets/EmotionalStatsWidget';
-import { QuickActionsWidget } from '@/components/dashboard/b2c/widgets/QuickActionsWidget';
-import { GoalsProgressWidget } from '@/components/dashboard/b2c/widgets/GoalsProgressWidget';
-import { RecentActivityWidget } from '@/components/dashboard/b2c/widgets/RecentActivityWidget';
-import { MoodTrendWidget } from '@/components/dashboard/b2c/widgets/MoodTrendWidget';
-import { WeeklyInsightsWidget } from '@/components/dashboard/b2c/widgets/WeeklyInsightsWidget';
-import { PersonalizedRecommendationsWidget } from '@/components/dashboard/b2c/widgets/PersonalizedRecommendationsWidget';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Bell, Settings, Calendar, Users } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Brain, 
+  Music, 
+  BookOpen, 
+  MessageCircle, 
+  Headphones,
+  Heart,
+  Trophy,
+  Calendar,
+  TrendingUp,
+  Star,
+  Zap,
+  Target
+} from 'lucide-react';
 
 const B2CDashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const todayStats = {
+    emotionalScore: 8.2,
+    sessionsCompleted: 3,
+    wellnessStreak: 12,
+    totalProgress: 68
+  };
+
+  const quickActions = [
+    {
+      icon: <Brain className="h-5 w-5" />,
+      title: "Scanner d'humeur",
+      description: "Analyser mes émotions",
+      path: "/scan",
+      color: "from-blue-500 to-cyan-500",
+      urgent: true
+    },
+    {
+      icon: <Music className="h-5 w-5" />,
+      title: "Ma playlist",
+      description: "Musique adaptée",
+      path: "/music",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: <MessageCircle className="h-5 w-5" />,
+      title: "Coach IA",
+      description: "Conseil personnalisé",
+      path: "/coach",
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      icon: <Headphones className="h-5 w-5" />,
+      title: "Session VR",
+      description: "Relaxation immersive",
+      path: "/vr",
+      color: "from-indigo-500 to-purple-500"
+    }
+  ];
+
+  const recentActivities = [
+    { type: "Méditation", time: "Il y a 2h", score: 9.1, icon: <Heart className="h-4 w-4" /> },
+    { type: "Journal", time: "Ce matin", score: 8.5, icon: <BookOpen className="h-4 w-4" /> },
+    { type: "Scanner", time: "Hier", score: 7.8, icon: <Brain className="h-4 w-4" /> }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-indigo-900/20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-indigo-900 p-4" data-testid="page-root">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Bonjour, Sarah ! 👋
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Voici votre tableau de bord personnel EmotionsCare
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <Calendar className="h-4 w-4 mr-2" />
-              Planifier
-            </Button>
-            <Button variant="outline" size="sm">
-              <Bell className="h-4 w-4 mr-2" />
-              Notifications
-            </Button>
-            <Button variant="outline" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Paramètres
-            </Button>
-          </div>
-        </div>
-
-        {/* Quick Status */}
-        <Card className="mb-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold mb-2">État Émotionnel Actuel</h2>
-                <p className="text-blue-100">Calme et Concentré - Score: 82/100</p>
-              </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold">82%</div>
-                <div className="text-blue-100 text-sm">+7% cette semaine</div>
-              </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
+                Tableau de bord personnel
+              </h1>
+              <p className="text-slate-600 dark:text-slate-300 mt-1">
+                Bonjour ! Voici votre résumé bien-être du jour
+              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            <MoodTrendWidget />
-            <PersonalizedRecommendationsWidget />
+            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              <Star className="mr-1 h-3 w-3" />
+              Série de {todayStats.wellnessStreak} jours
+            </Badge>
           </div>
+        </motion.div>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            <EmotionalStatsWidget />
-            <QuickActionsWidget />
-            <GoalsProgressWidget />
-          </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100">Score émotionnel</p>
+                    <p className="text-3xl font-bold">{todayStats.emotionalScore}/10</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-blue-200" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100">Sessions aujourd'hui</p>
+                    <p className="text-3xl font-bold">{todayStats.sessionsCompleted}</p>
+                  </div>
+                  <Zap className="h-8 w-8 text-purple-200" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-100">Série de jours</p>
+                    <p className="text-3xl font-bold">{todayStats.wellnessStreak}</p>
+                  </div>
+                  <Trophy className="h-8 w-8 text-green-200" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-orange-100">Progression</p>
+                    <p className="text-3xl font-bold">{todayStats.totalProgress}%</p>
+                  </div>
+                  <Target className="h-8 w-8 text-orange-200" />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
-        {/* Bottom Grid */}
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mb-8"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Zap className="mr-2 h-5 w-5" />
+                Actions rapides
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {quickActions.map((action, index) => (
+                  <motion.div
+                    key={action.title}
+                    whileHover={{ scale: 1.05 }}
+                    className="relative"
+                  >
+                    <Button
+                      onClick={() => navigate(action.path)}
+                      className={`w-full h-24 bg-gradient-to-r ${action.color} hover:opacity-90 text-white flex flex-col items-center justify-center space-y-2 relative`}
+                      variant="default"
+                    >
+                      {action.urgent && (
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                      )}
+                      {action.icon}
+                      <div className="text-center">
+                        <div className="font-semibold text-sm">{action.title}</div>
+                        <div className="text-xs opacity-90">{action.description}</div>
+                      </div>
+                    </Button>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Recent Activities & Progress */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <WeeklyInsightsWidget />
-          <RecentActivityWidget />
-        </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Calendar className="mr-2 h-5 w-5" />
+                  Activités récentes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentActivities.map((activity, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full">
+                          {activity.icon}
+                        </div>
+                        <div>
+                          <p className="font-medium">{activity.type}</p>
+                          <p className="text-sm text-slate-500">{activity.time}</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline">
+                        {activity.score}/10
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        {/* Community Section */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Communauté Bien-être
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-              <div>
-                <h3 className="font-medium">Rejoignez le Social Cocon</h3>
-                <p className="text-sm text-muted-foreground">
-                  Partagez anonymement avec d'autres personnes dans votre situation
-                </p>
-              </div>
-              <Button>Découvrir</Button>
-            </div>
-          </CardContent>
-        </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <TrendingUp className="mr-2 h-5 w-5" />
+                  Progression hebdomadaire
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Objectif bien-être</span>
+                      <span>{todayStats.totalProgress}%</span>
+                    </div>
+                    <Progress value={todayStats.totalProgress} className="h-2" />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Sessions VR</span>
+                      <span>85%</span>
+                    </div>
+                    <Progress value={85} className="h-2" />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Journal quotidien</span>
+                      <span>92%</span>
+                    </div>
+                    <Progress value={92} className="h-2" />
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Méditation</span>
+                      <span>78%</span>
+                    </div>
+                    <Progress value={78} className="h-2" />
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={() => navigate('/journal')}
+                  className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  Voir les détails
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
