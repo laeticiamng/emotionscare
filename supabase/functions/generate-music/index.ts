@@ -14,16 +14,21 @@ serve(async (req) => {
 
   try {
     const { lyrics, style = "ambient", rang = "A" } = await req.json();
-    const topMediAiKey = Deno.env.get('TOPMEDIAI_API_KEY');
+    const sunoApiKey = Deno.env.get('SUNO_API_KEY');
 
-    console.log('Requête reçue:', { lyrics: lyrics?.substring(0, 100) + '...', style, rang });
+    console.log('🎵 Requête génération musique Suno reçue:', {
+      lyricsLength: lyrics?.length || 0,
+      style,
+      rang,
+      lyricsPreview: lyrics?.substring(0, 100) + '...'
+    });
 
-    if (!topMediAiKey) {
-      console.log('Clé TopMediAI manquante, utilisation du mode simulation');
+    if (!sunoApiKey) {
+      console.log('⚠️ Clé Suno API manquante, utilisation du mode simulation');
       
       // Mode simulation si pas de clé API
       const mockResponse = {
-        id: `sim_${Date.now()}`,
+        id: `suno_sim_${Date.now()}`,
         title: `Musique ${style} générée`,
         audioUrl: `/audio/generated-${style}-${Date.now()}.mp3`,
         duration: 240,
@@ -44,85 +49,93 @@ serve(async (req) => {
       });
     }
 
-    console.log('Génération musique - Rang', rang, ', Style:', style);
+    console.log('🎤 Soumission à Suno AI - Rang', rang);
 
     // Nettoyage des paroles
     const cleanLyrics = lyrics ? lyrics.replace(/[\r\n]+/g, ' ').trim() : '';
-    console.log('Paroles nettoyées:', cleanLyrics.substring(0, 100) + '...');
+    console.log('📖 Paroles (', cleanLyrics.length, 'caractères):', cleanLyrics.substring(0, 100) + '...');
 
     // Construction du prompt musical basé sur le style
     let musicPrompt = '';
     switch (style) {
       case 'lofi-piano':
-        musicPrompt = 'lo-fi piano, soft jazz, relaxing, mellow, educational music, extended composition, 4 minutes, instrumental, contemplative and deep, clear melody, full composition, 240 seconds duration';
+        musicPrompt = 'lo-fi piano, soft jazz, relaxing, mellow, contemplative, clear melody';
         break;
       case 'afrobeat':
-        musicPrompt = 'afrobeat, energetic drums, bass guitar, rhythmic, educational music, full song structure, extended composition, instrumental, contemplative and deep, clear melody, full composition, extended track';
+        musicPrompt = 'afrobeat, energetic drums, bass guitar, rhythmic, uplifting';
+        break;
+      case 'jazz-moderne':
+        musicPrompt = 'modern jazz, saxophone, piano, smooth rhythms, sophisticated';
         break;
       case 'ambient':
-        musicPrompt = 'ambient, atmospheric, calm, meditative, background music, instrumental, long form composition, peaceful, contemplative';
+        musicPrompt = 'ambient, atmospheric, calm, meditative, peaceful';
         break;
       default:
-        musicPrompt = `${style}, instrumental, educational music, contemplative, clear melody, full composition`;
+        musicPrompt = `${style}, melodic, harmonious`;
     }
 
-    console.log('Prompt musical:', musicPrompt);
+    console.log('🎵 Prompt musical Suno:', musicPrompt);
 
-    // Appel à l'API TopMediAI
-    const response = await fetch('https://api.topmediai.com/v1/music', {
+    // Appel à l'API Suno pour générer la musique
+    const sunoResponse = await fetch('https://api.suno.ai/v1/songs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': topMediAiKey
+        'Authorization': `Bearer ${sunoApiKey}`
       },
       body: JSON.stringify({
-        is_auto: 1,
-        prompt: musicPrompt,
-        lyrics: cleanLyrics,
         title: `Musique ${style} - ${rang}`,
-        instrumental: cleanLyrics ? 0 : 1,
-        model_version: "v3.5"
+        tags: musicPrompt,
+        prompt: cleanLyrics || musicPrompt,
+        make_instrumental: !cleanLyrics,
+        wait_audio: true
       })
     });
 
-    const responseText = await response.text();
-    console.log('Réponse TopMediAI:', response.status, responseText);
+    const responseText = await sunoResponse.text();
+    console.log('📡 Réponse Suno API:', sunoResponse.status, responseText.substring(0, 500));
 
-    if (!response.ok) {
-      console.error('Erreur TopMediAI API:', response.status, responseText);
-      throw new Error(`API TopMediAI: ${response.status}`);
+    if (!sunoResponse.ok) {
+      console.error('❌ Erreur Suno API:', sunoResponse.status, responseText);
+      throw new Error(`API Suno: ${sunoResponse.status} - ${responseText}`);
     }
 
-    const data = JSON.parse(responseText);
+    const sunoData = JSON.parse(responseText);
 
-    if (data.success && data.data) {
+    // Suno retourne généralement un tableau de chansons
+    const song = Array.isArray(sunoData) ? sunoData[0] : sunoData;
+
+    if (song && (song.audio_url || song.url)) {
+      console.log('✅ Chanson générée avec succès via Suno - Rang', rang);
+      
       return new Response(JSON.stringify({
         success: true,
         music: {
-          id: data.data.id || `gen_${Date.now()}`,
-          title: data.data.title || `Musique ${style}`,
-          audioUrl: data.data.audio_url || data.data.audioUrl,
-          duration: data.data.duration || 240,
+          id: song.id || `suno_${Date.now()}`,
+          title: song.title || `Musique ${style}`,
+          audioUrl: song.audio_url || song.url,
+          duration: song.duration || 240,
           style: style,
           lyrics: cleanLyrics,
           generated_at: new Date().toISOString(),
-          status: data.data.status || 'completed',
-          topmediai_id: data.data.id
+          status: song.status || 'completed',
+          suno_id: song.id,
+          image_url: song.image_url
         },
-        source: 'topmediai'
+        source: 'suno'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     } else {
-      console.error('Réponse TopMediAI inattendue:', data);
-      throw new Error('Réponse inattendue de TopMediAI');
+      console.error('❌ Réponse Suno inattendue:', sunoData);
+      throw new Error('Réponse inattendue de Suno AI');
     }
 
   } catch (error) {
-    console.error('Erreur génération musique:', error);
+    console.error('❌ Erreur génération musique Suno:', error);
     return new Response(JSON.stringify({ 
       error: error.message,
-      details: 'Erreur lors de la génération musicale avec TopMediAI'
+      details: 'Erreur lors de la génération musicale avec Suno AI'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
