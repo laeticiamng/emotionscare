@@ -17,16 +17,48 @@ const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
 const TestPage = React.lazy(() => import('@/pages/TestPage'));
 const Point20Page = React.lazy(() => import('@/pages/Point20Page'));
 
+// Nouvelles pages pour les 52 routes
+const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
+const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
+const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
+const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
+const VrPage = React.lazy(() => import('@/pages/VrPage'));
+const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
+const FlashGlowPage = React.lazy(() => import('@/pages/FlashGlowPage'));
+const MoodMixerPage = React.lazy(() => import('@/pages/MoodMixerPage'));
+const BreathworkPage = React.lazy(() => import('@/pages/BreathworkPage'));
+const SocialCoconPage = React.lazy(() => import('@/pages/SocialCoconPage'));
+
 // Wrapper pour Suspense
 const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <Suspense fallback={
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       <LoadingAnimation size="lg" />
     </div>
   }>
     {children}
   </Suspense>
 );
+
+// Manifeste des routes pour les tests E2E
+export const ROUTE_MANIFEST = [
+  '/',
+  '/choose-mode', 
+  '/auth',
+  '/b2b',
+  '/test',
+  '/point20',
+  '/scan',
+  '/music',
+  '/journal',
+  '/coach',
+  '/vr',
+  '/gamification',
+  '/flash-glow',
+  '/mood-mixer',
+  '/breathwork',
+  '/social-cocon'
+];
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
   return [
@@ -82,7 +114,88 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
             </SuspenseWrapper>
           ),
         },
-        // Intégration des routes des modules
+        // Nouvelles routes principales
+        {
+          path: 'scan',
+          element: (
+            <SuspenseWrapper>
+              <ScanPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'music',
+          element: (
+            <SuspenseWrapper>
+              <MusicPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'journal',
+          element: (
+            <SuspenseWrapper>
+              <JournalPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'coach',
+          element: (
+            <SuspenseWrapper>
+              <CoachPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'vr',
+          element: (
+            <SuspenseWrapper>
+              <VrPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'gamification',
+          element: (
+            <SuspenseWrapper>
+              <GamificationPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'flash-glow',
+          element: (
+            <SuspenseWrapper>
+              <FlashGlowPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'mood-mixer',
+          element: (
+            <SuspenseWrapper>
+              <MoodMixerPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'breathwork',
+          element: (
+            <SuspenseWrapper>
+              <BreathworkPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'social-cocon',
+          element: (
+            <SuspenseWrapper>
+              <SocialCoconPage />
+            </SuspenseWrapper>
+          ),
+        },
+        // Intégration des routes des modules existants
         ...innovationRoutes,
         ...rhRoutes,
       ],

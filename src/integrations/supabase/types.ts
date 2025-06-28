@@ -421,6 +421,36 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          created_at: string | null
+          html_content: string
+          id: string
+          name: string
+          subject: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          html_content: string
+          id?: string
+          name: string
+          subject: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          html_content?: string
+          id?: string
+          name?: string
+          subject?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       emotions: {
         Row: {
           ai_feedback: string | null
@@ -603,6 +633,168 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      med_mng_song_likes: {
+        Row: {
+          created_at: string
+          id: string
+          song_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          song_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          song_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "med_mng_song_likes_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_song_likes_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      med_mng_songs: {
+        Row: {
+          created_at: string
+          id: string
+          lyrics: Json | null
+          meta: Json | null
+          suno_audio_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lyrics?: Json | null
+          meta?: Json | null
+          suno_audio_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lyrics?: Json | null
+          meta?: Json | null
+          suno_audio_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      med_mng_subscriptions: {
+        Row: {
+          created_at: string
+          credits_left: number
+          gateway: string
+          id: string
+          paypal_subscription_id: string | null
+          plan: string
+          renews_at: string
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_left?: number
+          gateway: string
+          id?: string
+          paypal_subscription_id?: string | null
+          plan: string
+          renews_at: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_left?: number
+          gateway?: string
+          id?: string
+          paypal_subscription_id?: string | null
+          plan?: string
+          renews_at?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      med_mng_user_settings: {
+        Row: {
+          created_at: string
+          theme_json: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          theme_json?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          theme_json?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      med_mng_user_songs: {
+        Row: {
+          created_at: string
+          id: string
+          song_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          song_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          song_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "med_mng_user_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_user_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       medilinko_consultations: {
         Row: {
@@ -1167,9 +1359,59 @@ export type Database = {
           },
         ]
       }
+      user_generated_music: {
+        Row: {
+          audio_url: string
+          created_at: string
+          id: string
+          item_code: string | null
+          music_id: string
+          music_style: string
+          rang: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          id?: string
+          item_code?: string | null
+          music_id: string
+          music_style: string
+          rang: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          id?: string
+          item_code?: string | null
+          music_id?: string
+          music_style?: string
+          rang?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      med_mng_view_library: {
+        Row: {
+          added_to_library_at: string | null
+          created_at: string | null
+          id: string | null
+          is_liked: boolean | null
+          meta: Json | null
+          suno_audio_id: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_invitation: {
@@ -1224,6 +1466,38 @@ export type Database = {
       mark_notifications_as_read: {
         Args: { user_id_param: string; notification_ids?: string[] }
         Returns: number
+      }
+      med_mng_add_to_library: {
+        Args: { song_id: string }
+        Returns: undefined
+      }
+      med_mng_create_user_sub: {
+        Args: {
+          plan_name: string
+          gateway_name: string
+          subscription_id?: string
+        }
+        Returns: undefined
+      }
+      med_mng_get_remaining_quota: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      med_mng_refresh_monthly_quota: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      med_mng_remove_from_library: {
+        Args: { song_id: string }
+        Returns: undefined
+      }
+      med_mng_save_theme: {
+        Args: { theme_json: Json }
+        Returns: undefined
+      }
+      med_mng_toggle_like: {
+        Args: { song_id: string }
+        Returns: boolean
       }
       verify_invitation_token: {
         Args: { token_param: string }
