@@ -1,159 +1,109 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Building2, ArrowLeft, Users, Shield } from 'lucide-react';
 
 const AuthPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Logique d'authentification à implémenter
-    console.log('Auth form submitted:', formData);
-  };
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="max-w-md mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Button
-            onClick={() => navigate('/')}
-            variant="ghost"
-            className="mb-8 hover:bg-blue-50"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour à l'accueil
+            </Link>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Authentification
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Connectez-vous à votre espace EmotionsCare
+            </p>
+          </div>
 
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
-            <CardHeader className="text-center space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                <User className="h-8 w-8 text-white" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-gray-800">
-                {isLogin ? 'Connexion' : 'Inscription'}
-              </CardTitle>
-              <p className="text-gray-600">
-                {isLogin ? 'Connectez-vous à votre compte' : 'Créez votre compte EmotionsCare'}
-              </p>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin && (
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nom complet</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Votre nom"
-                        className="pl-10"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      className="pl-10"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
+          {/* Auth Options */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* B2C Login */}
+            <Card className="group hover:shadow-xl transition-all duration-300">
+              <CardHeader className="text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                    <Heart className="h-10 w-10 text-blue-600" />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      className="pl-10 pr-10"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-xl text-lg"
-                >
-                  {isLogin ? 'Se connecter' : "S'inscrire"}
-                </Button>
-              </form>
-
-              <div className="text-center space-y-4">
-                <p className="text-sm text-gray-600">
-                  {isLogin ? "Pas encore de compte ?" : "Déjà un compte ?"}
-                  <button
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="ml-2 text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    {isLogin ? "S'inscrire" : "Se connecter"}
-                  </button>
+                <CardTitle className="text-xl">Connexion Particulier</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-center text-muted-foreground text-sm mb-6">
+                  Accédez à votre espace personnel de bien-être émotionnel
                 </p>
-
+                
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-gray-800">Choisissez votre type de connexion</h3>
-                  <div className="grid gap-3">
-                    <Button 
-                      onClick={() => navigate('/b2c/login')}
-                      variant="outline"
-                      className="w-full border-blue-200 hover:border-blue-400 hover:bg-blue-50"
-                    >
-                      <Heart className="mr-2 h-4 w-4 text-blue-500" />
-                      Connexion Particulier
+                  <Link to="/b2c/login" className="block">
+                    <Button className="w-full bg-blue-500 hover:bg-blue-600">
+                      Se connecter
                     </Button>
-                    <Button 
-                      onClick={() => navigate('/b2b/selection')}
-                      variant="outline"
-                      className="w-full border-purple-200 hover:border-purple-400 hover:bg-purple-50"
-                    >
-                      <User className="mr-2 h-4 w-4 text-purple-500" />
-                      Connexion Entreprise
+                  </Link>
+                  <Link to="/b2c/register" className="block">
+                    <Button variant="outline" className="w-full">
+                      Créer un compte
                     </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* B2B Login */}
+            <Card className="group hover:shadow-xl transition-all duration-300">
+              <CardHeader className="text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                    <Building2 className="h-10 w-10 text-purple-600" />
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                <CardTitle className="text-xl">Connexion Entreprise</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-center text-muted-foreground text-sm mb-6">
+                  Accédez aux outils de gestion d'équipe et tableaux de bord RH
+                </p>
+                
+                <div className="space-y-3">
+                  <Link to="/b2b/user/login" className="block">
+                    <Button className="w-full bg-green-500 hover:bg-green-600">
+                      <Users className="mr-2 h-4 w-4" />
+                      Connexion Collaborateur
+                    </Button>
+                  </Link>
+                  <Link to="/b2b/admin/login" className="block">
+                    <Button className="w-full bg-purple-500 hover:bg-purple-600">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Connexion Administrateur
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Help Section */}
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">
+              Besoin d'aide pour vous connecter ?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="ghost">
+                Mot de passe oublié ?
+              </Button>
+              <Button variant="ghost">
+                Contacter le support
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

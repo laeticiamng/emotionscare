@@ -1,114 +1,128 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Heart, Users, Building, UserCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Building2, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Button
-            onClick={() => navigate('/')}
-            variant="ghost"
-            className="mb-8 hover:bg-blue-50"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
-
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-indigo-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour
+            </Link>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Choisissez votre mode d'accès
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-muted-foreground">
               Sélectionnez l'option qui correspond le mieux à vos besoins
             </p>
           </div>
 
+          {/* Mode Selection Cards */}
           <div className="grid md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-                <CardHeader className="text-center">
-                  <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Heart className="h-12 w-12 text-white" />
+            {/* B2C Card */}
+            <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300">
+              <CardHeader className="pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 rounded-full bg-blue-100 dark:bg-blue-900/30 group-hover:scale-110 transition-transform">
+                    <Heart className="h-12 w-12 text-blue-600" />
                   </div>
-                  <CardTitle className="text-2xl font-bold text-blue-800 mb-4">
-                    Particulier (B2C)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center space-y-6">
-                  <div className="space-y-3">
-                    <p className="text-gray-700 text-lg">
-                      Accès individuel pour votre bien-être personnel
-                    </p>
-                    <ul className="text-sm text-gray-600 space-y-2">
-                      <li>• Analyse émotionnelle personnalisée</li>
-                      <li>• Coach IA disponible 24/7</li>
-                      <li>• Musique thérapeutique adaptée</li>
-                      <li>• Journal émotionnel privé</li>
-                    </ul>
+                </div>
+                <CardTitle className="text-2xl text-center">Particulier (B2C)</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-muted-foreground mb-6">
+                  Pour votre bien-être personnel et celui de votre famille
+                </p>
+                
+                <div className="space-y-3 mb-8 text-left">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Accès complet aux outils personnels</span>
                   </div>
-                  <Button 
-                    onClick={() => navigate('/b2c/login')}
-                    className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white py-3 rounded-xl text-lg"
-                  >
-                    Accès Particulier
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Scanner d'émotions avancé</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Coach virtuel personnalisé</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Musique thérapeutique adaptée</span>
+                  </div>
+                </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-                <CardHeader className="text-center">
-                  <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Building className="h-12 w-12 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-purple-800 mb-4">
-                    Entreprise (B2B)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center space-y-6">
-                  <div className="space-y-3">
-                    <p className="text-gray-700 text-lg">
-                      Solution complète pour les organisations
-                    </p>
-                    <ul className="text-sm text-gray-600 space-y-2">
-                      <li>• Tableau de bord RH avancé</li>
-                      <li>• Analytics d'équipe en temps réel</li>
-                      <li>• Gestion des utilisateurs</li>
-                      <li>• Rapports de bien-être collectif</li>
-                    </ul>
-                  </div>
-                  <Button 
-                    onClick={() => navigate('/b2b/selection')}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl text-lg"
-                  >
-                    Accès Entreprise
+                <Link to="/b2c/login" className="block">
+                  <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                    Commencer en tant que Particulier
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* B2B Card */}
+            <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-300">
+              <CardHeader className="pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 rounded-full bg-purple-100 dark:bg-purple-900/30 group-hover:scale-110 transition-transform">
+                    <Building2 className="h-12 w-12 text-purple-600" />
+                  </div>
+                </div>
+                <CardTitle className="text-2xl text-center">Entreprise (B2B)</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-muted-foreground mb-6">
+                  Pour améliorer le bien-être de vos équipes
+                </p>
+                
+                <div className="space-y-3 mb-8 text-left">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Dashboard RH complet</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Analyse du climat émotionnel</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Gestion d'équipes</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                    <span className="text-sm">Rapports et statistiques</span>
+                  </div>
+                </div>
+
+                <Link to="/b2b" className="block">
+                  <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                    Accéder à l'Espace Entreprise
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           </div>
-        </motion.div>
+
+          {/* Bottom CTA */}
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">
+              Vous hésitez ? Découvrez nos fonctionnalités
+            </p>
+            <Button variant="outline">
+              En savoir plus
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
