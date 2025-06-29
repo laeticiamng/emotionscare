@@ -1,121 +1,152 @@
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MusicTrack } from '@/types/music';
+import { useToast } from '@/components/ui/use-toast';
 
 export const useMusicControls = () => {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.8);
+  const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
 
   // Initialiser l'audio
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.preload = 'metadata';
+      
+      // Configuration pour les URLs externes (Suno)
+      audioRef.current.crossOrigin = 'anonymous';
+      
+      // Event listeners
+      audioRef.current.addEventListener('loadedmetadata', () => {
+        setDuration(audioRef.current?.duration || 0);
+        setIsLoading(false);
+      });
+      
+      audioRef.current.addEventListener('timeupdate', () => {
+        setCurrentTime(audioRef.current?.currentTime || 0);
+      });
+      
+      audioRef.current.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      });
+      
+      audioRef.current.addEventListener('error', (e) => {
+        console.error('❌ Audio error:', e);
+        setIsLoading(false);
+        setIsPlaying(false);
+        toast({
+          title: "Erreur de lecture",
+          description: "Impossible de lire ce fichier audio",
+          variant: "destructive"
+        });
+      });
+
+      audioRef.current.addEventListener('canplay', () => {
+        console.log('✅ Audio ready to play');
+        setIsLoading(false);
+      });
+
+      audioRef.current.addEventListener('loadstart', () => {
+        console.log('🔄 Audio loading started');
+        setIsLoading(true);
+      });
     }
-
-    const audio = audioRef.current;
-
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleDurationChange = () => setDuration(audio.duration || 0);
-    const handleEnded = () => setIsPlaying(false);
-    const handleLoadedData = () => {
-      setDuration(audio.duration || 0);
-      console.log('Audio chargé, durée:', audio.duration);
-    };
-    const handleError = (e: Event) => {
-      console.error('Erreur audio:', e);
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('durationchange', handleDurationChange);
-    audio.addEventListener('loadedmetadata', handleLoadedData);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('durationchange', handleDurationChange);
-      audio.removeEventListener('loadedmetadata', handleLoadedData);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-    };
   }, []);
 
-  // Gérer le volume
+  // Mettre à jour le volume
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume;
     }
   }, [volume, isMuted]);
 
-  const playTrack = useCallback(async (track: MusicTrack) => {
+  const playTrack = async (track: MusicTrack) => {
     if (!audioRef.current) return;
-
+    
+    console.log('🎵 Playing track:', track);
+    setIsLoading(true);
+    
     try {
-      console.log('Lecture de:', track.title, 'URL:', track.url || track.audioUrl);
-      
-      const audioUrl = track.url || track.audioUrl;
-      if (!audioUrl) {
-        console.error('Pas d\'URL audio pour ce morceau');
-        return;
-      }
-
-      if (currentTrack?.id !== track.id) {
-        audioRef.current.src = audioUrl;
+      // Si c'est une nouvelle piste
+      if (!currentTrack || currentTrack.id !== track.id) {
+        audioRef.current.src = track.url;
         setCurrentTrack(track);
         setCurrentTime(0);
+        
+        toast({
+          title: "Chargement...",
+          description: `Préparation de "${track.title}"`,
+          duration: 2000
+        });
       }
-
+      
       await audioRef.current.play();
       setIsPlaying(true);
+      
     } catch (error) {
-      console.error('Erreur lecture audio:', error);
+      console.error('❌ Play error:', error);
+      setIsLoading(false);
       setIsPlaying(false);
+      
+      toast({
+        title: "Erreur de lecture",
+        description: "Impossible de jouer cette piste",
+        variant: "destructive"
+      });
     }
-  }, [currentTrack]);
+  };
 
-  const play = useCallback(async () => {
+  const play = async () => {
     if (!audioRef.current || !currentTrack) return;
     
     try {
       await audioRef.current.play();
       setIsPlaying(true);
     } catch (error) {
-      console.error('Erreur play:', error);
+      console.error('❌ Play error:', error);
+      toast({
+        title: "Erreur de lecture",
+        description: "Impossible de reprendre la lecture",
+        variant: "destructive"
+      });
     }
-  }, [currentTrack]);
+  };
 
-  const pause = useCallback(() => {
+  const pause = () => {
     if (audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
     }
-  }, []);
+  };
 
-  const seek = useCallback((time: number) => {
+  const seek = (time: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
       setCurrentTime(time);
     }
-  }, []);
+  };
 
-  const toggleMute = useCallback(() => {
-    setIsMuted(prev => !prev);
-  }, []);
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
 
   return {
-    currentTrack,
     isPlaying,
     currentTime,
     duration,
     volume,
     isMuted,
+    currentTrack,
+    isLoading,
     playTrack,
     play,
     pause,

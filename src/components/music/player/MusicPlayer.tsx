@@ -7,6 +7,7 @@ import ProgressBar from './ProgressBar';
 import VolumeControl from './VolumeControl';
 import { useMusicControls } from '@/hooks/useMusicControls';
 import { MusicTrack } from '@/types/music';
+import { Loader2 } from 'lucide-react';
 
 interface MusicPlayerProps {
   track?: MusicTrack | null;
@@ -20,6 +21,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
     duration,
     volume,
     isMuted,
+    isLoading,
     play,
     pause,
     seek,
@@ -38,7 +40,15 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
   return (
     <Card className={className}>
       <CardContent className="p-4 space-y-4">
-        <TrackInfo track={track} />
+        <div className="flex items-center justify-between">
+          <TrackInfo track={track} />
+          {isLoading && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Chargement...
+            </div>
+          )}
+        </div>
         
         <ProgressBar
           currentTime={currentTime}
@@ -49,6 +59,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
         <div className="flex items-center justify-between">
           <PlayerControls
             isPlaying={isPlaying}
+            loadingTrack={isLoading}
             onPlay={play}
             onPause={pause}
             onPrevious={handlePrevious}

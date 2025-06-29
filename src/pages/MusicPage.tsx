@@ -1,87 +1,140 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Play, 
-  Pause, 
-  SkipForward, 
-  SkipBack, 
-  Volume2, 
-  VolumeX,
-  Heart,
-  Shuffle,
-  Repeat,
-  Music,
-  Headphones,
-  Waves,
-  Sparkles
-} from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
-import { toast } from 'sonner';
+import MusicPlayer from '@/components/music/player/MusicPlayer';
+import EmotionMusicGenerator from '@/components/music/EmotionMusicGenerator';
+import { MusicTrack } from '@/types/music';
+import { useMusicControls } from '@/hooks/useMusicControls';
+import { Play, Music, Headphones } from 'lucide-react';
 
 const MusicPage: React.FC = () => {
-  const { currentTrack, isPlaying } = useMusicControls();
+  const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
+  const { playTrack } = useMusicControls();
+
+  const handleTrackGenerated = (track: MusicTrack) => {
+    console.log('🎵 New track generated:', track);
+    setGeneratedTrack(track);
+    
+    // Auto-play le nouveau morceau
+    setTimeout(() => {
+      playTrack(track);
+    }, 500);
+  };
+
+  // Morceaux de test pour vérifier la lecture
+  const testTracks: MusicTrack[] = [
+    {
+      id: 'test-1',
+      title: 'Test Audio 1',
+      artist: 'Test Artist',
+      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+      duration: 10,
+      emotion: 'test',
+    },
+    {
+      id: 'test-2', 
+      title: 'Test Audio 2',
+      artist: 'Test Artist',
+      url: 'https://audio-previews.elements.envatousercontent.com/files/369519426/preview.mp3',
+      duration: 30,
+      emotion: 'test',
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
-            Thérapie Musicale IA
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Génération musicale personnalisée basée sur vos émotions
-          </p>
-        </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
+          <Music className="h-8 w-8" />
+          Thérapie Musicale
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Génération de musique adaptée à vos émotions avec l'IA
+        </p>
+      </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="space-y-6">
+      <Tabs defaultValue="generate" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="generate">Générer</TabsTrigger>
+          <TabsTrigger value="player">Lecteur</TabsTrigger>
+          <TabsTrigger value="test">Test Audio</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="generate" className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <EmotionMusicGenerator />
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Comment ça marche ?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Choisissez votre émotion actuelle</li>
-                  <li>• Ajoutez une description personnalisée (optionnel)</li>
-                  <li>• Cliquez sur "Générer" pour créer votre musique</li>
-                  <li>• La musique sera générée par IA et jouée automatiquement</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6">
-            <MusicPlayer track={currentTrack} />
-            
-            {currentTrack && (
+            {generatedTrack && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Piste actuelle</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Headphones className="h-5 w-5" />
+                    Dernier morceau généré
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <p className="font-medium">{currentTrack.title}</p>
-                    <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Émotion: {currentTrack.emotion}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${isPlaying ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      <span className="text-sm">{isPlaying ? 'En cours' : 'En pause'}</span>
-                    </div>
+                    <p className="font-medium">{generatedTrack.title}</p>
+                    <p className="text-sm text-muted-foreground">Par {generatedTrack.artist}</p>
+                    <p className="text-sm">Émotion: {generatedTrack.emotion}</p>
+                    <Button 
+                      onClick={() => playTrack(generatedTrack)}
+                      className="w-full mt-4"
+                    >
+                      <Play className="mr-2 h-4 w-4" />
+                      Écouter
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             )}
           </div>
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="player" className="space-y-6">
+          <MusicPlayer track={generatedTrack} />
+          
+          {!generatedTrack && (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <Music className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  Aucun morceau chargé. Générez d'abord une piste dans l'onglet "Générer".
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="test" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Test de lecture audio</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Testez la lecture audio avec ces échantillons :
+              </p>
+              {testTracks.map((track) => (
+                <div key={track.id} className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <p className="font-medium">{track.title}</p>
+                    <p className="text-sm text-muted-foreground">{track.artist}</p>
+                  </div>
+                  <Button 
+                    onClick={() => playTrack(track)}
+                    size="sm"
+                  >
+                    <Play className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
