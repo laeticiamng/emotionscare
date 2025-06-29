@@ -1,209 +1,210 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 const MiniMusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.8);
+  const [volume, setVolume] = useState(0.7);
   const [currentTrack, setCurrentTrack] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Utiliser des sons de test réels et accessibles
-  const tracks = [
-    {
-      title: "Méditation Matinale",
-      url: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwSBY1IYmF2" // Son de test court
-    },
-    {
-      title: "Relaxation Océan",
-      url: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwSBY1IYmF2"
-    },
-    {
-      title: "Zen Garden",
-      url: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwSBY1IYmF2"
-    }
+  // Liste simple de fichiers audio de test
+  const testTracks = [
+    '/sounds/ambient-calm.mp3',
+    '/sounds/welcome.mp3',
+    '/sounds/notification.mp3'
   ];
 
-  useEffect(() => {
-    // Créer l'élément audio programmatiquement
-    const audio = new Audio();
-    audio.preload = 'metadata';
-    audio.volume = volume;
+  // Fonction de play/pause simple et directe
+  const handlePlayPause = async () => {
+    console.log('🎵 Bouton play/pause cliqué');
     
-    // Événements audio
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-      console.log('Audio loaded, duration:', audio.duration);
-    };
+    if (!audioRef.current) {
+      console.error('❌ Référence audio manquante');
+      return;
+    }
+
+    try {
+      if (isPlaying) {
+        console.log('⏸️ Pause de la musique');
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        console.log('▶️ Lecture de la musique');
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          setIsPlaying(true);
+          console.log('✅ Lecture démarrée avec succès');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de la lecture:', error);
+      setIsPlaying(false);
+    }
+  };
+
+  const handleNext = () => {
+    console.log('⏭️ Piste suivante');
+    const nextTrack = (currentTrack + 1) % testTracks.length;
+    setCurrentTrack(nextTrack);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const handlePrevious = () => {
+    console.log('⏮️ Piste précédente');
+    const prevTrack = currentTrack === 0 ? testTracks.length - 1 : currentTrack - 1;
+    setCurrentTrack(prevTrack);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const handleVolumeChange = (newVolume: number[]) => {
+    const vol = newVolume[0] / 100;
+    setVolume(vol);
+    if (audioRef.current) {
+      audioRef.current.volume = vol;
+    }
+  };
+
+  const handleProgressChange = (newProgress: number[]) => {
+    const time = (newProgress[0] / 100) * duration;
+    setCurrentTime(time);
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+    }
+  };
+
+  // Gestionnaires d'événements audio
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
     };
 
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+
     const handleEnded = () => {
       setIsPlaying(false);
-      setCurrentTime(0);
-      console.log('Audio ended');
+      handleNext();
     };
 
     const handleError = (e: Event) => {
-      console.error('Audio error:', e);
+      console.error('❌ Erreur audio:', e);
       setIsPlaying(false);
     };
 
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
-    audioRef.current = audio;
-
-    // Charger la première piste
-    audio.src = tracks[currentTrack].url;
+    // Configuration initiale
+    audio.volume = volume;
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
-      audio.pause();
     };
-  }, [currentTrack]);
+  }, [volume]);
 
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
-
-    console.log('Play/Pause clicked, current state:', isPlaying);
-
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        console.log('⏸️ Audio paused');
-      } else {
-        // Assurer que l'audio est chargé
-        if (audioRef.current.readyState === 0) {
-          audioRef.current.src = tracks[currentTrack].url;
-          await audioRef.current.load();
-        }
-        
-        await audioRef.current.play();
-        setIsPlaying(true);
-        console.log('▶️ Audio playing');
-      }
-    } catch (error) {
-      console.error('Erreur lors de la lecture:', error);
-      setIsPlaying(false);
-    }
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handlePrevious = () => {
-    const newTrack = currentTrack > 0 ? currentTrack - 1 : tracks.length - 1;
-    setCurrentTrack(newTrack);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    console.log('⏮️ Piste précédente:', tracks[newTrack].title);
-  };
-
-  const handleNext = () => {
-    const newTrack = currentTrack < tracks.length - 1 ? currentTrack + 1 : 0;
-    setCurrentTrack(newTrack);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    console.log('⏭️ Piste suivante:', tracks[newTrack].title);
-  };
-
-  const handleProgressChange = (value: number[]) => {
-    if (audioRef.current) {
-      const newTime = value[0];
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
-    }
-  };
-
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-  };
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const trackName = `Piste ${currentTrack + 1}`;
 
   return (
-    <div className="w-full space-y-3">
+    <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 rounded-lg text-white space-y-3">
+      {/* Élément audio */}
+      <audio
+        ref={audioRef}
+        src={testTracks[currentTrack]}
+        preload="metadata"
+      />
+      
       {/* Info piste */}
       <div className="text-center">
-        <h4 className="text-sm font-medium text-white">{tracks[currentTrack].title}</h4>
-      </div>
-
-      {/* Contrôles principaux */}
-      <div className="flex items-center justify-center space-x-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handlePrevious}
-          className="h-8 w-8 text-white hover:bg-white/20"
-        >
-          <SkipBack className="h-4 w-4" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handlePlayPause}
-          className="h-10 w-10 text-white hover:bg-white/20 bg-white/10"
-        >
-          {isPlaying ? (
-            <Pause className="h-5 w-5" />
-          ) : (
-            <Play className="h-5 w-5 ml-0.5" />
-          )}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleNext}
-          className="h-8 w-8 text-white hover:bg-white/20"
-        >
-          <SkipForward className="h-4 w-4" />
-        </Button>
+        <div className="font-medium">{trackName}</div>
+        <div className="text-xs opacity-75">Musicothérapie adaptative</div>
       </div>
 
       {/* Barre de progression */}
       <div className="space-y-1">
         <Slider
-          value={[currentTime]}
-          max={duration || 100}
-          step={0.1}
+          value={[progress]}
           onValueChange={handleProgressChange}
-          className="cursor-pointer"
+          max={100}
+          step={0.1}
+          className="w-full"
         />
-        <div className="flex justify-between text-xs text-white/70">
+        <div className="flex justify-between text-xs opacity-75">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
 
+      {/* Contrôles */}
+      <div className="flex items-center justify-center space-x-4">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handlePrevious}
+          className="text-white hover:bg-white/20"
+        >
+          <SkipBack className="h-4 w-4" />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handlePlayPause}
+          className="text-white hover:bg-white/20 p-2"
+        >
+          {isPlaying ? (
+            <Pause className="h-5 w-5" />
+          ) : (
+            <Play className="h-5 w-5" />
+          )}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleNext}
+          className="text-white hover:bg-white/20"
+        >
+          <SkipForward className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Contrôle volume */}
       <div className="flex items-center space-x-2">
-        <Volume2 className="h-4 w-4 text-white/70" />
+        <Volume2 className="h-4 w-4" />
         <Slider
-          value={[volume]}
-          max={1}
-          step={0.01}
+          value={[volume * 100]}
           onValueChange={handleVolumeChange}
-          className="flex-1 cursor-pointer"
+          max={100}
+          step={1}
+          className="flex-1"
         />
       </div>
     </div>
