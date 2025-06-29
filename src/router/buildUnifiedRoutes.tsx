@@ -1,213 +1,143 @@
 
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { RouteObject } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
-import LoadingAnimation from '@/components/ui/LoadingAnimation';
-import { homeRoutes } from './routes/homeRoutes';
-import { publicRoutes } from './routes/publicRoutes';
-import { innovationRoutes } from './routes/innovationRoutes';
-import { rhRoutes } from './routes/rhRoutes';
+import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
-// Page components avec lazy loading
-const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
-const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
-const B2BSelectionPage = React.lazy(() => import('@/pages/B2BSelectionPage'));
-const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage'));
-const TestPage = React.lazy(() => import('@/pages/TestPage'));
-const Point20Page = React.lazy(() => import('@/pages/Point20Page'));
+// Pages existantes (import direct)
+import HomePage from '@/pages/HomePage';
+import ChooseModePage from '@/pages/ChooseModePage';
+import AuthPage from '@/pages/AuthPage';
+import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import TestPage from '@/pages/TestPage';
+import Point20Page from '@/pages/Point20Page';
 
-// Nouvelles pages pour les 52 routes
-const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
-const MusicPage = React.lazy(() => import('@/pages/MusicPage'));
-const JournalPage = React.lazy(() => import('@/pages/JournalPage'));
-const CoachPage = React.lazy(() => import('@/pages/CoachPage'));
-const VrPage = React.lazy(() => import('@/pages/VrPage'));
-const GamificationPage = React.lazy(() => import('@/pages/GamificationPage'));
-const FlashGlowPage = React.lazy(() => import('@/pages/FlashGlowPage'));
-const MoodMixerPage = React.lazy(() => import('@/pages/MoodMixerPage'));
-const BreathworkPage = React.lazy(() => import('@/pages/BreathworkPage'));
-const SocialCoconPage = React.lazy(() => import('@/pages/SocialCoconPage'));
+// Pages avec lazy loading (fichiers existants)
+const VRPage = lazy(() => import('@/pages/VRPage'));
+const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
+const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+
+// Pages temporaires simples pour les routes manquantes
+const TemporaryPage = ({ title }: { title: string }) => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="text-center p-8">
+      <h1 className="text-4xl font-bold text-gray-800 mb-4">{title}</h1>
+      <p className="text-gray-600 mb-6">Cette page est en cours de développement</p>
+      <div className="animate-pulse bg-gradient-to-r from-purple-200 to-blue-200 h-32 rounded-lg"></div>
+    </div>
+  </div>
+);
 
 // Wrapper pour Suspense
-const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Suspense fallback={
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-      <LoadingAnimation size="lg" />
-    </div>
-  }>
-    {children}
+const withSuspense = (Component: React.ComponentType<any>) => (props: any) => (
+  <Suspense fallback={<LoadingAnimation text="Chargement..." />}>
+    <Component {...props} />
   </Suspense>
 );
 
-// Manifeste des routes pour les tests E2E
-export const ROUTE_MANIFEST = [
-  '/',
-  '/choose-mode', 
-  '/auth',
-  '/b2b',
-  '/test',
-  '/point20',
-  '/scan',
-  '/music',
-  '/journal',
-  '/coach',
-  '/vr',
-  '/gamification',
-  '/flash-glow',
-  '/mood-mixer',
-  '/breathwork',
-  '/social-cocon'
-];
+// Création des pages temporaires
+const ScanPage = () => <TemporaryPage title="Scanner Émotionnel" />;
+const MusicPage = () => <TemporaryPage title="Thérapie Musicale" />;
+const JournalPage = () => <TemporaryPage title="Journal Émotionnel" />;
+const CoachPage = () => <TemporaryPage title="Coach IA" />;
+const SocialCoconPage = () => <TemporaryPage title="Social Cocon" />;
+const FlashGlowPage = () => <TemporaryPage title="Flash Glow" />;
+const MoodMixerPage = () => <TemporaryPage title="Mood Mixer" />;
+const BreathworkPage = () => <TemporaryPage title="Exercices de Respiration" />;
+const PreferencesPage = () => <TemporaryPage title="Préférences" />;
+const SettingsPage = () => <TemporaryPage title="Paramètres" />;
 
-export const buildUnifiedRoutes = (): RouteObject[] => {
+export function buildUnifiedRoutes(): RouteObject[] {
   return [
+    // Routes publiques
     {
-      path: '/',
-      element: <Layout />,
-      children: [
-        {
-          index: true,
-          element: (
-            <SuspenseWrapper>
-              <HomePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'choose-mode',
-          element: (
-            <SuspenseWrapper>
-              <ChooseModePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'auth',
-          element: (
-            <SuspenseWrapper>
-              <AuthPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b',
-          element: (
-            <SuspenseWrapper>
-              <B2BSelectionPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'test',
-          element: (
-            <SuspenseWrapper>
-              <TestPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'point20',
-          element: (
-            <SuspenseWrapper>
-              <Point20Page />
-            </SuspenseWrapper>
-          ),
-        },
-        // Nouvelles routes principales
-        {
-          path: 'scan',
-          element: (
-            <SuspenseWrapper>
-              <ScanPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'music',
-          element: (
-            <SuspenseWrapper>
-              <MusicPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'journal',
-          element: (
-            <SuspenseWrapper>
-              <JournalPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'coach',
-          element: (
-            <SuspenseWrapper>
-              <CoachPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'vr',
-          element: (
-            <SuspenseWrapper>
-              <VrPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'gamification',
-          element: (
-            <SuspenseWrapper>
-              <GamificationPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'flash-glow',
-          element: (
-            <SuspenseWrapper>
-              <FlashGlowPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'mood-mixer',
-          element: (
-            <SuspenseWrapper>
-              <MoodMixerPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'breathwork',
-          element: (
-            <SuspenseWrapper>
-              <BreathworkPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'social-cocon',
-          element: (
-            <SuspenseWrapper>
-              <SocialCoconPage />
-            </SuspenseWrapper>
-          ),
-        },
-        // Intégration des routes des modules existants
-        ...innovationRoutes,
-        ...rhRoutes,
-      ],
+      path: UNIFIED_ROUTES.HOME,
+      element: <HomePage />,
     },
-    // Route 404 - doit être la dernière
+    {
+      path: UNIFIED_ROUTES.CHOOSE_MODE,
+      element: <ChooseModePage />,
+    },
+    {
+      path: UNIFIED_ROUTES.AUTH,
+      element: <AuthPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.B2B_SELECTION,
+      element: <B2BSelectionPage />,
+    },
+
+    // Routes fonctionnelles avec lazy loading
+    {
+      path: UNIFIED_ROUTES.VR,
+      element: withSuspense(VRPage)({}),
+    },
+    {
+      path: '/meditation',
+      element: withSuspense(MeditationPage)({}),
+    },
+    {
+      path: UNIFIED_ROUTES.GAMIFICATION,
+      element: withSuspense(GamificationPage)({}),
+    },
+
+    // Routes temporaires (pages en développement)
+    {
+      path: UNIFIED_ROUTES.SCAN,
+      element: <ScanPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.MUSIC,
+      element: <MusicPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.JOURNAL,
+      element: <JournalPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.COACH,
+      element: <CoachPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.SOCIAL_COCON,
+      element: <SocialCoconPage />,
+    },
+    {
+      path: '/flash-glow',
+      element: <FlashGlowPage />,
+    },
+    {
+      path: '/mood-mixer',
+      element: <MoodMixerPage />,
+    },
+    {
+      path: '/breathwork',
+      element: <BreathworkPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.PREFERENCES,
+      element: <PreferencesPage />,
+    },
+    {
+      path: UNIFIED_ROUTES.SETTINGS,
+      element: <SettingsPage />,
+    },
+
+    // Routes de test
+    {
+      path: '/test',
+      element: <TestPage />,
+    },
+    {
+      path: '/point20',
+      element: <Point20Page />,
+    },
+
+    // Route 404
     {
       path: '*',
-      element: (
-        <SuspenseWrapper>
-          <NotFoundPage />
-        </SuspenseWrapper>
-      ),
+      element: <NotFoundPage />,
     },
   ];
-};
+}
