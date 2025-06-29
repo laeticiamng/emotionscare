@@ -22,6 +22,9 @@ export interface Playlist {
   mood?: string;
 }
 
+// Alias pour compatibilité
+export type MusicPlaylist = Playlist;
+
 export interface MusicPlayerState {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
@@ -42,4 +45,15 @@ export interface AdaptiveMusicConfig {
   fadeInDuration: number; // en ms
   fadeOutDuration: number; // en ms
   volumeAdjustment: boolean;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  preferences?: {
+    genre?: string[];
+    tempo?: 'slow' | 'medium' | 'fast';
+    instrumental?: boolean;
+    language?: string;
+  };
 }
