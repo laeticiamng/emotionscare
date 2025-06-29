@@ -34,6 +34,15 @@ const EmotionsCareMusicPlayer: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handlePlayPause = () => {
+    console.log('🎵 EmotionsCare Player: Click play/pause, isPlaying:', isPlaying, 'isLoading:', isLoading);
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  };
+
   return (
     <Card className="fixed bottom-4 right-4 w-96 z-50 shadow-xl border-primary/20">
       <CardHeader className="pb-3">
@@ -87,8 +96,8 @@ const EmotionsCareMusicPlayer: React.FC = () => {
           <Button
             variant="default"
             size="icon"
-            onClick={isPlaying ? pause : play}
-            disabled={isLoading}
+            onClick={handlePlayPause}
+            disabled={isLoading || !currentTrack}
             className="h-10 w-10"
           >
             {isPlaying ? (
@@ -121,12 +130,16 @@ const EmotionsCareMusicPlayer: React.FC = () => {
           />
         </div>
         
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="text-center text-sm text-muted-foreground">
-            Chargement de la musique thérapeutique...
-          </div>
-        )}
+        {/* Status */}
+        <div className="text-center text-sm text-muted-foreground">
+          {isLoading ? (
+            'Chargement de la musique thérapeutique...'
+          ) : isPlaying ? (
+            'En cours de lecture'
+          ) : (
+            'En pause'
+          )}
+        </div>
       </CardContent>
     </Card>
   );
