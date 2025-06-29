@@ -17,6 +17,7 @@ import Point20Page from '@/pages/Point20Page';
 const VRPage = lazy(() => import('@/pages/VRPage'));
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+const MusicPage = lazy(() => import('@/pages/MusicPage'));
 
 // Pages temporaires simples pour les routes manquantes
 const TemporaryPage = ({ title }: { title: string }) => (
@@ -38,7 +39,6 @@ const withSuspense = (Component: React.ComponentType<any>) => (props: any) => (
 
 // Création des pages temporaires
 const ScanPage = () => <TemporaryPage title="Scanner Émotionnel" />;
-const MusicPage = () => <TemporaryPage title="Thérapie Musicale" />;
 const JournalPage = () => <TemporaryPage title="Journal Émotionnel" />;
 const CoachPage = () => <TemporaryPage title="Coach IA" />;
 const SocialCoconPage = () => <TemporaryPage title="Social Cocon" />;
@@ -81,15 +81,15 @@ export function buildUnifiedRoutes(): RouteObject[] {
       path: UNIFIED_ROUTES.GAMIFICATION,
       element: withSuspense(GamificationPage)({}),
     },
+    {
+      path: UNIFIED_ROUTES.MUSIC,
+      element: withSuspense(MusicPage)({}),
+    },
 
     // Routes temporaires (pages en développement)
     {
       path: UNIFIED_ROUTES.SCAN,
       element: <ScanPage />,
-    },
-    {
-      path: UNIFIED_ROUTES.MUSIC,
-      element: <MusicPage />,
     },
     {
       path: UNIFIED_ROUTES.JOURNAL,

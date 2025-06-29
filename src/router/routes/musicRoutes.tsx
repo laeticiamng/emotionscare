@@ -1,6 +1,8 @@
 
 import { RouteObject } from 'react-router-dom';
-import MusicPage from '@/pages/MusicPage';
+import { lazy } from 'react';
+
+const MusicPage = lazy(() => import('@/pages/MusicPage'));
 
 export const musicRoutes: RouteObject[] = [
   {
