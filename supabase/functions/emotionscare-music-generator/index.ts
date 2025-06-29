@@ -6,6 +6,91 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// URLs d'audio de test qui fonctionnent réellement
+const WORKING_AUDIO_URLS = {
+  calm: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+  energetic: 'https://www.soundjay.com/misc/sounds/bell-ringing-01.wav',
+  happy: 'https://www.soundjay.com/misc/sounds/bell-ringing-02.wav',
+  focus: 'https://www.soundjay.com/misc/sounds/bell-ringing-03.wav',
+  relaxed: 'https://www.soundjay.com/misc/sounds/bell-ringing-04.wav'
+}
+
+// Fonction pour générer une playlist basée sur l'émotion
+function generatePlaylistForEmotion(emotion: string, intensity: number = 0.7) {
+  console.log(`🎵 EmotionsCare Music Generator - Génération pour émotion: ${emotion}, intensité: ${intensity}`)
+  
+  const emotionLower = emotion.toLowerCase()
+  
+  // Sélectionner l'URL audio appropriée
+  const audioUrl = WORKING_AUDIO_URLS[emotionLower as keyof typeof WORKING_AUDIO_URLS] || WORKING_AUDIO_URLS.calm
+  
+  // Générer une playlist avec plusieurs morceaux
+  const tracks = Array.from({ length: 6 + Math.floor(Math.random() * 3) }, (_, i) => ({
+    id: `track-${emotion}-${i + 1}`,
+    title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Track ${i + 1}`,
+    artist: `AI Composer ${String.fromCharCode(65 + i)}`,
+    duration: 180 + Math.floor(Math.random() * 120), // 3-5 minutes
+    url: audioUrl,
+    audioUrl: audioUrl,
+    coverUrl: `https://picsum.photos/300/300?random=${i}`,
+    emotion: emotionLower,
+    genre: getGenreForEmotion(emotionLower),
+    bpm: getBpmForEmotion(emotionLower, intensity),
+    energy: intensity,
+    valence: getValenceForEmotion(emotionLower)
+  }))
+
+  const playlist = {
+    id: `playlist-${emotion}-${Date.now()}`,
+    name: `Playlist ${emotion.charAt(0).toUpperCase() + emotion.slice(1)}`,
+    description: `Musique générée automatiquement pour l'émotion ${emotion}`,
+    coverUrl: `https://picsum.photos/400/400?random=${emotion}`,
+    emotion: emotionLower,
+    mood: emotionLower,
+    tracks
+  }
+
+  console.log(`✅ Playlist générée avec succès: ${tracks.length} morceaux pour ${emotion}`)
+  return playlist
+}
+
+function getGenreForEmotion(emotion: string): string {
+  const genreMap: { [key: string]: string } = {
+    calm: 'ambient',
+    energetic: 'electronic',
+    happy: 'pop',
+    sad: 'acoustic',
+    focus: 'lo-fi',
+    relaxed: 'chillout'
+  }
+  return genreMap[emotion] || 'ambient'
+}
+
+function getBpmForEmotion(emotion: string, intensity: number): number {
+  const baseBpm: { [key: string]: number } = {
+    calm: 60,
+    energetic: 128,
+    happy: 120,
+    sad: 70,
+    focus: 80,
+    relaxed: 65
+  }
+  const base = baseBpm[emotion] || 80
+  return Math.round(base * (0.8 + intensity * 0.4))
+}
+
+function getValenceForEmotion(emotion: string): number {
+  const valenceMap: { [key: string]: number } = {
+    calm: 0.5,
+    energetic: 0.8,
+    happy: 0.9,
+    sad: 0.2,
+    focus: 0.6,
+    relaxed: 0.7
+  }
+  return valenceMap[emotion] || 0.5
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -13,155 +98,18 @@ serve(async (req) => {
 
   try {
     const { emotion, intensity = 0.7 } = await req.json()
-    
-    console.log(`🎵 EmotionsCare Music Generator - Génération pour émotion: ${emotion}, intensité: ${intensity}`)
 
-    // Mapping des émotions vers des fichiers audio réels
-    const emotionAudioMap = {
-      calm: '/sounds/nature-calm.mp3',
-      energetic: '/sounds/upbeat-energy.mp3', 
-      focused: '/sounds/focus-ambient.mp3',
-      happy: '/sounds/upbeat-energy.mp3',
-      sad: '/sounds/nature-calm.mp3',
-      angry: '/sounds/upbeat-energy.mp3',
-      anxious: '/sounds/nature-calm.mp3',
-      confident: '/sounds/upbeat-energy.mp3'
+    if (!emotion) {
+      return new Response(
+        JSON.stringify({ error: 'Emotion parameter is required' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      )
     }
 
-    // Générer une playlist complète basée sur l'émotion
-    const generatePlaylist = (targetEmotion: string) => {
-      const baseAudio = emotionAudioMap[targetEmotion as keyof typeof emotionAudioMap] || '/sounds/ambient-calm.mp3'
-      
-      const tracks = []
-      for (let i = 1; i <= 8; i++) {
-        tracks.push({
-          id: `${targetEmotion}-track-${i}`,
-          title: `${getEmotionTitle(targetEmotion)} ${i}`,
-          artist: getEmotionArtist(targetEmotion),
-          url: baseAudio,
-          audioUrl: baseAudio, // Pour compatibilité
-          duration: Math.floor(Math.random() * 240) + 120, // 2-6 minutes
-          emotion: targetEmotion,
-          energy: getEnergyLevel(targetEmotion),
-          valence: getValence(targetEmotion),
-          bpm: getBpm(targetEmotion),
-          genre: getGenre(targetEmotion),
-          mood: targetEmotion,
-          therapeuticBenefits: getTherapeuticBenefits(targetEmotion),
-          recommendedContext: getRecommendedContext(targetEmotion)
-        })
-      }
-      return tracks
-    }
-
-    function getEmotionTitle(emotion: string): string {
-      const titles = {
-        calm: 'Sérénité',
-        energetic: 'Dynamisme', 
-        focused: 'Concentration',
-        happy: 'Joie',
-        sad: 'Mélancolie',
-        angry: 'Libération',
-        anxious: 'Apaisement',
-        confident: 'Assurance'
-      }
-      return titles[emotion as keyof typeof titles] || 'Harmonie'
-    }
-
-    function getEmotionArtist(emotion: string): string {
-      const artists = {
-        calm: 'Nature Therapy',
-        energetic: 'Energy Boost',
-        focused: 'Deep Focus', 
-        happy: 'Joy Collective',
-        sad: 'Healing Sounds',
-        angry: 'Release Therapy',
-        anxious: 'Calm Mind',
-        confident: 'Power Vibes'
-      }
-      return artists[emotion as keyof typeof artists] || 'Therapeutic Music'
-    }
-
-    function getEnergyLevel(emotion: string): number {
-      const energyMap = {
-        calm: 0.2, energetic: 0.9, focused: 0.5, happy: 0.8,
-        sad: 0.3, angry: 0.7, anxious: 0.4, confident: 0.7
-      }
-      return energyMap[emotion as keyof typeof energyMap] || 0.5
-    }
-
-    function getValence(emotion: string): number {
-      const valenceMap = {
-        calm: 0.6, energetic: 0.8, focused: 0.5, happy: 0.9,
-        sad: 0.2, angry: 0.3, anxious: 0.3, confident: 0.8
-      }
-      return valenceMap[emotion as keyof typeof valenceMap] || 0.5
-    }
-
-    function getBpm(emotion: string): number {
-      const bpmMap = {
-        calm: 70, energetic: 130, focused: 80, happy: 120,
-        sad: 60, angry: 140, anxious: 75, confident: 110
-      }
-      return bpmMap[emotion as keyof typeof bpmMap] || 80
-    }
-
-    function getGenre(emotion: string): string {
-      const genreMap = {
-        calm: 'Ambient', energetic: 'Electronic', focused: 'Minimal',
-        happy: 'Pop', sad: 'Acoustic', angry: 'Rock', 
-        anxious: 'New Age', confident: 'Upbeat'
-      }
-      return genreMap[emotion as keyof typeof genreMap] || 'Ambient'
-    }
-
-    function getTherapeuticBenefits(emotion: string): string[] {
-      const benefitsMap = {
-        calm: ['Réduction du stress', 'Relaxation profonde', 'Amélioration du sommeil'],
-        energetic: ['Boost de motivation', 'Amélioration de l\'humeur', 'Augmentation de l\'énergie'],
-        focused: ['Amélioration de la concentration', 'Productivité accrue', 'Clarté mentale'],
-        happy: ['Élévation de l\'humeur', 'Sentiment de bien-être', 'Optimisme'],
-        sad: ['Libération émotionnelle', 'Acceptation', 'Guérison intérieure'],
-        angry: ['Canalisation de la colère', 'Libération des tensions', 'Équilibre émotionnel'],
-        anxious: ['Réduction de l\'anxiété', 'Calme intérieur', 'Stabilité émotionnelle'],
-        confident: ['Renforcement de la confiance', 'Empowerment', 'Assurance personnelle']
-      }
-      return benefitsMap[emotion as keyof typeof benefitsMap] || ['Bien-être général']
-    }
-
-    function getRecommendedContext(emotion: string): string[] {
-      const contextMap = {
-        calm: ['Méditation', 'Avant le coucher', 'Moments de détente'],
-        energetic: ['Sport', 'Réveil', 'Motivation matinale'],
-        focused: ['Travail', 'Étude', 'Tâches importantes'],
-        happy: ['Célébration', 'Moments sociaux', 'Loisirs'],
-        sad: ['Introspection', 'Moments difficiles', 'Thérapie'],
-        angry: ['Défoulement', 'Sport intense', 'Libération'],
-        anxious: ['Stress', 'Préparation d\'examen', 'Situations difficiles'],
-        confident: ['Présentation', 'Entretien', 'Défis personnels']
-      }
-      return contextMap[emotion as keyof typeof contextMap] || ['Usage général']
-    }
-
-    const playlist = {
-      id: `playlist-${Date.now()}`,
-      name: `Thérapie ${emotion.charAt(0).toUpperCase() + emotion.slice(1)}`,
-      emotion: emotion,
-      description: `Playlist thérapeutique personnalisée pour l'état émotionnel ${emotion}`,
-      tracks: generatePlaylist(emotion),
-      intensity: intensity,
-      createdAt: new Date().toISOString(),
-      therapeuticProfile: {
-        targetEmotion: emotion,
-        intensity: intensity,
-        expectedBenefits: getTherapeuticBenefits(emotion),
-        recommendedUsage: getRecommendedContext(emotion),
-        sessionDuration: '15-30 minutes',
-        adaptationLevel: 'Personnalisé'
-      }
-    }
-
-    console.log(`✅ Playlist générée avec succès: ${playlist.tracks.length} morceaux pour ${emotion}`)
+    const playlist = generatePlaylistForEmotion(emotion, intensity)
 
     return new Response(
       JSON.stringify(playlist),
@@ -170,9 +118,9 @@ serve(async (req) => {
       },
     )
   } catch (error) {
-    console.error('Erreur dans emotionscare-music-generator:', error)
+    console.error('Error in emotionscare-music-generator:', error)
     return new Response(
-      JSON.stringify({ error: 'Erreur lors de la génération musicale' }),
+      JSON.stringify({ error: 'Internal server error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
