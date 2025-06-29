@@ -35,13 +35,25 @@ const EmotionsCareMusicPlayer: React.FC = () => {
   };
 
   const handlePlayPause = () => {
-    console.log('🎵 EmotionsCare Player: Click play/pause, isPlaying:', isPlaying, 'isLoading:', isLoading);
+    console.log('🎵 EmotionsCare Player: Click play/pause');
+    console.log('🎵 State:', { isPlaying, isLoading, currentTrack: !!currentTrack });
+    
     if (isPlaying) {
       pause();
     } else {
       play();
     }
   };
+
+  // Calculer si le bouton doit être désactivé
+  const isButtonDisabled = isLoading || !currentTrack;
+  
+  console.log('🎵 EmotionsCare Player Render:', {
+    isLoading,
+    hasCurrentTrack: !!currentTrack,
+    isButtonDisabled,
+    isPlaying
+  });
 
   return (
     <Card className="fixed bottom-4 right-4 w-96 z-50 shadow-xl border-primary/20">
@@ -87,7 +99,7 @@ const EmotionsCareMusicPlayer: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={previousTrack}
-            disabled={isLoading}
+            disabled={isButtonDisabled}
             className="h-8 w-8"
           >
             <SkipBack className="h-4 w-4" />
@@ -97,7 +109,7 @@ const EmotionsCareMusicPlayer: React.FC = () => {
             variant="default"
             size="icon"
             onClick={handlePlayPause}
-            disabled={isLoading || !currentTrack}
+            disabled={isButtonDisabled}
             className="h-10 w-10"
           >
             {isPlaying ? (
@@ -111,7 +123,7 @@ const EmotionsCareMusicPlayer: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={nextTrack}
-            disabled={isLoading}
+            disabled={isButtonDisabled}
             className="h-8 w-8"
           >
             <SkipForward className="h-4 w-4" />
@@ -130,16 +142,25 @@ const EmotionsCareMusicPlayer: React.FC = () => {
           />
         </div>
         
-        {/* Status */}
+        {/* Status Debug */}
         <div className="text-center text-sm text-muted-foreground">
           {isLoading ? (
             'Chargement de la musique thérapeutique...'
+          ) : !currentTrack ? (
+            'Aucune piste sélectionnée'
           ) : isPlaying ? (
             'En cours de lecture'
           ) : (
-            'En pause'
+            'Prêt à jouer'
           )}
         </div>
+        
+        {/* Debug info in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="text-xs text-muted-foreground border-t pt-2">
+            Debug: isLoading={isLoading.toString()}, hasTrack={(!!currentTrack).toString()}, disabled={isButtonDisabled.toString()}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

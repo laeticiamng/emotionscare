@@ -1,23 +1,9 @@
 
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
-
-interface MusicTrack {
-  id: string;
-  title: string;
-  artist?: string;
-  url: string;
-  duration: number;
-}
-
-interface Playlist {
-  id: string;
-  name: string;
-  tracks: MusicTrack[];
-  emotion: string;
-}
+import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 interface EmotionsCareMusicContextType {
-  currentPlaylist: Playlist | null;
+  currentPlaylist: MusicPlaylist | null;
   currentTrack: MusicTrack | null;
   currentTrackIndex: number;
   isPlaying: boolean;
@@ -25,7 +11,7 @@ interface EmotionsCareMusicContextType {
   currentTime: number;
   duration: number;
   volume: number;
-  loadPlaylist: (playlist: Playlist) => void;
+  loadPlaylist: (playlist: MusicPlaylist) => void;
   play: () => void;
   pause: () => void;
   nextTrack: () => void;
@@ -36,8 +22,20 @@ interface EmotionsCareMusicContextType {
 
 const EmotionsCareMusicContext = createContext<EmotionsCareMusicContextType | undefined>(undefined);
 
-export const EmotionsCareMusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
+export const useEmotionsCareMusicContext = () => {
+  const context = useContext(EmotionsCareMusicContext);
+  if (!context) {
+    throw new Error('useEmotionsCareMusicContext must be used within EmotionsCareMusicProvider');
+  }
+  return context;
+};
+
+interface EmotionsCareMusicProviderProps {
+  children: ReactNode;
+}
+
+export const EmotionsCareMusicProvider: React.FC<EmotionsCareMusicProviderProps> = ({ children }) => {
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,180 +44,143 @@ export const EmotionsCareMusicProvider: React.FC<{ children: React.ReactNode }> 
   const [volume, setVolume] = useState(0.7);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
   const currentTrack = currentPlaylist?.tracks[currentTrackIndex] || null;
 
-  // Initialiser l'audio element
-  useEffect(() => {
-    if (!audioRef.current) {
-      const audio = new Audio();
-      audio.preload = 'metadata';
-      
-      audio.addEventListener('loadedmetadata', () => {
-        setDuration(audio.duration || 0);
-        setIsLoading(false);
-      });
-      
-      audio.addEventListener('timeupdate', () => {
-        setCurrentTime(audio.currentTime || 0);
-      });
-      
-      audio.addEventListener('ended', () => {
-        nextTrack();
-      });
-      
-      audio.addEventListener('play', () => {
-        setIsPlaying(true);
-      });
-      
-      audio.addEventListener('pause', () => {
-        setIsPlaying(false);
-      });
-      
-      audio.addEventListener('error', (e) => {
-        console.error('❌ EmotionsCare Audio Error:', e);
-        setIsLoading(false);
-        setIsPlaying(false);
-      });
-      
-      audioRef.current = audio;
-    }
-    
-    return () => {
-      if (playbackTimeoutRef.current) {
-        clearTimeout(playbackTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Charger un nouveau track
-  const loadCurrentTrack = useCallback(async () => {
-    if (!currentTrack || !audioRef.current) return;
-    
+  const loadPlaylist = (playlist: MusicPlaylist) => {
+    console.log('🎵 EmotionsCare Context: Loading playlist:', playlist);
     setIsLoading(true);
-    
-    try {
-      // Arrêter la lecture actuelle si nécessaire
-      if (!audioRef.current.paused) {
-        audioRef.current.pause();
-      }
-      
-      // Charger le nouveau track
-      audioRef.current.src = currentTrack.url;
-      audioRef.current.volume = volume;
-      
-      console.log('🎵 EmotionsCare: Chargement du track:', currentTrack.title);
-      
-    } catch (error) {
-      console.error('❌ EmotionsCare: Erreur de chargement:', error);
-      setIsLoading(false);
-    }
-  }, [currentTrack, volume]);
-
-  // Effet pour charger le track quand il change
-  useEffect(() => {
-    if (currentTrack) {
-      loadCurrentTrack();
-    }
-  }, [currentTrack, loadCurrentTrack]);
-
-  const loadPlaylist = useCallback((playlist: Playlist) => {
-    console.log('🎵 EmotionsCare: Chargement de la playlist:', playlist);
     setCurrentPlaylist(playlist);
     setCurrentTrackIndex(0);
-    setCurrentTime(0);
     setIsPlaying(false);
-  }, []);
+    setCurrentTime(0);
+    setDuration(0);
+    
+    // Simuler un court délai de chargement puis marquer comme prêt
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log('✅ EmotionsCare Context: Playlist ready, isLoading set to false');
+    }, 500);
+  };
 
-  const play = useCallback(async () => {
-    if (!audioRef.current || !currentTrack || isLoading) {
-      console.log('⚠️ EmotionsCare: Impossible de jouer - audio:', !!audioRef.current, 'track:', !!currentTrack, 'loading:', isLoading);
+  const play = async () => {
+    console.log('🎵 EmotionsCare Context: Play called, currentTrack:', currentTrack, 'isLoading:', isLoading);
+    
+    if (!currentTrack) {
+      console.warn('❌ EmotionsCare Context: No current track to play');
       return;
     }
 
     try {
-      console.log('▶️ EmotionsCare: Lecture du track:', currentTrack.title);
-      
-      // S'assurer que l'audio est prêt
-      if (audioRef.current.readyState < 2) {
-        setIsLoading(true);
-        await new Promise((resolve) => {
-          const handleCanPlay = () => {
-            audioRef.current?.removeEventListener('canplay', handleCanPlay);
-            setIsLoading(false);
-            resolve(true);
-          };
-          audioRef.current?.addEventListener('canplay', handleCanPlay);
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        audioRef.current.volume = volume;
+        
+        audioRef.current.addEventListener('loadedmetadata', () => {
+          setDuration(audioRef.current?.duration || 0);
+        });
+        
+        audioRef.current.addEventListener('timeupdate', () => {
+          setCurrentTime(audioRef.current?.currentTime || 0);
+        });
+        
+        audioRef.current.addEventListener('ended', () => {
+          nextTrack();
         });
       }
-      
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        await playPromise;
-        setIsPlaying(true);
-        console.log('✅ EmotionsCare: Lecture démarrée');
+
+      if (audioRef.current.src !== currentTrack.url) {
+        audioRef.current.src = currentTrack.url;
       }
+
+      await audioRef.current.play();
+      setIsPlaying(true);
+      console.log('✅ EmotionsCare Context: Audio playing successfully');
       
     } catch (error) {
-      console.error('❌ EmotionsCare: Erreur de lecture:', error);
+      console.error('❌ EmotionsCare Context: Play error:', error);
       setIsPlaying(false);
-      setIsLoading(false);
     }
-  }, [currentTrack, isLoading]);
+  };
 
-  const pause = useCallback(() => {
-    if (!audioRef.current) return;
-    
-    console.log('⏸️ EmotionsCare: Pause');
-    audioRef.current.pause();
-    setIsPlaying(false);
-  }, []);
+  const pause = () => {
+    console.log('⏸️ EmotionsCare Context: Pause called');
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
 
-  const nextTrack = useCallback(() => {
+  const nextTrack = () => {
     if (!currentPlaylist) return;
     
     const nextIndex = (currentTrackIndex + 1) % currentPlaylist.tracks.length;
-    console.log('⏭️ EmotionsCare: Track suivant:', nextIndex);
     setCurrentTrackIndex(nextIndex);
     setCurrentTime(0);
-    setIsPlaying(false);
-  }, [currentTrackIndex, currentPlaylist]);
+    
+    if (isPlaying) {
+      // Will trigger play automatically due to useEffect
+    }
+  };
 
-  const previousTrack = useCallback(() => {
+  const previousTrack = () => {
     if (!currentPlaylist) return;
     
     const prevIndex = currentTrackIndex === 0 
       ? currentPlaylist.tracks.length - 1 
       : currentTrackIndex - 1;
-    console.log('⏮️ EmotionsCare: Track précédent:', prevIndex);
     setCurrentTrackIndex(prevIndex);
     setCurrentTime(0);
-    setIsPlaying(false);
-  }, [currentTrackIndex, currentPlaylist]);
+    
+    if (isPlaying) {
+      // Will trigger play automatically due to useEffect
+    }
+  };
 
-  const handleSetVolume = useCallback((newVolume: number) => {
+  const handleSetVolume = (newVolume: number) => {
     setVolume(newVolume);
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
     }
-  }, []);
+  };
 
-  const clearPlaylist = useCallback(() => {
-    console.log('🗑️ EmotionsCare: Suppression de la playlist');
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-    }
+  const clearPlaylist = () => {
+    console.log('🗑️ EmotionsCare Context: Clearing playlist');
+    pause();
     setCurrentPlaylist(null);
     setCurrentTrackIndex(0);
-    setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
+    setIsLoading(false);
+    
+    if (audioRef.current) {
+      audioRef.current.src = '';
+    }
+  };
+
+  // Auto-play when track changes and was playing
+  useEffect(() => {
+    if (currentTrack && isPlaying && audioRef.current) {
+      audioRef.current.src = currentTrack.url;
+      play();
+    }
+  }, [currentTrackIndex]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, []);
 
-  const contextValue: EmotionsCareMusicContextType = {
+  const value: EmotionsCareMusicContextType = {
     currentPlaylist,
     currentTrack,
     currentTrackIndex,
@@ -238,16 +199,8 @@ export const EmotionsCareMusicProvider: React.FC<{ children: React.ReactNode }> 
   };
 
   return (
-    <EmotionsCareMusicContext.Provider value={contextValue}>
+    <EmotionsCareMusicContext.Provider value={value}>
       {children}
     </EmotionsCareMusicContext.Provider>
   );
-};
-
-export const useEmotionsCareMusicContext = () => {
-  const context = useContext(EmotionsCareMusicContext);
-  if (!context) {
-    throw new Error('useEmotionsCareMusicContext must be used within EmotionsCareMusicProvider');
-  }
-  return context;
 };
