@@ -1,74 +1,95 @@
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { MusicTrack } from '@/types/music';
 
 export const useMusicControls = () => {
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout>();
 
-  // Initialiser l'audio avec un fichier de test
+  // Initialiser l'audio
   useEffect(() => {
-    const audio = new Audio('/sounds/ambient-calm.mp3');
-    audio.volume = volume;
-    audioRef.current = audio;
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.preload = 'metadata';
+    }
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
+    const audio = audioRef.current;
+
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleDurationChange = () => setDuration(audio.duration || 0);
+    const handleEnded = () => setIsPlaying(false);
+    const handleLoadedData = () => {
+      setDuration(audio.duration || 0);
+      console.log('Audio chargé, durée:', audio.duration);
     };
-
-    const handleEnded = () => {
+    const handleError = (e: Event) => {
+      console.error('Erreur audio:', e);
       setIsPlaying(false);
-      setCurrentTime(0);
     };
 
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('durationchange', handleDurationChange);
+    audio.addEventListener('loadedmetadata', handleLoadedData);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('durationchange', handleDurationChange);
+      audio.removeEventListener('loadedmetadata', handleLoadedData);
       audio.removeEventListener('ended', handleEnded);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      audio.pause();
+      audio.removeEventListener('error', handleError);
     };
   }, []);
 
-  // Mettre à jour le temps de lecture
+  // Gérer le volume
   useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
-        }
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
     }
+  }, [volume, isMuted]);
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+  const playTrack = useCallback(async (track: MusicTrack) => {
+    if (!audioRef.current) return;
+
+    try {
+      console.log('Lecture de:', track.title, 'URL:', track.url || track.audioUrl);
+      
+      const audioUrl = track.url || track.audioUrl;
+      if (!audioUrl) {
+        console.error('Pas d\'URL audio pour ce morceau');
+        return;
       }
-    };
-  }, [isPlaying]);
+
+      if (currentTrack?.id !== track.id) {
+        audioRef.current.src = audioUrl;
+        setCurrentTrack(track);
+        setCurrentTime(0);
+      }
+
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Erreur lecture audio:', error);
+      setIsPlaying(false);
+    }
+  }, [currentTrack]);
 
   const play = useCallback(async () => {
-    if (audioRef.current) {
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error('Erreur lors de la lecture:', error);
-      }
+    if (!audioRef.current || !currentTrack) return;
+    
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Erreur play:', error);
     }
-  }, []);
+  }, [currentTrack]);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
@@ -84,34 +105,22 @@ export const useMusicControls = () => {
     }
   }, []);
 
-  const setVolumeLevel = useCallback((newVolume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setVolume(clampedVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : clampedVolume;
-    }
-  }, [isMuted]);
-
   const toggleMute = useCallback(() => {
-    setIsMuted(prev => {
-      const newMuted = !prev;
-      if (audioRef.current) {
-        audioRef.current.volume = newMuted ? 0 : volume;
-      }
-      return newMuted;
-    });
-  }, [volume]);
+    setIsMuted(prev => !prev);
+  }, []);
 
   return {
+    currentTrack,
     isPlaying,
     currentTime,
     duration,
     volume,
     isMuted,
+    playTrack,
     play,
     pause,
     seek,
-    setVolume: setVolumeLevel,
+    setVolume,
     toggleMute
   };
 };
