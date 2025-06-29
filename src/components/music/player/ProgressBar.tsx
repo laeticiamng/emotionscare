@@ -15,26 +15,22 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   onSeek,
   className = ""
 }) => {
-  const formatTime = (seconds: number): string => {
+  const handleSeek = (values: number[]) => {
+    onSeek(values[0]);
+  };
+
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  const handleValueChange = (values: number[]) => {
-    const newTime = (values[0] / 100) * duration;
-    onSeek(newTime);
-  };
-
   return (
     <div className={`space-y-2 ${className}`}>
       <Slider
-        value={[progress]}
-        onValueChange={handleValueChange}
-        max={100}
-        step={0.1}
+        value={[currentTime]}
+        max={duration || 100}
+        onValueChange={handleSeek}
         className="w-full"
       />
       <div className="flex justify-between text-xs text-muted-foreground">
