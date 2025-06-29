@@ -6,12 +6,13 @@ import { Music, Play } from 'lucide-react';
 import { EmotionResult } from '@/types/emotion';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import EmotionsCareMusicPlayer from './EmotionsCareMusicPlayer';
+import { EmotionsCareMusicProvider } from '@/contexts/EmotionsCareMusicContext';
 
 interface EmotionsCareRecommendationProps {
   emotionResult: EmotionResult;
 }
 
-const EmotionsCareRecommendation: React.FC<EmotionsCareRecommendationProps> = ({ emotionResult }) => {
+const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProps> = ({ emotionResult }) => {
   const { activateMusicForEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
   const [generatedPlaylist, setGeneratedPlaylist] = useState<any>(null);
   
@@ -83,6 +84,14 @@ const EmotionsCareRecommendation: React.FC<EmotionsCareRecommendationProps> = ({
         />
       )}
     </>
+  );
+};
+
+const EmotionsCareRecommendation: React.FC<EmotionsCareRecommendationProps> = (props) => {
+  return (
+    <EmotionsCareMusicProvider>
+      <EmotionsCareRecommendationContent {...props} />
+    </EmotionsCareMusicProvider>
   );
 };
 

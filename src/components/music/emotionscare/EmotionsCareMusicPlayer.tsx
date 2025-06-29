@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipForward, SkipBack, Volume2, X } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { Play, Pause, SkipForward, SkipBack, Volume2, X, AlertCircle } from 'lucide-react';
+import { useEmotionsCareMusic } from '@/contexts/EmotionsCareMusicContext';
 import { Slider } from '@/components/ui/slider';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface EmotionsCareMusicPlayerProps {
   playlist: any;
@@ -19,14 +20,17 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
     isPlaying, 
     volume, 
     currentTrack,
+    isLoading,
+    error,
     play, 
     pause, 
     toggle,
     nextTrack,
     prevTrack,
     setVolume,
-    setPlaylist 
-  } = useMusic();
+    setPlaylist,
+    clearError
+  } = useEmotionsCareMusic();
 
   const [isVisible, setIsVisible] = useState(true);
 
@@ -35,12 +39,10 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
       console.log('🎵 EmotionsCare - Chargement de la playlist:', playlist);
       setPlaylist(playlist.tracks);
       
-      // Auto-play le premier morceau
+      // Auto-play après un délai
       setTimeout(() => {
-        if (playlist.tracks[0]) {
-          play();
-        }
-      }, 500);
+        play();
+      }, 1000);
     }
   }, [playlist, setPlaylist, play]);
 
@@ -54,6 +56,10 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
 
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0]);
+  };
+
+  const handleClearError = () => {
+    clearError();
   };
 
   if (!isVisible || !playlist?.tracks?.length) {
@@ -86,6 +92,24 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
             </Button>
           </div>
 
+          {/* Affichage des erreurs */}
+          {error && (
+            <Alert variant="destructive" className="py-2">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                {error}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearError}
+                  className="ml-2 h-auto p-1 text-xs"
+                >
+                  Réessayer
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Info du morceau actuel */}
           {currentTrackInfo && (
             <div className="text-center py-2">
@@ -95,6 +119,11 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               <p className="text-xs text-muted-foreground truncate">
                 {currentTrackInfo.artist}
               </p>
+              {isLoading && (
+                <p className="text-xs text-primary animate-pulse">
+                  Chargement...
+                </p>
+              )}
             </div>
           )}
 
@@ -105,6 +134,7 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               size="icon"
               onClick={prevTrack}
               className="h-8 w-8"
+              disabled={isLoading}
             >
               <SkipBack className="h-4 w-4" />
             </Button>
@@ -114,8 +144,11 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               size="icon"
               onClick={toggle}
               className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90"
+              disabled={isLoading}
             >
-              {isPlaying ? (
+              {isLoading ? (
+                <div className="h-5 w-5 animate-spin border-2 border-white border-t-transparent rounded-full" />
+              ) : isPlaying ? (
                 <Pause className="h-5 w-5" />
               ) : (
                 <Play className="h-5 w-5 ml-0.5" />
@@ -127,6 +160,7 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               size="icon"
               onClick={nextTrack}
               className="h-8 w-8"
+              disabled={isLoading}
             >
               <SkipForward className="h-4 w-4" />
             </Button>
@@ -147,7 +181,8 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
           {/* Statut EmotionsCare */}
           <div className="text-center">
             <p className="text-xs text-primary font-medium">
-              {isPlaying ? '▶️ Lecture EmotionsCare' : '⏸️ En pause'}
+              {isLoading ? '⏳ Chargement EmotionsCare' : 
+               isPlaying ? '▶️ Lecture EmotionsCare' : '⏸️ En pause'}
             </p>
           </div>
         </CardContent>
