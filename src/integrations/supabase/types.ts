@@ -484,6 +484,94 @@ export type Database = {
         }
         Relationships: []
       }
+      emotionscare_song_likes: {
+        Row: {
+          created_at: string
+          id: string
+          song_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          song_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          song_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotionscare_song_likes_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "emotionscare_songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emotionscare_songs: {
+        Row: {
+          created_at: string
+          id: string
+          lyrics: Json | null
+          meta: Json | null
+          suno_audio_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lyrics?: Json | null
+          meta?: Json | null
+          suno_audio_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lyrics?: Json | null
+          meta?: Json | null
+          suno_audio_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      emotionscare_user_songs: {
+        Row: {
+          created_at: string
+          id: string
+          song_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          song_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          song_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotionscare_user_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "emotionscare_songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
           id: string
