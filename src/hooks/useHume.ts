@@ -1,112 +1,49 @@
 
-import { useState, useRef, useCallback } from 'react';
-import { useMood } from './useMood';
-
-interface HumeEmotionData {
-  valence: number;
-  arousal: number;
-  emotions: Array<{
-    name: string;
-    score: number;
-  }>;
-  timestamp: number;
-}
-
-interface HumeConfig {
-  enableFace: boolean;
-  enableVoice: boolean;
-  duration: number; // en secondes
-}
+import { useState, useCallback } from 'react';
+import { EmotionResult } from '@/types/emotion';
 
 export const useHume = () => {
-  const [isConnected, setIsConnected] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [emotionData, setEmotionData] = useState<HumeEmotionData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  
-  const wsRef = useRef<WebSocket | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const { updateMood } = useMood();
+  const [lastEmotionResult, setLastEmotionResult] = useState<EmotionResult | null>(null);
 
-  // Simulation WebSocket Hume (stub pour tests)
-  const connectHume = useCallback(async (config: HumeConfig = { enableFace: true, enableVoice: true, duration: 10 }) => {
+  const startEmotionScan = useCallback(async (duration: number = 5) => {
     setIsAnalyzing(true);
-    setError(null);
-
+    
     try {
-      // Demander permissions webcam/micro si nécessaire
-      if (config.enableFace || config.enableVoice) {
-        const constraints: MediaStreamConstraints = {
-          video: config.enableFace,
-          audio: config.enableVoice
-        };
-
-        streamRef.current = await navigator.mediaDevices.getUserMedia(constraints);
-      }
-
-      // Simulation WebSocket connection (remplacer par vraie connexion Hume)
-      // const wsUrl = `wss://api.hume.ai/v0/stream/models`;
-      // wsRef.current = new WebSocket(wsUrl);
+      // Simuler l'analyse émotionnelle
+      await new Promise(resolve => setTimeout(resolve, duration * 1000));
       
-      // STUB : Simulation des données Hume
-      setTimeout(() => {
-        const mockEmotionData: HumeEmotionData = {
-          valence: Math.random() * 2 - 1, // -1 à 1
-          arousal: Math.random(), // 0 à 1
-          emotions: [
-            { name: 'joy', score: Math.random() },
-            { name: 'calm', score: Math.random() },
-            { name: 'excitement', score: Math.random() }
-          ],
-          timestamp: Date.now()
-        };
-
-        setEmotionData(mockEmotionData);
-        
-        // Mettre à jour useMood() avec les nouvelles données
-        updateMood({
-          valence: mockEmotionData.valence,
-          arousal: mockEmotionData.arousal,
-          timestamp: new Date().toISOString(),
-          source: 'hume_analysis'
-        });
-
-        setIsConnected(true);
-        setIsAnalyzing(false);
-      }, config.duration * 1000);
-
-    } catch (err: any) {
-      setError(err.message || 'Erreur connexion Hume');
+      // Générer un résultat d'émotion simulé (à remplacer par la vraie intégration Hume)
+      const emotions = ['happy', 'sad', 'calm', 'energetic', 'anxious', 'angry'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const confidence = 0.6 + Math.random() * 0.4; // Entre 0.6 et 1.0
+      
+      const result: EmotionResult = {
+        emotion: randomEmotion,
+        confidence,
+        timestamp: new Date(),
+        source: 'facial_analysis'
+      };
+      
+      setLastEmotionResult(result);
+      return result;
+    } catch (error) {
+      console.error('Erreur lors du scan émotionnel:', error);
+      throw error;
+    } finally {
       setIsAnalyzing(false);
     }
-  }, [updateMood]);
+  }, []);
 
-  const disconnect = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-
-    setIsConnected(false);
+  const resetScan = useCallback(() => {
+    setLastEmotionResult(null);
     setIsAnalyzing(false);
   }, []);
 
-  const startEmotionScan = useCallback((duration: number = 10) => {
-    return connectHume({ enableFace: true, enableVoice: true, duration });
-  }, [connectHume]);
-
   return {
-    isConnected,
     isAnalyzing,
-    emotionData,
-    error,
+    lastEmotionResult,
     startEmotionScan,
-    disconnect,
-    connectHume
+    resetScan
   };
 };

@@ -1,17 +1,18 @@
 
 export interface EmotionResult {
   emotion: string;
-  confidence?: number;
-  intensity?: number;
-  timestamp?: Date;
-  metadata?: Record<string, any>;
+  confidence: number;
+  timestamp: Date;
+  source: 'facial_analysis' | 'voice_analysis' | 'text_analysis';
+  details?: {
+    valence?: number;
+    arousal?: number;
+    intensity?: number;
+  };
 }
 
-export interface EmotionData {
-  id: string;
-  emotion: string;
-  intensity: number;
-  timestamp: Date;
-  triggers?: string[];
-  notes?: string;
+export interface EmotionAnalysisConfig {
+  duration: number;
+  sensitivity: number;
+  sources: ('facial' | 'voice' | 'text')[];
 }
