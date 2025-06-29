@@ -6,15 +6,20 @@ import { Music, Play } from 'lucide-react';
 import { EmotionResult } from '@/types/emotion';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import EmotionsCareMusicPlayer from './EmotionsCareMusicPlayer';
-import { EmotionsCareMusicProvider } from '@/contexts/EmotionsCareMusicContext';
+import { EmotionsCareMusicProvider, useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
 
 interface EmotionsCareRecommendationProps {
   emotionResult: EmotionResult;
 }
 
 const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProps> = ({ emotionResult }) => {
-  const { activateMusicForEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
-  const [generatedPlaylist, setGeneratedPlaylist] = useState<any>(null);
+  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  const { 
+    currentPlaylist, 
+    isLoading: musicLoading, 
+    loadPlaylist, 
+    isPlaying 
+  } = useEmotionsCareMusicContext();
   
   const handleActivateMusic = async () => {
     try {
@@ -27,15 +32,11 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
       
       if (playlist) {
         console.log('✅ EmotionsCare - Playlist reçue:', playlist);
-        setGeneratedPlaylist(playlist);
+        loadPlaylist(playlist);
       }
     } catch (error) {
       console.error('❌ EmotionsCare - Erreur:', error);
     }
-  };
-  
-  const handleClosePlayer = () => {
-    setGeneratedPlaylist(null);
   };
   
   return (
@@ -68,20 +69,17 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
           <Button 
             onClick={handleActivateMusic} 
             className="w-full bg-primary hover:bg-primary/90"
-            disabled={isLoading}
+            disabled={musicLoading}
           >
             <Play className="mr-2 h-4 w-4" /> 
-            {isLoading ? 'Génération EmotionsCare...' : 'Activer la thérapie musicale'}
+            {musicLoading ? 'Génération EmotionsCare...' : 'Activer la thérapie musicale'}
           </Button>
         </CardContent>
       </Card>
 
       {/* Lecteur EmotionsCare */}
-      {generatedPlaylist && (
-        <EmotionsCareMusicPlayer 
-          playlist={generatedPlaylist}
-          onClose={handleClosePlayer}
-        />
+      {currentPlaylist && (
+        <EmotionsCareMusicPlayer />
       )}
     </>
   );
