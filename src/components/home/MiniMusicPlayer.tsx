@@ -4,47 +4,40 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  url: string;
-}
-
 const MiniMusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [volume, setVolume] = useState(0.8);
+  const [currentTrack, setCurrentTrack] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Pistes de test avec des sons générés programmatiquement
-  const tracks: Track[] = [
+  // Utiliser des sons de test réels et accessibles
+  const tracks = [
     {
-      id: '1',
-      title: 'Méditation Calme',
-      artist: 'Nature Sounds',
-      url: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DvullFCh9+vd3yvnU1+hJ5xNm2bAcfNJ3C6dJQCg0LYLjL6edUCQ1Hp+DwrV8bBjab2PG9aDcHLYPU7d2EVQoQdLrq6qJgDzFfvuPqVlAJF1K55PlPLiFGn9TzNmDv4NqYaP0Nd2WqgIZFRZI4d+lS8u7fHQs/aqL0yfueCNYflr7uxLl4dLCWJoW3x7jEZEPLdG5jJNfF5uHvLMKhNDFjhLBfU4wBBAAIZGF0YeYBAABBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUF'
+      title: "Méditation Matinale",
+      url: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwSBY1IYmF2" // Son de test court
     },
     {
-      id: '2', 
-      title: 'Focus Intense',
-      artist: 'Deep Work',
-      url: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DvullFCh9+vd3yvnU1+hJ5xNm2bAcfNJ3C6dJQCg0LYLjL6edUCQ1Hp+DwrV8bBjab2PG9aDcHLYPU7d2EVQoQdLrq6qJgDzFfvuPqVlAJF1K55PlPLiFGn9TzNmDv4NqYaP0Nd2WqgIZFRZI4d+lS8u7fHQs/aqL0yfueCNYflr7uxLl4dLCWJoW3x7jEZEPLdG5jJNfF5uHvLMKhNDFjhLBfU4wBBAAIZGF0YeYBAABBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUF'
+      title: "Relaxation Océan",
+      url: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwSBY1IYmF2"
+    },
+    {
+      title: "Zen Garden",
+      url: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTmb1vPMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwSBY1IYmF2"
     }
   ];
 
-  const currentTrack = tracks[currentTrackIndex];
-
-  // Gestionnaires d'événements audio
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
+    // Créer l'élément audio programmatiquement
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audio.volume = volume;
+    
+    // Événements audio
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
+      console.log('Audio loaded, duration:', audio.duration);
     };
 
     const handleTimeUpdate = () => {
@@ -53,87 +46,91 @@ const MiniMusicPlayer: React.FC = () => {
 
     const handleEnded = () => {
       setIsPlaying(false);
-      nextTrack();
+      setCurrentTime(0);
+      console.log('Audio ended');
+    };
+
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      setIsPlaying(false);
     };
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    audioRef.current = audio;
+
+    // Charger la première piste
+    audio.src = tracks[currentTrack].url;
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      audio.pause();
     };
-  }, []);
+  }, [currentTrack]);
 
-  // Contrôle du volume
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
+  const handlePlayPause = async () => {
+    if (!audioRef.current) return;
 
-  // Fonctions de contrôle
-  const togglePlayPause = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    console.log('Play/Pause clicked, current state:', isPlaying);
 
     try {
       if (isPlaying) {
-        await audio.pause();
+        audioRef.current.pause();
         setIsPlaying(false);
+        console.log('⏸️ Audio paused');
       } else {
-        await audio.play();
+        // Assurer que l'audio est chargé
+        if (audioRef.current.readyState === 0) {
+          audioRef.current.src = tracks[currentTrack].url;
+          await audioRef.current.load();
+        }
+        
+        await audioRef.current.play();
         setIsPlaying(true);
+        console.log('▶️ Audio playing');
       }
     } catch (error) {
-      console.error('Erreur lors de la lecture audio:', error);
-      // Générer un son de test programmatiquement si l'audio échoue
-      generateTestSound();
+      console.error('Erreur lors de la lecture:', error);
+      setIsPlaying(false);
     }
   };
 
-  const generateTestSound = () => {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // Note A4
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 1);
-    
-    setIsPlaying(true);
-    setTimeout(() => setIsPlaying(false), 1000);
+  const handlePrevious = () => {
+    const newTrack = currentTrack > 0 ? currentTrack - 1 : tracks.length - 1;
+    setCurrentTrack(newTrack);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    console.log('⏮️ Piste précédente:', tracks[newTrack].title);
   };
 
-  const nextTrack = () => {
-    setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+  const handleNext = () => {
+    const newTrack = currentTrack < tracks.length - 1 ? currentTrack + 1 : 0;
+    setCurrentTrack(newTrack);
     setIsPlaying(false);
-  };
-
-  const previousTrack = () => {
-    setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
-    setIsPlaying(false);
+    setCurrentTime(0);
+    console.log('⏭️ Piste suivante:', tracks[newTrack].title);
   };
 
   const handleProgressChange = (value: number[]) => {
-    const audio = audioRef.current;
-    if (audio && duration) {
-      const newTime = (value[0] / 100) * duration;
-      audio.currentTime = newTime;
+    if (audioRef.current) {
+      const newTime = value[0];
+      audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
     }
   };
 
   const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0] / 100);
+    const newVolume = value[0];
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
   };
 
   const formatTime = (time: number) => {
@@ -142,83 +139,71 @@ const MiniMusicPlayer: React.FC = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
-
   return (
-    <div className="w-full max-w-sm mx-auto">
-      <audio
-        ref={audioRef}
-        src={currentTrack.url}
-        preload="metadata"
-      />
-      
-      {/* Info de la piste */}
-      <div className="text-center mb-4">
-        <h3 className="text-sm font-medium text-white truncate">
-          {currentTrack.title}
-        </h3>
-        <p className="text-xs text-white/70 truncate">
-          {currentTrack.artist}
-        </p>
+    <div className="w-full space-y-3">
+      {/* Info piste */}
+      <div className="text-center">
+        <h4 className="text-sm font-medium text-white">{tracks[currentTrack].title}</h4>
       </div>
 
-      {/* Barre de progression */}
-      <div className="mb-4">
-        <Slider
-          value={[progressPercentage]}
-          onValueChange={handleProgressChange}
-          max={100}
-          step={1}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-white/70 mt-1">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-      </div>
-
-      {/* Contrôles de lecture */}
-      <div className="flex items-center justify-center space-x-4 mb-4">
+      {/* Contrôles principaux */}
+      <div className="flex items-center justify-center space-x-3">
         <Button
-          onClick={previousTrack}
-          size="sm"
           variant="ghost"
-          className="text-white hover:text-white/80"
+          size="icon"
+          onClick={handlePrevious}
+          className="h-8 w-8 text-white hover:bg-white/20"
         >
           <SkipBack className="h-4 w-4" />
         </Button>
 
         <Button
-          onClick={togglePlayPause}
-          size="lg"
-          className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-full w-12 h-12"
+          variant="ghost"
+          size="icon"
+          onClick={handlePlayPause}
+          className="h-10 w-10 text-white hover:bg-white/20 bg-white/10"
         >
           {isPlaying ? (
-            <Pause className="h-6 w-6" />
+            <Pause className="h-5 w-5" />
           ) : (
-            <Play className="h-6 w-6 ml-0.5" />
+            <Play className="h-5 w-5 ml-0.5" />
           )}
         </Button>
 
         <Button
-          onClick={nextTrack}
-          size="sm"
           variant="ghost"
-          className="text-white hover:text-white/80"
+          size="icon"
+          onClick={handleNext}
+          className="h-8 w-8 text-white hover:bg-white/20"
         >
           <SkipForward className="h-4 w-4" />
         </Button>
       </div>
 
-      {/* Contrôle du volume */}
+      {/* Barre de progression */}
+      <div className="space-y-1">
+        <Slider
+          value={[currentTime]}
+          max={duration || 100}
+          step={0.1}
+          onValueChange={handleProgressChange}
+          className="cursor-pointer"
+        />
+        <div className="flex justify-between text-xs text-white/70">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
+
+      {/* Contrôle volume */}
       <div className="flex items-center space-x-2">
         <Volume2 className="h-4 w-4 text-white/70" />
         <Slider
-          value={[volume * 100]}
+          value={[volume]}
+          max={1}
+          step={0.01}
           onValueChange={handleVolumeChange}
-          max={100}
-          step={1}
-          className="flex-1"
+          className="flex-1 cursor-pointer"
         />
       </div>
     </div>
