@@ -1,212 +1,114 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 const MiniMusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
-  const [currentTrack, setCurrentTrack] = useState(0);
+  const [duration, setDuration] = useState(240); // 4 minutes par défaut
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Liste simple de fichiers audio de test
-  const testTracks = [
-    '/sounds/ambient-calm.mp3',
-    '/sounds/welcome.mp3',
-    '/sounds/notification.mp3'
-  ];
-
-  // Fonction de play/pause simple et directe
-  const handlePlayPause = async () => {
-    console.log('🎵 Bouton play/pause cliqué');
+  // Fonction de test simple pour vérifier que les clics fonctionnent
+  const handlePlayClick = () => {
+    console.log('🎵 CLICK DÉTECTÉ - Bouton Play cliqué !');
+    alert('Bouton Play cliqué !'); // Alerte visible pour tester
+    setIsPlaying(!isPlaying);
     
-    if (!audioRef.current) {
-      console.error('❌ Référence audio manquante');
-      return;
-    }
-
-    try {
+    if (audioRef.current) {
       if (isPlaying) {
-        console.log('⏸️ Pause de la musique');
         audioRef.current.pause();
-        setIsPlaying(false);
+        console.log('⏸️ Audio en pause');
       } else {
-        console.log('▶️ Lecture de la musique');
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          await playPromise;
-          setIsPlaying(true);
-          console.log('✅ Lecture démarrée avec succès');
-        }
+        audioRef.current.play().catch(error => {
+          console.log('❌ Impossible de lire l\'audio:', error);
+        });
+        console.log('▶️ Audio en lecture');
       }
-    } catch (error) {
-      console.error('❌ Erreur lors de la lecture:', error);
-      setIsPlaying(false);
     }
   };
 
-  const handleNext = () => {
-    console.log('⏭️ Piste suivante');
-    const nextTrack = (currentTrack + 1) % testTracks.length;
-    setCurrentTrack(nextTrack);
-    setCurrentTime(0);
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-    }
+  const handlePreviousClick = () => {
+    console.log('⏮️ CLICK DÉTECTÉ - Bouton Précédent cliqué !');
+    alert('Bouton Précédent cliqué !');
   };
 
-  const handlePrevious = () => {
-    console.log('⏮️ Piste précédente');
-    const prevTrack = currentTrack === 0 ? testTracks.length - 1 : currentTrack - 1;
-    setCurrentTrack(prevTrack);
-    setCurrentTime(0);
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-    }
+  const handleNextClick = () => {
+    console.log('⏭️ CLICK DÉTECTÉ - Bouton Suivant cliqué !');
+    alert('Bouton Suivant cliqué !');
   };
-
-  const handleVolumeChange = (newVolume: number[]) => {
-    const vol = newVolume[0] / 100;
-    setVolume(vol);
-    if (audioRef.current) {
-      audioRef.current.volume = vol;
-    }
-  };
-
-  const handleProgressChange = (newProgress: number[]) => {
-    const time = (newProgress[0] / 100) * duration;
-    setCurrentTime(time);
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-    }
-  };
-
-  // Gestionnaires d'événements audio
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      handleNext();
-    };
-
-    const handleError = (e: Event) => {
-      console.error('❌ Erreur audio:', e);
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-
-    // Configuration initiale
-    audio.volume = volume;
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-    };
-  }, [volume]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const trackName = `Piste ${currentTrack + 1}`;
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 rounded-lg text-white space-y-3">
-      {/* Élément audio */}
-      <audio
-        ref={audioRef}
-        src={testTracks[currentTrack]}
-        preload="metadata"
-      />
-      
-      {/* Info piste */}
-      <div className="text-center">
-        <div className="font-medium">{trackName}</div>
-        <div className="text-xs opacity-75">Musicothérapie adaptative</div>
+    <div className="w-full bg-white/10 backdrop-blur-sm rounded-lg p-4 text-white">
+      <div className="text-center mb-3">
+        <h4 className="font-medium">Focus Profond</h4>
+        <p className="text-sm opacity-75">Ambiance Zen</p>
       </div>
-
+      
       {/* Barre de progression */}
-      <div className="space-y-1">
-        <Slider
-          value={[progress]}
-          onValueChange={handleProgressChange}
-          max={100}
-          step={0.1}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs opacity-75">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+      <div className="mb-3">
+        <div className="w-full bg-white/20 rounded-full h-1">
+          <div 
+            className="bg-white h-1 rounded-full transition-all duration-300" 
+            style={{ width: `${(currentTime / duration) * 100}%` }}
+          />
+        </div>
+        <div className="flex justify-between text-xs mt-1 opacity-75">
+          <span>0:00</span>
+          <span>4:00</span>
         </div>
       </div>
 
-      {/* Contrôles */}
+      {/* Contrôles de lecture - VERSION SIMPLE AVEC ONCLICK DIRECT */}
       <div className="flex items-center justify-center space-x-4">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handlePrevious}
-          className="text-white hover:bg-white/20"
+        <button
+          onClick={handlePreviousClick}
+          className="p-2 hover:bg-white/20 rounded-full transition-colors"
+          type="button"
         >
-          <SkipBack className="h-4 w-4" />
-        </Button>
+          <SkipBack className="h-5 w-5" />
+        </button>
         
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handlePlayPause}
-          className="text-white hover:bg-white/20 p-2"
+        <button
+          onClick={handlePlayClick}
+          className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+          type="button"
         >
           {isPlaying ? (
-            <Pause className="h-5 w-5" />
+            <Pause className="h-6 w-6" />
           ) : (
-            <Play className="h-5 w-5" />
+            <Play className="h-6 w-6" />
           )}
-        </Button>
+        </button>
         
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handleNext}
-          className="text-white hover:bg-white/20"
+        <button
+          onClick={handleNextClick}
+          className="p-2 hover:bg-white/20 rounded-full transition-colors"
+          type="button"
         >
-          <SkipForward className="h-4 w-4" />
-        </Button>
+          <SkipForward className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Contrôle volume */}
-      <div className="flex items-center space-x-2">
-        <Volume2 className="h-4 w-4" />
-        <Slider
-          value={[volume * 100]}
-          onValueChange={handleVolumeChange}
-          max={100}
-          step={1}
-          className="flex-1"
-        />
-      </div>
+      {/* Audio element caché */}
+      <audio
+        ref={audioRef}
+        preload="none"
+        onTimeUpdate={() => {
+          if (audioRef.current) {
+            setCurrentTime(audioRef.current.currentTime);
+          }
+        }}
+        onLoadedMetadata={() => {
+          if (audioRef.current) {
+            setDuration(audioRef.current.duration);
+          }
+        }}
+      >
+        <source src="/sounds/nature-calm.mp3" type="audio/mpeg" />
+        <source src="/sounds/ambient-calm.mp3" type="audio/mpeg" />
+        Votre navigateur ne supporte pas l'élément audio.
+      </audio>
     </div>
   );
 };
