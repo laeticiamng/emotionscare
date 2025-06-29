@@ -1,233 +1,311 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Music, Play, Pause, Volume2, Heart, Zap, Sun, CloudRain } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Headphones, Sparkles } from 'lucide-react';
+import { useMusic } from '@/contexts/MusicContext';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import AutoMusicPlayer from '@/components/music/AutoMusicPlayer';
 import { useHume } from '@/hooks/useHume';
 import { toast } from 'sonner';
 
 const MusicPage: React.FC = () => {
-  const { activateMusicForEmotion, isLoading } = useMusicEmotionIntegration();
-  const { startEmotionScan, isAnalyzing, lastEmotionResult } = useHume();
-  const [generatedPlaylist, setGeneratedPlaylist] = useState<any>(null);
-  const [customDescription, setCustomDescription] = useState('');
-  const [isGeneratingCustom, setIsGeneratingCustom] = useState(false);
+  const { 
+    currentTrack, 
+    isPlaying, 
+    volume, 
+    play, 
+    pause, 
+    nextTrack, 
+    prevTrack, 
+    setVolume 
+  } = useMusic();
+  
+  const { activateMusicForEmotion, isLoading: musicLoading } = useMusicEmotionIntegration();
+  const { startAnalysis, isAnalyzing } = useHume();
+  
+  const [manualEmotion, setManualEmotion] = useState('');
+  const [description, setDescription] = useState('');
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
 
-  // Sélection rapide d'émotions
-  const quickEmotions = [
-    { name: 'Énergique', emotion: 'energetic', icon: Zap, color: 'bg-orange-500' },
-    { name: 'Calme', emotion: 'calm', icon: CloudRain, color: 'bg-blue-500' },
-    { name: 'Joyeux', emotion: 'happy', icon: Sun, color: 'bg-yellow-500' },
-    { name: 'Triste', emotion: 'sad', icon: Heart, color: 'bg-purple-500' }
-  ];
-
-  const handleQuickEmotion = async (emotion: string) => {
+  // Fonction pour gérer la sélection rapide
+  const handleQuickSelection = async (emotion: string) => {
+    console.log(`🎵 Sélection rapide: ${emotion}`);
+    setCurrentEmotion(emotion);
+    
     try {
-      console.log(`🎵 Génération musique pour émotion: ${emotion}`);
-      const playlist = await activateMusicForEmotion({
-        emotion,
+      toast.loading('Génération de la playlist en cours...', { id: 'music-generation' });
+      
+      const result = await activateMusicForEmotion({
+        emotion: emotion.toLowerCase(),
         intensity: 0.7
       });
       
-      if (playlist) {
-        setGeneratedPlaylist(playlist);
-        toast.success('Musique générée avec succès !');
+      if (result) {
+        toast.success(`Playlist ${emotion} générée avec succès !`, { id: 'music-generation' });
+        console.log('✅ Playlist générée:', result);
+      } else {
+        toast.error('Erreur lors de la génération de la playlist', { id: 'music-generation' });
       }
     } catch (error) {
-      console.error('Erreur génération musique:', error);
-      toast.error('Erreur lors de la génération musicale');
+      console.error('❌ Erreur sélection rapide:', error);
+      toast.error('Erreur lors de la génération de la playlist', { id: 'music-generation' });
     }
   };
 
+  // Fonction pour scanner l'émotion
   const handleEmotionScan = async () => {
+    console.log('🔍 Démarrage du scan émotionnel');
+    
     try {
-      toast.info('Analyse émotionnelle en cours...', { duration: 3000 });
-      await startEmotionScan(5);
+      toast.loading('Analyse de votre émotion...', { id: 'emotion-scan' });
       
-      // Attendre un peu que le résultat soit disponible
-      setTimeout(async () => {
-        if (lastEmotionResult?.emotion) {
-          console.log('🎭 Émotion détectée:', lastEmotionResult.emotion);
-          const playlist = await activateMusicForEmotion({
-            emotion: lastEmotionResult.emotion.toLowerCase(),
-            intensity: lastEmotionResult.confidence || 0.5
-          });
-          
-          if (playlist) {
-            setGeneratedPlaylist(playlist);
-            toast.success(`Musique adaptée à votre émotion: ${lastEmotionResult.emotion}`);
-          }
-        }
-      }, 1000);
+      const emotionResult = await startAnalysis();
+      
+      if (emotionResult && emotionResult.emotion) {
+        console.log('✅ Émotion détectée:', emotionResult.emotion);
+        setCurrentEmotion(emotionResult.emotion);
+        
+        toast.success(`Émotion détectée: ${emotionResult.emotion}`, { id: 'emotion-scan' });
+        
+        // Générer automatiquement la musique pour cette émotion
+        await handleQuickSelection(emotionResult.emotion);
+      } else {
+        toast.error('Impossible de détecter votre émotion', { id: 'emotion-scan' });
+      }
     } catch (error) {
-      console.error('Erreur scan émotionnel:', error);
-      toast.error('Erreur lors du scan émotionnel');
+      console.error('❌ Erreur scan émotionnel:', error);
+      toast.error('Erreur lors de l\'analyse émotionnelle', { id: 'emotion-scan' });
     }
   };
 
-  const handleCustomGeneration = async () => {
-    if (!customDescription.trim()) {
-      toast.error('Veuillez entrer une description');
+  // Fonction pour la génération manuelle
+  const handleManualGeneration = async () => {
+    if (!manualEmotion.trim()) {
+      toast.error('Veuillez saisir une émotion');
       return;
     }
 
-    setIsGeneratingCustom(true);
+    console.log(`🎵 Génération manuelle: ${manualEmotion}`);
+    
     try {
-      console.log(`🎼 Génération personnalisée: ${customDescription}`);
+      toast.loading('Génération personnalisée...', { id: 'manual-generation' });
       
-      // Analyser la description pour déterminer l'émotion
-      let detectedEmotion = 'calm';
-      const description = customDescription.toLowerCase();
-      
-      if (description.includes('énergique') || description.includes('dynamique') || description.includes('sport')) {
-        detectedEmotion = 'energetic';
-      } else if (description.includes('triste') || description.includes('mélancolique')) {
-        detectedEmotion = 'sad';
-      } else if (description.includes('joyeux') || description.includes('heureux') || description.includes('fête')) {
-        detectedEmotion = 'happy';
-      } else if (description.includes('stressé') || description.includes('anxieux')) {
-        detectedEmotion = 'anxious';
-      }
-
-      const playlist = await activateMusicForEmotion({
-        emotion: detectedEmotion,
-        intensity: 0.6,
-        preferences: {
-          genre: description.includes('piano') ? ['classical', 'ambient'] : undefined,
-          instrumental: description.includes('instrumental') || description.includes('piano')
-        }
+      const result = await activateMusicForEmotion({
+        emotion: manualEmotion.toLowerCase(),
+        intensity: 0.7
       });
       
-      if (playlist) {
-        setGeneratedPlaylist(playlist);
-        toast.success('Musique personnalisée générée !');
+      if (result) {
+        setCurrentEmotion(manualEmotion);
+        toast.success('Playlist personnalisée générée !', { id: 'manual-generation' });
+      } else {
+        toast.error('Erreur lors de la génération', { id: 'manual-generation' });
       }
     } catch (error) {
-      console.error('Erreur génération personnalisée:', error);
-      toast.error('Erreur lors de la génération personnalisée');
-    } finally {
-      setIsGeneratingCustom(false);
+      console.error('❌ Erreur génération manuelle:', error);
+      toast.error('Erreur lors de la génération', { id: 'manual-generation' });
     }
   };
 
-  const handleClosePlayer = () => {
-    setGeneratedPlaylist(null);
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="container mx-auto p-6 space-y-8">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold gradient-text">
-          Musicothérapie EmotionsCare
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Musique thérapeutique adaptée à votre état émotionnel
+        <div className="flex items-center justify-center gap-2">
+          <Music className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold">Thérapie Musicale</h1>
+        </div>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Découvrez des playlists personnalisées adaptées à votre état émotionnel pour améliorer votre bien-être
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sélection rapide */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Music className="h-5 w-5" />
+              <Sparkles className="h-5 w-5" />
               Sélection rapide
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {quickEmotions.map((item) => (
-                <Button
-                  key={item.emotion}
-                  variant="outline"
-                  className="h-20 flex flex-col items-center gap-2"
-                  onClick={() => handleQuickEmotion(item.emotion)}
-                  disabled={isLoading}
-                >
-                  <div className={`${item.color} p-2 rounded-full text-white`}>
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                  <span>{item.name}</span>
-                </Button>
-              ))}
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Button 
+                onClick={() => handleQuickSelection('Énergique')}
+                disabled={musicLoading}
+                variant="outline"
+                className="h-12 text-sm font-medium hover:bg-orange-50 hover:border-orange-300"
+              >
+                🔥 Énergique
+              </Button>
+              <Button 
+                onClick={() => handleQuickSelection('Calme')}
+                disabled={musicLoading}
+                variant="outline"
+                className="h-12 text-sm font-medium hover:bg-blue-50 hover:border-blue-300"
+              >
+                🧘 Calme
+              </Button>
+              <Button 
+                onClick={() => handleQuickSelection('Heureux')}
+                disabled={musicLoading}
+                variant="outline"
+                className="h-12 text-sm font-medium hover:bg-yellow-50 hover:border-yellow-300"
+              >
+                😊 Heureux
+              </Button>
+              <Button 
+                onClick={() => handleQuickSelection('Triste')}
+                disabled={musicLoading}
+                variant="outline"
+                className="h-12 text-sm font-medium hover:bg-purple-50 hover:border-purple-300"
+              >
+                😢 Triste
+              </Button>
             </div>
+            {currentEmotion && (
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <p className="text-sm font-medium">
+                  État sélectionné: <span className="text-primary">{currentEmotion}</span>
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Scanner émotionnel */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5" />
-              Scanner émotionnel
-            </CardTitle>
+            <CardTitle>Scanner émotionnel</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Analysez votre état émotionnel en temps réel
-              </p>
-              <Button
-                onClick={handleEmotionScan}
-                disabled={isAnalyzing}
-                className="w-full"
-              >
-                {isAnalyzing ? 'Analyse en cours...' : 'Scanner mon émotion'}
-              </Button>
-              
-              {lastEmotionResult && (
-                <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-sm">
-                    <strong>Émotion détectée:</strong> {lastEmotionResult.emotion}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Confiance: {Math.round((lastEmotionResult.confidence || 0) * 100)}%
-                  </p>
-                </div>
-              )}
-            </div>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Laissez l'IA analyser votre état émotionnel actuel
+            </p>
+            <Button 
+              onClick={handleEmotionScan}
+              disabled={isAnalyzing}
+              className="w-full"
+            >
+              {isAnalyzing ? 'Analyse en cours...' : 'Scanner mon émotion'}
+            </Button>
+            {currentEmotion && (
+              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-sm font-medium text-green-800">
+                  Émotion détectée: {currentEmotion}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Génération manuelle */}
-        <Card className="lg:col-span-2">
+        <Card>
           <CardHeader>
             <CardTitle>Génération manuelle</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Description personnalisée</label>
-                <Textarea
-                  placeholder="Décrivez l'ambiance musicale souhaitée (ex: piano relaxant, musique énergique pour le sport...)"
-                  value={customDescription}
-                  onChange={(e) => setCustomDescription(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <Button
-                onClick={handleCustomGeneration}
-                disabled={isGeneratingCustom || !customDescription.trim()}
-                className="w-full"
-              >
-                {isGeneratingCustom ? 'Génération en cours...' : 'Générer la musique'}
-              </Button>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="emotion">Émotion cible</Label>
+              <Input 
+                id="emotion"
+                value={manualEmotion}
+                onChange={(e) => setManualEmotion(e.target.value)}
+                placeholder="ex: motivé, détendu, concentré..."
+              />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description personnalisée</Label>
+              <Textarea 
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Décrivez votre humeur ou vos préférences musicales..."
+                rows={3}
+              />
+            </div>
+            <Button 
+              onClick={handleManualGeneration}
+              disabled={musicLoading || !manualEmotion.trim()}
+              className="w-full"
+            >
+              {musicLoading ? 'Génération...' : 'Générer la musique'}
+            </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Lecteur automatique */}
-      {generatedPlaylist && (
-        <AutoMusicPlayer 
-          playlist={generatedPlaylist}
-          onClose={handleClosePlayer}
-        />
-      )}
+      {/* Lecteur musical */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Headphones className="h-5 w-5" />
+            Lecteur
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {currentTrack ? (
+            <div className="space-y-6">
+              {/* Info du morceau */}
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold">{currentTrack.title}</h3>
+                <p className="text-muted-foreground">{currentTrack.artist}</p>
+              </div>
+
+              {/* Contrôles de lecture */}
+              <div className="flex items-center justify-center space-x-4">
+                <Button variant="ghost" size="icon" onClick={prevTrack}>
+                  <SkipBack className="h-5 w-5" />
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="icon" 
+                  className="h-12 w-12 rounded-full"
+                  onClick={isPlaying ? pause : play}
+                >
+                  {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={nextTrack}>
+                  <SkipForward className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Contrôle du volume */}
+              <div className="flex items-center space-x-3">
+                <Volume2 className="h-5 w-5 text-muted-foreground" />
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="flex-1 h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-sm text-muted-foreground w-12">
+                  {Math.round(volume * 100)}%
+                </span>
+              </div>
+
+              {/* Statut */}
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  {isPlaying ? '▶️ En cours de lecture' : '⏸️ En pause'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 space-y-4">
+              <Music className="h-12 w-12 text-muted-foreground mx-auto" />
+              <p className="text-muted-foreground">
+                Sélectionnez une émotion pour commencer à écouter de la musique
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
