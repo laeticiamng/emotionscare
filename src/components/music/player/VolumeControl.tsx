@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
 
 interface VolumeControlProps {
@@ -20,16 +20,16 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   className = ""
 }) => {
   const handleVolumeChange = (values: number[]) => {
-    onVolumeChange(values[0] / 100);
+    onVolumeChange(values[0]);
   };
 
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
       <Button
         variant="ghost"
-        size="sm"
+        size="icon"
         onClick={onMuteToggle}
-        className="p-1"
+        className="h-8 w-8"
       >
         {isMuted || volume === 0 ? (
           <VolumeX className="h-4 w-4" />
@@ -40,10 +40,10 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
       
       <div className="w-20">
         <Slider
-          value={[isMuted ? 0 : volume * 100]}
+          value={[isMuted ? 0 : volume]}
+          max={1}
+          step={0.1}
           onValueChange={handleVolumeChange}
-          max={100}
-          step={1}
           className="w-full"
         />
       </div>

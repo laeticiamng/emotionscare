@@ -1,69 +1,76 @@
 
 import { useState } from 'react';
-import { MusicPlaylist, MusicTrack } from '@/types/music';
-import { useMusic } from '@/contexts/MusicContext';
-import { mockMusicTracks, mockMusicPlaylists } from '@/mocks/musicTracks';
+import { useMusicGeneration } from './useMusicGeneration';
+import { useMusicControls } from './useMusicControls';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
+  customPrompt?: string;
 }
 
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { setPlaylist, play } = useMusic();
+  const { generateMusic } = useMusicGeneration();
+  const { playTrack } = useMusicControls();
 
   const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
     
     try {
-      // Simuler un délai de chargement
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const track = await generateMusic(params.emotion, params.customPrompt);
       
-      // Trouver une playlist adaptée à l'émotion
-      const matchingPlaylist = mockMusicPlaylists.find(
-        playlist => playlist.emotion === params.emotion
-      ) || mockMusicPlaylists[0];
-      
-      if (matchingPlaylist) {
-        setPlaylist(matchingPlaylist.tracks);
-        console.log(`Playlist activée pour l'émotion: ${params.emotion}`);
-        return matchingPlaylist;
+      if (track) {
+        // Créer une playlist avec le track généré
+        const playlist: MusicPlaylist = {
+          id: crypto.randomUUID(),
+          name: `Playlist ${params.emotion}`,
+          tracks: [track],
+          emotion: params.emotion
+        };
+        
+        // Jouer automatiquement le track
+        await playTrack(track);
+        
+        return playlist;
       }
       
       return null;
     } catch (error) {
-      console.error('Erreur activation musique:', error);
+      console.error('Error activating music for emotion:', error);
       return null;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const playEmotion = async (emotion: string): Promise<MusicPlaylist | null> => {
-    const result = await activateMusicForEmotion({ emotion });
-    if (result && result.tracks.length > 0) {
-      play(result.tracks[0]);
-    }
-    return result;
+  const playEmotion = async (emotion: string, customPrompt?: string): Promise<MusicPlaylist | null> => {
+    return activateMusicForEmotion({ emotion, customPrompt });
   };
 
   const getMusicRecommendationForEmotion = async (emotionResult: any): Promise<MusicPlaylist | null> => {
     if (!emotionResult?.emotion) return null;
-    return await activateMusicForEmotion({ emotion: emotionResult.emotion });
+    
+    return activateMusicForEmotion({
+      emotion: emotionResult.emotion,
+      intensity: emotionResult.confidence || 0.5
+    });
   };
 
   const getEmotionMusicDescription = (emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      calm: 'Musique apaisante pour maintenir votre sérénité',
-      happy: 'Musique joyeuse pour amplifier votre bonheur',
-      energetic: 'Musique dynamique pour votre énergie',
-      focused: 'Musique de concentration pour optimiser votre focus',
-      sad: 'Musique douce pour vous accompagner',
-      relaxed: 'Musique relaxante pour votre détente'
+    const descriptions = {
+      'calm': 'Musique apaisante pour la détente et la méditation',
+      'energetic': 'Rythmes énergiques pour vous motiver',
+      'happy': 'Mélodies joyeuses pour égayer votre journée',
+      'focused': 'Sons concentrés pour optimiser votre productivité',
+      'relaxed': 'Ambiances douces pour vous relaxer',
+      'motivated': 'Musiques inspirantes pour vous booster',
+      'joy': 'Harmonies pleines de joie et de positivité',
+      'sadness': 'Mélodies douces pour accompagner vos émotions'
     };
     
-    return descriptions[emotion] || 'Musique adaptée à votre état émotionnel';
+    return descriptions[emotion as keyof typeof descriptions] || 'Musique adaptée à votre état émotionnel';
   };
 
   return {
@@ -74,3 +81,12 @@ export const useMusicEmotionIntegration = () => {
     isLoading
   };
 };
+
+// Types additionnels pour la compatibilité
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  tracks: MusicTrack[];
+  emotion: string;
+  description?: string;
+}

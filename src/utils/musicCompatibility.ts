@@ -1,34 +1,32 @@
 
-import { MusicTrack } from '@/types/music';
+// Utilitaires pour assurer la compatibilité avec différents formats de musique
 
-export const getTrackTitle = (track: MusicTrack): string => {
-  return track.title || 'Titre inconnu';
+export const ensureArray = <T>(value: T | T[] | undefined | null): T[] => {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
 };
 
-export const getTrackArtist = (track: MusicTrack): string => {
-  return track.artist || 'Artiste inconnu';
-};
-
-export const getTrackCover = (track: MusicTrack): string => {
-  return track.cover || track.coverImage || '/images/default-album.jpg';
-};
-
-export const formatDuration = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
-export const normalizeMusicTrack = (track: any): MusicTrack => {
+export const normalizeMusicTrack = (track: any): any => {
   return {
-    id: track.id || Math.random().toString(36).substr(2, 9),
-    title: track.title || track.name || 'Titre inconnu',
-    artist: track.artist || track.author || 'Artiste inconnu',
-    album: track.album,
-    duration: track.duration || 0,
-    url: track.url || track.src || '',
-    cover: track.cover || track.coverImage || track.image,
-    genre: track.genre,
-    mood: track.mood
+    id: track.id || crypto.randomUUID(),
+    title: track.title || 'Titre inconnu',
+    artist: track.artist || 'Artiste inconnu',
+    url: track.url || track.audio_url || '',
+    duration: track.duration || 240,
+    emotion: track.emotion || 'neutral',
+    coverUrl: track.coverUrl || track.image_url,
+    genre: track.genre || 'ambient',
+    energy: track.energy || 0.5,
+    valence: track.valence || 0.5
+  };
+};
+
+export const createMusicPlaylist = (tracks: any[], emotion: string, name?: string) => {
+  return {
+    id: crypto.randomUUID(),
+    name: name || `Playlist ${emotion}`,
+    tracks: ensureArray(tracks).map(normalizeMusicTrack),
+    emotion,
+    description: `Musique générée pour l'émotion: ${emotion}`
   };
 };
