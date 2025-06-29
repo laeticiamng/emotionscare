@@ -13,45 +13,63 @@ export const useMusicControls = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Initialiser l'audio
+  // Créer l'élément audio si nécessaire
   useEffect(() => {
-    audioRef.current = new Audio();
-    const audio = audioRef.current;
-    
-    audio.addEventListener('loadstart', () => setIsLoading(true));
-    audio.addEventListener('canplay', () => setIsLoading(false));
-    audio.addEventListener('timeupdate', () => {
-      setCurrentTime(audio.currentTime);
-    });
-    audio.addEventListener('loadedmetadata', () => {
-      setDuration(audio.duration);
-    });
-    audio.addEventListener('ended', () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    });
-    audio.addEventListener('error', (e) => {
-      console.error('Audio error:', e);
-      setIsLoading(false);
-      setIsPlaying(false);
-    });
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.preload = 'metadata';
+      
+      // Event listeners
+      audioRef.current.addEventListener('loadstart', () => setIsLoading(true));
+      audioRef.current.addEventListener('loadeddata', () => setIsLoading(false));
+      audioRef.current.addEventListener('loadedmetadata', () => {
+        setDuration(audioRef.current?.duration || 0);
+      });
+      audioRef.current.addEventListener('timeupdate', () => {
+        setCurrentTime(audioRef.current?.currentTime || 0);
+      });
+      audioRef.current.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      });
+      audioRef.current.addEventListener('error', (e) => {
+        console.error('Audio error:', e);
+        setIsLoading(false);
+        setIsPlaying(false);
+      });
+    }
 
     return () => {
-      audio.pause();
-      audio.src = '';
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
     };
   }, []);
 
+  // Mettre à jour le volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
   const playTrack = async (track: MusicTrack) => {
-    if (!audioRef.current) return;
-    
+    if (!audioRef.current || !track.url) {
+      console.error('No audio element or track URL');
+      return;
+    }
+
     try {
       setIsLoading(true);
       setCurrentTrack(track);
       
-      audioRef.current.src = track.url;
-      audioRef.current.volume = isMuted ? 0 : volume;
+      // Arrêter la lecture actuelle si elle existe
+      if (!audioRef.current.paused) {
+        audioRef.current.pause();
+      }
       
+      audioRef.current.src = track.url;
       await audioRef.current.load();
       await audioRef.current.play();
       setIsPlaying(true);
@@ -64,13 +82,13 @@ export const useMusicControls = () => {
   };
 
   const play = async () => {
-    if (!audioRef.current) return;
-    
-    try {
-      await audioRef.current.play();
-      setIsPlaying(true);
-    } catch (error) {
-      console.error('Error playing:', error);
+    if (audioRef.current && currentTrack) {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('Error playing:', error);
+      }
     }
   };
 
@@ -89,18 +107,12 @@ export const useMusicControls = () => {
   };
 
   const setVolumeLevel = (newVolume: number) => {
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : newVolume;
-    }
+    const clampedVolume = Math.max(0, Math.min(1, newVolume));
+    setVolume(clampedVolume);
   };
 
   const toggleMute = () => {
-    const newMuted = !isMuted;
-    setIsMuted(newMuted);
-    if (audioRef.current) {
-      audioRef.current.volume = newMuted ? 0 : volume;
-    }
+    setIsMuted(!isMuted);
   };
 
   return {
@@ -116,6 +128,6 @@ export const useMusicControls = () => {
     pause,
     seek,
     setVolume: setVolumeLevel,
-    toggleMute
+    toggleMute,
   };
 };

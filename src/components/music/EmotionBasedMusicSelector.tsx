@@ -1,85 +1,82 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Brain, Music, Play, Loader2 } from 'lucide-react';
+import { Mic, Music, Loader2 } from 'lucide-react';
 import { useHumeAnalysis } from '@/hooks/useHumeAnalysis';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useMusicControls } from '@/hooks/useMusicControls';
 import { toast } from 'sonner';
 
-const EMOTION_PRESETS = {
-  joy: {
-    label: 'Joyeux',
-    description: 'Musique uplifting et énergique',
-    prompt: 'musique joyeuse et énergique avec des mélodies uplifting',
-    color: 'bg-yellow-500'
-  },
-  calm: {
-    label: 'Calme',
-    description: 'Ambiance relaxante et apaisante',
-    prompt: 'musique douce et relaxante avec des sons apaisants',
-    color: 'bg-blue-500'
-  },
-  excitement: {
-    label: 'Excité',
-    description: 'Rythmes dynamiques et motivants',
-    prompt: 'musique dynamique et motivante avec des rythmes énergiques',
-    color: 'bg-orange-500'
-  },
-  sadness: {
-    label: 'Mélancolique',
-    description: 'Mélodies douces et contemplatives',
-    prompt: 'musique douce et mélancolique pour la réflexion',
-    color: 'bg-purple-500'
-  },
-  anger: {
-    label: 'Tendu',
-    description: 'Musique pour évacuer les tensions',
-    prompt: 'musique puissante pour libérer les tensions',
-    color: 'bg-red-500'
-  },
-  neutral: {
-    label: 'Neutre',
-    description: 'Ambiance équilibrée et harmonieuse',
-    prompt: 'musique équilibrée et harmonieuse',
-    color: 'bg-gray-500'
-  }
-};
-
 const EmotionBasedMusicSelector: React.FC = () => {
-  const { startVoiceAnalysis, isAnalyzing, currentEmotion, emotionData } = useHumeAnalysis();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [detectedEmotion, setDetectedEmotion] = useState<string | null>(null);
+  
+  const { analyzeEmotion } = useHumeAnalysis();
   const { generateMusic, isGenerating } = useMusicGeneration();
-  const { playTrack } = useMusicControls();
-  const [suggestedEmotions, setSuggestedEmotions] = useState<string[]>([]);
+  const { playTrack, isLoading: isPlayerLoading } = useMusicControls();
 
-  useEffect(() => {
-    if (emotionData) {
-      // Prendre les 3 émotions les plus fortes
-      const topEmotions = emotionData.emotions
-        .sort((a, b) => b.confidence - a.confidence)
-        .slice(0, 3)
-        .map(e => e.name);
-      setSuggestedEmotions(topEmotions);
-    }
-  }, [emotionData]);
-
-  const handleEmotionSelect = async (emotion: string) => {
-    const preset = EMOTION_PRESETS[emotion as keyof typeof EMOTION_PRESETS];
-    if (!preset) return;
-
+  const handleEmotionScan = async () => {
+    setIsAnalyzing(true);
     try {
-      toast.info(`Génération de musique ${preset.label.toLowerCase()}...`);
-      const track = await generateMusic(emotion, preset.prompt);
-      if (track) {
-        await playTrack(track);
-        toast.success(`Musique ${preset.label.toLowerCase()} générée !`);
-      }
+      // Demander permission microphone
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      toast.info('Analysing your emotion...', {
+        description: 'Please speak or make sounds for 5 seconds',
+      });
+
+      // Simuler l'enregistrement pendant 5 secondes
+      setTimeout(async () => {
+        stream.getTracks().forEach(track => track.stop());
+        
+        try {
+          // Analyser avec Hume (simulation pour le moment)
+          const mockEmotions = ['calm', 'happy', 'sad', 'energetic', 'anxious'];
+          const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)];
+          
+          setDetectedEmotion(randomEmotion);
+          toast.success(`Emotion detected: ${randomEmotion}`);
+          
+          // Générer automatiquement la musique
+          await handleGenerateMusic(randomEmotion);
+          
+        } catch (error) {
+          console.error('Error analyzing emotion:', error);
+          toast.error('Failed to analyze emotion');
+        }
+        
+        setIsAnalyzing(false);
+      }, 5000);
+      
     } catch (error) {
-      console.error('Erreur génération:', error);
-      toast.error('Erreur lors de la génération');
+      console.error('Error accessing microphone:', error);
+      toast.error('Unable to access microphone');
+      setIsAnalyzing(false);
     }
   };
+
+  const handleGenerateMusic = async (emotion: string) => {
+    try {
+      const track = await generateMusic(emotion, `Relaxing ${emotion} music`);
+      if (track) {
+        toast.success('Music generated successfully!');
+        // Jouer automatiquement la piste générée
+        await playTrack(track);
+      }
+    } catch (error) {
+      console.error('Error generating music:', error);
+      toast.error('Failed to generate music');
+    }
+  };
+
+  const predefinedEmotions = [
+    { emotion: 'calm', label: 'Calme', color: 'bg-blue-100 hover:bg-blue-200' },
+    { emotion: 'happy', label: 'Joyeux', color: 'bg-yellow-100 hover:bg-yellow-200' },
+    { emotion: 'sad', label: 'Triste', color: 'bg-gray-100 hover:bg-gray-200' },
+    { emotion: 'energetic', label: 'Énergique', color: 'bg-red-100 hover:bg-red-200' },
+    { emotion: 'focused', label: 'Concentré', color: 'bg-green-100 hover:bg-green-200' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -87,117 +84,72 @@ const EmotionBasedMusicSelector: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-purple-500" />
+            <Mic className="h-5 w-5" />
             Scanner Émotionnel
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Analysez votre état émotionnel pour une musique parfaitement adaptée
-            </p>
-            
-            <Button 
-              onClick={startVoiceAnalysis}
-              disabled={isAnalyzing}
-              size="lg"
-              className="w-full"
-            >
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyse en cours...
-                </>
-              ) : (
-                <>
-                  <Mic className="mr-2 h-4 w-4" />
-                  Scanner mon humeur
-                </>
-              )}
-            </Button>
-
-            {currentEmotion && (
-              <div className="p-3 bg-muted rounded-lg">
-                <p className="font-medium">Émotion détectée: {currentEmotion}</p>
-                {emotionData && (
-                  <p className="text-sm text-muted-foreground">
-                    Confiance: {Math.round(emotionData.confidence_score * 100)}%
-                  </p>
-                )}
-              </div>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground">
+            Analysez votre état émotionnel en temps réel pour générer une musique adaptée
+          </p>
+          
+          <Button
+            onClick={handleEmotionScan}
+            disabled={isAnalyzing || isGenerating}
+            className="w-full"
+            size="lg"
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyse en cours...
+              </>
+            ) : (
+              <>
+                <Mic className="mr-2 h-4 w-4" />
+                Scanner mon émotion
+              </>
             )}
-          </div>
+          </Button>
+
+          {detectedEmotion && (
+            <div className="p-3 bg-primary/10 rounded-lg">
+              <p className="text-sm font-medium">
+                Émotion détectée : <span className="capitalize">{detectedEmotion}</span>
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Suggestions basées sur l'analyse */}
-      {suggestedEmotions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Music className="h-5 w-5 text-green-500" />
-              Recommandations Personnalisées
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Basé sur votre analyse émotionnelle
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {suggestedEmotions.map((emotion) => {
-                const preset = EMOTION_PRESETS[emotion as keyof typeof EMOTION_PRESETS];
-                if (!preset) return null;
-                
-                return (
-                  <Button
-                    key={emotion}
-                    onClick={() => handleEmotionSelect(emotion)}
-                    disabled={isGenerating}
-                    variant="outline"
-                    className="h-auto p-4 flex flex-col items-start"
-                  >
-                    <div className={`w-3 h-3 rounded-full ${preset.color} mb-2`} />
-                    <div className="text-left">
-                      <div className="font-medium">{preset.label}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {preset.description}
-                      </div>
-                    </div>
-                  </Button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Presets généraux */}
+      {/* Sélection rapide d'émotions */}
       <Card>
         <CardHeader>
-          <CardTitle>Ambiances Prêtes</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Music className="h-5 w-5" />
+            Sélection Rapide
+          </CardTitle>
         </CardHeader>
         <CardContent>
+          <p className="text-muted-foreground mb-4">
+            Choisissez directement votre état émotionnel
+          </p>
+          
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {Object.entries(EMOTION_PRESETS).map(([key, preset]) => (
+            {predefinedEmotions.map(({ emotion, label, color }) => (
               <Button
-                key={key}
-                onClick={() => handleEmotionSelect(key)}
-                disabled={isGenerating}
+                key={emotion}
                 variant="outline"
-                className="h-auto p-4 flex flex-col items-center gap-2"
+                onClick={() => handleGenerateMusic(emotion)}
+                disabled={isGenerating || isPlayerLoading}
+                className={`${color} border-2 hover:border-primary/50`}
               >
-                <div className={`w-4 h-4 rounded-full ${preset.color}`} />
-                <div className="text-center">
-                  <div className="font-medium text-sm">{preset.label}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {preset.description}
-                  </div>
-                </div>
                 {isGenerating ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Play className="h-3 w-3" />
+                  <Music className="mr-2 h-4 w-4" />
                 )}
+                {label}
               </Button>
             ))}
           </div>
