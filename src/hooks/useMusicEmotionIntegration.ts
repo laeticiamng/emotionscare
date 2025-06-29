@@ -1,102 +1,74 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { normalizeMusicTrack, createMusicPlaylist } from '@/utils/musicCompatibility';
+import { useToast } from '@/components/ui/use-toast';
+import { MusicPlaylist } from '@/types/music';
 
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const { toast } = useToast();
 
-  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+  const activateMusicForEmotion = async (params: { emotion: string; intensity?: number }) => {
     setIsLoading(true);
     
     try {
-      console.log('🎵 Activation de la musique pour:', params);
+      console.log('🎵 Appel de la fonction emotionscare-music-generator avec:', params);
       
       const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
         body: {
           emotion: params.emotion,
-          intensity: params.intensity || 0.5,
-          preferences: params.preferences || {}
+          intensity: params.intensity || 0.7
         }
       });
 
       if (error) {
-        console.error('❌ Erreur lors de la génération musicale:', error);
+        console.error('❌ Erreur Supabase:', error);
         throw error;
       }
 
-      if (data?.playlist) {
-        console.log('✅ Playlist générée avec succès:', data.playlist);
-        
-        // Normaliser les morceaux
-        const normalizedTracks = data.playlist.tracks.map(normalizeMusicTrack);
-        
-        // Créer la playlist
-        const playlist = createMusicPlaylist(
-          normalizedTracks,
-          params.emotion,
-          data.playlist.name
-        );
-
-        setCurrentPlaylist(playlist);
-
-        toast({
-          title: "🎵 Musique générée !",
-          description: `Une playlist de ${playlist.tracks.length} morceaux adaptée à votre émotion "${params.emotion}" est prête.`
-        });
-
-        return playlist;
+      if (!data) {
+        throw new Error('Aucune donnée reçue de la fonction');
       }
 
-      throw new Error('Pas de playlist dans la réponse');
-
-    } catch (error) {
-      console.error('❌ Erreur complète:', error);
+      console.log('✅ Playlist générée:', data);
       
       toast({
-        title: "❌ Erreur musicale",
-        description: "Impossible de générer la musique. Réessayez.",
-        variant: "destructive"
+        title: "Playlist générée",
+        description: `Playlist pour l'émotion "${params.emotion}" créée avec succès`,
       });
 
-      return null;
+      return data as MusicPlaylist;
+    } catch (error) {
+      console.error('❌ Erreur lors de la génération:', error);
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer la playlist. Vérifiez votre connexion.",
+        variant: "destructive",
+      });
+      
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getMusicRecommendationForEmotion = async (emotionResult: any): Promise<MusicPlaylist | null> => {
-    return await activateMusicForEmotion({
-      emotion: emotionResult.emotion.toLowerCase(),
-      intensity: emotionResult.confidence || 0.7
-    });
-  };
-
   const getEmotionMusicDescription = (emotion: string): string => {
-    const descriptions = {
-      calm: 'Musique apaisante pour maintenir votre sérénité',
-      happy: 'Musique joyeuse pour amplifier votre bonheur',
-      sad: 'Musique douce pour vous accompagner',
-      anxious: 'Musique relaxante pour réduire le stress',
-      angry: 'Musique calmante pour apaiser les tensions',
-      energetic: 'Musique dynamique pour votre énergie',
-      focused: 'Musique de concentration pour votre productivité',
-      relaxed: 'Musique détendue pour votre bien-être'
+    const descriptions: Record<string, string> = {
+      calm: "Une musique apaisante pour vous détendre et retrouver votre sérénité.",
+      energetic: "Des rythmes dynamiques pour vous donner de l'énergie et de la motivation.",
+      happy: "Des mélodies joyeuses pour amplifier votre bonne humeur.",
+      sad: "Des sons réconfortants pour vous accompagner dans vos moments difficiles.",
+      focused: "Une ambiance sonore parfaite pour la concentration et la productivité.",
+      relaxed: "Des sonorités douces pour un moment de détente absolu.",
     };
     
-    return descriptions[emotion as keyof typeof descriptions] || 
-           'Musique adaptée à votre état émotionnel';
+    return descriptions[emotion.toLowerCase()] || "Une playlist personnalisée selon votre état émotionnel.";
   };
 
   return {
     activateMusicForEmotion,
-    getMusicRecommendationForEmotion,
     getEmotionMusicDescription,
-    isLoading,
-    currentPlaylist
+    isLoading
   };
 };
