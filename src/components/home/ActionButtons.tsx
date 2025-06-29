@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Brain, Music, BookOpen, Users, Settings, Headphones, Trophy, Bell } from 'lucide-react';
+import MiniMusicPlayer from './MiniMusicPlayer';
 
 const ActionButtons: React.FC = () => {
   const navigate = useNavigate();
@@ -21,7 +21,8 @@ const ActionButtons: React.FC = () => {
       title: "Musicothérapie",
       description: "Musique adaptative",
       path: "/music",
-      color: "bg-purple-500 hover:bg-purple-600"
+      color: "bg-purple-500 hover:bg-purple-600",
+      isMusic: true
     },
     {
       icon: <BookOpen className="h-6 w-6" />,
@@ -85,19 +86,34 @@ const ActionButtons: React.FC = () => {
           whileHover={{ scale: 1.05 }}
           className="group"
         >
-          <Button
-            onClick={() => navigate(action.path)}
-            className={`w-full h-32 ${action.color} text-white flex flex-col items-center justify-center space-y-2 transition-all duration-300 shadow-lg hover:shadow-xl`}
-            variant="default"
-          >
-            <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-              {action.icon}
+          {action.isMusic ? (
+            <div className={`w-full h-auto ${action.color} text-white p-6 rounded-lg space-y-4 transition-all duration-300 shadow-lg hover:shadow-xl`}>
+              <div className="flex items-center space-y-2 flex-col">
+                <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                  {action.icon}
+                </div>
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg">{action.title}</h3>
+                  <p className="text-sm opacity-90">{action.description}</p>
+                </div>
+              </div>
+              <MiniMusicPlayer />
             </div>
-            <div className="text-center">
-              <h3 className="font-semibold text-lg">{action.title}</h3>
-              <p className="text-sm opacity-90">{action.description}</p>
-            </div>
-          </Button>
+          ) : (
+            <Button
+              onClick={() => navigate(action.path)}
+              className={`w-full h-32 ${action.color} text-white flex flex-col items-center justify-center space-y-2 transition-all duration-300 shadow-lg hover:shadow-xl`}
+              variant="default"
+            >
+              <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                {action.icon}
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">{action.title}</h3>
+                <p className="text-sm opacity-90">{action.description}</p>
+              </div>
+            </Button>
+          )}
         </motion.div>
       ))}
     </div>
