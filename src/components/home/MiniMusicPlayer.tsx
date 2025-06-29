@@ -11,100 +11,115 @@ interface Track {
   url: string;
 }
 
-// Pistes de test avec des URLs audio réelles
-const testTracks: Track[] = [
-  {
-    id: '1',
-    title: 'Relaxation Nature',
-    artist: 'EmotionsCare',
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
-  },
-  {
-    id: '2',
-    title: 'Méditation Calme',
-    artist: 'Wellness',
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
-  },
-  {
-    id: '3',
-    title: 'Focus Énergie',
-    artist: 'Productivity',
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
-  }
-];
-
 const MiniMusicPlayer: React.FC = () => {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState([80]);
+  const [volume, setVolume] = useState(0.7);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const currentTrack = testTracks[currentTrackIndex];
-
-  // Mettre à jour le volume
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume[0] / 100;
+  // Pistes de test avec des sons générés programmatiquement
+  const tracks: Track[] = [
+    {
+      id: '1',
+      title: 'Méditation Calme',
+      artist: 'Nature Sounds',
+      url: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DvullFCh9+vd3yvnU1+hJ5xNm2bAcfNJ3C6dJQCg0LYLjL6edUCQ1Hp+DwrV8bBjab2PG9aDcHLYPU7d2EVQoQdLrq6qJgDzFfvuPqVlAJF1K55PlPLiFGn9TzNmDv4NqYaP0Nd2WqgIZFRZI4d+lS8u7fHQs/aqL0yfueCNYflr7uxLl4dLCWJoW3x7jEZEPLdG5jJNfF5uHvLMKhNDFjhLBfU4wBBAAIZGF0YeYBAABBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUF'
+    },
+    {
+      id: '2', 
+      title: 'Focus Intense',
+      artist: 'Deep Work',
+      url: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DvullFCh9+vd3yvnU1+hJ5xNm2bAcfNJ3C6dJQCg0LYLjL6edUCQ1Hp+DwrV8bBjab2PG9aDcHLYPU7d2EVQoQdLrq6qJgDzFfvuPqVlAJF1K55PlPLiFGn9TzNmDv4NqYaP0Nd2WqgIZFRZI4d+lS8u7fHQs/aqL0yfueCNYflr7uxLl4dLCWJoW3x7jEZEPLdG5jJNfF5uHvLMKhNDFjhLBfU4wBBAAIZGF0YeYBAABBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUF'
     }
-  }, [volume]);
+  ];
 
-  // Mettre à jour la progression
+  const currentTrack = tracks[currentTrackIndex];
+
+  // Gestionnaires d'événements audio
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const updateProgress = () => {
-      if (audio.duration) {
-        setProgress((audio.currentTime / audio.duration) * 100);
-      }
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
     };
 
-    const updateDuration = () => {
-      setDuration(audio.duration || 0);
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
     };
 
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleNext);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      nextTrack();
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleNext);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, [currentTrackIndex]);
+  }, []);
 
-  const togglePlay = async () => {
+  // Contrôle du volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  // Fonctions de contrôle
+  const togglePlayPause = async () => {
     const audio = audioRef.current;
     if (!audio) return;
 
     try {
       if (isPlaying) {
-        audio.pause();
+        await audio.pause();
         setIsPlaying(false);
       } else {
         await audio.play();
         setIsPlaying(true);
       }
     } catch (error) {
-      console.log('Erreur de lecture audio:', error);
-      // Fallback: générer un bip sonore avec Web Audio API
+      console.error('Erreur lors de la lecture audio:', error);
+      // Générer un son de test programmatiquement si l'audio échoue
       generateTestSound();
-      setIsPlaying(!isPlaying);
     }
   };
 
-  const handleNext = () => {
-    const nextIndex = (currentTrackIndex + 1) % testTracks.length;
-    setCurrentTrackIndex(nextIndex);
+  const generateTestSound = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // Note A4
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 1);
+    
+    setIsPlaying(true);
+    setTimeout(() => setIsPlaying(false), 1000);
+  };
+
+  const nextTrack = () => {
+    setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
     setIsPlaying(false);
   };
 
-  const handlePrevious = () => {
-    const prevIndex = currentTrackIndex === 0 ? testTracks.length - 1 : currentTrackIndex - 1;
-    setCurrentTrackIndex(prevIndex);
+  const previousTrack = () => {
+    setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
     setIsPlaying(false);
   };
 
@@ -113,28 +128,12 @@ const MiniMusicPlayer: React.FC = () => {
     if (audio && duration) {
       const newTime = (value[0] / 100) * duration;
       audio.currentTime = newTime;
-      setProgress(value[0]);
+      setCurrentTime(newTime);
     }
   };
 
-  // Générer un son de test avec Web Audio API
-  const generateTestSound = () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // Note A4
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.5); // 0.5 seconde
-    } catch (error) {
-      console.log('Web Audio API non supporté');
-    }
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0] / 100);
   };
 
   const formatTime = (time: number) => {
@@ -143,8 +142,10 @@ const MiniMusicPlayer: React.FC = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
+
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full max-w-sm mx-auto">
       <audio
         ref={audioRef}
         src={currentTrack.url}
@@ -152,64 +153,73 @@ const MiniMusicPlayer: React.FC = () => {
       />
       
       {/* Info de la piste */}
-      <div className="text-center">
-        <p className="font-medium text-sm text-white truncate">{currentTrack.title}</p>
-        <p className="text-xs text-white/80 truncate">{currentTrack.artist}</p>
+      <div className="text-center mb-4">
+        <h3 className="text-sm font-medium text-white truncate">
+          {currentTrack.title}
+        </h3>
+        <p className="text-xs text-white/70 truncate">
+          {currentTrack.artist}
+        </p>
       </div>
 
       {/* Barre de progression */}
-      <div className="flex items-center gap-2 text-xs text-white/70">
-        <span>{formatTime((progress / 100) * duration)}</span>
+      <div className="mb-4">
         <Slider
-          value={[progress]}
+          value={[progressPercentage]}
+          onValueChange={handleProgressChange}
           max={100}
           step={1}
-          onValueChange={handleProgressChange}
-          className="flex-1"
+          className="w-full"
         />
-        <span>{formatTime(duration)}</span>
+        <div className="flex justify-between text-xs text-white/70 mt-1">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
       </div>
 
       {/* Contrôles de lecture */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center space-x-4 mb-4">
         <Button
-          size="icon"
+          onClick={previousTrack}
+          size="sm"
           variant="ghost"
-          onClick={handlePrevious}
-          className="h-8 w-8 text-white hover:bg-white/20"
+          className="text-white hover:text-white/80"
         >
           <SkipBack className="h-4 w-4" />
         </Button>
 
         <Button
-          size="icon"
-          onClick={togglePlay}
-          className="h-10 w-10 bg-white/20 hover:bg-white/30 text-white"
+          onClick={togglePlayPause}
+          size="lg"
+          className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-full w-12 h-12"
         >
-          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          {isPlaying ? (
+            <Pause className="h-6 w-6" />
+          ) : (
+            <Play className="h-6 w-6 ml-0.5" />
+          )}
         </Button>
 
         <Button
-          size="icon"
+          onClick={nextTrack}
+          size="sm"
           variant="ghost"
-          onClick={handleNext}
-          className="h-8 w-8 text-white hover:bg-white/20"
+          className="text-white hover:text-white/80"
         >
           <SkipForward className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Contrôle du volume */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center space-x-2">
         <Volume2 className="h-4 w-4 text-white/70" />
         <Slider
-          value={volume}
+          value={[volume * 100]}
+          onValueChange={handleVolumeChange}
           max={100}
           step={1}
-          onValueChange={setVolume}
           className="flex-1"
         />
-        <span className="text-xs text-white/70 w-8">{volume[0]}%</span>
       </div>
     </div>
   );
