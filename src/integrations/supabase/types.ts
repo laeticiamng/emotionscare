@@ -1559,6 +1559,10 @@ export type Database = {
         Args: { song_id: string }
         Returns: undefined
       }
+      med_mng_create_activity_log_cleanup_job: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       med_mng_create_user_sub: {
         Args: {
           plan_name: string
@@ -1567,9 +1571,38 @@ export type Database = {
         }
         Returns: undefined
       }
+      med_mng_get_activity_stats: {
+        Args: { p_start_date?: string; p_end_date?: string }
+        Returns: {
+          activity_type: string
+          total_count: number
+          percentage: number
+        }[]
+      }
+      med_mng_get_anonymous_activity_logs: {
+        Args: {
+          p_start_date?: string
+          p_end_date?: string
+          p_activity_type?: string
+          p_search_term?: string
+          p_page?: number
+          p_page_size?: number
+        }
+        Returns: {
+          id: string
+          activity_type: string
+          category: string
+          count: number
+          timestamp_day: string
+        }[]
+      }
       med_mng_get_remaining_quota: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      med_mng_log_user_activity: {
+        Args: { activity_type_param: string; activity_details_param?: Json }
+        Returns: undefined
       }
       med_mng_refresh_monthly_quota: {
         Args: Record<PropertyKey, never>
