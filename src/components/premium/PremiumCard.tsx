@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
 import { LucideIcon } from 'lucide-react';
 
 interface PremiumCardProps {
@@ -23,44 +22,52 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5 }}
-      whileHover={{ y: -5, scale: 1.02 }}
+      initial={{ opacity: 0, y: 30, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        delay, 
+        duration: 0.8,
+        type: "spring",
+        stiffness: 100
+      }}
+      whileHover={{ 
+        y: -10, 
+        scale: 1.02,
+        transition: { duration: 0.3 }
+      }}
       whileTap={{ scale: 0.98 }}
+      className="premium-card group cursor-pointer"
+      onClick={onClick}
     >
-      <Card 
-        className="relative overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm"
-        onClick={onClick}
-      >
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
+      <div className={`h-full bg-gradient-to-br ${gradient} text-white p-8 rounded-2xl shadow-premium relative overflow-hidden`}>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
-        <CardContent className="p-6 relative z-10">
-          <div className="flex items-center gap-4 mb-4">
-            <div className={`p-3 rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-lg group-hover:scale-110 transition-transform`}>
-              <Icon className="h-6 w-6" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-6 mb-6">
+            <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white shadow-lg group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+              <Icon className="h-8 w-8" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg group-hover:text-purple-600 transition-colors">
+              <h3 className="font-bold text-2xl mb-2">
                 {title}
               </h3>
             </div>
           </div>
           
-          <p className="text-muted-foreground group-hover:text-foreground transition-colors">
+          <p className="text-white/90 leading-relaxed text-lg">
             {description}
           </p>
 
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm text-purple-600 font-medium">Découvrir</span>
+          <div className="mt-6 flex items-center justify-between">
+            <span className="text-sm text-white/80 font-semibold">Découvrir</span>
             <motion.div
-              className="w-2 h-2 rounded-full bg-purple-600"
-              animate={{ scale: [1, 1.2, 1] }}
+              className="w-3 h-3 rounded-full bg-white/80"
+              animate={{ scale: [1, 1.3, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 };
