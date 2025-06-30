@@ -369,6 +369,7 @@ export type Database = {
           interaction_config: Json | null
           item_code: string
           paroles_musicales: string[] | null
+          payload_v2: Json | null
           pitch_intro: string | null
           quiz_questions: Json | null
           reward_messages: Json | null
@@ -388,6 +389,7 @@ export type Database = {
           interaction_config?: Json | null
           item_code: string
           paroles_musicales?: string[] | null
+          payload_v2?: Json | null
           pitch_intro?: string | null
           quiz_questions?: Json | null
           reward_messages?: Json | null
@@ -407,6 +409,7 @@ export type Database = {
           interaction_config?: Json | null
           item_code?: string
           paroles_musicales?: string[] | null
+          payload_v2?: Json | null
           pitch_intro?: string | null
           quiz_questions?: Json | null
           reward_messages?: Json | null

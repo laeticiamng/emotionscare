@@ -1,96 +1,108 @@
 
 import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const MiniMusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(240); // 4 minutes par défaut
+  const [duration, setDuration] = useState(240);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Fonction de test simple pour vérifier que les clics fonctionnent
   const handlePlayClick = () => {
-    console.log('🎵 CLICK DÉTECTÉ - Bouton Play cliqué !');
-    alert('Bouton Play cliqué !'); // Alerte visible pour tester
+    console.log('🎵 PLAY BUTTON CLICKED');
     setIsPlaying(!isPlaying);
     
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
-        console.log('⏸️ Audio en pause');
       } else {
         audioRef.current.play().catch(error => {
-          console.log('❌ Impossible de lire l\'audio:', error);
+          console.log('Audio play failed:', error);
         });
-        console.log('▶️ Audio en lecture');
       }
     }
   };
 
   const handlePreviousClick = () => {
-    console.log('⏮️ CLICK DÉTECTÉ - Bouton Précédent cliqué !');
-    alert('Bouton Précédent cliqué !');
+    console.log('⏮️ PREVIOUS CLICKED');
   };
 
   const handleNextClick = () => {
-    console.log('⏭️ CLICK DÉTECTÉ - Bouton Suivant cliqué !');
-    alert('Bouton Suivant cliqué !');
+    console.log('⏭️ NEXT CLICKED');
   };
 
+  const progress = (currentTime / duration) * 100;
+
   return (
-    <div className="w-full bg-white/10 backdrop-blur-sm rounded-lg p-4 text-white">
-      <div className="text-center mb-3">
-        <h4 className="font-medium">Focus Profond</h4>
-        <p className="text-sm opacity-75">Ambiance Zen</p>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="premium-music-player w-full p-6 text-white relative"
+    >
+      {/* Album Art & Info */}
+      <div className="flex items-center mb-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-blue-500 rounded-xl mr-4 flex items-center justify-center">
+          <Volume2 className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg">Focus Profond</h4>
+          <p className="text-white/70 text-sm">Ambiance Zen • Relaxation</p>
+        </div>
       </div>
       
-      {/* Barre de progression */}
-      <div className="mb-3">
-        <div className="w-full bg-white/20 rounded-full h-1">
-          <div 
-            className="bg-white h-1 rounded-full transition-all duration-300" 
-            style={{ width: `${(currentTime / duration) * 100}%` }}
+      {/* Progress Bar */}
+      <div className="mb-6">
+        <div className="premium-progress-bar">
+          <motion.div 
+            className="premium-progress-fill"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3 }}
           />
         </div>
-        <div className="flex justify-between text-xs mt-1 opacity-75">
-          <span>0:00</span>
-          <span>4:00</span>
+        <div className="flex justify-between text-xs mt-2 text-white/60">
+          <span>{Math.floor(currentTime / 60)}:{Math.floor(currentTime % 60).toString().padStart(2, '0')}</span>
+          <span>{Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}</span>
         </div>
       </div>
 
-      {/* Contrôles de lecture - VERSION SIMPLE AVEC ONCLICK DIRECT */}
-      <div className="flex items-center justify-center space-x-4">
-        <button
+      {/* Control Buttons */}
+      <div className="flex items-center justify-center space-x-6">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handlePreviousClick}
-          className="p-2 hover:bg-white/20 rounded-full transition-colors"
-          type="button"
+          className="premium-control-button p-3 transition-all duration-300"
         >
-          <SkipBack className="h-5 w-5" />
-        </button>
+          <SkipBack className="h-5 w-5 text-white" />
+        </motion.button>
         
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handlePlayClick}
-          className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
-          type="button"
+          className="premium-control-button p-4 bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg"
         >
           {isPlaying ? (
-            <Pause className="h-6 w-6" />
+            <Pause className="h-6 w-6 text-white" />
           ) : (
-            <Play className="h-6 w-6" />
+            <Play className="h-6 w-6 text-white ml-1" />
           )}
-        </button>
+        </motion.button>
         
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleNextClick}
-          className="p-2 hover:bg-white/20 rounded-full transition-colors"
-          type="button"
+          className="premium-control-button p-3 transition-all duration-300"
         >
-          <SkipForward className="h-5 w-5" />
-        </button>
+          <SkipForward className="h-5 w-5 text-white" />
+        </motion.button>
       </div>
 
-      {/* Audio element caché */}
+      {/* Hidden Audio Element */}
       <audio
         ref={audioRef}
         preload="none"
@@ -105,11 +117,9 @@ const MiniMusicPlayer: React.FC = () => {
           }
         }}
       >
-        <source src="/sounds/nature-calm.mp3" type="audio/mpeg" />
-        <source src="/sounds/ambient-calm.mp3" type="audio/mpeg" />
-        Votre navigateur ne supporte pas l'élément audio.
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+b12H4" type="audio/wav" />
       </audio>
-    </div>
+    </motion.div>
   );
 };
 
