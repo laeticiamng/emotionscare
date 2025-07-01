@@ -1,282 +1,164 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
 import { 
-  Users, 
   Brain, 
   Music, 
-  BookOpen, 
-  MessageCircle,
-  Target,
-  Calendar,
+  MessageCircle, 
+  Users, 
   TrendingUp,
-  Award,
-  Bell,
-  Settings
+  Target,
+  Clock,
+  Award
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const B2BUserDashboard: React.FC = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState('week');
-
-  const stats = {
-    emotionalScore: 7.2,
-    weeklyGoal: 75,
-    streakDays: 5,
-    totalSessions: 23
-  };
-
-  const quickActions = [
-    { name: 'Scanner', icon: Brain, href: '/scan', color: 'blue' },
-    { name: 'Musique', icon: Music, href: '/music', color: 'purple' },
-    { name: 'Journal', icon: BookOpen, href: '/journal', color: 'green' },
-    { name: 'Coach', icon: MessageCircle, href: '/coach', color: 'orange' }
+  const teamStats = [
+    { label: 'Mon équipe', value: '12', icon: Users, color: 'text-blue-600' },
+    { label: 'Mes objectifs', value: '8/10', icon: Target, color: 'text-green-600' },
+    { label: 'Temps bien-être', value: '2h45', icon: Clock, color: 'text-purple-600' },
+    { label: 'Niveau', value: 'Expert', icon: Award, color: 'text-orange-600' }
   ];
 
-  const weeklyProgress = [
-    { day: 'L', completed: true },
-    { day: 'M', completed: true },
-    { day: 'M', completed: true },
-    { day: 'J', completed: true },
-    { day: 'V', completed: true },
-    { day: 'S', completed: false },
-    { day: 'D', completed: false }
+  const quickAccess = [
+    { icon: Brain, title: 'Check-in quotidien', desc: 'Comment vous sentez-vous ?', path: '/scan', color: 'from-blue-500 to-cyan-500' },
+    { icon: Music, title: 'Pause musicale', desc: 'Moment de détente', path: '/music', color: 'from-purple-500 to-pink-500' },
+    { icon: MessageCircle, title: 'Coach équipe', desc: 'Conseils pour le travail', path: '/coach', color: 'from-green-500 to-emerald-500' },
+    { icon: Users, title: 'Mon équipe', desc: 'Activités collaboratives', path: '/team', color: 'from-orange-500 to-red-500' }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50" data-testid="page-root">
-      <div className="container mx-auto px-4 py-8">
+    <MainLayout>
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Bonjour, Marie ! 👋
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Voici votre tableau de bord bien-être
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <Bell className="h-4 w-4 mr-2" />
-              Notifications
-            </Button>
-            <Button variant="outline" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Paramètres
-            </Button>
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent mb-2">
+            Espace Collaborateur
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Votre bien-être au travail, notre priorité
+          </p>
+        </motion.div>
 
-        {/* Stats principales */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Score émotionnel</p>
-                  <p className="text-3xl font-bold">{stats.emotionalScore}/10</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm">Objectif hebdo</p>
-                  <p className="text-3xl font-bold">{stats.weeklyGoal}%</p>
-                </div>
-                <Target className="h-8 w-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm">Série</p>
-                  <p className="text-3xl font-bold">{stats.streakDays} jours</p>
-                </div>
-                <Award className="h-8 w-8 text-orange-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Sessions</p>
-                  <p className="text-3xl font-bold">{stats.totalSessions}</p>
-                </div>
-                <Users className="h-8 w-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Actions rapides */}
-          <div className="lg:col-span-2">
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {quickActions.map((action) => {
-                    const IconComponent = action.icon;
-                    return (
-                      <Link key={action.name} to={action.href}>
-                        <Button
-                          variant="outline"
-                          className="h-20 w-full flex flex-col items-center justify-center gap-2 hover:shadow-md"
-                        >
-                          <IconComponent className={`h-6 w-6 text-${action.color}-600`} />
-                          <span className="text-sm">{action.name}</span>
-                        </Button>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Progression hebdomadaire */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Progression de la semaine
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-gray-600">5/7 jours complétés</span>
-                  <Badge variant="secondary">{Math.round((5/7) * 100)}%</Badge>
-                </div>
-                <Progress value={(5/7) * 100} className="mb-4" />
-                <div className="flex gap-2">
-                  {weeklyProgress.map((day, index) => (
-                    <div
-                      key={index}
-                      className={`flex-1 text-center p-2 rounded ${
-                        day.completed
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      <div className="text-xs font-medium">{day.day}</div>
+        {/* Statistiques équipe */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {teamStats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="premium-card">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                      </div>
+                      <Icon className={`h-8 w-8 ${stat.color}`} />
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Accès rapide */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Accès rapide</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickAccess.map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <motion.div
+                  key={action.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Card className="premium-card group cursor-pointer h-full">
+                    <CardContent className="p-6">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="font-semibold mb-2">{action.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{action.desc}</p>
+                      <Button asChild variant="outline" className="w-full">
+                        <Link to={action.path}>Accéder</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
+        </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Recommandations */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommandations</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Brain className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium">Scan émotionnel</span>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    Votre dernier scan remonte à hier. Prenez 2 minutes pour vérifier votre état.
-                  </p>
-                  <Link to="/scan">
-                    <Button size="sm" className="mt-2 w-full">
-                      Faire un scan
-                    </Button>
-                  </Link>
-                </div>
-
-                <div className="p-3 bg-purple-50 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Music className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium">Pause musicale</span>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    15 minutes de musique relaxante pour votre après-midi.
-                  </p>
-                  <Link to="/music">
-                    <Button size="sm" variant="outline" className="mt-2 w-full">
-                      Écouter
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Accomplissements */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Accomplissements</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <Award className="h-5 w-5 text-yellow-600" />
-                  </div>
+        {/* Activités d'équipe */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="premium-card">
+            <CardHeader>
+              <CardTitle>Challenges d'équipe</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
                   <div>
-                    <p className="text-sm font-medium">Série de 5 jours</p>
-                    <p className="text-xs text-gray-500">Débloqué aujourd'hui</p>
+                    <p className="font-medium">Méditation collective</p>
+                    <p className="text-sm text-muted-foreground">8/12 participants</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">67%</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Brain className="h-5 w-5 text-blue-600" />
-                  </div>
+                <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
                   <div>
-                    <p className="text-sm font-medium">Expert Scanner</p>
-                    <p className="text-xs text-gray-500">20 scans complétés</p>
+                    <p className="font-medium">Pause bien-être</p>
+                    <p className="text-sm text-muted-foreground">Quotidien</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">100%</p>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                <Link to="/gamification">
-                  <Button variant="outline" size="sm" className="w-full mt-3">
-                    Voir tous les succès
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Support */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Besoin d'aide ?</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Link to="/coach">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Parler au coach
-                  </Button>
-                </Link>
-                <Button variant="outline" size="sm" className="w-full">
-                  <Users className="h-4 w-4 mr-2" />
-                  Contacter RH
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="premium-card">
+            <CardHeader>
+              <CardTitle>Recommandations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg">
+                  <p className="font-medium mb-2">Session VR recommandée</p>
+                  <p className="text-sm text-muted-foreground">Basée sur votre stress cette semaine</p>
+                  <Button size="sm" className="mt-2">Essayer</Button>
+                </div>
+                <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg">
+                  <p className="font-medium mb-2">Exercice de respiration</p>
+                  <p className="text-sm text-muted-foreground">Pour améliorer votre concentration</p>
+                  <Button size="sm" variant="outline" className="mt-2">Commencer</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

@@ -81,6 +81,59 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_tracks: {
+        Row: {
+          created_at: string
+          duration: number | null
+          file_path: string | null
+          file_url: string | null
+          id: string
+          is_muted: boolean | null
+          is_solo: boolean | null
+          name: string
+          order: number | null
+          project_id: string
+          type: string
+          volume: number | null
+        }
+        Insert: {
+          created_at?: string
+          duration?: number | null
+          file_path?: string | null
+          file_url?: string | null
+          id?: string
+          is_muted?: boolean | null
+          is_solo?: boolean | null
+          name: string
+          order?: number | null
+          project_id: string
+          type: string
+          volume?: number | null
+        }
+        Update: {
+          created_at?: string
+          duration?: number | null
+          file_path?: string | null
+          file_url?: string | null
+          id?: string
+          is_muted?: boolean | null
+          is_solo?: boolean | null
+          name?: string
+          order?: number | null
+          project_id?: string
+          type?: string
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_tracks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "recording_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           awarded_at: string
@@ -575,6 +628,146 @@ export type Database = {
           },
         ]
       }
+      emotionsroom_favorites: {
+        Row: {
+          created_at: string
+          favorite_user_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          favorite_user_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          favorite_user_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      emotionsroom_profiles: {
+        Row: {
+          avatar_emoji: string | null
+          created_at: string
+          favorite_mood: string | null
+          id: string
+          is_anonymous: boolean | null
+          nickname: string
+          settings: Json | null
+          total_rooms: number | null
+          total_time_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          created_at?: string
+          favorite_mood?: string | null
+          id: string
+          is_anonymous?: boolean | null
+          nickname: string
+          settings?: Json | null
+          total_rooms?: number | null
+          total_time_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_emoji?: string | null
+          created_at?: string
+          favorite_mood?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          nickname?: string
+          settings?: Json | null
+          total_rooms?: number | null
+          total_time_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      emotionsroom_rooms: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean | null
+          max_participants: number | null
+          mood: string
+          music_track_id: string | null
+          participants: Json | null
+          room_settings: Json | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          mood: string
+          music_track_id?: string | null
+          participants?: Json | null
+          room_settings?: Json | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          mood?: string
+          music_track_id?: string | null
+          participants?: Json | null
+          room_settings?: Json | null
+        }
+        Relationships: []
+      }
+      emotionsroom_sessions: {
+        Row: {
+          duration_minutes: number | null
+          feedback_rating: number | null
+          feedback_text: string | null
+          id: string
+          joined_at: string
+          left_at: string | null
+          mood: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          duration_minutes?: number | null
+          feedback_rating?: number | null
+          feedback_text?: string | null
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          mood: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          duration_minutes?: number | null
+          feedback_rating?: number | null
+          feedback_text?: string | null
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          mood?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotionsroom_sessions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "emotionsroom_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
           id: string
@@ -697,6 +890,138 @@ export type Database = {
             columns: ["therapeutic_id"]
             isOneToOne: false
             referencedRelation: "therapeutic_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jam_participants: {
+        Row: {
+          current_mood: string | null
+          id: string
+          instrument_type: string
+          is_spectator: boolean | null
+          joined_at: string
+          left_at: string | null
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          current_mood?: string | null
+          id?: string
+          instrument_type: string
+          is_spectator?: boolean | null
+          joined_at?: string
+          left_at?: string | null
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          current_mood?: string | null
+          id?: string
+          instrument_type?: string
+          is_spectator?: boolean | null
+          joined_at?: string
+          left_at?: string | null
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jam_participants_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "jam_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jam_rooms: {
+        Row: {
+          created_at: string
+          creator_id: string
+          current_participants: number | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_public: boolean | null
+          max_participants: number | null
+          mood: string
+          name: string
+          recording_project_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          current_participants?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          max_participants?: number | null
+          mood: string
+          name: string
+          recording_project_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          current_participants?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          max_participants?: number | null
+          mood?: string
+          name?: string
+          recording_project_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jam_rooms_recording_project_id_fkey"
+            columns: ["recording_project_id"]
+            isOneToOne: false
+            referencedRelation: "recording_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jam_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          mood_evolution: Json | null
+          participants_count: number | null
+          recording_url: string | null
+          room_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          mood_evolution?: Json | null
+          participants_count?: number | null
+          recording_url?: string | null
+          room_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          mood_evolution?: Json | null
+          participants_count?: number | null
+          recording_url?: string | null
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jam_sessions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "jam_rooms"
             referencedColumns: ["id"]
           },
         ]
@@ -1229,6 +1554,36 @@ export type Database = {
           role?: string | null
           updated_at?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      recording_projects: {
+        Row: {
+          bpm: number | null
+          created_at: string
+          id: string
+          key: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bpm?: number | null
+          created_at?: string
+          id?: string
+          key?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bpm?: number | null
+          created_at?: string
+          id?: string
+          key?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

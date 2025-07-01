@@ -1,313 +1,139 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import { 
   Brain, 
   Music, 
-  BookOpen, 
   MessageCircle, 
-  Headphones,
-  Heart,
-  Trophy,
-  Calendar,
+  FileText, 
+  Heart, 
   TrendingUp,
-  Star,
-  Zap,
-  Target
+  Calendar,
+  Award,
+  Users
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const B2CDashboardPage: React.FC = () => {
-  const navigate = useNavigate();
-
-  const todayStats = {
-    emotionalScore: 8.2,
-    sessionsCompleted: 3,
-    wellnessStreak: 12,
-    totalProgress: 68
-  };
-
   const quickActions = [
-    {
-      icon: <Brain className="h-5 w-5" />,
-      title: "Scanner d'humeur",
-      description: "Analyser mes émotions",
-      path: "/scan",
-      color: "from-blue-500 to-cyan-500",
-      urgent: true
-    },
-    {
-      icon: <Music className="h-5 w-5" />,
-      title: "Ma playlist",
-      description: "Musique adaptée",
-      path: "/music",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      icon: <MessageCircle className="h-5 w-5" />,
-      title: "Coach IA",
-      description: "Conseil personnalisé",
-      path: "/coach",
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      icon: <Headphones className="h-5 w-5" />,
-      title: "Session VR",
-      description: "Relaxation immersive",
-      path: "/vr",
-      color: "from-indigo-500 to-purple-500"
-    }
+    { icon: Brain, title: 'Scanner émotions', desc: 'Analysez votre état émotionnel', path: '/scan', color: 'from-blue-500 to-cyan-500' },
+    { icon: Music, title: 'Musique thérapeutique', desc: 'Écoutez des mélodies apaisantes', path: '/music', color: 'from-purple-500 to-pink-500' },
+    { icon: MessageCircle, title: 'Coach IA', desc: 'Parlez avec votre coach virtuel', path: '/coach', color: 'from-green-500 to-emerald-500' },
+    { icon: Heart, title: 'VR Thérapie', desc: 'Immersion thérapeutique', path: '/vr', color: 'from-red-500 to-orange-500' }
   ];
 
-  const recentActivities = [
-    { type: "Méditation", time: "Il y a 2h", score: 9.1, icon: <Heart className="h-4 w-4" /> },
-    { type: "Journal", time: "Ce matin", score: 8.5, icon: <BookOpen className="h-4 w-4" /> },
-    { type: "Scanner", time: "Hier", score: 7.8, icon: <Brain className="h-4 w-4" /> }
+  const stats = [
+    { label: 'Sessions cette semaine', value: '12', icon: Calendar, color: 'text-blue-600' },
+    { label: 'Progression', value: '+15%', icon: TrendingUp, color: 'text-green-600' },
+    { label: 'Badges obtenus', value: '8', icon: Award, color: 'text-purple-600' },
+    { label: 'Communauté', value: '1,2k', icon: Users, color: 'text-orange-600' }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-indigo-900 p-4" data-testid="page-root">
-      <div className="max-w-7xl mx-auto">
+    <MainLayout>
+      <div className="space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="text-center"
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 dark:text-white">
-                Tableau de bord personnel
-              </h1>
-              <p className="text-slate-600 dark:text-slate-300 mt-1">
-                Bonjour ! Voici votre résumé bien-être du jour
-              </p>
-            </div>
-            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-              <Star className="mr-1 h-3 w-3" />
-              Série de {todayStats.wellnessStreak} jours
-            </Badge>
-          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            Bienvenue sur votre espace personnel
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Prenez soin de votre bien-être mental avec nos outils thérapeutiques
+          </p>
         </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100">Score émotionnel</p>
-                    <p className="text-3xl font-bold">{todayStats.emotionalScore}/10</p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-blue-200" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100">Sessions aujourd'hui</p>
-                    <p className="text-3xl font-bold">{todayStats.sessionsCompleted}</p>
-                  </div>
-                  <Zap className="h-8 w-8 text-purple-200" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100">Série de jours</p>
-                    <p className="text-3xl font-bold">{todayStats.wellnessStreak}</p>
-                  </div>
-                  <Trophy className="h-8 w-8 text-green-200" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100">Progression</p>
-                    <p className="text-3xl font-bold">{todayStats.totalProgress}%</p>
-                  </div>
-                  <Target className="h-8 w-8 text-orange-200" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+        {/* Statistiques */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="premium-card">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                      </div>
+                      <Icon className={`h-8 w-8 ${stat.color}`} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
 
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mb-8"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Zap className="mr-2 h-5 w-5" />
-                Actions rapides
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {quickActions.map((action, index) => (
-                  <motion.div
-                    key={action.title}
-                    whileHover={{ scale: 1.05 }}
-                    className="relative"
-                  >
-                    <Button
-                      onClick={() => navigate(action.path)}
-                      className={`w-full h-24 bg-gradient-to-r ${action.color} hover:opacity-90 text-white flex flex-col items-center justify-center space-y-2 relative`}
-                      variant="default"
-                    >
-                      {action.urgent && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                      )}
-                      {action.icon}
-                      <div className="text-center">
-                        <div className="font-semibold text-sm">{action.title}</div>
-                        <div className="text-xs opacity-90">{action.description}</div>
-                      </div>
-                    </Button>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Recent Activities & Progress */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Activités récentes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full">
-                          {activity.icon}
-                        </div>
-                        <div>
-                          <p className="font-medium">{activity.type}</p>
-                          <p className="text-sm text-slate-500">{activity.time}</p>
-                        </div>
-                      </div>
-                      <Badge variant="outline">
-                        {activity.score}/10
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TrendingUp className="mr-2 h-5 w-5" />
-                  Progression hebdomadaire
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Objectif bien-être</span>
-                      <span>{todayStats.totalProgress}%</span>
-                    </div>
-                    <Progress value={todayStats.totalProgress} className="h-2" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Sessions VR</span>
-                      <span>85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Journal quotidien</span>
-                      <span>92%</span>
-                    </div>
-                    <Progress value={92} className="h-2" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Méditation</span>
-                      <span>78%</span>
-                    </div>
-                    <Progress value={78} className="h-2" />
-                  </div>
-                </div>
-                
-                <Button 
-                  onClick={() => navigate('/journal')}
-                  className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        {/* Actions rapides */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Actions rapides</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickActions.map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <motion.div
+                  key={action.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
                 >
-                  Voir les détails
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
+                  <Card className="premium-card group cursor-pointer h-full">
+                    <CardContent className="p-6">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="font-semibold mb-2">{action.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{action.desc}</p>
+                      <Button asChild variant="outline" className="w-full">
+                        <Link to={action.path}>Accéder</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Journal récent */}
+        <Card className="premium-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Dernières entrées de journal
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
+                <p className="text-sm text-muted-foreground">Aujourd'hui</p>
+                <p>Session de méditation très apaisante ce matin...</p>
+              </div>
+              <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
+                <p className="text-sm text-muted-foreground">Hier</p>
+                <p>Excellente journée avec mes exercices de respiration...</p>
+              </div>
+            </div>
+            <Button asChild variant="outline" className="w-full mt-4">
+              <Link to="/journal">Voir tout le journal</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
