@@ -1,185 +1,144 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Building2, 
-  Users, 
-  Shield, 
-  ArrowRight,
-  Star,
-  Check,
-  Crown,
-  UserCheck
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Users, Shield, ArrowRight, ArrowLeft } from 'lucide-react';
+import MainLayout from '@/components/layout/MainLayout';
 
 const B2BSelectionPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const roles = [
+    {
+      type: 'user',
+      title: 'Collaborateur',
+      description: 'Accès aux outils de bien-être émotionnel pour les employés',
+      icon: Users,
+      path: '/b2b/user/login',
+      gradient: 'from-blue-500 to-cyan-600',
+      features: [
+        'Scan émotionnel personnel',
+        'Musique thérapeutique',
+        'Coach IA',
+        'Social Cocon équipe'
+      ]
+    },
+    {
+      type: 'admin',
+      title: 'Administrateur RH',
+      description: 'Gestion complète du bien-être des équipes',
+      icon: Shield,
+      path: '/b2b/admin/login',
+      gradient: 'from-purple-500 to-pink-600',
+      features: [
+        'Tableau de bord équipes',
+        'Rapports et analytics',
+        'Gestion des utilisateurs',
+        'Optimisation RH'
+      ]
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" data-testid="page-root">
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Building2 className="h-12 w-12 text-blue-600" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
+        <div className="max-w-4xl w-full">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="mb-6 text-muted-foreground hover:text-primary"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour à l'accueil
+            </Button>
+            
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
               Espace Entreprise
             </h1>
-          </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Choisissez votre mode d'accès à la plateforme EmotionsCare for Business
-          </p>
-        </div>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-2">
+              Choisissez votre type d'accès
+            </p>
+            <p className="text-muted-foreground">
+              Sélectionnez le profil correspondant à votre rôle dans l'entreprise
+            </p>
+          </motion.div>
 
-        {/* Options d'accès */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Accès Collaborateur */}
-          <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-500 transform rotate-12 translate-x-6 -translate-y-6"></div>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">Collaborateur</CardTitle>
-                  <Badge variant="secondary" className="mt-1">Accès Standard</Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-gray-600 text-lg">
-                Accédez à vos outils de bien-être émotionnel fournis par votre entreprise
-              </p>
+          {/* Role Selection Cards */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {roles.map((role, index) => {
+              const IconComponent = role.icon;
               
-              <div className="space-y-3">
-                {[
-                  'Scan émotionnel quotidien',
-                  'Séances de méditation guidée', 
-                  'Musiques thérapeutiques',
-                  'Coach virtuel personnalisé',
-                  'Journal émotionnel privé'
-                ].map((feature, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span className="text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <UserCheck className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">Accès sécurisé</span>
-                </div>
-                <p className="text-sm text-blue-700">
-                  Vos données restent privées et sont protégées selon les standards RGPD
-                </p>
-              </div>
-
-              <Link to="/b2b/user/login">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-6">
-                  <Users className="h-5 w-5 mr-2" />
-                  Accès Collaborateur
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Accès Admin/RH */}
-          <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-300 bg-gradient-to-br from-white to-purple-50">
-            <div className="absolute top-0 right-0">
-              <Badge className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 py-1 rounded-bl-lg rounded-tr-lg">
-                Premium
-              </Badge>
-            </div>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                  <Crown className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">Administrateur RH</CardTitle>
-                  <Badge className="bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 border-0 mt-1">
-                    Accès Complet
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-gray-600 text-lg">
-                Gérez le bien-être de vos équipes avec des outils d'analyse avancés
-              </p>
-              
-              <div className="space-y-3">
-                {[
-                  'Dashboard analytique complet',
-                  'Gestion des équipes et permissions',
-                  'Rapports de bien-être organisationnel',
-                  'Outils de prévention et d\'intervention',
-                  'Export de données et métriques'
-                ].map((feature, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-purple-500" />
-                    <span className="text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-lg border border-purple-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <Shield className="h-5 w-5 text-purple-600" />
-                  <span className="font-medium text-purple-900">Conformité garantie</span>
-                </div>
-                <p className="text-sm text-purple-700">
-                  Respect total de la confidentialité avec agrégation anonymisée des données
-                </p>
-              </div>
-
-              <Link to="/b2b/admin/login">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-lg py-6">
-                  <Shield className="h-5 w-5 mr-2" />
-                  Accès Administrateur
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Informations supplémentaires */}
-        <div className="mt-16 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Pourquoi choisir EmotionsCare for Business ?</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Sécurité maximale</h3>
-                <p className="text-gray-600 text-sm">Données cryptées et conformité RGPD garantie</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Impact collectif</h3>
-                <p className="text-gray-600 text-sm">Amélioration du bien-être de toute l'organisation</p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Star className="h-8 w-8 text-purple-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Résultats mesurables</h3>
-                <p className="text-gray-600 text-sm">Analytics et KPIs pour suivre les progrès</p>
-              </div>
-            </div>
+              return (
+                <motion.div
+                  key={role.type}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 group cursor-pointer h-full"
+                        onClick={() => navigate(role.path)}>
+                    <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                    
+                    <CardHeader className="space-y-4 text-center">
+                      <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${role.gradient} flex items-center justify-center mx-auto`}>
+                        <IconComponent className="h-8 w-8 text-white" />
+                      </div>
+                      <CardTitle className="text-2xl">{role.title}</CardTitle>
+                      <CardDescription className="text-base">
+                        {role.description}
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-6">
+                      <ul className="space-y-3">
+                        {role.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center text-sm text-muted-foreground">
+                            <div className={`h-2 w-2 bg-gradient-to-r ${role.gradient} rounded-full mr-3`} />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <Button 
+                        className={`w-full bg-gradient-to-br ${role.gradient} hover:opacity-90 text-white shadow-lg`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(role.path);
+                        }}
+                      >
+                        Se connecter en tant que {role.title}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
+
+          {/* Footer Info */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mt-12"
+          >
+            <p className="text-sm text-muted-foreground">
+              Besoin d'aide ? Contactez votre administrateur système ou l'équipe support
+            </p>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
