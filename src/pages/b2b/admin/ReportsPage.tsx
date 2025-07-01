@@ -1,109 +1,159 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { FileText, Download, Calendar, BarChart3 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { BarChart3, Download, Calendar, TrendingUp, Users, Activity } from 'lucide-react';
+import PremiumCard from '@/components/ui/PremiumCard';
+import PremiumButton from '@/components/ui/PremiumButton';
 
 const ReportsPage: React.FC = () => {
-  const reports = [
-    { id: 1, name: 'Rapport Bien-être Mensuel', type: 'well-being', status: 'ready', date: '2024-01-15' },
-    { id: 2, name: 'Analyse Émotionnelle Équipe', type: 'emotion', status: 'generating', date: '2024-01-14' },
-    { id: 3, name: 'Statistiques Utilisation', type: 'usage', status: 'ready', date: '2024-01-13' },
-  ];
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Rapports & Analytics</h1>
-          <p className="text-muted-foreground">
-            Générez et consultez les rapports d'analyse
-          </p>
+    <div className="container mx-auto px-4 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-6xl mx-auto"
+      >
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              Rapports & Analyses
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Analyses détaillées du bien-être organisationnel
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <PremiumButton variant="secondary">
+              <Calendar className="mr-2 h-4 w-4" />
+              Période
+            </PremiumButton>
+            <PremiumButton variant="primary">
+              <Download className="mr-2 h-4 w-4" />
+              Exporter
+            </PremiumButton>
+          </div>
         </div>
-        <Button>
-          <FileText className="mr-2 h-4 w-4" />
-          Nouveau Rapport
-        </Button>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Rapports</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">+2 ce mois</p>
-          </CardContent>
-        </Card>
+        {/* Métriques principales */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <PremiumCard className="text-center">
+            <TrendingUp className="h-12 w-12 mx-auto mb-4 text-green-500" />
+            <h3 className="text-2xl font-bold text-green-600">+15%</h3>
+            <p className="text-muted-foreground">Amélioration ce mois</p>
+          </PremiumCard>
+          
+          <PremiumCard className="text-center">
+            <Users className="h-12 w-12 mx-auto mb-4 text-blue-500" />
+            <h3 className="text-2xl font-bold text-blue-600">78%</h3>
+            <p className="text-muted-foreground">Participation</p>
+          </PremiumCard>
+          
+          <PremiumCard className="text-center">
+            <Activity className="h-12 w-12 mx-auto mb-4 text-purple-500" />
+            <h3 className="text-2xl font-bold text-purple-600">4.2/5</h3>
+            <p className="text-muted-foreground">Satisfaction</p>
+          </PremiumCard>
+          
+          <PremiumCard className="text-center">
+            <BarChart3 className="h-12 w-12 mx-auto mb-4 text-orange-500" />
+            <h3 className="text-2xl font-bold text-orange-600">87%</h3>
+            <p className="text-muted-foreground">Score global</p>
+          </PremiumCard>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">En Cours</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">Génération en cours</p>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Graphique d'évolution */}
+          <PremiumCard>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold">Évolution du Bien-être</h3>
+              <BarChart3 className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div className="h-64 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center">
+              <p className="text-muted-foreground">Graphique d'évolution temporelle</p>
+            </div>
+          </PremiumCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Téléchargements</CardTitle>
-            <Download className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">Ce mois</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Automatisés</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Rapports planifiés</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Rapports Récents</CardTitle>
-          <CardDescription>Liste des derniers rapports générés</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {reports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between border-b pb-4">
-                <div className="space-y-1">
-                  <p className="font-medium">{report.name}</p>
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>{report.date}</span>
+          {/* Répartition par équipe */}
+          <PremiumCard>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold">Répartition par Équipe</h3>
+              <Users className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span>Marketing</span>
+                <div className="flex items-center">
+                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{ width: '85%' }}></div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant={report.status === 'ready' ? 'default' : 'secondary'}>
-                    {report.status === 'ready' ? 'Prêt' : 'En cours'}
-                  </Badge>
-                  {report.status === 'ready' && (
-                    <Button size="sm" variant="outline">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <span className="text-sm font-medium">85%</span>
                 </div>
               </div>
-            ))}
+              <div className="flex items-center justify-between">
+                <span>Développement</span>
+                <div className="flex items-center">
+                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '92%' }}></div>
+                  </div>
+                  <span className="text-sm font-medium">92%</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Service Client</span>
+                <div className="flex items-center">
+                  <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                    <div className="bg-purple-500 h-2 rounded-full" style={{ width: '78%' }}></div>
+                  </div>
+                  <span className="text-sm font-medium">78%</span>
+                </div>
+              </div>
+            </div>
+          </PremiumCard>
+        </div>
+
+        {/* Rapports disponibles */}
+        <PremiumCard>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold">Rapports Disponibles</h3>
+            <Download className="h-6 w-6 text-muted-foreground" />
           </div>
-        </CardContent>
-      </Card>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border">
+              <h4 className="font-bold mb-2">Rapport Mensuel</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Synthèse complète du mois écoulé
+              </p>
+              <PremiumButton variant="primary" size="sm" className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Télécharger
+              </PremiumButton>
+            </div>
+            
+            <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border">
+              <h4 className="font-bold mb-2">Analyse par Équipe</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Détail par équipe et manager
+              </p>
+              <PremiumButton variant="secondary" size="sm" className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Télécharger
+              </PremiumButton>
+            </div>
+            
+            <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border">
+              <h4 className="font-bold mb-2">Tendances Annuelles</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Évolution sur 12 mois
+              </p>
+              <PremiumButton variant="accent" size="sm" className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Télécharger
+              </PremiumButton>
+            </div>
+          </div>
+        </PremiumCard>
+      </motion.div>
     </div>
   );
 };

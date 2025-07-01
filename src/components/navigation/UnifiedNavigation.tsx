@@ -1,220 +1,225 @@
 
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Home,
-  User,
-  Building2,
-  Shield,
-  LogOut,
-  Settings,
-  BarChart3,
-  Users,
-  Calendar,
-  FileText,
-  Brain,
-  Music,
-  Heart,
-  Gamepad2,
-  MessageCircle
+  Home, Scan, Music, MessageCircle, BookOpen, Headphones, 
+  Settings, Gamepad2, Users, BarChart3, Calendar, 
+  TrendingUp, User, Building2, Shield, LogOut
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 
 const UnifiedNavigation: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { userMode, setUserMode } = useUserMode();
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleModeChange = (mode: string) => {
-    setUserMode(mode as any);
-    switch (mode) {
-      case 'b2c':
-        navigate('/b2c/dashboard');
-        break;
-      case 'b2b_user':
-        navigate('/b2b/user/dashboard');
-        break;
-      case 'b2b_admin':
-        navigate('/b2b/admin/dashboard');
-        break;
-    }
+  const { user, logout } = useAuth();
+  
+  // Déterminer le rôle de l'utilisateur basé sur l'URL actuelle
+  const getCurrentUserRole = () => {
+    if (location.pathname.startsWith('/b2c')) return 'b2c';
+    if (location.pathname.startsWith('/b2b/user')) return 'b2b_user';
+    if (location.pathname.startsWith('/b2b/admin')) return 'b2b_admin';
+    return 'b2c'; // par défaut
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
+  const userRole = getCurrentUserRole();
 
-  // Navigation items selon le mode utilisateur
+  // Éléments de navigation selon le rôle
   const getNavigationItems = () => {
-    const commonItems = [
-      { icon: Brain, label: 'Scanner émotions', path: '/scan' },
-      { icon: Music, label: 'Musique thérapeutique', path: '/music' },
-      { icon: MessageCircle, label: 'Coach IA', path: '/coach' },
-      { icon: FileText, label: 'Journal', path: '/journal' },
-      { icon: Heart, label: 'VR Thérapie', path: '/vr' },
-      { icon: Settings, label: 'Préférences', path: '/preferences' },
+    const baseItems = [
+      { 
+        name: 'Dashboard', 
+        href: userRole === 'b2c' ? '/b2c/dashboard' : 
+              userRole === 'b2b_user' ? '/b2b/user/dashboard' : 
+              '/b2b/admin/dashboard',
+        icon: Home 
+      },
+      { 
+        name: 'Scanner', 
+        href: userRole === 'b2c' ? '/b2c/scan' : 
+              userRole === 'b2b_user' ? '/b2b/user/scan' : 
+              '/b2b/admin/scan',
+        icon: Scan 
+      },
+      { 
+        name: 'Musique', 
+        href: userRole === 'b2c' ? '/b2c/music' : 
+              userRole === 'b2b_user' ? '/b2b/user/music' : 
+              '/b2b/admin/music',
+        icon: Music 
+      },
+      { 
+        name: 'Coach IA', 
+        href: userRole === 'b2c' ? '/b2c/coach' : 
+              userRole === 'b2b_user' ? '/b2b/user/coach' : 
+              '/b2b/admin/coach',
+        icon: MessageCircle 
+      },
+      { 
+        name: 'Journal', 
+        href: userRole === 'b2c' ? '/b2c/journal' : 
+              userRole === 'b2b_user' ? '/b2b/user/journal' : 
+              '/b2b/admin/journal',
+        icon: BookOpen 
+      },
+      { 
+        name: 'VR', 
+        href: userRole === 'b2c' ? '/b2c/vr' : 
+              userRole === 'b2b_user' ? '/b2b/user/vr' : 
+              '/b2b/admin/vr',
+        icon: Headphones 
+      },
+      { 
+        name: 'Gamification', 
+        href: userRole === 'b2c' ? '/b2c/gamification' : 
+              userRole === 'b2b_user' ? '/b2b/user/gamification' : 
+              '/b2b/admin/gamification',
+        icon: Gamepad2 
+      },
+      { 
+        name: 'Cocon Social', 
+        href: userRole === 'b2c' ? '/b2c/social-cocon' : 
+              userRole === 'b2b_user' ? '/b2b/user/social-cocon' : 
+              '/b2b/admin/social-cocon',
+        icon: Users 
+      },
     ];
 
-    switch (userMode) {
-      case 'b2c':
-        return [
-          { icon: Home, label: 'Dashboard', path: '/b2c/dashboard' },
-          ...commonItems,
-          { icon: Gamepad2, label: 'Gamification', path: '/gamification' },
-          { icon: Users, label: 'Cocon social', path: '/social-cocon' },
-        ];
-      case 'b2b_user':
-        return [
-          { icon: Home, label: 'Dashboard', path: '/b2b/user/dashboard' },
-          ...commonItems,
-          { icon: Users, label: 'Mon équipe', path: '/team' },
-          { icon: Gamepad2, label: 'Challenges', path: '/gamification' },
-        ];
-      case 'b2b_admin':
-        return [
-          { icon: Home, label: 'Dashboard Admin', path: '/b2b/admin/dashboard' },
-          ...commonItems,
-          { icon: Users, label: 'Gestion équipes', path: '/teams' },
-          { icon: BarChart3, label: 'Rapports', path: '/reports' },
-          { icon: Calendar, label: 'Événements', path: '/events' },
-          { icon: Settings, label: 'Administration', path: '/settings' },
-        ];
-      default:
-        return [];
+    // Ajouter les éléments spécifiques aux admins B2B
+    if (userRole === 'b2b_admin') {
+      baseItems.push(
+        { name: 'Équipes', href: '/b2b/admin/teams', icon: Users },
+        { name: 'Rapports', href: '/b2b/admin/reports', icon: BarChart3 },
+        { name: 'Événements', href: '/b2b/admin/events', icon: Calendar },
+        { name: 'Optimisation', href: '/b2b/admin/optimisation', icon: TrendingUp },
+      );
     }
-  };
 
-  const getModeIcon = (mode: string) => {
-    switch (mode) {
-      case 'b2c': return User;
-      case 'b2b_user': return Building2;
-      case 'b2b_admin': return Shield;
-      default: return User;
-    }
-  };
+    // Ajouter les préférences pour tous
+    baseItems.push({ 
+      name: 'Préférences', 
+      href: userRole === 'b2c' ? '/b2c/preferences' : 
+            userRole === 'b2b_user' ? '/b2b/user/preferences' : 
+            '/b2b/admin/settings',
+      icon: Settings 
+    });
 
-  const getModeLabel = (mode: string) => {
-    switch (mode) {
-      case 'b2c': return 'Particulier';
-      case 'b2b_user': return 'Collaborateur';
-      case 'b2b_admin': return 'Administrateur RH';
-      default: return 'Non défini';
-    }
+    return baseItems;
   };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="fixed top-4 right-4 z-50">
-        <Card className="backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-white/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Button asChild variant="outline" size="sm">
-                <Link to="/choose-mode">Se connecter</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const navigationItems = getNavigationItems();
-  const currentPath = location.pathname;
+
+  const getRoleBadge = () => {
+    switch (userRole) {
+      case 'b2c':
+        return { icon: User, label: 'Particulier', color: 'bg-blue-500' };
+      case 'b2b_user':
+        return { icon: Building2, label: 'Collaborateur', color: 'bg-green-500' };
+      case 'b2b_admin':
+        return { icon: Shield, label: 'Admin RH', color: 'bg-purple-500' };
+      default:
+        return { icon: User, label: 'Utilisateur', color: 'bg-gray-500' };
+    }
+  };
+
+  const roleBadge = getRoleBadge();
 
   return (
-    <motion.div 
-      className="fixed left-4 top-4 bottom-4 w-64 z-50"
-      initial={{ x: -20, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card className="h-full backdrop-blur-xl bg-white/95 dark:bg-gray-900/95 border-white/20 shadow-2xl">
-        <CardContent className="p-6 h-full flex flex-col">
-          {/* Header avec mode utilisateur */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                EmotionsCare
-              </h2>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4" />
-              </Button>
+    <nav className="fixed left-0 top-0 h-full w-72 bg-white/95 backdrop-blur-xl border-r border-white/20 shadow-2xl z-50">
+      <div className="flex flex-col h-full">
+        {/* Header avec logo et rôle */}
+        <div className="p-6 border-b border-white/10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+              EmotionsCare
+            </h1>
+            <div className={cn(
+              "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white",
+              roleBadge.color
+            )}>
+              <roleBadge.icon className="h-4 w-4 mr-2" />
+              {roleBadge.label}
             </div>
-            
-            {/* Sélecteur de mode */}
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Mode actuel :</p>
-              <div className="flex flex-wrap gap-1">
-                {['b2c', 'b2b_user', 'b2b_admin'].map((mode) => {
-                  const Icon = getModeIcon(mode);
-                  const isActive = userMode === mode;
-                  return (
-                    <Button
-                      key={mode}
-                      variant={isActive ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleModeChange(mode)}
-                      className={`flex-1 ${isActive ? 'bg-gradient-to-r from-blue-600 to-purple-600' : ''}`}
-                    >
-                      <Icon className="h-3 w-3 mr-1" />
-                      <span className="text-xs">{getModeLabel(mode).split(' ')[0]}</span>
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-            
-            {/* Informations utilisateur */}
-            <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
-              <p className="text-sm font-medium">{user?.email}</p>
-              <Badge variant="secondary" className="mt-1">
-                {getModeLabel(userMode || 'b2c')}
-              </Badge>
-            </div>
-          </div>
+          </motion.div>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto space-y-1">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentPath === item.path;
-              
+        {/* Navigation principale */}
+        <div className="flex-1 overflow-y-auto py-6">
+          <div className="space-y-2 px-4">
+            {navigationItems.map((item, index) => {
+              const isActive = location.pathname === item.href;
               return (
-                <Button
-                  key={item.path}
-                  asChild
-                  variant={isActive ? "default" : "ghost"}
-                  className={`w-full justify-start ${
-                    isActive 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                      : 'hover:bg-white/50 dark:hover:bg-gray-800/50'
-                  }`}
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
                 >
-                  <Link to={item.path}>
-                    <Icon className="h-4 w-4 mr-3" />
-                    {item.label}
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "flex items-center px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300 group",
+                      isActive
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                        : "text-gray-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600"
+                    )}
+                  >
+                    <item.icon className={cn(
+                      "h-5 w-5 mr-3 transition-transform duration-300",
+                      isActive ? "scale-110" : "group-hover:scale-110"
+                    )} />
+                    {item.name}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeIndicator"
+                        className="ml-auto w-2 h-2 bg-white rounded-full"
+                      />
+                    )}
                   </Link>
-                </Button>
+                </motion.div>
               );
             })}
-          </nav>
-
-          {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-white/20">
-            <p className="text-xs text-center text-muted-foreground">
-              EmotionsCare Premium
-            </p>
           </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+
+        {/* Footer avec profil utilisateur */}
+        <div className="p-6 border-t border-white/10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            {user && (
+              <div className="flex items-center p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                  {user.email?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="ml-3 flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user.email}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {roleBadge.label}
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-300 group"
+            >
+              <LogOut className="h-4 w-4 mr-2 group-hover:scale-110" />
+              Déconnexion
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    </nav>
   );
 };
 
