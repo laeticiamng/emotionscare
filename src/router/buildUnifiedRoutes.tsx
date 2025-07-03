@@ -5,6 +5,10 @@ import Layout from '@/components/layout/Layout';
 import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { dashboardRoutes } from './routes/dashboardRoutes';
+import { userRoutes } from './routes/userRoutes';
+import { adminRoutes } from './routes/adminRoutes';
+import { b2bRoutes } from './routes/b2bRoutes';
+import { b2cRoutes } from './routes/b2cRoutes';
 import OptimizedErrorBoundary from '@/components/ErrorBoundary/OptimizedErrorBoundary';
 
 // Lazy load components to avoid build errors
@@ -137,7 +141,7 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           ),
         },
         
-        // Protected Dashboard Routes
+        // Protected Dashboard Routes  
         ...dashboardRoutes,
         
         // Feature Routes (accessible to all authenticated users)
