@@ -46,7 +46,7 @@ serve(async (req) => {
           body: JSON.stringify({
             name: "Coach EmotionsCare",
             instructions: instructions || "Répondre avec empathie et clarté aux questions émotionnelles ou pratiques des utilisateurs.",
-            model: "gpt-4",
+            model: "gpt-4.1-2025-04-14",
             tools: []
           }),
         });

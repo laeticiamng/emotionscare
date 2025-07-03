@@ -74,7 +74,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model || 'gpt-4o',
+        model: model || 'gpt-4.1-2025-04-14',
         temperature: temperature || 0.4,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -101,7 +101,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model || 'gpt-4o',
+        model: model || 'gpt-4.1-2025-04-14',
         temperature: 0.1,
         messages: [
           { 

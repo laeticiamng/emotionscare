@@ -68,7 +68,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model || 'gpt-4o',
+        model: model || 'gpt-4.1-2025-04-14',
         temperature: temperature || 0.3,
         messages: [
           { role: 'system', content: 'Vous êtes un expert du RGPD spécialisé dans la vulgarisation et l\'empathie.' },
