@@ -81,6 +81,42 @@ export type Database = {
         }
         Relationships: []
       }
+      api_integrations: {
+        Row: {
+          base_url: string
+          configuration: Json
+          created_at: string
+          id: string
+          is_optimized: boolean | null
+          name: string
+          performance_metrics: Json | null
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          base_url: string
+          configuration?: Json
+          created_at?: string
+          id?: string
+          is_optimized?: boolean | null
+          name: string
+          performance_metrics?: Json | null
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          base_url?: string
+          configuration?: Json
+          created_at?: string
+          id?: string
+          is_optimized?: boolean | null
+          name?: string
+          performance_metrics?: Json | null
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       audio_tracks: {
         Row: {
           created_at: string
@@ -788,6 +824,47 @@ export type Database = {
           topic?: string
         }
         Relationships: []
+      }
+      integration_logs: {
+        Row: {
+          created_at: string
+          id: string
+          integration_id: string | null
+          metadata: Json | null
+          request_type: string
+          response_time_ms: number | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          integration_id?: string | null
+          metadata?: Json | null
+          request_type: string
+          response_time_ms?: number | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          integration_id?: string | null
+          metadata?: Json | null
+          request_type?: string
+          response_time_ms?: number | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_logs_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "api_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invitations: {
         Row: {
