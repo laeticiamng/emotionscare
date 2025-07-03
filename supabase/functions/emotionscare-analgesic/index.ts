@@ -245,19 +245,23 @@ async function generateSunoMusic(payload: any): Promise<string> {
     throw new Error('SUNO_API_KEY not configured');
   }
 
-  const response = await fetch('https://api.suno.ai/v1/music', {
+  // Utilisation de l'API stable sunoapi.org recommandée
+  const response = await fetch('https://api.sunoapi.org/api/v1/music', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${sunoApiKey}`,
+      'Accept': 'application/json'
     },
     body: JSON.stringify({
       prompt: payload.prompt,
       style: payload.style,
       title: payload.title,
-      custom_mode: true,
+      custom_mode: true, // Mode V4 pour qualité optimale
       instrumental: payload.instrumental || false,
-      model: 'V4_5',
+      wait_audio: false, // Streaming pour réponse rapide (20s)
+      make_instrumental: payload.instrumental || false,
+      model: 'V4_5'
     }),
   });
 
@@ -275,9 +279,11 @@ async function getTrackStatus(taskId: string) {
     throw new Error('SUNO_API_KEY not configured');
   }
 
-  const response = await fetch(`https://api.suno.ai/v1/tasks/${taskId}`, {
+  // Utilisation de l'API stable pour vérification du statut
+  const response = await fetch(`https://api.sunoapi.org/api/v1/tasks/${taskId}`, {
     headers: {
       'Authorization': `Bearer ${sunoApiKey}`,
+      'Accept': 'application/json'
     },
   });
 

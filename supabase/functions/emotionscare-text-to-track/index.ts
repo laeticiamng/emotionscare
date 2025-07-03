@@ -65,25 +65,29 @@ class SunoClient {
   }
 
   async generateMusic(params: any) {
-    const response = await fetch('https://api.suno.ai/v1/music', {
+    // Utilisation de l'API stable sunoapi.org
+    const response = await fetch('https://api.sunoapi.org/api/v1/music', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.apiKey}`,
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         prompt: params.prompt,
         style: params.style,
         title: params.title,
-        custom_mode: params.customMode || false,
+        custom_mode: true, // Mode V4 pour qualité optimale
         instrumental: params.instrumental || false,
+        wait_audio: false, // Streaming pour réponse rapide (20s)
         model: params.model || 'V4_5',
         callback_url: params.callBackUrl,
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Suno Music API Error: ${response.status}`);
+      const errorData = await response.text();
+      throw new Error(`Suno Music API Error: ${response.status} - ${errorData}`);
     }
 
     return await response.json();
