@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { PlatformTester } from '@/components/testing/PlatformTester';
-import { AutoFixer } from '@/components/testing/AutoFixer';
+import ComprehensiveTester from '@/components/testing/ComprehensiveTester';
+import AutoFixer from '@/components/testing/AutoFixer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const PlatformTestPage: React.FC = () => {
@@ -13,7 +13,7 @@ const PlatformTestPage: React.FC = () => {
             <TabsTrigger value="fixer">Correcteur</TabsTrigger>
           </TabsList>
           <TabsContent value="tester">
-            <PlatformTester />
+            <ComprehensiveTester />
           </TabsContent>
           <TabsContent value="fixer">
             <AutoFixer />
