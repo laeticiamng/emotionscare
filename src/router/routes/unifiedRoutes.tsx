@@ -329,6 +329,14 @@ export const unifiedRoutes: RouteObject[] = [
     path: '/test',
     Component: withSuspenseAndErrorBoundary(PlatformTestPage),
   },
+  {
+    path: '/test/qa',
+    Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/QATestPage'))),
+  },
+  {
+    path: '/test/report',
+    Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/QAReportPage'))),
+  },
 
   // Route B2B manquante
   {
