@@ -2558,6 +2558,15 @@ export type Database = {
         Args: { song_id: string }
         Returns: boolean
       }
+      migrate_edn_items_complete: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          processed_count: number
+          success_count: number
+          error_count: number
+          details: Json
+        }[]
+      }
       migrate_edn_items_to_platform: {
         Args: Record<PropertyKey, never>
         Returns: {
