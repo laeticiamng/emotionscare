@@ -682,6 +682,42 @@ export type Database = {
         }
         Relationships: []
       }
+      edn_items_uness: {
+        Row: {
+          contenu_complet_html: string | null
+          created_at: string
+          date_import: string
+          id: string
+          intitule: string
+          item_id: number
+          rangs_a: string[] | null
+          rangs_b: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          contenu_complet_html?: string | null
+          created_at?: string
+          date_import?: string
+          id?: string
+          intitule: string
+          item_id: number
+          rangs_a?: string[] | null
+          rangs_b?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          contenu_complet_html?: string | null
+          created_at?: string
+          date_import?: string
+          id?: string
+          intitule?: string
+          item_id?: number
+          rangs_a?: string[] | null
+          rangs_b?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           created_at: string | null

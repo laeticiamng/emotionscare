@@ -43,6 +43,7 @@ const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 const AuditTicketP0Page = lazy(() => import('@/pages/AuditTicketP0Page'));
+const PlatformTestPage = lazy(() => import('@/pages/testing/PlatformTestPage'));
 
 // Composant de chargement
 const PageLoadingFallback = () => (
@@ -182,5 +183,11 @@ export const unifiedRoutes: RouteObject[] = [
   {
     path: '/audit-ticket-p0',
     Component: withSuspenseAndErrorBoundary(AuditTicketP0Page),
+  },
+  
+  // Testing (development only)
+  {
+    path: '/test',
+    Component: withSuspenseAndErrorBoundary(PlatformTestPage),
   },
 ];
