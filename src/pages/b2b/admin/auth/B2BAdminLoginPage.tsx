@@ -1,130 +1,98 @@
-
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Shield } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Shield, Mail, Lock, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const loginSchema = z.object({
-  email: z.string().email({ message: 'Adresse e-mail invalide' }),
-  password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 const B2BAdminLoginPage: React.FC = () => {
-  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    setError(null);
-    
+
     try {
-      const { error } = await signIn(data.email, data.password);
-      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (error) {
-        setError(error.message);
+        toast({
+          title: "Erreur de connexion",
+          description: error.message,
+          variant: "destructive"
+        });
         return;
       }
-      
+
+      if (data.user) {
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue dans l'interface d'administration !",
+        });
+        navigate('/b2b/admin/dashboard');
+      }
+    } catch (err) {
       toast({
-        title: "Connexion réussie",
-        description: "Bienvenue dans votre espace administrateur",
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive"
       });
-      
-      navigate('/b2b/admin/dashboard');
-    } catch (err: any) {
-      console.error('Erreur de connexion:', err);
-      setError(err.message || 'Échec de la connexion. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-slate-200">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Shield className="h-8 w-8 text-slate-600 mr-2" />
-            <span className="text-2xl font-bold">Administration</span>
-          </div>
-          <CardTitle className="text-2xl">Espace Administrateur</CardTitle>
-          <CardDescription>
-            Accès réservé aux administrateurs RH
-          </CardDescription>
+    <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Card className="w-full max-w-md shadow-lg border-2">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center flex items-center justify-center gap-2">
+            <Shield className="w-6 h-6" />
+            Administration RH
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email administrateur</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@entreprise.com"
-                {...form.register('email')}
+                placeholder="admin.rh@entreprise.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
-              {form.formState.errors.email && (
-                <p className="text-sm text-red-600">{form.formState.errors.email.message}</p>
-              )}
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
               <Input
                 id="password"
                 type="password"
-                {...form.register('password')}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
-              {form.formState.errors.password && (
-                <p className="text-sm text-red-600">{form.formState.errors.password.message}</p>
-              )}
             </div>
-            
+
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
-                </>
-              ) : (
-                'Accéder au tableau de bord'
-              )}
+              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Accès administration
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <div className="text-center text-sm">
-            <Link to="/b2b/selection" className="text-gray-600 hover:underline">
-              ← Retour à la sélection
-            </Link>
-          </div>
-        </CardFooter>
       </Card>
     </div>
   );

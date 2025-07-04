@@ -1,141 +1,176 @@
-
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Heart } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Heart, Mail, Lock, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const loginSchema = z.object({
-  email: z.string().email({ message: 'Adresse e-mail invalide' }),
-  password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 const B2CLoginPage: React.FC = () => {
-  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    setError(null);
-    
+    setError('');
+
     try {
-      const { error } = await signIn(data.email, data.password);
-      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (error) {
         setError(error.message);
+        toast({
+          title: "Erreur de connexion",
+          description: error.message,
+          variant: "destructive"
+        });
         return;
       }
-      
+
+      if (data.user) {
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue sur EmotionsCare !",
+        });
+        navigate('/b2c/dashboard');
+      }
+    } catch (err) {
+      setError('Une erreur inattendue s\'est produite');
       toast({
-        title: "Connexion réussie",
-        description: "Bienvenue dans votre espace personnel",
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive"
       });
-      
-      navigate('/b2c/dashboard');
-    } catch (err: any) {
-      console.error('Erreur de connexion:', err);
-      setError(err.message || 'Échec de la connexion. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Heart className="h-8 w-8 text-pink-500 mr-2" />
-            <span className="text-2xl font-bold">EmotionsCare</span>
-          </div>
-          <CardTitle className="text-2xl">Connexion</CardTitle>
-          <CardDescription>
-            Connectez-vous à votre espace bien-être
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Adresse e-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="votre@email.com"
-                {...form.register('email')}
-              />
-              {form.formState.errors.email && (
-                <p className="text-sm text-red-600">{form.formState.errors.email.message}</p>
-              )}
+    <div data-testid="page-root" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="w-full max-w-md space-y-6">
+        {/* Logo & Header */}
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+              <Heart className="w-8 h-8 text-white" />
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                {...form.register('password')}
-              />
-              {form.formState.errors.password && (
-                <p className="text-sm text-red-600">{form.formState.errors.password.message}</p>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              EmotionsCare
+            </h1>
+            <p className="text-muted-foreground">Connexion Espace Personnel</p>
+          </div>
+        </div>
+
+        {/* Login Form */}
+        <Card className="shadow-lg">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">Connexion</CardTitle>
+            <p className="text-sm text-muted-foreground text-center">
+              Accédez à votre espace bien-être personnel
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="votre.email@exemple.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Connexion...
+                  </>
+                ) : (
+                  'Se connecter'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 space-y-4">
+              <div className="text-center">
+                <Link 
+                  to="/auth/forgot-password" 
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+
+              <div className="text-center text-sm text-muted-foreground">
+                Pas encore de compte ?{' '}
+                <Link 
+                  to="/b2c/register" 
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Créer un compte
+                </Link>
+              </div>
+
+              <div className="text-center">
+                <Link 
+                  to="/choose-mode" 
+                  className="text-sm text-muted-foreground hover:underline"
+                >
+                  ← Retour au choix de mode
+                </Link>
+              </div>
             </div>
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
-                </>
-              ) : (
-                'Se connecter'
-              )}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <div className="text-center text-sm">
-            <Link to="/b2c/register" className="text-primary hover:underline">
-              Pas encore de compte ? S'inscrire
-            </Link>
-          </div>
-          <div className="text-center text-sm">
-            <Link to="/b2c/reset-password" className="text-gray-600 hover:underline">
-              Mot de passe oublié ?
-            </Link>
-          </div>
-          <div className="text-center text-sm">
-            <Link to="/choose-mode" className="text-gray-600 hover:underline">
-              ← Retour au choix de mode
-            </Link>
-          </div>
-        </CardFooter>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
