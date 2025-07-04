@@ -9,6 +9,7 @@ import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
 // Pages B2C
 const B2CLoginPage = lazy(() => import('@/pages/b2c/LoginPage'));
@@ -39,11 +40,43 @@ const EventsPage = lazy(() => import('@/pages/EventsPage'));
 const OptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 
+// Pages modules fun-first
+const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
+const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
+const AmbitionArcadePage = lazy(() => import('@/pages/AmbitionArcadePage'));
+const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
+const StorySynthLabPage = lazy(() => import('@/pages/StorySynthLabPage'));
+const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
+const ARFiltersPage = lazy(() => import('@/pages/ARFiltersPage'));
+const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
+const ScreenSilkBreakPage = lazy(() => import('@/pages/ScreenSilkBreakPage'));
+const VRGalactiquePage = lazy(() => import('@/pages/VRGalactiquePage'));
+const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
+
+// Pages analytics & data
+const WeeklyBarsPage = lazy(() => import('@/pages/WeeklyBarsPage'));
+const HeatmapVibesPage = lazy(() => import('@/pages/HeatmapVibesPage'));
+const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
+
+// Pages paramètres & compte
+const PrivacyTogglesPage = lazy(() => import('@/pages/PrivacyTogglesPage'));
+const DataExportPage = lazy(() => import('@/pages/DataExportPage'));
+const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
+const PlatformStatusPage = lazy(() => import('@/pages/PlatformStatusPage'));
+const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
+const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
+const InAppFeedbackPage = lazy(() => import('@/pages/InAppFeedbackPage'));
+
 // Pages spéciales
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 const AuditTicketP0Page = lazy(() => import('@/pages/AuditTicketP0Page'));
 const PlatformTestPage = lazy(() => import('@/pages/testing/PlatformTestPage'));
+
+// Pages administration B2B
+const SecurityDashboardPage = lazy(() => import('@/pages/SecurityDashboardPage'));
+const SystemAuditPage = lazy(() => import('@/pages/SystemAuditPage'));
+const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
 
 // Composant de chargement
 const PageLoadingFallback = () => (
@@ -171,15 +204,121 @@ export const unifiedRoutes: RouteObject[] = [
     Component: withSuspenseAndErrorBoundary(SettingsPage),
   },
 
-  // Pages spéciales
+  // Modules fun-first avec IA
   {
-    path: '/notifications',
+    path: UNIFIED_ROUTES.BOSS_LEVEL_GRIT,
+    Component: withSuspenseAndErrorBoundary(BossLevelGritPage),
+  },
+  {
+    path: UNIFIED_ROUTES.MOOD_MIXER,
+    Component: withSuspenseAndErrorBoundary(MoodMixerPage),
+  },
+  {
+    path: UNIFIED_ROUTES.AMBITION_ARCADE,
+    Component: withSuspenseAndErrorBoundary(AmbitionArcadePage),
+  },
+  {
+    path: UNIFIED_ROUTES.BOUNCE_BACK_BATTLE,
+    Component: withSuspenseAndErrorBoundary(BounceBackBattlePage),
+  },
+  {
+    path: UNIFIED_ROUTES.STORY_SYNTH_LAB,
+    Component: withSuspenseAndErrorBoundary(StorySynthLabPage),
+  },
+  {
+    path: UNIFIED_ROUTES.FLASH_GLOW,
+    Component: withSuspenseAndErrorBoundary(FlashGlowPage),
+  },
+  {
+    path: UNIFIED_ROUTES.AR_FILTERS,
+    Component: withSuspenseAndErrorBoundary(ARFiltersPage),
+  },
+  {
+    path: UNIFIED_ROUTES.BUBBLE_BEAT,
+    Component: withSuspenseAndErrorBoundary(BubbleBeatPage),
+  },
+  {
+    path: UNIFIED_ROUTES.SCREEN_SILK_BREAK,
+    Component: withSuspenseAndErrorBoundary(ScreenSilkBreakPage),
+  },
+  {
+    path: UNIFIED_ROUTES.VR_GALACTIQUE,
+    Component: withSuspenseAndErrorBoundary(VRGalactiquePage),
+  },
+  {
+    path: UNIFIED_ROUTES.INSTANT_GLOW,
+    Component: withSuspenseAndErrorBoundary(InstantGlowPage),
+  },
+
+  // Analytics & data
+  {
+    path: UNIFIED_ROUTES.WEEKLY_BARS,
+    Component: withSuspenseAndErrorBoundary(WeeklyBarsPage),
+  },
+  {
+    path: UNIFIED_ROUTES.HEATMAP_VIBES,
+    Component: withSuspenseAndErrorBoundary(HeatmapVibesPage),
+  },
+  {
+    path: UNIFIED_ROUTES.BREATHWORK,
+    Component: withSuspenseAndErrorBoundary(BreathworkPage),
+  },
+
+  // Paramètres & compte
+  {
+    path: UNIFIED_ROUTES.PRIVACY_TOGGLES,
+    Component: withSuspenseAndErrorBoundary(PrivacyTogglesPage),
+  },
+  {
+    path: UNIFIED_ROUTES.EXPORT_CSV,
+    Component: withSuspenseAndErrorBoundary(DataExportPage),
+  },
+  {
+    path: UNIFIED_ROUTES.ACCOUNT_DELETE,
+    Component: withSuspenseAndErrorBoundary(AccountDeletionPage),
+  },
+  {
+    path: UNIFIED_ROUTES.HEALTH_CHECK_BADGE,
+    Component: withSuspenseAndErrorBoundary(PlatformStatusPage),
+  },
+  {
+    path: UNIFIED_ROUTES.NOTIFICATIONS,
     Component: withSuspenseAndErrorBoundary(NotificationsPage),
   },
   {
-    path: '/help-center',
+    path: UNIFIED_ROUTES.HELP_CENTER,
     Component: withSuspenseAndErrorBoundary(HelpCenterPage),
   },
+  {
+    path: UNIFIED_ROUTES.PROFILE_SETTINGS,
+    Component: withSuspenseAndErrorBoundary(ProfileSettingsPage),
+  },
+
+  // Historique & feedback
+  {
+    path: UNIFIED_ROUTES.ACTIVITY_HISTORY,
+    Component: withSuspenseAndErrorBoundary(ActivityHistoryPage),
+  },
+  {
+    path: UNIFIED_ROUTES.FEEDBACK,
+    Component: withSuspenseAndErrorBoundary(InAppFeedbackPage),
+  },
+
+  // Administration B2B
+  {
+    path: UNIFIED_ROUTES.SECURITY,
+    Component: withSuspenseAndErrorBoundary(SecurityDashboardPage),
+  },
+  {
+    path: UNIFIED_ROUTES.AUDIT,
+    Component: withSuspenseAndErrorBoundary(SystemAuditPage),
+  },
+  {
+    path: UNIFIED_ROUTES.ACCESSIBILITY,
+    Component: withSuspenseAndErrorBoundary(AccessibilityPage),
+  },
+
+  // Pages spéciales
   {
     path: '/audit-ticket-p0',
     Component: withSuspenseAndErrorBoundary(AuditTicketP0Page),
@@ -189,5 +328,17 @@ export const unifiedRoutes: RouteObject[] = [
   {
     path: '/test',
     Component: withSuspenseAndErrorBoundary(PlatformTestPage),
+  },
+
+  // Route B2B manquante
+  {
+    path: UNIFIED_ROUTES.B2B,
+    Component: withSuspenseAndErrorBoundary(B2BSelectionPage),
+  },
+
+  // Route Onboarding manquante
+  {
+    path: UNIFIED_ROUTES.ONBOARDING,
+    Component: withSuspenseAndErrorBoundary(OnboardingPage),
   },
 ];
