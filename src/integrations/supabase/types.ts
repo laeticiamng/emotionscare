@@ -559,6 +559,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ecos_situations_uness: {
+        Row: {
+          competences_associees: string[] | null
+          contenu_complet_html: string | null
+          created_at: string
+          date_import: string
+          id: string
+          intitule_sd: string
+          sd_id: number
+          updated_at: string
+          url_source: string | null
+        }
+        Insert: {
+          competences_associees?: string[] | null
+          contenu_complet_html?: string | null
+          created_at?: string
+          date_import?: string
+          id?: string
+          intitule_sd: string
+          sd_id: number
+          updated_at?: string
+          url_source?: string | null
+        }
+        Update: {
+          competences_associees?: string[] | null
+          contenu_complet_html?: string | null
+          created_at?: string
+          date_import?: string
+          id?: string
+          intitule_sd?: string
+          sd_id?: number
+          updated_at?: string
+          url_source?: string | null
+        }
+        Relationships: []
+      }
       edn_items: {
         Row: {
           created_at: string | null
@@ -890,6 +926,69 @@ export type Database = {
         }
         Relationships: []
       }
+      emotionsroom_ice_candidates: {
+        Row: {
+          candidate: Json
+          created_at: string
+          from_peer_id: string
+          id: string
+          room_id: string
+          to_peer_id: string
+        }
+        Insert: {
+          candidate: Json
+          created_at?: string
+          from_peer_id: string
+          id?: string
+          room_id: string
+          to_peer_id: string
+        }
+        Update: {
+          candidate?: Json
+          created_at?: string
+          from_peer_id?: string
+          id?: string
+          room_id?: string
+          to_peer_id?: string
+        }
+        Relationships: []
+      }
+      emotionsroom_participants: {
+        Row: {
+          audio_enabled: boolean
+          created_at: string
+          id: string
+          joined_at: string
+          left_at: string | null
+          peer_id: string
+          room_id: string
+          user_id: string
+          video_enabled: boolean
+        }
+        Insert: {
+          audio_enabled?: boolean
+          created_at?: string
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          peer_id: string
+          room_id: string
+          user_id: string
+          video_enabled?: boolean
+        }
+        Update: {
+          audio_enabled?: boolean
+          created_at?: string
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          peer_id?: string
+          room_id?: string
+          user_id?: string
+          video_enabled?: boolean
+        }
+        Relationships: []
+      }
       emotionsroom_profiles: {
         Row: {
           avatar_emoji: string | null
@@ -1008,6 +1107,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      emotionsroom_webrtc_answers: {
+        Row: {
+          answer: Json
+          created_at: string
+          from_peer_id: string
+          id: string
+          room_id: string
+          to_peer_id: string
+        }
+        Insert: {
+          answer: Json
+          created_at?: string
+          from_peer_id: string
+          id?: string
+          room_id: string
+          to_peer_id: string
+        }
+        Update: {
+          answer?: Json
+          created_at?: string
+          from_peer_id?: string
+          id?: string
+          room_id?: string
+          to_peer_id?: string
+        }
+        Relationships: []
+      }
+      emotionsroom_webrtc_offers: {
+        Row: {
+          created_at: string
+          from_peer_id: string
+          id: string
+          offer: Json
+          room_id: string
+          to_peer_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_peer_id: string
+          id?: string
+          offer: Json
+          room_id: string
+          to_peer_id: string
+        }
+        Update: {
+          created_at?: string
+          from_peer_id?: string
+          id?: string
+          offer?: Json
+          room_id?: string
+          to_peer_id?: string
+        }
+        Relationships: []
       }
       google_sheets_integrations: {
         Row: {
@@ -2404,6 +2557,15 @@ export type Database = {
       med_mng_toggle_like: {
         Args: { song_id: string }
         Returns: boolean
+      }
+      migrate_edn_items_to_platform: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          processed_count: number
+          success_count: number
+          error_count: number
+          details: Json
+        }[]
       }
       verify_invitation_token: {
         Args: { token_param: string }

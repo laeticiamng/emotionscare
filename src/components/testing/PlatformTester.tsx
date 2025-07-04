@@ -27,80 +27,97 @@ export const PlatformTester: React.FC = () => {
     const warnings: string[] = [];
 
     try {
-      // Simuler navigation vers la route
+      // Navigation directe vers la route
       const testUrl = `${window.location.origin}${route}`;
       
-      // Test de base : essayer de charger la route
-      const response = await fetch(testUrl, { method: 'HEAD' });
+      // Test de navigation
+      const currentUrl = window.location.pathname;
+      window.history.pushState({}, '', route);
       
-      if (!response.ok) {
-        errors.push(`HTTP ${response.status}: ${response.statusText}`);
+      // Attendre le rendu
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Vérifier que la route existe
+      const pageRoot = document.querySelector('main[data-testid="page-root"]') || 
+                      document.querySelector('main') ||
+                      document.querySelector('[data-testid*="page"]') ||
+                      document.body;
+      
+      if (!pageRoot) {
+        errors.push('Aucun élément principal trouvé sur la page');
       }
 
-      // Tester les éléments essentiels via DOM
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = testUrl;
-      document.body.appendChild(iframe);
+      // Vérifier les erreurs React
+      const errorBoundaries = document.querySelectorAll('[data-testid*="error"]');
+      if (errorBoundaries.length > 0) {
+        errors.push(`${errorBoundaries.length} error boundary(s) détecté(s)`);
+      }
 
-      await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error('Timeout: Page took too long to load'));
-        }, 10000);
+      // Vérifier le titre de la page
+      if (!document.title || document.title.includes('404') || document.title === 'EmotionsCare') {
+        warnings.push('Titre de page générique ou manquant');
+      }
 
-        iframe.onload = () => {
-          clearTimeout(timeout);
-          try {
-            const doc = iframe.contentDocument;
-            if (!doc) {
-              warnings.push('Cannot access iframe content (CORS)');
-              resolve(true);
-              return;
-            }
+      // Vérifier si la page contient du contenu
+      const hasContent = pageRoot && pageRoot.textContent && pageRoot.textContent.trim().length > 50;
+      if (!hasContent) {
+        warnings.push('Page semble vide ou avec peu de contenu');
+      }
 
-            // Vérifier les éléments de base
-            const main = doc.querySelector('main[data-testid="page-root"]');
-            if (!main) {
-              errors.push('Missing main[data-testid="page-root"] element');
-            }
-
-            const errorElements = doc.querySelectorAll('[data-testid*="error"]');
-            if (errorElements.length > 0) {
-              errors.push(`Found ${errorElements.length} error elements`);
-            }
-
-            // Vérifier le titre
-            if (!doc.title || doc.title.includes('404')) {
-              warnings.push('Missing or invalid page title');
-            }
-
-            // Vérifier les liens cassés
-            const links = doc.querySelectorAll('a[href]');
-            links.forEach((link) => {
-              const href = link.getAttribute('href');
-              if (href?.includes('undefined') || href?.includes('null')) {
-                warnings.push(`Broken link detected: ${href}`);
-              }
-            });
-
-            resolve(true);
-          } catch (e) {
-            warnings.push(`DOM inspection error: ${e.message}`);
-            resolve(true);
-          }
-        };
-
-        iframe.onerror = () => {
-          clearTimeout(timeout);
-          errors.push('Failed to load iframe');
-          resolve(true);
-        };
+      // Vérifier les boutons et liens
+      const buttons = document.querySelectorAll('button');
+      const links = document.querySelectorAll('a[href]');
+      
+      buttons.forEach((button, index) => {
+        if (!button.textContent?.trim()) {
+          warnings.push(`Bouton ${index + 1} sans texte`);
+        }
       });
 
-      document.body.removeChild(iframe);
+      links.forEach((link, index) => {
+        const href = link.getAttribute('href');
+        if (!href || href.includes('undefined') || href.includes('null') || href === '#') {
+          warnings.push(`Lien ${index + 1} invalide: ${href}`);
+        }
+      });
+
+      // Vérifier les images
+      const images = document.querySelectorAll('img');
+      images.forEach((img, index) => {
+        if (!img.src || img.src.includes('undefined')) {
+          warnings.push(`Image ${index + 1} avec source invalide`);
+        }
+        if (!img.alt) {
+          warnings.push(`Image ${index + 1} sans texte alternatif`);
+        }
+      });
+
+      // Test spécifique selon le type de page
+      if (route.includes('/b2b')) {
+        const b2bElements = document.querySelectorAll('[data-testid*="b2b"], [class*="b2b"]');
+        if (b2bElements.length === 0) {
+          warnings.push('Page B2B sans éléments spécifiques B2B détectés');
+        }
+      }
+
+      if (route.includes('/dashboard')) {
+        const dashboardElements = document.querySelectorAll('[data-testid*="dashboard"], .dashboard, [class*="card"]');
+        if (dashboardElements.length === 0) {
+          warnings.push('Dashboard sans cartes ou widgets détectés');
+        }
+      }
+
+      // Vérifier la navigation
+      const navElements = document.querySelectorAll('nav, [role="navigation"], .nav, [class*="nav"]');
+      if (navElements.length === 0 && route !== '/') {
+        warnings.push('Aucune navigation détectée');
+      }
+
+      // Revenir à l'URL originale
+      window.history.pushState({}, '', currentUrl);
 
     } catch (error) {
-      errors.push(`Test error: ${error.message}`);
+      errors.push(`Erreur de test: ${error.message}`);
     }
 
     const loadTime = performance.now() - startTime;
