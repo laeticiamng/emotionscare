@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       
       // Compte test spécial
-      if (email === 'test@emotionscare.com') {
+      if (email === 'test@emotionscare.com' && password === 'emotionscare') {
         const testUser: User = {
           id: '00000000-0000-0000-0000-000000000001',
           email,
