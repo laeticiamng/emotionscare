@@ -1,110 +1,192 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Building2, ArrowLeft, Users, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Mail, Lock, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AuthPage: React.FC = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      if (isLogin) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        if (data.user) {
+          // Utiliser le login du contexte pour synchroniser l'état
+          await login(email, password);
+          navigate('/');
+        }
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.user) {
+          setError('Vérifiez votre email pour confirmer votre inscription.');
+        }
+      }
+    } catch (error: any) {
+      setError(error.message || 'Une erreur est survenue');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Compte test rapide
+  const handleTestLogin = async () => {
+    setEmail('test@emotionscare.com');
+    setPassword('testpassword123');
+    setLoading(true);
+    setError('');
+
+    try {
+      await login('test@emotionscare.com', 'testpassword123');
+      navigate('/');
+    } catch (error: any) {
+      setError('Erreur de connexion avec le compte test');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour à l'accueil
-            </Link>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Authentification
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Connectez-vous à votre espace EmotionsCare
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-primary">
+              {isLogin ? 'Connexion' : 'Inscription'}
+            </CardTitle>
+            <p className="text-muted-foreground">
+              {isLogin ? 'Connectez-vous à votre compte' : 'Créez votre compte'}
             </p>
-          </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
 
-          {/* Auth Options */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* B2C Login */}
-            <Card className="group hover:shadow-xl transition-all duration-300">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                    <Heart className="h-10 w-10 text-blue-600" />
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pl-10 pr-10"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-                <CardTitle className="text-xl">Connexion Particulier</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-center text-muted-foreground text-sm mb-6">
-                  Accédez à votre espace personnel de bien-être émotionnel
-                </p>
-                
-                <div className="space-y-3">
-                  <Link to="/b2c/login" className="block">
-                    <Button className="w-full bg-blue-500 hover:bg-blue-600">
-                      Se connecter
-                    </Button>
-                  </Link>
-                  <Link to="/b2c/register" className="block">
-                    <Button variant="outline" className="w-full">
-                      Créer un compte
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* B2B Login */}
-            <Card className="group hover:shadow-xl transition-all duration-300">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/30">
-                    <Building2 className="h-10 w-10 text-purple-600" />
-                  </div>
+              {error && (
+                <div className="text-destructive text-sm bg-destructive/10 p-3 rounded-md">
+                  {error}
                 </div>
-                <CardTitle className="text-xl">Connexion Entreprise</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-center text-muted-foreground text-sm mb-6">
-                  Accédez aux outils de gestion d'équipe et tableaux de bord RH
-                </p>
-                
-                <div className="space-y-3">
-                  <Link to="/b2b/user/login" className="block">
-                    <Button className="w-full bg-green-500 hover:bg-green-600">
-                      <Users className="mr-2 h-4 w-4" />
-                      Connexion Collaborateur
-                    </Button>
-                  </Link>
-                  <Link to="/b2b/admin/login" className="block">
-                    <Button className="w-full bg-purple-500 hover:bg-purple-600">
-                      <Shield className="mr-2 h-4 w-4" />
-                      Connexion Administrateur
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              )}
 
-          {/* Help Section */}
-          <div className="text-center mt-12">
-            <p className="text-muted-foreground mb-4">
-              Besoin d'aide pour vous connecter ?
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="ghost">
-                Mot de passe oublié ?
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : 'S\'inscrire')}
               </Button>
-              <Button variant="ghost">
-                Contacter le support
+            </form>
+
+            <div className="space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Ou
+                  </span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleTestLogin}
+                disabled={loading}
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Connexion Test
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin ? 'Pas de compte ? S\'inscrire' : 'Déjà un compte ? Se connecter'}
               </Button>
             </div>
-          </div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -9,10 +11,12 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  register: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,58 +27,105 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simuler la vérification de l'authentification
-    const checkAuth = async () => {
-      try {
-        setIsLoading(true);
-        // Ici, vous devriez vérifier avec votre service d'authentification
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
+    // Récupérer la session initiale
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          role: 'b2c' // Par défaut
+        });
+      }
+      setIsLoading(false);
+    });
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            role: 'b2c'
+          });
+        } else {
+          setUser(null);
         }
-      } catch (error) {
-        console.error('Erreur lors de la vérification de l\'authentification:', error);
-      } finally {
         setIsLoading(false);
       }
-    };
+    );
 
-    checkAuth();
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      // Simuler une connexion
-      const mockUser: User = {
-        id: '1',
+      
+      // Compte test spécial
+      if (email === 'test@emotionscare.com') {
+        const testUser: User = {
+          id: '00000000-0000-0000-0000-000000000001',
+          email,
+          role: 'b2c'
+        };
+        setUser(testUser);
+        setIsLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        role: 'b2b_user' // Par défaut, vous pouvez ajuster selon vos besoins
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+        password,
+      });
+
+      if (error) throw error;
     } catch (error) {
-      console.error('Erreur de connexion:', error);
-      throw error;
-    } finally {
       setIsLoading(false);
+      throw error;
     }
   };
 
-  const logout = () => {
+  const register = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      setIsLoading(false);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    setIsLoading(true);
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('user');
+    setSession(null);
+    setIsLoading(false);
   };
 
   const value: AuthContextType = {
     user,
+    session,
     isAuthenticated: !!user,
     isLoading,
     login,
     logout,
+    register,
   };
 
   return (
