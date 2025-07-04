@@ -1,11 +1,15 @@
 
 // Routes unifiées - TICKET FE-FINAL-ROUTE-COMPLETION (52 routes officielles)
 export const UNIFIED_ROUTES = {
-  // Routes publiques (4)
+  // Routes publiques (8)
   HOME: '/',
   CHOOSE_MODE: '/choose-mode',
   ONBOARDING: '/onboarding',
   B2B_SELECTION: '/b2b/selection',
+  AUTH: '/auth',
+  PRICING: '/pricing',
+  CONTACT: '/contact',
+  ABOUT: '/about',
   
   // Routes d'authentification (6)
   B2C_LOGIN: '/b2c/login',

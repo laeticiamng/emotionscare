@@ -73,6 +73,12 @@ const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 const AuditTicketP0Page = lazy(() => import('@/pages/AuditTicketP0Page'));
 const PlatformTestPage = lazy(() => import('@/pages/testing/PlatformTestPage'));
 
+// Pages manquantes
+const AuthPage = lazy(() => import('@/pages/Auth'));
+const PricingPage = lazy(() => import('@/pages/Pricing'));
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
+const AboutPage = lazy(() => import('@/pages/AboutPage'));
+
 // Pages administration B2B
 const SecurityDashboardPage = lazy(() => import('@/pages/SecurityDashboardPage'));
 const SystemAuditPage = lazy(() => import('@/pages/SystemAuditPage'));
@@ -108,6 +114,22 @@ export const unifiedRoutes: RouteObject[] = [
   {
     path: UNIFIED_ROUTES.B2B_SELECTION,
     Component: withSuspenseAndErrorBoundary(B2BSelectionPage),
+  },
+  {
+    path: UNIFIED_ROUTES.AUTH,
+    Component: withSuspenseAndErrorBoundary(AuthPage),
+  },
+  {
+    path: UNIFIED_ROUTES.PRICING,
+    Component: withSuspenseAndErrorBoundary(PricingPage),
+  },
+  {
+    path: UNIFIED_ROUTES.CONTACT,
+    Component: withSuspenseAndErrorBoundary(ContactPage),
+  },
+  {
+    path: UNIFIED_ROUTES.ABOUT,
+    Component: withSuspenseAndErrorBoundary(AboutPage),
   },
 
   // Routes B2C
@@ -336,6 +358,14 @@ export const unifiedRoutes: RouteObject[] = [
   {
     path: '/test/report',
     Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/QAReportPage'))),
+  },
+  {
+    path: '/test/complete',
+    Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/CompletePlatformTestPage'))),
+  },
+  {
+    path: '/test/status',
+    Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/PlatformStatusPage'))),
   },
 
   // Route B2B manquante

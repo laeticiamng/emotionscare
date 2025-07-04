@@ -2464,6 +2464,12 @@ export type Database = {
         Args: { report_type_param?: string }
         Returns: string
       }
+      generate_specific_content_all_items: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          updated_count: number
+        }[]
+      }
       get_activity_stats: {
         Args: { p_start_date?: string; p_end_date?: string }
         Returns: {
@@ -2574,6 +2580,14 @@ export type Database = {
           success_count: number
           error_count: number
           details: Json
+        }[]
+      }
+      update_edn_items_with_specific_content: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          processed_count: number
+          success_count: number
+          error_count: number
         }[]
       }
       verify_invitation_token: {
