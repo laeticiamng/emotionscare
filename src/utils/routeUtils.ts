@@ -1,25 +1,26 @@
 
-// Routes unifiées - AUDIT COMPLET CORRIGÉ
+// Routes unifiées - TICKET FE-FINAL-ROUTE-COMPLETION (52 routes officielles)
 export const UNIFIED_ROUTES = {
-  // Routes publiques
+  // Routes publiques (4)
   HOME: '/',
   CHOOSE_MODE: '/choose-mode',
-  AUTH: '/auth',
+  ONBOARDING: '/onboarding',
   B2B_SELECTION: '/b2b/selection',
   
-  // Routes d'authentification - UNIQUES
+  // Routes d'authentification (6)
   B2C_LOGIN: '/b2c/login',
   B2C_REGISTER: '/b2c/register',
   B2B_USER_LOGIN: '/b2b/user/login',
   B2B_USER_REGISTER: '/b2b/user/register',
   B2B_ADMIN_LOGIN: '/b2b/admin/login',
+  B2B: '/b2b',
   
-  // Dashboards - UNIQUES
+  // Dashboards (3)
   B2C_DASHBOARD: '/b2c/dashboard',
   B2B_USER_DASHBOARD: '/b2b/user/dashboard',
   B2B_ADMIN_DASHBOARD: '/b2b/admin/dashboard',
   
-  // Fonctionnalités communes - CHEMINS UNIQUES
+  // Fonctionnalités principales (8)
   SCAN: '/scan',
   MUSIC: '/music',
   COACH: '/coach',
@@ -29,12 +30,46 @@ export const UNIFIED_ROUTES = {
   GAMIFICATION: '/gamification',
   SOCIAL_COCON: '/social-cocon',
   
-  // Fonctionnalités administrateur - UNIQUES
+  // Modules fun-first avec IA (11)
+  BOSS_LEVEL_GRIT: '/boss-level-grit',
+  MOOD_MIXER: '/mood-mixer',
+  AMBITION_ARCADE: '/ambition-arcade',
+  BOUNCE_BACK_BATTLE: '/bounce-back-battle',
+  STORY_SYNTH_LAB: '/story-synth-lab',
+  FLASH_GLOW: '/flash-glow',
+  AR_FILTERS: '/ar-filters',
+  BUBBLE_BEAT: '/bubble-beat',
+  SCREEN_SILK_BREAK: '/screen-silk-break',
+  VR_GALACTIQUE: '/vr-galactique',
+  INSTANT_GLOW: '/instant-glow',
+  
+  // Analytics & data (3)
+  WEEKLY_BARS: '/weekly-bars',
+  HEATMAP_VIBES: '/heatmap-vibes',
+  BREATHWORK: '/breathwork',
+  
+  // Paramètres & compte (7)
+  PRIVACY_TOGGLES: '/privacy-toggles',
+  EXPORT_CSV: '/export-csv',
+  ACCOUNT_DELETE: '/account/delete',
+  HEALTH_CHECK_BADGE: '/health-check-badge',
+  NOTIFICATIONS: '/notifications',
+  HELP_CENTER: '/help-center',
+  PROFILE_SETTINGS: '/profile-settings',
+  
+  // Historique & feedback (2)
+  ACTIVITY_HISTORY: '/activity-history',
+  FEEDBACK: '/feedback',
+  
+  // Administration B2B (8)
   TEAMS: '/teams',
   REPORTS: '/reports',
   EVENTS: '/events',
   OPTIMISATION: '/optimisation',
-  SETTINGS: '/settings'
+  SETTINGS: '/settings',
+  SECURITY: '/security',
+  AUDIT: '/audit',
+  ACCESSIBILITY: '/accessibility'
 } as const;
 
 export type UnifiedRoute = typeof UNIFIED_ROUTES[keyof typeof UNIFIED_ROUTES];
