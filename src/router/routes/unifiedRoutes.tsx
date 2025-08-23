@@ -72,6 +72,9 @@ const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 const AuditTicketP0Page = lazy(() => import('@/pages/AuditTicketP0Page'));
 const PlatformTestPage = lazy(() => import('@/pages/testing/PlatformTestPage'));
+const CompletePlatformTestPage = lazy(() => import('@/pages/testing/CompletePlatformTestPage'));
+const PlatformStatusPageTesting = lazy(() => import('@/pages/testing/PlatformStatusPage'));
+const OptimizationDashboard = lazy(() => import('@/pages/OptimizationDashboard'));
 
 // Pages manquantes
 const AuthPage = lazy(() => import('@/pages/Auth'));
@@ -361,11 +364,17 @@ export const unifiedRoutes: RouteObject[] = [
   },
   {
     path: '/test/complete',
-    Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/CompletePlatformTestPage'))),
+    Component: withSuspenseAndErrorBoundary(CompletePlatformTestPage),
   },
   {
     path: '/test/status',
-    Component: withSuspenseAndErrorBoundary(lazy(() => import('@/pages/testing/PlatformStatusPage'))),
+    Component: withSuspenseAndErrorBoundary(PlatformStatusPageTesting),
+  },
+  
+  // Route d'optimisation
+  {
+    path: '/optimization',
+    Component: withSuspenseAndErrorBoundary(OptimizationDashboard),
   },
 
   // Route B2B manquante
