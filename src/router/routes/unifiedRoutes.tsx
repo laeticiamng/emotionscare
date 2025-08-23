@@ -75,6 +75,7 @@ const PlatformTestPage = lazy(() => import('@/pages/testing/PlatformTestPage'));
 const CompletePlatformTestPage = lazy(() => import('@/pages/testing/CompletePlatformTestPage'));
 const PlatformStatusPageTesting = lazy(() => import('@/pages/testing/PlatformStatusPage'));
 const OptimizationDashboard = lazy(() => import('@/pages/OptimizationDashboard'));
+const AccessibilityDashboard = lazy(() => import('@/pages/AccessibilityDashboard'));
 
 // Pages manquantes
 const AuthPage = lazy(() => import('@/pages/Auth'));
@@ -371,10 +372,14 @@ export const unifiedRoutes: RouteObject[] = [
     Component: withSuspenseAndErrorBoundary(PlatformStatusPageTesting),
   },
   
-  // Route d'optimisation
+  // Routes d'optimisation et accessibilité
   {
     path: '/optimization',
     Component: withSuspenseAndErrorBoundary(OptimizationDashboard),
+  },
+  {
+    path: '/accessibility-audit',
+    Component: withSuspenseAndErrorBoundary(AccessibilityDashboard),
   },
 
   // Route B2B manquante
