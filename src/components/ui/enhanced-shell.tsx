@@ -6,6 +6,8 @@ import EnhancedHeader from './enhanced-header';
 import EnhancedFooter from './enhanced-footer';
 import CommandMenu from './command-menu';
 import NotificationToast from './notification-toast';
+import { FloatingActionButton } from './enhanced-user-experience';
+import { Sparkles, Download, Share2, Settings, HelpCircle } from 'lucide-react';
 
 interface ToastNotification {
   id: string;
@@ -39,6 +41,30 @@ const EnhancedShell: React.FC = () => {
   const removeNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
+  
+  // Floating Actions Configuration
+  const floatingActions = [
+    {
+      icon: Download,
+      label: 'Télécharger',
+      onClick: () => addNotification({ type: 'info', title: 'Téléchargement', message: 'Fonctionnalité à venir' })
+    },
+    {
+      icon: Share2,
+      label: 'Partager',
+      onClick: () => addNotification({ type: 'success', title: 'Partagé', message: 'Lien copié dans le presse-papier' })
+    },
+    {
+      icon: Settings,
+      label: 'Paramètres',
+      onClick: () => window.location.href = '/preferences'
+    },
+    {
+      icon: HelpCircle,
+      label: 'Aide',
+      onClick: () => addNotification({ type: 'info', title: 'Aide', message: 'Centre d\'aide ouvert' })
+    }
+  ];
   
   // Exemple d'ajout de notification au montage
   React.useEffect(() => {
@@ -80,6 +106,8 @@ const EnhancedShell: React.FC = () => {
         notifications={notifications}
         onRemove={removeNotification}
       />
+      
+      <FloatingActionButton actions={floatingActions} />
     </div>
   );
 };

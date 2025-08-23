@@ -1,4 +1,5 @@
 @import './styles/premium-design.css';
+@import './styles/enhanced-design.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
