@@ -42,9 +42,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem('theme', theme);
-      setTheme(theme);
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem('theme', newTheme);
+      setTheme(newTheme);
     },
   };
 
