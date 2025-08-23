@@ -68,16 +68,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Compte test spécial
+      // Compte test spécial - optimisé avec cache et validation
       if (email === 'test@emotionscare.com' && password === 'emotionscare') {
         const testUser: User = {
           id: '00000000-0000-0000-0000-000000000001',
           email,
-          role: 'b2c'
+          role: 'b2c' as UserRole,
+          profile: {
+            firstName: 'Test',
+            lastName: 'User',
+            displayName: 'Utilisateur Test'
+          }
         };
+        
         setUser(testUser);
-        setIsLoading(false);
-        return;
+        setIsAuthenticated(true);
+        
+        // Cache optimisé avec gestion d'erreurs et expiration
+        try {
+          const sessionData = {
+            user: testUser,
+            timestamp: Date.now(),
+            expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24h
+          };
+          localStorage.setItem('emotionscare_session', JSON.stringify(sessionData));
+        } catch (error) {
+          console.warn('Failed to cache session:', error);
+        }
+        
+        return { user: testUser, error: null };
       }
 
       const { error } = await supabase.auth.signInWithPassword({
