@@ -4,7 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import MusicProvider from './contexts/MusicContext';
 import { RootErrorBoundary } from './components/RootErrorBoundary';
 import AppRouter from './router/AppRouter';
-import LiveUXMonitor from '@/components/ux/LiveUXMonitor';
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +27,6 @@ const App: React.FC = () => {
               <RootErrorBoundary>
                 <AppRouter />
               </RootErrorBoundary>
-              <LiveUXMonitor />
             </div>
           </MusicProvider>
         </ThemeProvider>

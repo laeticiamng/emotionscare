@@ -3,6 +3,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import NavBar from './NavBar';
 import { Toaster } from 'sonner';
+import LiveUXMonitor from '@/components/ux/LiveUXMonitor';
 
 const Layout: React.FC = () => {
   return (
@@ -12,6 +13,7 @@ const Layout: React.FC = () => {
         <Outlet />
       </main>
       <Toaster position="top-right" />
+      <LiveUXMonitor />
     </div>
   );
 };
