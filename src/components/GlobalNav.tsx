@@ -26,23 +26,37 @@ const GlobalNav: React.FC = () => {
   };
 
   return (
-    <header className="border-b">
+    <header role="banner" className="border-b">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link to="/" className="font-bold text-xl flex items-center gap-2">
+          <Link 
+            to="/" 
+            className="font-bold text-xl flex items-center gap-2 focus-enhanced"
+            aria-label="EmotionsCare - Retour à l'accueil"
+          >
             EmotionsCare
           </Link>
         </div>
 
-        <nav className="flex items-center gap-4">
+        <nav id="main-navigation" role="navigation" aria-label="Navigation principale" className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button 
+                    variant="ghost" 
+                    className="relative h-8 w-8 rounded-full focus-enhanced"
+                    aria-label={`Menu utilisateur pour ${user?.name || 'utilisateur'}`}
+                    aria-expanded={false}
+                  >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
-                      <AvatarFallback>{getInitials(user?.name || 'User')}</AvatarFallback>
+                      <AvatarImage 
+                        src={user?.avatar} 
+                        alt={`Photo de profil de ${user?.name || 'utilisateur'}`} 
+                      />
+                      <AvatarFallback aria-label={`Initiales: ${getInitials(user?.name || 'User')}`}>
+                        {getInitials(user?.name || 'User')}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -73,14 +87,14 @@ const GlobalNav: React.FC = () => {
             </>
           ) : (
             <>
-              <Link to="/login">
-                <Button variant="ghost" size="sm">
-                  Log in
+              <Link to="/auth" aria-label="Page de connexion">
+                <Button variant="ghost" size="sm" className="focus-enhanced">
+                  Se connecter
                 </Button>
               </Link>
-              <Link to="/register">
-                <Button size="sm">
-                  Sign up
+              <Link to="/auth" aria-label="Page d'inscription">
+                <Button size="sm" className="focus-enhanced">
+                  S'inscrire
                 </Button>
               </Link>
             </>
