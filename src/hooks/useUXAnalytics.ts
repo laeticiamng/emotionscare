@@ -27,8 +27,16 @@ interface UXMetrics {
 }
 
 export const useUXAnalytics = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  let location, navigate;
+  
+  try {
+    location = useLocation();
+    navigate = useNavigate();
+  } catch (error) {
+    // Fallback si pas dans un contexte Router
+    location = { pathname: '/' };
+    navigate = () => {};
+  }
   
   const [session, setSession] = useState<UserSession>(() => ({
     sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
