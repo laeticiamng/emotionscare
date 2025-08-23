@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
+import { EnhancedSkipLinks } from '@/components/ui/enhanced-accessibility';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <AccessibilitySkipLinks />
+      <EnhancedSkipLinks />
       
       {/* Hero Section */}
       <section role="banner" className="relative overflow-hidden" aria-labelledby="hero-title">
