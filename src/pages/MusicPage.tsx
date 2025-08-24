@@ -1,5 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import EnhancedMusicTherapyPage from '@/pages/enhanced/EnhancedMusicTherapyPage';
+
+const MusicPage: React.FC = () => {
+  return <EnhancedMusicTherapyPage />;
+};
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Music2, Heart, Timer, TrendingUp, Shuffle, Repeat } from 'lucide-react';

@@ -1,13 +1,10 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, Bot, User, ArrowLeft, Lightbulb } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React from 'react';
+import EnhancedCoachPage from '@/pages/enhanced/EnhancedCoachPage';
 
 const CoachPage: React.FC = () => {
+  return <EnhancedCoachPage />;
+};
   const navigate = useNavigate();
   const [messages, setMessages] = useState([
     {
