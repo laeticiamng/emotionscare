@@ -23,7 +23,7 @@ import {
   User,
   Settings,
   Gamepad2,
-  VrHeadset,
+  Glasses,
   Sparkles,
   Eye
 } from 'lucide-react';
@@ -51,8 +51,8 @@ const GlobalNavigation: React.FC = () => {
   ];
 
   const immersiveRoutes: NavigationItem[] = [
-    { title: 'VR Standard', route: OFFICIAL_ROUTES.VR, icon: VrHeadset, description: 'Réalité virtuelle' },
-    { title: 'VR Galactique', route: OFFICIAL_ROUTES.VR_GALACTIQUE, icon: VrHeadset, description: 'Expérience spatiale' },
+    { title: 'VR Standard', route: OFFICIAL_ROUTES.VR, icon: Glasses, description: 'Réalité virtuelle' },
+    { title: 'VR Galactique', route: OFFICIAL_ROUTES.VR_GALACTIQUE, icon: Glasses, description: 'Expérience spatiale' },
     { title: 'Screen Silk Break', route: OFFICIAL_ROUTES.SCREEN_SILK_BREAK, icon: Eye, description: 'Pause écran' },
     { title: 'Story Synth Lab', route: OFFICIAL_ROUTES.STORY_SYNTH_LAB, icon: Brain, description: 'Histoires génératives' },
     { title: 'AR Filters', route: OFFICIAL_ROUTES.AR_FILTERS, icon: Camera, description: 'Réalité augmentée' },

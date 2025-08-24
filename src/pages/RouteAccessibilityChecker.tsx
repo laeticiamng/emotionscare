@@ -14,7 +14,7 @@ import {
   Shield,
   Camera,
   Music,
-  VrHeadset,
+  Glasses,
   Heart,
   Sparkles,
   Brain,
@@ -49,8 +49,8 @@ const RouteAccessibilityChecker: React.FC = () => {
     { route: OFFICIAL_ROUTES.INSTANT_GLOW, title: 'Instant Glow', accessible: true, navigationMethods: ['Menu Global', 'Accès Rapide'], icon: Sparkles },
 
     // Routes expériences immersives
-    { route: OFFICIAL_ROUTES.VR, title: 'VR Standard', accessible: true, navigationMethods: ['Menu Global', 'Accès Rapide'], icon: VrHeadset },
-    { route: OFFICIAL_ROUTES.VR_GALACTIQUE, title: 'VR Galactique', accessible: true, navigationMethods: ['Menu Global'], icon: VrHeadset },
+    { route: OFFICIAL_ROUTES.VR, title: 'VR Standard', accessible: true, navigationMethods: ['Menu Global', 'Accès Rapide'], icon: Glasses },
+    { route: OFFICIAL_ROUTES.VR_GALACTIQUE, title: 'VR Galactique', accessible: true, navigationMethods: ['Menu Global'], icon: Glasses },
     { route: OFFICIAL_ROUTES.SCREEN_SILK_BREAK, title: 'Screen Silk Break', accessible: true, navigationMethods: ['Menu Global'], icon: Eye },
     { route: OFFICIAL_ROUTES.STORY_SYNTH_LAB, title: 'Story Synth Lab', accessible: true, navigationMethods: ['Menu Global', 'Accès Rapide'], icon: Brain },
     { route: OFFICIAL_ROUTES.AR_FILTERS, title: 'AR Filters', accessible: true, navigationMethods: ['Menu Global'], icon: Camera },

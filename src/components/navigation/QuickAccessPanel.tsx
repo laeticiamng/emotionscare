@@ -20,7 +20,7 @@ import {
   Compass,
   Camera,
   Music,
-  VrHeadset,
+  Glasses,
   Users,
   Heart,
   Brain,
@@ -76,7 +76,7 @@ const QuickAccessPanel: React.FC = () => {
     {
       title: 'VR Expérience',
       route: OFFICIAL_ROUTES.VR,
-      icon: VrHeadset,
+      icon: Glasses,
       category: 'Immersif',
       priority: 'high',
       description: 'Immersion en réalité virtuelle',
