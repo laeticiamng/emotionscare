@@ -1,9 +1,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Target, Award, TrendingUp, Calendar, Star } from 'lucide-react';
-import PremiumCard from '@/components/ui/PremiumCard';
-import PremiumButton from '@/components/ui/PremiumButton';
+import { Trophy, Target, Award, TrendingUp, Calendar, Star, Users, BarChart3, Gamepad2 } from 'lucide-react';
+import PageLayout from '@/components/common/PageLayout';
+import FeatureCard from '@/components/common/FeatureCard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const GamificationPage: React.FC = () => {
   const achievements = [
@@ -19,64 +22,124 @@ const GamificationPage: React.FC = () => {
     { title: "Constance", description: "15 jours sans interruption", progress: 80, reward: "Avatar Doré" }
   ];
 
+  const rewards = [
+    {
+      title: 'Thème Premium',
+      description: 'Interface personnalisée exclusive',
+      icon: <span className="text-4xl">🎨</span>,
+      cost: '500 XP',
+      gradient: 'from-yellow-500 to-orange-500'
+    },
+    {
+      title: 'Module VR Bonus',
+      description: 'Accès à des expériences exclusives',
+      icon: <span className="text-4xl">🔮</span>,
+      cost: '800 XP',
+      gradient: 'from-purple-500 to-pink-500'
+    },
+    {
+      title: 'Statut VIP',
+      description: 'Avantages exclusifs pendant 1 mois',
+      icon: <span className="text-4xl">👑</span>,
+      cost: '1200 XP',
+      gradient: 'from-blue-500 to-cyan-500'
+    }
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-6xl mx-auto"
-      >
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            Gamification & Récompenses
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Transformez votre parcours bien-être en aventure ludique
-          </p>
-        </div>
-
-        {/* Stats générales */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <PremiumCard className="text-center">
-            <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-500" />
-            <h3 className="text-2xl font-bold text-yellow-600">1,250</h3>
-            <p className="text-muted-foreground">Points XP</p>
-          </PremiumCard>
-          
-          <PremiumCard className="text-center">
-            <Target className="h-12 w-12 mx-auto mb-4 text-blue-500" />
-            <h3 className="text-2xl font-bold text-blue-600">Niveau 8</h3>
-            <p className="text-muted-foreground">Explorateur</p>
-          </PremiumCard>
-          
-          <PremiumCard className="text-center">
-            <Award className="h-12 w-12 mx-auto mb-4 text-purple-500" />
-            <h3 className="text-2xl font-bold text-purple-600">12</h3>
-            <p className="text-muted-foreground">Badges</p>
-          </PremiumCard>
-          
-          <PremiumCard className="text-center">
-            <TrendingUp className="h-12 w-12 mx-auto mb-4 text-green-500" />
-            <h3 className="text-2xl font-bold text-green-600">24</h3>
-            <p className="text-muted-foreground">Série de jours</p>
-          </PremiumCard>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+    <PageLayout
+      header={{
+        title: 'Gamification',
+        subtitle: 'Transformez votre bien-être en aventure',
+        description: 'Gagnez des points, débloquez des succès et relevez des défis pour maintenir votre motivation au quotidien.',
+        icon: Trophy,
+        gradient: 'from-yellow-500/20 to-orange-500/5',
+        badge: 'Système de Récompenses',
+        stats: [
+          {
+            label: 'Points XP',
+            value: '1.250',
+            icon: Trophy,
+            color: 'text-yellow-500'
+          },
+          {
+            label: 'Niveau',
+            value: '8',
+            icon: Target,
+            color: 'text-blue-500'
+          },
+          {
+            label: 'Badges',
+            value: '12',
+            icon: Award,
+            color: 'text-purple-500'
+          },
+          {
+            label: 'Série',
+            value: '24j',
+            icon: TrendingUp,
+            color: 'text-green-500'
+          }
+        ],
+        actions: [
+          {
+            label: 'Nouvelle Mission',
+            onClick: () => console.log('New mission'),
+            variant: 'default',
+            icon: Target
+          },
+          {
+            label: 'Classement',
+            onClick: () => console.log('Leaderboard'),
+            variant: 'outline',
+            icon: BarChart3
+          }
+        ]
+      }}
+      tips={{
+        title: 'Maximisez vos récompenses',
+        items: [
+          {
+            title: 'Constance',
+            content: 'Maintenez votre série quotidienne pour des bonus XP',
+            icon: Calendar
+          },
+          {
+            title: 'Variété',
+            content: 'Explorez différents modules pour débloquer plus de succès',
+            icon: Target
+          },
+          {
+            title: 'Défis',
+            content: 'Participez aux défis communautaires pour des récompenses exclusives',
+            icon: Users
+          }
+        ],
+        cta: {
+          label: 'Guide de la gamification',
+          onClick: () => console.log('Gamification guide')
+        }
+      }}
+    >
+      <div className="space-y-8">
+        {/* Succès et Défis */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Succès */}
-          <PremiumCard>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold">Succès Débloqués</h3>
-              <Award className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-6 w-6 text-purple-500" />
+                Succès Débloqués ({achievements.filter(a => a.unlocked).length}/{achievements.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {achievements.map((achievement, index) => (
                 <div 
                   key={index}
                   className={`flex items-center p-4 rounded-lg ${
                     achievement.unlocked 
-                      ? 'bg-gradient-to-r from-green-50 to-blue-50 border border-green-200' 
-                      : 'bg-gray-50 border border-gray-200 opacity-60'
+                      ? 'bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-800' 
+                      : 'bg-muted opacity-60'
                   }`}
                 >
                   <div className="text-2xl mr-4">{achievement.icon}</div>
@@ -89,24 +152,26 @@ const GamificationPage: React.FC = () => {
                   )}
                 </div>
               ))}
-            </div>
-          </PremiumCard>
+            </CardContent>
+          </Card>
 
           {/* Défis actuels */}
-          <PremiumCard>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold">Défis en Cours</h3>
-              <Calendar className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gamepad2 className="h-6 w-6 text-blue-500" />
+                Défis en Cours
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
               {challenges.map((challenge, index) => (
-                <div key={index} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                <div key={index} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-bold">{challenge.title}</h4>
-                    <span className="text-sm text-blue-600">{challenge.progress}%</span>
+                    <span className="text-sm text-blue-600 dark:text-blue-400">{challenge.progress}%</span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div className="w-full bg-muted rounded-full h-2 mb-2">
                     <div 
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${challenge.progress}%` }}
@@ -118,48 +183,53 @@ const GamificationPage: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
-          </PremiumCard>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Boutique de récompenses */}
-        <PremiumCard>
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">Boutique de Récompenses</h3>
-            <p className="text-muted-foreground">Échangez vos points XP contre des récompenses exclusives</p>
-          </div>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-foreground">Boutique de Récompenses</h2>
+          <p className="text-muted-foreground">Échangez vos points XP contre des récompenses exclusives</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-6 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border">
-              <div className="text-4xl mb-4">🎨</div>
-              <h4 className="font-bold mb-2">Thème Premium</h4>
-              <p className="text-sm text-muted-foreground mb-4">Interface personnalisée exclusive</p>
-              <PremiumButton variant="accent" size="sm">
-                500 XP
-              </PremiumButton>
-            </div>
-            
-            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border">
-              <div className="text-4xl mb-4">🔮</div>
-              <h4 className="font-bold mb-2">Module VR Bonus</h4>
-              <p className="text-sm text-muted-foreground mb-4">Accès à des expériences exclusives</p>
-              <PremiumButton variant="primary" size="sm">
-                800 XP
-              </PremiumButton>
-            </div>
-            
-            <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border">
-              <div className="text-4xl mb-4">👑</div>
-              <h4 className="font-bold mb-2">Statut VIP</h4>
-              <p className="text-sm text-muted-foreground mb-4">Avantages exclusifs pendant 1 mois</p>
-              <PremiumButton variant="secondary" size="sm">
-                1200 XP
-              </PremiumButton>
-            </div>
+            {rewards.map((reward, index) => (
+              <FeatureCard
+                key={index}
+                title={reward.title}
+                description={reward.description}
+                icon={reward.icon}
+                gradient={reward.gradient}
+                metadata={[{ label: 'Coût', value: reward.cost }]}
+                action={{
+                  label: 'Échanger',
+                  onClick: () => console.log(`Exchange for ${reward.title}`)
+                }}
+              />
+            ))}
           </div>
-        </PremiumCard>
-      </motion.div>
-    </div>
+        </div>
+
+        {/* Progression détaillée */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Progression vers le Niveau 9</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm">
+                <span>1.250 / 1.500 XP</span>
+                <span>83%</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-3">
+                <div className="bg-gradient-to-r from-yellow-500 to-orange-500 h-3 rounded-full transition-all duration-500" style={{ width: '83%' }}></div>
+              </div>
+              <p className="text-sm text-muted-foreground">Plus que 250 XP pour atteindre le niveau Maître !</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
   );
 };
 
