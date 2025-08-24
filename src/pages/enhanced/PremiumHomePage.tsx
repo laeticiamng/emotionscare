@@ -217,13 +217,13 @@ const PremiumHomePage: React.FC = () => {
   return (
     <ResponsiveWrapper>
       <motion.div 
-        className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden relative"
+        className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden relative"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/20 to-accent/10" />
 
         <DeviceOptimizedLayout>
           {/* Hero Section */}
@@ -388,32 +388,32 @@ const PremiumHomePage: React.FC = () => {
                   )}>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-purple-200 text-sm">Équilibre Émotionnel</span>
-                        <span className="text-white font-bold">{userMetrics.emotional_balance}%</span>
+                        <span className="text-slate-200 text-sm">Équilibre Émotionnel</span>
+                        <span className="text-slate-300 font-bold">{userMetrics.emotional_balance}%</span>
                       </div>
                       <Progress value={userMetrics.emotional_balance} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-purple-200 text-sm">Niveau de Stress</span>
-                        <span className="text-white font-bold">{userMetrics.stress_level}%</span>
+                        <span className="text-slate-200 text-sm">Niveau de Stress</span>
+                        <span className="text-slate-300 font-bold">{userMetrics.stress_level}%</span>
                       </div>
                       <Progress value={100 - userMetrics.stress_level} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-purple-200 text-sm">Score de Focus</span>
-                        <span className="text-white font-bold">{userMetrics.focus_score}%</span>
+                        <span className="text-slate-200 text-sm">Score de Focus</span>
+                        <span className="text-slate-300 font-bold">{userMetrics.focus_score}%</span>
                       </div>
                       <Progress value={userMetrics.focus_score} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-purple-200 text-sm">Séries Consécutives</span>
-                        <span className="text-white font-bold">{userMetrics.wellness_streak}j</span>
+                        <span className="text-slate-200 text-sm">Séries Consécutives</span>
+                        <span className="text-slate-300 font-bold">{userMetrics.wellness_streak}j</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         {Array.from({ length: Math.min(userMetrics.wellness_streak, 7) }).map((_, i) => (
@@ -446,7 +446,7 @@ const PremiumHomePage: React.FC = () => {
               )}>
                 Fonctionnalités Premium
               </h2>
-              <p className="text-purple-200 max-w-2xl mx-auto">
+              <p className="text-slate-300 max-w-2xl mx-auto">
                 Explorez nos outils thérapeutiques alimentés par l'IA la plus avancée
               </p>
             </div>
@@ -496,10 +496,10 @@ const PremiumHomePage: React.FC = () => {
                         </div>
                       </div>
                       
-                      <h3 className="text-white text-lg font-semibold leading-none tracking-tight group-hover:text-purple-200 transition-colors">
+                      <h3 className="text-slate-100 text-lg font-semibold leading-none tracking-tight group-hover:text-slate-200 transition-colors">
                         {feature.title}
                       </h3>
-                      <CardDescription className="text-purple-200 text-sm leading-relaxed">
+                      <CardDescription className="text-slate-300 text-sm leading-relaxed">
                         {feature.description}
                       </CardDescription>
                     </CardHeader>
