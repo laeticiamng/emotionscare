@@ -1,0 +1,153 @@
+import { supabase } from '@/integrations/supabase/client';
+
+export interface JournalEntry {
+  id: string;
+  user_id: string;
+  content: string;
+  emotion_analysis?: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VoiceEntry {
+  id: string;
+  user_id: string;
+  audio_url: string;
+  transcription?: string;
+  emotion_analysis?: any;
+  created_at: string;
+}
+
+export class JournalService {
+  static async getEntries(): Promise<JournalEntry[]> {
+    try {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Erreur lors de la récupération des entrées:', error);
+        throw new Error('Impossible de récupérer les entrées du journal');
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Erreur service journal:', error);
+      throw error;
+    }
+  }
+
+  static async createEntry(content: string): Promise<JournalEntry> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Utilisateur non authentifié');
+
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .insert({
+          user_id: user.id,
+          content,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erreur lors de la création de l\'entrée:', error);
+        throw new Error('Impossible de créer l\'entrée du journal');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erreur création entrée:', error);
+      throw error;
+    }
+  }
+
+  static async createVoiceEntry(audioBlob: Blob): Promise<VoiceEntry> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Utilisateur non authentifié');
+
+      // Upload audio file
+      const fileName = `voice_${Date.now()}.wav`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('voice-recordings')
+        .upload(fileName, audioBlob);
+
+      if (uploadError) {
+        console.error('Erreur upload audio:', uploadError);
+        throw new Error('Impossible d\'uploader l\'enregistrement audio');
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('voice-recordings')
+        .getPublicUrl(fileName);
+
+      // Create voice entry record
+      const { data, error } = await supabase
+        .from('voice_entries')
+        .insert({
+          user_id: user.id,
+          audio_url: publicUrl,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erreur création entrée vocale:', error);
+        throw new Error('Impossible de créer l\'entrée vocale');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erreur création entrée vocale:', error);
+      throw error;
+    }
+  }
+
+  static async updateEntry(id: string, content: string): Promise<JournalEntry> {
+    try {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .update({
+          content,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erreur mise à jour entrée:', error);
+        throw new Error('Impossible de mettre à jour l\'entrée');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erreur mise à jour:', error);
+      throw error;
+    }
+  }
+
+  static async deleteEntry(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('journal_entries')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Erreur suppression entrée:', error);
+        throw new Error('Impossible de supprimer l\'entrée');
+      }
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      throw error;
+    }
+  }
+}
