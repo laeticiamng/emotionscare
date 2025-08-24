@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { EnhancedSkipLinks } from '@/components/ui/enhanced-accessibility';
-import HeroSection from '@/components/home/HeroSection';
-import FeaturesSection from '@/components/home/FeaturesSection';
+import OptimizedHeroSection from '@/components/home/OptimizedHeroSection';
+import OptimizedFeaturesSection from '@/components/home/OptimizedFeaturesSection';
 import CtaSection from '@/components/home/CtaSection';
+import '@/styles/optimized-animations.css';
 
 const HomePage: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -19,18 +20,9 @@ const HomePage: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
+        duration: shouldReduceMotion ? 0.1 : 0.3,
+        staggerChildren: shouldReduceMotion ? 0 : 0.05
       }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 }
     }
   };
 
@@ -43,13 +35,13 @@ const HomePage: React.FC = () => {
     >
       <EnhancedSkipLinks />
       
-      {/* Hero Section */}
-      <HeroSection />
+      {/* Optimized Hero Section */}
+      <OptimizedHeroSection />
       
-      {/* Features Section */}
-      <FeaturesSection />
+      {/* Optimized Features Section */}
+      <OptimizedFeaturesSection />
       
-      {/* CTA Section */}
+      {/* CTA Section - Keep original for now */}
       <CtaSection />
     </motion.div>
   );
