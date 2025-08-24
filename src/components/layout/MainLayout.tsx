@@ -35,7 +35,7 @@ const MainLayout: React.FC = () => {
       {/* Contenu principal */}
       <main 
         id="main-content" 
-        className="flex-1 pt-16 transition-all duration-200"
+        className="flex-1 transition-all duration-200"
         style={{ marginLeft: sidebarOpen ? '0' : '0' }}
       >
         <Outlet />
