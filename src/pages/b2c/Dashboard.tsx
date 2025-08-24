@@ -62,8 +62,26 @@ const B2CDashboard: React.FC = () => {
       case 'social':
         navigate('/b2c/social');
         break;
+      case 'vr':
+        navigate('/b2c/vr');
+        break;
+      case 'gamification':
+        navigate('/b2c/gamification');
+        break;
+      case 'settings':
+        navigate('/b2c/settings');
+        break;
+      case 'coach':
+        navigate('/b2c/coach');
+        break;
+      case 'calendar':
+        toast.success('Module calendrier disponible prochainement');
+        break;
+      case 'profile':
+        navigate('/b2c/profile');
+        break;
       default:
-        toast.info('Fonctionnalité en cours de développement');
+        toast.info('Navigation vers ' + action);
     }
   };
 

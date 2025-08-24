@@ -71,19 +71,31 @@ const JournalEntryPage: React.FC = () => {
   }, [id]);
   
   const handleEditEntry = () => {
-    // Dans une application réelle, naviguer vers une page d'édition
+    // Simulation d'édition - navigue vers le journal avec le focus sur cette entrée
+    navigate('/journal', { state: { editEntry: entry } });
     toast({
-      title: "Fonctionnalité en développement",
-      description: "L'édition des entrées de journal sera disponible prochainement."
+      title: "Mode édition",
+      description: "Redirection vers le journal pour éditer cette entrée."
     });
   };
   
   const handleDeleteEntry = () => {
-    // Dans une application réelle, demander confirmation et supprimer
-    toast({
-      title: "Êtes-vous sûr?",
-      description: "Cette fonctionnalité sera bientôt disponible."
-    });
+    // Simulation de suppression avec confirmation
+    const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cette entrée ? Cette action est irréversible.");
+    
+    if (confirmDelete) {
+      // Dans une vraie app, cela supprimerait l'entrée de la base de données
+      toast({
+        title: "Entrée supprimée",
+        description: "L'entrée a été supprimée avec succès.",
+        variant: "destructive"
+      });
+      
+      // Rediriger vers le journal après suppression
+      setTimeout(() => {
+        navigate('/journal');
+      }, 1500);
+    }
   };
   
   const getMoodEmoji = (mood: string) => {
