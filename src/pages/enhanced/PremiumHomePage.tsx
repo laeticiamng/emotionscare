@@ -558,7 +558,7 @@ const PremiumHomePage: React.FC = () => {
               <Card className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border-white/10">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white text-xl">Votre Tableau de Bord</CardTitle>
+                    <h2 className="text-white text-xl font-semibold leading-none tracking-tight">Votre Tableau de Bord</h2>
                     <Badge className={cn(
                       "px-3 py-1",
                       userMetrics.mood_trend === 'improving' && "bg-green-500/20 text-green-300 border-green-500/30",
@@ -704,9 +704,9 @@ const PremiumHomePage: React.FC = () => {
                         </div>
                       </div>
                       
-                      <CardTitle className="text-white text-lg group-hover:text-purple-200 transition-colors">
+                      <h3 className="text-white text-lg font-semibold leading-none tracking-tight group-hover:text-purple-200 transition-colors">
                         {feature.title}
-                      </CardTitle>
+                      </h3>
                       <CardDescription className="text-purple-200 text-sm leading-relaxed">
                         {feature.description}
                       </CardDescription>
