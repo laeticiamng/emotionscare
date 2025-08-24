@@ -42,17 +42,17 @@ const OptimizedLayout: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="hidden">
           <BreadcrumbNav />
-          
-          <Suspense fallback={
-            <div className="flex items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          }>
-            <Outlet />
-          </Suspense>
         </div>
+        
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        }>
+          <Outlet />
+        </Suspense>
       </div>
     </>
   );
