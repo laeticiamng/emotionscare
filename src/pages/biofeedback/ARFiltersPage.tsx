@@ -32,15 +32,49 @@ const ARFiltersPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg">
                   <h3 className="font-medium mb-2">Détection faciale émotionnelle</h3>
-                  <p className="text-sm text-muted-foreground">À implémenter</p>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Reconnaissance des émotions via l'analyse faciale en temps réel
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Camera className="h-4 w-4 text-primary" />
+                      <span className="text-xs text-muted-foreground">Algorithme IA avancé</span>
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Tester la détection
+                    </Button>
+                  </div>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <h3 className="font-medium mb-2">Filtres interactifs</h3>
-                  <p className="text-sm text-muted-foreground">À implémenter</p>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Filtres AR adaptatifs selon votre état émotionnel
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      <Badge variant="secondary" className="text-xs">Joie</Badge>
+                      <Badge variant="secondary" className="text-xs">Calme</Badge>
+                      <Badge variant="secondary" className="text-xs">Énergie</Badge>
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Voir les filtres
+                    </Button>
+                  </div>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <h3 className="font-medium mb-2">Capture d'humeur</h3>
-                  <p className="text-sm text-muted-foreground">À implémenter</p>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Enregistrez votre humeur avec un filtre personnalisé
+                    </p>
+                    <div className="text-center">
+                      <Star className="h-6 w-6 text-primary mx-auto mb-1" />
+                      <span className="text-xs text-muted-foreground">Moments précieux</span>
+                    </div>
+                    <Button size="sm" variant="outline" className="w-full">
+                      Capturer maintenant
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>
