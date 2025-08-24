@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/components/theme-provider';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
 import { FontFamily, FontSize } from '@/types';

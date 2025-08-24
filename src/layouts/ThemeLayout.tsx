@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/components/theme-provider';
 
 interface ThemeLayoutProps {
   children: React.ReactNode;

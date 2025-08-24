@@ -8,7 +8,7 @@ import {
   Zap, Moon, Sun, Palette, Move, RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/components/theme-provider';
 
 // Accessibility Settings Context
 interface AccessibilitySettings {

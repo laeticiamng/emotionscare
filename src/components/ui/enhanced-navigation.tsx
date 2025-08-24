@@ -9,7 +9,7 @@ import {
   ChevronDown, Search, Bell, Moon, Sun, Palette
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/components/theme-provider';
 
 interface NavItem {
   name: string;

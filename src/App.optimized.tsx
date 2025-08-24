@@ -9,7 +9,7 @@ import { performanceOptimizer } from '@/lib/performance/performanceOptimizer';
 import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 
 // Lazy load des providers pour réduire le bundle initial
-const ThemeProvider = lazy(() => import('@/contexts/ThemeContext').then(m => ({ default: m.ThemeProvider })));
+const ThemeProvider = lazy(() => import('@/components/theme-provider').then(m => ({ default: m.ThemeProvider })));
 const MusicProvider = lazy(() => import('@/contexts/MusicContext'));
 const AppRouter = lazy(() => import('@/router/AppRouter'));
 
@@ -91,7 +91,7 @@ const App: React.FC = memo(() => {
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
         // Précharger les chunks critiques
-        import('@/contexts/ThemeContext');
+        import('@/components/theme-provider');
         import('@/contexts/MusicContext');
       });
     }

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useOrchestration } from '@/contexts/OrchestrationContext';
 import { Globe, ZoomIn, ZoomOut, Map } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/components/theme-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface EmotionCluster {
