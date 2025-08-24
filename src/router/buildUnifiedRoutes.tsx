@@ -78,6 +78,7 @@ const PageQualityAuditor = lazy(() => import('@/pages/PageQualityAuditor'));
 const TestFeatureCard = lazy(() => import('@/components/debug/TestFeatureCard'));
 const PageHealthCheck = lazy(() => import('@/components/debug/PageHealthCheck'));
 const PageIntegrityChecker = lazy(() => import('@/components/debug/PageIntegrityChecker'));
+const ApiIntegrationChecker = lazy(() => import('@/components/debug/ApiIntegrationChecker'));
 
 // Wrapper component for Suspense
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -554,6 +555,14 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: (
             <SuspenseWrapper>
               <PageIntegrityChecker />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'api-integration-test',
+          element: (
+            <SuspenseWrapper>
+              <ApiIntegrationChecker />
             </SuspenseWrapper>
           ),
         },
