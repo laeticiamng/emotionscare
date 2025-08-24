@@ -12,7 +12,7 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const AuthPage = lazy(() => import('@/pages/AuthPage'));
-const B2BSelectionPage = lazy(() => import('@/pages/b2b/B2BSelectionPage'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 
 // Auth pages (6)
 const B2CLoginPage = lazy(() => import('@/pages/b2c/auth/B2CLoginPage'));
