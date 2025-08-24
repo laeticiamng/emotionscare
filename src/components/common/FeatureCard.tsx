@@ -131,11 +131,17 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             transition={{ duration: 0.6 }}
           >
             {React.isValidElement(icon) ? (
-              icon
+              // C'est déjà un élément JSX comme <Wind className="h-6 w-6" />
+              React.cloneElement(icon, { className: "h-8 w-8 text-white" })
             ) : typeof icon === 'function' ? (
+              // C'est une référence de composant comme Wind
               React.createElement(icon as React.ComponentType<{ className?: string }>, { className: "h-8 w-8 text-white" })
+            ) : typeof icon === 'string' ? (
+              // C'est un émoji ou du texte
+              <span className="text-2xl">{icon}</span>
             ) : (
-              icon
+              // Fallback pour d'autres types
+              <div className="h-8 w-8 text-white flex items-center justify-center">{icon}</div>
             )}
           </motion.div>
 
