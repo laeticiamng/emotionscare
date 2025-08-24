@@ -74,7 +74,9 @@ const SettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
 const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
 const AuditPage = lazy(() => import('@/pages/AuditPage'));
 const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
+const InnovationPage = lazy(() => import('@/pages/InnovationPage'));
 const PlatformAuditPage = lazy(() => import('@/pages/PlatformAuditPage'));
+const CompleteSystemAuditPage = lazy(() => import('@/pages/CompleteSystemAuditPage'));
 
 const RouteAccessibilityChecker = lazy(() => import('@/pages/RouteAccessibilityChecker'));
 const NavigationTestPage = lazy(() => import('@/pages/NavigationTestPage'));
@@ -551,10 +553,26 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           ),
         },
         {
+          path: 'innovation',
+          element: (
+            <SuspenseWrapper>
+              <InnovationPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
           path: 'platform-audit',
           element: (
             <SuspenseWrapper>
               <PlatformAuditPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'system-audit',
+          element: (
+            <SuspenseWrapper>
+              <CompleteSystemAuditPage />
             </SuspenseWrapper>
           ),
         },
