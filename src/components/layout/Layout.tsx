@@ -1,13 +1,13 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { TopNav } from '@/components/layout/TopNav';
+import GlobalNav from '@/components/GlobalNav';
 import Footer from '@/components/layout/Footer';
 
 const Layout: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/10" data-testid="page-root">
-      <TopNav />
+      <GlobalNav />
       
       <main id="main-content" className="flex-1">
         <Outlet />
