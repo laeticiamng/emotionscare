@@ -1,163 +1,278 @@
-
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { memo, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, Brain, Music, Camera, BookOpen, Users, TrendingUp, Zap, Clock, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Heart, Brain, Music, Camera, BookOpen, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
+import PageLayout from '@/components/common/PageLayout';
+import FeatureCard from '@/components/common/FeatureCard';
 
 const B2CDashboardPage: React.FC = () => {
-  const modules = [
+  const navigate = useNavigate();
+
+  // Mock data pour les stats utilisateur
+  const userStats = useMemo(() => ({
+    scansToday: 3,
+    musicSessions: 2,
+    journalEntries: 1,
+    currentMood: 'Positif',
+    streak: 7,
+    totalXP: 1240
+  }), []);
+
+  const quickActions = useMemo(() => [
     {
       title: 'Scan Émotionnel',
-      description: 'Analysez vos émotions en temps réel',
+      description: 'Analysez vos émotions en temps réel avec notre IA avancée',
       icon: Camera,
-      href: '/b2c/scan',
-      color: 'bg-blue-500',
-    },
-    {
-      title: 'Coach IA',
-      description: 'Votre assistant personnel pour le bien-être',
-      icon: Brain,
-      href: '/b2c/coach',
-      color: 'bg-green-500',
+      gradient: 'from-blue-500 to-blue-600',
+      route: '/scan',
+      stats: [
+        { label: 'Aujourd\'hui', value: `${userStats.scansToday}` },
+        { label: 'Précision', value: '95%' }
+      ],
+      isPremium: true,
+      isPopular: true
     },
     {
       title: 'Musicothérapie',
-      description: 'Musique adaptée à vos émotions',
+      description: 'Découvrez la musique parfaite pour votre état émotionnel',
       icon: Music,
-      href: '/b2c/music',
-      color: 'bg-purple-500',
+      gradient: 'from-purple-500 to-purple-600',
+      route: '/music',
+      stats: [
+        { label: 'Sessions', value: `${userStats.musicSessions}` },
+        { label: 'Minutes', value: '45' }
+      ]
+    },
+    {
+      title: 'Coach IA Personnel',
+      description: 'Votre guide bien-être disponible 24/7',
+      icon: Brain,
+      gradient: 'from-green-500 to-green-600',
+      route: '/coach',
+      stats: [
+        { label: 'Conseils', value: '12' },
+        { label: 'Satisfaction', value: '98%' }
+      ],
+      isPremium: true
     },
     {
       title: 'Journal Émotionnel',
-      description: 'Suivez votre parcours émotionnel',
+      description: 'Suivez et analysez votre parcours émotionnel',
       icon: BookOpen,
-      href: '/b2c/journal',
-      color: 'bg-orange-500',
+      gradient: 'from-orange-500 to-orange-600',
+      route: '/journal',
+      stats: [
+        { label: 'Entrées', value: `${userStats.journalEntries}` },
+        { label: 'Cette semaine', value: '5' }
+      ]
     },
     {
-      title: 'Communauté',
-      description: 'Partagez avec d\'autres utilisateurs',
+      title: 'Cocon Social',
+      description: 'Connectez-vous avec une communauté bienveillante',
       icon: Users,
-      href: '/b2c/social',
-      color: 'bg-pink-500',
+      gradient: 'from-pink-500 to-pink-600',
+      route: '/social-cocon',
+      stats: [
+        { label: 'Amis', value: '24' },
+        { label: 'Messages', value: '8' }
+      ]
     },
-  ];
+    {
+      title: 'Gamification',
+      description: 'Transformez votre bien-être en aventure épique',
+      icon: Star,
+      gradient: 'from-yellow-500 to-yellow-600',
+      route: '/gamification',
+      stats: [
+        { label: 'Niveau', value: '7' },
+        { label: 'XP Total', value: `${userStats.totalXP}` }
+      ],
+      isPopular: true
+    }
+  ], [userStats]);
+
+  const recentActivities = useMemo(() => [
+    {
+      type: 'scan',
+      title: 'Scan émotionnel',
+      subtitle: 'Il y a 2 heures',
+      result: 'Joie',
+      icon: Camera,
+      color: 'text-blue-500',
+      bgColor: 'bg-blue-50',
+      badgeColor: 'bg-blue-100 text-blue-700'
+    },
+    {
+      type: 'music',
+      title: 'Session musicale',
+      subtitle: 'Hier soir',
+      result: '15 min',
+      icon: Music,
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-50',
+      badgeColor: 'bg-purple-100 text-purple-700'
+    },
+    {
+      type: 'journal',
+      title: 'Entrée de journal',
+      subtitle: 'Il y a 3 jours',
+      result: 'Réflexion',
+      icon: BookOpen,
+      color: 'text-orange-500',
+      bgColor: 'bg-orange-50',
+      badgeColor: 'bg-orange-100 text-orange-700'
+    }
+  ], []);
+
+  const handleQuickAction = useCallback((route: string, title: string) => {
+    toast.info(`Navigation vers ${title}`);
+    navigate(route);
+  }, [navigate]);
+
+  const handleStartScan = useCallback(() => {
+    toast.success('Démarrage du scan émotionnel', {
+      description: 'Positionnez-vous face à la caméra'
+    });
+    navigate('/scan');
+  }, [navigate]);
+
+  const header = {
+    title: 'Tableau de Bord Personnel',
+    subtitle: 'Bienvenue dans votre espace bien-être',
+    description: 'Suivez votre progression, accédez à vos outils favoris et continuez votre parcours de développement personnel',
+    icon: Heart,
+    badge: 'Espace B2C',
+    stats: [
+      { label: 'Humeur Actuelle', value: userStats.currentMood, icon: Heart, color: 'text-pink-500' },
+      { label: 'Série Active', value: `${userStats.streak} jours`, icon: Zap, color: 'text-yellow-500' },
+      { label: 'Total XP', value: `${userStats.totalXP}`, icon: Star, color: 'text-purple-500' },
+      { label: 'Niveau', value: '7', icon: TrendingUp, color: 'text-green-500' }
+    ],
+    actions: [
+      {
+        label: 'Scanner Maintenant',
+        onClick: handleStartScan,
+        variant: 'default' as const,
+        icon: Camera
+      },
+      {
+        label: 'Voir Profil',
+        onClick: () => navigate('/profile-settings'),
+        variant: 'outline' as const,
+        icon: Users
+      }
+    ]
+  };
+
+  const tips = {
+    title: 'Optimisez votre parcours bien-être',
+    items: [
+      {
+        title: 'Routine Quotidienne',
+        content: 'Effectuez un scan émotionnel chaque matin pour personnaliser votre journée',
+        icon: Clock
+      },
+      {
+        title: 'Écoute Active',
+        content: 'Utilisez la musicothérapie pendant les transitions entre activités',
+        icon: Music
+      },
+      {
+        title: 'Réflexion Continue',
+        content: 'Tenez un journal pour identifier vos patterns émotionnels',
+        icon: BookOpen
+      }
+    ],
+    cta: {
+      label: 'Guide Utilisateur Complet',
+      onClick: () => navigate('/help-center')
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Tableau de bord</h1>
-          <p className="text-muted-foreground">
-            Bienvenue dans votre espace bien-être personnel
-          </p>
-        </div>
-        <Heart className="h-8 w-8 text-pink-500" />
-      </div>
-
-      {/* Welcome Card */}
-      <Card className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-pink-500" />
-            Comment vous sentez-vous aujourd'hui ?
-          </CardTitle>
-          <CardDescription>
-            Prenez un moment pour scanner vos émotions et découvrir la musique parfaite pour votre humeur.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Link to="/b2c/scan">
-            <Button className="bg-pink-500 hover:bg-pink-600">
-              Commencer un scan émotionnel
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-
-      {/* Modules Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {modules.map((module) => {
-          const IconComponent = module.icon;
-          return (
-            <Card key={module.href} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${module.color}`}>
-                    <IconComponent className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{module.title}</CardTitle>
-                    <CardDescription>{module.description}</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Link to={module.href}>
-                  <Button variant="outline" className="w-full">
-                    Accéder
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Activité récente</CardTitle>
-          <CardDescription>
-            Vos dernières sessions et progrès
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Camera className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="font-medium">Scan émotionnel</p>
-                  <p className="text-sm text-muted-foreground">Il y a 2 heures</p>
-                </div>
-              </div>
-              <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                Joie
-              </span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Music className="h-5 w-5 text-purple-500" />
-                <div>
-                  <p className="font-medium">Session musicale</p>
-                  <p className="text-sm text-muted-foreground">Hier</p>
-                </div>
-              </div>
-              <span className="text-sm bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                15 min
-              </span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-orange-500" />
-                <div>
-                  <p className="font-medium">Entrée de journal</p>
-                  <p className="text-sm text-muted-foreground">Il y a 3 jours</p>
-                </div>
-              </div>
-              <span className="text-sm bg-orange-100 text-orange-700 px-2 py-1 rounded">
-                Réflexion
-              </span>
-            </div>
+    <PageLayout header={header} tips={tips}>
+      <div className="space-y-12">
+        {/* Actions Rapides */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-center">
+            Vos Outils de Bien-être
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {quickActions.map((action, index) => (
+              <FeatureCard
+                key={action.title}
+                title={action.title}
+                description={action.description}
+                icon={action.icon}
+                gradient={action.gradient}
+                isPremium={action.isPremium}
+                isPopular={action.isPopular}
+                stats={action.stats}
+                action={{
+                  label: 'Accéder',
+                  onClick: () => handleQuickAction(action.route, action.title)
+                }}
+                index={index}
+              />
+            ))}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        {/* Activité Récente */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <Clock className="h-6 w-6 text-primary" />
+            Activité Récente
+          </h2>
+          
+          <Card className="p-6 bg-background/50 backdrop-blur-sm">
+            <CardContent className="p-0">
+              <div className="space-y-4">
+                {recentActivities.map((activity, index) => {
+                  const IconComponent = activity.icon;
+                  return (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-4 ${activity.bgColor} rounded-lg hover:shadow-md transition-shadow cursor-pointer`}
+                      onClick={() => navigate(`/${activity.type}`)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-lg bg-white shadow-sm`}>
+                          <IconComponent className={`h-5 w-5 ${activity.color}`} />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{activity.title}</p>
+                          <p className="text-sm text-muted-foreground">{activity.subtitle}</p>
+                        </div>
+                      </div>
+                      
+                      <Badge className={activity.badgeColor}>
+                        {activity.result}
+                      </Badge>
+                    </div>
+                  );
+                })}
+                
+                <div className="text-center pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/activity-history')}
+                    className="w-full"
+                  >
+                    Voir tout l'historique
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </PageLayout>
   );
 };
 
-export default B2CDashboardPage;
+export default memo(B2CDashboardPage);

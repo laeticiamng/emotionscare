@@ -74,6 +74,7 @@ const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
 
 const RouteAccessibilityChecker = lazy(() => import('@/pages/RouteAccessibilityChecker'));
 const NavigationTestPage = lazy(() => import('@/pages/NavigationTestPage'));
+const PageQualityAuditor = lazy(() => import('@/pages/PageQualityAuditor'));
 
 // Wrapper component for Suspense
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -548,6 +549,16 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: (
             <SuspenseWrapper>
               <NavigationTestPage />
+            </SuspenseWrapper>
+          ),
+        },
+        
+        // Route d'audit qualité des pages
+        {
+          path: 'page-quality-audit',
+          element: (
+            <SuspenseWrapper>
+              <PageQualityAuditor />
             </SuspenseWrapper>
           ),
         },
