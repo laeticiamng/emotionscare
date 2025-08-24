@@ -15,27 +15,26 @@ export const useAppState = () => {
     isAuthenticated: auth.isAuthenticated,
     user: auth.user,
     isAuthLoading: auth.isLoading,
-    authError: auth.error,
     
     // Mode utilisateur
     currentUserMode: userMode.userMode,
     isModeLoading: userMode.isLoading,
     
     // Layout
-    sidebarCollapsed: layout.sidebarCollapsed,
+    layoutSidebarCollapsed: layout.sidebarCollapsed,
     theme: layout.theme,
     fullscreen: layout.fullscreen,
     
     // Sidebar
-    sidebarOpen: sidebar.isOpen,
+    sidebarCollapsed: sidebar.collapsed,
     
     // Actions
-    signIn: auth.signIn,
-    signUp: auth.signUp,
-    signOut: auth.signOut,
+    login: auth.login,
+    register: auth.register,
+    logout: auth.logout,
     setUserMode: userMode.setUserMode,
     toggleSidebar: layout.toggleSidebar,
     setTheme: layout.setTheme,
-    toggleSidebarOpen: sidebar.toggleSidebar,
+    toggleSidebarCollapsed: sidebar.toggleCollapsed,
   };
 };
