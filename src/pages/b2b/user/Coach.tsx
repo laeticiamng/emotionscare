@@ -142,9 +142,38 @@ const B2BUserCoachPage: React.FC = () => {
                     </Button>
                   </div>
                   
-                  <div className="bg-muted p-4 rounded-lg text-center">
-                    <p className="mb-4">Fonctionnalité en cours de développement</p>
-                    <Button>Commencer la conversation</Button>
+                  <div className="h-96 bg-background rounded-lg border p-4">
+                    <div className="h-full overflow-y-auto space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-medium">
+                          IA
+                        </div>
+                        <div className="bg-muted p-3 rounded-lg max-w-[80%]">
+                          <p className="text-sm">
+                            {activeConversation === 'workplace-wellness' && 
+                              "Bonjour ! Comment se passe votre journée de travail ? Y a-t-il des aspects de votre environnement professionnel qui vous préoccupent ?"
+                            }
+                            {activeConversation === 'stress-management' && 
+                              "Je comprends que le stress professionnel peut être difficile à gérer. Pouvez-vous me parler des situations qui vous stressent le plus au travail ?"
+                            }
+                            {activeConversation === 'communication-skills' && 
+                              "La communication est essentielle au travail. Quels défis rencontrez-vous dans vos interactions avec vos collègues ou votre hiérarchie ?"
+                            }
+                            {activeConversation === 'work-life-balance' && 
+                              "L'équilibre entre vie professionnelle et personnelle est crucial. Comment gérez-vous actuellement cette transition entre travail et vie privée ?"
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Tapez votre message..."
+                        className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <Button>Envoyer</Button>
+                    </div>
                   </div>
                 </div>
               )}

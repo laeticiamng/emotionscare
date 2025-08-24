@@ -28,31 +28,61 @@ const SettingsPage: React.FC = () => {
         >
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <Settings className="h-12 w-12 text-gray-500" />
+              <Settings className="h-12 w-12 text-slate-500" />
             </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-gray-600 to-slate-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-slate-600 to-gray-600 bg-clip-text text-transparent">
               Paramètres
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Personnalisez votre expérience
+              Personnalisez votre expérience bien-être
             </p>
           </div>
 
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Configuration</CardTitle>
-              <CardDescription className="text-center">
-                Fonctionnalité en cours de développement
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Personnalisez vos préférences et paramètres
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Préférences</CardTitle>
+                  <CardDescription>Personnalisez vos paramètres</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span>Notifications push</span>
+                    <Button variant="outline" size="sm">Configurer</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Thème d'interface</span>
+                    <Button variant="outline" size="sm">Changer</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Langue</span>
+                    <Button variant="outline" size="sm">Français</Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Confidentialité</CardTitle>
+                  <CardDescription>Gérez vos données personnelles</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span>Données personnelles</span>
+                    <Button variant="outline" size="sm">Voir</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Partage anonyme</span>
+                    <Button variant="outline" size="sm">Activé</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Export de données</span>
+                    <Button variant="outline" size="sm">Télécharger</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>

@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import B2CGamification from '@/pages/b2c/Gamification';
 
 const GamificationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,21 +37,7 @@ const GamificationPage: React.FC = () => {
             </p>
           </div>
 
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Badges et Défis</CardTitle>
-              <CardDescription className="text-center">
-                Fonctionnalité en cours de développement
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Système de badges et défis pour motiver votre parcours
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <B2CGamification />
         </motion.div>
       </div>
     </div>

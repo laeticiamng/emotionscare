@@ -1,10 +1,12 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { MusicProvider } from '@/contexts/MusicContext';
+import MusicPlayer from '@/components/music/MusicPlayer';
+import MusicRecommendations from '@/components/music/MusicRecommendations';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const MusicPage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,21 +40,33 @@ const MusicPage: React.FC = () => {
             </p>
           </div>
 
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Votre Espace Musical</CardTitle>
-              <CardDescription className="text-center">
-                Fonctionnalité en cours de développement
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Bientôt disponible : votre bibliothèque musicale personnalisée
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <MusicProvider>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Lecteur Musical Thérapeutique</CardTitle>
+                  <CardDescription>
+                    Musique personnalisée selon votre état émotionnel
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <MusicPlayer />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recommandations Personnalisées</CardTitle>
+                  <CardDescription>
+                    Suggestions basées sur votre humeur actuelle
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <MusicRecommendations />
+                </CardContent>
+              </Card>
+            </div>
+          </MusicProvider>
         </motion.div>
       </div>
     </div>

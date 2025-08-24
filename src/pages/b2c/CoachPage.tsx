@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import EnhancedCoachChat from '@/components/coach/EnhancedCoachChat';
 
 const CoachPage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,21 +37,13 @@ const CoachPage: React.FC = () => {
             </p>
           </div>
 
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Assistant Coach</CardTitle>
-              <CardDescription className="text-center">
-                Fonctionnalité en cours de développement
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Votre coach IA personnalisé vous accompagnera bientôt
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="max-w-4xl mx-auto bg-background rounded-lg border shadow-lg">
+            <EnhancedCoachChat 
+              initialMessage="Bonjour ! Je suis votre coach IA personnel. Comment puis-je vous accompagner aujourd'hui dans votre parcours de bien-être ?" 
+              showCharacter={true}
+              showHeader={true}
+            />
+          </div>
         </motion.div>
       </div>
     </div>

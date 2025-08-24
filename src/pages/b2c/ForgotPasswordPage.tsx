@@ -121,7 +121,6 @@ const B2CForgotPasswordPage: React.FC = () => {
                   type="button" 
                   variant="ghost" 
                   className="w-full" 
-                  onClick={() => {}}
                   asChild
                 >
                   <Link to="/b2c/login">
