@@ -310,7 +310,7 @@ const HomePage: React.FC = () => {
                 Essai gratuit particulier
               </Button>
               <Button
-                onClick={() => navigate('/b2b-selection')}
+                onClick={() => navigate('/b2b/selection')}
                 variant="outline"
                 size="lg"
                 className="border-white text-white hover:bg-white hover:text-purple-600 font-semibold px-8 focus-enhanced"

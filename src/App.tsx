@@ -27,11 +27,9 @@ const App: React.FC = () => {
           <AuthProvider>
             <UserModeProvider>
               <MusicProvider>
-                <div className="min-h-screen bg-background">
-                  <RootErrorBoundary>
-                    <AppRouter />
-                  </RootErrorBoundary>
-                </div>
+                <RootErrorBoundary>
+                  <AppRouter />
+                </RootErrorBoundary>
               </MusicProvider>
             </UserModeProvider>
           </AuthProvider>

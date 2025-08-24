@@ -89,7 +89,7 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
   return [
     {
       path: '/',
-      element: <Layout />,
+      element: <MainLayout />,
       children: [
         {
           index: true,

@@ -1,24 +1,30 @@
-
 import React from 'react';
-import UnifiedNavigation from '@/components/navigation/UnifiedNavigation';
-import PremiumLayout from './PremiumLayout';
+import { Outlet } from 'react-router-dom';
+import GlobalNavigation from '@/components/navigation/GlobalNavigation';
+import BreadcrumbNavigation from '@/components/navigation/BreadcrumbNavigation';
+import QuickAccessPanel from '@/components/navigation/QuickAccessPanel';
+import SkipToContent from '@/components/accessibility/SkipToContent';
 
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
-
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC = () => {
   return (
-    <PremiumLayout>
-      <div className="min-h-screen flex">
-        <UnifiedNavigation />
-        <main className="flex-1 ml-72 p-6">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
-      </div>
-    </PremiumLayout>
+    <div className="min-h-screen bg-background">
+      {/* Skip to content pour l'accessibilité */}
+      <SkipToContent />
+      
+      {/* Navigation globale (menu hamburger) */}
+      <GlobalNavigation />
+      
+      {/* Fil d'Ariane */}
+      <BreadcrumbNavigation />
+      
+      {/* Contenu principal */}
+      <main id="main-content" className="flex-1">
+        <Outlet />
+      </main>
+      
+      {/* Panneau d'accès rapide */}
+      <QuickAccessPanel />
+    </div>
   );
 };
 
