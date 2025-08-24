@@ -30,6 +30,7 @@ const VRPage = lazy(() => import('@/pages/features/VRPage'));
 const PreferencesPage = lazy(() => import('@/pages/features/PreferencesPage'));
 const GamificationPage = lazy(() => import('@/pages/features/GamificationPage'));
 const SocialCoconPage = lazy(() => import('@/pages/features/SocialCoconPage'));
+const DemoPage = lazy(() => import('@/pages/DemoPage'));
 
 // Modules fun-first avec IA (11)
 const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
@@ -118,6 +119,14 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: (
             <SuspenseWrapper>
               <ChooseModePage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'demo',
+          element: (
+            <SuspenseWrapper>
+              <DemoPage />
             </SuspenseWrapper>
           ),
         },

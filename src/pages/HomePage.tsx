@@ -81,11 +81,11 @@ const HomePage: React.FC = () => {
     },
     {
       id: 'immersive-meditation',
-      title: 'Méditation Immersive',
+      title: 'Méditation Immersive', 
       description: 'Expériences de méditation avec environnements 3D',
       icon: Waves,
       gradient: 'from-blue-500 to-cyan-600',
-      route: '/meditation',
+      route: '/breathwork',
       premium: true,
       stats: '200+ sessions'
     },
@@ -115,7 +115,7 @@ const HomePage: React.FC = () => {
       description: 'Communauté bienveillante et groupes de soutien',
       icon: Users,
       gradient: 'from-pink-500 to-rose-600',
-      route: '/social',
+      route: '/social-cocon',
       premium: false,
       stats: '10k+ membres'
     },
@@ -125,7 +125,7 @@ const HomePage: React.FC = () => {
       description: 'Intégration avec vos appareils de santé',
       icon: Heart,
       gradient: 'from-red-500 to-pink-600',
-      route: '/biometrics',
+      route: '/weekly-bars',
       premium: true,
       stats: 'Multi-appareils'
     }
@@ -422,7 +422,7 @@ const HomePage: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate('/demo')}
+                onClick={() => navigate('/onboarding')}
                 className="border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg rounded-full backdrop-blur-md"
               >
                 <Play className="mr-2 h-5 w-5" />
