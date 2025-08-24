@@ -90,13 +90,15 @@ const JournalPage: React.FC = () => {
         actions: [
           {
             label: 'Nouvelle Entrée',
-            onClick: () => console.log('New entry'),
+            onClick: () => {
+              document.getElementById('nouvelle-entree')?.scrollIntoView({ behavior: 'smooth' });
+            },
             variant: 'default',
             icon: Plus
           },
           {
             label: 'Statistiques',
-            onClick: () => console.log('Statistics'),
+            onClick: () => navigate('/journal/statistics'),
             variant: 'outline',
             icon: BarChart3
           }
@@ -123,13 +125,13 @@ const JournalPage: React.FC = () => {
         ],
         cta: {
           label: 'Guide du journal émotionnel',
-          onClick: () => console.log('Journal guide')
+          onClick: () => navigate('/help-center#journal-guide')
         }
       }}
     >
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Nouvelle entrée */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1" id="nouvelle-entree">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

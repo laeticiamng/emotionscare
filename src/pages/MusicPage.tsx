@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Music2, Heart, Timer, TrendingUp } from 'lucide-react';
 import PageLayout from '@/components/common/PageLayout';
-import FeatureCard from '@/components/common/FeatureCard';
+import { useNavigate } from 'react-router-dom';
 
 const MusicPage: React.FC = () => {
+  const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -168,7 +169,7 @@ const MusicPage: React.FC = () => {
           },
           {
             label: 'Ma Playlist',
-            onClick: () => console.log('My playlist'),
+            onClick: () => navigate('/music/playlist'),
             variant: 'outline',
             icon: Heart
           }
@@ -195,7 +196,7 @@ const MusicPage: React.FC = () => {
         ],
         cta: {
           label: 'Guide de musicothérapie',
-          onClick: () => console.log('Music therapy guide')
+          onClick: () => navigate('/help-center#music-therapy-guide')
         }
       }}
     >

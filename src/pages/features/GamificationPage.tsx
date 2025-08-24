@@ -7,8 +7,10 @@ import FeatureCard from '@/components/common/FeatureCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 const GamificationPage: React.FC = () => {
+  const navigate = useNavigate();
   const achievements = [
     { title: "Premier Pas", description: "Première séance complétée", icon: "🎯", unlocked: true },
     { title: "Régularité", description: "7 jours consécutifs", icon: "📅", unlocked: true },
@@ -84,13 +86,13 @@ const GamificationPage: React.FC = () => {
         actions: [
           {
             label: 'Nouvelle Mission',
-            onClick: () => console.log('New mission'),
+            onClick: () => navigate('/gamification/missions'),
             variant: 'default',
             icon: Target
           },
           {
             label: 'Classement',
-            onClick: () => console.log('Leaderboard'),
+            onClick: () => navigate('/gamification/leaderboard'),
             variant: 'outline',
             icon: BarChart3
           }
@@ -117,7 +119,7 @@ const GamificationPage: React.FC = () => {
         ],
         cta: {
           label: 'Guide de la gamification',
-          onClick: () => console.log('Gamification guide')
+          onClick: () => navigate('/help-center#gamification-guide')
         }
       }}
     >
@@ -203,7 +205,7 @@ const GamificationPage: React.FC = () => {
                 metadata={[{ label: 'Coût', value: reward.cost }]}
                 action={{
                   label: 'Échanger',
-                  onClick: () => console.log(`Exchange for ${reward.title}`)
+                  onClick: () => navigate('/gamification/exchange')
                 }}
               />
             ))}

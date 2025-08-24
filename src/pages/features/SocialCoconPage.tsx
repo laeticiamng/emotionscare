@@ -6,9 +6,10 @@ import PageLayout from '@/components/common/PageLayout';
 import FeatureCard from '@/components/common/FeatureCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 const SocialCoconPage: React.FC = () => {
+  const navigate = useNavigate();
   const communityEvents = [
     {
       title: "Méditation de Groupe",
@@ -51,28 +52,28 @@ const SocialCoconPage: React.FC = () => {
       description: 'Partagez votre humeur et vos ressentis du jour',
       icon: <MessageCircle className="h-6 w-6" />,
       gradient: 'from-blue-500 to-cyan-500',
-      action: () => console.log('Create post')
+      action: () => navigate('/social-cocon/create-post')
     },
     {
       title: 'Trouver un Buddy',
       description: 'Connectez-vous avec quelqu\'un qui partage vos objectifs',
       icon: <UserPlus className="h-6 w-6" />,
       gradient: 'from-green-500 to-emerald-500',
-      action: () => console.log('Find buddy')
+      action: () => navigate('/social-cocon/find-buddy')
     },
     {
       title: 'Rejoindre un Groupe',
       description: 'Participez à des sessions collectives de bien-être',
       icon: <Users className="h-6 w-6" />,
       gradient: 'from-purple-500 to-violet-500',
-      action: () => console.log('Join group')
+      action: () => navigate('/social-cocon/groups')
     },
     {
       title: 'Événements',
       description: 'Découvrez les prochains événements communautaires',
       icon: <Calendar className="h-6 w-6" />,
       gradient: 'from-orange-500 to-red-500',
-      action: () => console.log('View events')
+      action: () => navigate('/social-cocon/events')
     }
   ];
 
@@ -114,13 +115,13 @@ const SocialCoconPage: React.FC = () => {
         actions: [
           {
             label: 'Rejoindre Event',
-            onClick: () => console.log('Join event'),
+            onClick: () => navigate('/social-cocon/events'),
             variant: 'default',
             icon: Calendar
           },
           {
             label: 'Mon Profil',
-            onClick: () => console.log('My profile'),
+            onClick: () => navigate('/profile'),
             variant: 'outline',
             icon: Users
           }

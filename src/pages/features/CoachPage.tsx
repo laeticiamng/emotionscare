@@ -1,41 +1,45 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Brain, Calendar, TrendingUp, Sparkles, Clock, Target, Users } from 'lucide-react';
 import PageLayout from '@/components/common/PageLayout';
 import FeatureCard from '@/components/common/FeatureCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const CoachPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const coachFeatures = [
     {
       title: 'Chat avec le Coach',
       description: 'Discutez avec votre coach IA pour obtenir des conseils personnalisés',
       icon: <MessageCircle className="h-6 w-6" />,
       gradient: 'from-blue-500 to-cyan-500',
-      action: () => console.log('Start chat')
+      action: () => navigate('/coach/chat')
     },
     {
       title: 'Exercices Guidés',
       description: 'Accédez à des exercices de respiration et de méditation',
       icon: <Brain className="h-6 w-6" />,
       gradient: 'from-purple-500 to-violet-500',
-      action: () => console.log('View exercises')
+      action: () => navigate('/breathwork')
     },
     {
       title: 'Plans Personnalisés',
       description: 'Programmes adaptés à vos objectifs et votre rythme',
       icon: <Target className="h-6 w-6" />,
       gradient: 'from-green-500 to-emerald-500',
-      action: () => console.log('Create plan')
+      action: () => navigate('/coach/plan')
     },
     {
       title: 'Suivi Progrès',
       description: 'Analysez votre évolution avec des métriques détaillées',
       icon: <TrendingUp className="h-6 w-6" />,
       gradient: 'from-orange-500 to-red-500',
-      action: () => console.log('View progress')
+      action: () => navigate('/coach/progress')
     }
   ];
 
@@ -90,13 +94,13 @@ const CoachPage: React.FC = () => {
         actions: [
           {
             label: 'Nouvelle Session',
-            onClick: () => console.log('New session'),
+            onClick: () => navigate('/coach/chat'),
             variant: 'default',
             icon: MessageCircle
           },
           {
             label: 'Mon Plan',
-            onClick: () => console.log('My plan'),
+            onClick: () => navigate('/coach/plan'),
             variant: 'outline',
             icon: Calendar
           }
@@ -123,7 +127,7 @@ const CoachPage: React.FC = () => {
         ],
         cta: {
           label: 'Guide du coaching IA',
-          onClick: () => console.log('Coaching guide')
+          onClick: () => navigate('/coach/chat')
         }
       }}
     >
@@ -141,7 +145,7 @@ const CoachPage: React.FC = () => {
                 gradient={feature.gradient}
                 action={{
                   label: 'Commencer',
-                  onClick: feature.action
+                  onClick: () => navigate('/coach/chat')
                 }}
               />
             ))}
@@ -170,7 +174,7 @@ const CoachPage: React.FC = () => {
                   </span>
                 </div>
               ))}
-              <Button className="w-full mt-4" variant="outline">
+              <Button className="w-full mt-4" variant="outline" onClick={() => navigate('/coach/schedule')}>
                 <Calendar className="h-4 w-4 mr-2" />
                 Voir le planning complet
               </Button>
@@ -218,7 +222,7 @@ const CoachPage: React.FC = () => {
             <p className="text-muted-foreground mb-6">
               Votre coach IA vous attend pour une conversation personnalisée selon votre humeur du moment.
             </p>
-            <Button size="lg" className="px-8">
+            <Button size="lg" className="px-8" onClick={() => navigate('/coach/chat')}>
               <MessageCircle className="h-5 w-5 mr-2" />
               Démarrer une conversation
             </Button>

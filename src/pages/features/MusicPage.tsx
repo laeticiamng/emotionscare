@@ -408,7 +408,10 @@ const MemoizedCategoryCard = memo<{
           <Button 
             variant="outline" 
             className="w-full" 
-            onClick={() => console.log(`Voir toute la playlist ${category.title}`)}
+            onClick={() => {
+              announce(`Affichage de toute la playlist ${category.title}`);
+              // Ici on pourrait ouvrir une vue détaillée de la playlist
+            }}
           >
             Voir toute la playlist
           </Button>

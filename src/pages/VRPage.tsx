@@ -105,13 +105,17 @@ const VRPage: React.FC = () => {
         actions: [
           {
             label: 'Nouvelle Session',
-            onClick: () => console.log('New VR session'),
+        onClick: () => {
+          window.open('/vr-session', '_blank');  
+        },
             variant: 'default',
             icon: Play
           },
           {
             label: 'Paramètres VR',
-            onClick: () => console.log('VR settings'),
+        onClick: () => {
+          window.location.href = '/vr-settings';
+        },
             variant: 'outline',
             icon: Settings
           }
@@ -138,7 +142,9 @@ const VRPage: React.FC = () => {
         ],
         cta: {
           label: 'Guide d\'utilisation VR',
-          onClick: () => console.log('VR guide')
+          onClick: () => {
+            window.open('/help-center#vr-guide', '_blank');
+          }
         }
       }}
     >
