@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { motion, useReducedMotion, useMotionValue, useTransform, AnimatePresence, useViewportScroll, useScroll, useSpring, useAnimation } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, useReducedMotion, useMotionValue, useTransform, AnimatePresence, useViewportScroll } from 'framer-motion';
 import { 
   Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, 
   Zap, Globe, Shield, Target, Trophy, Mic, Camera, Volume2, 
@@ -11,7 +11,7 @@ import {
   Palette, Brush, Wand2, Stars, Compass, Map, Navigation,
   Timer, Stopwatch, AlarmClock, Coffee, BookOpen, Lightbulb,
   Rocket, Award, Medal, Crown, Gem, Diamond, Infinity,
-  MousePointer2, Fingerprint, ScanLine, Radar, Crosshair
+  MousePointer2, Fingerprint, ScanLine, Radar, Crosshair, Watch
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -89,7 +89,6 @@ const PremiumHomePage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const particleCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
-  const controls = useAnimation();
   
   // États avancés de l'interface
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -158,7 +157,7 @@ const PremiumHomePage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Système de particules interactives
+  // Système de particules interactives (simplifié)
   useEffect(() => {
     if (!particleCanvasRef.current || shouldReduceMotion || !immersiveElements.showParticles) return;
 
@@ -166,52 +165,58 @@ const PremiumHomePage: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Réduire la fréquence de mise à jour du canvas pour éviter les problèmes de performance
+    let lastUpdateTime = 0;
+    const targetFPS = 30; // Limiter à 30 FPS
+    const frameDuration = 1000 / targetFPS;
+
+    canvas.width = Math.min(window.innerWidth, 1920);
+    canvas.height = Math.min(window.innerHeight, 1080);
 
     const createParticle = (): InteractiveParticle => ({
       id: Math.random().toString(36).substr(2, 9),
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 2,
-      vy: (Math.random() - 0.5) * 2,
-      size: Math.random() * 3 + 1,
-      opacity: Math.random() * 0.5 + 0.1,
+      vx: (Math.random() - 0.5) * 1, // Réduire la vitesse
+      vy: (Math.random() - 0.5) * 1,
+      size: Math.random() * 2 + 1, // Réduire la taille
+      opacity: Math.random() * 0.3 + 0.1, // Réduire l'opacité
       color: ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B'][Math.floor(Math.random() * 4)],
       life: 1
     });
 
-    const initialParticles = Array.from({ length: 50 }, createParticle);
-    setParticles(initialParticles);
+    const particlePool = Array.from({ length: 25 }, createParticle); // Réduire le nombre de particules
 
-    const animateParticles = () => {
+    const animateParticles = (timestamp: number) => {
+      if (timestamp - lastUpdateTime < frameDuration) {
+        animationRef.current = requestAnimationFrame(animateParticles);
+        return;
+      }
+      lastUpdateTime = timestamp;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      setParticles(prevParticles => {
-        return prevParticles.map(particle => {
-          // Update position
-          particle.x += particle.vx;
-          particle.y += particle.vy;
-          
-          // Boundary collision
-          if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-          if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
-          
-          // Draw particle
-          ctx.globalAlpha = particle.opacity;
-          ctx.fillStyle = particle.color;
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-          ctx.fill();
-          
-          return particle;
-        });
+      particlePool.forEach(particle => {
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        
+        // Boundary collision
+        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        
+        // Draw particle
+        ctx.globalAlpha = particle.opacity;
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
       });
 
       animationRef.current = requestAnimationFrame(animateParticles);
     };
 
-    animateParticles();
+    animationRef.current = requestAnimationFrame(animateParticles);
 
     return () => {
       if (animationRef.current) {
@@ -220,67 +225,98 @@ const PremiumHomePage: React.FC = () => {
     };
   }, [shouldReduceMotion, immersiveElements.showParticles]);
 
-  // Monitoring des performances en temps réel
+  // Monitoring des performances en temps réel (optimisé)
   useEffect(() => {
+    let mounted = true;
+    
     const updatePerformanceMetrics = () => {
-      const now = performance.now();
-      const memory = (performance as any).memory;
+      if (!mounted) return;
       
-      setPerformanceMetrics({
-        cpu_usage: Math.random() * 40 + 10, // Simulation
-        memory_usage: memory ? (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100 : Math.random() * 60 + 20,
-        network_latency: Math.random() * 50 + 10,
-        frame_rate: Math.round(1000 / (now - (window as any).lastFrameTime || now)),
-        ai_response_time: Math.random() * 200 + 100
-      });
-      
-      (window as any).lastFrameTime = now;
+      try {
+        const memory = (performance as any).memory;
+        
+        setPerformanceMetrics({
+          cpu_usage: Math.random() * 40 + 10, // Simulation
+          memory_usage: memory ? Math.min((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100, 100) : Math.random() * 60 + 20,
+          network_latency: Math.random() * 50 + 10,
+          frame_rate: 60, // Valeur fixe pour éviter les calculs complexes
+          ai_response_time: Math.random() * 200 + 100
+        });
+      } catch (error) {
+        console.warn('Performance metrics error:', error);
+      }
     };
 
-    const interval = setInterval(updatePerformanceMetrics, 2000);
+    const interval = setInterval(updatePerformanceMetrics, 5000); // Réduire la fréquence
     updatePerformanceMetrics();
 
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
-  // Cursor trail effect
+  // Cursor trail effect (simplifié)
   useEffect(() => {
     if (shouldReduceMotion || deviceOptimization === 'mobile') return;
+
+    let trailTimeout: NodeJS.Timeout;
 
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
       setCursorTrail(prev => [
-        ...prev.slice(-10),
+        ...prev.slice(-5), // Réduire la longueur du trail
         { x: e.clientX, y: e.clientY, timestamp: now }
       ]);
+
+      // Nettoyer le trail automatiquement
+      clearTimeout(trailTimeout);
+      trailTimeout = setTimeout(() => {
+        setCursorTrail([]);
+      }, 2000);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(trailTimeout);
+    };
   }, [shouldReduceMotion, deviceOptimization]);
 
-  // Simulation de données biométriques
+  // Simulation de données biométriques (optimisée)
   useEffect(() => {
     if (!immersiveElements.biometricSync) return;
 
+    let mounted = true;
+
     const updateBiometrics = () => {
+      if (!mounted) return;
+      
       setBiometricData(prev => ({
-        heartRate: Math.max(60, Math.min(100, prev.heartRate + (Math.random() - 0.5) * 4)),
-        stressIndex: Math.max(0, Math.min(100, prev.stressIndex + (Math.random() - 0.5) * 8)),
-        focusLevel: Math.max(0, Math.min(100, prev.focusLevel + (Math.random() - 0.5) * 6)),
-        energyLevel: Math.max(0, Math.min(100, prev.energyLevel + (Math.random() - 0.5) * 5))
+        heartRate: Math.max(60, Math.min(100, prev.heartRate + (Math.random() - 0.5) * 2)), // Réduire la variation
+        stressIndex: Math.max(0, Math.min(100, prev.stressIndex + (Math.random() - 0.5) * 4)),
+        focusLevel: Math.max(0, Math.min(100, prev.focusLevel + (Math.random() - 0.5) * 3)),
+        energyLevel: Math.max(0, Math.min(100, prev.energyLevel + (Math.random() - 0.5) * 2))
       }));
     };
 
-    const interval = setInterval(updateBiometrics, 3000);
-    return () => clearInterval(interval);
+    const interval = setInterval(updateBiometrics, 5000); // Moins fréquent
+    
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [immersiveElements.biometricSync]);
 
-  // IA Insights génération
+  // IA Insights génération (optimisée)
   useEffect(() => {
     if (!isAuthenticated || !userMetrics) return;
 
+    let mounted = true;
+
     const generateAIInsights = () => {
+      if (!mounted) return;
+      
       const insights = [
         "Votre niveau de stress a diminué de 15% cette semaine 📉",
         "Moment optimal pour une séance de méditation détecté 🧘‍♀️",
@@ -293,10 +329,13 @@ const PremiumHomePage: React.FC = () => {
       setAiInsights(insights.slice(0, 3));
     };
 
-    const interval = setInterval(generateAIInsights, 15000);
+    const interval = setInterval(generateAIInsights, 30000); // Moins fréquent
     generateAIInsights();
 
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [isAuthenticated, userMetrics]);
 
   // Mode immersif toggle
@@ -542,7 +581,7 @@ const PremiumHomePage: React.FC = () => {
           id: 'biometric-sync',
           title: 'Synchronisation Biométrique',
           description: 'Intégration Apple Watch, Fitbit, Oura avec IA prédictive de santé mentale',
-          icon: Smartwatch,
+          icon: Watch,
           gradient: 'from-cyan-400 via-blue-500 to-purple-500',
           route: '/breathwork',
           premium: true,
