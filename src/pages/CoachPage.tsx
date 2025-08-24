@@ -1,20 +1,32 @@
-
-import React from 'react';
-import EnhancedCoachPage from '@/pages/enhanced/EnhancedCoachPage';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { PageRoot } from '@/components/common/PageRoot';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Bot, User, Send, Lightbulb } from 'lucide-react';
+import { useMood } from '@/contexts/MoodContext';
+import { useActivityLogger } from '@/hooks/useActivityLogger';
 
 const CoachPage: React.FC = () => {
-  return <EnhancedCoachPage />;
-};
   const navigate = useNavigate();
+  const { currentMood } = useMood();
+  const { logActivity } = useActivityLogger();
+  
   const [messages, setMessages] = useState([
     {
       id: 1,
-      sender: 'coach',
+      sender: 'coach' as const,
       content: 'Bonjour ! Je suis votre coach IA personnel. Comment vous sentez-vous aujourd\'hui ?',
       timestamp: new Date().toISOString()
     }
   ]);
   const [newMessage, setNewMessage] = useState('');
+
+  React.useEffect(() => {
+    logActivity('/coach', 'ai_coach_page');
+  }, [logActivity]);
 
   const suggestions = [
     "Je me sens stressé au travail",
@@ -49,7 +61,7 @@ const CoachPage: React.FC = () => {
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <PageRoot className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -176,15 +188,21 @@ const CoachPage: React.FC = () => {
                   <div className="space-y-3">
                     <div className="p-3 bg-green-50 rounded-lg">
                       <div className="text-sm font-medium text-green-800">Humeur</div>
-                      <div className="text-xs text-green-600">Positive (85%)</div>
+                      <div className="text-xs text-green-600">
+                        {currentMood ? `${Math.round(currentMood.valence * 100)}%` : 'Non détectée'}
+                      </div>
                     </div>
                     <div className="p-3 bg-blue-50 rounded-lg">
                       <div className="text-sm font-medium text-blue-800">Énergie</div>
-                      <div className="text-xs text-blue-600">Élevée (78%)</div>
+                      <div className="text-xs text-blue-600">
+                        {currentMood ? `${Math.round(currentMood.arousal * 100)}%` : 'Non détectée'}
+                      </div>
                     </div>
                     <div className="p-3 bg-purple-50 rounded-lg">
-                      <div className="text-sm font-medium text-purple-800">Stress</div>
-                      <div className="text-xs text-purple-600">Faible (22%)</div>
+                      <div className="text-sm font-medium text-purple-800">Bien-être</div>
+                      <div className="text-xs text-purple-600">
+                        {currentMood ? `${Math.round((currentMood.valence + currentMood.arousal) * 50)}%` : 'En attente'}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -217,13 +235,20 @@ const CoachPage: React.FC = () => {
                   >
                     📝 Écrire dans le journal
                   </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/breathwork')}
+                  >
+                    🫁 Exercices de respiration
+                  </Button>
                 </CardContent>
               </Card>
             </div>
           </div>
         </motion.div>
       </div>
-    </div>
+    </PageRoot>
   );
 };
 
