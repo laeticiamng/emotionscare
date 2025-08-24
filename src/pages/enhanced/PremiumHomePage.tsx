@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { 
   Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, 
   Zap, Globe, Shield, Target, Trophy, Activity, TrendingUp, 
-  Play, Sun, Moon, ChevronDown
+  Play, Sun, Moon, ChevronDown, Settings, Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase';
 import ResponsiveWrapper from '@/components/responsive/ResponsiveWrapper';
-import { NavigationButton } from '@/components/ui/navigation-button';
 import { cn } from '@/lib/utils';
 
 interface UserMetrics {
@@ -310,25 +309,25 @@ const PremiumHomePage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
             >
-              <NavigationButton
-                to="/choose-mode"
+              <Button
+                onClick={() => navigate('/choose-mode')}
                 size="lg"
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg rounded-full shadow-2xl hover:shadow-purple-500/25 border-0"
-                showArrow
               >
                 <Zap className="mr-2 h-5 w-5" />
                 Commencer Maintenant
-              </NavigationButton>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
               
-              <NavigationButton
-                to="/demo"
+              <Button
+                onClick={() => navigate('/demo')}
                 variant="outline"
                 size="lg"
                 className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg rounded-full backdrop-blur-md"
               >
                 <Play className="mr-2 h-5 w-5" />
                 Découvrir
-              </NavigationButton>
+              </Button>
             </motion.div>
 
             {/* Quick Stats */}
@@ -516,14 +515,14 @@ const PremiumHomePage: React.FC = () => {
                         </div>
                       </div>
                       
-                      <NavigationButton
-                        to={feature.route}
+                      <Button
+                        onClick={() => navigate(feature.route)}
                         className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20"
                         variant="outline"
-                        showArrow
                       >
                         Explorer
-                      </NavigationButton>
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>

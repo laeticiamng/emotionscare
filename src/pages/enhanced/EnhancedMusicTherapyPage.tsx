@@ -10,7 +10,7 @@ import {
   Play, Pause, SkipBack, SkipForward, Volume2, Music2, Heart, Timer, 
   TrendingUp, Shuffle, Repeat, Download, Share2, Sparkles, Wand2,
   Headphones, Activity, ArrowLeft, Mic, Brain, Zap, Wind, Sun, Moon,
-  Coffee, Smile, Target, Cloud, Mountain, Waves, Globe
+  Coffee, Smile, Target, Cloud, Mountain, Waves, Globe, Loader2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import ResponsiveWrapper from '@/components/responsive/ResponsiveWrapper';
 import { supabase } from '@/integrations/supabase/client';
-import FunctionalButton from '@/components/ui/functional-button';
 import { cn } from '@/lib/utils';
 
 interface Track {
@@ -173,6 +172,8 @@ const EnhancedMusicTherapyPage: React.FC = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePersonalizedMusic = async () => {
     if (!emotionalPrompt.trim() && !selectedMood) {
@@ -454,17 +455,14 @@ const EnhancedMusicTherapyPage: React.FC = () => {
                 </div>
               </div>
 
-              <FunctionalButton
-                actionId="generate-music"
+              <Button
                 onClick={generatePersonalizedMusic}
                 disabled={isGenerating || (!emotionalPrompt.trim() && !selectedMood)}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-4"
-                loadingText="Génération IA en cours..."
-                successMessage="Musique thérapeutique générée avec succès !"
               >
                 {isGenerating ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                     Création par Suno IA...
                   </div>
                 ) : (
@@ -473,7 +471,7 @@ const EnhancedMusicTherapyPage: React.FC = () => {
                     Générer ma Thérapie Musicale
                   </div>
                 )}
-              </FunctionalButton>
+              </Button>
             </CardContent>
           </Card>
 
@@ -541,61 +539,68 @@ const EnhancedMusicTherapyPage: React.FC = () => {
 
               {/* Contrôles */}
               <div className="flex items-center justify-center space-x-6">
-                <FunctionalButton
-                  actionId="shuffle"
-                  onClick={() => setIsShuffling(!isShuffling)}
+                <Button
+                  onClick={() => {
+                    setIsShuffling(!isShuffling);
+                    toast({
+                      title: isShuffling ? "Lecture séquentielle" : "Lecture aléatoire",
+                      description: isShuffling ? "Mode aléatoire désactivé" : "Les pistes seront mélangées"
+                    });
+                  }}
                   variant="ghost"
                   size="sm"
                   className={cn("w-12 h-12 rounded-full", isShuffling && "text-purple-600 bg-purple-100")}
                 >
                   <Shuffle className="h-5 w-5" />
-                </FunctionalButton>
+                </Button>
 
-                <FunctionalButton
-                  actionId="prev-track"
+                <Button
                   onClick={handlePrevTrack}
                   variant="ghost"
                   size="sm"
                   className="w-12 h-12 rounded-full"
                 >
                   <SkipBack className="h-6 w-6" />
-                </FunctionalButton>
+                </Button>
 
-                <FunctionalButton
-                  actionId="play-pause"
+                <Button
                   onClick={handlePlayPause}
                   size="lg"
                   className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                   disabled={currentTrack.isGenerating}
                 >
                   {isLoading || currentTrack.isGenerating ? (
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+                    <Loader2 className="h-8 w-8 animate-spin" />
                   ) : isPlaying ? (
                     <Pause className="h-8 w-8" />
                   ) : (
                     <Play className="h-8 w-8" />
                   )}
-                </FunctionalButton>
+                </Button>
 
-                <FunctionalButton
-                  actionId="next-track"
+                <Button
                   onClick={handleNextTrack}
                   variant="ghost"
                   size="sm"
                   className="w-12 h-12 rounded-full"
                 >
                   <SkipForward className="h-6 w-6" />
-                </FunctionalButton>
+                </Button>
 
-                <FunctionalButton
-                  actionId="repeat"
-                  onClick={() => setIsRepeating(!isRepeating)}
+                <Button
+                  onClick={() => {
+                    setIsRepeating(!isRepeating);
+                    toast({
+                      title: isRepeating ? "Répétition désactivée" : "Répétition activée",
+                      description: isRepeating ? "Lecture normale" : "La piste sera répétée"
+                    });
+                  }}
                   variant="ghost"
                   size="sm"
                   className={cn("w-12 h-12 rounded-full", isRepeating && "text-purple-600 bg-purple-100")}
                 >
                   <Repeat className="h-5 w-5" />
-                </FunctionalButton>
+                </Button>
               </div>
 
               {/* Contrôle volume */}
@@ -625,8 +630,7 @@ const EnhancedMusicTherapyPage: React.FC = () => {
                 </div>
                 
                 <div className="flex gap-2">
-                  <FunctionalButton
-                    actionId="export-playlist"
+                  <Button
                     onClick={async () => {
                       toast({
                         title: "Export réussi",
@@ -638,10 +642,9 @@ const EnhancedMusicTherapyPage: React.FC = () => {
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Exporter
-                  </FunctionalButton>
+                  </Button>
                   
-                  <FunctionalButton
-                    actionId="share-playlist"
+                  <Button
                     onClick={async () => {
                       toast({
                         title: "Lien copié",
@@ -653,7 +656,7 @@ const EnhancedMusicTherapyPage: React.FC = () => {
                   >
                     <Share2 className="h-4 w-4 mr-2" />
                     Partager
-                  </FunctionalButton>
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -740,8 +743,7 @@ const EnhancedMusicTherapyPage: React.FC = () => {
 
           {/* Actions avancées */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FunctionalButton
-              actionId="analyze-session"
+            <Button
               onClick={async () => {
                 toast({
                   title: "Analyse terminée",
@@ -753,20 +755,18 @@ const EnhancedMusicTherapyPage: React.FC = () => {
             >
               <Brain className="mr-2 h-5 w-5" />
               Analyser ma Session
-            </FunctionalButton>
+            </Button>
 
-            <FunctionalButton
-              actionId="view-progress"
+            <Button
               onClick={() => navigate('/weekly-bars')}
               className="flex-1 py-6"
               variant="outline"
             >
               <TrendingUp className="mr-2 h-5 w-5" />
               Voir mes Progrès
-            </FunctionalButton>
+            </Button>
 
-            <FunctionalButton
-              actionId="schedule-therapy"
+            <Button
               onClick={async () => {
                 toast({
                   title: "Thérapie programmée",
@@ -778,7 +778,7 @@ const EnhancedMusicTherapyPage: React.FC = () => {
             >
               <Timer className="mr-2 h-5 w-5" />
               Programmer Thérapie
-            </FunctionalButton>
+            </Button>
           </div>
         </div>
       </div>

@@ -17,7 +17,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import ResponsiveWrapper from '@/components/responsive/ResponsiveWrapper';
 import { supabase } from '@/integrations/supabase/client';
-import FunctionalButton from '@/components/ui/functional-button';
 import { cn } from '@/lib/utils';
 
 interface EmotionResult {
@@ -705,15 +704,13 @@ const EnhancedEmotionScanPage: React.FC = () => {
                   )}
 
                   {/* Bouton de scan principal */}
-                  <FunctionalButton
-                    actionId="emotion-scan"
+                  <Button
                     onClick={performScan}
                     disabled={isScanning || (scanMode === 'text' && !textInput.trim())}
                     className={cn(
                       "w-full py-6 text-lg font-semibold bg-gradient-to-r text-white",
                       scanModes.find(m => m.id === scanMode)?.color || "from-indigo-500 to-purple-500"
                     )}
-                    loadingText="Analyse IA en cours..."
                   >
                     {isScanning ? (
                       <div className="flex items-center gap-3">
@@ -731,7 +728,7 @@ const EnhancedEmotionScanPage: React.FC = () => {
                         Démarrer l'Analyse
                       </div>
                     )}
-                  </FunctionalButton>
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -941,8 +938,7 @@ const EnhancedEmotionScanPage: React.FC = () => {
                   </CardTitle>
                   
                   <div className="flex gap-2">
-                    <FunctionalButton
-                      actionId="export-data"
+                    <Button
                       onClick={async () => {
                         toast({
                           title: "Export réussi",
@@ -954,7 +950,7 @@ const EnhancedEmotionScanPage: React.FC = () => {
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Exporter
-                    </FunctionalButton>
+                    </Button>
                   </div>
                 </div>
               </CardHeader>

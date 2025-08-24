@@ -10,13 +10,12 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Settings, Palette, Bell, Shield, Brain, Music, 
   Moon, Sun, Volume2, Vibrate, Globe, Clock,
-  Heart, Activity, Zap, Target, Eye, Waves
+  Heart, Activity, Zap, Target, Eye, Waves, Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { ResponsiveWrapper } from '@/components/responsive/ResponsiveWrapper';
-import { FunctionalButton } from '@/components/ui/functional-button';
 import { motion } from 'framer-motion';
 
 interface UserPreferences {
@@ -104,6 +103,7 @@ const EnhancedPreferencesPage: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -133,7 +133,27 @@ const EnhancedPreferencesPage: React.FC = () => {
     }
   };
 
+  const updatePreference = (path: string, value: any) => {
+    setPreferences(prev => {
+      const keys = path.split('.');
+      const updated = { ...prev };
+      let current: any = updated;
+      
+      for (let i = 0; i < keys.length - 1; i++) {
+        current[keys[i]] = { ...current[keys[i]] };
+        current = current[keys[i]];
+      }
+      
+      current[keys[keys.length - 1]] = value;
+      return updated;
+    });
+    setHasChanges(true);
+  };
+
   const savePreferences = async () => {
+    if (isSaving) return;
+    
+    setIsSaving(true);
     try {
       const { error } = await supabase
         .from('user_preferences')
@@ -166,24 +186,9 @@ const EnhancedPreferencesPage: React.FC = () => {
         description: "Impossible de sauvegarder vos préférences",
         variant: "destructive"
       });
+    } finally {
+      setIsSaving(false);
     }
-  };
-
-  const updatePreference = (path: string, value: any) => {
-    setPreferences(prev => {
-      const keys = path.split('.');
-      const updated = { ...prev };
-      let current: any = updated;
-      
-      for (let i = 0; i < keys.length - 1; i++) {
-        current[keys[i]] = { ...current[keys[i]] };
-        current = current[keys[i]];
-      }
-      
-      current[keys[keys.length - 1]] = value;
-      return updated;
-    });
-    setHasChanges(true);
   };
 
   const musicGenres = [
@@ -236,14 +241,17 @@ const EnhancedPreferencesPage: React.FC = () => {
                     <Zap className="h-5 w-5 text-blue-600" />
                     <span className="text-sm font-medium">Modifications non sauvegardées</span>
                   </div>
-                  <FunctionalButton
-                    actionId="save-preferences"
+                  <Button
                     onClick={savePreferences}
+                    disabled={isSaving}
                     size="sm"
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    Sauvegarder
-                  </FunctionalButton>
+                    {isSaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    {isSaving ? "Sauvegarde..." : "Sauvegarder"}
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
@@ -738,16 +746,19 @@ const EnhancedPreferencesPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mt-8 text-center"
             >
-              <FunctionalButton
-                actionId="save-all-preferences"
+              <Button
                 onClick={savePreferences}
+                disabled={isSaving}
                 size="lg"
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-0 min-w-[200px]"
-                successMessage="Toutes vos préférences ont été sauvegardées !"
               >
-                <Settings className="h-5 w-5 mr-2" />
-                Sauvegarder Toutes les Préférences
-              </FunctionalButton>
+                {isSaving ? (
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                ) : (
+                  <Settings className="h-5 w-5 mr-2" />
+                )}
+                {isSaving ? "Sauvegarde..." : "Sauvegarder Toutes les Préférences"}
+              </Button>
             </motion.div>
           )}
         </div>
