@@ -77,6 +77,7 @@ const NavigationTestPage = lazy(() => import('@/pages/NavigationTestPage'));
 const PageQualityAuditor = lazy(() => import('@/pages/PageQualityAuditor'));
 const TestFeatureCard = lazy(() => import('@/components/debug/TestFeatureCard'));
 const PageHealthCheck = lazy(() => import('@/components/debug/PageHealthCheck'));
+const PageIntegrityChecker = lazy(() => import('@/components/debug/PageIntegrityChecker'));
 
 // Wrapper component for Suspense
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -545,6 +546,14 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: (
             <SuspenseWrapper>
               <TestFeatureCard />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'page-integrity-checker',
+          element: (
+            <SuspenseWrapper>
+              <PageIntegrityChecker />
             </SuspenseWrapper>
           ),
         },

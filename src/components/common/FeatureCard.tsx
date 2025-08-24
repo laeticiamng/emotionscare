@@ -130,19 +130,28 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             }}
             transition={{ duration: 0.6 }}
           >
-            {React.isValidElement(icon) ? (
-              // C'est déjà un élément JSX comme <Wind className="h-6 w-6" />
-              React.cloneElement(icon, { className: "h-8 w-8 text-white" })
-            ) : typeof icon === 'function' ? (
-              // C'est une référence de composant comme Wind
-              React.createElement(icon as React.ComponentType<{ className?: string }>, { className: "h-8 w-8 text-white" })
-            ) : typeof icon === 'string' ? (
-              // C'est un émoji ou du texte
-              <span className="text-2xl">{icon}</span>
-            ) : (
-              // Fallback pour d'autres types
-              <div className="h-8 w-8 text-white flex items-center justify-center">{icon}</div>
-            )}
+            {(() => {
+              // Si c'est déjà un élément JSX avec className
+              if (React.isValidElement(icon)) {
+                return React.cloneElement(icon as React.ReactElement<any>, { 
+                  className: "h-8 w-8 text-white" 
+                });
+              }
+              
+              // Si c'est une référence de composant (comme Target, Zap, etc.)
+              if (typeof icon === 'function') {
+                const IconComponent = icon as React.ComponentType<{ className?: string }>;
+                return <IconComponent className="h-8 w-8 text-white" />;
+              }
+              
+              // Si c'est une string (émoji)
+              if (typeof icon === 'string') {
+                return <span className="text-2xl">{icon}</span>;
+              }
+              
+              // Fallback
+              return <div className="h-8 w-8 text-white flex items-center justify-center">{icon}</div>;
+            })()}
           </motion.div>
 
           <div>
