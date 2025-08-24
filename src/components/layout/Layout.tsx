@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import GlobalNav from '@/components/GlobalNav';
-import Footer from '@/components/layout/Footer';
+import SecurityFooter from '@/components/SecurityFooter';
 
 const Layout: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ const Layout: React.FC = () => {
         <Outlet />
       </main>
       
-      <Footer />
+      <SecurityFooter />
       
       <Toaster 
         position="top-right" 
