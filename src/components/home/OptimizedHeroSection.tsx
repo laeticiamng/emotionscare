@@ -98,7 +98,7 @@ const OptimizedHeroSection: React.FC = () => {
           {/* Optimized Badge */}
           <motion.div
             variants={itemVariants}
-            className="mb-6 sm:mb-8"
+            className="mb-6 sm:mb-8 -mt-8 lg:-mt-12"
           >
             <Badge 
               variant="outline" 
