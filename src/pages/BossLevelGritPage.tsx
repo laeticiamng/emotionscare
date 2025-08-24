@@ -1,248 +1,339 @@
-import React, { memo, useCallback, useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Gamepad2, Trophy, Star, Zap, Crown, Target, Medal, Flame } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import PageLayout from '@/components/common/PageLayout';
-import FeatureCard from '@/components/common/FeatureCard';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Target, 
+  Crown,
+  Flame
+} from 'lucide-react';
+import UnifiedShell from '@/components/unified/UnifiedShell';
+import ChallengeCard from '@/components/boss-level-grit/ChallengeCard';
+import ActiveSession from '@/components/boss-level-grit/ActiveSession';
+import ProgressStats from '@/components/boss-level-grit/ProgressStats';
+import AchievementsList from '@/components/boss-level-grit/AchievementsList';
+import { GritChallenge, GritStats } from '@/types/boss-level-grit';
 
 const BossLevelGritPage: React.FC = () => {
-  const navigate = useNavigate();
-  const shouldReduceMotion = useReducedMotion();
+  const [activeTab, setActiveTab] = useState('challenges');
+  const [selectedChallenge, setSelectedChallenge] = useState<GritChallenge | null>(null);
 
-  // State management pour les données de progression
-  const [gameState, setGameState] = React.useState({
-    currentLevel: 7,
-    experience: 750,
-    maxExperience: 1000,
-    streak: 12,
-    completedChallenges: 2,
-    totalChallenges: 4
-  });
-
-  const challenges = useMemo(() => [
-    { 
-      id: 1, 
-      title: 'Défi Matinal', 
-      description: 'Méditation 10min avant 8h', 
-      reward: 150, 
-      completed: true,
-      difficulty: 'Facile',
-      icon: Target
+  // Mock data - en production, ces données viendraient d'une API
+  const [gritStats] = useState<GritStats>({
+    totalXp: 2450,
+    currentLevel: {
+      id: 'warrior',
+      name: 'Guerrier Mental',
+      description: 'Vous maîtrisez les bases de la résilience',
+      minXp: 2000,
+      maxXp: 5000,
+      color: 'hsl(var(--primary))',
+      icon: '⚔️',
+      benefits: ['Défis avancés débloqués', 'Sessions personnalisées', 'Coach IA spécialisé'],
+      unlockedFeatures: ['Challenges Master', 'Mindset Builder', 'Progress Analytics']
     },
-    { 
-      id: 2, 
-      title: 'Hydratation Power', 
-      description: 'Boire 2L d\'eau aujourd\'hui', 
-      reward: 100, 
-      completed: false,
-      difficulty: 'Moyen',
-      icon: Zap
+    nextLevel: {
+      id: 'master',
+      name: 'Maître de la Résilience',
+      description: 'Expert en gestion du stress et dépassement de soi',
+      minXp: 5000,
+      maxXp: 10000,
+      color: 'hsl(var(--accent))',
+      icon: '🏆',
+      benefits: ['Défis légendaires', 'Coaching personnalisé', 'Communauté VIP'],
+      unlockedFeatures: ['Legend Challenges', 'Personal Coach', 'VIP Community']
     },
-    { 
-      id: 3, 
-      title: 'Gratitude Boss', 
-      description: 'Noter 3 gratitudes', 
-      reward: 200, 
-      completed: false,
-      difficulty: 'Facile',
-      icon: Star
+    completedChallenges: 23,
+    currentStreak: 7,
+    longestStreak: 14,
+    averageScore: 87,
+    totalSessionTime: 1240,
+    categoriesProgress: {
+      mental: 85,
+      physical: 60,
+      emotional: 75,
+      spiritual: 45
     },
-    { 
-      id: 4, 
-      title: 'Mouvement Énergie', 
-      description: '30min d\'activité physique', 
-      reward: 250, 
-      completed: true,
-      difficulty: 'Difficile',
-      icon: Trophy
-    },
-  ], []);
-
-  const handleChallengeComplete = useCallback((challengeId: number) => {
-    const challenge = challenges.find(c => c.id === challengeId);
-    if (challenge && !challenge.completed) {
-      setGameState(prev => ({
-        ...prev,
-        experience: prev.experience + challenge.reward,
-        completedChallenges: prev.completedChallenges + 1
-      }));
-      
-      toast.success(`🎉 Défi "${challenge.title}" terminé !`, {
-        description: `+${challenge.reward} XP gagnés`
-      });
-    }
-  }, [challenges]);
-
-  const handleUnlockBossFinal = useCallback(() => {
-    if (gameState.completedChallenges >= gameState.totalChallenges) {
-      toast.success('🔓 Boss Final débloqué !', {
-        description: 'Préparez-vous pour le défi ultime'
-      });
-      navigate('/boss-final');
-    } else {
-      toast.warning('🔒 Complétez tous les défis quotidiens d\'abord');
-    }
-  }, [gameState, navigate]);
-
-  const progressPercentage = (gameState.experience / gameState.maxExperience) * 100;
-  const canUnlockBoss = gameState.completedChallenges >= gameState.totalChallenges;
-
-  const header = {
-    title: 'Boss Level Grit',
-    subtitle: 'Transformez vos défis en victoires épiques',
-    description: 'Développez votre résilience mentale à travers des défis gamifiés et progressifs',
-    icon: Crown,
-    badge: 'Gamification Premium',
-    stats: [
-      { label: 'Niveau Boss', value: `${gameState.currentLevel}`, icon: Trophy, color: 'text-yellow-500' },
-      { label: 'Jours de Suite', value: `${gameState.streak}`, icon: Flame, color: 'text-red-500' },
-      { label: 'Points XP', value: `${gameState.experience}`, icon: Zap, color: 'text-purple-500' },
-      { label: 'Défis Terminés', value: `${gameState.completedChallenges}/${gameState.totalChallenges}`, icon: Medal, color: 'text-green-500' }
-    ],
-    actions: [
+    achievements: [
       {
-        label: 'Voir Historique',
-        onClick: () => navigate('/activity-history'),
-        variant: 'outline' as const,
-        icon: Target
+        id: 'first-complete',
+        title: 'Premier Défi',
+        description: 'Complétez votre premier défi',
+        icon: '🎯',
+        type: 'completion',
+        requirement: 1,
+        progress: 1,
+        unlocked: true,
+        unlockedAt: new Date('2024-01-15'),
+        reward: { xp: 100 }
       },
       {
-        label: 'Défis Personnalisés',
-        onClick: () => toast.info('Création de défis personnalisés à venir'),
-        variant: 'default' as const,
-        icon: Star
+        id: 'streak-master',
+        title: 'Maître de la Constance',
+        description: 'Maintenez une série de 10 jours',
+        icon: '🔥',
+        type: 'streak',
+        requirement: 10,
+        progress: 7,
+        unlocked: false,
+        reward: { xp: 500, features: ['Advanced Analytics'] }
+      },
+      {
+        id: 'mental-fortress',
+        title: 'Forteresse Mentale',
+        description: 'Complétez 5 défis mentaux',
+        icon: '🧠',
+        type: 'category',
+        requirement: 5,
+        progress: 3,
+        unlocked: false,
+        reward: { xp: 300 }
+      },
+      {
+        id: 'perfect-score',
+        title: 'Perfection',
+        description: 'Obtenez un score de 100%',
+        icon: '⭐',
+        type: 'score',
+        requirement: 100,
+        progress: 87,
+        unlocked: false,
+        reward: { xp: 400, features: ['Perfect Mode'] }
       }
     ]
+  });
+
+  const [challenges] = useState<GritChallenge[]>([
+    {
+      id: 'mental-fortress',
+      title: 'Forteresse Mentale',
+      description: 'Développez votre résistance au stress avec des techniques avancées de visualisation et de pleine conscience',
+      difficulty: 'warrior',
+      category: 'mental',
+      duration: 15,
+      xpReward: 200,
+      completionRate: 78,
+      status: 'available',
+      tags: ['Visualisation', 'Stress', 'Focus', 'Méditation'],
+      createdAt: new Date()
+    },
+    {
+      id: 'emotional-mastery',
+      title: 'Maîtrise Émotionnelle',
+      description: 'Apprenez à gérer vos émotions intenses et à les transformer en force motrice',
+      difficulty: 'master',
+      category: 'emotional',
+      duration: 20,
+      xpReward: 350,
+      completionRate: 65,
+      status: 'available',
+      streakRequired: 5,
+      tags: ['Émotions', 'Régulation', 'Transformation', 'Intelligence émotionnelle'],
+      createdAt: new Date()
+    },
+    {
+      id: 'physical-endurance',
+      title: 'Endurance Physique',
+      description: 'Repoussez vos limites physiques avec des exercices progressifs et adaptés',
+      difficulty: 'novice',
+      category: 'physical',
+      duration: 10,
+      xpReward: 150,
+      completionRate: 89,
+      status: 'completed',
+      tags: ['Endurance', 'Corps', 'Limites', 'Progression'],
+      createdAt: new Date(),
+      completedAt: new Date('2024-01-10')
+    },
+    {
+      id: 'spiritual-awakening',
+      title: 'Éveil Spirituel',
+      description: 'Connectez-vous à votre essence profonde et trouvez votre purpose dans l\'adversité',
+      difficulty: 'legend',
+      category: 'spiritual',
+      duration: 30,
+      xpReward: 500,
+      completionRate: 42,
+      status: 'locked',
+      streakRequired: 15,
+      prerequisites: ['mental-fortress', 'emotional-mastery'],
+      tags: ['Spiritualité', 'Purpose', 'Connexion', 'Transcendance'],
+      createdAt: new Date()
+    },
+    {
+      id: 'pressure-diamond',
+      title: 'Diamant sous Pression',
+      description: 'Transformez la pression en performance exceptionnelle grâce à des techniques de résilience avancées',
+      difficulty: 'master',
+      category: 'mental',
+      duration: 25,
+      xpReward: 400,
+      completionRate: 58,
+      status: 'available',
+      streakRequired: 10,
+      tags: ['Pression', 'Performance', 'Résilience', 'Excellence'],
+      createdAt: new Date()
+    },
+    {
+      id: 'heart-warrior',
+      title: 'Guerrier du Cœur',
+      description: 'Développez votre courage émotionnel et votre capacité à faire face aux défis relationnels',
+      difficulty: 'warrior',
+      category: 'emotional',
+      duration: 18,
+      xpReward: 250,
+      completionRate: 72,
+      status: 'available',
+      tags: ['Courage', 'Relations', 'Vulnérabilité', 'Authenticité'],
+      createdAt: new Date()
+    }
+  ]);
+
+  const startChallenge = (challenge: GritChallenge) => {
+    setSelectedChallenge(challenge);
+    setActiveTab('session');
   };
 
-  const tips = {
-    title: 'Stratégies de Boss pour maximiser vos gains',
-    items: [
-      {
-        title: 'Progression Constante',
-        content: 'Complétez au moins un défi par jour pour maintenir votre streak',
-        icon: Target
-      },
-      {
-        title: 'Difficultés Équilibrées',
-        content: 'Alternez entre défis faciles et difficiles pour éviter l\'épuisement',
-        icon: Zap
-      },
-      {
-        title: 'Récompenses Stratégiques',
-        content: 'Utilisez vos XP pour débloquer de nouveaux défis premium',
-        icon: Crown
-      }
-    ],
-    cta: {
-      label: 'Guide Complet Boss Level',
-      onClick: () => navigate('/help-center')
+  const completeChallenge = (score: number, insights: string[]) => {
+    if (selectedChallenge) {
+      console.log('Défi complété:', {
+        challenge: selectedChallenge.id,
+        score,
+        insights
+      });
+      
+      // Mise à jour du statut du défi
+      setSelectedChallenge(null);
+      setActiveTab('challenges');
+      
+      // Ici on mettrait à jour les stats et sauvegarderait en base
     }
+  };
+
+  const backToChallenges = () => {
+    setSelectedChallenge(null);
+    setActiveTab('challenges');
   };
 
   return (
-    <PageLayout header={header} tips={tips}>
-      <div className="space-y-8">
-        {/* Barre de Progression Niveau */}
+    <UnifiedShell>
+      <div className="container mx-auto p-6 space-y-8">
+        {/* Header avec stats globales */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="max-w-2xl mx-auto space-y-4 p-6 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-2xl border border-primary/20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
         >
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Niveau {gameState.currentLevel}</span>
-            <span className="text-sm font-medium">Niveau {gameState.currentLevel + 1}</span>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Crown className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Boss Level Grit
+            </h1>
           </div>
-          <Progress 
-            value={progressPercentage} 
-            className="h-4 bg-background/50"
-          />
-          <div className="flex justify-between items-center text-xs text-muted-foreground">
-            <span>{gameState.experience} XP</span>
-            <span>{gameState.maxExperience} XP</span>
-          </div>
-          <p className="text-center text-sm text-muted-foreground">
-            {gameState.maxExperience - gameState.experience} XP jusqu'au prochain niveau
-          </p>
-        </motion.div>
-
-        {/* Défis Quotidiens */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-            <Target className="h-6 w-6 text-primary" />
-            Défis Boss du Jour
-          </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {challenges.map((challenge, index) => {
-              const IconComponent = challenge.icon;
-              return (
-                <FeatureCard
-                  key={challenge.id}
-                  title={challenge.title}
-                  description={challenge.description}
-                  icon={IconComponent}
-                  gradient={challenge.completed 
-                    ? 'from-green-500 to-emerald-500' 
-                    : 'from-orange-500 to-red-500'
-                  }
-                  isPremium={challenge.difficulty === 'Difficile'}
-                  isPopular={challenge.reward >= 200}
-                  stats={[
-                    { label: 'XP', value: `${challenge.reward}` },
-                    { label: 'Difficulté', value: challenge.difficulty }
-                  ]}
-                  action={{
-                    label: challenge.completed ? '✓ Boss Vaincu' : 'Relever le Défi',
-                    onClick: () => handleChallengeComplete(challenge.id)
-                  }}
-                  index={index}
-                  className={challenge.completed ? 'opacity-75' : ''}
-                />
-              );
-            })}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-primary">{gritStats.totalXp}</div>
+                <div className="text-sm text-muted-foreground">XP Total</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-accent/10 to-accent/5">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Flame className="h-4 w-4 text-accent" />
+                  <div className="text-2xl font-bold text-accent">{gritStats.currentStreak}</div>
+                </div>
+                <div className="text-sm text-muted-foreground">Série Actuelle</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-muted/20 to-muted/10">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold">{gritStats.completedChallenges}</div>
+                <div className="text-sm text-muted-foreground">Défis Complétés</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-destructive/10 to-destructive/5">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-destructive">{gritStats.averageScore}%</div>
+                <div className="text-sm text-muted-foreground">Score Moyen</div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        {/* Boss Final */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          className="text-center"
-        >
-          <FeatureCard
-            title="Boss Final de la Semaine"
-            description={canUnlockBoss 
-              ? "Tous les défis sont terminés ! Affrontez le boss final pour des récompenses épiques."
-              : "Complétez tous les défis quotidiens pour débloquer le boss final"
-            }
-            icon={Crown}
-            gradient="from-purple-600 via-pink-600 to-red-600"
-            isPremium={true}
-            isPopular={canUnlockBoss}
-            stats={canUnlockBoss ? [
-              { label: 'Récompense', value: '1000 XP' },
-              { label: 'Rareté', value: 'Légendaire' }
-            ] : [
-              { label: 'Progression', value: `${gameState.completedChallenges}/${gameState.totalChallenges}` },
-              { label: 'Statut', value: 'Verrouillé' }
-            ]}
-            action={{
-              label: canUnlockBoss ? '🔓 Affronter le Boss Final' : '🔒 Débloquer Boss Final',
-              onClick: handleUnlockBossFinal
-            }}
-            className="max-w-lg mx-auto"
-          />
+          {/* Progression vers le niveau suivant */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-semibold">{gritStats.currentLevel.name}</span>
+                  <Badge variant="secondary">{gritStats.currentLevel.icon}</Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {gritStats.totalXp} / {gritStats.nextLevel.minXp} XP
+                </div>
+              </div>
+              <Progress 
+                value={(gritStats.totalXp - gritStats.currentLevel.minXp) / (gritStats.nextLevel.minXp - gritStats.currentLevel.minXp) * 100} 
+                className="h-3"
+              />
+              <div className="text-center mt-2 text-sm text-muted-foreground">
+                {gritStats.nextLevel.minXp - gritStats.totalXp} XP pour atteindre {gritStats.nextLevel.name}
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
+
+        {/* Tabs principales */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="challenges">Défis</TabsTrigger>
+            <TabsTrigger value="session">Session Active</TabsTrigger>
+            <TabsTrigger value="progress">Progression</TabsTrigger>
+            <TabsTrigger value="achievements">Succès</TabsTrigger>
+          </TabsList>
+
+          {/* Onglet Défis */}
+          <TabsContent value="challenges" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {challenges.map((challenge) => (
+                <ChallengeCard
+                  key={challenge.id}
+                  challenge={challenge}
+                  onStart={startChallenge}
+                />
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Onglet Session Active */}
+          <TabsContent value="session" className="space-y-6">
+            <ActiveSession
+              challenge={selectedChallenge}
+              onComplete={completeChallenge}
+              onBack={backToChallenges}
+            />
+          </TabsContent>
+
+          {/* Onglet Progression */}
+          <TabsContent value="progress" className="space-y-6">
+            <ProgressStats stats={gritStats} />
+          </TabsContent>
+
+          {/* Onglet Succès */}
+          <TabsContent value="achievements" className="space-y-6">
+            <AchievementsList achievements={gritStats.achievements} />
+          </TabsContent>
+        </Tabs>
       </div>
-    </PageLayout>
+    </UnifiedShell>
   );
 };
 
-export default memo(BossLevelGritPage);
+export default BossLevelGritPage;
