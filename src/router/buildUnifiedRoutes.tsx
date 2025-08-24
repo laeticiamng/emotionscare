@@ -55,8 +55,11 @@ const ExportCSVPage = lazy(() => import('@/pages/ExportCSVPage'));
 const AccountDeletePage = lazy(() => import('@/pages/AccountDeletePage'));
 const HealthCheckBadgePage = lazy(() => import('@/pages/HealthCheckBadgePage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
+const NotificationPage = lazy(() => import('@/pages/NotificationPage'));
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
 const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const SearchPage = lazy(() => import('@/pages/SearchPage'));
 
 // Historique & feedback (2)
 const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
@@ -410,7 +413,7 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           path: 'notifications',
           element: (
             <SuspenseWrapper>
-              <NotificationsPage />
+              <NotificationPage />
             </SuspenseWrapper>
           ),
         },
@@ -427,6 +430,22 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: (
             <SuspenseWrapper>
               <ProfileSettingsPage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'profile',
+          element: (
+            <SuspenseWrapper>
+              <ProfilePage />
+            </SuspenseWrapper>
+          ),
+        },
+        {
+          path: 'search',
+          element: (
+            <SuspenseWrapper>
+              <SearchPage />
             </SuspenseWrapper>
           ),
         },
