@@ -1,16 +1,38 @@
 import { defineConfig } from 'vitest/config';
-import path from 'node:path';
-import 'ts-node/register';
-import 'tsconfig-paths/register';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts', './test/setupTests.ts'],
-  },
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/coverage/**',
+        'supabase/',
+        'docs/'
+      ],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 85,
+          statements: 85
+        }
+      }
+    }
   },
 });

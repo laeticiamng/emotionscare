@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useOpenAI } from './useOpenAI';
+import useOpenAI from './api/useOpenAI';
 
 interface AmbitionLevel {
   id: string;
@@ -25,7 +25,7 @@ interface AmbitionGoal {
 export const useAmbition = () => {
   const [goals, setGoals] = useState<AmbitionGoal[]>([]);
   const [isCreating, setIsCreating] = useState(false);
-  const { generateText, isLoading } = useOpenAI();
+  const { generateResponse, isLoading } = useOpenAI();
 
   const createGoal = async (title: string, description: string): Promise<AmbitionGoal | null> => {
     setIsCreating(true);
@@ -58,7 +58,7 @@ Chaque niveau doit :
 `;
 
     try {
-      const response = await generateText({ prompt });
+      const response = await generateResponse({ prompt });
       if (!response) return null;
 
       const jsonMatch = response.match(/\{[\s\S]*\}/);
