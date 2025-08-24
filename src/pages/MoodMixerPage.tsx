@@ -5,20 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Music, Heart, Zap, Headphones, Play, Shuffle } from 'lucide-react';
+import { Music, Heart, Zap, Headphones, Play, Shuffle, Palette, Timer, BarChart3, TrendingUp } from 'lucide-react';
+import PageLayout from '@/components/common/PageLayout';
+import FeatureCard from '@/components/common/FeatureCard';
 
 const MoodMixerPage: React.FC = () => {
   const [energy, setEnergy] = useState([50]);
   const [emotion, setEmotion] = useState([50]);
   const [focus, setFocus] = useState([50]);
-  const [currentMix, setCurrentMix] = useState('Équilibre Parfait');
-
-  const moods = [
-    { name: 'Énergie Pure', color: 'from-red-500 to-orange-500', icon: Zap },
-    { name: 'Zen Profond', color: 'from-blue-500 to-purple-500', icon: Heart },
-    { name: 'Focus Laser', color: 'from-green-500 to-teal-500', icon: Headphones },
-    { name: 'Créativité Flow', color: 'from-purple-500 to-pink-500', icon: Music },
-  ];
 
   const getMixName = () => {
     const e = energy[0];
@@ -32,190 +26,235 @@ const MoodMixerPage: React.FC = () => {
     return 'Équilibre Personnel';
   };
 
+  const moods = [
+    {
+      title: 'Énergie Pure',
+      description: 'Musique dynamique et motivante pour booster votre énergie',
+      icon: <Zap className="h-8 w-8" />,
+      gradient: 'from-red-500 to-orange-500',
+      action: () => {
+        setEnergy([90]);
+        setEmotion([80]);
+        setFocus([60]);
+      }
+    },
+    {
+      title: 'Zen Profond',
+      description: 'Sons apaisants pour la relaxation et la méditation',
+      icon: <Heart className="h-8 w-8" />,
+      gradient: 'from-blue-500 to-purple-500',
+      action: () => {
+        setEnergy([20]);
+        setEmotion([90]);
+        setFocus([40]);
+      }
+    },
+    {
+      title: 'Focus Laser',
+      description: 'Ambiances de concentration pour le travail intense',
+      icon: <Headphones className="h-8 w-8" />,
+      gradient: 'from-green-500 to-teal-500',
+      action: () => {
+        setEnergy([60]);
+        setEmotion([50]);
+        setFocus([95]);
+      }
+    },
+    {
+      title: 'Créativité Flow',
+      description: 'Musique inspirante pour libérer votre créativité',
+      icon: <Music className="h-8 w-8" />,
+      gradient: 'from-purple-500 to-pink-500',
+      action: () => {
+        setEnergy([70]);
+        setEmotion([80]);
+        setFocus([75]);
+      }
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 text-white p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4"
-        >
-          <div className="flex items-center justify-center gap-3">
-            <Music className="h-8 w-8 text-purple-400" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Mood Mixer
-            </h1>
-          </div>
-          <p className="text-lg text-slate-300">
-            Créez votre ambiance sonore personnalisée
-          </p>
-          <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
-            Adaptation Immédiate
-          </Badge>
-        </motion.div>
-
-        {/* Contrôles de Mix */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="space-y-6"
-        >
-          <Card className="bg-black/30 border-purple-500/30 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle className="text-center text-2xl">
-                Mix Actuel: <span className="text-purple-400">{getMixName()}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Slider Énergie */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-red-400" />
-                    Énergie
-                  </label>
-                  <span className="text-sm text-slate-400">{energy[0]}%</span>
-                </div>
-                <Slider
-                  value={energy}
-                  onValueChange={setEnergy}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="h-2 rounded-full bg-gradient-to-r from-red-500 to-orange-500 opacity-30"></div>
+    <PageLayout
+      header={{
+        title: 'Mood Mixer',
+        subtitle: 'Créez votre ambiance sonore parfaite',
+        description: 'Ajustez vos paramètres émotionnels pour générer une playlist personnalisée qui correspond exactement à votre état d\'esprit et vos objectifs.',
+        icon: Palette,
+        gradient: 'from-purple-500/20 to-pink-500/5',
+        badge: 'IA Musicale',
+        stats: [
+          {
+            label: 'Mix Créés',
+            value: '24',
+            icon: Music,
+            color: 'text-blue-500'
+          },
+          {
+            label: 'Satisfaction',
+            value: '89%',
+            icon: Heart,
+            color: 'text-purple-500'
+          },
+          {
+            label: 'Temps Total',
+            value: '2h47',
+            icon: Timer,
+            color: 'text-green-500'
+          },
+          {
+            label: 'Amélioration',
+            value: '+15%',
+            icon: TrendingUp,
+            color: 'text-orange-500'
+          }
+        ],
+        actions: [
+          {
+            label: 'Nouveau Mix',
+            onClick: () => console.log('Create new mix'),
+            variant: 'default',
+            icon: Palette
+          },
+          {
+            label: 'Mes Favoris',
+            onClick: () => console.log('Show favorites'),
+            variant: 'outline',
+            icon: Heart
+          }
+        ]
+      }}
+      tips={{
+        title: 'Optimisez votre expérience Mood Mixer',
+        items: [
+          {
+            title: 'Expérimentez',
+            content: 'N\'hésitez pas à tester différentes combinaisons pour découvrir de nouveaux styles',
+            icon: Shuffle
+          },
+          {
+            title: 'Sauvegardez',
+            content: 'Enregistrez vos mix favoris pour les retrouver facilement',
+            icon: Heart
+          },
+          {
+            title: 'Contexte',
+            content: 'Adaptez vos réglages selon l\'activité : travail, sport, relaxation...',
+            icon: BarChart3
+          }
+        ],
+        cta: {
+          label: 'Guide du Mood Mixer',
+          onClick: () => console.log('Mood mixer guide')
+        }
+      }}
+    >
+      <div className="space-y-8">
+        {/* Contrôleur de Mix Principal */}
+        <Card className="bg-gradient-to-br from-background to-muted/20 border-primary/20">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl">
+              Mix Actuel: <span className="text-primary">{getMixName()}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Slider Énergie */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-red-500" />
+                  Énergie
+                </label>
+                <span className="text-sm text-muted-foreground">{energy[0]}%</span>
               </div>
+              <Slider
+                value={energy}
+                onValueChange={setEnergy}
+                max={100}
+                step={1}
+                className="w-full"
+              />
+              <div className="h-2 rounded-full bg-gradient-to-r from-red-500 to-orange-500 opacity-30"></div>
+            </div>
 
-              {/* Slider Émotion */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-pink-400" />
-                    Émotion
-                  </label>
-                  <span className="text-sm text-slate-400">{emotion[0]}%</span>
-                </div>
-                <Slider
-                  value={emotion}
-                  onValueChange={setEmotion}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-30"></div>
+            {/* Slider Émotion */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-pink-500" />
+                  Émotion
+                </label>
+                <span className="text-sm text-muted-foreground">{emotion[0]}%</span>
               </div>
+              <Slider
+                value={emotion}
+                onValueChange={setEmotion}
+                max={100}
+                step={1}
+                className="w-full"
+              />
+              <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-30"></div>
+            </div>
 
-              {/* Slider Focus */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium flex items-center gap-2">
-                    <Headphones className="h-4 w-4 text-green-400" />
-                    Focus
-                  </label>
-                  <span className="text-sm text-slate-400">{focus[0]}%</span>
-                </div>
-                <Slider
-                  value={focus}
-                  onValueChange={setFocus}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                />
-                <div className="h-2 rounded-full bg-gradient-to-r from-green-500 to-teal-500 opacity-30"></div>
+            {/* Slider Focus */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Headphones className="h-4 w-4 text-green-500" />
+                  Focus
+                </label>
+                <span className="text-sm text-muted-foreground">{focus[0]}%</span>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              <Slider
+                value={focus}
+                onValueChange={setFocus}
+                max={100}
+                step={1}
+                className="w-full"
+              />
+              <div className="h-2 rounded-full bg-gradient-to-r from-green-500 to-teal-500 opacity-30"></div>
+            </div>
+
+            {/* Contrôles de Lecture */}
+            <div className="flex items-center justify-center gap-4 pt-6">
+              <Button
+                size="lg"
+                className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90"
+              >
+                <Play className="h-6 w-6" />
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-16 w-16 rounded-full"
+              >
+                <Shuffle className="h-6 w-6" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Presets d'Ambiance */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="space-y-4"
-        >
-          <h3 className="text-xl font-semibold text-center">Ambiances Prédéfinies</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {moods.map((mood, index) => {
-              const IconComponent = mood.icon;
-              return (
-                <motion.button
-                  key={mood.name}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`p-4 rounded-xl bg-gradient-to-br ${mood.color} bg-opacity-20 border border-white/20 hover:border-white/40 transition-all`}
-                >
-                  <IconComponent className="h-8 w-8 mx-auto mb-2 text-white" />
-                  <p className="text-sm font-medium text-center">{mood.name}</p>
-                </motion.button>
-              );
-            })}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-foreground">Ambiances Prédéfinies</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {moods.map((mood, index) => (
+              <FeatureCard
+                key={index}
+                title={mood.title}
+                description={mood.description}
+                icon={mood.icon}
+                gradient={mood.gradient}
+                action={{
+                  label: 'Appliquer',
+                  onClick: mood.action
+                }}
+                className="hover:scale-105 transition-transform cursor-pointer"
+              />
+            ))}
           </div>
-        </motion.div>
-
-        {/* Contrôles de Lecture */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-center space-y-6"
-        >
-          <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/30 backdrop-blur-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 w-16 h-16 rounded-full"
-                >
-                  <Play className="h-6 w-6" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-purple-500/50 hover:bg-purple-500/20 w-16 h-16 rounded-full"
-                >
-                  <Shuffle className="h-6 w-6" />
-                </Button>
-              </div>
-              <p className="text-slate-300 mt-4">
-                Votre mix personnel est prêt à être diffusé
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Historique des Mix */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="grid grid-cols-3 gap-4"
-        >
-          <Card className="bg-blue-500/10 border-blue-500/30">
-            <CardContent className="p-4 text-center">
-              <Music className="h-6 w-6 text-blue-400 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-blue-400">24</p>
-              <p className="text-sm text-slate-400">Mix Créés</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-purple-500/10 border-purple-500/30">
-            <CardContent className="p-4 text-center">
-              <Heart className="h-6 w-6 text-purple-400 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-purple-400">89%</p>
-              <p className="text-sm text-slate-400">Satisfaction</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-green-500/10 border-green-500/30">
-            <CardContent className="p-4 text-center">
-              <Headphones className="h-6 w-6 text-green-400 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-green-400">2h47</p>
-              <p className="text-sm text-slate-400">Temps Total</p>
-            </CardContent>
-          </Card>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
