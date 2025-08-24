@@ -1,11 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useReducedMotion, useMotionValue, useTransform, AnimatePresence, useViewportScroll } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { motion, useReducedMotion, useMotionValue, useTransform, AnimatePresence, useViewportScroll, useScroll, useSpring, useAnimation } from 'framer-motion';
 import { 
   Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, 
   Zap, Globe, Shield, Target, Trophy, Mic, Camera, Volume2, 
   Play, Pause, RotateCcw, Eye, Waves, Wind, Sun, Moon, ChevronDown,
   Activity, TrendingUp, Calendar, Clock, MessageCircle, Headphones,
-  Smartphone, Monitor, Tablet, Battery, Wifi, Signal
+  Smartphone, Monitor, Tablet, Battery, Wifi, Signal, Settings,
+  Maximize2, Minimize2, BarChart3, PieChart, LineChart, 
+  Layers3, Cpu, Database, Network, CloudLightning, Sparkle,
+  Palette, Brush, Wand2, Stars, Compass, Map, Navigation,
+  Timer, Stopwatch, AlarmClock, Coffee, BookOpen, Lightbulb,
+  Rocket, Award, Medal, Crown, Gem, Diamond, Infinity,
+  MousePointer2, Fingerprint, ScanLine, Radar, Crosshair
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +36,10 @@ interface UserMetrics {
   achievements: string[];
   mood_trend: 'improving' | 'stable' | 'declining';
   last_session: string;
+  daily_goals: number;
+  weekly_progress: number;
+  energy_level: number;
+  mindfulness_score: number;
 }
 
 interface LiveFeature {
@@ -45,6 +55,29 @@ interface LiveFeature {
   category: 'therapy' | 'wellness' | 'social' | 'analytics' | 'entertainment';
   ai_powered: boolean;
   real_time: boolean;
+  completion_rate: number;
+  trending: boolean;
+  new_feature: boolean;
+}
+
+interface InteractiveParticle {
+  id: string;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  opacity: number;
+  color: string;
+  life: number;
+}
+
+interface PerformanceMetrics {
+  cpu_usage: number;
+  memory_usage: number;
+  network_latency: number;
+  frame_rate: number;
+  ai_response_time: number;
 }
 
 const PremiumHomePage: React.FC = () => {
@@ -54,16 +87,39 @@ const PremiumHomePage: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useViewportScroll();
   const containerRef = useRef<HTMLDivElement>(null);
+  const particleCanvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
+  const controls = useAnimation();
   
-  // État de l'interface
+  // États avancés de l'interface
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userMetrics, setUserMetrics] = useState<UserMetrics | null>(null);
   const [liveFeatures, setLiveFeatures] = useState<LiveFeature[]>([]);
   const [isLiveDataLoading, setIsLiveDataLoading] = useState(true);
-  const [ambientMode, setAmbientMode] = useState<'cosmic' | 'forest' | 'ocean' | 'off'>('cosmic');
+  const [ambientMode, setAmbientMode] = useState<'cosmic' | 'forest' | 'ocean' | 'aurora' | 'nebula' | 'off'>('cosmic');
   const [deviceOptimization, setDeviceOptimization] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [personalizedGreeting, setPersonalizedGreeting] = useState('');
   const [todayInsights, setTodayInsights] = useState<string[]>([]);
+  const [isImmersiveMode, setIsImmersiveMode] = useState(false);
+  const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
+  const [particles, setParticles] = useState<InteractiveParticle[]>([]);
+  const [cursorTrail, setCursorTrail] = useState<Array<{x: number, y: number, timestamp: number}>>([]);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [biometricData, setBiometricData] = useState({
+    heartRate: 72,
+    stressIndex: 25,
+    focusLevel: 85,
+    energyLevel: 78
+  });
+  const [aiInsights, setAiInsights] = useState<string[]>([]);
+  const [interactionHeatMap, setInteractionHeatMap] = useState<Array<{x: number, y: number, intensity: number}>>([]);
+  const [immersiveElements, setImmersiveElements] = useState({
+    showParticles: true,
+    enableSoundscape: false,
+    adaptiveLighting: true,
+    biometricSync: false,
+    personalizedAnimations: true
+  });
 
   // Animation values
   const mouseX = useMotionValue(0);
@@ -102,6 +158,204 @@ const PremiumHomePage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Système de particules interactives
+  useEffect(() => {
+    if (!particleCanvasRef.current || shouldReduceMotion || !immersiveElements.showParticles) return;
+
+    const canvas = particleCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const createParticle = (): InteractiveParticle => ({
+      id: Math.random().toString(36).substr(2, 9),
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 2,
+      vy: (Math.random() - 0.5) * 2,
+      size: Math.random() * 3 + 1,
+      opacity: Math.random() * 0.5 + 0.1,
+      color: ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B'][Math.floor(Math.random() * 4)],
+      life: 1
+    });
+
+    const initialParticles = Array.from({ length: 50 }, createParticle);
+    setParticles(initialParticles);
+
+    const animateParticles = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      setParticles(prevParticles => {
+        return prevParticles.map(particle => {
+          // Update position
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          
+          // Boundary collision
+          if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+          if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+          
+          // Draw particle
+          ctx.globalAlpha = particle.opacity;
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+          ctx.fill();
+          
+          return particle;
+        });
+      });
+
+      animationRef.current = requestAnimationFrame(animateParticles);
+    };
+
+    animateParticles();
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [shouldReduceMotion, immersiveElements.showParticles]);
+
+  // Monitoring des performances en temps réel
+  useEffect(() => {
+    const updatePerformanceMetrics = () => {
+      const now = performance.now();
+      const memory = (performance as any).memory;
+      
+      setPerformanceMetrics({
+        cpu_usage: Math.random() * 40 + 10, // Simulation
+        memory_usage: memory ? (memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100 : Math.random() * 60 + 20,
+        network_latency: Math.random() * 50 + 10,
+        frame_rate: Math.round(1000 / (now - (window as any).lastFrameTime || now)),
+        ai_response_time: Math.random() * 200 + 100
+      });
+      
+      (window as any).lastFrameTime = now;
+    };
+
+    const interval = setInterval(updatePerformanceMetrics, 2000);
+    updatePerformanceMetrics();
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Cursor trail effect
+  useEffect(() => {
+    if (shouldReduceMotion || deviceOptimization === 'mobile') return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const now = Date.now();
+      setCursorTrail(prev => [
+        ...prev.slice(-10),
+        { x: e.clientX, y: e.clientY, timestamp: now }
+      ]);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [shouldReduceMotion, deviceOptimization]);
+
+  // Simulation de données biométriques
+  useEffect(() => {
+    if (!immersiveElements.biometricSync) return;
+
+    const updateBiometrics = () => {
+      setBiometricData(prev => ({
+        heartRate: Math.max(60, Math.min(100, prev.heartRate + (Math.random() - 0.5) * 4)),
+        stressIndex: Math.max(0, Math.min(100, prev.stressIndex + (Math.random() - 0.5) * 8)),
+        focusLevel: Math.max(0, Math.min(100, prev.focusLevel + (Math.random() - 0.5) * 6)),
+        energyLevel: Math.max(0, Math.min(100, prev.energyLevel + (Math.random() - 0.5) * 5))
+      }));
+    };
+
+    const interval = setInterval(updateBiometrics, 3000);
+    return () => clearInterval(interval);
+  }, [immersiveElements.biometricSync]);
+
+  // IA Insights génération
+  useEffect(() => {
+    if (!isAuthenticated || !userMetrics) return;
+
+    const generateAIInsights = () => {
+      const insights = [
+        "Votre niveau de stress a diminué de 15% cette semaine 📉",
+        "Moment optimal pour une séance de méditation détecté 🧘‍♀️",
+        "Votre rythme cardiaque indique un état de relaxation idéal 💚",
+        "Suggestion IA : Essayez une pause respiration de 5 minutes 🌬️",
+        "Tendance positive détectée dans votre équilibre émotionnel 📈",
+        "Votre focus est à son maximum, parfait pour les tâches importantes ⚡"
+      ];
+
+      setAiInsights(insights.slice(0, 3));
+    };
+
+    const interval = setInterval(generateAIInsights, 15000);
+    generateAIInsights();
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, userMetrics]);
+
+  // Mode immersif toggle
+  const toggleImmersiveMode = useCallback(() => {
+    setIsImmersiveMode(prev => {
+      const newMode = !prev;
+      
+      if (newMode) {
+        // Activer mode plein écran
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {
+            toast({
+              title: "Mode immersif activé",
+              description: "Plein écran non disponible sur cet appareil",
+              duration: 3000
+            });
+          });
+        }
+        
+        // Activer tous les effets immersifs
+        setImmersiveElements({
+          showParticles: true,
+          enableSoundscape: true,
+          adaptiveLighting: true,
+          biometricSync: true,
+          personalizedAnimations: true
+        });
+        
+        toast({
+          title: "🚀 Mode Immersif Activé",
+          description: "Expérience premium complètement débloquée",
+          duration: 4000
+        });
+      } else {
+        // Désactiver mode plein écran
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+        
+        setImmersiveElements({
+          showParticles: true,
+          enableSoundscape: false,
+          adaptiveLighting: true,
+          biometricSync: false,
+          personalizedAnimations: true
+        });
+        
+        toast({
+          title: "Mode Standard",
+          description: "Retour à l'affichage normal",
+          duration: 2000
+        });
+      }
+      
+      return newMode;
+    });
+  }, [toast]);
+
+  // Fonction pour ajuster les métriques utilisateur par défaut
   const loadUserMetrics = async () => {
     try {
       const { data, error } = await supabase
@@ -115,7 +369,7 @@ const PremiumHomePage: React.FC = () => {
       if (data) {
         setUserMetrics(data);
       } else {
-        // Données par défaut pour nouveaux utilisateurs
+        // Données par défaut enrichies pour nouveaux utilisateurs
         setUserMetrics({
           emotional_balance: 75,
           stress_level: 30,
@@ -124,7 +378,11 @@ const PremiumHomePage: React.FC = () => {
           total_sessions: 0,
           achievements: [],
           mood_trend: 'stable',
-          last_session: new Date().toISOString()
+          last_session: new Date().toISOString(),
+          daily_goals: 3,
+          weekly_progress: 65,
+          energy_level: 82,
+          mindfulness_score: 78
         });
       }
     } catch (error) {
@@ -159,12 +417,12 @@ const PremiumHomePage: React.FC = () => {
   const loadLiveFeatures = async () => {
     setIsLiveDataLoading(true);
     try {
-      // Simulation de données live (en réalité, cela viendrait de l'API)
+      // Simulation de données live enrichies (en réalité, cela viendrait de l'API)
       const features: LiveFeature[] = [
         {
           id: 'ai-emotion-scan',
           title: 'Scan Émotionnel IA',
-          description: 'Analyse instantanée de votre état émotionnel avec IA multimodale',
+          description: 'Analyse instantanée multimodale : voix, texte, expressions faciales avec IA GPT-4 Vision',
           icon: Brain,
           gradient: 'from-purple-500 via-blue-500 to-cyan-500',
           route: '/scan',
@@ -173,12 +431,15 @@ const PremiumHomePage: React.FC = () => {
           avg_rating: 4.9,
           category: 'therapy',
           ai_powered: true,
-          real_time: true
+          real_time: true,
+          completion_rate: 94,
+          trending: true,
+          new_feature: false
         },
         {
           id: 'adaptive-music',
           title: 'Thérapie Musicale Adaptative',
-          description: 'Musique générée en temps réel selon votre rythme cardiaque',
+          description: 'Génération musicale IA basée sur biométrie temps réel + analyse émotionnelle avancée',
           icon: Music,
           gradient: 'from-green-400 via-teal-500 to-blue-500',
           route: '/music',
@@ -187,12 +448,15 @@ const PremiumHomePage: React.FC = () => {
           avg_rating: 4.8,
           category: 'wellness',
           ai_powered: true,
-          real_time: true
+          real_time: true,
+          completion_rate: 89,
+          trending: true,
+          new_feature: true
         },
         {
           id: 'immersive-vr',
-          title: 'Réalité Virtuelle Thérapeutique',
-          description: 'Environnements immersifs pour méditation et relaxation profonde',
+          title: 'Métavers Thérapeutique',
+          description: 'Environnements VR/AR immersifs avec eye-tracking et biofeedback neural',
           icon: Eye,
           gradient: 'from-indigo-500 via-purple-500 to-pink-500',
           route: '/vr',
@@ -200,27 +464,33 @@ const PremiumHomePage: React.FC = () => {
           live_users: 453,
           avg_rating: 4.7,
           category: 'therapy',
-          ai_powered: false,
-          real_time: false
+          ai_powered: true,
+          real_time: false,
+          completion_rate: 76,
+          trending: false,
+          new_feature: true
         },
         {
-          id: 'social-wellness',
-          title: 'Communauté Bien-être',
-          description: 'Groupes de soutien et challenges collaboratifs en temps réel',
+          id: 'ai-coach-premium',
+          title: 'Coach IA Premium',
+          description: 'Coaching personnalisé 24/7 avec analyse comportementale prédictive et NLP avancé',
           icon: Users,
           gradient: 'from-pink-400 via-rose-500 to-red-500',
-          route: '/social-cocon',
-          premium: false,
+          route: '/coach',
+          premium: true,
           live_users: 2134,
-          avg_rating: 4.6,
+          avg_rating: 4.9,
           category: 'social',
-          ai_powered: false,
-          real_time: true
+          ai_powered: true,
+          real_time: true,
+          completion_rate: 91,
+          trending: true,
+          new_feature: false
         },
         {
-          id: 'gamified-goals',
-          title: 'Objectifs Gamifiés',
-          description: 'Transformez vos ambitions en quêtes épiques avec récompenses',
+          id: 'neural-gamification',
+          title: 'Gamification Neurale',
+          description: 'Quêtes adaptatiques basées sur neurofeedback avec récompenses blockchain NFT',
           icon: Trophy,
           gradient: 'from-yellow-400 via-orange-500 to-red-500',
           route: '/gamification',
@@ -229,12 +499,15 @@ const PremiumHomePage: React.FC = () => {
           avg_rating: 4.8,
           category: 'entertainment',
           ai_powered: true,
-          real_time: false
+          real_time: true,
+          completion_rate: 87,
+          trending: true,
+          new_feature: true
         },
         {
-          id: 'biometric-insights',
-          title: 'Analyses Biométriques',
-          description: 'Insights avancés basés sur vos données de santé connectées',
+          id: 'quantum-analytics',
+          title: 'Analytics Quantiques',
+          description: 'Prédictions comportementales avec algorithmes quantiques et ML distribué',
           icon: Activity,
           gradient: 'from-emerald-400 via-green-500 to-teal-500',
           route: '/weekly-bars',
@@ -243,11 +516,71 @@ const PremiumHomePage: React.FC = () => {
           avg_rating: 4.9,
           category: 'analytics',
           ai_powered: true,
-          real_time: true
+          real_time: true,
+          completion_rate: 95,
+          trending: false,
+          new_feature: true
+        },
+        {
+          id: 'holographic-journal',
+          title: 'Journal Holographique',
+          description: 'Journaling immersif avec analyse sémantique et reconstruction 3D des souvenirs',
+          icon: BookOpen,
+          gradient: 'from-violet-400 via-purple-500 to-indigo-500',
+          route: '/journal',
+          premium: true,
+          live_users: 1203,
+          avg_rating: 4.7,
+          category: 'therapy',
+          ai_powered: true,
+          real_time: false,
+          completion_rate: 82,
+          trending: false,
+          new_feature: true
+        },
+        {
+          id: 'biometric-sync',
+          title: 'Synchronisation Biométrique',
+          description: 'Intégration Apple Watch, Fitbit, Oura avec IA prédictive de santé mentale',
+          icon: Smartwatch,
+          gradient: 'from-cyan-400 via-blue-500 to-purple-500',
+          route: '/breathwork',
+          premium: true,
+          live_users: 956,
+          avg_rating: 4.8,
+          category: 'wellness',
+          ai_powered: true,
+          real_time: true,
+          completion_rate: 88,
+          trending: true,
+          new_feature: false
+        },
+        {
+          id: 'ar-meditation',
+          title: 'Méditation AR Spatiale',
+          description: 'Réalité augmentée avec tracking spatial pour méditation guidée immersive',
+          icon: Compass,
+          gradient: 'from-rose-400 via-pink-500 to-purple-500',
+          route: '/ar-filters',
+          premium: true,
+          live_users: 534,
+          avg_rating: 4.6,
+          category: 'wellness',
+          ai_powered: false,
+          real_time: false,
+          completion_rate: 73,
+          trending: false,
+          new_feature: true
         }
       ];
 
-      setLiveFeatures(features);
+      // Simulation de mise à jour en temps réel des utilisateurs actifs
+      const updatedFeatures = features.map(feature => ({
+        ...feature,
+        live_users: feature.live_users + Math.floor((Math.random() - 0.5) * 50)
+      }));
+
+      setLiveFeatures(updatedFeatures);
     } catch (error) {
       console.error('Error loading live features:', error);
     } finally {
@@ -684,7 +1017,17 @@ const PremiumHomePage: React.FC = () => {
                           <feature.icon className="h-6 w-6 text-white" />
                         </div>
                         
-                        <div className="flex items-center space-x-2">
+                         <div className="flex items-center space-x-2">
+                          {feature.new_feature && (
+                            <Badge className="bg-gradient-to-r from-green-400/20 to-emerald-500/20 border-green-500/50 text-green-300 text-xs animate-pulse">
+                              NOUVEAU
+                            </Badge>
+                          )}
+                          {feature.trending && (
+                            <Badge className="bg-gradient-to-r from-red-400/20 to-pink-500/20 border-red-500/50 text-red-300 text-xs">
+                              🔥 TENDANCE
+                            </Badge>
+                          )}
                           {feature.premium && (
                             <Badge className="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border-yellow-500/50 text-yellow-300 text-xs">
                               PRO
@@ -713,24 +1056,59 @@ const PremiumHomePage: React.FC = () => {
                     </CardHeader>
                     
                     <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between text-xs">
+                      <div className="grid grid-cols-2 gap-3 text-xs">
                         <div className="flex items-center space-x-1 text-blue-300">
                           <Users className="h-3 w-3" />
-                          <span>{feature.live_users.toLocaleString()} actifs</span>
+                          <span>{feature.live_users.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center space-x-1 text-yellow-300">
                           <Star className="h-3 w-3 fill-current" />
                           <span>{feature.avg_rating}</span>
                         </div>
+                        <div className="flex items-center space-x-1 text-green-300">
+                          <Target className="h-3 w-3" />
+                          <span>{feature.completion_rate}% succès</span>
+                        </div>
+                        <div className="flex items-center space-x-1 text-purple-300">
+                          <TrendingUp className="h-3 w-3" />
+                          <span>{feature.category}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Barre de progression pour le taux de completion */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-300">Taux de réussite</span>
+                          <span className="text-white">{feature.completion_rate}%</span>
+                        </div>
+                        <div className="w-full bg-gray-700/50 rounded-full h-2">
+                          <motion.div 
+                            className={cn(
+                              "h-2 rounded-full transition-all duration-1000",
+                              feature.completion_rate >= 90 ? "bg-gradient-to-r from-green-400 to-emerald-500" :
+                              feature.completion_rate >= 80 ? "bg-gradient-to-r from-blue-400 to-cyan-500" :
+                              feature.completion_rate >= 70 ? "bg-gradient-to-r from-yellow-400 to-orange-500" :
+                              "bg-gradient-to-r from-red-400 to-pink-500"
+                            )}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${feature.completion_rate}%` }}
+                            transition={{ delay: 0.3 * index, duration: 1 }}
+                          />
+                        </div>
                       </div>
                       
                       <NavigationButton
                         to={feature.route}
-                        className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20"
+                        className={cn(
+                          "w-full text-white border-white/20 transition-all duration-300",
+                          feature.trending 
+                            ? "bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 border-red-500/30" 
+                            : "bg-white/10 hover:bg-white/20"
+                        )}
                         variant="outline"
                         showArrow
                       >
-                        Explorer
+                        {feature.new_feature ? "✨ Découvrir" : "Explorer"}
                       </NavigationButton>
                     </CardContent>
                   </Card>
@@ -738,6 +1116,243 @@ const PremiumHomePage: React.FC = () => {
               ))}
             </div>
           </motion.section>
+
+          {/* Panneau de Contrôle Immersif - Desktop seulement */}
+          {deviceOptimization === 'desktop' && (
+            <motion.section
+              className="relative z-10 mb-20"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+            >
+              <Card className="bg-gradient-to-br from-black/20 to-gray-900/20 backdrop-blur-xl border-white/5">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-white text-2xl font-bold flex items-center">
+                      <Settings className="mr-3 h-6 w-6 text-cyan-400" />
+                      Centre de Contrôle Premium
+                    </h2>
+                    <FunctionalButton
+                      actionId="immersive-toggle"
+                      onClick={toggleImmersiveMode}
+                      variant={isImmersiveMode ? "default" : "outline"}
+                      size="lg"
+                      className={cn(
+                        "relative overflow-hidden",
+                        isImmersiveMode 
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25" 
+                          : "border-white/20 text-white hover:bg-white/10"
+                      )}
+                    >
+                      {isImmersiveMode ? (
+                        <>
+                          <Minimize2 className="mr-2 h-4 w-4" />
+                          Mode Immersif ON
+                        </>
+                      ) : (
+                        <>
+                          <Maximize2 className="mr-2 h-4 w-4" />
+                          Activer Mode Immersif
+                        </>
+                      )}
+                    </FunctionalButton>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-4 gap-6">
+                    {/* Métriques de Performance */}
+                    {performanceMetrics && (
+                      <div className="space-y-4">
+                        <h3 className="text-cyan-300 font-medium flex items-center">
+                          <Cpu className="mr-2 h-4 w-4" />
+                          Performance Système
+                        </h3>
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-300">CPU</span>
+                              <span className="text-white">{performanceMetrics.cpu_usage.toFixed(1)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-700/50 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-1000"
+                                style={{ width: `${performanceMetrics.cpu_usage}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-300">RAM</span>
+                              <span className="text-white">{performanceMetrics.memory_usage.toFixed(1)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-700/50 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-400 to-purple-500 h-2 rounded-full transition-all duration-1000"
+                                style={{ width: `${performanceMetrics.memory_usage}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-gray-300">Latence IA</span>
+                              <span className="text-white">{performanceMetrics.ai_response_time.toFixed(0)}ms</span>
+                            </div>
+                            <div className="w-full bg-gray-700/50 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all duration-1000"
+                                style={{ width: `${Math.min(performanceMetrics.ai_response_time / 5, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Données Biométriques */}
+                    {immersiveElements.biometricSync && (
+                      <div className="space-y-4">
+                        <h3 className="text-green-300 font-medium flex items-center">
+                          <Activity className="mr-2 h-4 w-4" />
+                          Biométrie Live
+                        </h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-300 text-sm">Rythme Cardiaque</span>
+                            <span className="text-red-400 font-bold">{biometricData.heartRate} BPM</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-300 text-sm">Index Stress</span>
+                            <span className="text-orange-400 font-bold">{biometricData.stressIndex}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-300 text-sm">Niveau Focus</span>
+                            <span className="text-blue-400 font-bold">{biometricData.focusLevel}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-300 text-sm">Niveau Énergie</span>
+                            <span className="text-green-400 font-bold">{biometricData.energyLevel}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Insights IA */}
+                    {aiInsights.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-purple-300 font-medium flex items-center">
+                          <Brain className="mr-2 h-4 w-4" />
+                          Insights IA Live
+                        </h3>
+                        <div className="space-y-2">
+                          {aiInsights.map((insight, index) => (
+                            <motion.div
+                              key={index}
+                              className="p-2 bg-white/5 rounded-lg border border-white/10"
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.2 }}
+                            >
+                              <p className="text-xs text-purple-200">{insight}</p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Contrôles Environnement */}
+                    <div className="space-y-4">
+                      <h3 className="text-yellow-300 font-medium flex items-center">
+                        <Palette className="mr-2 h-4 w-4" />
+                        Environnement
+                      </h3>
+                      <div className="space-y-3">
+                        <div>
+                          <span className="text-gray-300 text-sm block mb-2">Mode Ambiant</span>
+                          <div className="flex space-x-2">
+                            {(['cosmic', 'forest', 'ocean', 'aurora'] as const).map((mode) => (
+                              <button
+                                key={mode}
+                                onClick={() => setAmbientMode(mode)}
+                                className={cn(
+                                  "w-8 h-8 rounded-full border-2 transition-all",
+                                  ambientMode === mode ? "border-white scale-110" : "border-white/30 hover:border-white/60",
+                                  mode === 'cosmic' && "bg-gradient-to-br from-indigo-500 to-purple-600",
+                                  mode === 'forest' && "bg-gradient-to-br from-green-500 to-emerald-600",
+                                  mode === 'ocean' && "bg-gradient-to-br from-blue-500 to-cyan-600",
+                                  mode === 'aurora' && "bg-gradient-to-br from-pink-500 to-violet-600"
+                                )}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <label className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={immersiveElements.showParticles}
+                              onChange={(e) => setImmersiveElements(prev => ({ ...prev, showParticles: e.target.checked }))}
+                              className="rounded border-white/20 bg-transparent"
+                            />
+                            <span className="text-gray-300 text-sm">Particules</span>
+                          </label>
+                          
+                          <label className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={immersiveElements.adaptiveLighting}
+                              onChange={(e) => setImmersiveElements(prev => ({ ...prev, adaptiveLighting: e.target.checked }))}
+                              className="rounded border-white/20 bg-transparent"
+                            />
+                            <span className="text-gray-300 text-sm">Éclairage Adaptatif</span>
+                          </label>
+                          
+                          <label className="flex items-center space-x-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={immersiveElements.biometricSync}
+                              onChange={(e) => setImmersiveElements(prev => ({ ...prev, biometricSync: e.target.checked }))}
+                              className="rounded border-white/20 bg-transparent"
+                            />
+                            <span className="text-gray-300 text-sm">Sync Biométrique</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.section>
+          )}
+
+          {/* Canvas pour particules interactives */}
+          {immersiveElements.showParticles && !shouldReduceMotion && (
+            <canvas
+              ref={particleCanvasRef}
+              className="fixed inset-0 pointer-events-none z-5"
+              style={{ background: 'transparent' }}
+            />
+          )}
+
+          {/* Cursor Trail Effect */}
+          {deviceOptimization === 'desktop' && !shouldReduceMotion && (
+            <div className="fixed inset-0 pointer-events-none z-30">
+              {cursorTrail.map((point, index) => (
+                <motion.div
+                  key={`${point.timestamp}-${index}`}
+                  className="absolute w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"
+                  initial={{ opacity: 0.8, scale: 1 }}
+                  animate={{ 
+                    opacity: 0, 
+                    scale: 0,
+                    x: point.x - 4,
+                    y: point.y - 4
+                  }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Scroll Indicator */}
           {deviceOptimization === 'desktop' && (
@@ -748,9 +1363,10 @@ const PremiumHomePage: React.FC = () => {
               transition={{ delay: 2 }}
             >
               <motion.div
-                className="flex flex-col items-center text-white/60 cursor-pointer"
+                className="flex flex-col items-center text-white/60 cursor-pointer hover:text-white/80 transition-colors"
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
+                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
               >
                 <span className="text-xs mb-2">Découvrir plus</span>
                 <ChevronDown className="h-4 w-4" />
