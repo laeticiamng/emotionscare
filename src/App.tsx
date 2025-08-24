@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';
 import MusicProvider from './contexts/MusicContext';
