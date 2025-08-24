@@ -1,6 +1,18 @@
 
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.openai-realtime]
+verify_jwt = false
+
+[functions.suno-music-generation]
+verify_jwt = false  
+
+[functions.emotion-analysis]
+verify_jwt = false
+
+[functions.journal-analysis]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

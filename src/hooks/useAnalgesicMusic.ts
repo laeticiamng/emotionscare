@@ -2,6 +2,7 @@
 // Hook React pour la musique antalgique EmotionsCare
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSunoMusic } from '@/hooks/api/useSunoMusic';
 
 export interface AnalgesicTrackRequest {
   text: string;
