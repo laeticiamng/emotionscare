@@ -12,7 +12,7 @@ import {
   Music, 
   BookOpen, 
   Wind, 
-  Eye3D, 
+  Eye, 
   Palette, 
   Wand2,
   Zap,
@@ -56,7 +56,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'coach', label: 'Coach IA', icon: Sparkles, href: '/coach', category: 'Accompagnement', description: 'Assistant personnel', isNew: true },
   
   // Modules innovants
-  { id: 'vr', label: 'Réalité Virtuelle', icon: Eye3D, href: '/vr', category: 'Immersif', description: 'Expériences VR', isPremium: true },
+  { id: 'vr', label: 'Réalité Virtuelle', icon: Eye, href: '/vr', category: 'Immersif', description: 'Expériences VR', isPremium: true },
   { id: 'mood-mixer', label: 'Mood Mixer', icon: Palette, href: '/mood-mixer', category: 'Créatif', description: 'Mix personnalisé' },
   { id: 'story-synth', label: 'Story Synth Lab', icon: Wand2, href: '/story-synth-lab', category: 'Créatif', description: 'Histoires IA' },
   { id: 'boss-level', label: 'Boss Level Grit', icon: Target, href: '/boss-level-grit', category: 'Développement', description: 'Défis gamifiés' },
@@ -65,7 +65,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'ambition-arcade', label: 'Ambition Arcade', icon: Zap, href: '/ambition-arcade', category: 'Gamification', description: 'Jeux motivationnels' },
   { id: 'bounce-back', label: 'Bounce Back Battle', icon: Shield, href: '/bounce-back-battle', category: 'Résilience', description: 'Récupération émotionnelle' },
   { id: 'flash-glow', label: 'Flash Glow', icon: Sparkles, href: '/flash-glow', category: 'Instantané', description: 'Boost rapide' },
-  { id: 'ar-filters', label: 'AR Filters', icon: Eye3D, href: '/ar-filters', category: 'Immersif', description: 'Réalité augmentée' },
+  { id: 'ar-filters', label: 'AR Filters', icon: Eye, href: '/ar-filters', category: 'Immersif', description: 'Réalité augmentée' },
   
   // Analytics
   { id: 'weekly-bars', label: 'Weekly Bars', icon: BarChart3, href: '/weekly-bars', category: 'Analytics', description: 'Graphiques hebdo' },
