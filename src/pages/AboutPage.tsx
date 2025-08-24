@@ -238,7 +238,7 @@ const AboutPage: React.FC = () => {
                     <div className="mx-auto p-3 bg-primary/10 rounded-full w-fit mb-4">
                       <value.icon className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle>{value.title}</CardTitle>
+                    <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">{value.description}</p>
@@ -271,7 +271,7 @@ const AboutPage: React.FC = () => {
                       <feature.icon className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <CardTitle>{feature.title}</CardTitle>
+                      <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
                       <CardDescription>{feature.description}</CardDescription>
                     </div>
                   </div>
@@ -301,7 +301,7 @@ const AboutPage: React.FC = () => {
                   <div className="w-20 h-20 bg-gradient-to-br from-primary to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
                     {member.name.split(' ').map(n => n[0]).join('')}
                   </div>
-                  <CardTitle>{member.name}</CardTitle>
+                  <h3 className="font-semibold text-lg mb-2">{member.name}</h3>
                   <CardDescription>{member.role}</CardDescription>
                   <Badge variant="secondary">{member.speciality}</Badge>
                 </CardHeader>
@@ -323,10 +323,10 @@ const AboutPage: React.FC = () => {
           <Card>
             <CardHeader>
               <div className="text-center">
-                <CardTitle className="text-2xl mb-2 flex items-center justify-center gap-2">
+                <h2 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
                   <Award className="h-6 w-6 text-primary" />
                   Certifications & Conformité
-                </CardTitle>
+                </h2>
                 <CardDescription>
                   Notre engagement envers la sécurité et la qualité
                 </CardDescription>
@@ -357,9 +357,9 @@ const AboutPage: React.FC = () => {
         >
           <Card className="bg-gradient-to-r from-primary/10 to-purple-500/10 border-primary/20">
             <CardContent className="py-12">
-              <h3 className="text-3xl font-bold mb-4">
+              <h2 className="text-3xl font-bold mb-4">
                 Prêt à Transformer Votre Bien-être ?
-              </h3>
+              </h2>
               <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Rejoignez des milliers d'utilisateurs qui ont déjà commencé leur parcours 
                 vers un meilleur équilibre émotionnel avec EmotionsCare.
