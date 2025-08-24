@@ -1,6 +1,6 @@
 
 import { ReactElement, ReactNode } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 type NotificationVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 

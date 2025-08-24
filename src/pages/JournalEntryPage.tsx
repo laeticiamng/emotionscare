@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Clock, TagIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import JournalPageHeader from '@/components/journal/JournalPageHeader';
 
 // Interface de l'entrée de journal

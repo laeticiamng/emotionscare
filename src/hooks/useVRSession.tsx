@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import VRService from '@/lib/vrService';
 import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface UseVRSessionOptions {
   autoStart?: boolean;

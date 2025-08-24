@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Camera, Mic, Star, Send, Bug, Lightbulb, Heart, Plus } from 'lucide-react';
 import { FeedbackEntry } from '@/types/feedback';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface FeedbackFormProps {
   onSubmit: (feedback: Partial<FeedbackEntry>) => void;

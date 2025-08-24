@@ -11,7 +11,7 @@ import MiniCoach from '@/components/coach/MiniCoach';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ActionButtons from '@/components/home/ActionButtons';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useUserMode } from '@/contexts/UserModeContext';
 import GamificationWidget from '@/components/dashboard/widgets/GamificationWidget';
 

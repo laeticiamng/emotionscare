@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { EmotionResult } from '@/types/emotion';
 import { MusicPlaylist } from '@/types/music';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface MusicEmotionSyncProps {
   emotionResult?: EmotionResult | null;

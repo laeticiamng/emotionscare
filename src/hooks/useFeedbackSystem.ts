@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { FeedbackEntry, ImprovementSuggestion, QualityMetrics, AuditLog } from '@/types/feedback';
 import { FeedbackService } from '@/services/FeedbackService';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface UseFeedbackSystemReturn {
   // État

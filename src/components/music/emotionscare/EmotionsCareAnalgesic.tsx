@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Heart, Activity, Brain, Music, Clock, Play } from 'lucide-react';
 import { useAnalgesicMusic } from '@/hooks/useAnalgesicMusic';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const EmotionsCareAnalgesic: React.FC = () => {
   const [inputText, setInputText] = useState('');
