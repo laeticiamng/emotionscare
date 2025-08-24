@@ -9,11 +9,12 @@ import { ArrowRight, Star, Zap } from 'lucide-react';
 interface FeatureCardProps {
   title: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string }> | React.ReactNode;
   gradient?: string;
   action?: {
     label: string;
     onClick: () => void;
+    variant?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
   };
   isPremium?: boolean;
   isPopular?: boolean;
@@ -21,6 +22,11 @@ interface FeatureCardProps {
     label: string;
     value: string;
   }>;
+  metadata?: Array<{
+    label: string;
+    value: string;
+  }>;
+  category?: string;
   index?: number;
   className?: string;
 }
@@ -28,12 +34,14 @@ interface FeatureCardProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({
   title,
   description,
-  icon: Icon,
+  icon,
   gradient = 'from-primary to-primary/80',
   action,
   isPremium,
   isPopular,
   stats,
+  metadata,
+  category,
   index = 0,
   className
 }) => {
@@ -73,6 +81,15 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         isPopular && "ring-2 ring-primary/20 ring-offset-2 ring-offset-background",
         className
       )}>
+        {/* Category Badge */}
+        {category && (
+          <div className="absolute top-4 right-4 z-20">
+            <Badge variant="secondary" className="bg-background/90 text-muted-foreground">
+              {category}
+            </Badge>
+          </div>
+        )}
+
         {/* Popular Badge */}
         {isPopular && (
           <div className="absolute -top-2 -right-2 z-20">
@@ -113,7 +130,13 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             }}
             transition={{ duration: 0.6 }}
           >
-            <Icon className="h-8 w-8 text-white" />
+            {React.isValidElement(icon) ? (
+              icon
+            ) : typeof icon === 'function' ? (
+              React.createElement(icon as React.ComponentType<{ className?: string }>, { className: "h-8 w-8 text-white" })
+            ) : (
+              icon
+            )}
           </motion.div>
 
           <div>
@@ -127,6 +150,18 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         </CardHeader>
 
         <CardContent className="relative z-10 space-y-4">
+          {/* Metadata */}
+          {metadata && metadata.length > 0 && (
+            <div className="space-y-2 py-3 bg-muted/20 rounded-lg px-3">
+              {metadata.map((meta, idx) => (
+                <div key={idx} className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">{meta.label}:</span>
+                  <span className="font-medium text-foreground">{meta.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Stats */}
           {stats && stats.length > 0 && (
             <div className="grid grid-cols-2 gap-2 py-4 bg-muted/20 rounded-lg">
@@ -142,10 +177,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           {/* Action Button */}
           {action && (
             <Button 
+              variant={action.variant || 'default'}
               className={cn(
                 "w-full font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl",
-                `bg-gradient-to-r ${gradient}`,
-                "hover:scale-105 transition-all duration-300 text-white"
+                action.variant === 'default' && `bg-gradient-to-r ${gradient}`,
+                "hover:scale-105 transition-all duration-300",
+                action.variant === 'default' && "text-white"
               )}
               onClick={(e) => {
                 e.stopPropagation();
