@@ -43,4 +43,5 @@ const AppShell: React.FC = () => {
   );
 };
 
+export { AppShell };
 export default AppShell;

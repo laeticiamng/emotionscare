@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import { OFFICIAL_ROUTES } from '../routesManifest';
-import { AppShell } from '../components/layout/AppShell';
+import AppShell from '../components/layout/AppShell';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 // Lazy load all pages for the 52 official routes
