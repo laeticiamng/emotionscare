@@ -74,6 +74,7 @@ const SettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
 const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
 const AuditPage = lazy(() => import('@/pages/AuditPage'));
 const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
+const PlatformAuditPage = lazy(() => import('@/pages/PlatformAuditPage'));
 
 const RouteAccessibilityChecker = lazy(() => import('@/pages/RouteAccessibilityChecker'));
 const NavigationTestPage = lazy(() => import('@/pages/NavigationTestPage'));
@@ -547,6 +548,14 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
                 <AccessibilityPage />
               </SuspenseWrapper>
             </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'platform-audit',
+          element: (
+            <SuspenseWrapper>
+              <PlatformAuditPage />
+            </SuspenseWrapper>
           ),
         },
         
