@@ -1,196 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageRoot } from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Target, 
-  Crown,
-  Flame
-} from 'lucide-react';
-import UnifiedShell from '@/components/unified/UnifiedShell';
-import ChallengeCard from '@/components/boss-level-grit/ChallengeCard';
-import ActiveSession from '@/components/boss-level-grit/ActiveSession';
-import ProgressStats from '@/components/boss-level-grit/ProgressStats';
-import AchievementsList from '@/components/boss-level-grit/AchievementsList';
-import { GritChallenge, GritStats } from '@/types/boss-level-grit';
+import { Sword, Shield, Crown, Target, Zap, Heart } from 'lucide-react';
+import { useMood } from '@/contexts/MoodContext';
+import { useActivityLogger } from '@/hooks/useActivityLogger';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
-const BossLevelGritPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('challenges');
-  const [selectedChallenge, setSelectedChallenge] = useState<GritChallenge | null>(null);
+const BossLevelGritPage = () => {
+  const [currentQuest, setCurrentQuest] = useState<any>(null);
+  const [gritLevel, setGritLevel] = useState(1);
+  const [experience, setExperience] = useState(250);
+  const [isLoadingQuest, setIsLoadingQuest] = useState(false);
+  const [completedQuests, setCompletedQuests] = useState(0);
+  const { currentMood } = useMood();
+  const { logActivity } = useActivityLogger();
 
-  // Mock data - en production, ces données viendraient d'une API
-  const [gritStats] = useState<GritStats>({
-    totalXp: 2450,
-    currentLevel: {
-      id: 'warrior',
-      name: 'Guerrier Mental',
-      description: 'Vous maîtrisez les bases de la résilience',
-      minXp: 2000,
-      maxXp: 5000,
-      color: 'hsl(var(--primary))',
-      icon: '⚔️',
-      benefits: ['Défis avancés débloqués', 'Sessions personnalisées', 'Coach IA spécialisé'],
-      unlockedFeatures: ['Challenges Master', 'Mindset Builder', 'Progress Analytics']
-    },
-    nextLevel: {
-      id: 'master',
-      name: 'Maître de la Résilience',
-      description: 'Expert en gestion du stress et dépassement de soi',
-      minXp: 5000,
-      maxXp: 10000,
-      color: 'hsl(var(--accent))',
-      icon: '🏆',
-      benefits: ['Défis légendaires', 'Coaching personnalisé', 'Communauté VIP'],
-      unlockedFeatures: ['Legend Challenges', 'Personal Coach', 'VIP Community']
-    },
-    completedChallenges: 23,
-    currentStreak: 7,
-    longestStreak: 14,
-    averageScore: 87,
-    totalSessionTime: 1240,
-    categoriesProgress: {
-      mental: 85,
-      physical: 60,
-      emotional: 75,
-      spiritual: 45
-    },
-    achievements: [
-      {
-        id: 'first-complete',
-        title: 'Premier Défi',
-        description: 'Complétez votre premier défi',
-        icon: '🎯',
-        type: 'completion',
-        requirement: 1,
-        progress: 1,
-        unlocked: true,
-        unlockedAt: new Date('2024-01-15'),
-        reward: { xp: 100 }
-      },
-      {
-        id: 'streak-master',
-        title: 'Maître de la Constance',
-        description: 'Maintenez une série de 10 jours',
-        icon: '🔥',
-        type: 'streak',
-        requirement: 10,
-        progress: 7,
-        unlocked: false,
-        reward: { xp: 500, features: ['Advanced Analytics'] }
-      },
-      {
-        id: 'mental-fortress',
-        title: 'Forteresse Mentale',
-        description: 'Complétez 5 défis mentaux',
-        icon: '🧠',
-        type: 'category',
-        requirement: 5,
-        progress: 3,
-        unlocked: false,
-        reward: { xp: 300 }
-      },
-      {
-        id: 'perfect-score',
-        title: 'Perfection',
-        description: 'Obtenez un score de 100%',
-        icon: '⭐',
-        type: 'score',
-        requirement: 100,
-        progress: 87,
-        unlocked: false,
-        reward: { xp: 400, features: ['Perfect Mode'] }
-      }
-    ]
-  });
-
-  const [challenges] = useState<GritChallenge[]>([
-    {
-      id: 'mental-fortress',
-      title: 'Forteresse Mentale',
-      description: 'Développez votre résistance au stress avec des techniques avancées de visualisation et de pleine conscience',
-      difficulty: 'warrior',
-      category: 'mental',
-      duration: 15,
-      xpReward: 200,
-      completionRate: 78,
-      status: 'available',
-      tags: ['Visualisation', 'Stress', 'Focus', 'Méditation'],
-      createdAt: new Date()
-    },
-    {
-      id: 'emotional-mastery',
-      title: 'Maîtrise Émotionnelle',
-      description: 'Apprenez à gérer vos émotions intenses et à les transformer en force motrice',
-      difficulty: 'master',
-      category: 'emotional',
-      duration: 20,
-      xpReward: 350,
-      completionRate: 65,
-      status: 'available',
-      streakRequired: 5,
-      tags: ['Émotions', 'Régulation', 'Transformation', 'Intelligence émotionnelle'],
-      createdAt: new Date()
-    },
-    {
-      id: 'physical-endurance',
-      title: 'Endurance Physique',
-      description: 'Repoussez vos limites physiques avec des exercices progressifs et adaptés',
-      difficulty: 'novice',
-      category: 'physical',
-      duration: 10,
-      xpReward: 150,
-      completionRate: 89,
-      status: 'completed',
-      tags: ['Endurance', 'Corps', 'Limites', 'Progression'],
-      createdAt: new Date(),
-      completedAt: new Date('2024-01-10')
-    },
-    {
-      id: 'spiritual-awakening',
-      title: 'Éveil Spirituel',
-      description: 'Connectez-vous à votre essence profonde et trouvez votre purpose dans l\'adversité',
-      difficulty: 'legend',
-      category: 'spiritual',
-      duration: 30,
-      xpReward: 500,
-      completionRate: 42,
-      status: 'locked',
-      streakRequired: 15,
-      prerequisites: ['mental-fortress', 'emotional-mastery'],
-      tags: ['Spiritualité', 'Purpose', 'Connexion', 'Transcendance'],
-      createdAt: new Date()
-    },
-    {
-      id: 'pressure-diamond',
-      title: 'Diamant sous Pression',
-      description: 'Transformez la pression en performance exceptionnelle grâce à des techniques de résilience avancées',
-      difficulty: 'master',
-      category: 'mental',
-      duration: 25,
-      xpReward: 400,
-      completionRate: 58,
-      status: 'available',
-      streakRequired: 10,
-      tags: ['Pression', 'Performance', 'Résilience', 'Excellence'],
-      createdAt: new Date()
-    },
-    {
-      id: 'heart-warrior',
-      title: 'Guerrier du Cœur',
-      description: 'Développez votre courage émotionnel et votre capacité à faire face aux défis relationnels',
-      difficulty: 'warrior',
-      category: 'emotional',
-      duration: 18,
-      xpReward: 250,
-      completionRate: 72,
-      status: 'available',
-      tags: ['Courage', 'Relations', 'Vulnérabilité', 'Authenticité'],
-      createdAt: new Date()
-    }
-  ]);
+  useEffect(() => {
+    logActivity('/boss-level-grit', 'grit_development_page');
+    loadPersonalizedQuest();
+  }, [logActivity]);
 
   const startChallenge = (challenge: GritChallenge) => {
     setSelectedChallenge(challenge);

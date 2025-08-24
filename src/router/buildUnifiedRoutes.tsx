@@ -1,663 +1,320 @@
+import React from 'react';
+import { RouteObject } from 'react-router-dom';
+import { OFFICIAL_ROUTES } from '../routesManifest';
+import { AppShell } from '../components/layout/AppShell';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
-import { lazy, Suspense } from 'react';
-import { RouteObject, Navigate } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
-import MainLayout from '@/components/layout/MainLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { dashboardRoutes } from './routes/dashboardRoutes';
-import OptimizedErrorBoundary from '@/components/ErrorBoundary/OptimizedErrorBoundary';
+// Lazy load all pages for the 52 official routes
+const HomePage = React.lazy(() => import('../pages/HomePage'));
+const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 
-// Lazy load components - 52 ROUTES OFFICIELLES
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
-const AuthPage = lazy(() => import('@/pages/AuthPage'));
-const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+// Mesure émotionnelle et biométrie (9 routes)
+const EmotionScanPage = React.lazy(() => import('../pages/EmotionScanPage'));
+const ARFiltersPage = React.lazy(() => import('../pages/ARFiltersPage'));
+const BubbleBeatPage = React.lazy(() => import('../pages/BubbleBeatPage'));
+const ScreenSilkBreakPage = React.lazy(() => import('../pages/ScreenSilkBreakPage'));
+const VRGalactiquePage = React.lazy(() => import('../pages/VRGalactiquePage'));
+const VRHubPage = React.lazy(() => import('../pages/VRHubPage'));
+const BreathworkPage = React.lazy(() => import('../pages/BreathworkPage'));
+const InstantGlowPage = React.lazy(() => import('../pages/InstantGlowPage'));
+const PlatformStatusPage = React.lazy(() => import('../pages/PlatformStatusPage'));
 
-// Auth pages (6)
-const B2CLoginPage = lazy(() => import('@/pages/b2c/auth/B2CLoginPage'));
-const B2CRegisterPage = lazy(() => import('@/pages/b2c/auth/B2CRegisterPage'));
-const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/auth/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/auth/B2BUserRegisterPage'));
-const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/auth/B2BAdminLoginPage'));
+// Résilience et rebond (5 routes)
+const BossLevelGritPage = React.lazy(() => import('../pages/BossLevelGritPage'));
+const BounceBackBattlePage = React.lazy(() => import('../pages/BounceBackBattlePage'));
+const FlashGlowPage = React.lazy(() => import('../pages/FlashGlowPage'));
+const WeeklyBarsPage = React.lazy(() => import('../pages/WeeklyBarsPage'));
+const HeatmapVibesPage = React.lazy(() => import('../pages/HeatmapVibesPage'));
 
-// Feature pages principales (8)
-const ScanPage = lazy(() => import('@/pages/features/ScanPage'));
-const MusicPage = lazy(() => import('@/pages/features/MusicPage'));
-const CoachPage = lazy(() => import('@/pages/features/CoachPage'));
-const JournalPage = lazy(() => import('@/pages/features/JournalPage'));
-const VRPage = lazy(() => import('@/pages/features/VRPage'));
-const PreferencesPage = lazy(() => import('@/pages/features/PreferencesPage'));
-const GamificationPage = lazy(() => import('@/pages/features/GamificationPage'));
-const SocialCoconPage = lazy(() => import('@/pages/features/SocialCoconPage'));
-const DemoPage = lazy(() => import('@/pages/DemoPage'));
+// Ambition, motivation, progression (4 routes)
+const AmbitionArcadePage = React.lazy(() => import('../pages/AmbitionArcadePage'));
+const MoodMixerPage = React.lazy(() => import('../pages/MoodMixerPage'));
+const MusicTherapyPage = React.lazy(() => import('../pages/MusicTherapyPage'));
+const GamificationPage = React.lazy(() => import('../pages/GamificationPage'));
 
-// Modules fun-first avec IA (11)
-const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
-const MoodMixerPage = lazy(() => import('@/pages/MoodMixerPage'));
-const AmbitionArcadePage = lazy(() => import('@/pages/AmbitionArcadePage'));
-const BounceBackBattlePage = lazy(() => import('@/pages/BounceBackBattlePage'));
-const StorySynthLabPage = lazy(() => import('@/pages/StorySynthLabPage'));
-const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
-const ARFiltersPage = lazy(() => import('@/pages/ARFiltersPage'));
-const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
-const ScreenSilkBreakPage = lazy(() => import('@/pages/ScreenSilkBreakPage'));
-const VRGalactiquePage = lazy(() => import('@/pages/VRGalactiquePage'));
-const InstantGlowPage = lazy(() => import('@/pages/InstantGlowPage'));
+// Journal et insights (4 routes)
+const JournalPage = React.lazy(() => import('../pages/JournalPage'));
+const DataExportPage = React.lazy(() => import('../pages/DataExportPage'));
+const ActivityHistoryPage = React.lazy(() => import('../pages/ActivityHistoryPage'));
+const InAppFeedbackPage = React.lazy(() => import('../pages/InAppFeedbackPage'));
 
-// Analytics & data (3)
-const WeeklyBarsPage = lazy(() => import('@/pages/WeeklyBarsPage'));
-const HeatmapVibesPage = lazy(() => import('@/pages/HeatmapVibesPage'));
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
+// Onboarding, accès, préférences (9 routes)
+const OnboardingPage = React.lazy(() => import('../pages/OnboardingPage'));
+const ChooseModePage = React.lazy(() => import('../pages/ChooseModePage'));
+const ProfileSettingsPage = React.lazy(() => import('../pages/ProfileSettingsPage'));
+const UserPreferencesPage = React.lazy(() => import('../pages/UserPreferencesPage'));
+const PrivacyTogglesPage = React.lazy(() => import('../pages/PrivacyTogglesPage'));
+const NotificationsPage = React.lazy(() => import('../pages/NotificationsPage'));
+const HelpCenterPage = React.lazy(() => import('../pages/HelpCenterPage'));
+const AccountDeletionPage = React.lazy(() => import('../pages/AccountDeletionPage'));
 
-// Paramètres & compte (7)
-const PrivacyTogglesPage = lazy(() => import('@/pages/PrivacyTogglesPage'));
-const ExportCSVPage = lazy(() => import('@/pages/ExportCSVPage'));
-const AccountDeletePage = lazy(() => import('@/pages/AccountDeletePage'));
-const HealthCheckBadgePage = lazy(() => import('@/pages/HealthCheckBadgePage'));
-const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
-const NotificationPage = lazy(() => import('@/pages/NotificationPage'));
-const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'));
-const ProfileSettingsPage = lazy(() => import('@/pages/ProfileSettingsPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
-const SearchPage = lazy(() => import('@/pages/SearchPage'));
+// B2C (3 routes)
+const B2CLoginPage = React.lazy(() => import('../pages/B2CLoginPage'));
+const B2CRegisterPage = React.lazy(() => import('../pages/B2CRegisterPage'));
+const B2CDashboardPage = React.lazy(() => import('../pages/B2CDashboardPage'));
 
-// Historique & feedback (2)
-const ActivityHistoryPage = lazy(() => import('@/pages/ActivityHistoryPage'));
-const FeedbackPage = lazy(() => import('@/pages/FeedbackPage'));
+// B2B (6 routes)
+const B2BSelectionPage = React.lazy(() => import('../pages/B2BSelectionPage'));
+const B2BUserLoginPage = React.lazy(() => import('../pages/B2BUserLoginPage'));
+const B2BUserRegisterPage = React.lazy(() => import('../pages/B2BUserRegisterPage'));
+const B2BUserDashboardPage = React.lazy(() => import('../pages/B2BUserDashboardPage'));
+const B2BAdminLoginPage = React.lazy(() => import('../pages/B2BAdminLoginPage'));
+const B2BAdminDashboardPage = React.lazy(() => import('../pages/B2BAdminDashboardPage'));
 
-// B2B Admin pages (8)
-const TeamsPage = lazy(() => import('@/pages/b2b/admin/TeamsPage'));
-const ReportsPage = lazy(() => import('@/pages/b2b/admin/ReportsPage'));
-const EventsPage = lazy(() => import('@/pages/b2b/admin/EventsPage'));
-const OptimisationPage = lazy(() => import('@/pages/b2b/admin/OptimisationPage'));
-const SettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
-const SecurityPage = lazy(() => import('@/pages/SecurityPage'));
-const AuditPage = lazy(() => import('@/pages/AuditPage'));
-const AccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
-const InnovationPage = lazy(() => import('@/pages/InnovationPage'));
-const PlatformAuditPage = lazy(() => import('@/pages/PlatformAuditPage'));
-const CompleteSystemAuditPage = lazy(() => import('@/pages/CompleteSystemAuditPage'));
+// B2B Admin (12 routes)
+const TeamsPage = React.lazy(() => import('../pages/TeamsPage'));
+const ReportsPage = React.lazy(() => import('../pages/ReportsPage'));
+const EventsPage = React.lazy(() => import('../pages/EventsPage'));
+const OptimisationPage = React.lazy(() => import('../pages/OptimisationPage'));
+const SettingsPage = React.lazy(() => import('../pages/SettingsPage'));
+const SecurityDashboardPage = React.lazy(() => import('../pages/SecurityDashboardPage'));
+const SystemAuditPage = React.lazy(() => import('../pages/SystemAuditPage'));
+const AccessibilityPage = React.lazy(() => import('../pages/AccessibilityPage'));
+const InnovationLabPage = React.lazy(() => import('../pages/InnovationLabPage'));
 
-const RouteAccessibilityChecker = lazy(() => import('@/pages/RouteAccessibilityChecker'));
-const NavigationTestPage = lazy(() => import('@/pages/NavigationTestPage'));
-const PageQualityAuditor = lazy(() => import('@/pages/PageQualityAuditor'));
-const TestFeatureCard = lazy(() => import('@/components/debug/TestFeatureCard'));
-const PageHealthCheck = lazy(() => import('@/components/debug/PageHealthCheck'));
-const PageIntegrityChecker = lazy(() => import('@/components/debug/PageIntegrityChecker'));
-const ApiIntegrationChecker = lazy(() => import('@/components/debug/ApiIntegrationChecker'));
+// Additional required pages
+const CoachPage = React.lazy(() => import('../pages/CoachPage'));
 
-// Wrapper component for Suspense
+// Suspense wrapper component
 const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
-  <OptimizedErrorBoundary>
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    }>
-      {children}
-    </Suspense>
-  </OptimizedErrorBoundary>
+  <React.Suspense fallback={<LoadingSpinner />}>
+    {children}
+  </React.Suspense>
 );
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
   return [
     {
       path: '/',
-      element: <MainLayout />,
+      element: <AppShell />,
       children: [
-        {
-          index: true,
-          element: (
-            <SuspenseWrapper>
-              <HomePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'choose-mode',
-          element: (
-            <SuspenseWrapper>
-              <ChooseModePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'demo',
-          element: (
-            <SuspenseWrapper>
-              <DemoPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'onboarding',
-          element: (
-            <SuspenseWrapper>
-              <OnboardingPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'auth',
-          element: (
-            <SuspenseWrapper>
-              <AuthPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'b2b',
-          element: <Navigate to="/b2b/selection" replace />,
-        },
-        {
-          path: 'b2b/selection',
-          element: (
-            <SuspenseWrapper>
-              <B2BSelectionPage />
-            </SuspenseWrapper>
-          ),
+        // Home (1 route)
+        { 
+          path: OFFICIAL_ROUTES.HOME, 
+          element: <SuspenseWrapper><HomePage /></SuspenseWrapper> 
         },
         
-        // B2C Auth Routes
-        {
-          path: 'b2c/login',
-          element: (
-            <SuspenseWrapper>
-              <B2CLoginPage />
-            </SuspenseWrapper>
-          ),
+        // Mesure émotionnelle et biométrie (8 routes)
+        { 
+          path: OFFICIAL_ROUTES.SCAN, 
+          element: <SuspenseWrapper><EmotionScanPage /></SuspenseWrapper> 
         },
-        {
-          path: 'b2c/register',
-          element: (
-            <SuspenseWrapper>
-              <B2CRegisterPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.MUSIC, 
+          element: <SuspenseWrapper><MusicTherapyPage /></SuspenseWrapper> 
         },
-        
-        // B2B Auth Routes
-        {
-          path: 'b2b/user/login',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserLoginPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.FLASH_GLOW, 
+          element: <SuspenseWrapper><FlashGlowPage /></SuspenseWrapper> 
         },
-        {
-          path: 'b2b/user/register',
-          element: (
-            <SuspenseWrapper>
-              <B2BUserRegisterPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.BOSS_LEVEL_GRIT, 
+          element: <SuspenseWrapper><BossLevelGritPage /></SuspenseWrapper> 
         },
-        {
-          path: 'b2b/admin/login',
-          element: (
-            <SuspenseWrapper>
-              <B2BAdminLoginPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.MOOD_MIXER, 
+          element: <SuspenseWrapper><MoodMixerPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.BOUNCE_BACK_BATTLE, 
+          element: <SuspenseWrapper><BounceBackBattlePage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.BREATHWORK, 
+          element: <SuspenseWrapper><BreathworkPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.INSTANT_GLOW, 
+          element: <SuspenseWrapper><InstantGlowPage /></SuspenseWrapper> 
         },
         
-        // Protected Dashboard Routes  
-        ...dashboardRoutes,
-        
-        // Feature Routes (accessible to all authenticated users)
-        {
-          path: 'scan',
-          element: (
-            <SuspenseWrapper>
-              <ScanPage />
-            </SuspenseWrapper>
-          ),
+        // Expériences immersives (6 routes)
+        { 
+          path: OFFICIAL_ROUTES.VR, 
+          element: <SuspenseWrapper><VRHubPage /></SuspenseWrapper> 
         },
-        {
-          path: 'music',
-          element: (
-            <SuspenseWrapper>
-              <MusicPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.VR_GALACTIQUE, 
+          element: <SuspenseWrapper><VRGalactiquePage /></SuspenseWrapper> 
         },
-        {
-          path: 'coach',
-          element: (
-            <SuspenseWrapper>
-              <CoachPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.SCREEN_SILK_BREAK, 
+          element: <SuspenseWrapper><ScreenSilkBreakPage /></SuspenseWrapper> 
         },
-        {
-          path: 'journal',
-          element: (
-            <SuspenseWrapper>
-              <JournalPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.STORY_SYNTH_LAB, 
+          element: <SuspenseWrapper><CoachPage /></SuspenseWrapper> 
         },
-        {
-          path: 'vr',
-          element: (
-            <SuspenseWrapper>
-              <VRPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.AR_FILTERS, 
+          element: <SuspenseWrapper><ARFiltersPage /></SuspenseWrapper> 
         },
-        {
-          path: 'preferences',
-          element: (
-            <SuspenseWrapper>
-              <PreferencesPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'gamification',
-          element: (
-            <SuspenseWrapper>
-              <GamificationPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'social-cocon',
-          element: (
-            <SuspenseWrapper>
-              <SocialCoconPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.BUBBLE_BEAT, 
+          element: <SuspenseWrapper><BubbleBeatPage /></SuspenseWrapper> 
         },
         
-        // Modules fun-first avec IA (11 routes)
-        {
-          path: 'boss-level-grit',
-          element: (
-            <SuspenseWrapper>
-              <BossLevelGritPage />
-            </SuspenseWrapper>
-          ),
+        // Ambition & progression (4 routes)
+        { 
+          path: OFFICIAL_ROUTES.AMBITION_ARCADE, 
+          element: <SuspenseWrapper><AmbitionArcadePage /></SuspenseWrapper> 
         },
-        {
-          path: 'mood-mixer',
-          element: (
-            <SuspenseWrapper>
-              <MoodMixerPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.GAMIFICATION, 
+          element: <SuspenseWrapper><GamificationPage /></SuspenseWrapper> 
         },
-        {
-          path: 'ambition-arcade',
-          element: (
-            <SuspenseWrapper>
-              <AmbitionArcadePage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.WEEKLY_BARS, 
+          element: <SuspenseWrapper><WeeklyBarsPage /></SuspenseWrapper> 
         },
-        {
-          path: 'bounce-back-battle',
-          element: (
-            <SuspenseWrapper>
-              <BounceBackBattlePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'story-synth-lab',
-          element: (
-            <SuspenseWrapper>
-              <StorySynthLabPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'flash-glow',
-          element: (
-            <SuspenseWrapper>
-              <FlashGlowPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'ar-filters',
-          element: (
-            <SuspenseWrapper>
-              <ARFiltersPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'bubble-beat',
-          element: (
-            <SuspenseWrapper>
-              <BubbleBeatPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'screen-silk-break',
-          element: (
-            <SuspenseWrapper>
-              <ScreenSilkBreakPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'vr-galactique',
-          element: (
-            <SuspenseWrapper>
-              <VRGalactiquePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'instant-glow',
-          element: (
-            <SuspenseWrapper>
-              <InstantGlowPage />
-            </SuspenseWrapper>
-          ),
-        },
-
-        // Analytics & data (3 routes)
-        {
-          path: 'weekly-bars',
-          element: (
-            <SuspenseWrapper>
-              <WeeklyBarsPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'heatmap-vibes',
-          element: (
-            <SuspenseWrapper>
-              <HeatmapVibesPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'breathwork',
-          element: (
-            <SuspenseWrapper>
-              <BreathworkPage />
-            </SuspenseWrapper>
-          ),
-        },
-
-        // Paramètres & compte (7 routes)
-        {
-          path: 'privacy-toggles',
-          element: (
-            <SuspenseWrapper>
-              <PrivacyTogglesPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'export-csv',
-          element: (
-            <SuspenseWrapper>
-              <ExportCSVPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'account/delete',
-          element: (
-            <SuspenseWrapper>
-              <AccountDeletePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'health-check-badge',
-          element: (
-            <SuspenseWrapper>
-              <HealthCheckBadgePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'notifications',
-          element: (
-            <SuspenseWrapper>
-              <NotificationPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'help-center',
-          element: (
-            <SuspenseWrapper>
-              <HelpCenterPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'profile-settings',
-          element: (
-            <SuspenseWrapper>
-              <ProfileSettingsPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'profile',
-          element: (
-            <SuspenseWrapper>
-              <ProfilePage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'search',
-          element: (
-            <SuspenseWrapper>
-              <SearchPage />
-            </SuspenseWrapper>
-          ),
-        },
-
-        // Historique & feedback (2 routes)
-        {
-          path: 'activity-history',
-          element: (
-            <SuspenseWrapper>
-              <ActivityHistoryPage />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'feedback',
-          element: (
-            <SuspenseWrapper>
-              <FeedbackPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.HEATMAP_VIBES, 
+          element: <SuspenseWrapper><HeatmapVibesPage /></SuspenseWrapper> 
         },
         
-        // B2B Admin Features (8 routes)
-        {
-          path: 'teams',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <TeamsPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        // Espaces utilisateur (16 routes)
+        { 
+          path: OFFICIAL_ROUTES.CHOOSE_MODE, 
+          element: <SuspenseWrapper><ChooseModePage /></SuspenseWrapper> 
         },
-        {
-          path: 'reports',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <ReportsPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.ONBOARDING, 
+          element: <SuspenseWrapper><OnboardingPage /></SuspenseWrapper> 
         },
-        {
-          path: 'events',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <EventsPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.B2C_LOGIN, 
+          element: <SuspenseWrapper><B2CLoginPage /></SuspenseWrapper> 
         },
-        {
-          path: 'optimisation',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <OptimisationPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.B2C_REGISTER, 
+          element: <SuspenseWrapper><B2CRegisterPage /></SuspenseWrapper> 
         },
-        {
-          path: 'settings',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <SettingsPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.B2C_DASHBOARD, 
+          element: <SuspenseWrapper><B2CDashboardPage /></SuspenseWrapper> 
         },
-        {
-          path: 'security',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <SecurityPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.PREFERENCES, 
+          element: <SuspenseWrapper><UserPreferencesPage /></SuspenseWrapper> 
         },
-        {
-          path: 'audit',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <AuditPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.SOCIAL_COCON, 
+          element: <SuspenseWrapper><CoachPage /></SuspenseWrapper> 
         },
-        {
-          path: 'accessibility',
-          element: (
-            <ProtectedRoute requiredRole="b2b_admin">
-              <SuspenseWrapper>
-                <AccessibilityPage />
-              </SuspenseWrapper>
-            </ProtectedRoute>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.PROFILE_SETTINGS, 
+          element: <SuspenseWrapper><ProfileSettingsPage /></SuspenseWrapper> 
         },
-        {
-          path: 'innovation',
-          element: (
-            <SuspenseWrapper>
-              <InnovationPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.ACTIVITY_HISTORY, 
+          element: <SuspenseWrapper><ActivityHistoryPage /></SuspenseWrapper> 
         },
-        {
-          path: 'platform-audit',
-          element: (
-            <SuspenseWrapper>
-              <PlatformAuditPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.NOTIFICATIONS, 
+          element: <SuspenseWrapper><NotificationsPage /></SuspenseWrapper> 
         },
-        {
-          path: 'system-audit',
-          element: (
-            <SuspenseWrapper>
-              <CompleteSystemAuditPage />
-            </SuspenseWrapper>
-          ),
+        { 
+          path: OFFICIAL_ROUTES.FEEDBACK, 
+          element: <SuspenseWrapper><InAppFeedbackPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.ACCOUNT_DELETE, 
+          element: <SuspenseWrapper><AccountDeletionPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.EXPORT_CSV, 
+          element: <SuspenseWrapper><DataExportPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.PRIVACY_TOGGLES, 
+          element: <SuspenseWrapper><PrivacyTogglesPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.HEALTH_CHECK_BADGE, 
+          element: <SuspenseWrapper><PlatformStatusPage /></SuspenseWrapper> 
         },
         
-        // Route de santé des pages
-        {
-          path: 'page-health-check',
-          element: (
-            <SuspenseWrapper>
-              <PageHealthCheck />
-            </SuspenseWrapper>
-          ),
+        // B2B espaces (18 routes)
+        { 
+          path: OFFICIAL_ROUTES.B2B, 
+          element: <SuspenseWrapper><B2BSelectionPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_SELECTION, 
+          element: <SuspenseWrapper><B2BSelectionPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_USER_LOGIN, 
+          element: <SuspenseWrapper><B2BUserLoginPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_USER_REGISTER, 
+          element: <SuspenseWrapper><B2BUserRegisterPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_USER_DASHBOARD, 
+          element: <SuspenseWrapper><B2BUserDashboardPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_ADMIN_LOGIN, 
+          element: <SuspenseWrapper><B2BAdminLoginPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.B2B_ADMIN_DASHBOARD, 
+          element: <SuspenseWrapper><B2BAdminDashboardPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.TEAMS, 
+          element: <SuspenseWrapper><TeamsPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.REPORTS, 
+          element: <SuspenseWrapper><ReportsPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.EVENTS, 
+          element: <SuspenseWrapper><EventsPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.OPTIMISATION, 
+          element: <SuspenseWrapper><OptimisationPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.SETTINGS, 
+          element: <SuspenseWrapper><SettingsPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.SECURITY, 
+          element: <SuspenseWrapper><SecurityDashboardPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.AUDIT, 
+          element: <SuspenseWrapper><SystemAuditPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.ACCESSIBILITY, 
+          element: <SuspenseWrapper><AccessibilityPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.INNOVATION, 
+          element: <SuspenseWrapper><InnovationLabPage /></SuspenseWrapper> 
+        },
+        { 
+          path: OFFICIAL_ROUTES.HELP_CENTER, 
+          element: <SuspenseWrapper><HelpCenterPage /></SuspenseWrapper> 
         },
         
-        // Route de test pour debugging FeatureCard
-        {
-          path: 'test-feature-card',
-          element: (
-            <SuspenseWrapper>
-              <TestFeatureCard />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'page-integrity-checker',
-          element: (
-            <SuspenseWrapper>
-              <PageIntegrityChecker />
-            </SuspenseWrapper>
-          ),
-        },
-        {
-          path: 'api-integration-test',
-          element: (
-            <SuspenseWrapper>
-              <ApiIntegrationChecker />
-            </SuspenseWrapper>
-          ),
-        },
-        
-        // Catch all route
-        {
-          path: '*',
-          element: <Navigate to="/" replace />,
-        },
-        
-        // Route de vérification d'accessibilité (dev)
-        {
-          path: 'route-checker',
-          element: (
-            <SuspenseWrapper>
-              <RouteAccessibilityChecker />
-            </SuspenseWrapper>
-          ),
-        },
-        
-        // Route de test de navigation
-        {
-          path: 'navigation-test',
-          element: (
-            <SuspenseWrapper>
-              <NavigationTestPage />
-            </SuspenseWrapper>
-          ),
-        },
-        
-        // Route d'audit qualité des pages
-        {
-          path: 'page-quality-audit',
-          element: (
-            <SuspenseWrapper>
-              <PageQualityAuditor />
-            </SuspenseWrapper>
-          ),
-        },
-      ],
-    },
+        // 404 catch-all
+        { 
+          path: '*', 
+          element: <SuspenseWrapper><NotFoundPage /></SuspenseWrapper> 
+        }
+      ]
+    }
   ];
 };
+
+// Export route manifest for testing and auditing
+export const ROUTE_MANIFEST = Object.values(OFFICIAL_ROUTES);
+
+console.log(`✅ Unified Router: ${ROUTE_MANIFEST.length}/52 routes configured`);

@@ -1,54 +1,105 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { PageRoot } from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
-import { Home, ArrowLeft, Search } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Home, ArrowLeft, Search, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const NotFoundPage: React.FC = () => {
+const NotFoundPage = () => {
+  const navigate = useNavigate();
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-      <div className="text-center px-4">
-        <div className="mb-8">
-          <h1 className="text-9xl font-bold text-red-500 mb-4">404</h1>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Page introuvable</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-md mx-auto">
-            Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+    <PageRoot className="container mx-auto px-4 py-16">
+      <div className="max-w-2xl mx-auto text-center space-y-8">
+        
+        {/* Fun 404 Visual */}
+        <div className="relative">
+          <div className="text-8xl font-bold text-primary/20 mb-4">404</div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Heart className="h-16 w-16 text-primary animate-pulse" />
+          </div>
+        </div>
+
+        {/* Warm Message */}
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold text-foreground">
+            Cette page s'est envolée... 🦋
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            Pas de panique ! Même les meilleures aventures ont parfois des chemins inattendus. 
+            Retournons ensemble vers un endroit familier.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/">
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-              <Home className="mr-2 h-4 w-4" />
-              Retour à l'accueil
-            </Button>
-          </Link>
-          
-          <Button 
-            variant="outline" 
-            onClick={() => window.history.back()}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Page précédente
-          </Button>
+        {/* Action Cards */}
+        <div className="grid gap-4 max-w-lg mx-auto">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/')}>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Home className="h-5 w-5" />
+                Retour à l'accueil
+              </CardTitle>
+              <CardDescription>
+                Retrouvez votre tableau de bord et toutes vos fonctionnalités préférées
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(-1)}>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <ArrowLeft className="h-5 w-5" />
+                Page précédente
+              </CardTitle>
+              <CardDescription>
+                Retourner là où vous étiez juste avant
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/scan')}>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Search className="h-5 w-5" />
+                Scanner de bien-être
+              </CardTitle>
+              <CardDescription>
+                Commencez par découvrir votre état du moment
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
 
-        <div className="mt-12">
-          <p className="text-muted-foreground mb-4">Suggestions :</p>
+        {/* Popular Destinations */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Ou explorez nos espaces populaires :</h2>
           <div className="flex flex-wrap gap-2 justify-center">
-            <Link to="/choose-mode">
-              <Button variant="ghost" size="sm">Choisir votre mode</Button>
-            </Link>
-            <Link to="/auth">
-              <Button variant="ghost" size="sm">Se connecter</Button>
-            </Link>
-            <Link to="/b2b">
-              <Button variant="ghost" size="sm">Espace Entreprise</Button>
-            </Link>
+            <Button variant="outline" size="sm" onClick={() => navigate('/music')}>
+              🎵 Musicothérapie
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/breathwork')}>
+              🫁 Respiration
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/mood-mixer')}>
+              🎧 Mood Mixer
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/journal')}>
+              📝 Journal
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/coach')}>
+              💬 Coach IA
+            </Button>
           </div>
         </div>
+
+        {/* Encouraging Message */}
+        <div className="p-6 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
+          <p className="text-sm text-muted-foreground italic">
+            "Chaque détour peut devenir une belle découverte. Prenez votre temps, nous sommes là pour vous accompagner." ✨
+          </p>
+        </div>
       </div>
-    </div>
+    </PageRoot>
   );
 };
 
