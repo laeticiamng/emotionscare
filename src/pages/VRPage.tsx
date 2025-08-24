@@ -11,7 +11,7 @@ import {
   Users,
   Star,
   ArrowRight,
-  Eye3D,
+  Eye,
   Zap,
   Timer
 } from 'lucide-react';
@@ -73,7 +73,7 @@ const VRPage: React.FC = () => {
         title: 'Réalité Virtuelle',
         subtitle: 'Expériences immersives pour votre bien-être',
         description: 'Plongez dans des environnements virtuels thérapeutiques et détendez-vous dans des mondes créés spécialement pour votre équilibre émotionnel.',
-        icon: Eye3D,
+        icon: Eye,
         gradient: 'from-purple-500/20 to-blue-500/5',
         badge: 'Technologie Premium',
         stats: [
