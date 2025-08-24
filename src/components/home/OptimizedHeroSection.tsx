@@ -74,7 +74,7 @@ const OptimizedHeroSection: React.FC = () => {
   }), [shouldReduceMotion]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-primary/5 to-secondary/10 pt-0">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-primary/5 to-secondary/10 -mt-4 lg:-mt-8">
       {/* Optimized Background Elements - GPU accelerated */}
       <motion.div 
         className="absolute inset-0"
