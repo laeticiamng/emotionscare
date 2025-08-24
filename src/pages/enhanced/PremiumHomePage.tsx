@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, useReducedMotion, useMotionValue, useTransform, AnimatePresence, useViewportScroll } from 'framer-motion';
 import { 
   Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, 
@@ -90,7 +90,7 @@ const PremiumHomePage: React.FC = () => {
   const particleCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   
-  // États avancés de l'interface
+  // États avancés de l'interface (optimisés)
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userMetrics, setUserMetrics] = useState<UserMetrics | null>(null);
   const [liveFeatures, setLiveFeatures] = useState<LiveFeature[]>([]);
@@ -101,7 +101,6 @@ const PremiumHomePage: React.FC = () => {
   const [todayInsights, setTodayInsights] = useState<string[]>([]);
   const [isImmersiveMode, setIsImmersiveMode] = useState(false);
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
-  const [particles, setParticles] = useState<InteractiveParticle[]>([]);
   const [cursorTrail, setCursorTrail] = useState<Array<{x: number, y: number, timestamp: number}>>([]);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [biometricData, setBiometricData] = useState({
@@ -112,13 +111,22 @@ const PremiumHomePage: React.FC = () => {
   });
   const [aiInsights, setAiInsights] = useState<string[]>([]);
   const [interactionHeatMap, setInteractionHeatMap] = useState<Array<{x: number, y: number, intensity: number}>>([]);
-  const [immersiveElements, setImmersiveElements] = useState({
-    showParticles: true,
-    enableSoundscape: false,
-    adaptiveLighting: true,
-    biometricSync: false,
-    personalizedAnimations: true
-  });
+  
+  // États séparés pour éviter les re-renders
+  const [showParticles, setShowParticles] = useState(true);
+  const [enableSoundscape, setEnableSoundscape] = useState(false);
+  const [adaptiveLighting, setAdaptiveLighting] = useState(true);
+  const [biometricSync, setBiometricSync] = useState(false);
+  const [personalizedAnimations, setPersonalizedAnimations] = useState(true);
+
+  // Object mémorisé pour éviter les re-renders
+  const immersiveElements = useMemo(() => ({
+    showParticles,
+    enableSoundscape,
+    adaptiveLighting,
+    biometricSync,
+    personalizedAnimations
+  }), [showParticles, enableSoundscape, adaptiveLighting, biometricSync, personalizedAnimations]);
 
   // Animation values
   const mouseX = useMotionValue(0);
@@ -157,9 +165,9 @@ const PremiumHomePage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Système de particules interactives (simplifié)
+  // Système de particules interactives (simplifié et stable)
   useEffect(() => {
-    if (!particleCanvasRef.current || shouldReduceMotion || !immersiveElements.showParticles) return;
+    if (!particleCanvasRef.current || shouldReduceMotion || !showParticles) return;
 
     const canvas = particleCanvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -167,7 +175,7 @@ const PremiumHomePage: React.FC = () => {
 
     // Réduire la fréquence de mise à jour du canvas pour éviter les problèmes de performance
     let lastUpdateTime = 0;
-    const targetFPS = 30; // Limiter à 30 FPS
+    const targetFPS = 30;
     const frameDuration = 1000 / targetFPS;
 
     canvas.width = Math.min(window.innerWidth, 1920);
@@ -177,15 +185,15 @@ const PremiumHomePage: React.FC = () => {
       id: Math.random().toString(36).substr(2, 9),
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 1, // Réduire la vitesse
+      vx: (Math.random() - 0.5) * 1,
       vy: (Math.random() - 0.5) * 1,
-      size: Math.random() * 2 + 1, // Réduire la taille
-      opacity: Math.random() * 0.3 + 0.1, // Réduire l'opacité
+      size: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.3 + 0.1,
       color: ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B'][Math.floor(Math.random() * 4)],
       life: 1
     });
 
-    const particlePool = Array.from({ length: 25 }, createParticle); // Réduire le nombre de particules
+    const particlePool = Array.from({ length: 25 }, createParticle);
 
     const animateParticles = (timestamp: number) => {
       if (timestamp - lastUpdateTime < frameDuration) {
@@ -197,15 +205,12 @@ const PremiumHomePage: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       particlePool.forEach(particle => {
-        // Update position
         particle.x += particle.vx;
         particle.y += particle.vy;
         
-        // Boundary collision
         if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
         if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
         
-        // Draw particle
         ctx.globalAlpha = particle.opacity;
         ctx.fillStyle = particle.color;
         ctx.beginPath();
@@ -223,9 +228,9 @@ const PremiumHomePage: React.FC = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [shouldReduceMotion, immersiveElements.showParticles]);
+  }, [shouldReduceMotion, showParticles]); // Dépendance primitive stable
 
-  // Monitoring des performances en temps réel (optimisé)
+  // Monitoring des performances (stable)
   useEffect(() => {
     let mounted = true;
     
@@ -236,10 +241,10 @@ const PremiumHomePage: React.FC = () => {
         const memory = (performance as any).memory;
         
         setPerformanceMetrics({
-          cpu_usage: Math.random() * 40 + 10, // Simulation
+          cpu_usage: Math.random() * 40 + 10,
           memory_usage: memory ? Math.min((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100, 100) : Math.random() * 60 + 20,
           network_latency: Math.random() * 50 + 10,
-          frame_rate: 60, // Valeur fixe pour éviter les calculs complexes
+          frame_rate: 60,
           ai_response_time: Math.random() * 200 + 100
         });
       } catch (error) {
@@ -247,16 +252,16 @@ const PremiumHomePage: React.FC = () => {
       }
     };
 
-    const interval = setInterval(updatePerformanceMetrics, 5000); // Réduire la fréquence
+    const interval = setInterval(updatePerformanceMetrics, 10000); // Plus long intervalle
     updatePerformanceMetrics();
 
     return () => {
       mounted = false;
       clearInterval(interval);
     };
-  }, []);
+  }, []); // Pas de dépendances
 
-  // Cursor trail effect (simplifié)
+  // Cursor trail effect (stable)
   useEffect(() => {
     if (shouldReduceMotion || deviceOptimization === 'mobile') return;
 
@@ -265,11 +270,10 @@ const PremiumHomePage: React.FC = () => {
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
       setCursorTrail(prev => [
-        ...prev.slice(-5), // Réduire la longueur du trail
+        ...prev.slice(-5),
         { x: e.clientX, y: e.clientY, timestamp: now }
       ]);
 
-      // Nettoyer le trail automatiquement
       clearTimeout(trailTimeout);
       trailTimeout = setTimeout(() => {
         setCursorTrail([]);
@@ -283,9 +287,9 @@ const PremiumHomePage: React.FC = () => {
     };
   }, [shouldReduceMotion, deviceOptimization]);
 
-  // Simulation de données biométriques (optimisée)
+  // Simulation de données biométriques (stable)
   useEffect(() => {
-    if (!immersiveElements.biometricSync) return;
+    if (!biometricSync) return;
 
     let mounted = true;
 
@@ -293,24 +297,24 @@ const PremiumHomePage: React.FC = () => {
       if (!mounted) return;
       
       setBiometricData(prev => ({
-        heartRate: Math.max(60, Math.min(100, prev.heartRate + (Math.random() - 0.5) * 2)), // Réduire la variation
+        heartRate: Math.max(60, Math.min(100, prev.heartRate + (Math.random() - 0.5) * 2)),
         stressIndex: Math.max(0, Math.min(100, prev.stressIndex + (Math.random() - 0.5) * 4)),
         focusLevel: Math.max(0, Math.min(100, prev.focusLevel + (Math.random() - 0.5) * 3)),
         energyLevel: Math.max(0, Math.min(100, prev.energyLevel + (Math.random() - 0.5) * 2))
       }));
     };
 
-    const interval = setInterval(updateBiometrics, 5000); // Moins fréquent
+    const interval = setInterval(updateBiometrics, 10000); // Plus long intervalle
     
     return () => {
       mounted = false;
       clearInterval(interval);
     };
-  }, [immersiveElements.biometricSync]);
+  }, [biometricSync]); // Dépendance primitive stable
 
-  // IA Insights génération (optimisée)
+  // IA Insights génération (stable)  
   useEffect(() => {
-    if (!isAuthenticated || !userMetrics) return;
+    if (!isAuthenticated) return;
 
     let mounted = true;
 
@@ -329,16 +333,16 @@ const PremiumHomePage: React.FC = () => {
       setAiInsights(insights.slice(0, 3));
     };
 
-    const interval = setInterval(generateAIInsights, 30000); // Moins fréquent
+    const interval = setInterval(generateAIInsights, 60000); // Très long intervalle
     generateAIInsights();
 
     return () => {
       mounted = false;
       clearInterval(interval);
     };
-  }, [isAuthenticated, userMetrics]);
+  }, [isAuthenticated]); // Seule dépendance stable
 
-  // Mode immersif toggle
+  // Mode immersif toggle (stable)
   const toggleImmersiveMode = useCallback(() => {
     setIsImmersiveMode(prev => {
       const newMode = !prev;
@@ -356,13 +360,11 @@ const PremiumHomePage: React.FC = () => {
         }
         
         // Activer tous les effets immersifs
-        setImmersiveElements({
-          showParticles: true,
-          enableSoundscape: true,
-          adaptiveLighting: true,
-          biometricSync: true,
-          personalizedAnimations: true
-        });
+        setShowParticles(true);
+        setEnableSoundscape(true);
+        setAdaptiveLighting(true);
+        setBiometricSync(true);
+        setPersonalizedAnimations(true);
         
         toast({
           title: "🚀 Mode Immersif Activé",
@@ -375,13 +377,11 @@ const PremiumHomePage: React.FC = () => {
           document.exitFullscreen().catch(() => {});
         }
         
-        setImmersiveElements({
-          showParticles: true,
-          enableSoundscape: false,
-          adaptiveLighting: true,
-          biometricSync: false,
-          personalizedAnimations: true
-        });
+        setShowParticles(true);
+        setEnableSoundscape(false);
+        setAdaptiveLighting(true);
+        setBiometricSync(false);
+        setPersonalizedAnimations(true);
         
         toast({
           title: "Mode Standard",
@@ -1248,7 +1248,7 @@ const PremiumHomePage: React.FC = () => {
                     )}
 
                     {/* Données Biométriques */}
-                    {immersiveElements.biometricSync && (
+                    {biometricSync && (
                       <div className="space-y-4">
                         <h3 className="text-green-300 font-medium flex items-center">
                           <Activity className="mr-2 h-4 w-4" />
@@ -1329,8 +1329,8 @@ const PremiumHomePage: React.FC = () => {
                           <label className="flex items-center space-x-2 cursor-pointer">
                             <input
                               type="checkbox"
-                              checked={immersiveElements.showParticles}
-                              onChange={(e) => setImmersiveElements(prev => ({ ...prev, showParticles: e.target.checked }))}
+                              checked={showParticles}
+                              onChange={(e) => setShowParticles(e.target.checked)}
                               className="rounded border-white/20 bg-transparent"
                             />
                             <span className="text-gray-300 text-sm">Particules</span>
@@ -1339,8 +1339,8 @@ const PremiumHomePage: React.FC = () => {
                           <label className="flex items-center space-x-2 cursor-pointer">
                             <input
                               type="checkbox"
-                              checked={immersiveElements.adaptiveLighting}
-                              onChange={(e) => setImmersiveElements(prev => ({ ...prev, adaptiveLighting: e.target.checked }))}
+                              checked={adaptiveLighting}
+                              onChange={(e) => setAdaptiveLighting(e.target.checked)}
                               className="rounded border-white/20 bg-transparent"
                             />
                             <span className="text-gray-300 text-sm">Éclairage Adaptatif</span>
@@ -1349,8 +1349,8 @@ const PremiumHomePage: React.FC = () => {
                           <label className="flex items-center space-x-2 cursor-pointer">
                             <input
                               type="checkbox"
-                              checked={immersiveElements.biometricSync}
-                              onChange={(e) => setImmersiveElements(prev => ({ ...prev, biometricSync: e.target.checked }))}
+                              checked={biometricSync}
+                              onChange={(e) => setBiometricSync(e.target.checked)}
                               className="rounded border-white/20 bg-transparent"
                             />
                             <span className="text-gray-300 text-sm">Sync Biométrique</span>
@@ -1365,7 +1365,7 @@ const PremiumHomePage: React.FC = () => {
           )}
 
           {/* Canvas pour particules interactives */}
-          {immersiveElements.showParticles && !shouldReduceMotion && (
+          {showParticles && !shouldReduceMotion && (
             <canvas
               ref={particleCanvasRef}
               className="fixed inset-0 pointer-events-none z-5"
