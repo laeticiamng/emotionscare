@@ -1,10 +1,8 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from '@/components/theme-provider';
-import { AuthProvider } from './contexts/AuthContext';
-import { UserModeProvider } from './contexts/UserModeContext';
 import MusicProvider from './contexts/MusicContext';
 import { RootErrorBoundary } from './components/RootErrorBoundary';
+import AppProviders from './AppProviders';
 import AppRouter from './router/AppRouter';
 
 
@@ -23,17 +21,13 @@ const App: React.FC = () => {
   return (
     <RootErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <AuthProvider>
-            <UserModeProvider>
-              <MusicProvider>
-                <RootErrorBoundary>
-                  <AppRouter />
-                </RootErrorBoundary>
-              </MusicProvider>
-            </UserModeProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <AppProviders>
+          <MusicProvider>
+            <RootErrorBoundary>
+              <AppRouter />
+            </RootErrorBoundary>
+          </MusicProvider>
+        </AppProviders>
       </QueryClientProvider>
     </RootErrorBoundary>
   );
