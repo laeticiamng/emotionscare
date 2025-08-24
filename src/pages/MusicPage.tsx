@@ -3,8 +3,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
-import Container from '@/components/layout/Container';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Music2, Heart, Timer, TrendingUp } from 'lucide-react';
+import PageLayout from '@/components/common/PageLayout';
+import FeatureCard from '@/components/common/FeatureCard';
 
 const MusicPage: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -12,7 +13,7 @@ const MusicPage: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(1); // Index 1 car "Focus Profond" est sélectionné
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(1);
 
   const tracks = [
     {
@@ -20,21 +21,27 @@ const MusicPage: React.FC = () => {
       title: 'Méditation Matinale',
       artist: 'Sons de la Nature',
       duration: 180, // 3:00
-      url: '/sounds/nature-calm.mp3'
+      url: '/sounds/nature-calm.mp3',
+      category: 'Relaxation',
+      mood: 'Calme'
     },
     {
       id: 2,
       title: 'Focus Profond',
       artist: 'Ambiance Zen',
       duration: 240, // 4:00
-      url: '/sounds/focus-ambient.mp3'
+      url: '/sounds/focus-ambient.mp3',
+      category: 'Concentration',
+      mood: 'Focus'
     },
     {
       id: 3,
       title: 'Relaxation Océan',
       artist: 'Vagues Apaisantes',
       duration: 300, // 5:00
-      url: '/sounds/ambient-calm.mp3'
+      url: '/sounds/ambient-calm.mp3',
+      category: 'Détente',
+      mood: 'Sérénité'
     }
   ];
 
@@ -71,11 +78,9 @@ const MusicPage: React.FC = () => {
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
-      console.log('⏸️ Lecture en pause');
     } else {
       audio.play().then(() => {
         setIsPlaying(true);
-        console.log('▶️ Lecture démarrée');
       }).catch(err => {
         console.error('Erreur lors de la lecture:', err);
       });
@@ -86,14 +91,12 @@ const MusicPage: React.FC = () => {
     const newIndex = currentTrackIndex > 0 ? currentTrackIndex - 1 : tracks.length - 1;
     setCurrentTrackIndex(newIndex);
     setIsPlaying(false);
-    console.log('⏮️ Piste précédente:', tracks[newIndex].title);
   };
 
   const handleNext = () => {
     const newIndex = currentTrackIndex < tracks.length - 1 ? currentTrackIndex + 1 : 0;
     setCurrentTrackIndex(newIndex);
     setIsPlaying(false);
-    console.log('⏭️ Piste suivante:', tracks[newIndex].title);
   };
 
   const handleSeek = (value: number[]) => {
@@ -103,19 +106,16 @@ const MusicPage: React.FC = () => {
     const newTime = value[0];
     audio.currentTime = newTime;
     setCurrentTime(newTime);
-    console.log('🎯 Saut à:', Math.floor(newTime / 60) + ':' + String(Math.floor(newTime % 60)).padStart(2, '0'));
   };
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
     setVolume(newVolume);
-    console.log('🔊 Volume:', Math.round(newVolume * 100) + '%');
   };
 
   const handleTrackSelect = (index: number) => {
     setCurrentTrackIndex(index);
     setIsPlaying(false);
-    console.log('🎵 Piste sélectionnée:', tracks[index].title);
   };
 
   const formatTime = (time: number): string => {
@@ -125,12 +125,81 @@ const MusicPage: React.FC = () => {
   };
 
   return (
-    <Container>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          🎵 Lecteur de Musique EmotionsCare
-        </h1>
-
+    <PageLayout
+      header={{
+        title: 'Musicothérapie',
+        subtitle: 'Thérapie par la musique adaptative',
+        description: 'Découvrez notre collection de musiques thérapeutiques personnalisées selon votre état émotionnel et vos objectifs de bien-être.',
+        icon: Music2,
+        gradient: 'from-purple-500/20 to-pink-500/5',
+        badge: 'Thérapie Sonore',
+        stats: [
+          {
+            label: 'Pistes disponibles',
+            value: '247',
+            icon: Music2,
+            color: 'text-purple-500'
+          },
+          {
+            label: 'Temps d\'écoute',
+            value: '12h',
+            icon: Timer,
+            color: 'text-blue-500'
+          },
+          {
+            label: 'Satisfaction',
+            value: '96%',
+            icon: Heart,
+            color: 'text-pink-500'
+          },
+          {
+            label: 'Progression',
+            value: '+18%',
+            icon: TrendingUp,
+            color: 'text-green-500'
+          }
+        ],
+        actions: [
+          {
+            label: isPlaying ? 'Pause' : 'Lecture',
+            onClick: handlePlayPause,
+            variant: 'default',
+            icon: isPlaying ? Pause : Play
+          },
+          {
+            label: 'Ma Playlist',
+            onClick: () => console.log('My playlist'),
+            variant: 'outline',
+            icon: Heart
+          }
+        ]
+      }}
+      tips={{
+        title: 'Optimisez votre expérience musicale',
+        items: [
+          {
+            title: 'Casque recommandé',
+            content: 'Utilisez un casque de qualité pour une immersion complète',
+            icon: Volume2
+          },
+          {
+            title: 'Régularité',
+            content: 'Écoutez 15-20 minutes par jour pour de meilleurs résultats',
+            icon: Timer
+          },
+          {
+            title: 'État d\'esprit',
+            content: 'Choisissez la musique selon votre humeur du moment',
+            icon: Heart
+          }
+        ],
+        cta: {
+          label: 'Guide de musicothérapie',
+          onClick: () => console.log('Music therapy guide')
+        }
+      }}
+    >
+      <div className="space-y-8">
         {/* Lecteur Audio Caché */}
         <audio 
           ref={audioRef} 
@@ -139,15 +208,22 @@ const MusicPage: React.FC = () => {
         />
 
         {/* Lecteur Principal */}
-        <Card className="p-6">
+        <Card className="bg-gradient-to-br from-background to-muted/20">
           <CardHeader>
-            <CardTitle className="text-center">🎵 En cours de lecture</CardTitle>
+            <CardTitle className="text-center flex items-center justify-center gap-2">
+              <Music2 className="h-6 w-6 text-primary" />
+              En cours de lecture
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Info Piste */}
             <div className="text-center">
               <h2 className="text-2xl font-semibold">{currentTrack.title}</h2>
               <p className="text-muted-foreground">{currentTrack.artist}</p>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">{currentTrack.category}</span>
+                <span className="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs">{currentTrack.mood}</span>
+              </div>
             </div>
 
             {/* Barre de Progression */}
@@ -180,7 +256,7 @@ const MusicPage: React.FC = () => {
                 variant="default" 
                 size="icon"
                 onClick={handlePlayPause}
-                className="h-16 w-16 rounded-full bg-blue-600 hover:bg-blue-700"
+                className="h-16 w-16 rounded-full"
               >
                 {isPlaying ? (
                   <Pause className="h-8 w-8" />
@@ -215,36 +291,46 @@ const MusicPage: React.FC = () => {
         </Card>
 
         {/* Playlist */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Playlist</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {tracks.map((track, index) => (
-                <div
-                  key={track.id}
-                  onClick={() => handleTrackSelect(index)}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                    index === currentTrackIndex 
-                      ? 'bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' 
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  <div>
-                    <h3 className="font-medium">{track.title}</h3>
-                    <p className="text-sm text-muted-foreground">{track.artist}</p>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-foreground">Playlist Recommandée</h2>
+          <div className="grid gap-4">
+            {tracks.map((track, index) => (
+              <Card
+                key={track.id}
+                className={`cursor-pointer transition-all hover:shadow-lg ${
+                  index === currentTrackIndex 
+                    ? 'ring-2 ring-primary bg-primary/5' 
+                    : 'hover:bg-muted/50'
+                }`}
+                onClick={() => handleTrackSelect(index)}
+              >
+                <CardContent className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      index === currentTrackIndex ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                    }`}>
+                      <Music2 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">{track.title}</h3>
+                      <p className="text-sm text-muted-foreground">{track.artist}</p>
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {formatTime(track.duration)}
+                  <div className="text-right">
+                    <div className="text-sm text-muted-foreground">
+                      {formatTime(track.duration)}
+                    </div>
+                    <div className="flex gap-1 mt-1">
+                      <span className="bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full text-xs">{track.category}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
-    </Container>
+    </PageLayout>
   );
 };
 
