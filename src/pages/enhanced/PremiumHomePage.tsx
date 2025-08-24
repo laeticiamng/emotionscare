@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase';
-import { ResponsiveWrapper } from '@/components/responsive/ResponsiveWrapper';
+import ResponsiveWrapper from '@/components/responsive/ResponsiveWrapper';
 import { FunctionalButton } from '@/components/ui/functional-button';
 import { NavigationButton } from '@/components/ui/navigation-button';
 import { cn } from '@/lib/utils';

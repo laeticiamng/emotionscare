@@ -161,3 +161,4 @@ const ResponsiveWrapper: React.FC<ResponsiveWrapperProps> = ({
 };
 
 export default ResponsiveWrapper;
+export { ResponsiveWrapper };
