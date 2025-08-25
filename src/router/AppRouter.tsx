@@ -74,7 +74,7 @@ const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 /**
- * Routeur principal de l'application - Version complète
+ * Routeur principal de l'application - Version simplifiée
  */
 export const AppRouter: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -125,121 +125,158 @@ export const AppRouter: React.FC = () => {
       />
 
       {/* Routes principales protégées */}
-      <Route path="/*" element={
-        <ProtectedRoute>
-          <Suspense fallback={<FullPageLoader />}>
+      <Route 
+        path="/home" 
+        element={
+          <ProtectedRoute>
             <MainLayout>
-              <Routes>
-                {/* Page d'accueil authentifiée */}
-                <Route 
-                  path="home" 
-                  element={
-                    <PageWrapper>
-                      <HomePage />
-                    </PageWrapper>
-                  } 
-                />
-
-                {/* Modules principaux */}
-                <Route 
-                  path="scan" 
-                  element={
-                    <PageWrapper>
-                      <ScanPage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="scan-voice" 
-                  element={
-                    <PageWrapper>
-                      <ScanVoicePage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="music" 
-                  element={
-                    <PageWrapper>
-                      <MusicPage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="breathwork" 
-                  element={
-                    <PageWrapper>
-                      <BreathworkPage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="journal" 
-                  element={
-                    <PageWrapper>
-                      <JournalPage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="coach" 
-                  element={
-                    <PageWrapper>
-                      <CoachPage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="vr" 
-                  element={
-                    <PageWrapper>
-                      <VrPage />
-                    </PageWrapper>
-                  } 
-                />
-                <Route 
-                  path="edn" 
-                  element={
-                    <ProtectedRoute permissions={['student', 'educator']}>
-                      <PageWrapper>
-                        <EdnPage />
-                      </PageWrapper>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="ecos" 
-                  element={
-                    <ProtectedRoute permissions={['student', 'educator']}>
-                      <PageWrapper>
-                        <EcosPage />
-                      </PageWrapper>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="account" 
-                  element={
-                    <PageWrapper>
-                      <AccountPage />
-                    </PageWrapper>
-                  } 
-                />
-
-                {/* 404 - Doit être en dernier */}
-                <Route 
-                  path="*" 
-                  element={
-                    <PageWrapper>
-                      <NotFoundPage />
-                    </PageWrapper>
-                  } 
-                />
-              </Routes>
+              <PageWrapper>
+                <HomePage />
+              </PageWrapper>
             </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/scan" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <ScanPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/scan-voice" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <ScanVoicePage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/music" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <MusicPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/breathwork" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <BreathworkPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/journal" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <JournalPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/coach" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <CoachPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/vr" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <VrPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/edn" 
+        element={
+          <ProtectedRoute permissions={['student', 'educator']}>
+            <MainLayout>
+              <PageWrapper>
+                <EdnPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/ecos" 
+        element={
+          <ProtectedRoute permissions={['student', 'educator']}>
+            <MainLayout>
+              <PageWrapper>
+                <EcosPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/account" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <PageWrapper>
+                <AccountPage />
+              </PageWrapper>
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* 404 - Doit être en dernier */}
+      <Route 
+        path="*" 
+        element={
+          <Suspense fallback={<FullPageLoader />}>
+            <NotFoundPage />
           </Suspense>
-        </ProtectedRoute>
-      } />
+        } 
+      />
     </Routes>
   );
 };
