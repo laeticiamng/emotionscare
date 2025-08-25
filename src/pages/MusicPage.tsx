@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Track {
   id: string;
@@ -141,50 +142,99 @@ export const MusicPage: React.FC = () => {
   const genres = ['ambient', 'classical', 'electronic', 'nature', 'binaural', 'lo-fi'];
   const instruments = ['piano', 'guitar', 'flute', 'strings', 'synthesizer', 'nature-sounds'];
 
-  // Générer une nouvelle piste
+  // Générer une nouvelle piste avec l'IA
   const generateMusic = async () => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour générer de la musique thérapeutique",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGenerating(true);
     setGenerationProgress(0);
 
     const progressInterval = setInterval(() => {
       setGenerationProgress(prev => {
-        if (prev >= 100) {
+        if (prev >= 95) {
           clearInterval(progressInterval);
-          return 100;
+          return 95;
         }
         return prev + Math.random() * 15 + 5;
       });
-    }, 200);
+    }, 500);
 
-    // Simulation de génération
-    setTimeout(() => {
+    try {
+      console.log('🎵 Démarrage génération musicale:', generationParams);
+
+      const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
+        body: {
+          ...generationParams,
+          userId: user.id
+        }
+      });
+
       clearInterval(progressInterval);
-      setGenerationProgress(100);
+
+      if (error) {
+        console.error('❌ Erreur génération:', error);
+        throw new Error(error.message || 'Erreur lors de la génération musicale');
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Échec de la génération musicale');
+      }
+
+      console.log('✅ Musique générée:', data.track);
       
       const newTrack: Track = {
-        id: Date.now().toString(),
-        title: `${generationParams.mood.charAt(0).toUpperCase() + generationParams.mood.slice(1)} ${generationParams.genre}`,
-        artist: 'EmotionsCare AI',
-        duration: Math.floor(Math.random() * 240) + 120,
-        genre: generationParams.genre,
-        mood: generationParams.mood,
-        bpm: generationParams.tempo === 'slow' ? 60 : generationParams.tempo === 'medium' ? 100 : 140,
-        energy: generationParams.energy,
-        valence: Math.floor(Math.random() * 50) + 50,
+        id: data.track.id,
+        title: data.track.title,
+        artist: data.track.artist,
+        duration: data.track.duration,
+        genre: data.track.genre,
+        mood: data.track.mood,
+        bpm: data.track.bpm,
+        energy: data.track.energy,
+        valence: data.track.valence,
         isLiked: false,
         isGenerated: true,
+        audioUrl: data.track.audio_url,
         coverArt: '🎵'
       };
 
       setCurrentTrack(newTrack);
-      setIsGenerating(false);
-      setGenerationProgress(0);
+      setGenerationProgress(100);
+      
+      // Ajouter à la bibliothèque locale temporairement
+      setFilteredLibrary(prev => [newTrack, ...prev]);
       
       toast({
-        title: "Musique générée avec succès !",
-        description: `"${newTrack.title}" est prête à être écoutée`,
+        title: "Musique thérapeutique générée !",
+        description: `"${newTrack.title}" est prête à être écoutée. ${data.track.suno_id ? 'Traitement audio en cours...' : ''}`,
       });
-    }, 3000);
+
+      // Si c'est un ID Suno, on peut vérifier le statut périodiquement
+      if (data.track.suno_id) {
+        // Logique de vérification du statut Suno à implémenter
+        console.log('🔄 Suivi du traitement Suno ID:', data.track.suno_id);
+      }
+
+    } catch (error) {
+      console.error('❌ Erreur génération musicale:', error);
+      clearInterval(progressInterval);
+      
+      toast({
+        title: "Erreur de génération",
+        description: error.message || "Une erreur s'est produite lors de la génération musicale",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+      setGenerationProgress(0);
+    }
   };
 
   // Contrôles de lecture
