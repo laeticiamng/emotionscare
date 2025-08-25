@@ -1,17 +1,17 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Wifi, WifiOff, AlertTriangle } from 'lucide-react';
+import { Wifi, WifiOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-/**
- * Indicateur de statut global de l'application
- */
-export const StatusIndicator: React.FC = () => {
-  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
-  const [hasError, setHasError] = React.useState(false);
+interface StatusIndicatorProps {
+  className?: string;
+}
 
-  React.useEffect(() => {
+export const StatusIndicator: React.FC<StatusIndicatorProps> = ({ className }) => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [systemStatus, setSystemStatus] = useState<'healthy' | 'warning' | 'error'>('healthy');
+
+  useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
@@ -24,40 +24,53 @@ export const StatusIndicator: React.FC = () => {
     };
   }, []);
 
-  // Si tout va bien, ne rien afficher
-  if (isOnline && !hasError) return null;
+  // Simuler le statut système (dans un vrai app, cela viendrait d'une API)
+  useEffect(() => {
+    const checkSystemHealth = () => {
+      // Logique de vérification du système
+      const healthCheck = Math.random();
+      if (healthCheck > 0.9) setSystemStatus('warning');
+      else if (healthCheck > 0.95) setSystemStatus('error');
+      else setSystemStatus('healthy');
+    };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed bottom-4 right-4 z-50"
-    >
-      <Badge
-        variant="outline"
-        className={cn(
-          "flex items-center space-x-2 p-3 shadow-lg",
-          !isOnline && "bg-red-50 text-red-700 border-red-200",
-          hasError && "bg-orange-50 text-orange-700 border-orange-200"
-        )}
-      >
-        {!isOnline ? (
-          <>
-            <WifiOff className="h-4 w-4" />
-            <span>Hors ligne</span>
-          </>
-        ) : hasError ? (
-          <>
-            <AlertTriangle className="h-4 w-4" />
-            <span>Erreur de connexion</span>
-          </>
-        ) : (
-          <>
-            <Wifi className="h-4 w-4" />
-            <span>En ligne</span>
-          </>
-        )}
-      </Badge>
-    </motion.div>
-  );
+    const interval = setInterval(checkSystemHealth, 30000); // Vérifier toutes les 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!isOnline) {
+    return (
+      <div className={cn("fixed bottom-4 right-4 z-50", className)}>
+        <Badge variant="destructive" className="flex items-center gap-2">
+          <WifiOff className="h-3 w-3" />
+          Hors ligne
+        </Badge>
+      </div>
+    );
+  }
+
+  if (systemStatus === 'error') {
+    return (
+      <div className={cn("fixed bottom-4 right-4 z-50", className)}>
+        <Badge variant="destructive" className="flex items-center gap-2">
+          <AlertCircle className="h-3 w-3" />
+          Problème système
+        </Badge>
+      </div>
+    );
+  }
+
+  if (systemStatus === 'warning') {
+    return (
+      <div className={cn("fixed bottom-4 right-4 z-50", className)}>
+        <Badge variant="secondary" className="flex items-center gap-2 bg-yellow-100 text-yellow-800 border-yellow-200">
+          <AlertCircle className="h-3 w-3" />
+          Performance dégradée
+        </Badge>
+      </div>
+    );
+  }
+
+  // Système en bonne santé - ne rien afficher pour ne pas encombrer
+  return null;
 };

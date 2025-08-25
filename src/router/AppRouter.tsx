@@ -91,15 +91,13 @@ export const AppRouter: React.FC = () => {
         } 
       />
 
-      {/* Redirection de l'index selon l'état d'auth */}
+      {/* Page d'accueil unifiée */}
       <Route 
         path="/" 
         element={
-          isAuthenticated ? (
-            <Navigate to="/home" replace />
-          ) : (
-            <Navigate to="/landing" replace />
-          )
+          <Suspense fallback={<FullPageLoader />}>
+            <HomePage />
+          </Suspense>
         } 
       />
 

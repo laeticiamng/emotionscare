@@ -3,17 +3,17 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { 
   Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, 
   Zap, Globe, Shield, Target, Trophy, Activity, TrendingUp, 
-  Play, Sun, Moon, ChevronDown, Settings, Loader2
+  Play, Sun, Moon, ChevronDown, Settings, Loader2, Clock, 
+  Headphones, BookOpen, MessageCircle, CheckCircle
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase';
-import ResponsiveWrapper from '@/components/responsive/ResponsiveWrapper';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 interface UserMetrics {
@@ -40,17 +40,27 @@ interface LiveFeature {
   real_time: boolean;
 }
 
+interface RecentActivity {
+  id: string;
+  type: 'scan' | 'music' | 'breathwork' | 'journal' | 'coach';
+  title: string;
+  timestamp: Date;
+  duration: number;
+  score?: number;
+}
+
 const PremiumHomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, profile } = useAuth();
   const { toast } = useToast();
   const shouldReduceMotion = useReducedMotion();
   
   // États simplifiés
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userMetrics, setUserMetrics] = useState<UserMetrics | null>(null);
-  const [deviceOptimization, setDeviceOptimization] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [personalizedGreeting, setPersonalizedGreeting] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Features statiques pour éviter les re-renders
   const liveFeatures = useMemo(() => [
@@ -97,98 +107,134 @@ const PremiumHomePage: React.FC = () => {
       real_time: true
     },
     {
-      id: 'gamification',
-      title: 'Objectifs Gamifiés',
-      description: 'Transformez vos ambitions en quêtes épiques',
-      icon: Trophy,
-      gradient: 'from-yellow-400 via-orange-500 to-red-500',
-      route: '/gamification',
+      id: 'voice-analysis',
+      title: 'Analyse Vocale IA',
+      description: 'Détection des émotions dans votre voix',
+      icon: Headphones,
+      gradient: 'from-indigo-400 via-purple-500 to-pink-500',
+      route: '/scan-voice',
       premium: true,
-      live_users: 1876,
-      avg_rating: 4.8,
-      category: 'entertainment' as const,
+      live_users: 567,
+      avg_rating: 4.7,
+      category: 'therapy' as const,
       ai_powered: true,
-      real_time: false
+      real_time: true
     },
     {
-      id: 'analytics',
-      title: 'Analytics Bien-être',
-      description: 'Insights avancés basés sur vos données de santé',
+      id: 'breathwork',
+      title: 'Exercices Respiratoires',
+      description: 'Techniques de respiration guidées avec biofeedback',
       icon: Activity,
       gradient: 'from-emerald-400 via-green-500 to-teal-500',
-      route: '/weekly-bars',
+      route: '/breathwork',
+      premium: false,
+      live_users: 1456,
+      avg_rating: 4.8,
+      category: 'wellness' as const,
+      ai_powered: false,
+      real_time: true
+    },
+    {
+      id: 'journal',
+      title: 'Journal Émotionnel IA',
+      description: 'Suivi des émotions avec analyses prédictives',
+      icon: BookOpen,
+      gradient: 'from-orange-400 via-red-500 to-pink-500',
+      route: '/journal',
       premium: true,
-      live_users: 687,
+      live_users: 789,
       avg_rating: 4.9,
       category: 'analytics' as const,
       ai_powered: true,
-      real_time: true
+      real_time: false
     }
   ], []);
 
-  // Détection de l'appareil (stable)
-  useEffect(() => {
-    const detectDevice = () => {
-      const width = window.innerWidth;
-      if (width >= 1024) setDeviceOptimization('desktop');
-      else if (width >= 768) setDeviceOptimization('tablet');
-      else setDeviceOptimization('mobile');
-    };
-
-    detectDevice();
-    window.addEventListener('resize', detectDevice);
-    return () => window.removeEventListener('resize', detectDevice);
-  }, []);
-
   // Horloge (optimisée)
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 30000); // Toutes les 30 secondes
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
     return () => clearInterval(timer);
   }, []);
 
   // Chargement des données utilisateur (mémorisé)
-  const loadUserMetrics = useCallback(async () => {
+  const loadUserData = useCallback(async () => {
     if (!user?.id) return;
     
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Charger les métriques utilisateur
+      const { data: metricsData } = await supabase
         .from('user_metrics')
         .select('*')
         .eq('user_id', user.id)
         .single();
 
-      if (data) {
-        setUserMetrics(data);
+      if (metricsData) {
+        setUserMetrics(metricsData);
       } else {
-        setUserMetrics({
+        // Créer des métriques par défaut
+        const defaultMetrics = {
           emotional_balance: 75,
           stress_level: 30,
           focus_score: 80,
           wellness_streak: 1,
           total_sessions: 0,
-          mood_trend: 'stable'
-        });
+          mood_trend: 'stable' as const
+        };
+        setUserMetrics(defaultMetrics);
+      }
+
+      // Charger l'activité récente
+      const { data: activityData } = await supabase
+        .from('user_activities')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (activityData) {
+        setRecentActivity(activityData.map(activity => ({
+          id: activity.id,
+          type: activity.activity_type,
+          title: activity.title || 'Session',
+          timestamp: new Date(activity.created_at),
+          duration: activity.duration || 0,
+          score: activity.score
+        })));
       }
     } catch (error) {
-      console.error('Error loading user metrics:', error);
+      console.error('Error loading user data:', error);
+      // Données par défaut
+      setUserMetrics({
+        emotional_balance: 75,
+        stress_level: 30,
+        focus_score: 80,
+        wellness_streak: 1,
+        total_sessions: 0,
+        mood_trend: 'stable'
+      });
+    } finally {
+      setIsLoading(false);
     }
   }, [user?.id]);
 
   // Greeting personnalisé (mémorisé)
   const loadPersonalizedContent = useCallback(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setPersonalizedGreeting('Bonjour et excellente journée !');
-    else if (hour < 18) setPersonalizedGreeting('Bon après-midi, continuez sur votre lancée !');
-    else setPersonalizedGreeting('Bonsoir, temps de vous détendre ?');
-  }, []);
+    const name = profile?.display_name || user?.email?.split('@')[0] || 'là';
+    
+    if (hour < 12) setPersonalizedGreeting(`Bonjour ${name}, excellente journée !`);
+    else if (hour < 18) setPersonalizedGreeting(`Bon après-midi ${name}, continuez sur votre lancée !`);
+    else setPersonalizedGreeting(`Bonsoir ${name}, temps de vous détendre ?`);
+  }, [profile?.display_name, user?.email]);
 
   // Chargement initial (stable)
   useEffect(() => {
     if (isAuthenticated && user?.id) {
-      loadUserMetrics();
+      loadUserData();
     }
     loadPersonalizedContent();
-  }, [isAuthenticated, user?.id, loadUserMetrics, loadPersonalizedContent]);
+  }, [isAuthenticated, user?.id, loadUserData, loadPersonalizedContent]);
 
   const getGreetingIcon = () => {
     const hour = new Date().getHours();
@@ -197,356 +243,316 @@ const PremiumHomePage: React.FC = () => {
     return <Moon className="h-5 w-5 text-blue-400" />;
   };
 
-  const DeviceOptimizedLayout = ({ children }: { children: React.ReactNode }) => {
-    const isDesktop = deviceOptimization === 'desktop';
-    const isTablet = deviceOptimization === 'tablet';
-    
-    return (
-      <div className={cn(
-        "container mx-auto px-4",
-        isDesktop && "px-8 max-w-7xl",
-        isTablet && "px-6 max-w-6xl",
-        "px-4 max-w-sm sm:max-w-md md:max-w-4xl"
-      )}>
-        {children}
-      </div>
-    );
+  const getMoodTrendIcon = (trend: string) => {
+    switch (trend) {
+      case 'improving': return <TrendingUp className="h-4 w-4 text-green-600" />;
+      case 'declining': return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
+      default: return <ArrowRight className="h-4 w-4 text-blue-600" />;
+    }
   };
 
+  const getActivityIcon = (type: string) => {
+    const icons = {
+      scan: Brain,
+      music: Music,
+      breathwork: Activity,
+      journal: BookOpen,
+      coach: MessageCircle
+    };
+    const IconComponent = icons[type as keyof typeof icons] || CheckCircle;
+    return <IconComponent className="h-4 w-4" />;
+  };
+
+  const startQuickSession = (route: string) => {
+    toast({
+      title: "Session démarrée",
+      description: "Redirection vers votre activité...",
+    });
+    navigate(route);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Chargement de votre tableau de bord...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <ResponsiveWrapper>
-      {/* Full-bleed hero with no side margins */}
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
       <motion.section 
-        className="w-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative"
+        className="relative bg-gradient-to-br from-primary/10 via-background to-accent/5 py-12 px-4 sm:px-6 lg:px-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/20 to-accent/10" />
-
-        {/* Hero content with internal padding only */}
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Hero Section */}
+        <div className="max-w-7xl mx-auto">
           <motion.div 
-            className={cn(
-              "relative z-10 pt-8 pb-20 text-center", // Réduit le padding-top
-              deviceOptimization === 'desktop' && "pt-12 pb-32",
-              deviceOptimization === 'tablet' && "pt-10 pb-24"
-            )}
+            className="text-center space-y-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {/* Greeting */}
-            {isAuthenticated && (
-              <motion.div
-                className="inline-flex items-center space-x-3 bg-white/5 backdrop-blur-md rounded-full px-6 py-3 border border-white/10 mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                {getGreetingIcon()}
-                <span className="text-white font-medium">
-                  {personalizedGreeting || 'Bienvenue sur EmotionsCare'}
-                </span>
-              </motion.div>
-            )}
-
-            {/* Main Title */}
+            {/* Greeting personnalisé */}
             <motion.div
-              className="space-y-4 mb-8"
+              className="inline-flex items-center space-x-3 bg-card/80 backdrop-blur-sm rounded-full px-6 py-3 border shadow-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {getGreetingIcon()}
+              <span className="font-medium">
+                {personalizedGreeting}
+              </span>
+            </motion.div>
+
+            {/* Titre principal */}
+            <motion.div
+              className="space-y-4"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <h1 className={cn(
-                "font-bold bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent",
-                deviceOptimization === 'desktop' && "text-6xl lg:text-7xl",
-                deviceOptimization === 'tablet' && "text-4xl md:text-5xl",
-                "text-3xl sm:text-4xl"
-              )}>
+              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent">
                 EmotionsCare
               </h1>
               
-              <motion.div
-                className="flex items-center justify-center space-x-2"
-                animate={shouldReduceMotion ? {} : { scale: [1, 1.05, 1] }}
-                transition={{ duration: 4, repeat: Infinity }}
-              >
-                <Sparkles className="h-6 w-6 text-yellow-400" />
-                <span className="text-lg text-purple-200 font-medium">
-                  Plateforme IA Émotionnelle Premium
+              <div className="flex items-center justify-center space-x-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="text-lg text-muted-foreground font-medium">
+                  Votre compagnon bien-être personnel
                 </span>
-                <Sparkles className="h-6 w-6 text-yellow-400" />
-              </motion.div>
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
             </motion.div>
 
-            {/* Description */}
-            <motion.p 
-              className={cn(
-                "text-purple-100 leading-relaxed mx-auto mb-8",
-                deviceOptimization === 'desktop' && "text-xl max-w-4xl",
-                deviceOptimization === 'tablet' && "text-lg max-w-3xl",
-                "text-base max-w-2xl"
-              )}
+            {/* Actions rapides */}
+            <motion.div
+              className="flex flex-wrap gap-3 justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
-              Découvrez la thérapie digitale de nouvelle génération avec l'IA la plus avancée.
-              <br />
-              <span className="text-cyan-300 font-medium">
-                Analyse émotionnelle • Bien-être personnalisé • Communauté bienveillante
-              </span>
-            </motion.p>
-
-            {/* CTA Button */}
-            <motion.div
-              className="flex items-center justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-            >
-              <Button
-                onClick={() => navigate('/choose-mode')}
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg rounded-full shadow-2xl hover:shadow-purple-500/25 border-0"
+              <Button 
+                onClick={() => startQuickSession('/scan')}
+                className="bg-gradient-to-r from-primary to-primary/80 hover:opacity-90"
               >
-                <Zap className="mr-2 h-5 w-5" />
-                Commencer Maintenant
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <Brain className="w-4 h-4 mr-2" />
+                Scan Rapide
               </Button>
-            </motion.div>
-
-            {/* Quick Stats */}
-            <motion.div
-              className="flex items-center justify-center space-x-8 pt-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
-            >
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">10K+</div>
-                <div className="text-xs text-purple-200">Utilisateurs</div>
-              </div>
-              <div className="w-px h-8 bg-white/20" />
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">4.9★</div>
-                <div className="text-xs text-purple-200">Satisfaction</div>
-              </div>
-              <div className="w-px h-8 bg-white/20" />
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">24/7</div>
-                <div className="text-xs text-purple-200">Support IA</div>
-              </div>
+              <Button 
+                variant="outline"
+                onClick={() => startQuickSession('/music')}
+              >
+                <Music className="w-4 h-4 mr-2" />
+                Musique Thérapie
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => startQuickSession('/breathwork')}
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Respiration
+              </Button>
             </motion.div>
           </motion.div>
         </div>
       </motion.section>
 
-      {/* User Dashboard Preview - separate section with white background */}
-      {isAuthenticated && userMetrics && (
-        <section className="w-full bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
-            <motion.div
-              className="relative z-10"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
-            >
-              <Card className="bg-white border border-gray-200 shadow-[0_10px_20px_rgba(2,6,23,0.08)] rounded-2xl">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-gray-900 text-xl font-semibold leading-none tracking-tight">Votre Tableau de Bord</h2>
-                    <Badge className={cn(
-                      "px-3 py-1",
-                      userMetrics.mood_trend === 'improving' && "bg-green-600 text-white border-0",
-                      userMetrics.mood_trend === 'stable' && "bg-blue-600 text-white border-0",
-                      userMetrics.mood_trend === 'declining' && "bg-orange-600 text-white border-0"
-                    )}>
-                      {userMetrics.mood_trend === 'improving' && '📈 En amélioration'}
-                      {userMetrics.mood_trend === 'stable' && '➡️ Stable'}
-                      {userMetrics.mood_trend === 'declining' && '📉 À surveiller'}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className={cn(
-                    "grid gap-6",
-                    deviceOptimization === 'desktop' && "grid-cols-4",
-                    deviceOptimization === 'tablet' && "grid-cols-2",
-                    "grid-cols-1"
-                  )}>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">Équilibre Émotionnel</span>
-                        <span className="text-gray-900 font-bold">{userMetrics.emotional_balance}%</span>
-                      </div>
-                      <Progress value={userMetrics.emotional_balance} className="h-2" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">Niveau de Stress</span>
-                        <span className="text-gray-900 font-bold">{userMetrics.stress_level}%</span>
-                      </div>
-                      <Progress value={100 - userMetrics.stress_level} className="h-2" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">Score de Focus</span>
-                        <span className="text-gray-900 font-bold">{userMetrics.focus_score}%</span>
-                      </div>
-                      <Progress value={userMetrics.focus_score} className="h-2" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">Séries Consécutives</span>
-                        <span className="text-gray-900 font-bold">{userMetrics.wellness_streak}j</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        {Array.from({ length: Math.min(userMetrics.wellness_streak, 7) }).map((_, i) => (
-                          <div key={i} className="w-3 h-3 bg-green-400 rounded-full" />
-                        ))}
-                        {userMetrics.wellness_streak > 7 && (
-                          <span className="text-green-600 text-xs ml-2">+{userMetrics.wellness_streak - 7}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </section>
-      )}
-
-      {/* Live Features Grid - separate section with white background */}
-      <section className="w-full bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
-          <motion.div
-            className="relative z-10"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Métriques utilisateur */}
+        {userMetrics && (
+          <motion.section
+            className="mb-8"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6 }}
+            transition={{ delay: 1 }}
           >
-            <div className="text-center mb-12">
-              <h2 className={cn(
-                "font-bold text-gray-900 mb-4",
-                deviceOptimization === 'desktop' && "text-4xl",
-                deviceOptimization === 'tablet' && "text-3xl",
-                "text-2xl"
-              )}>
-                Fonctionnalités Premium
-              </h2>
-              <p className="text-gray-700 max-w-2xl mx-auto">
-                Explorez nos outils thérapeutiques alimentés par l'IA la plus avancée
-              </p>
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl">Votre Tableau de Bord</CardTitle>
+                  <Badge className={cn(
+                    "px-3 py-1 flex items-center gap-1",
+                    userMetrics.mood_trend === 'improving' && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+                    userMetrics.mood_trend === 'stable' && "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+                    userMetrics.mood_trend === 'declining' && "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                  )}>
+                    {getMoodTrendIcon(userMetrics.mood_trend)}
+                    {userMetrics.mood_trend === 'improving' && 'En amélioration'}
+                    {userMetrics.mood_trend === 'stable' && 'Stable'}
+                    {userMetrics.mood_trend === 'declining' && 'À surveiller'}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Équilibre Émotionnel</span>
+                      <span className="font-bold">{userMetrics.emotional_balance}%</span>
+                    </div>
+                    <Progress value={userMetrics.emotional_balance} className="h-2" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Niveau de Stress</span>
+                      <span className="font-bold">{userMetrics.stress_level}%</span>
+                    </div>
+                    <Progress value={100 - userMetrics.stress_level} className="h-2" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Score de Focus</span>
+                      <span className="font-bold">{userMetrics.focus_score}%</span>
+                    </div>
+                    <Progress value={userMetrics.focus_score} className="h-2" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Série Consécutive</span>
+                      <span className="font-bold">{userMetrics.wellness_streak}j</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: Math.min(userMetrics.wellness_streak, 7) }).map((_, i) => (
+                        <div key={i} className="w-2 h-2 bg-primary rounded-full" />
+                      ))}
+                      {userMetrics.wellness_streak > 7 && (
+                        <span className="text-primary text-xs ml-2">+{userMetrics.wellness_streak - 7}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.section>
+        )}
+
+        {/* Activité récente et Fonctionnalités */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Activité récente */}
+          <motion.section
+            className="lg:col-span-1"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.2 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Activité Récente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recentActivity.length > 0 ? (
+                  <div className="space-y-3">
+                    {recentActivity.map((activity) => (
+                      <div key={activity.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50">
+                        <div className="p-1.5 bg-primary/10 rounded-lg">
+                          {getActivityIcon(activity.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{activity.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {activity.timestamp.toLocaleDateString()}
+                          </p>
+                        </div>
+                        {activity.score && (
+                          <Badge variant="outline" className="text-xs">
+                            {activity.score}%
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Aucune activité récente</p>
+                    <p className="text-xs">Commencez votre première session !</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.section>
+
+          {/* Fonctionnalités principales */}
+          <motion.section
+            className="lg:col-span-2"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.4 }}
+          >
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2">Fonctionnalités Premium</h2>
+              <p className="text-muted-foreground">Explorez nos outils thérapeutiques alimentés par l'IA</p>
             </div>
 
-            <div className={cn(
-              "grid gap-6",
-              deviceOptimization === 'desktop' && "grid-cols-3",
-              deviceOptimization === 'tablet' && "grid-cols-2",
-              "grid-cols-1"
-            )}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {liveFeatures.map((feature, index) => (
                 <motion.div
                   key={feature.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 * index }}
-                  whileHover={shouldReduceMotion ? {} : { y: -5, scale: 1.02 }}
-                  className="group"
+                  transition={{ delay: 1.6 + index * 0.1 }}
                 >
-                  <Card className="bg-white rounded-2xl border border-gray-200 shadow-[0_10px_20px_rgba(2,6,23,0.08)] hover:shadow-[0_16px_28px_rgba(2,6,23,0.12)] transition-all duration-300 cursor-pointer h-full hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 focus-within:ring-offset-white">
-                    <CardHeader>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={cn(
-                          "p-3 rounded-xl bg-gradient-to-br shadow-sm transition-all duration-300",
-                          feature.gradient
-                        )}>
+                  <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group"
+                        onClick={() => navigate(feature.route)}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className={`p-3 rounded-2xl bg-gradient-to-br ${feature.gradient} group-hover:scale-110 transition-transform`}>
                           <feature.icon className="h-6 w-6 text-white" />
                         </div>
-                        
-                        <div className="flex items-center space-x-2">
+                        <div className="text-right">
                           {feature.premium && (
-                            <Badge className="bg-gray-900 text-white text-xs font-semibold border-0">
-                              PRO
+                            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 mb-1">
+                              Premium
                             </Badge>
                           )}
                           {feature.ai_powered && (
-                            <Badge className="bg-indigo-600 text-white text-xs font-semibold border-0">
+                            <Badge variant="outline" className="text-xs">
                               IA
                             </Badge>
                           )}
-                          {feature.real_time && (
-                            <Badge className="bg-emerald-600 text-white text-xs font-medium border-0">
-                              Live
-                            </Badge>
-                          )}
                         </div>
                       </div>
-                      
-                      <h3 className="text-gray-900 text-lg font-semibold leading-none tracking-tight group-hover:text-gray-700 transition-colors">
-                        {feature.title}
-                      </h3>
-                      <CardDescription className="text-gray-700 text-sm leading-relaxed">
+                      <CardTitle className="text-lg">{feature.title}</CardTitle>
+                      <CardDescription className="text-sm">
                         {feature.description}
                       </CardDescription>
                     </CardHeader>
-                    
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between text-xs text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-3 w-3" />
-                          <span>{feature.live_users.toLocaleString()} actifs</span>
+                    <CardContent>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <div className="flex items-center space-x-4">
+                          <span className="flex items-center">
+                            <Users className="h-3 w-3 mr-1" />
+                            {feature.live_users.toLocaleString()}
+                          </span>
+                          <span className="flex items-center">
+                            <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
+                            {feature.avg_rating}
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-3 w-3 fill-current text-yellow-500" />
-                          <span>{feature.avg_rating}</span>
-                        </div>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </div>
-                      
-                      <Button
-                        onClick={() => navigate(feature.route)}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 font-medium"
-                      >
-                        Explorer
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
               ))}
             </div>
-          </motion.div>
+          </motion.section>
         </div>
-      </section>
-
-      {/* Scroll Indicator */}
-      {deviceOptimization === 'desktop' && (
-        <motion.div
-          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2 }}
-        >
-          <motion.div
-            className="flex flex-col items-center text-white/60 cursor-pointer hover:text-white/80 transition-colors"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-          >
-            <span className="text-xs mb-2">Découvrir plus</span>
-            <ChevronDown className="h-4 w-4" />
-          </motion.div>
-        </motion.div>
-      )}
-    </ResponsiveWrapper>
+      </div>
+    </div>
   );
 };
 
