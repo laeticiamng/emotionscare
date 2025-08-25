@@ -11,7 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AppLayout } from '@/components/layout/AppLayout';
 
 // Pages
-import { HomePage } from '@/pages/HomePage';
+import HomePage from '@/pages/HomePage';
 import { EcosPage } from '@/pages/EcosPage';
 import { EdnPage } from '@/pages/EdnPage';
 import { AccountPage } from '@/pages/AccountPage';
