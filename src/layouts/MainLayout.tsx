@@ -6,7 +6,6 @@ import { Sidebar } from '@/components/navigation/Sidebar';
 import { TopBar } from '@/components/navigation/TopBar';
 import { Breadcrumb } from '@/components/navigation/Breadcrumb';
 import { StatusIndicator } from '@/components/common/StatusIndicator';
-import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 
@@ -30,58 +29,56 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   return (
-    <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
-      <div className="h-screen flex overflow-hidden bg-background">
-        {/* Sidebar */}
-        <Sidebar 
-          collapsed={sidebarCollapsed} 
-          onToggle={handleSidebarToggle}
+    <div className="h-screen flex overflow-hidden bg-background">
+      {/* Sidebar */}
+      <Sidebar 
+        collapsed={sidebarCollapsed} 
+        onToggle={handleSidebarToggle}
+      />
+
+      {/* Contenu principal */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Barre de navigation supérieure */}
+        <TopBar 
+          currentItem={currentItem}
+          onSidebarToggle={handleSidebarToggle}
+          sidebarCollapsed={sidebarCollapsed}
         />
 
-        {/* Contenu principal */}
+        {/* Zone de contenu avec breadcrumb */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Barre de navigation supérieure */}
-          <TopBar 
-            currentItem={currentItem}
-            onSidebarToggle={handleSidebarToggle}
-            sidebarCollapsed={sidebarCollapsed}
-          />
+          {/* Breadcrumb */}
+          {breadcrumb.length > 1 && (
+            <div className="px-6 py-2 border-b border-border">
+              <Breadcrumb items={breadcrumb} />
+            </div>
+          )}
 
-          {/* Zone de contenu avec breadcrumb */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Breadcrumb */}
-            {breadcrumb.length > 1 && (
-              <div className="px-6 py-2 border-b border-border">
-                <Breadcrumb items={breadcrumb} />
-              </div>
-            )}
+          {/* Contenu principal avec animations */}
+          <main className={cn(
+            "flex-1 overflow-auto relative",
+            "transition-all duration-300 ease-in-out"
+          )}>
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="h-full"
+            >
+              {children}
+            </motion.div>
 
-            {/* Contenu principal avec animations */}
-            <main className={cn(
-              "flex-1 overflow-auto relative",
-              "transition-all duration-300 ease-in-out"
-            )}>
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="h-full"
-              >
-                {children}
-              </motion.div>
-
-              {/* Indicateur de statut global */}
-              <StatusIndicator />
-            </main>
-          </div>
+            {/* Indicateur de statut global */}
+            <StatusIndicator />
+          </main>
         </div>
-
-        {/* Toast notifications */}
-        <Toaster />
       </div>
-    </ThemeProvider>
+
+      {/* Toast notifications */}
+      <Toaster />
+    </div>
   );
 };
 
