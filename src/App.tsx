@@ -17,19 +17,20 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <NotificationProvider>
-          <ModalProvider>
-            <Router>
-              <AppRouter />
-            </Router>
-          </ModalProvider>
-        </NotificationProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
+  console.log('📱 App: Début du rendu principal');
+  
+  try {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <AppRouter />
+        </Router>
+      </QueryClientProvider>
+    );
+  } catch (error) {
+    console.error('❌ Erreur dans App:', error);
+    return <div style={{color: 'red', padding: '20px', background: 'white'}}>Erreur App: {error?.message}</div>;
+  }
 }
 
 export default App;
