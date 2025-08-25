@@ -4,6 +4,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MoodProvider } from '@/contexts/MoodContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import { Toaster } from '@/components/ui/sonner';
 
 interface AppProvidersProps {
@@ -16,8 +17,10 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <AuthProvider>
         <UserModeProvider>
           <MoodProvider>
-            {children}
-            <Toaster position="top-right" />
+            <NotificationProvider>
+              {children}
+              <Toaster position="top-right" />
+            </NotificationProvider>
           </MoodProvider>
         </UserModeProvider>
       </AuthProvider>
