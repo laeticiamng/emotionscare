@@ -228,9 +228,9 @@ const PremiumHomePage: React.FC = () => {
           {/* Hero Section */}
           <motion.section 
             className={cn(
-              "relative z-10 py-20 text-center",
-              deviceOptimization === 'desktop' && "py-32",
-              deviceOptimization === 'tablet' && "py-24"
+              "relative z-10 pt-8 pb-20 text-center", // Réduit le padding-top
+              deviceOptimization === 'desktop' && "pt-12 pb-32",
+              deviceOptimization === 'tablet' && "pt-10 pb-24"
             )}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

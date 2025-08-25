@@ -1,23 +1,101 @@
 
-import React, { Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
+import { cn } from '@/lib/utils';
 
 const AppShell: React.FC = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Auto-collapse sidebar on smaller screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1280) {
+        setSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close mobile sidebar on escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [sidebarOpen]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <Header />
-      
-      <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 pt-16 pl-64">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 w-full">
+      {/* Header */}
+      <header className="sticky top-0 z-50 h-16 bg-white/80 backdrop-blur border-b">
+        <div className="flex items-center justify-between h-full px-4">
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="xl:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+            aria-label="Toggle navigation"
+          >
+            {sidebarOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </button>
+
+          {/* Desktop sidebar toggle */}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="hidden xl:flex p-2 rounded-md hover:bg-gray-100 transition-colors"
+            aria-label="Collapse sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <Header />
+        </div>
+      </header>
+
+      <div className="flex w-full">
+        {/* Desktop Sidebar */}
+        <aside 
+          className={cn(
+            "hidden xl:block border-r bg-white h-[calc(100vh-4rem)] sticky top-16 transition-all duration-300",
+            sidebarCollapsed ? "w-16" : "w-64"
+          )}
+        >
+          <Sidebar collapsed={sidebarCollapsed} />
+        </aside>
+
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setSidebarOpen(false)}>
+            <aside className="absolute left-0 top-16 h-[calc(100vh-4rem)] w-72 bg-white shadow-xl border-r">
+              <Sidebar collapsed={false} />
+            </aside>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <main className={cn(
+          "flex-1 min-w-0 transition-all duration-300",
+          "pt-0" // No padding-top since header is sticky
+        )}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -25,13 +103,13 @@ const AppShell: React.FC = () => {
             className="container mx-auto px-6 py-8"
           >
             <EnhancedErrorBoundary>
-              <Suspense fallback={
+              <React.Suspense fallback={
                 <div className="flex items-center justify-center min-h-[400px]">
                   <LoadingSpinner size="lg" />
                 </div>
               }>
                 <Outlet />
-              </Suspense>
+              </React.Suspense>
             </EnhancedErrorBoundary>
           </motion.div>
         </main>
