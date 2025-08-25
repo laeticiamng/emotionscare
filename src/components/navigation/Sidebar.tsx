@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Menu, X, ChevronDown, ChevronRight, 
-  Heart, Crown, Beta, Clock 
+  Heart, Crown, FlaskConical, Clock 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'beta':
-        return <Beta className="h-3 w-3 text-blue-500" />;
+        return <FlaskConical className="h-3 w-3 text-blue-500" />;
       case 'coming-soon':
         return <Clock className="h-3 w-3 text-orange-500" />;
       case 'maintenance':
