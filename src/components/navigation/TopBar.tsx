@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Menu, Search, Bell, Settings, User,
-  Crown, Beta, Clock, AlertTriangle 
+  Crown, FlaskConical, Clock, AlertTriangle 
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,7 +35,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       case 'beta':
         return (
           <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-            <Beta className="h-3 w-3 mr-1" />
+            <FlaskConical className="h-3 w-3 mr-1" />
             Bêta
           </Badge>
         );
