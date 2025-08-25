@@ -1,396 +1,513 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { 
-  Activity, 
-  Brain, 
-  Heart, 
-  Music, 
-  TrendingUp, 
-  Users, 
-  Calendar,
-  Target,
-  Award,
-  Zap,
-  Clock
+  Brain, Music, Heart, TrendingUp, Calendar, Clock,
+  Zap, Target, Users, BookOpen, Activity, Award
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { NavButton } from '@/components/navigation/NavButton';
-import { findNavNode } from '@/lib/nav-schema';
+import { NAV_SCHEMA, findNavNode } from '@/lib/nav-schema';
+import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+
+interface DashboardStats {
+  totalSessions: number;
+  wellbeingScore: number;
+  streakDays: number;
+  completedGoals: number;
+  weeklyProgress: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'scan' | 'music' | 'coach' | 'journal' | 'vr';
+  title: string;
+  timestamp: Date;
+  score?: number;
+  duration?: number;
+}
+
+interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  action: string;
+  isPremium?: boolean;
+}
 
 /**
- * Dashboard unifié - Point d'entrée principal post-connexion
- * Suit l'architecture déclarative avec actions centralisées
+ * Dashboard complet - Vue d'ensemble de l'activité utilisateur
+ * Intégration avec toutes les fonctionnalités via le système de navigation unifié
  */
-const ComprehensiveDashboard: React.FC = () => {
-  const { user } = useAuth();
+export function ComprehensiveDashboard() {
+  const { user, isAuthenticated } = useAuth();
 
-  // Données mock - à remplacer par React Query
-  const userStats = {
-    emotionalBalance: 78,
-    stressLevel: 32,
-    focusScore: 85,
-    wellnessStreak: 12,
-    totalSessions: 156,
-    weeklyProgress: 68,
-  };
+  // Requêtes pour les données du dashboard
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['dashboard-stats', user?.id],
+    queryFn: () => fetchDashboardStats(user?.id),
+    enabled: isAuthenticated,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
 
-  const recentActivity = [
-    { id: 1, type: 'scan', title: 'Scan émotionnel matinal', date: '2h', score: 8.2 },
-    { id: 2, type: 'music', title: 'Session musicothérapie', date: '1j', duration: '25min' },
-    { id: 3, type: 'journal', title: 'Entrée journal', date: '2j', mood: 'positive' },
-    { id: 4, type: 'vr', title: 'Méditation VR', date: '3j', session: 'Forêt zen' },
+  const { data: recentActivity } = useQuery({
+    queryKey: ['recent-activity', user?.id],
+    queryFn: () => fetchRecentActivity(user?.id),
+    enabled: isAuthenticated,
+  });
+
+  const { data: recommendations } = useQuery({
+    queryKey: ['recommendations', user?.id],
+    queryFn: () => fetchRecommendations(user?.id),
+    enabled: isAuthenticated,
+  });
+
+  // Actions rapides définies via le schéma de navigation
+  const quickActions: QuickAction[] = [
+    {
+      id: 'scan',
+      title: 'Scan Émotionnel',
+      description: 'Analysez votre état actuel',
+      icon: 'Brain',
+      action: '/scan',
+      isPremium: true,
+    },
+    {
+      id: 'music',
+      title: 'Musicothérapie',
+      description: 'Session adaptée à votre humeur',
+      icon: 'Music',
+      action: '/music',
+      isPremium: true,
+    },
+    {
+      id: 'coach',
+      title: 'Coach IA',
+      description: 'Conversation personnalisée',
+      icon: 'Users',
+      action: '/coach',
+    },
+    {
+      id: 'journal',
+      title: 'Journal',
+      description: 'Écrivez vos pensées',
+      icon: 'BookOpen',
+      action: '/journal',
+    },
+    {
+      id: 'vr',
+      title: 'Expérience VR',
+      description: 'Immersion thérapeutique',
+      icon: 'Glasses',
+      action: '/vr',
+      isPremium: true,
+    },
+    {
+      id: 'breathwork',
+      title: 'Respiration',
+      description: 'Exercices guidés',
+      icon: 'Wind',
+      action: '/breathwork',
+    },
   ];
 
-  const quickActions = [
-    { nodeId: 'scan', urgent: true },
-    { nodeId: 'music', popular: true },
-    { nodeId: 'coach' },
-    { nodeId: 'journal' },
-  ];
-
-  const achievements = [
-    { id: 1, title: 'Série de 7 jours', icon: Award, unlocked: true, progress: 100 },
-    { id: 2, title: 'Maître du scan', icon: Brain, unlocked: true, progress: 100 },
-    { id: 3, title: 'Mélomane thérapeutique', icon: Music, unlocked: false, progress: 73 },
-    { id: 4, title: 'Explorateur VR', icon: Target, unlocked: false, progress: 45 },
-  ];
+  if (!isAuthenticated) {
+    return <UnauthenticatedDashboard />;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header avec salutation personnalisée */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Bonjour {user?.user_metadata?.name || 'Utilisateur'} 👋
-              </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mt-2">
-                Votre tableau de bord émotionnel vous attend
-              </p>
+    <div className="space-y-6">
+      {/* En-tête de bienvenue */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-2"
+      >
+        <h1 className="text-3xl font-bold">
+          Bonjour, {user?.email?.split('@')[0]} 👋
+        </h1>
+        <p className="text-muted-foreground">
+          Voici un aperçu de votre parcours bien-être aujourd'hui.
+        </p>
+      </motion.div>
+
+      {/* Statistiques principales */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statsLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-8 bg-gray-200 rounded"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <>
+            <StatsCard
+              title="Score Bien-être"
+              value={`${stats?.wellbeingScore || 0}/10`}
+              icon={Heart}
+              trend="+0.5 vs hier"
+              color="text-green-600"
+            />
+            <StatsCard
+              title="Sessions"
+              value={stats?.totalSessions || 0}
+              icon={Activity}
+              trend="Cette semaine"
+              color="text-blue-600"
+            />
+            <StatsCard
+              title="Série"
+              value={`${stats?.streakDays || 0} jours`}
+              icon={Zap}
+              trend="Record: 12j"
+              color="text-orange-600"
+            />
+            <StatsCard
+              title="Objectifs"
+              value={`${stats?.completedGoals || 0}/5`}
+              icon={Target}
+              trend="Ce mois"
+              color="text-purple-600"
+            />
+          </>
+        )}
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Actions rapides */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Actions Rapides
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {quickActions.map((action, index) => {
+                const navNode = findNavNode(action.id);
+                return (
+                  <motion.div
+                    key={action.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    {navNode ? (
+                      <NavButton
+                        node={navNode}
+                        variant="outline"
+                        className="h-auto p-4 flex-col items-start gap-2 text-left w-full"
+                        showBadge={true}
+                      />
+                    ) : (
+                      <QuickActionCard action={action} />
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="flex items-center gap-2">
-                <Zap className="h-3 w-3" />
-                Série active: {userStats.wellnessStreak}j
-              </Badge>
+          </CardContent>
+        </Card>
+
+        {/* Progression hebdomadaire */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Progression
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Objectif hebdomadaire</span>
+                <span>{stats?.weeklyProgress || 0}%</span>
+              </div>
+              <Progress value={stats?.weeklyProgress || 0} />
             </div>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Colonne principale */}
-          <div className="lg:col-span-8 space-y-6">
             
-            {/* Métriques principales */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-blue-500" />
-                    Vue d'ensemble de votre bien-être
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                          Équilibre émotionnel
-                        </span>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {userStats.emotionalBalance}%
-                        </span>
-                      </div>
-                      <Progress value={userStats.emotionalBalance} className="h-2" />
-                      <div className="flex items-center text-xs text-green-600">
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                        +5% cette semaine
-                      </div>
-                    </div>
+            <div className="space-y-3">
+              <ProgressItem label="Sessions complétées" progress={80} />
+              <ProgressItem label="Temps d'activité" progress={65} />
+              <ProgressItem label="Régularité" progress={90} />
+            </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                          Gestion du stress
-                        </span>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {100 - userStats.stressLevel}%
-                        </span>
-                      </div>
-                      <Progress value={100 - userStats.stressLevel} className="h-2" />
-                      <div className="flex items-center text-xs text-blue-600">
-                        <Heart className="h-3 w-3 mr-1" />
-                        Très bon niveau
-                      </div>
-                    </div>
+            <Button className="w-full" variant="outline">
+              <Award className="h-4 w-4 mr-2" />
+              Voir les badges
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                          Score de focus
-                        </span>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {userStats.focusScore}%
-                        </span>
-                      </div>
-                      <Progress value={userStats.focusScore} className="h-2" />
-                      <div className="flex items-center text-xs text-purple-600">
-                        <Brain className="h-3 w-3 mr-1" />
-                        Excellent niveau
-                      </div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Activité récente */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Activité Récente
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentActivity?.length ? (
+              <div className="space-y-3">
+                {recentActivity.map((activity: RecentActivity, index: number) => (
+                  <motion.div
+                    key={activity.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  >
+                    <ActivityIcon type={activity.type} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{activity.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatRelativeTime(activity.timestamp)}
+                      </p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                    {activity.score && (
+                      <Badge variant="secondary">
+                        {activity.score}/10
+                      </Badge>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Aucune activité récente</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-            {/* Actions rapides */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Actions rapides</CardTitle>
-                  <CardDescription>
-                    Accédez rapidement à vos outils favoris
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {quickActions.map(({ nodeId, urgent, popular }) => {
-                      const node = findNavNode(nodeId);
-                      if (!node) return null;
-                      
-                      return (
-                        <div key={nodeId} className="relative">
-                          {urgent && (
-                            <Badge className="absolute -top-2 -right-2 z-10 bg-red-500">
-                              Urgent
-                            </Badge>
-                          )}
-                          {popular && (
-                            <Badge className="absolute -top-2 -right-2 z-10 bg-green-500">
-                              Populaire
-                            </Badge>
-                          )}
-                          <NavButton 
-                            node={node} 
-                            variant="outline"
-                            className="w-full h-24 flex-col gap-2 text-center hover:shadow-md transition-all duration-200"
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Activité récente */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-gray-500" />
-                    Activité récente
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentActivity.map((activity, index) => (
-                      <div key={activity.id} className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                        <div className="p-2 rounded-full bg-white dark:bg-gray-700">
-                          {activity.type === 'scan' && <Brain className="h-4 w-4 text-purple-500" />}
-                          {activity.type === 'music' && <Music className="h-4 w-4 text-green-500" />}
-                          {activity.type === 'journal' && <Heart className="h-4 w-4 text-pink-500" />}
-                          {activity.type === 'vr' && <Target className="h-4 w-4 text-blue-500" />}
-                        </div>
-                        
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {activity.title}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Il y a {activity.date}
-                            {activity.score && ` • Score: ${activity.score}/10`}
-                            {activity.duration && ` • Durée: ${activity.duration}`}
-                            {activity.mood && ` • Humeur: ${activity.mood}`}
-                            {activity.session && ` • Session: ${activity.session}`}
-                          </div>
-                        </div>
-                        
-                        <Button variant="ghost" size="sm">
-                          Voir détails
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-
-          {/* Colonne latérale */}
-          <div className="lg:col-span-4 space-y-6">
-            
-            {/* Objectifs et achievements */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Award className="h-5 w-5 text-yellow-500" />
-                    Achievements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {achievements.map((achievement) => {
-                      const IconComponent = achievement.icon;
-                      return (
-                        <div key={achievement.id} className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-full ${achievement.unlocked ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400'}`}>
-                            <IconComponent className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1">
-                            <div className={`font-medium ${achievement.unlocked ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>
-                              {achievement.title}
-                            </div>
-                            <Progress value={achievement.progress} className="h-1 mt-1" />
-                          </div>
-                          {achievement.unlocked && (
-                            <Badge variant="secondary" className="text-xs">
-                              ✓
-                            </Badge>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Progrès hebdomadaire */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-500" />
-                    Cette semaine
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Objectif hebdomadaire</span>
-                        <span className="text-sm text-gray-500">{userStats.weeklyProgress}%</span>
-                      </div>
-                      <Progress value={userStats.weeklyProgress} />
+        {/* Recommandations personnalisées */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5" />
+              Recommandations IA
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recommendations?.length ? (
+              <div className="space-y-4">
+                {recommendations.map((rec: any, index: number) => (
+                  <motion.div
+                    key={rec.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-4 border rounded-lg space-y-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{rec.type}</Badge>
+                      {rec.priority === 'high' && (
+                        <Badge variant="destructive">Priorité</Badge>
+                      )}
                     </div>
-                    
-                    <Separator />
-                    
-                    <div className="grid grid-cols-2 gap-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {userStats.totalSessions}
-                        </div>
-                        <div className="text-xs text-gray-500">Sessions totales</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {userStats.wellnessStreak}
-                        </div>
-                        <div className="text-xs text-gray-500">Jours consécutifs</div>
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <Button className="w-full" variant="outline">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Voir les analytics détaillées
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Recommandations IA */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-purple-500" />
-                    Recommandations IA
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                      <div className="font-medium text-purple-900 dark:text-purple-200 text-sm">
-                        Session de respiration recommandée
-                      </div>
-                      <div className="text-xs text-purple-600 dark:text-purple-300 mt-1">
-                        Votre niveau de stress semble élevé aujourd'hui
-                      </div>
-                    </div>
-                    
-                    <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                      <div className="font-medium text-green-900 dark:text-green-200 text-sm">
-                        Nouvelle playlist disponible
-                      </div>
-                      <div className="text-xs text-green-600 dark:text-green-300 mt-1">
-                        Basée sur vos préférences musicales
-                      </div>
-                    </div>
-                    
-                    <Button variant="ghost" className="w-full text-xs">
-                      Voir toutes les recommandations
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
+                    <p className="font-medium">{rec.title}</p>
+                    <p className="text-sm text-muted-foreground">{rec.description}</p>
+                    {rec.actionButton && (
+                      <Button size="sm" variant="outline" className="w-full">
+                        {rec.actionButton}
+                      </Button>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Brain className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Aucune recommandation pour le moment</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
+}
 
-export default ComprehensiveDashboard;
+// Composants utilitaires
+function StatsCard({ title, value, icon: Icon, trend, color }: {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  trend: string;
+  color: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between space-y-0 pb-2">
+          <p className="text-sm font-medium">{title}</p>
+          <Icon className={`h-4 w-4 ${color}`} />
+        </div>
+        <div className="space-y-1">
+          <p className="text-2xl font-bold">{value}</p>
+          <p className="text-xs text-muted-foreground">{trend}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function QuickActionCard({ action }: { action: QuickAction }) {
+  const IconComponent = (Brain as any); // Fallback icon
+  
+  return (
+    <Button
+      variant="outline"
+      className="h-auto p-4 flex-col items-start gap-2 text-left w-full"
+      onClick={() => window.location.href = action.action}
+    >
+      <div className="flex items-center gap-2 w-full">
+        <IconComponent className="h-4 w-4" />
+        <span className="font-medium">{action.title}</span>
+        {action.isPremium && (
+          <Badge variant="default" className="text-xs ml-auto">PRO</Badge>
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground">{action.description}</p>
+    </Button>
+  );
+}
+
+function ProgressItem({ label, progress }: { label: string; progress: number }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-xs">
+        <span>{label}</span>
+        <span>{progress}%</span>
+      </div>
+      <Progress value={progress} className="h-1" />
+    </div>
+  );
+}
+
+function ActivityIcon({ type }: { type: string }) {
+  const icons = {
+    scan: Brain,
+    music: Music,
+    coach: Users,
+    journal: BookOpen,
+    vr: Activity,
+  };
+  
+  const Icon = (icons as any)[type] || Activity;
+  return <Icon className="h-5 w-5 text-muted-foreground" />;
+}
+
+function UnauthenticatedDashboard() {
+  return (
+    <div className="text-center space-y-6 py-12">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="space-y-4"
+      >
+        <Heart className="h-16 w-16 mx-auto text-primary" />
+        <h1 className="text-3xl font-bold">Bienvenue sur EmotionsCare</h1>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          Votre plateforme de bien-être émotionnel alimentée par l'IA. 
+          Connectez-vous pour commencer votre parcours.
+        </p>
+      </motion.div>
+      
+      <div className="flex gap-4 justify-center">
+        <Button size="lg">Se connecter</Button>
+        <Button variant="outline" size="lg">Découvrir</Button>
+      </div>
+    </div>
+  );
+}
+
+function formatRelativeTime(date: Date): string {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) return `il y a ${days}j`;
+  if (hours > 0) return `il y a ${hours}h`;
+  if (minutes > 0) return `il y a ${minutes}min`;
+  return 'À l\'instant';
+}
+
+// Mock API functions
+async function fetchDashboardStats(userId?: string): Promise<DashboardStats> {
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  return {
+    totalSessions: 24,
+    wellbeingScore: 8.2,
+    streakDays: 5,
+    completedGoals: 3,
+    weeklyProgress: 75,
+  };
+}
+
+async function fetchRecentActivity(userId?: string): Promise<RecentActivity[]> {
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  return [
+    {
+      id: '1',
+      type: 'scan',
+      title: 'Scan émotionnel matinal',
+      timestamp: new Date(Date.now() - 3600000),
+      score: 8.5,
+    },
+    {
+      id: '2',
+      type: 'music',
+      title: 'Session relaxation',
+      timestamp: new Date(Date.now() - 7200000),
+      duration: 1200,
+    },
+    {
+      id: '3',
+      type: 'journal',
+      title: 'Réflexions du soir',
+      timestamp: new Date(Date.now() - 86400000),
+    },
+  ];
+}
+
+async function fetchRecommendations(userId?: string) {
+  await new Promise(resolve => setTimeout(resolve, 700));
+  
+  return [
+    {
+      id: '1',
+      type: 'Bien-être',
+      title: 'Session de respiration recommandée',
+      description: 'Votre stress semble élevé. Essayez 5 minutes de respiration.',
+      priority: 'high',
+      actionButton: 'Commencer maintenant',
+    },
+    {
+      id: '2',
+      type: 'Progression',
+      title: 'Objectif hebdomadaire proche',
+      description: 'Plus que 2 sessions pour atteindre votre objectif.',
+      priority: 'medium',
+      actionButton: 'Voir mes objectifs',
+    },
+  ];
+}

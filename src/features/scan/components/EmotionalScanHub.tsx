@@ -1,504 +1,380 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Play, Pause, Camera, Brain, Heart, Zap } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Brain, 
-  Camera, 
-  Mic, 
-  Heart, 
-  Zap, 
-  TrendingUp, 
-  BarChart3,
-  Clock,
-  Target,
-  Play,
-  Pause,
-  RotateCcw
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation } from '@tanstack/react-query';
+
+interface EmotionalState {
+  emotion: string;
+  intensity: number;
+  confidence: number;
+  timestamp: number;
+}
+
+interface ScanResult {
+  id: string;
+  overallMood: string;
+  states: EmotionalState[];
+  recommendations: string[];
+  score: number;
+  duration: number;
+}
 
 /**
- * Hub de scan émotionnel - Fonctionnalité premium IA
- * États: loading, scanning, results, history
+ * Hub de scan émotionnel - Analyse en temps réel avec IA
+ * Gestion complète: capture, analyse, résultats, recommendations
  */
-const EmotionalScanHub: React.FC = () => {
-  const { user } = useAuth();
-  const [scanState, setScanState] = useState<'idle' | 'scanning' | 'results' | 'history'>('idle');
-  const [scanProgress, setScanProgress] = useState(0);
-  const [scanMethod, setScanMethod] = useState<'camera' | 'voice' | 'text'>('camera');
+export function EmotionalScanHub() {
+  const [isScanning, setIsScanning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [currentResult, setCurrentResult] = useState<ScanResult | null>(null);
+  const { toast } = useToast();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Mock data - à remplacer par React Query
-  const scanResults = {
-    dominantEmotion: 'Sérénité',
-    confidence: 0.87,
-    emotions: {
-      joie: 0.65,
-      sérénité: 0.87,
-      énergie: 0.43,
-      stress: 0.22,
-      fatigue: 0.18,
+  // Query pour l'historique des scans
+  const { data: scanHistory, refetch: refetchHistory } = useQuery({
+    queryKey: ['scan-history'],
+    queryFn: () => fetchScanHistory(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Mutation pour sauvegarder un scan
+  const saveScanMutation = useMutation({
+    mutationFn: (result: ScanResult) => saveScanResult(result),
+    onSuccess: () => {
+      toast({
+        title: "Scan sauvegardé",
+        description: "Votre analyse émotionnelle a été enregistrée.",
+      });
+      refetchHistory();
     },
-    insights: [
-      'Votre niveau de sérénité est exceptionnellement élevé',
-      'Légère tension détectée au niveau des épaules',
-      'Rythme cardiaque stable et régulier',
-    ],
-    recommendations: [
-      'Continuez vos pratiques de méditation',
-      'Pensez à faire des pauses régulières',
-      'Session de musicothérapie recommandée',
-    ],
-  };
-
-  const scanHistory = [
-    { id: 1, date: '2024-01-15T10:30', emotion: 'Joie', score: 8.2, method: 'camera' },
-    { id: 2, date: '2024-01-14T15:45', emotion: 'Calme', score: 7.8, method: 'voice' },
-    { id: 3, date: '2024-01-14T09:15', emotion: 'Énergie', score: 9.1, method: 'camera' },
-    { id: 4, date: '2024-01-13T18:20', emotion: 'Fatigue', score: 4.3, method: 'text' },
-  ];
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur de sauvegarde",
+        description: "Impossible de sauvegarder le scan.",
+      });
+    },
+  });
 
   const startScan = async () => {
-    setScanState('scanning');
-    setScanProgress(0);
-    
-    // Simulation du scan
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setScanState('results');
-          return 100;
-        }
-        return prev + 10;
+    try {
+      // Démarrer la capture vidéo
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480 } 
       });
-    }, 300);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+
+      setIsScanning(true);
+      setProgress(0);
+      setCurrentResult(null);
+
+      // Simuler le processus de scan avec progression
+      intervalRef.current = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            completeScan();
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 100);
+
+      toast({
+        title: "Scan démarré",
+        description: "Analyse de votre état émotionnel en cours...",
+      });
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur de capture",
+        description: "Impossible d'accéder à la caméra.",
+      });
+    }
   };
 
-  const resetScan = () => {
-    setScanState('idle');
-    setScanProgress(0);
+  const completeScan = async () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    // Arrêter le stream vidéo
+    if (videoRef.current?.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+    }
+
+    setIsScanning(false);
+
+    // Générer un résultat de démonstration (en production: appel API d'analyse)
+    const result: ScanResult = {
+      id: `scan-${Date.now()}`,
+      overallMood: 'Positive',
+      states: [
+        { emotion: 'Joie', intensity: 0.7, confidence: 0.85, timestamp: Date.now() },
+        { emotion: 'Sérénité', intensity: 0.6, confidence: 0.75, timestamp: Date.now() },
+        { emotion: 'Focus', intensity: 0.8, confidence: 0.90, timestamp: Date.now() },
+      ],
+      recommendations: [
+        'Continuez cette pratique positive',
+        'Essayez une session de musicothérapie',
+        'Partagez cette énergie avec votre coach IA'
+      ],
+      score: 8.2,
+      duration: 5000,
+    };
+
+    setCurrentResult(result);
+    
+    // Sauvegarder automatiquement
+    saveScanMutation.mutate(result);
+
+    toast({
+      title: "Analyse terminée!",
+      description: `Score de bien-être: ${result.score}/10`,
+    });
+  };
+
+  const stopScan = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    
+    // Arrêter le stream
+    if (videoRef.current?.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+    }
+
+    setIsScanning(false);
+    setProgress(0);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        
-        {/* Header */}
-        <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="inline-flex items-center gap-2 bg-purple-100 dark:bg-purple-900/30 px-4 py-2 rounded-full mb-4">
-            <Brain className="h-5 w-5 text-purple-600" />
-            <Badge variant="secondary" className="bg-purple-600 text-white">
-              IA Premium
-            </Badge>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="space-y-6">
+      {/* En-tête */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center space-y-4"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <Brain className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
             Scan Émotionnel IA
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Analyse instantanée de votre état émotionnel avec notre IA multimodale de pointe
-          </p>
-        </motion.div>
+        </div>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Analysez votre état émotionnel en temps réel grâce à l'intelligence artificielle. 
+          Obtenez des recommendations personnalisées pour votre bien-être.
+        </p>
+      </motion.div>
 
-        <Tabs defaultValue="scan" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
-            <TabsTrigger value="scan">Nouveau Scan</TabsTrigger>
-            <TabsTrigger value="results">Résultats</TabsTrigger>
-            <TabsTrigger value="history">Historique</TabsTrigger>
-          </TabsList>
-
-          {/* Onglet Nouveau Scan */}
-          <TabsContent value="scan" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Zone de scan principale */}
-              <div className="lg:col-span-2">
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Card className="h-full">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Target className="h-5 w-5 text-purple-500" />
-                        Zone d'analyse
-                      </CardTitle>
-                      <CardDescription>
-                        Choisissez votre méthode d'analyse préférée
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      
-                      {/* Sélection de méthode */}
-                      <div className="grid grid-cols-3 gap-4 mb-6">
-                        {[
-                          { id: 'camera', icon: Camera, label: 'Visuel', desc: 'Expression faciale' },
-                          { id: 'voice', icon: Mic, label: 'Vocal', desc: 'Analyse vocale' },
-                          { id: 'text', icon: Brain, label: 'Textuel', desc: 'Sentiment écrit' },
-                        ].map((method) => (
-                          <Card 
-                            key={method.id}
-                            className={cn(
-                              "cursor-pointer transition-all duration-200 hover:shadow-md",
-                              scanMethod === method.id 
-                                ? "ring-2 ring-purple-500 bg-purple-50 dark:bg-purple-900/20" 
-                                : "hover:bg-gray-50 dark:hover:bg-gray-800"
-                            )}
-                            onClick={() => setScanMethod(method.id as any)}
-                          >
-                            <CardContent className="p-4 text-center">
-                              <method.icon className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-                              <div className="font-medium text-sm">{method.label}</div>
-                              <div className="text-xs text-gray-500 mt-1">{method.desc}</div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-
-                      {/* Zone de capture */}
-                      <div className="relative">
-                        <div className={cn(
-                          "aspect-video bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40 rounded-xl border-2 border-dashed flex items-center justify-center",
-                          scanState === 'scanning' && "border-purple-500 animate-pulse"
-                        )}>
-                          <AnimatePresence mode="wait">
-                            {scanState === 'idle' && (
-                              <motion.div
-                                className="text-center"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                              >
-                                <div className="h-16 w-16 bg-purple-200 dark:bg-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                                  {scanMethod === 'camera' && <Camera className="h-8 w-8 text-purple-600" />}
-                                  {scanMethod === 'voice' && <Mic className="h-8 w-8 text-purple-600" />}
-                                  {scanMethod === 'text' && <Brain className="h-8 w-8 text-purple-600" />}
-                                </div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                                  Prêt pour l'analyse {scanMethod === 'camera' ? 'visuelle' : scanMethod === 'voice' ? 'vocale' : 'textuelle'}
-                                </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                  {scanMethod === 'camera' && 'Positionnez-vous face à la caméra'}
-                                  {scanMethod === 'voice' && 'Préparez-vous à parler pendant 30 secondes'}
-                                  {scanMethod === 'text' && 'Décrivez votre état émotionnel actuel'}
-                                </p>
-                              </motion.div>
-                            )}
-
-                            {scanState === 'scanning' && (
-                              <motion.div
-                                className="text-center"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                              >
-                                <div className="h-16 w-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                                  <Zap className="h-8 w-8 text-white" />
-                                </div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                                  Analyse en cours...
-                                </h3>
-                                <Progress value={scanProgress} className="w-64 mx-auto mb-2" />
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  {scanProgress}% - Traitement IA
-                                </p>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-
-                        {/* Contrôles */}
-                        <div className="flex items-center justify-center gap-4 mt-6">
-                          {scanState === 'idle' && (
-                            <Button
-                              onClick={startScan}
-                              size="lg"
-                              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                            >
-                              <Play className="h-5 w-5 mr-2" />
-                              Lancer l'analyse
-                            </Button>
-                          )}
-
-                          {scanState === 'scanning' && (
-                            <Button
-                              onClick={resetScan}
-                              variant="outline"
-                              size="lg"
-                            >
-                              <Pause className="h-5 w-5 mr-2" />
-                              Arrêter
-                            </Button>
-                          )}
-
-                          {scanState === 'results' && (
-                            <Button
-                              onClick={resetScan}
-                              variant="outline"
-                              size="lg"
-                            >
-                              <RotateCcw className="h-5 w-5 mr-2" />
-                              Nouveau scan
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </div>
-
-              {/* Panneau latéral */}
-              <div className="space-y-6">
-                
-                {/* Conseils */}
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Conseils pour un scan optimal</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="h-2 w-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
-                        <div className="text-sm">
-                          <strong>Éclairage :</strong> Privilégiez une lumière naturelle douce
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="h-2 w-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
-                        <div className="text-sm">
-                          <strong>Position :</strong> Regardez directement la caméra
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="h-2 w-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
-                        <div className="text-sm">
-                          <strong>Authenticité :</strong> Soyez naturel et détendu
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                {/* Dernier scan */}
-                {scanHistory.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          Dernier scan
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">{scanHistory[0].emotion}</span>
-                            <Badge variant="secondary">{scanHistory[0].score}/10</Badge>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {new Date(scanHistory[0].date).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </div>
-                          <Progress value={scanHistory[0].score * 10} className="h-2 mt-2" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                )}
-              </div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Interface de scan */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Capture & Analyse
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Zone vidéo */}
+            <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+              />
+              {!isScanning && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                  <div className="text-center text-white">
+                    <Camera className="h-12 w-12 mx-auto mb-2" />
+                    <p>Caméra non activée</p>
+                  </div>
+                </div>
+              )}
+              {isScanning && (
+                <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/70 text-white px-3 py-1 rounded-full">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  <span className="text-sm">Analyse en cours...</span>
+                </div>
+              )}
             </div>
-          </TabsContent>
 
-          {/* Onglet Résultats */}
-          <TabsContent value="results" className="space-y-6">
-            {scanState === 'results' ? (
+            {/* Progression */}
+            {isScanning && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Progression de l'analyse</span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="h-2" />
+              </div>
+            )}
+
+            {/* Boutons de contrôle */}
+            <div className="flex gap-2">
+              {!isScanning ? (
+                <Button onClick={startScan} className="flex-1" size="lg">
+                  <Play className="h-4 w-4 mr-2" />
+                  Démarrer le Scan
+                </Button>
+              ) : (
+                <Button onClick={stopScan} variant="destructive" className="flex-1" size="lg">
+                  <Pause className="h-4 w-4 mr-2" />
+                  Arrêter le Scan
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Résultats */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              Résultats d'Analyse
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {currentResult ? (
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-4"
               >
-                
-                {/* Résultats principaux */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-red-500" />
-                      Analyse émotionnelle
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center mb-6">
-                      <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        {scanResults.dominantEmotion}
-                      </div>
-                      <div className="text-lg text-gray-600 dark:text-gray-400">
-                        Confiance: {Math.round(scanResults.confidence * 100)}%
+                {/* Score global */}
+                <div className="text-center p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950 dark:to-blue-950 rounded-lg">
+                  <div className="text-3xl font-bold text-primary mb-1">
+                    {currentResult.score}/10
+                  </div>
+                  <div className="text-sm text-muted-foreground">Score de bien-être</div>
+                  <Badge variant="secondary" className="mt-2">
+                    {currentResult.overallMood}
+                  </Badge>
+                </div>
+
+                {/* États détectés */}
+                <div className="space-y-2">
+                  <h4 className="font-medium">États émotionnels détectés:</h4>
+                  {currentResult.states.map((state, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="font-medium">{state.emotion}</span>
+                      <div className="flex items-center gap-2">
+                        <Progress 
+                          value={state.intensity * 100} 
+                          className="w-16 h-2" 
+                        />
+                        <span className="text-xs text-muted-foreground w-8">
+                          {Math.round(state.intensity * 100)}%
+                        </span>
                       </div>
                     </div>
+                  ))}
+                </div>
 
-                    <div className="space-y-3">
-                      {Object.entries(scanResults.emotions).map(([emotion, value]) => (
-                        <div key={emotion} className="space-y-1">
-                          <div className="flex justify-between text-sm">
-                            <span className="capitalize">{emotion}</span>
-                            <span>{Math.round(value * 100)}%</span>
-                          </div>
-                          <Progress value={value * 100} className="h-2" />
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Insights et recommandations */}
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Insights IA</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {scanResults.insights.map((insight, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm">
-                            <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                            {insight}
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Recommandations</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {scanResults.recommendations.map((rec, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm">
-                            <Target className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                            {rec}
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      <Button className="w-full mt-4" variant="outline">
-                        <Zap className="h-4 w-4 mr-2" />
-                        Appliquer les recommandations
-                      </Button>
-                    </CardContent>
-                  </Card>
+                {/* Recommendations */}
+                <div className="space-y-2">
+                  <h4 className="font-medium flex items-center gap-1">
+                    <Zap className="h-4 w-4" />
+                    Recommendations:
+                  </h4>
+                  <ul className="space-y-1">
+                    {currentResult.recommendations.map((rec, index) => (
+                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </motion.div>
             ) : (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Brain className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                    Aucun résultat disponible
-                  </h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">
-                    Lancez un nouveau scan pour voir les résultats ici
-                  </p>
-                  <Button onClick={() => setScanState('idle')} variant="outline">
-                    Retour au scan
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className="text-center py-12 text-muted-foreground">
+                <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Lancez un scan pour voir vos résultats</p>
+              </div>
             )}
-          </TabsContent>
-
-          {/* Onglet Historique */}
-          <TabsContent value="history" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-purple-500" />
-                    Historique des analyses
-                  </CardTitle>
-                  <CardDescription>
-                    Suivez l'évolution de votre bien-être émotionnel
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {scanHistory.map((scan) => (
-                      <div 
-                        key={scan.id} 
-                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
-                            {scan.method === 'camera' && <Camera className="h-5 w-5 text-purple-600" />}
-                            {scan.method === 'voice' && <Mic className="h-5 w-5 text-purple-600" />}
-                            {scan.method === 'text' && <Brain className="h-5 w-5 text-purple-600" />}
-                          </div>
-                          
-                          <div>
-                            <div className="font-medium text-gray-900 dark:text-white">
-                              {scan.emotion}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {new Date(scan.date).toLocaleDateString('fr-FR', {
-                                day: 'numeric',
-                                month: 'long',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right">
-                          <div className="font-bold text-lg text-gray-900 dark:text-white">
-                            {scan.score}/10
-                          </div>
-                          <Badge variant="outline" className="text-xs">
-                            {scan.method}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <Button variant="outline" className="w-full mt-4">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Voir l'analyse détaillée
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Historique récent */}
+      {scanHistory && scanHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Historique des Scans</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {scanHistory.slice(0, 6).map((scan: ScanResult, index: number) => (
+                <motion.div
+                  key={scan.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <Badge variant="outline">{scan.overallMood}</Badge>
+                    <span className="font-bold text-primary">{scan.score}/10</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(scan.timestamp || Date.now()).toLocaleDateString()}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
-};
+}
 
-export default EmotionalScanHub;
+// Mock functions - à remplacer par de vrais appels API
+async function fetchScanHistory(): Promise<ScanResult[]> {
+  // Simuler une requête API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  return [
+    {
+      id: 'scan-1',
+      overallMood: 'Positive',
+      states: [],
+      recommendations: [],
+      score: 8.5,
+      duration: 5000,
+      timestamp: Date.now() - 86400000,
+    },
+    {
+      id: 'scan-2',
+      overallMood: 'Calme',
+      states: [],
+      recommendations: [],
+      score: 7.2,
+      duration: 5000,
+      timestamp: Date.now() - 172800000,
+    },
+  ];
+}
+
+async function saveScanResult(result: ScanResult): Promise<void> {
+  // Simuler sauvegarde
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('Scan sauvegardé:', result);
+}

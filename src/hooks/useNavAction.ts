@@ -45,8 +45,16 @@ export function useNavAction() {
         }
 
         case "modal": {
-          // TODO: intégrer système modal avec Zustand
-          console.log(`Opening modal: ${action.id}`, action.payload);
+          // Intégrer système modal avec Zustand
+          const { useModalStore } = await import('@/state/modalStore');
+          const modalStore = useModalStore.getState();
+          
+          modalStore.open({
+            id: action.id,
+            component: getModalComponent(action.id),
+            props: action.payload,
+            ...(action.payload as any)?.modalOptions,
+          });
           
           // Analytics
           window.gtag?.('event', 'modal_open', {
@@ -133,6 +141,20 @@ export function useNavAction() {
     executeAction,
     getContext,
   };
+}
+
+/**
+ * Helper pour mapper les IDs de modal aux composants
+ */
+function getModalComponent(modalId: string): string {
+  const modalMap: Record<string, string> = {
+    'auth-modal': 'AuthModal',
+    'feedback-modal': 'FeedbackModal',
+    'settings-modal': 'SettingsModal',
+    'confirm-dialog': 'ConfirmDialog',
+  };
+  
+  return modalMap[modalId] || 'DefaultModal';
 }
 
 /**
