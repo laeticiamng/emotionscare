@@ -12,7 +12,7 @@ import { Slider } from '@/components/ui/slider';
 import { 
   Music, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
   Shuffle, Repeat, Heart, Download, Share, Zap, Library,
-  Palette, Sliders, Headphones, Waveform, Settings,
+  Palette, Sliders, Headphones, AudioWaveform, Settings,
   Timer, Target, Users, Star, Sparkles
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -400,7 +400,7 @@ export const MusicPage: React.FC = () => {
               >
                 {isGenerating ? (
                   <>
-                    <Waveform className="h-5 w-5 mr-2 animate-pulse" />
+                    <AudioWaveform className="h-5 w-5 mr-2 animate-pulse" />
                     Génération en cours... {Math.round(generationProgress)}%
                   </>
                 ) : (
