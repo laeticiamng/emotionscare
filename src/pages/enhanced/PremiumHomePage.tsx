@@ -452,11 +452,11 @@ const PremiumHomePage: React.FC = () => {
                   whileHover={shouldReduceMotion ? {} : { y: -5, scale: 1.02 }}
                   className="group"
                 >
-                  <Card className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border-white/10 hover:border-white/20 transition-all duration-500 cursor-pointer h-full">
+                  <Card className="bg-white rounded-2xl border border-gray-200 shadow-[0_10px_20px_rgba(2,6,23,0.08)] hover:shadow-[0_16px_28px_rgba(2,6,23,0.12)] transition-all duration-300 cursor-pointer h-full hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 focus-within:ring-offset-white">
                     <CardHeader>
                       <div className="flex items-center justify-between mb-4">
                         <div className={cn(
-                          "p-3 rounded-xl bg-gradient-to-br shadow-lg group-hover:shadow-xl transition-all duration-300",
+                          "p-3 rounded-xl bg-gradient-to-br shadow-sm transition-all duration-300",
                           feature.gradient
                         )}>
                           <feature.icon className="h-6 w-6 text-white" />
@@ -464,48 +464,46 @@ const PremiumHomePage: React.FC = () => {
                         
                         <div className="flex items-center space-x-2">
                           {feature.premium && (
-                            <Badge className="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border-yellow-500/50 text-yellow-300 text-xs">
+                            <Badge className="bg-gray-900 text-white text-xs font-semibold border-0">
                               PRO
                             </Badge>
                           )}
                           {feature.ai_powered && (
-                            <Badge className="bg-gradient-to-r from-purple-400/20 to-pink-500/20 border-purple-500/50 text-purple-300 text-xs">
+                            <Badge className="bg-indigo-600 text-white text-xs font-semibold border-0">
                               IA
                             </Badge>
                           )}
                           {feature.real_time && (
-                            <div className="flex items-center space-x-1">
-                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                              <span className="text-green-300 text-xs">Live</span>
-                            </div>
+                            <Badge className="bg-emerald-600 text-white text-xs font-medium border-0">
+                              Live
+                            </Badge>
                           )}
                         </div>
                       </div>
                       
-                      <h3 className="text-slate-100 text-lg font-semibold leading-none tracking-tight group-hover:text-slate-200 transition-colors">
+                      <h3 className="text-gray-900 text-lg font-semibold leading-none tracking-tight group-hover:text-gray-700 transition-colors">
                         {feature.title}
                       </h3>
-                      <CardDescription className="text-slate-300 text-sm leading-relaxed">
+                      <CardDescription className="text-gray-700 text-sm leading-relaxed">
                         {feature.description}
                       </CardDescription>
                     </CardHeader>
                     
                     <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center space-x-1 text-blue-300">
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <div className="flex items-center space-x-1">
                           <Users className="h-3 w-3" />
                           <span>{feature.live_users.toLocaleString()} actifs</span>
                         </div>
-                        <div className="flex items-center space-x-1 text-yellow-300">
-                          <Star className="h-3 w-3 fill-current" />
+                        <div className="flex items-center space-x-1">
+                          <Star className="h-3 w-3 fill-current text-yellow-500" />
                           <span>{feature.avg_rating}</span>
                         </div>
                       </div>
                       
                       <Button
                         onClick={() => navigate(feature.route)}
-                        className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20"
-                        variant="outline"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 font-medium"
                       >
                         Explorer
                         <ArrowRight className="ml-2 h-4 w-4" />
