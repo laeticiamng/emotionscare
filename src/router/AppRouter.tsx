@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { NavigationHelper } from '@/config/navigation';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { FullPageLoader } from '@/components/FullPageLoader';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,11 +8,11 @@ import { useAuth } from '@/contexts/AuthContext';
 const MainLayout = lazy(() => import('@/layouts/MainLayout'));
 const AuthLayout = lazy(() => import('@/layouts/AuthLayout'));
 
-// Pages principales avec lazy loading
+// Pages principales existantes
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const ScanPage = lazy(() => import('@/pages/ScanPage'));
 const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
+const BreathworkPage = lazy(() => import('@/pages/BreathworkPageTemp'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
 const CoachPage = lazy(() => import('@/pages/CoachPage'));
 const VrPage = lazy(() => import('@/pages/VrPage'));
@@ -23,15 +22,6 @@ const AccountPage = lazy(() => import('@/pages/AccountPage'));
 
 // Pages d'authentification
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
-
-// Pages de sous-modules
-const ScanVoicePage = lazy(() => import('@/pages/scan/ScanVoicePage'));
-const ScanTextPage = lazy(() => import('@/pages/scan/ScanTextPage'));
-const ScanHistoryPage = lazy(() => import('@/pages/scan/ScanHistoryPage'));
-
-const MusicGeneratorPage = lazy(() => import('@/pages/music/MusicGeneratorPage'));
-const MusicLibraryPage = lazy(() => import('@/pages/music/MusicLibraryPage'));
-const MoodMixerPage = lazy(() => import('@/pages/music/MoodMixerPage'));
 
 // Pages d'erreur
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPageTemp'));
@@ -82,7 +72,7 @@ const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 /**
- * Routeur principal de l'application
+ * Routeur principal de l'application - Version simplifiée
  */
 export const AppRouter: React.FC = () => {
   return (
@@ -115,7 +105,7 @@ export const AppRouter: React.FC = () => {
                   } 
                 />
 
-                {/* Module Scanner */}
+                {/* Modules principaux */}
                 <Route 
                   path="scan" 
                   element={
@@ -124,8 +114,6 @@ export const AppRouter: React.FC = () => {
                     </PageWrapper>
                   } 
                 />
-
-                {/* Module Musicothérapie */}
                 <Route 
                   path="music" 
                   element={
@@ -134,8 +122,6 @@ export const AppRouter: React.FC = () => {
                     </PageWrapper>
                   } 
                 />
-
-                {/* Module Breathwork */}
                 <Route 
                   path="breathwork" 
                   element={
@@ -144,8 +130,6 @@ export const AppRouter: React.FC = () => {
                     </PageWrapper>
                   } 
                 />
-
-                {/* Module Journal */}
                 <Route 
                   path="journal" 
                   element={
@@ -154,8 +138,6 @@ export const AppRouter: React.FC = () => {
                     </PageWrapper>
                   } 
                 />
-
-                {/* Autres modules principaux */}
                 <Route 
                   path="coach" 
                   element={
@@ -172,8 +154,6 @@ export const AppRouter: React.FC = () => {
                     </PageWrapper>
                   } 
                 />
-
-                {/* Modules spécialisés avec permissions */}
                 <Route 
                   path="edn" 
                   element={
@@ -194,8 +174,6 @@ export const AppRouter: React.FC = () => {
                     </ProtectedRoute>
                   } 
                 />
-
-                {/* Compte et paramètres */}
                 <Route 
                   path="account" 
                   element={

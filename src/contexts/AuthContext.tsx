@@ -7,6 +7,7 @@ interface User {
   id: string;
   email: string;
   role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  permissions?: string[];
 }
 
 interface AuthContextType {
@@ -38,7 +39,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser({
           id: session.user.id,
           email: session.user.email || '',
-          role: 'b2c' // Par défaut
+          role: 'b2c', // Par défaut
+          permissions: ['student', 'user'] // Permissions par défaut
         });
       }
       setIsLoading(false);
@@ -52,7 +54,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser({
             id: session.user.id,
             email: session.user.email || '',
-            role: 'b2c'
+            role: 'b2c',
+            permissions: ['student', 'user'] // Permissions par défaut
           });
         } else {
           setUser(null);
