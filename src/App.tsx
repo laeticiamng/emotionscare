@@ -15,13 +15,13 @@ import HomePage from '@/pages/HomePage';
 import { EcosPage } from '@/pages/EcosPage';
 import { EdnPage } from '@/pages/EdnPage';
 import { AccountPage } from '@/pages/AccountPage';
-import { ScanPage } from '@/pages/ScanPage';
+import ScanPage from '@/pages/ScanPage';
 import { MusicPage } from '@/pages/MusicPage';
-import { CoachPage } from '@/pages/CoachPage';
-import { BreathworkPage } from '@/pages/BreathworkPage';
+import CoachPage from '@/pages/CoachPage';
+import BreathworkPage from '@/pages/BreathworkPage';
 import JournalPage from '@/pages/JournalPage';
 import { VrPage } from '@/pages/VrPage';
-import { NotFoundPage } from '@/pages/NotFoundPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 
 const queryClient = new QueryClient({
