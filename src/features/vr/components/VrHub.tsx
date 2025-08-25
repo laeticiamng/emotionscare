@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  VrHeadset, 
+  Headset, 
   Play, 
   Pause, 
   RotateCcw,
@@ -84,7 +84,7 @@ export function VrHub() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <VrHeadset className="h-8 w-8 text-primary" />
+            <Headset className="h-8 w-8 text-primary" />
             Réalité Virtuelle
           </h1>
           <p className="text-muted-foreground">
@@ -146,7 +146,7 @@ export function VrHub() {
             }`}
           >
             <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg flex items-center justify-center">
-              <VrHeadset className="h-16 w-16 text-white" />
+              <Headset className="h-16 w-16 text-white" />
             </div>
             
             <CardHeader className="pb-3">
@@ -243,7 +243,7 @@ export function VrHub() {
               className="w-full justify-start"
               onClick={() => navAction({ type: 'modal', id: 'vr-tutorial' })}
             >
-              <VrHeadset className="w-4 h-4 mr-2" />
+              <Headset className="w-4 h-4 mr-2" />
               Tutoriel VR
             </Button>
           </CardContent>
@@ -258,7 +258,7 @@ export function VrHub() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-center text-sm text-muted-foreground py-8">
-              <VrHeadset className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <Headset className="w-12 h-12 mx-auto mb-2 opacity-50" />
               Aucune session enregistrée
             </div>
           </CardContent>

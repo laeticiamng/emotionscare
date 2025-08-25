@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ModalProvider } from '@/components/modals/ModalProvider';
-import { AuthProvider } from '@/contexts/AuthProvider';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import { ThemeProvider } from '@/components/theme-provider';
 
 // Layout components
@@ -37,7 +38,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
         <AuthProvider>
-          <ModalProvider>
+          <NotificationProvider>
+            <ModalProvider>
             <Router>
               <AppLayout>
                 <Routes>
@@ -56,7 +58,8 @@ function App() {
               </AppLayout>
             </Router>
             <Toaster />
-          </ModalProvider>
+            </ModalProvider>
+          </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
