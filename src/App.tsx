@@ -19,7 +19,7 @@ import { ScanPage } from '@/pages/ScanPage';
 import { MusicPage } from '@/pages/MusicPage';
 import { CoachPage } from '@/pages/CoachPage';
 import { BreathworkPage } from '@/pages/BreathworkPage';
-import { JournalPage } from '@/pages/JournalPage';
+import JournalPage from '@/pages/JournalPage';
 import { VrPage } from '@/pages/VrPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
