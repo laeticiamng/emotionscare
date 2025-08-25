@@ -299,12 +299,9 @@ const PremiumHomePage: React.FC = () => {
               </span>
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <motion.div
-              className={cn(
-                "flex items-center justify-center gap-4",
-                deviceOptimization === 'mobile' && "flex-col space-y-3"
-              )}
+              className="flex items-center justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
@@ -317,16 +314,6 @@ const PremiumHomePage: React.FC = () => {
                 <Zap className="mr-2 h-5 w-5" />
                 Commencer Maintenant
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              
-              <Button
-                onClick={() => navigate('/demo')}
-                variant="outline"
-                size="lg"
-                className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg rounded-full backdrop-blur-md"
-              >
-                <Play className="mr-2 h-5 w-5" />
-                Découvrir
               </Button>
             </motion.div>
 
