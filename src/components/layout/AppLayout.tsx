@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Navigation } from './Navigation';
-import { Header } from './Header';
-import { Footer } from './Footer';
+import Header from './Header';
+import Footer from './Footer';
 import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
