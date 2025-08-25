@@ -18,10 +18,10 @@ import { AccountPage } from '@/pages/AccountPage';
 import ScanPage from '@/pages/ScanPage';
 import { MusicPage } from '@/pages/MusicPage';
 import CoachPage from '@/pages/CoachPage';
-import BreathworkPage from '@/pages/BreathworkPage';
+import BreathworkPageTemp from '@/pages/BreathworkPageTemp';
 import JournalPage from '@/pages/JournalPage';
 import { VrPage } from '@/pages/VrPage';
-import NotFoundPage from '@/pages/NotFoundPage';
+import NotFoundPageTemp from '@/pages/NotFoundPageTemp';
 
 
 const queryClient = new QueryClient({
@@ -50,10 +50,10 @@ function App() {
                   <Route path="/scan" element={<ScanPage />} />
                   <Route path="/music" element={<MusicPage />} />
                   <Route path="/coach" element={<CoachPage />} />
-                  <Route path="/breathwork" element={<BreathworkPage />} />
+                  <Route path="/breathwork" element={<BreathworkPageTemp />} />
                   <Route path="/journal" element={<JournalPage />} />
                   <Route path="/vr" element={<VrPage />} />
-                  <Route path="*" element={<NotFoundPage />} />
+                  <Route path="*" element={<NotFoundPageTemp />} />
                 </Routes>
               </AppLayout>
             </Router>
