@@ -1,7 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { FullPageLoader } from '@/components/FullPageLoader';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Layout components avec lazy loading
@@ -64,11 +63,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
  * Wrapper pour les pages avec gestion d'erreur et loading
  */
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ErrorBoundary>
-    <Suspense fallback={<FullPageLoader />}>
-      {children}
-    </Suspense>
-  </ErrorBoundary>
+  <Suspense fallback={<FullPageLoader />}>
+    {children}
+  </Suspense>
 );
 
 /**
