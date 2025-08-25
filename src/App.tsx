@@ -1,9 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { MusicProvider } from '@/contexts/MusicContext';
 import { Toaster } from '@/components/ui/sonner';
+import { Button } from '@/components/ui/button';
+
+// Pages
+import { EmotionalScan } from '@/pages/EmotionalScan';
+import { MusicTherapy } from '@/pages/MusicTherapy';
+import { Journal } from '@/pages/Journal';
+import { AICoach } from '@/pages/AICoach';
+import { Breathwork } from '@/pages/Breathwork';
+import { VRTherapy } from '@/pages/VRTherapy';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,7 +24,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Page d'accueil progressive avec authentification
+// Page d'accueil avec navigation complète
 const HomePage = () => (
   <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
     <div className="container mx-auto px-4 py-8">
@@ -31,9 +41,9 @@ const HomePage = () => (
           </div>
           <h3 className="text-xl font-semibold mb-2">Scan Émotionnel</h3>
           <p className="text-muted-foreground mb-4">Analysez vos émotions en temps réel avec notre IA</p>
-          <button className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors">
-            Commencer le scan
-          </button>
+          <Link to="/scan">
+            <Button className="w-full">Commencer le scan</Button>
+          </Link>
         </div>
 
         {/* Musicothérapie */}
@@ -110,28 +120,12 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route 
-                path="/login" 
-                element={
-                  <div className="min-h-screen flex items-center justify-center bg-background">
-                    <div className="p-8 bg-card rounded-xl shadow-lg">
-                      <h2 className="text-2xl font-bold mb-4">Connexion</h2>
-                      <p>Page de connexion à implémenter</p>
-                    </div>
-                  </div>
-                } 
-              />
-              <Route 
-                path="*" 
-                element={
-                  <div className="min-h-screen flex items-center justify-center bg-background">
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold text-foreground mb-2">Page non trouvée</h2>
-                      <p className="text-muted-foreground">La page que vous cherchez n'existe pas.</p>
-                    </div>
-                  </div>
-                } 
-              />
+              <Route path="/scan" element={<EmotionalScan />} />
+              <Route path="/music" element={<MusicTherapy />} />
+              <Route path="/journal" element={<Journal />} />
+              <Route path="/coach" element={<AICoach />} />
+              <Route path="/breathwork" element={<Breathwork />} />
+              <Route path="/vr" element={<VRTherapy />} />
             </Routes>
           </Router>
           <Toaster position="top-right" />
