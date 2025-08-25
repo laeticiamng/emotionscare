@@ -1,269 +1,434 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Brain, Mic, Type, Camera, Play, Square, Zap, Target, BarChart3, TrendingUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import PageLayout from '@/components/common/PageLayout';
-import FeatureCard from '@/components/common/FeatureCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
+import { 
+  Mic, MicOff, Brain, FileText, BarChart3, Play, Pause, 
+  Square, RefreshCw, TrendingUp, Activity, Heart, Zap,
+  Users, Calendar, Clock, Target
+} from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
-const ScanPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanMode, setScanMode] = useState<'voice' | 'text' | 'face'>('voice');
-  const [emotionResults, setEmotionResults] = useState<any>(null);
+interface EmotionResult {
+  emotion: string;
+  confidence: number;
+  color: string;
+  description: string;
+}
 
-  const handleStartScan = () => {
-    setIsScanning(true);
-    setTimeout(() => {
-      setEmotionResults({
-        dominant: 'Joie',
-        confidence: 85,
-        emotions: {
-          'Joie': 85,
-          'Sérénité': 65,
-          'Excitation': 45,
-          'Tristesse': 15,
-          'Colère': 10
-        }
-      });
-      setIsScanning(false);
-    }, 3000);
+interface ScanSession {
+  id: string;
+  type: 'voice' | 'text';
+  timestamp: Date;
+  results: EmotionResult[];
+  content: string;
+  aiAnalysis: string;
+}
+
+export const ScanPage: React.FC = () => {
+  const { user } = useAuth();
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [textInput, setTextInput] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [currentResults, setCurrentResults] = useState<EmotionResult[]>([]);
+  const [scanHistory, setScanHistory] = useState<ScanSession[]>([]);
+  const [activeTab, setActiveTab] = useState('voice');
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+
+  // Simuler les résultats d'analyse émotionnelle
+  const mockEmotionAnalysis = (input: string, type: 'voice' | 'text'): EmotionResult[] => {
+    const emotions = [
+      { emotion: 'Joie', confidence: Math.random() * 40 + 60, color: 'bg-yellow-500', description: 'Sentiment positif et énergique' },
+      { emotion: 'Calme', confidence: Math.random() * 30 + 50, color: 'bg-blue-500', description: 'État de sérénité et relaxation' },
+      { emotion: 'Anxiété', confidence: Math.random() * 25 + 10, color: 'bg-orange-500', description: 'Tension et préoccupation' },
+      { emotion: 'Tristesse', confidence: Math.random() * 20 + 5, color: 'bg-gray-500', description: 'Mélancolie et abattement' },
+      { emotion: 'Excitation', confidence: Math.random() * 35 + 25, color: 'bg-purple-500', description: 'Enthousiasme et dynamisme' }
+    ];
+    
+    return emotions.sort((a, b) => b.confidence - a.confidence).slice(0, 3);
   };
 
-  const scanModes = [
-    {
-      id: 'voice',
-      title: 'Analyse Vocale',
-      description: 'Analyse de votre voix pour détecter les émotions',
-      icon: <Mic className="h-6 w-6" />,
-      gradient: 'from-blue-500 to-cyan-500',
-      tip: 'Parlez naturellement pendant 10-15 secondes'
-    },
-    {
-      id: 'text',
-      title: 'Analyse Textuelle',
-      description: 'Analyse de vos écrits et ressentis',
-      icon: <Type className="h-6 w-6" />,
-      gradient: 'from-green-500 to-emerald-500',
-      tip: 'Écrivez quelques phrases sur votre ressenti'
-    },
-    {
-      id: 'face',
-      title: 'Analyse Faciale',
-      description: 'Détection des micro-expressions',
-      icon: <Camera className="h-6 w-6" />,
-      gradient: 'from-purple-500 to-violet-500',
-      tip: 'Regardez la caméra avec une expression naturelle'
+  // Démarrer l'enregistrement vocal
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      
+      // Analyse du niveau audio en temps réel
+      audioContextRef.current = new AudioContext();
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      source.connect(analyserRef.current);
+      
+      analyserRef.current.fftSize = 256;
+      const bufferLength = analyserRef.current.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      
+      const updateAudioLevel = () => {
+        if (analyserRef.current && isRecording) {
+          analyserRef.current.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+          setAudioLevel((average / 255) * 100);
+          requestAnimationFrame(updateAudioLevel);
+        }
+      };
+      updateAudioLevel();
+      
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      toast({
+        title: "Enregistrement démarré",
+        description: "Parlez naturellement pour analyser vos émotions",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur microphone",
+        description: "Impossible d'accéder au microphone",
+        variant: "destructive",
+      });
     }
-  ];
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
+      setAudioLevel(0);
+      analyzeVoice();
+    }
+  };
+
+  const analyzeVoice = async () => {
+    setIsAnalyzing(true);
+    
+    // Simulation d'analyse
+    setTimeout(() => {
+      const results = mockEmotionAnalysis('voice input', 'voice');
+      setCurrentResults(results);
+      
+      const newSession: ScanSession = {
+        id: Date.now().toString(),
+        type: 'voice',
+        timestamp: new Date(),
+        results,
+        content: 'Enregistrement vocal analysé',
+        aiAnalysis: generateAIAnalysis(results)
+      };
+      
+      setScanHistory(prev => [newSession, ...prev.slice(0, 9)]);
+      setIsAnalyzing(false);
+      
+      toast({
+        title: "Analyse terminée",
+        description: `Émotion principale: ${results[0]?.emotion}`,
+      });
+    }, 2000);
+  };
+
+  const analyzeText = async () => {
+    if (!textInput.trim()) return;
+    
+    setIsAnalyzing(true);
+    
+    setTimeout(() => {
+      const results = mockEmotionAnalysis(textInput, 'text');
+      setCurrentResults(results);
+      
+      const newSession: ScanSession = {
+        id: Date.now().toString(),
+        type: 'text',
+        timestamp: new Date(),
+        results,
+        content: textInput,
+        aiAnalysis: generateAIAnalysis(results)
+      };
+      
+      setScanHistory(prev => [newSession, ...prev.slice(0, 9)]);
+      setIsAnalyzing(false);
+      setTextInput('');
+      
+      toast({
+        title: "Analyse terminée",
+        description: `Émotion principale: ${results[0]?.emotion}`,
+      });
+    }, 1500);
+  };
+
+  const generateAIAnalysis = (results: EmotionResult[]): string => {
+    const mainEmotion = results[0];
+    const analysisTexts = {
+      'Joie': 'Votre état émotionnel reflète une belle énergie positive. Cette joie peut être un excellent moteur pour vos projets.',
+      'Calme': 'Vous êtes dans un état de sérénité qui favorise la réflexion et la prise de décision éclairée.',
+      'Anxiété': 'Je perçois une certaine tension. Avez-vous considéré des techniques de respiration pour vous apaiser ?',
+      'Tristesse': 'Il est important de reconnaître ces sentiments. Prenez le temps nécessaire pour vous ressourcer.',
+      'Excitation': 'Cette énergie dynamique est formidable ! Canalisez-la vers vos objectifs les plus importants.'
+    };
+    
+    return analysisTexts[mainEmotion?.emotion as keyof typeof analysisTexts] || 'Votre profil émotionnel est unique et mérite attention.';
+  };
 
   return (
-    <PageLayout
-      header={{
-        title: 'Scanner Émotionnel',
-        subtitle: 'Intelligence artificielle de pointe',
-        description: 'Découvrez votre état émotionnel en temps réel grâce à notre technologie avancée de reconnaissance émotionnelle multi-modale.',
-        icon: Brain,
-        gradient: 'from-blue-500/20 to-purple-500/5',
-        badge: 'IA Émotionnelle',
-        stats: [
-          {
-            label: 'Précision',
-            value: '94%',
-            icon: Target,
-            color: 'text-blue-500'
-          },
-          {
-            label: 'Analyses',
-            value: '2.1K',
-            icon: BarChart3,
-            color: 'text-green-500'
-          },
-          {
-            label: 'Progression',
-            value: '+23%',
-            icon: TrendingUp,
-            color: 'text-purple-500'
-          },
-          {
-            label: 'Modes',
-            value: '3',
-            icon: Zap,
-            color: 'text-orange-500'
-          }
-        ],
-        actions: [
-          {
-            label: 'Démarrer Analyse',
-            onClick: handleStartScan,
-            variant: 'default',
-            icon: Play
-          },
-          {
-            label: 'Historique',
-            onClick: () => navigate('/scan/history'),
-            variant: 'outline',
-            icon: BarChart3
-          }
-        ]
-      }}
-      tips={{
-        title: 'Conseils pour une analyse optimale',
-        items: [
-          {
-            title: 'Environnement',
-            content: 'Choisissez un endroit calme et bien éclairé',
-            icon: Target
-          },
-          {
-            title: 'Naturel',
-            content: 'Soyez vous-même, ne forcez pas vos expressions',
-            icon: Brain
-          },
-          {
-            title: 'Régularité',
-            content: 'Effectuez des scans réguliers pour suivre votre évolution',
-            icon: TrendingUp
-          }
-        ],
-        cta: {
-          label: 'Guide d\'utilisation du scanner',
-          onClick: () => console.log('Scanner guide')
-        }
-      }}
-    >
-      <div className="space-y-8">
-        {/* Modes de Scan */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-foreground">Modes d'Analyse</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {scanModes.map((mode) => (
-              <FeatureCard
-                key={mode.id}
-                title={mode.title}
-                description={mode.description}
-                icon={mode.icon}
-                gradient={mode.gradient}
-                metadata={[{ label: 'Conseil', value: mode.tip }]}
-                action={{
-                  label: scanMode === mode.id ? 'Sélectionné' : 'Sélectionner',
-                  onClick: () => setScanMode(mode.id as any),
-                  variant: scanMode === mode.id ? 'default' : 'outline'
-                }}
-                className={scanMode === mode.id ? 'ring-2 ring-primary' : ''}
-              />
-            ))}
-          </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center space-y-4"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <Brain className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold">Scanner Émotionnel</h1>
         </div>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Analysez vos émotions en temps réel grâce à notre IA avancée. 
+          Utilisez votre voix ou vos écrits pour mieux comprendre votre état émotionnel.
+        </p>
+      </motion.div>
 
-        {/* Zone de Scan et Résultats */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Panel de contrôle */}
-          <Card className="h-fit">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="voice" className="flex items-center gap-2">
+            <Mic className="h-4 w-4" />
+            Analyse Vocale
+          </TabsTrigger>
+          <TabsTrigger value="text" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Analyse Textuelle
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Historique
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="voice" className="space-y-6">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="h-6 w-6 text-primary" />
-                Mode: {scanModes.find(m => m.id === scanMode)?.title}
+                <Activity className="h-5 w-5" />
+                Analyse Vocale en Temps Réel
               </CardTitle>
+              <CardDescription>
+                Parlez pendant 10-30 secondes pour analyser vos émotions
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="text-center">
-                <Button
-                  onClick={handleStartScan}
-                  disabled={isScanning}
-                  size="lg"
-                  className="w-full"
+              <div className="flex flex-col items-center space-y-4">
+                <motion.div
+                  className="relative"
+                  animate={{ scale: isRecording ? [1, 1.1, 1] : 1 }}
+                  transition={{ repeat: isRecording ? Infinity : 0, duration: 2 }}
                 >
-                  {isScanning ? (
+                  <Button
+                    size="lg"
+                    variant={isRecording ? "destructive" : "default"}
+                    className="h-20 w-20 rounded-full"
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={isAnalyzing}
+                  >
+                    {isRecording ? <MicOff className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
+                  </Button>
+                  
+                  {isRecording && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full border-4 border-red-500"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                    />
+                  )}
+                </motion.div>
+                
+                {isRecording && (
+                  <div className="w-full max-w-xs space-y-2">
+                    <div className="text-center text-sm text-muted-foreground">Niveau audio</div>
+                    <Progress value={audioLevel} className="h-2" />
+                  </div>
+                )}
+                
+                <div className="text-center">
+                  <p className="text-sm font-medium">
+                    {isRecording ? "Enregistrement en cours..." : 
+                     isAnalyzing ? "Analyse en cours..." : 
+                     "Cliquez pour commencer l'enregistrement"}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="text" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Analyse Textuelle
+              </CardTitle>
+              <CardDescription>
+                Écrivez vos pensées pour analyser vos émotions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                placeholder="Décrivez comment vous vous sentez, vos pensées du moment, votre humeur..."
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                className="min-h-[120px] resize-none"
+                maxLength={500}
+              />
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">
+                  {textInput.length}/500 caractères
+                </span>
+                <Button 
+                  onClick={analyzeText} 
+                  disabled={!textInput.trim() || isAnalyzing}
+                  className="flex items-center gap-2"
+                >
+                  {isAnalyzing ? (
                     <>
-                      <Square className="mr-2 h-5 w-5" />
-                      Analyse en cours...
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Analyse...
                     </>
                   ) : (
                     <>
-                      <Play className="mr-2 h-5 w-5" />
-                      Commencer l'analyse
+                      <Brain className="h-4 w-4" />
+                      Analyser le Texte
                     </>
                   )}
                 </Button>
               </div>
-
-              <div className="p-4 bg-muted/50 rounded-xl">
-                <p className="text-sm text-muted-foreground text-center">
-                  💡 {scanModes.find(m => m.id === scanMode)?.tip}
-                </p>
-              </div>
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Résultats */}
-          <Card className="h-fit">
+        <TabsContent value="history" className="space-y-6">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 text-primary" />
-                Résultats d'Analyse
+                <BarChart3 className="h-5 w-5" />
+                Historique des Analyses
               </CardTitle>
+              <CardDescription>
+                Vos 10 dernières analyses émotionnelles
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {isScanning ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full mx-auto mb-4"></div>
-                  <p className="text-muted-foreground">Analyse en cours...</p>
-                </div>
-              ) : emotionResults ? (
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <Badge className="text-lg px-4 py-2 bg-primary text-primary-foreground">
-                      {emotionResults.dominant} ({emotionResults.confidence}%)
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-3">
-                    {Object.entries(emotionResults.emotions).map(([emotion, score]) => (
-                      <div key={emotion} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium">{emotion}</span>
-                          <span>{score}%</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all duration-500"
-                            style={{ width: `${score}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded-xl">
-                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">Recommandations</h4>
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      Votre état émotionnel indique une humeur positive ! 
-                      Continuez avec une musique énergisante ou une session de méditation.
-                    </p>
-                  </div>
-
-                  <Button 
-                    onClick={() => navigate('/music')}
-                    className="w-full"
-                  >
-                    Écouter la musique recommandée
-                  </Button>
+              {scanHistory.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Aucune analyse disponible</p>
+                  <p className="text-sm">Effectuez votre première analyse vocale ou textuelle</p>
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Commencez une analyse pour voir vos résultats</p>
+                <div className="space-y-4">
+                  {scanHistory.map((session) => (
+                    <motion.div
+                      key={session.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="border rounded-lg p-4 space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {session.type === 'voice' ? <Mic className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                          <Badge variant={session.type === 'voice' ? 'default' : 'secondary'}>
+                            {session.type === 'voice' ? 'Vocal' : 'Textuel'}
+                          </Badge>
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {session.timestamp.toLocaleDateString()} à {session.timestamp.toLocaleTimeString()}
+                        </span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        {session.results.map((result, index) => (
+                          <Badge key={index} variant="outline" className="flex items-center gap-1">
+                            <div className={`w-2 h-2 rounded-full ${result.color}`} />
+                            {result.emotion} ({Math.round(result.confidence)}%)
+                          </Badge>
+                        ))}
+                      </div>
+                      
+                      {session.content && session.type === 'text' && (
+                        <p className="text-sm text-muted-foreground bg-muted p-2 rounded">
+                          "{session.content.substring(0, 100)}{session.content.length > 100 ? '...' : ''}"
+                        </p>
+                      )}
+                      
+                      <p className="text-sm font-medium text-primary">
+                        {session.aiAnalysis}
+                      </p>
+                    </motion.div>
+                  ))}
                 </div>
               )}
             </CardContent>
           </Card>
-        </div>
-      </div>
-    </PageLayout>
+        </TabsContent>
+      </Tabs>
+
+      {/* Résultats de l'analyse actuelle */}
+      {currentResults.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Résultats de l'Analyse
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                {currentResults.map((result, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-4 h-4 rounded-full ${result.color}`} />
+                      <div>
+                        <h4 className="font-medium">{result.emotion}</h4>
+                        <p className="text-sm text-muted-foreground">{result.description}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold">{Math.round(result.confidence)}%</div>
+                      <Progress value={result.confidence} className="w-24 h-2" />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              
+              {/* IA Analysis */}
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <h4 className="font-medium text-primary mb-2 flex items-center gap-2">
+                  <Brain className="h-4 w-4" />
+                  Analyse IA Personnalisée
+                </h4>
+                <p className="text-sm">{generateAIAnalysis(currentResults)}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </div>
   );
 };
 
