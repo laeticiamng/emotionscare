@@ -21,6 +21,7 @@ const AccountPage = lazy(() => import('@/pages/AccountPage'));
 
 // Pages d'authentification
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
+const SignupPage = lazy(() => import('@/pages/auth/SignupPage'));
 
 // Pages d'erreur
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPageTemp'));
@@ -81,6 +82,17 @@ export const AppRouter: React.FC = () => {
           <Suspense fallback={<FullPageLoader />}>
             <AuthLayout>
               <LoginPage />
+            </AuthLayout>
+          </Suspense>
+        } 
+      />
+      
+      <Route 
+        path="/signup" 
+        element={
+          <Suspense fallback={<FullPageLoader />}>
+            <AuthLayout>
+              <SignupPage />
             </AuthLayout>
           </Suspense>
         } 
