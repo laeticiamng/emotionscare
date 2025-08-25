@@ -11,15 +11,29 @@ interface NotificationProviderProps {
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const notificationData = useNotificationsHook();
 
+  // Default notification settings
+  const defaultSettings = {
+    email: true,
+    push: true,
+    inApp: true,
+    types: {
+      security: true,
+      system: true,
+      social: true,
+      achievements: true,
+      reminders: true,
+    }
+  };
+
   const value: NotificationContextType = {
     notifications: notificationData.notifications,
     unreadCount: notificationData.unreadCount,
     markAsRead: notificationData.markAsRead,
     markAllAsRead: notificationData.markAllAsRead,
     addNotification: notificationData.addNotification,
-    removeNotification: notificationData.removeNotification,
-    settings: notificationData.settings,
-    updateSettings: notificationData.updateSettings,
+    removeNotification: notificationData.deleteNotification || (() => {}),
+    settings: defaultSettings,
+    updateSettings: () => {},
   };
 
   return (
