@@ -7,13 +7,17 @@ import { useAuth } from '@/contexts/AuthContext';
 const MainLayout = lazy(() => import('@/layouts/MainLayout'));
 const AuthLayout = lazy(() => import('@/layouts/AuthLayout'));
 
+// Pages publiques
+const LandingPage = lazy(() => import('@/pages/LandingPage'));
+
 // Pages principales existantes
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const ScanPage = lazy(() => import('@/pages/ScanPage'));
 const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const BreathworkPage = lazy(() => import('@/pages/BreathworkPageTemp'));
+const BreathworkPage = lazy(() => import('@/pages/BreathworkPage'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
 const CoachPage = lazy(() => import('@/pages/CoachPage'));
+const ScanVoicePage = lazy(() => import('@/pages/ScanVoicePage'));
 const VrPage = lazy(() => import('@/pages/VrPage'));
 const EcosPage = lazy(() => import('@/pages/EcosPage'));
 const EdnPage = lazy(() => import('@/pages/EdnPage'));
@@ -70,11 +74,35 @@ const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 /**
- * Routeur principal de l'application - Version simplifiée
+ * Routeur principal de l'application - Version complète
  */
 export const AppRouter: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
+      {/* Page d'accueil publique */}
+      <Route 
+        path="/landing" 
+        element={
+          <Suspense fallback={<FullPageLoader />}>
+            <LandingPage />
+          </Suspense>
+        } 
+      />
+
+      {/* Redirection de l'index selon l'état d'auth */}
+      <Route 
+        path="/" 
+        element={
+          isAuthenticated ? (
+            <Navigate to="/home" replace />
+          ) : (
+            <Navigate to="/landing" replace />
+          )
+        } 
+      />
+
       {/* Routes d'authentification */}
       <Route 
         path="/login" 
@@ -104,9 +132,9 @@ export const AppRouter: React.FC = () => {
           <Suspense fallback={<FullPageLoader />}>
             <MainLayout>
               <Routes>
-                {/* Page d'accueil */}
+                {/* Page d'accueil authentifiée */}
                 <Route 
-                  index 
+                  path="home" 
                   element={
                     <PageWrapper>
                       <HomePage />
@@ -120,6 +148,14 @@ export const AppRouter: React.FC = () => {
                   element={
                     <PageWrapper>
                       <ScanPage />
+                    </PageWrapper>
+                  } 
+                />
+                <Route 
+                  path="scan-voice" 
+                  element={
+                    <PageWrapper>
+                      <ScanVoicePage />
                     </PageWrapper>
                   } 
                 />
