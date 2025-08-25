@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from '@/components/ui/toaster';
 import { ModalProvider } from '@/components/modals/ModalProvider';
 import { AuthProvider } from '@/contexts/AuthProvider';
@@ -60,7 +59,6 @@ function App() {
           </ModalProvider>
         </AuthProvider>
       </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
