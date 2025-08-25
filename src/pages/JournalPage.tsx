@@ -1,256 +1,226 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { BookOpen, Plus, Calendar, Smile, Meh, Frown, PenTool, TrendingUp, Target, BarChart3 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import PageLayout from '@/components/common/PageLayout';
+import { Badge } from '@/components/ui/badge';
+import { 
+  BookOpen, Plus, Calendar, Heart, Brain, Sparkles,
+  MessageCircle, TrendingUp, Target
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface JournalEntry {
+  id: string;
+  content: string;
+  emotion: string;
+  mood_score: number;
+  ai_feedback?: string;
+  created_at: string;
+  tags: string[];
+}
+
+interface EmotionOption {
+  emoji: string;
+  label: string;
+  value: string;
+  score: number;
+  color: string;
+}
+
+const emotionOptions: EmotionOption[] = [
+  { emoji: '😊', label: 'Joyeux', value: 'joy', score: 8, color: 'bg-yellow-500' },
+  { emoji: '😌', label: 'Serein', value: 'serene', score: 7, color: 'bg-blue-500' },
+  { emoji: '😐', label: 'Neutre', value: 'neutral', score: 5, color: 'bg-gray-500' },
+  { emoji: '😟', label: 'Inquiet', value: 'worried', score: 3, color: 'bg-orange-500' },
+  { emoji: '😢', label: 'Triste', value: 'sad', score: 2, color: 'bg-blue-700' },
+  { emoji: '😠', label: 'En colère', value: 'angry', score: 2, color: 'bg-red-500' },
+  { emoji: '😰', label: 'Anxieux', value: 'anxious', score: 3, color: 'bg-purple-500' },
+  { emoji: '🤗', label: 'Reconnaissant', value: 'grateful', score: 8, color: 'bg-green-500' },
+];
 
 const JournalPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [entries, setEntries] = useState([
-    {
-      id: 1,
-      date: '2024-01-15',
-      mood: 'Joyeux',
-      title: 'Belle journée au travail',
-      content: 'Aujourd\'hui a été une journée particulièrement productive. J\'ai terminé mon projet et l\'équipe était très satisfaite.',
-      moodScore: 8
-    },
-    {
-      id: 2,
-      date: '2024-01-14',
-      mood: 'Calme',
-      title: 'Méditation matinale',
-      content: 'Session de méditation de 20 minutes ce matin. Je me sens plus centré et prêt pour la journée.',
-      moodScore: 7
-    }
-  ]);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [isWriting, setIsWriting] = useState(false);
+  const [newEntry, setNewEntry] = useState('');
+  const [selectedEmotion, setSelectedEmotion] = useState<EmotionOption | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
 
-  const [newEntry, setNewEntry] = useState({
-    title: '',
-    content: '',
-    mood: '',
-    moodScore: 5
-  });
+  const saveEntry = async () => {
+    if (!newEntry.trim() || !selectedEmotion || !user) return;
 
-  const handleSaveEntry = () => {
-    if (newEntry.title && newEntry.content) {
-      const entry = {
-        id: entries.length + 1,
-        date: new Date().toISOString().split('T')[0],
-        mood: newEntry.moodScore >= 7 ? 'Joyeux' : newEntry.moodScore >= 4 ? 'Calme' : 'Triste',
-        title: newEntry.title,
-        content: newEntry.content,
-        moodScore: newEntry.moodScore
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-coach', {
+        body: {
+          message: newEntry,
+          type: 'journal_analysis',
+          emotion: selectedEmotion.value
+        }
+      });
+
+      const aiFeedback = data?.response || "Merci d'avoir partagé vos pensées.";
+
+      const { data: entryData, error: saveError } = await supabase
+        .from('emotions')
+        .insert({
+          user_id: user.id,
+          text: newEntry,
+          emojis: selectedEmotion.emoji,
+          score: selectedEmotion.score,
+          ai_feedback: aiFeedback,
+          date: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (saveError) throw saveError;
+
+      const newJournalEntry: JournalEntry = {
+        id: entryData.id,
+        content: newEntry,
+        emotion: selectedEmotion.value,
+        mood_score: selectedEmotion.score,
+        ai_feedback: aiFeedback,
+        created_at: entryData.date,
+        tags: []
       };
-      setEntries([entry, ...entries]);
-      setNewEntry({ title: '', content: '', mood: '', moodScore: 5 });
+
+      setEntries(prev => [newJournalEntry, ...prev]);
+      setNewEntry('');
+      setSelectedEmotion(null);
+      setIsWriting(false);
+
+      toast({
+        title: "Entrée sauvegardée",
+        description: "Votre réflexion a été ajoutée à votre journal",
+      });
+    } catch (error) {
+      console.error('Error saving entry:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder l'entrée",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <PageLayout
-      header={{
-        title: 'Journal Émotionnel',
-        subtitle: 'Suivez votre parcours de bien-être',
-        description: 'Documentez vos émotions, réflexions et progrès quotidiens. Développez votre intelligence émotionnelle grâce à l\'introspection guidée.',
-        icon: BookOpen,
-        gradient: 'from-green-500/20 to-blue-500/5',
-        badge: 'Développement Personnel',
-        stats: [
-          {
-            label: 'Entrées',
-            value: entries.length.toString(),
-            icon: PenTool,
-            color: 'text-green-500'
-          },
-          {
-            label: 'Humeur moy.',
-            value: `${Math.round(entries.reduce((acc, e) => acc + e.moodScore, 0) / entries.length)}/10`,
-            icon: Target,
-            color: 'text-blue-500'
-          },
-          {
-            label: 'Progression',
-            value: '+12%',
-            icon: TrendingUp,
-            color: 'text-purple-500'
-          },
-          {
-            label: 'Régularité',
-            value: '85%',
-            icon: BarChart3,
-            color: 'text-orange-500'
-          }
-        ],
-        actions: [
-          {
-            label: 'Nouvelle Entrée',
-            onClick: () => {
-              document.getElementById('nouvelle-entree')?.scrollIntoView({ behavior: 'smooth' });
-            },
-            variant: 'default',
-            icon: Plus
-          },
-          {
-            label: 'Statistiques',
-            onClick: () => navigate('/journal/statistics'),
-            variant: 'outline',
-            icon: BarChart3
-          }
-        ]
-      }}
-      tips={{
-        title: 'Conseils pour un journal efficace',
-        items: [
-          {
-            title: 'Régularité',
-            content: 'Écrivez quotidiennement, même quelques lignes suffisent',
-            icon: Calendar
-          },
-          {
-            title: 'Honnêteté',
-            content: 'Soyez authentique dans vos ressentis et émotions',
-            icon: BookOpen
-          },
-          {
-            title: 'Gratitude',
-            content: 'Notez au moins une chose positive chaque jour',
-            icon: Smile
-          }
-        ],
-        cta: {
-          label: 'Guide du journal émotionnel',
-          onClick: () => navigate('/help-center#journal-guide')
-        }
-      }}
-    >
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Nouvelle entrée */}
-        <div className="lg:col-span-1" id="nouvelle-entree">
+  if (isWriting) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="space-y-6">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Nouvelle Entrée de Journal
+            </h1>
+            <p className="text-muted-foreground">
+              Exprimez vos pensées et émotions du moment
+            </p>
+          </div>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5 text-primary" />
-                Nouvelle Entrée
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                placeholder="Titre de l'entrée"
-                value={newEntry.title}
-                onChange={(e) => setNewEntry({...newEntry, title: e.target.value})}
-              />
-              
-              <Textarea
-                placeholder="Comment vous sentez-vous aujourd'hui ?"
-                rows={4}
-                value={newEntry.content}
-                onChange={(e) => setNewEntry({...newEntry, content: e.target.value})}
-              />
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Humeur (1-10)</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={newEntry.moodScore}
-                    onChange={(e) => setNewEntry({...newEntry, moodScore: parseInt(e.target.value)})}
-                    className="flex-1"
-                  />
-                  <span className="text-lg font-bold text-primary">{newEntry.moodScore}</span>
-                </div>
-              </div>
-
-              <Button 
-                onClick={handleSaveEntry}
-                className="w-full"
-                disabled={!newEntry.title || !newEntry.content}
-              >
-                Enregistrer
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Historique des entrées */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                Mes Entrées ({entries.length})
+                <Heart className="w-5 h-5 text-red-500" />
+                Comment vous sentez-vous ?
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {entries.map((entry) => (
-                  <motion.div
-                    key={entry.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-4 border border-border rounded-xl hover:shadow-md transition-shadow"
+              <div className="grid grid-cols-4 gap-3 mb-6">
+                {emotionOptions.map((emotion) => (
+                  <button
+                    key={emotion.value}
+                    onClick={() => setSelectedEmotion(emotion)}
+                    className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
+                      selectedEmotion?.value === emotion.value
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold text-foreground">{entry.title}</h3>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(entry.date).toLocaleDateString('fr-FR')}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{entry.moodScore}/10</span>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          entry.moodScore >= 7 ? 'bg-green-100 dark:bg-green-900' : 
-                          entry.moodScore >= 4 ? 'bg-yellow-100 dark:bg-yellow-900' : 'bg-red-100 dark:bg-red-900'
-                        }`}>
-                          {entry.moodScore >= 7 ? (
-                            <Smile className="h-4 w-4 text-green-600 dark:text-green-400" />
-                          ) : entry.moodScore >= 4 ? (
-                            <Meh className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                          ) : (
-                            <Frown className="h-4 w-4 text-red-600 dark:text-red-400" />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{entry.content}</p>
-                  </motion.div>
+                    <div className="text-2xl mb-1">{emotion.emoji}</div>
+                    <div className="text-xs font-medium">{emotion.label}</div>
+                  </button>
                 ))}
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Statistiques */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Aperçu de la Semaine</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-7 gap-2">
-                {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-xs text-muted-foreground mb-1">{day}</div>
-                    <div className={`w-8 h-8 rounded-full mx-auto flex items-center justify-center text-xs font-medium ${
-                      Math.random() > 0.3 ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {Math.random() > 0.3 ? Math.floor(Math.random() * 3) + 7 : '-'}
-                    </div>
-                  </div>
-                ))}
+              <Textarea
+                value={newEntry}
+                onChange={(e) => setNewEntry(e.target.value)}
+                placeholder="Décrivez vos pensées, sentiments, ou événements de la journée..."
+                className="min-h-[200px] mb-4"
+              />
+
+              <div className="flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsWriting(false);
+                    setNewEntry('');
+                    setSelectedEmotion(null);
+                  }}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={saveEntry}
+                  disabled={isLoading || !newEntry.trim() || !selectedEmotion}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Sauvegarder & Analyser
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-    </PageLayout>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Journal Émotionnel
+          </h1>
+          <p className="text-muted-foreground">
+            Suivez votre bien-être émotionnel et recevez des insights personnalisés
+          </p>
+        </div>
+        <Button onClick={() => setIsWriting(true)} size="lg">
+          <Plus className="w-5 h-5 mr-2" />
+          Nouvelle Entrée
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="text-center py-12">
+          <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Commencez votre journal</h3>
+          <p className="text-muted-foreground mb-6">
+            Exprimez vos pensées et recevez des insights IA personnalisés
+          </p>
+          <Button onClick={() => setIsWriting(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Créer ma première entrée
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -1,254 +1,166 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { PageRoot } from '@/components/common/PageRoot';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Bot, User, Send, Lightbulb } from 'lucide-react';
-import { useMood } from '@/contexts/MoodContext';
-import { useActivityLogger } from '@/hooks/useActivityLogger';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Heart, Brain, Sparkles, MessageCircle, Target, 
+  Zap, Users, Star, ArrowLeft
+} from 'lucide-react';
+import CoachChat from '@/components/coach/CoachChat';
+
+interface CoachType {
+  id: 'emotional' | 'wellness' | 'mindfulness' | 'general';
+  name: string;
+  role: string;
+  avatar: string;
+  description: string;
+  specialties: string[];
+  color: string;
+  bgColor: string;
+}
+
+const coaches: CoachType[] = [
+  {
+    id: 'emotional',
+    name: 'Emma',
+    role: 'Coach Émotionnel',
+    avatar: '🧘‍♀️',
+    description: 'Spécialisée dans la gestion des émotions, l\'anxiété et le développement de la résilience émotionnelle.',
+    specialties: ['Gestion du stress', 'Anxiété', 'Confiance en soi', 'Intelligence émotionnelle'],
+    color: 'text-pink-600',
+    bgColor: 'bg-pink-50 dark:bg-pink-900/20'
+  },
+  {
+    id: 'wellness',
+    name: 'Alex',
+    role: 'Coach Bien-être',
+    avatar: '🌟',
+    description: 'Expert en lifestyle sain, habitudes de vie et équilibre travail-vie personnelle.',
+    specialties: ['Habitudes saines', 'Équilibre vie-travail', 'Motivation', 'Objectifs de vie'],
+    color: 'text-green-600',
+    bgColor: 'bg-green-50 dark:bg-green-900/20'
+  },
+  {
+    id: 'mindfulness',
+    name: 'Sophia',
+    role: 'Coach Mindfulness',
+    avatar: '🧘',
+    description: 'Guide experte en méditation, pleine conscience et développement spirituel.',
+    specialties: ['Méditation', 'Pleine conscience', 'Spiritualité', 'Lâcher-prise'],
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50 dark:bg-purple-900/20'
+  },
+  {
+    id: 'general',
+    name: 'Jordan',
+    role: 'Coach Personnel',
+    avatar: '💭',
+    description: 'Accompagnement personnalisé et écoute active pour tous types de défis personnels.',
+    specialties: ['Écoute active', 'Développement personnel', 'Prise de décision', 'Clarification'],
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20'
+  }
+];
 
 const CoachPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { currentMood } = useMood();
-  const { logActivity } = useActivityLogger();
-  
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'coach' as const,
-      content: 'Bonjour ! Je suis votre coach IA personnel. Comment vous sentez-vous aujourd\'hui ?',
-      timestamp: new Date().toISOString()
-    }
-  ]);
-  const [newMessage, setNewMessage] = useState('');
+  const [selectedCoach, setSelectedCoach] = useState<CoachType | null>(null);
 
-  React.useEffect(() => {
-    logActivity('/coach', 'ai_coach_page');
-  }, [logActivity]);
+  if (selectedCoach) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => setSelectedCoach(null)}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour aux coaches
+          </Button>
+          
+          <div className={`${selectedCoach.bgColor} rounded-lg p-6 mb-6`}>
+            <div className="flex items-center gap-4">
+              <div className="text-6xl">{selectedCoach.avatar}</div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  {selectedCoach.name}
+                </h1>
+                <p className={`text-lg font-medium ${selectedCoach.color} mb-2`}>
+                  {selectedCoach.role}
+                </p>
+                <p className="text-muted-foreground max-w-2xl">
+                  {selectedCoach.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  const suggestions = [
-    "Je me sens stressé au travail",
-    "Comment améliorer mon sommeil ?",
-    "J'ai besoin de motivation",
-    "Exercices de respiration"
-  ];
-
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-
-    const userMessage = {
-      id: messages.length + 1,
-      sender: 'user' as const,
-      content: newMessage,
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages([...messages, userMessage]);
-    setNewMessage('');
-
-    // Simuler une réponse du coach
-    setTimeout(() => {
-      const coachResponse = {
-        id: messages.length + 2,
-        sender: 'coach' as const,
-        content: 'Je comprends votre situation. Basé sur votre état émotionnel actuel, je vous recommande de prendre quelques minutes pour respirer profondément. Voulez-vous que je vous guide dans un exercice de relaxation ?',
-        timestamp: new Date().toISOString()
-      };
-      setMessages(prev => [...prev, coachResponse]);
-    }, 1000);
-  };
+        <CoachChat 
+          coachType={selectedCoach.id} 
+          showVoice={true}
+          className="max-w-4xl mx-auto"
+        />
+      </div>
+    );
+  }
 
   return (
-    <PageRoot className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Button
-            onClick={() => navigate('/')}
-            variant="ghost"
-            className="mb-6 hover:bg-blue-50"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
-
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              Coach IA Personnel
-            </h1>
-            <p className="text-xl text-gray-600">
-              Votre accompagnateur bien-être disponible 24/7
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-4 gap-6">
-            {/* Chat principal */}
-            <div className="lg:col-span-3">
-              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 h-[600px] flex flex-col">
-                <CardHeader className="pb-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <Bot className="h-6 w-6 text-blue-500" />
-                    Conversation avec votre Coach
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="flex-1 flex flex-col">
-                  {/* Messages */}
-                  <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                    {messages.map((message) => (
-                      <motion.div
-                        key={message.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div className={`flex items-start gap-3 max-w-[80%] ${
-                          message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
-                        }`}>
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            message.sender === 'user' 
-                              ? 'bg-blue-500' 
-                              : 'bg-gradient-to-r from-purple-500 to-pink-500'
-                          }`}>
-                            {message.sender === 'user' ? (
-                              <User className="h-4 w-4 text-white" />
-                            ) : (
-                              <Bot className="h-4 w-4 text-white" />
-                            )}
-                          </div>
-                          <div className={`p-3 rounded-2xl ${
-                            message.sender === 'user'
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            <p className="text-sm leading-relaxed">{message.content}</p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Input de message */}
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Écrivez votre message..."
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      className="flex-1"
-                    />
-                    <Button 
-                      onClick={handleSendMessage}
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Suggestions rapides */}
-              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Lightbulb className="h-5 w-5 text-yellow-500" />
-                    Suggestions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {suggestions.map((suggestion, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        className="w-full text-left justify-start text-sm h-auto py-3 px-3 hover:bg-blue-50"
-                        onClick={() => setNewMessage(suggestion)}
-                      >
-                        {suggestion}
-                      </Button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* État émotionnel */}
-              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
-                <CardHeader>
-                  <CardTitle className="text-lg">Votre État</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <div className="text-sm font-medium text-green-800">Humeur</div>
-                      <div className="text-xs text-green-600">
-                        {currentMood ? `${Math.round(currentMood.valence * 100)}%` : 'Non détectée'}
-                      </div>
-                    </div>
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <div className="text-sm font-medium text-blue-800">Énergie</div>
-                      <div className="text-xs text-blue-600">
-                        {currentMood ? `${Math.round(currentMood.arousal * 100)}%` : 'Non détectée'}
-                      </div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <div className="text-sm font-medium text-purple-800">Bien-être</div>
-                      <div className="text-xs text-purple-600">
-                        {currentMood ? `${Math.round((currentMood.valence + currentMood.arousal) * 50)}%` : 'En attente'}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Actions rapides */}
-              <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0">
-                <CardHeader>
-                  <CardTitle className="text-lg">Actions Rapides</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => navigate('/music')}
-                  >
-                    🎵 Musique relaxante
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => navigate('/scan')}
-                  >
-                    🧠 Scanner émotions
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => navigate('/journal')}
-                  >
-                    📝 Écrire dans le journal
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => navigate('/breathwork')}
-                  >
-                    🫁 Exercices de respiration
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </motion.div>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-foreground mb-4">
+          Vos Coaches IA Personnels
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Découvrez nos coaches IA spécialisés, disponibles 24/7 pour vous accompagner 
+          dans votre développement personnel et votre bien-être émotionnel.
+        </p>
       </div>
-    </PageRoot>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        {coaches.map((coach) => (
+          <Card 
+            key={coach.id} 
+            className={`hover:shadow-lg transition-all duration-300 cursor-pointer ${coach.bgColor}`}
+            onClick={() => setSelectedCoach(coach)}
+          >
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">{coach.avatar}</div>
+                  <div>
+                    <CardTitle className="text-xl">{coach.name}</CardTitle>
+                    <CardDescription className={`font-medium ${coach.color}`}>
+                      {coach.role}
+                    </CardDescription>
+                  </div>
+                </div>
+                <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                  Disponible
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground text-sm">
+                {coach.description}
+              </p>
+              
+              <Button 
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedCoach(coach);
+                }}
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Commencer une conversation
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 };
 
