@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { VirtualReality, Mountain, Waves, TreePine, Smartphone, Headphones, Play } from 'lucide-react';
+import { Headset, Mountain, Waves, TreePine, Smartphone, Headphones, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const VRHubPage: React.FC = () => {
@@ -75,7 +75,7 @@ const VRHubPage: React.FC = () => {
   ];
 
   const categories = [
-    { id: 'all', name: 'Toutes', icon: VirtualReality },
+    { id: 'all', name: 'Toutes', icon: Headset },
     { id: 'relaxation', name: 'Relaxation', icon: Waves },
     { id: 'nature', name: 'Nature', icon: TreePine },
     { id: 'therapy', name: 'Thérapie', icon: Headphones },
@@ -116,7 +116,7 @@ const VRHubPage: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <VirtualReality className="h-8 w-8" />
+            <Headset className="h-8 w-8" />
             Hub Réalité Virtuelle
           </h1>
           <p className="text-muted-foreground">
@@ -177,7 +177,7 @@ const VRHubPage: React.FC = () => {
               <CardHeader className="pb-3">
                 {/* Preview visuel */}
                 <div className={`h-32 rounded-lg bg-gradient-to-br ${experience.preview} flex items-center justify-center mb-3`}>
-                  <VirtualReality className="h-12 w-12 text-white/80" />
+                  <Headset className="h-12 w-12 text-white/80" />
                 </div>
                 
                 <div className="flex justify-between items-start">
