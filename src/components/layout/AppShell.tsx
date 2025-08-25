@@ -43,7 +43,7 @@ const AppShell: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 w-full">
       {/* Header */}
-      <header className="sticky top-0 z-50 h-16 bg-white/80 backdrop-blur border-b">
+      <header className="sticky top-0 z-50 h-16 bg-white/80 backdrop-blur border-b header-safe-area">
         <div className="flex items-center justify-between h-full px-4">
           {/* Mobile menu button */}
           <button

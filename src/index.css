@@ -5,6 +5,27 @@
 @tailwind utilities;
 
 @layer base {
+  /* Base reset & full-bleed setup */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #0B1C3A; /* Same as hero gradient base */
+    scrollbar-gutter: stable both-edges; /* Prevent layout shift */
+  }
+
+  /* iOS safe-area handling */
+  @supports (padding: max(0px)) {
+    .header-safe-area {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+
+  /* Header height variable */
+  :root {
+    --header-h: 4rem; /* 64px */
+  }
+
   /* Configuration HTML par défaut */
   html {
     scroll-behavior: smooth;

@@ -215,18 +215,20 @@ const PremiumHomePage: React.FC = () => {
 
   return (
     <ResponsiveWrapper>
-      <motion.div 
-        className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden relative"
+      {/* Full-bleed hero with no side margins */}
+      <motion.section 
+        className="w-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Background gradient */}
+        {/* Background gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/20 to-accent/10" />
 
-        <DeviceOptimizedLayout>
+        {/* Hero content with internal padding only */}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
-          <motion.section 
+          <motion.div 
             className={cn(
               "relative z-10 pt-8 pb-20 text-center", // Réduit le padding-top
               deviceOptimization === 'desktop' && "pt-12 pb-32",
@@ -339,25 +341,29 @@ const PremiumHomePage: React.FC = () => {
                 <div className="text-xs text-purple-200">Support IA</div>
               </div>
             </motion.div>
-          </motion.section>
+          </motion.div>
+        </div>
+      </motion.section>
 
-          {/* User Dashboard Preview */}
-          {isAuthenticated && userMetrics && (
-            <motion.section
-              className="relative z-10 mb-20"
+      {/* User Dashboard Preview - separate section with white background */}
+      {isAuthenticated && userMetrics && (
+        <section className="w-full bg-white">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+            <motion.div
+              className="relative z-10"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4 }}
             >
-              <Card className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border-white/10">
+              <Card className="bg-white border border-gray-200 shadow-[0_10px_20px_rgba(2,6,23,0.08)] rounded-2xl">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <h2 className="text-white text-xl font-semibold leading-none tracking-tight">Votre Tableau de Bord</h2>
+                    <h2 className="text-gray-900 text-xl font-semibold leading-none tracking-tight">Votre Tableau de Bord</h2>
                     <Badge className={cn(
                       "px-3 py-1",
-                      userMetrics.mood_trend === 'improving' && "bg-green-500/20 text-green-300 border-green-500/30",
-                      userMetrics.mood_trend === 'stable' && "bg-blue-500/20 text-blue-300 border-blue-500/30",
-                      userMetrics.mood_trend === 'declining' && "bg-orange-500/20 text-orange-300 border-orange-500/30"
+                      userMetrics.mood_trend === 'improving' && "bg-green-600 text-white border-0",
+                      userMetrics.mood_trend === 'stable' && "bg-blue-600 text-white border-0",
+                      userMetrics.mood_trend === 'declining' && "bg-orange-600 text-white border-0"
                     )}>
                       {userMetrics.mood_trend === 'improving' && '📈 En amélioration'}
                       {userMetrics.mood_trend === 'stable' && '➡️ Stable'}
@@ -374,65 +380,69 @@ const PremiumHomePage: React.FC = () => {
                   )}>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-200 text-sm">Équilibre Émotionnel</span>
-                        <span className="text-slate-300 font-bold">{userMetrics.emotional_balance}%</span>
+                        <span className="text-gray-600 text-sm">Équilibre Émotionnel</span>
+                        <span className="text-gray-900 font-bold">{userMetrics.emotional_balance}%</span>
                       </div>
                       <Progress value={userMetrics.emotional_balance} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-200 text-sm">Niveau de Stress</span>
-                        <span className="text-slate-300 font-bold">{userMetrics.stress_level}%</span>
+                        <span className="text-gray-600 text-sm">Niveau de Stress</span>
+                        <span className="text-gray-900 font-bold">{userMetrics.stress_level}%</span>
                       </div>
                       <Progress value={100 - userMetrics.stress_level} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-200 text-sm">Score de Focus</span>
-                        <span className="text-slate-300 font-bold">{userMetrics.focus_score}%</span>
+                        <span className="text-gray-600 text-sm">Score de Focus</span>
+                        <span className="text-gray-900 font-bold">{userMetrics.focus_score}%</span>
                       </div>
                       <Progress value={userMetrics.focus_score} className="h-2" />
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-200 text-sm">Séries Consécutives</span>
-                        <span className="text-slate-300 font-bold">{userMetrics.wellness_streak}j</span>
+                        <span className="text-gray-600 text-sm">Séries Consécutives</span>
+                        <span className="text-gray-900 font-bold">{userMetrics.wellness_streak}j</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         {Array.from({ length: Math.min(userMetrics.wellness_streak, 7) }).map((_, i) => (
                           <div key={i} className="w-3 h-3 bg-green-400 rounded-full" />
                         ))}
                         {userMetrics.wellness_streak > 7 && (
-                          <span className="text-green-300 text-xs ml-2">+{userMetrics.wellness_streak - 7}</span>
+                          <span className="text-green-600 text-xs ml-2">+{userMetrics.wellness_streak - 7}</span>
                         )}
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            </motion.section>
-          )}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
-          {/* Live Features Grid */}
-          <motion.section
-            className="relative z-10 mb-20"
+      {/* Live Features Grid - separate section with white background */}
+      <section className="w-full bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+          <motion.div
+            className="relative z-10"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
           >
             <div className="text-center mb-12">
               <h2 className={cn(
-                "font-bold text-white mb-4",
+                "font-bold text-gray-900 mb-4",
                 deviceOptimization === 'desktop' && "text-4xl",
                 deviceOptimization === 'tablet' && "text-3xl",
                 "text-2xl"
               )}>
                 Fonctionnalités Premium
               </h2>
-              <p className="text-slate-300 max-w-2xl mx-auto">
+              <p className="text-gray-700 max-w-2xl mx-auto">
                 Explorez nos outils thérapeutiques alimentés par l'IA la plus avancée
               </p>
             </div>
@@ -513,29 +523,29 @@ const PremiumHomePage: React.FC = () => {
                 </motion.div>
               ))}
             </div>
-          </motion.section>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* Scroll Indicator */}
-          {deviceOptimization === 'desktop' && (
-            <motion.div
-              className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2 }}
-            >
-              <motion.div
-                className="flex flex-col items-center text-white/60 cursor-pointer hover:text-white/80 transition-colors"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-              >
-                <span className="text-xs mb-2">Découvrir plus</span>
-                <ChevronDown className="h-4 w-4" />
-              </motion.div>
-            </motion.div>
-          )}
-        </DeviceOptimizedLayout>
-      </motion.div>
+      {/* Scroll Indicator */}
+      {deviceOptimization === 'desktop' && (
+        <motion.div
+          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2 }}
+        >
+          <motion.div
+            className="flex flex-col items-center text-white/60 cursor-pointer hover:text-white/80 transition-colors"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+          >
+            <span className="text-xs mb-2">Découvrir plus</span>
+            <ChevronDown className="h-4 w-4" />
+          </motion.div>
+        </motion.div>
+      )}
     </ResponsiveWrapper>
   );
 };
