@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect } from 'react';
+import { PageRoot } from '@/components/common/PageRoot';
+import { useMoodSession } from '@/hooks/useMoodSession';
+import MoodCards from '@/components/mood/MoodCards';
+import MoodGlass from '@/components/mood/MoodGlass';
+import MusicPlayer from '@/components/mood/MusicPlayer';
+import MicroPrompts from '@/components/mood/MicroPrompts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Music, Heart, Zap, Headphones, Play, Shuffle, Palette, Timer, BarChart3, TrendingUp } from 'lucide-react';
-import PageLayout from '@/components/common/PageLayout';
-import FeatureCard from '@/components/common/FeatureCard';
+import { Palette } from 'lucide-react';
 
 const MoodMixerPage: React.FC = () => {
   const [energy, setEnergy] = useState([50]);
