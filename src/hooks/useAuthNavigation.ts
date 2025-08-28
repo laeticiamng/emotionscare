@@ -1,7 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getDashboardRoute } from '@/utils/routeUtils';
+import { getDashboardRoute } from '@/routerV2/helpers';
 
 export const useAuthNavigation = () => {
   const navigate = useNavigate();

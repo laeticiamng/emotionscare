@@ -1,5 +1,5 @@
 
-import { UNIFIED_ROUTES } from './routeUtils';
+import { Routes } from '@/routerV2';
 
 export interface RouteValidationResult {
   isValid: boolean;
@@ -16,42 +16,42 @@ export function validateRouteAccess(
 ): RouteValidationResult {
   // Routes publiques
   const publicRoutes = [
-    UNIFIED_ROUTES.HOME,
-    UNIFIED_ROUTES.CHOOSE_MODE,
-    UNIFIED_ROUTES.B2B_SELECTION,
-    UNIFIED_ROUTES.B2C_LOGIN,
-    UNIFIED_ROUTES.B2C_REGISTER,
-    UNIFIED_ROUTES.B2B_USER_LOGIN,
-    UNIFIED_ROUTES.B2B_USER_REGISTER,
-    UNIFIED_ROUTES.B2B_ADMIN_LOGIN
+    Routes.home(),
+    Routes.b2cLanding(),
+    Routes.b2bLanding(),
+    Routes.login({ segment: 'b2c' }),
+    Routes.signup({ segment: 'b2c' }),
+    Routes.login({ segment: 'b2b' }),
+    Routes.signup({ segment: 'b2b' }),
+    Routes.login()
   ];
 
   // Routes admin uniquement
   const adminOnlyRoutes = [
-    UNIFIED_ROUTES.TEAMS,
-    UNIFIED_ROUTES.REPORTS,
-    UNIFIED_ROUTES.EVENTS,
-    UNIFIED_ROUTES.OPTIMISATION,
-    UNIFIED_ROUTES.SETTINGS
+    Routes.teams(),
+    Routes.adminReports(),
+    Routes.adminEvents(),
+    Routes.adminOptimization(),
+    Routes.settingsGeneral()
   ];
 
   // Routes communes (nécessitent une authentification)
   const commonRoutes = [
-    UNIFIED_ROUTES.SCAN,
-    UNIFIED_ROUTES.MUSIC,
-    UNIFIED_ROUTES.COACH,
-    UNIFIED_ROUTES.JOURNAL,
-    UNIFIED_ROUTES.VR,
-    UNIFIED_ROUTES.PREFERENCES,
-    UNIFIED_ROUTES.GAMIFICATION,
-    UNIFIED_ROUTES.SOCIAL_COCON
+    Routes.scan(),
+    Routes.music(),
+    Routes.coach(),
+    Routes.journal(),
+    Routes.vr(),
+    Routes.settingsGeneral(),
+    Routes.leaderboard(),
+    Routes.socialCocon()
   ];
 
   // Dashboards
   const dashboards = [
-    UNIFIED_ROUTES.B2C_DASHBOARD,
-    UNIFIED_ROUTES.B2B_USER_DASHBOARD,
-    UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD
+    Routes.consumerHome(),
+    Routes.employeeHome(),
+    Routes.managerHome()
   ];
 
   // Vérification si la route est publique
@@ -110,36 +110,36 @@ export function validateRouteAccess(
 }
 
 function getLoginRouteForPath(pathname: string): string {
-  if (pathname.startsWith('/b2b/admin')) {
-    return UNIFIED_ROUTES.B2B_ADMIN_LOGIN;
-  } else if (pathname.startsWith('/b2b/user')) {
-    return UNIFIED_ROUTES.B2B_USER_LOGIN;
-  } else if (pathname.startsWith('/b2c')) {
-    return UNIFIED_ROUTES.B2C_LOGIN;
+  if (pathname.startsWith('/app/')) {
+    // Routes app nécessitent l'authentification principale
+    return Routes.login();
   }
-  return UNIFIED_ROUTES.CHOOSE_MODE;
+  return Routes.b2cLanding();
 }
 
 function getDashboardForRole(role?: string): string {
   switch (role) {
+    case 'consumer':
     case 'b2c':
-      return UNIFIED_ROUTES.B2C_DASHBOARD;
+      return Routes.consumerHome();
+    case 'employee':
     case 'b2b_user':
-      return UNIFIED_ROUTES.B2B_USER_DASHBOARD;
+      return Routes.employeeHome();
+    case 'manager':
     case 'b2b_admin':
-      return UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD;
+      return Routes.managerHome();
     default:
-      return UNIFIED_ROUTES.HOME;
+      return Routes.home();
   }
 }
 
 function getRoleForDashboard(pathname: string): string | null {
   switch (pathname) {
-    case UNIFIED_ROUTES.B2C_DASHBOARD:
+    case Routes.consumerHome():
       return 'b2c';
-    case UNIFIED_ROUTES.B2B_USER_DASHBOARD:
+    case Routes.employeeHome():
       return 'b2b_user';
-    case UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD:
+    case Routes.managerHome():
       return 'b2b_admin';
     default:
       return null;
@@ -147,20 +147,25 @@ function getRoleForDashboard(pathname: string): string | null {
 }
 
 export function getAllValidRoutes(): string[] {
-  return Object.values(UNIFIED_ROUTES);
+  return [
+    Routes.home(), Routes.scan(), Routes.music(), Routes.coach(),
+    Routes.journal(), Routes.vr(), Routes.consumerHome(),
+    Routes.employeeHome(), Routes.managerHome(), Routes.teams(),
+    Routes.adminReports(), Routes.adminEvents(), Routes.settingsGeneral()
+  ];
 }
 
 export function isRoutePublic(pathname: string): boolean {
   const publicRoutes = [
-    UNIFIED_ROUTES.HOME,
-    UNIFIED_ROUTES.CHOOSE_MODE,
-    UNIFIED_ROUTES.B2B_SELECTION,
-    UNIFIED_ROUTES.B2C_LOGIN,
-    UNIFIED_ROUTES.B2C_REGISTER,
-    UNIFIED_ROUTES.B2B_USER_LOGIN,
-    UNIFIED_ROUTES.B2B_USER_REGISTER,
-    UNIFIED_ROUTES.B2B_ADMIN_LOGIN
+    Routes.home(),
+    Routes.b2cLanding(),
+    Routes.b2bLanding(),
+    Routes.login({ segment: 'b2c' }),
+    Routes.signup({ segment: 'b2c' }),
+    Routes.login({ segment: 'b2b' }),
+    Routes.signup({ segment: 'b2b' }),
+    Routes.login()
   ];
   
-  return publicRoutes.includes(pathname as any);
+  return publicRoutes.includes(pathname);
 }

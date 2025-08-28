@@ -7,7 +7,7 @@ import { Heart, Building2, Sparkles, Users, Target, Lightbulb } from 'lucide-rea
 import WelcomeMessage from './WelcomeMessage';
 import ActionButtons from './ActionButtons';
 import AnimatedBackground from './AnimatedBackground';
-import { CURRENT_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 import '@/components/home/immersive-home.css';
 
 export const ImmersiveHome: React.FC = () => {
@@ -177,7 +177,7 @@ export const ImmersiveHome: React.FC = () => {
               </div>
               
               <Button
-                onClick={() => navigate(CURRENT_ROUTES.B2B_SELECTION)}
+                onClick={() => navigate(Routes.b2bLanding())}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3"
               >
                 Découvrir l'espace Entreprise
@@ -223,7 +223,7 @@ export const ImmersiveHome: React.FC = () => {
               </div>
               
               <Button
-                onClick={() => navigate(CURRENT_ROUTES.B2C_LOGIN)}
+                onClick={() => navigate(Routes.login({ segment: 'b2c' }))}
                 className="w-full bg-pink-600 hover:bg-pink-700 text-white rounded-full py-3"
               >
                 Découvrir l'espace Personnel

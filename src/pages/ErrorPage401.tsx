@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldX, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getDashboardRoute } from '@/utils/routeUtils';
+import { getDashboardRoute } from '@/routerV2/helpers';
 
 /**
  * Page 401 - Authentification requise

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -89,13 +89,13 @@ const SystemAudit: React.FC = () => {
         
         // Vérifications spécifiques par route
         switch (route) {
-          case UNIFIED_ROUTES.HOME:
-          case UNIFIED_ROUTES.CHOOSE_MODE: 
+          case Routes.home():
+          case Routes.b2cLanding(): 
             // Routes toujours accessibles
             break;
-          case UNIFIED_ROUTES.B2C_DASHBOARD:
-          case UNIFIED_ROUTES.B2B_USER_DASHBOARD:
-          case UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD:
+          case Routes.consumerHome():
+          case Routes.employeeHome():
+          case Routes.managerHome():
             if (!isAuthenticated) {
               hasContent = false;
               errors.push('Dashboard nécessite une authentification');
@@ -139,7 +139,12 @@ const SystemAudit: React.FC = () => {
     setIsAuditing(true);
     setAuditResults([]);
 
-    const routes = Object.values(UNIFIED_ROUTES);
+    const routes = [
+      Routes.home(), Routes.scan(), Routes.music(), Routes.coach(),
+      Routes.journal(), Routes.vr(), Routes.consumerHome(),
+      Routes.employeeHome(), Routes.managerHome(), Routes.teams(),
+      Routes.adminReports(), Routes.adminEvents(), Routes.settingsGeneral()
+    ];
     const results: RouteAuditResult[] = [];
 
     for (const route of routes) {

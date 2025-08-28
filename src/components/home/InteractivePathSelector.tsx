@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Heart, ArrowRight, Users, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { CURRENT_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 const InteractivePathSelector: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<'business' | 'personal' | null>(null);
@@ -25,7 +25,7 @@ const InteractivePathSelector: React.FC = () => {
         'Un accompagnement sur-mesure qui évolue avec vous'
       ],
       cta: 'Découvrir l\'espace Entreprise',
-      route: CURRENT_ROUTES.B2B_SELECTION
+      route: Routes.b2bLanding()
     },
     {
       id: 'personal' as const,
@@ -41,7 +41,7 @@ const InteractivePathSelector: React.FC = () => {
         'Le vrai luxe : s\'accorder du temps pour soi'
       ],
       cta: 'Découvrir l\'espace Personnel',
-      route: CURRENT_ROUTES.B2C_LOGIN
+      route: Routes.login({ segment: 'b2c' })
     }
   ];
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { CURRENT_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 /**
  * Hook pour gérer les erreurs d'authentification
@@ -29,7 +29,7 @@ export const useAuthErrorHandler = () => {
       });
 
       // Rediriger vers la page de choix de mode
-      navigate(CURRENT_ROUTES.CHOOSE_MODE);
+      navigate(Routes.b2cLanding());
     }
   }, [navigate, signOut]);
 

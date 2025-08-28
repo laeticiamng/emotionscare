@@ -107,7 +107,7 @@ export const CompleteRoutesAuditInterface: React.FC = () => {
       const isAccessible = await checkRouteAccessibility(route.path);
       
       if (!unifiedRouteExists && route.path !== '/b2b' && route.path !== '*') {
-        issues.push('Route manquante dans UNIFIED_ROUTES');
+        issues.push('Route manquante dans RouterV2 Registry');
         status = 'missing';
       }
       

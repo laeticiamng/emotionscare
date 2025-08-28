@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, ExternalLink } from 'lucide-react';
-import { OFFICIAL_ROUTES } from '@/routesManifest';
+import { Routes } from '@/routerV2';
 
 const NavigationValidator: React.FC = () => {
   const navigate = useNavigate();
@@ -13,49 +13,49 @@ const NavigationValidator: React.FC = () => {
     {
       name: 'Routes Principales',
       routes: [
-        { name: 'Accueil', path: OFFICIAL_ROUTES.HOME },
-        { name: 'Choix Mode', path: OFFICIAL_ROUTES.CHOOSE_MODE },
-        { name: 'Onboarding', path: OFFICIAL_ROUTES.ONBOARDING },
+        { name: 'Accueil', path: Routes.home() },
+        { name: 'Choix Mode', path: Routes.b2cLanding() },
+        { name: 'App Gate', path: Routes.app() },
       ]
     },
     {
       name: 'Fonctionnalités Core',
       routes: [
-        { name: 'Scanner', path: OFFICIAL_ROUTES.SCAN },
-        { name: 'Musique', path: OFFICIAL_ROUTES.MUSIC },
-        { name: 'Respiration', path: OFFICIAL_ROUTES.BREATHWORK },
-        { name: 'VR', path: OFFICIAL_ROUTES.VR },
-        { name: 'Gamification', path: OFFICIAL_ROUTES.GAMIFICATION },
+        { name: 'Scanner', path: Routes.scan() },
+        { name: 'Musique', path: Routes.music() },
+        { name: 'Breathwork', path: Routes.breath() },
+        { name: 'VR', path: Routes.vr() },
+        { name: 'Gamification', path: Routes.leaderboard() },
       ]
     },
     {
       name: 'Modules Innovants',
       routes: [
-        { name: 'Flash Glow', path: OFFICIAL_ROUTES.FLASH_GLOW },
-        { name: 'Boss Level Grit', path: OFFICIAL_ROUTES.BOSS_LEVEL_GRIT },
-        { name: 'Mood Mixer', path: OFFICIAL_ROUTES.MOOD_MIXER },
-        { name: 'Bounce Back Battle', path: OFFICIAL_ROUTES.BOUNCE_BACK_BATTLE },
-        { name: 'Instant Glow', path: OFFICIAL_ROUTES.INSTANT_GLOW },
+        { name: 'Flash Glow', path: Routes.flashGlow() },
+        { name: 'Boss Grit', path: Routes.bossGrit() },
+        { name: 'Mood Mixer', path: Routes.moodMixer() },
+        { name: 'Bounce Back', path: Routes.bounceBack() },
+        { name: 'Story Synth', path: Routes.storySynth() },
       ]
     },
     {
       name: 'Espaces Utilisateur B2C',
       routes: [
-        { name: 'Login B2C', path: OFFICIAL_ROUTES.B2C_LOGIN },
-        { name: 'Register B2C', path: OFFICIAL_ROUTES.B2C_REGISTER },
-        { name: 'Dashboard B2C', path: OFFICIAL_ROUTES.B2C_DASHBOARD },
-        { name: 'Préférences', path: OFFICIAL_ROUTES.PREFERENCES },
-        { name: 'Social Cocon', path: OFFICIAL_ROUTES.SOCIAL_COCON },
+        { name: 'Login B2C', path: Routes.login({ segment: 'b2c' }) },
+        { name: 'Signup B2C', path: Routes.signup({ segment: 'b2c' }) },
+        { name: 'Dashboard B2C', path: Routes.consumerHome() },
+        { name: 'Préférences', path: Routes.settingsGeneral() },
+        { name: 'Social Cocon', path: Routes.socialCocon() },
       ]
     },
     {
       name: 'Espaces B2B',
       routes: [
-        { name: 'B2B Selection', path: OFFICIAL_ROUTES.B2B_SELECTION },
-        { name: 'Login User B2B', path: OFFICIAL_ROUTES.B2B_USER_LOGIN },
-        { name: 'Dashboard User B2B', path: OFFICIAL_ROUTES.B2B_USER_DASHBOARD },
-        { name: 'Login Admin B2B', path: OFFICIAL_ROUTES.B2B_ADMIN_LOGIN },
-        { name: 'Dashboard Admin B2B', path: OFFICIAL_ROUTES.B2B_ADMIN_DASHBOARD },
+        { name: 'B2B Landing', path: Routes.b2bLanding() },
+        { name: 'Login B2B', path: Routes.login({ segment: 'b2b' }) },
+        { name: 'Dashboard User', path: Routes.employeeHome() },
+        { name: 'Dashboard Admin', path: Routes.managerHome() },
+        { name: 'Teams', path: Routes.teams() },
       ]
     }
   ];
@@ -79,7 +79,7 @@ const NavigationValidator: React.FC = () => {
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Test de toutes les routes et boutons de navigation. 
-            Total: {Object.keys(OFFICIAL_ROUTES).length} routes officielles
+            Total: 52 routes RouterV2
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
