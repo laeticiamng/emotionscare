@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Camera, Mic, Heart, Brain, Activity, 
          Smile, Frown, Meh, Zap, Calendar, TrendingUp } from 'lucide-react';
 import PrivacyFallback from '@/components/privacy/PrivacyFallbacks';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, EmptyState, useLoadingStates } from '@/components/ui/LoadingStates';
 import { analyticsService } from '@/services/analyticsService';
 
 const B2CScanPage: React.FC = () => {

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Sparkles, Sun, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, EmptyState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 
@@ -12,8 +12,8 @@ const B2CFlashGlowPage: React.FC = () => {
   const [isGlowing, setIsGlowing] = useState(false);
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement Flash Glow..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="dashboard" />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const handleFlashGlow = () => {
     setIsGlowing(true);
