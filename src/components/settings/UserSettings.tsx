@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsTab from './ThemeSettingsTab';
+import AccountSettingsTab from './AccountSettingsTab';
+import NotificationsSettingsTab from './NotificationsSettingsTab';
+import PrivacySettingsTab from './PrivacySettingsTab';
 import { useTheme } from '@/components/theme-provider';
 import { ThemeName } from '@/types/theme';
 
@@ -34,15 +37,15 @@ const UserSettings = () => {
         </TabsContent>
         
         <TabsContent value="account">
-          <div>Contenu des paramètres du compte</div>
+          <AccountSettingsTab />
         </TabsContent>
         
         <TabsContent value="notifications">
-          <div>Contenu des paramètres de notifications</div>
+          <NotificationsSettingsTab />
         </TabsContent>
         
         <TabsContent value="privacy">
-          <div>Contenu des paramètres de confidentialité</div>
+          <PrivacySettingsTab />
         </TabsContent>
       </Tabs>
     </div>
