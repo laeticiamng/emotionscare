@@ -39,6 +39,9 @@ const ActivityHistoryPage = React.lazy(() => import('../pages/ActivityHistoryPag
 const InAppFeedbackPage = React.lazy(() => import('../pages/InAppFeedbackPage'));
 const ActivityPage = React.lazy(() => import('../pages/ActivityPage'));
 const DashboardHome = React.lazy(() => import('../pages/DashboardHome'));
+const DashboardRH = React.lazy(() => import('../pages/org/DashboardRH'));
+const SettingsGeneral = React.lazy(() => import('../pages/Settings/General'));
+const MarketingHome = React.lazy(() => import('../pages/marketing/Home'));
 
 // Onboarding, accès, préférences (9 routes)
 const OnboardingPage = React.lazy(() => import('../pages/onboarding/OnboardingPage'));
@@ -92,10 +95,10 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
       path: '/',
       element: <AppShell />,
       children: [
-        // Home (1 route)
+        // Home (1 route) - Marketing landing
         { 
           path: OFFICIAL_ROUTES.HOME, 
-          element: <SuspenseWrapper><HomePage /></SuspenseWrapper> 
+          element: <SuspenseWrapper><MarketingHome /></SuspenseWrapper> 
         },
         
         // Mesure émotionnelle et biométrie (8 routes)
@@ -312,8 +315,12 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: <SuspenseWrapper><HelpHome /></SuspenseWrapper> 
         },
         { 
-          path: '/settings/profile', 
-          element: <SuspenseWrapper><ProfileSettings /></SuspenseWrapper> 
+          path: '/settings/general', 
+          element: <SuspenseWrapper><SettingsGeneral /></SuspenseWrapper> 
+        },
+        { 
+          path: '/app/rh', 
+          element: <SuspenseWrapper><DashboardRH /></SuspenseWrapper> 
         },
         
         // 404 catch-all
