@@ -90,5 +90,36 @@
     "disable": "Désactiver",
     "retry": "Réessayer",
     "close": "Fermer"
+  },
+  "rh": {
+    "title": "Heatmap Vibes",
+    "legend": {
+      "low": "Bas",
+      "medium": "Stable", 
+      "high": "Haut"
+    },
+    "trend": {
+      "up": "En hausse",
+      "flat": "Stable",
+      "down": "En baisse"
+    },
+    "anonymity": "Échantillon insuffisant (≥ {min} requis)"
+  },
+  "journal": {
+    "title": "Journal",
+    "voice": {
+      "start": "Enregistrer",
+      "stop": "Stop"
+    },
+    "text": {
+      "label": "Écrire une note"
+    },
+    "result": {
+      "clear": "Lucide",
+      "mixed": "Nuancé",
+      "pressured": "Sous pression"
+    },
+    "suggestion": "Suggestion",
+    "export": "Exporter"
   }
 }

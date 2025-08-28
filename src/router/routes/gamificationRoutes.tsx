@@ -13,6 +13,8 @@ const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
 const ScreenSilkPage = lazy(() => import('@/pages/ScreenSilkPage'));
 const VRGalaxyPage = lazy(() => import('@/pages/VRGalaxyPage'));
 const GlowDashboardPage = lazy(() => import('@/pages/GlowDashboardPage'));
+const DashboardRH = lazy(() => import('@/pages/org/DashboardRH'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
 
 export const gamificationRoutes: RouteObject[] = [
   {
@@ -58,5 +60,13 @@ export const gamificationRoutes: RouteObject[] = [
   {
     path: '/glow-dashboard',
     element: <GlowDashboardPage />,
+  },
+  {
+    path: '/org/dashboard-rh',
+    element: <DashboardRH />,
+  },
+  {
+    path: '/journal',
+    element: <JournalPage />,
   }
 ];

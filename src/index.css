@@ -83,6 +83,11 @@
     --glow-low: 38 92% 50%;
     --glow-medium: 45 93% 47%;
     --glow-high: 142 76% 36%;
+
+    /* Variables pour Vibe Heatmap */
+    --vibe-low: 38 92% 50%;
+    --vibe-medium: 45 93% 47%;
+    --vibe-high: 142 76% 36%;
   }
 
   .dark {
@@ -115,6 +120,11 @@
     --glow-low: 38 92% 60%;
     --glow-medium: 45 93% 57%;
     --glow-high: 142 76% 46%;
+
+    /* Variables pour Vibe Heatmap (dark mode) */
+    --vibe-low: 38 92% 60%;
+    --vibe-medium: 45 93% 57%;
+    --vibe-high: 142 76% 46%;
   }
   
   /* Support du contraste élevé */
