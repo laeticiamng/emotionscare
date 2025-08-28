@@ -1,6 +1,24 @@
 
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.org-dashboard-weekly]
+verify_jwt = false
+
+[functions.org-dashboard-export]
+verify_jwt = false
+
+[functions.journal-voice]
+verify_jwt = false
+
+[functions.journal-text]
+verify_jwt = false
+
+[functions.journal-entry]
+verify_jwt = false
+
+[functions.journal-weekly]
+verify_jwt = false
+
 [functions.face-filter-start]
 verify_jwt = false
 

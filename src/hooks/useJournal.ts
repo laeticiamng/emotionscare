@@ -1,131 +1,148 @@
-import { useState, useEffect } from 'react';
-import { JournalEntry, VoiceEntry, JournalService } from '@/services/journal';
-import { toast } from '@/hooks/use-toast';
+import useSWR, { mutate } from 'swr';
+import { supabase } from '@/integrations/supabase/client';
+import { JournalEntry, useJournalStore } from '@/store/journal.store';
+
+interface JournalList {
+  entries: JournalEntry[];
+}
+
+const fetchJournalEntries = async (params: { from?: string; to?: string; q?: string }): Promise<JournalList> => {
+  const { data, error } = await supabase.functions.invoke('journal-weekly', {
+    body: params
+  });
+
+  if (error) throw error;
+  return data;
+};
 
 export const useJournal = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { setUploading, setCurrentEntry, addEntry } = useJournalStore();
 
-  const loadEntries = async () => {
-    setIsLoading(true);
-    setError(null);
-    
+  const { data, error, isLoading } = useSWR(
+    ['journal-entries'],
+    () => fetchJournalEntries({}),
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 0,
+    }
+  );
+
+  const submitVoice = async (audioBlob: Blob): Promise<void> => {
     try {
-      const data = await JournalService.getEntries();
-      setEntries(data);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
+      setUploading(true);
+      
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'voice-note.webm');
+      formData.append('lang', 'fr');
+
+      const { data: result, error } = await supabase.functions.invoke('journal-voice', {
+        body: formData
       });
+
+      if (error) throw error;
+
+      // Poll for analysis result
+      const entryId = result.entry_id;
+      const pollResult = async (): Promise<JournalEntry> => {
+        const { data: entry, error } = await supabase.functions.invoke('journal-entry', {
+          body: { entry_id: entryId }
+        });
+        
+        if (error) throw error;
+        return entry;
+      };
+
+      // Simple polling with timeout
+      let attempts = 0;
+      const maxAttempts = 30; // 30 seconds max
+      
+      const checkResult = async (): Promise<JournalEntry> => {
+        try {
+          const entry = await pollResult();
+          if (entry.mood_bucket) {
+            return entry;
+          }
+        } catch (e) {
+          // Continue polling
+        }
+        
+        attempts++;
+        if (attempts >= maxAttempts) {
+          throw new Error('Analysis timeout');
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return checkResult();
+      };
+
+      const finalEntry = await checkResult();
+      setCurrentEntry(finalEntry);
+      addEntry(finalEntry);
+      mutate(['journal-entries']);
+
     } finally {
-      setIsLoading(false);
+      setUploading(false);
     }
   };
 
-  const createEntry = async (content: string): Promise<JournalEntry | null> => {
+  const submitText = async (text: string): Promise<void> => {
     try {
-      const newEntry = await JournalService.createEntry(content);
-      setEntries(prev => [newEntry, ...prev]);
-      toast({
-        title: "Succès",
-        description: "Entrée créée avec succès"
+      setUploading(true);
+
+      const { data: result, error } = await supabase.functions.invoke('journal-text', {
+        body: { text, lang: 'fr' }
       });
-      return newEntry;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return null;
+
+      if (error) throw error;
+
+      // Poll for result similar to voice
+      const entryId = result.entry_id;
+      const pollResult = async (): Promise<JournalEntry> => {
+        const { data: entry, error } = await supabase.functions.invoke('journal-entry', {
+          body: { entry_id: entryId }
+        });
+        
+        if (error) throw error;
+        return entry;
+      };
+
+      let attempts = 0;
+      const maxAttempts = 20;
+      
+      const checkResult = async (): Promise<JournalEntry> => {
+        try {
+          const entry = await pollResult();
+          if (entry.mood_bucket) {
+            return entry;
+          }
+        } catch (e) {
+          // Continue polling
+        }
+        
+        attempts++;
+        if (attempts >= maxAttempts) {
+          throw new Error('Analysis timeout');
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return checkResult();
+      };
+
+      const finalEntry = await checkResult();
+      setCurrentEntry(finalEntry);
+      addEntry(finalEntry);
+      mutate(['journal-entries']);
+
+    } finally {
+      setUploading(false);
     }
   };
-
-  const createVoiceEntry = async (audioBlob: Blob): Promise<VoiceEntry | null> => {
-    try {
-      const voiceEntry = await JournalService.createVoiceEntry(audioBlob);
-      toast({
-        title: "Succès",
-        description: "Enregistrement vocal sauvegardé"
-      });
-      // Reload entries to include voice entries if they're in the same table
-      await loadEntries();
-      return voiceEntry;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return null;
-    }
-  };
-
-  const updateEntry = async (id: string, content: string): Promise<boolean> => {
-    try {
-      const updatedEntry = await JournalService.updateEntry(id, content);
-      setEntries(prev => prev.map(entry => 
-        entry.id === id ? updatedEntry : entry
-      ));
-      toast({
-        title: "Succès",
-        description: "Entrée mise à jour"
-      });
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la mise à jour';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return false;
-    }
-  };
-
-  const deleteEntry = async (id: string): Promise<boolean> => {
-    try {
-      await JournalService.deleteEntry(id);
-      setEntries(prev => prev.filter(entry => entry.id !== id));
-      toast({
-        title: "Succès",
-        description: "Entrée supprimée"
-      });
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la suppression';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    loadEntries();
-  }, []);
 
   return {
-    entries,
-    isLoading,
+    entries: data?.entries || [],
+    loading: isLoading,
     error,
-    createEntry,
-    createVoiceEntry,
-    updateEntry,
-    deleteEntry,
-    refresh: loadEntries
+    submitVoice,
+    submitText,
   };
 };
