@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Shield, Activity, Brain, BarChart3, ChartPieIcon } from 'lucide-react';
@@ -38,7 +39,7 @@ const ValueProposition: React.FC = () => {
             </li>
           </ul>
           <Button asChild variant="ghost" className="w-full">
-            <Link to="/scan">Explorer</Link>
+            <Link to={routes.b2c.scan()}>Explorer</Link>
           </Button>
         </Card>
         
@@ -65,7 +66,7 @@ const ValueProposition: React.FC = () => {
             </li>
           </ul>
           <Button asChild variant="ghost" className="w-full">
-            <Link to="/music">Découvrir</Link>
+            <Link to={routes.b2c.music()}>Découvrir</Link>
           </Button>
         </Card>
         
@@ -92,7 +93,7 @@ const ValueProposition: React.FC = () => {
             </li>
           </ul>
           <Button asChild variant="ghost" className="w-full">
-            <Link to="/dashboard">En savoir plus</Link>
+            <Link to={routes.b2c.dashboard()}>En savoir plus</Link>
           </Button>
         </Card>
       </div>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { cn } from '@/lib/utils';
@@ -50,7 +51,7 @@ const EnhancedFooter: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {/* Logo & About Column */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to={routes.public.home()} className="flex items-center space-x-2">
               <motion.div 
                 whileHover={{ rotate: 10 }}
                 transition={{ duration: 0.2 }}
@@ -83,27 +84,27 @@ const EnhancedFooter: React.FC = () => {
             <h3 className="text-sm font-medium mb-4">Liens rapides</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="/about" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
                   À propos
                 </Link>
               </li>
               <li>
-                <Link to="/services" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.services()} className="hover:text-foreground transition-colors">
                   Nos services
                 </Link>
               </li>
               <li>
-                <Link to="/testimonials" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.testimonials()} className="hover:text-foreground transition-colors">
                   Témoignages
                 </Link>
               </li>
               <li>
-                <Link to="/blog" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.blog()} className="hover:text-foreground transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.contact()} className="hover:text-foreground transition-colors">
                   Contact
                 </Link>
               </li>
@@ -115,22 +116,22 @@ const EnhancedFooter: React.FC = () => {
             <h3 className="text-sm font-medium mb-4">Mentions légales</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="/terms" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.terms()} className="hover:text-foreground transition-colors">
                   Conditions d'utilisation
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.privacy()} className="hover:text-foreground transition-colors">
                   Politique de confidentialité
                 </Link>
               </li>
               <li>
-                <Link to="/cookies" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.cookies()} className="hover:text-foreground transition-colors">
                   Gestion des cookies
                 </Link>
               </li>
               <li>
-                <Link to="/legal" className="hover:text-foreground transition-colors">
+                <Link to={routes.public.legal()} className="hover:text-foreground transition-colors">
                   Mentions légales
                 </Link>
               </li>

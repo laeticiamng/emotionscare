@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from './ui/loading-animation';
@@ -14,7 +15,7 @@ interface ProtectedRouteWithModeProps {
 const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({ 
   children, 
   requiredMode,
-  redirectTo = '/choose-mode'
+  redirectTo = routes.special.chooseMode()
 }) => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: userModeLoading } = useUserMode();
@@ -32,13 +33,13 @@ const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({
   if (!isAuthenticated) {
     switch (requiredMode) {
       case 'b2c':
-        return <Navigate to="/b2c/login" replace />;
+        return <Navigate to={routes.auth.b2cLogin()} replace />;
       case 'b2b_user':
-        return <Navigate to="/b2b/user/login" replace />;
+        return <Navigate to={routes.auth.b2bUserLogin()} replace />;
       case 'b2b_admin':
-        return <Navigate to="/b2b/admin/login" replace />;
+        return <Navigate to={routes.auth.b2bAdminLogin()} replace />;
       default:
-        return <Navigate to="/login" replace />;
+        return <Navigate to={routes.auth.login()} replace />;
     }
   }
   
