@@ -6,8 +6,9 @@ export const useAccountDeletion = () => {
 
   // Check account status on mount
   useEffect(() => {
-    store.checkStatus();
-  }, []);
+    // Don't make API calls in demo/development mode
+    // store.checkStatus();
+  }, []); // Empty dependencies for mount-only effect
 
   // Calculate days until purge
   const getDaysUntilPurge = () => {

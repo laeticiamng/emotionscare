@@ -134,6 +134,9 @@ export const useAccountStore = create<AccountState>()(
 
       checkStatus: async () => {
         try {
+          // Skip API calls in development/demo mode
+          console.log('Account status check skipped in demo mode');
+          /*
           const response = await fetch('/api/me/account');
           if (!response.ok) return;
           
@@ -142,6 +145,7 @@ export const useAccountStore = create<AccountState>()(
             status: data.status,
             purgeAt: data.purge_at 
           });
+          */
         } catch (error) {
           console.warn('Failed to check account status:', error);
         }

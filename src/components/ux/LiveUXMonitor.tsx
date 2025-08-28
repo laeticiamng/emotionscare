@@ -43,12 +43,13 @@ const LiveUXMonitor: React.FC = () => {
       newAlerts.push('😴 Engagement faible - Utilisateur probablement perdu');
     }
     
-    if (funnel.stepCount > 5) {
+    const currentFunnel = getConversionFunnel();
+    if (currentFunnel.stepCount > 5) {
       newAlerts.push('🔄 Parcours complexe - Risque d\'abandon élevé');
     }
     
     setAlerts(newAlerts);
-  }, [metrics, funnel]);
+  }, [metrics.scrollDepth, metrics.timeOnPage, metrics.errorsEncountered.length, metrics.engagementScore]); // Use specific metrics instead of full objects
   
   const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000);

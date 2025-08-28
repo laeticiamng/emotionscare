@@ -78,7 +78,7 @@ export const useUXAnalytics = () => {
 
     // Mise à jour des métriques en temps réel
     updateMetrics(fullEvent);
-  }, [location.pathname]);
+  }, []); // Remove location.pathname from dependencies
 
   // Mise à jour des métriques
   const updateMetrics = useCallback((event: UXEvent) => {
@@ -99,7 +99,7 @@ export const useUXAnalytics = () => {
           break;
           
         case 'navigation':
-          const newPath = event.metadata?.to || location.pathname;
+          const newPath = event.metadata?.to || event.page;
           if (!newMetrics.navigationPath.includes(newPath)) {
             newMetrics.navigationPath.push(newPath);
           }
@@ -118,7 +118,7 @@ export const useUXAnalytics = () => {
       
       return newMetrics;
     });
-  }, [location.pathname]);
+  }, []); // Remove location.pathname from dependencies
 
   // Tracking automatique des clics
   useEffect(() => {
@@ -141,7 +141,7 @@ export const useUXAnalytics = () => {
 
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
-  }, [trackEvent]);
+  }, []); // Empty dependencies
 
   // Tracking automatique du scroll
   useEffect(() => {
@@ -159,7 +159,7 @@ export const useUXAnalytics = () => {
     const throttledScroll = throttle(handleScroll, 1000);
     window.addEventListener('scroll', throttledScroll);
     return () => window.removeEventListener('scroll', throttledScroll);
-  }, [trackEvent]);
+  }, []); // Empty dependencies
 
   // Tracking des erreurs
   useEffect(() => {
@@ -177,7 +177,7 @@ export const useUXAnalytics = () => {
 
     window.addEventListener('error', handleError);
     return () => window.removeEventListener('error', handleError);
-  }, [trackEvent]);
+  }, []); // Empty dependencies
 
   // Tracking de la navigation
   useEffect(() => {
@@ -185,7 +185,7 @@ export const useUXAnalytics = () => {
       type: 'navigation',
       metadata: { to: location.pathname, from: metrics.navigationPath[metrics.navigationPath.length - 1] }
     });
-  }, [location.pathname, trackEvent]);
+  }, [location.pathname]); // Only depend on location.pathname
 
   // Calcul du temps sur la page
   useEffect(() => {

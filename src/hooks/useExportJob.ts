@@ -42,7 +42,7 @@ export const useExportJob = () => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [store.job?.status, store]);
+  }, [store.job?.status]); // Remove store from dependencies
 
   // Handle network connectivity
   useEffect(() => {
@@ -68,7 +68,7 @@ export const useExportJob = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [store]);
+  }, []); // Empty dependencies for mount-only effect
 
   const start = async () => {
     const success = await store.startExport();
