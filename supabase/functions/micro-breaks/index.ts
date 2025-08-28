@@ -1,8 +1,10 @@
-import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
-import { MBreakSchema } from '../_shared/schemas.ts';
-import { supabase } from '../_shared/supa_client.ts';
-import { getUserHash, json } from '../_shared/http.ts';
-import { authorizeRole } from '../_shared/auth.ts';
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
+
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,32 +13,75 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user']);
-    if (!user) {
-      return json(status, { error: 'Unauthorized' });
+    const payload = await req.json();
+    const { action } = payload;
+
+    if (action === 'start') {
+      console.log('Screen-Silk session started:', payload);
+      
+      return new Response(
+        JSON.stringify({ ok: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-    const jwt = req.headers.get('authorization')?.replace('Bearer ', '') || '';
-    const userHash = getUserHash(jwt);
-    const body = await req.json();
-    const parsed = MBreakSchema.safeParse(body);
-    if (!parsed.success) {
-      return json(400, { error: parsed.error.errors });
+
+    if (action === 'stop') {
+      const { pattern, duration_sec, events, hrv, self_report } = payload;
+      
+      let hrv_summary = null;
+      if (hrv?.rr_during_ms?.length > 1) {
+        const rr_intervals = hrv.rr_during_ms;
+        const differences = [];
+        for (let i = 1; i < rr_intervals.length; i++) {
+          differences.push(Math.pow(rr_intervals[i] - rr_intervals[i-1], 2));
+        }
+        const rmssd = Math.sqrt(differences.reduce((a, b) => a + b, 0) / differences.length);
+        
+        hrv_summary = {
+          rmssd: rmssd,
+          sample_count: rr_intervals.length,
+          quality: rr_intervals.length >= 30 ? 'good' : 'fair'
+        };
+      }
+
+      const { error } = await supabase
+        .from('analytics_events')
+        .insert({
+          event_type: 'silk.session.complete',
+          event_data: {
+            pattern,
+            duration_sec,
+            events_count: events.length,
+            hrv_summary,
+            self_report,
+            timestamp: Date.now()
+          }
+        });
+
+      return new Response(
+        JSON.stringify({ 
+          ok: true, 
+          badge_id: 'silk_break',
+          message: 'Beau reset ✨'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-    const { data, error } = await supabase
-      .from('micro_breaks')
-      .insert({ ...parsed.data, user_id_hash: userHash })
-      .select('id')
-      .single();
-    if (error) {
-      return json(500, { error });
-    }
-    return json(201, { id: data.id });
-  } catch (err) {
-    console.error('micro-breaks error', err);
-    return json(500, { error: 'server_error' });
+
+    return new Response(
+      JSON.stringify({ error: 'Invalid action' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Error in micro-breaks function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });
