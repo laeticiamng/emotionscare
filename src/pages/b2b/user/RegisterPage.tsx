@@ -203,7 +203,7 @@ const B2BUserRegisterPage: React.FC = () => {
             <div className="mt-6 text-center">
               <div className="text-sm text-gray-600">
                 Vous avez déjà un compte ?{' '}
-                <Link to="/b2b/user/login" className="text-blue-600 hover:underline font-medium">
+                <Link to={Routes.login({ segment: "b2b" })} className="text-blue-600 hover:underline font-medium">
                   Se connecter
                 </Link>
               </div>
@@ -212,7 +212,7 @@ const B2BUserRegisterPage: React.FC = () => {
         </Card>
 
         <div className="mt-6 text-center">
-          <Link to="/b2b/selection" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+          <Link to={Routes.b2bLanding()} className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Retour aux options B2B
           </Link>

@@ -65,7 +65,7 @@ const JournalEntryPage: React.FC = () => {
             L'entrée de journal que vous recherchez n'existe pas ou a été supprimée.
           </p>
           <Button asChild>
-            <Link to="/journal">Retour au journal</Link>
+            <Link to={Routes.journal()}>Retour au journal</Link>
           </Button>
         </div>
       </Shell>

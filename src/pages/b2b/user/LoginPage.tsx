@@ -114,13 +114,13 @@ const B2BUserLoginPage: React.FC = () => {
             </form>
 
             <div className="mt-6 text-center space-y-4">
-              <Link to="/reset-password" className="text-sm text-blue-600 hover:underline">
+              <Link to={Routes.login()} className="text-sm text-blue-600 hover:underline">
                 Mot de passe oublié ?
               </Link>
               
               <div className="text-sm text-gray-600">
                 Pas encore de compte ?{' '}
-                <Link to="/b2b/user/register" className="text-blue-600 hover:underline font-medium">
+                <Link to={Routes.signup({ segment: "b2b" })} className="text-blue-600 hover:underline font-medium">
                   Demander un accès
                 </Link>
               </div>
@@ -129,7 +129,7 @@ const B2BUserLoginPage: React.FC = () => {
         </Card>
 
         <div className="mt-6 text-center">
-          <Link to="/b2b/selection" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+          <Link to={Routes.b2bLanding()} className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Retour aux options B2B
           </Link>

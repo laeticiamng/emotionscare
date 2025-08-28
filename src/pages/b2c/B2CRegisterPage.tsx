@@ -281,7 +281,7 @@ const B2CRegisterPage: React.FC = () => {
           <div className="text-center text-sm">
             <span className="text-muted-foreground">Déjà un compte ? </span>
             <Link
-              to="/b2c/login"
+              to={Routes.login({ segment: "b2c" })}
               className="text-primary hover:underline font-medium"
             >
               Se connecter

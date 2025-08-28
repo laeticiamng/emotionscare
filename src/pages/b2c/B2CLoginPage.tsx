@@ -159,7 +159,7 @@ const B2CLoginPage: React.FC = () => {
 
             <div className="flex items-center justify-between">
               <Link
-                to="/auth/reset-password"
+                to={Routes.login()}
                 className="text-sm text-primary hover:underline"
               >
                 Mot de passe oublié ?
@@ -178,7 +178,7 @@ const B2CLoginPage: React.FC = () => {
           <div className="text-center text-sm">
             <span className="text-muted-foreground">Pas encore de compte ? </span>
             <Link
-              to="/b2c/register"
+              to={Routes.signup({ segment: "b2c" })}
               className="text-primary hover:underline font-medium"
             >
               S'inscrire

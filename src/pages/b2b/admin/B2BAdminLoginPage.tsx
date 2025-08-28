@@ -143,11 +143,11 @@ const B2BAdminLoginPage: React.FC = () => {
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
                 Besoin d'aide ?{' '}
-                <Link to="/help-center" className="text-blue-600 hover:underline font-medium">
+                <Link to={Routes.help()} className="text-blue-600 hover:underline font-medium">
                   Centre d'aide
                 </Link>
               </p>
-              <Link to="/choose-mode" className="text-sm text-muted-foreground hover:underline">
+              <Link to={Routes.home()} className="text-sm text-muted-foreground hover:underline">
                 ← Retour au choix du mode
               </Link>
             </div>

@@ -117,7 +117,7 @@ const NotFoundPage: React.FC = () => {
               Vous cherchez quelque chose en particulier ?
             </p>
             <Button variant="link" asChild size="sm">
-              <Link to="/support">Contactez notre support</Link>
+              <Link to={Routes.help()}>Contactez notre support</Link>
             </Button>
           </motion.div>
         </motion.div>

@@ -70,7 +70,7 @@ const ForbiddenPage: React.FC = () => {
           >
             <p className="text-sm text-muted-foreground">
               Si vous pensez qu'il s'agit d'une erreur, veuillez contacter 
-              <Link to="/support" className="text-primary hover:underline mx-1">
+              <Link to={Routes.help()} className="text-primary hover:underline mx-1">
                 notre support
               </Link>
               pour obtenir de l'aide.
