@@ -1,6 +1,7 @@
 
 /**
  * @deprecated Use RouterV2 instead - see src/routerV2/
+ * This file will be removed in a future version
  */
 
 import { useLocation, useNavigate, useParams } from 'react-router-dom';

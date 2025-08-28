@@ -1,6 +1,7 @@
 
 /**
  * @deprecated Use RouterV2 instead - see src/routerV2/
+ * This file will be removed in a future version
  */
 
 // Routes unifiées - TICKET FE-FINAL-ROUTE-COMPLETION (52 routes officielles)

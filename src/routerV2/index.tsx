@@ -11,8 +11,8 @@ import { RouteGuard } from './guards';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import EnhancedShell from '@/components/layout/EnhancedShell';
 
-// Feature flag pour activer RouterV2
-const FF_ROUTER_V2 = import.meta.env.VITE_FF_ROUTER_V2 === 'true' || process.env.NODE_ENV === 'development';
+// RouterV2 est maintenant activé par défaut - plus de feature flag
+const FF_ROUTER_V2 = true;
 
 // ═══════════════════════════════════════════════════════════
 // LAZY IMPORTS DES PAGES
