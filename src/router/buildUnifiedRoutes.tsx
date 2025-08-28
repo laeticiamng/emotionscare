@@ -35,6 +35,33 @@ const B2CCoconPage = lazy(() => import('@/pages/B2CCoconPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
 
+// Pages Fun-First B2C
+const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
+const B2CFlashGlowPage = lazy(() => import('@/pages/B2CFlashGlowPage'));
+const B2CBossLevelGritPage = lazy(() => import('@/pages/B2CBossLevelGritPage'));
+const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
+const B2CBounceBackBattlePage = lazy(() => import('@/pages/B2CBounceBackBattlePage'));
+const B2CBreathworkPage = lazy(() => import('@/pages/B2CBreathworkPage'));
+const B2CInstantGlowPage = lazy(() => import('@/pages/B2CInstantGlowPage'));
+const B2CVRGalactiquePage = lazy(() => import('@/pages/B2CVRGalactiquePage'));
+const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
+const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
+const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
+const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage'));
+const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
+const B2CHeatmapVibesPage = lazy(() => import('@/pages/B2CHeatmapVibesPage'));
+
+// Pages Paramètres & Compte B2C
+const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
+const B2CActivityHistoryPage = lazy(() => import('@/pages/B2CActivityHistoryPage'));
+const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
+const B2CFeedbackPage = lazy(() => import('@/pages/B2CFeedbackPage'));
+const B2CSettingsRGPDPage = lazy(() => import('@/pages/B2CSettingsRGPDPage'));
+const B2CAccountDeletePage = lazy(() => import('@/pages/B2CAccountDeletePage'));
+const B2CExportCSVPage = lazy(() => import('@/pages/B2CExportCSVPage'));
+const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
+const B2CHealthCheckBadgePage = lazy(() => import('@/pages/B2CHealthCheckBadgePage'));
+
 // Pages protégées B2B User
 const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
 const B2BUserJournalPage = lazy(() => import('@/pages/B2BUserJournalPage'));
@@ -62,46 +89,22 @@ const B2BAdminSettingsPage = lazy(() => import('@/pages/B2BAdminSettingsPage'));
 
 // Liste des routes pour les tests
 export const ROUTE_MANIFEST = [
-  '/',
-  '/choose-mode',
-  '/b2c/login',
-  '/b2c/register',
-  '/b2b/selection',
-  '/b2b/user/login',
-  '/b2b/admin/login',
-  '/b2c/dashboard',
-  '/b2c/journal',
-  '/b2c/scan',
-  '/b2c/music',
-  '/b2c/coach',
-  '/b2c/coach-chat',
-  '/b2c/vr',
-  '/b2c/preferences',
-  '/b2c/settings',
-  '/b2c/cocon',
-  '/b2c/social-cocon',
-  '/b2c/gamification',
-  '/b2b/user/dashboard',
-  '/b2b/user/journal',
-  '/b2b/user/scan',
-  '/b2b/user/music',
-  '/b2b/user/coach',
-  '/b2b/user/vr',
-  '/b2b/user/preferences',
-  '/b2b/user/settings',
-  '/b2b/user/cocon',
-  '/b2b/user/social-cocon',
-  '/b2b/user/gamification',
-  '/b2b/admin/dashboard',
-  '/b2b/admin/journal',
-  '/b2b/admin/scan',
-  '/b2b/admin/music',
-  '/b2b/admin/teams',
-  '/b2b/admin/reports',
-  '/b2b/admin/events',
-  '/b2b/admin/social-cocon',
-  '/b2b/admin/optimisation',
-  '/b2b/admin/settings'
+  // Routes publiques
+  '/', '/choose-mode',
+  // Auth routes
+  '/b2c/login', '/b2c/register', '/b2b/selection', '/b2b/user/login', '/b2b/admin/login',
+  // Error routes
+  '/401', '/403', '/500',
+  // B2C routes principales
+  '/b2c/dashboard', '/b2c/journal', '/b2c/scan', '/b2c/music', '/b2c/coach', '/b2c/coach-chat', '/b2c/vr', '/b2c/preferences', '/b2c/settings', '/b2c/cocon', '/b2c/social-cocon', '/b2c/gamification',
+  // B2C Fun-First routes
+  '/b2c/bubble-beat', '/b2c/flash-glow', '/b2c/boss-level-grit', '/b2c/mood-mixer', '/b2c/bounce-back-battle', '/b2c/breathwork', '/b2c/instant-glow', '/b2c/vr-galactique', '/b2c/screen-silk-break', '/b2c/story-synth-lab', '/b2c/ar-filters', '/b2c/ambition-arcade', '/b2c/weekly-bars', '/b2c/heatmap-vibes',
+  // B2C Paramètres routes
+  '/b2c/profile-settings', '/b2c/activity-history', '/b2c/notifications', '/b2c/feedback', '/b2c/settings-rgpd', '/b2c/account-delete', '/b2c/export-csv', '/b2c/privacy-toggles', '/b2c/health-check-badge',
+  // B2B User routes
+  '/b2b/user/dashboard', '/b2b/user/journal', '/b2b/user/scan', '/b2b/user/music', '/b2b/user/coach', '/b2b/user/vr', '/b2b/user/preferences', '/b2b/user/settings', '/b2b/user/cocon', '/b2b/user/social-cocon', '/b2b/user/gamification',
+  // B2B Admin routes
+  '/b2b/admin/dashboard', '/b2b/admin/journal', '/b2b/admin/scan', '/b2b/admin/music', '/b2b/admin/teams', '/b2b/admin/reports', '/b2b/admin/events', '/b2b/admin/social-cocon', '/b2b/admin/optimisation', '/b2b/admin/settings', '/b2b/admin/security', '/b2b/admin/audit', '/b2b/admin/accessibility'
 ];
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
@@ -197,6 +200,100 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         {
           path: 'gamification',
           element: <B2CGamificationPage />
+        },
+        // Fun-First routes
+        {
+          path: 'bubble-beat',
+          element: <B2CBubbleBeatPage />
+        },
+        {
+          path: 'flash-glow',
+          element: <B2CFlashGlowPage />
+        },
+        {
+          path: 'boss-level-grit',
+          element: <B2CBossLevelGritPage />
+        },
+        {
+          path: 'mood-mixer',
+          element: <B2CMoodMixerPage />
+        },
+        {
+          path: 'bounce-back-battle',
+          element: <B2CBounceBackBattlePage />
+        },
+        {
+          path: 'breathwork',
+          element: <B2CBreathworkPage />
+        },
+        {
+          path: 'instant-glow',
+          element: <B2CInstantGlowPage />
+        },
+        {
+          path: 'vr-galactique',
+          element: <B2CVRGalactiquePage />
+        },
+        {
+          path: 'screen-silk-break',
+          element: <B2CScreenSilkBreakPage />
+        },
+        {
+          path: 'story-synth-lab',
+          element: <B2CStorySynthLabPage />
+        },
+        {
+          path: 'ar-filters',
+          element: <B2CARFiltersPage />
+        },
+        {
+          path: 'ambition-arcade',
+          element: <B2CAmbitionArcadePage />
+        },
+        {
+          path: 'weekly-bars',
+          element: <B2CWeeklyBarsPage />
+        },
+        {
+          path: 'heatmap-vibes',
+          element: <B2CHeatmapVibesPage />
+        },
+        // Paramètres & Compte routes
+        {
+          path: 'profile-settings',
+          element: <B2CProfileSettingsPage />
+        },
+        {
+          path: 'activity-history',
+          element: <B2CActivityHistoryPage />
+        },
+        {
+          path: 'notifications',
+          element: <B2CNotificationsPage />
+        },
+        {
+          path: 'feedback',
+          element: <B2CFeedbackPage />
+        },
+        {
+          path: 'settings-rgpd',
+          element: <B2CSettingsRGPDPage />
+        },
+        {
+          path: 'account-delete',
+          element: <B2CAccountDeletePage />
+        },
+        {
+          path: 'export-csv',
+          element: <B2CExportCSVPage />
+        },
+        {
+          path: 'privacy-toggles',
+          element: <B2CPrivacyTogglesPage />
+        },
+        {
+          path: 'health-check-badge',
+          element: <B2CHealthCheckBadgePage />
         }
       ]
     },
