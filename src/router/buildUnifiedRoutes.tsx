@@ -9,6 +9,11 @@ const MarketingHome = lazy(() => import('@/pages/marketing/Home'));
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
+// Pages d'erreur
+const ErrorPage401 = lazy(() => import('@/pages/ErrorPage401'));
+const ErrorPage403 = lazy(() => import('@/pages/ErrorPage403'));
+const ErrorPage500 = lazy(() => import('@/pages/ErrorPage500'));
+
 // Pages d'authentification
 const B2CLoginPage = lazy(() => import('@/pages/B2CLoginPage'));
 const B2CRegisterPage = lazy(() => import('@/pages/B2CRegisterPage'));
@@ -302,6 +307,20 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: <B2BAdminSettingsPage />
         }
       ]
+    },
+
+    // Pages d'erreur
+    {
+      path: '/401',
+      element: <ErrorPage401 />
+    },
+    {
+      path: '/403', 
+      element: <ErrorPage403 />
+    },
+    {
+      path: '/500',
+      element: <ErrorPage500 />
     },
 
     // Route de validation des routes (dev uniquement)
