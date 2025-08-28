@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Phone, MapPin, Calendar, Camera, Shield } from 'lucide-react';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 import { toast } from 'sonner';
@@ -27,8 +27,8 @@ const B2CProfileSettingsPage: React.FC = () => {
   });
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement du profil..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="card" />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const handleSave = async () => {
     setIsSaving(true);

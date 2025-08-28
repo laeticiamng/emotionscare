@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, Activity, Clock, TrendingUp, Download, Filter } from 'lucide-react';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 
@@ -11,8 +11,8 @@ const B2CActivityHistoryPage: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('7j');
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement de l'historique..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="list" count={5} />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const activities = [
     { date: '2024-01-15', type: 'Scan', duration: '5 min', score: 'Excellent', icon: '🎯' },

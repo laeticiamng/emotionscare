@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Trophy, Target, Zap, Flame, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 
@@ -15,8 +15,8 @@ const B2CBossLevelGritPage: React.FC = () => {
   const [achievements, setAchievements] = useState(['Déterminé', 'Résilient']);
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement Boss Level..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="dashboard" />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const handleTraining = () => {
     setIsTraining(true);

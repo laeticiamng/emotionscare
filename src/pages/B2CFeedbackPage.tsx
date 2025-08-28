@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Star, Send, Heart, Lightbulb, Bug } from 'lucide-react';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 import { toast } from 'sonner';
@@ -20,8 +20,8 @@ const B2CFeedbackPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement du formulaire..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="card" />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const handleSubmit = async () => {
     if (!message.trim()) {

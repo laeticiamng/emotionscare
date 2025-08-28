@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertTriangle, Shield, Trash2, Download, MessageSquare } from 'lucide-react';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 import { toast } from 'sonner';
@@ -25,8 +25,8 @@ const B2CAccountDeletePage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="card" />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const deletionReasons = [
     { value: 'not-useful', label: 'L\'application ne m\'est plus utile' },

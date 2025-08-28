@@ -5,7 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Music, Palette, Zap, Heart, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { LoadingStates } from '@/components/ui/LoadingStates';
+import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 
@@ -17,8 +17,8 @@ const B2CMoodMixerPage: React.FC = () => {
   const [currentMix, setCurrentMix] = useState('');
   const { loadingState } = usePageMetadata();
 
-  if (loadingState === 'loading') return <LoadingStates.Loading text="Chargement Mood Mixer..." />;
-  if (loadingState === 'error') return <LoadingStates.Error message="Erreur de chargement" />;
+  if (loadingState === 'loading') return <LoadingState type="dashboard" />;
+  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
 
   const generateMix = () => {
     const energy = energyLevel[0];
