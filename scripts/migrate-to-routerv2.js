@@ -36,6 +36,10 @@ const ROUTE_MAPPINGS = {
   '/meditation': 'routes.b2c.meditation()',
   '/vr': 'routes.b2c.vr()',
   '/profile': 'routes.b2c.profile()',
+  '/b2c/dashboard': 'routes.b2c.dashboard()',
+  '/b2c/music': 'routes.b2c.music()',
+  '/b2c/journal': 'routes.b2c.journal()',
+  '/b2c/coach': 'routes.b2c.coach()',
   
   // B2B routes
   '/b2b/admin/dashboard': 'routes.b2b.admin.dashboard()',
@@ -48,6 +52,8 @@ const ROUTE_MAPPINGS = {
   '/unauthorized': 'routes.special.unauthorized()',
   '/forbidden': 'routes.special.forbidden()',
   '/404': 'routes.special.notFound()',
+  '/app-gate': 'routes.special.appGate()',
+  '/verify-email': 'routes.auth.verifyEmail()',
 };
 
 function findFilesToMigrate() {
