@@ -6,6 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Camera, Mic, Heart, Brain, Activity, 
          Smile, Frown, Meh, Zap, Calendar, TrendingUp } from 'lucide-react';
+import { PrivacyFallbacks } from '@/components/privacy/PrivacyFallbacks';
+import { LoadingStates } from '@/components/ui/LoadingStates';
+import { analyticsService } from '@/services/analyticsService';
 
 const B2CScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +16,32 @@ const B2CScanPage: React.FC = () => {
   const [scanProgress, setScanProgress] = useState(0);
   const [scanResult, setScanResult] = useState<any>(null);
   const [scanType, setScanType] = useState<'facial' | 'voice' | 'text'>('facial');
+  const [cameraPermission, setCameraPermission] = useState<boolean>(true);
+  const [micPermission, setMicPermission] = useState<boolean>(true);
+
+  useEffect(() => {
+    analyticsService.trackModuleStart('scan');
+    // Vérifier les permissions au montage
+    checkPermissions();
+  }, []);
+
+  const checkPermissions = async () => {
+    try {
+      if (scanType === 'facial') {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(track => track.stop());
+        setCameraPermission(true);
+      } else if (scanType === 'voice') {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        setMicPermission(true);
+      }
+    } catch (error) {
+      if (scanType === 'facial') setCameraPermission(false);
+      if (scanType === 'voice') setMicPermission(false);
+      analyticsService.trackModuleFallback('scan', 'permission_denied');
+    }
+  };
   
   const emotionData = {
     happiness: 75,
@@ -46,8 +75,19 @@ const B2CScanPage: React.FC = () => {
   ];
 
   const startScan = () => {
+    // Vérifier les permissions avant de commencer
+    if (scanType === 'facial' && !cameraPermission) {
+      analyticsService.trackModuleFallback('scan', 'no_camera');
+      return;
+    }
+    if (scanType === 'voice' && !micPermission) {
+      analyticsService.trackModuleFallback('scan', 'no_microphone');
+      return;
+    }
+
     setIsScanning(true);
     setScanProgress(0);
+    analyticsService.track(`scan.${scanType}.start`, 'module');
     
     // Simulation du scan
     const interval = setInterval(() => {
@@ -61,6 +101,7 @@ const B2CScanPage: React.FC = () => {
             dominantEmotion: 'happiness',
             recommendations: recommendations
           });
+          analyticsService.trackModuleFinish('scan', 10);
           return 100;
         }
         return prev + 10;
@@ -144,6 +185,24 @@ const B2CScanPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Fallbacks privacy */}
+            {scanType === 'facial' && !cameraPermission && (
+              <PrivacyFallbacks 
+                type="NoCam"
+                message="Caméra non disponible"
+                fallbackAction={() => setScanType('text')}
+                fallbackLabel="Utiliser le questionnaire"
+              />
+            )}
+            
+            {scanType === 'voice' && !micPermission && (
+              <PrivacyFallbacks 
+                type="NoMic"
+                message="Microphone non disponible"
+                fallbackAction={() => setScanType('text')}
+                fallbackLabel="Utiliser le questionnaire"
+              />
+            )}
             {!isScanning && !scanResult && (
               <div className="text-center py-12">
                 <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
@@ -179,9 +238,9 @@ const B2CScanPage: React.FC = () => {
                   <Badge variant="secondary" className="text-lg px-4 py-2 mb-4">
                     État: {scanResult.mood === 'positive' ? 'Positif' : 'Neutre'}
                   </Badge>
-                  <p className="text-gray-600">
-                    Confiance: {Math.round(scanResult.confidence * 100)}%
-                  </p>
+                 <p className="text-gray-600">
+                   Confiance: {scanResult.confidence >= 0.8 ? 'Élevée' : scanResult.confidence >= 0.6 ? 'Bonne' : 'Modérée'}
+                 </p>
                 </div>
 
                 {/* Métriques détaillées */}
@@ -196,8 +255,10 @@ const B2CScanPage: React.FC = () => {
                            emotion === 'stress' ? 'Stress' :
                            emotion === 'energy' ? 'Énergie' : 'Focus'}
                         </h4>
-                        <div className="text-2xl font-bold text-blue-600">{value}%</div>
-                        <Progress value={value} className="mt-2" />
+                       <div className="text-2xl font-bold text-blue-600">
+                         {value >= 80 ? 'Élevé' : value >= 60 ? 'Bon' : value >= 40 ? 'Moyen' : 'Bas'}
+                       </div>
+                       <Progress value={value} className="mt-2" />
                       </div>
                     );
                   })}
@@ -270,7 +331,9 @@ const B2CScanPage: React.FC = () => {
                       <div className="text-sm text-gray-600">État: {entry.mood}</div>
                     </div>
                   </div>
-                  <div className="text-lg font-bold text-blue-600">{entry.score}%</div>
+                   <div className="text-lg font-bold text-blue-600">
+                     {entry.score >= 80 ? 'Excellent' : entry.score >= 60 ? 'Bon' : 'Moyen'}
+                   </div>
                 </div>
               ))}
             </div>

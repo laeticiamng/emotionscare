@@ -389,12 +389,12 @@ const B2CMusicPage: React.FC = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-1">2h 34min</div>
-                <div className="text-sm text-gray-600">Temps d'écoute cette semaine</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-1">156</div>
-                <div className="text-sm text-gray-600">Titres écoutés</div>
+               <div className="text-3xl font-bold text-purple-600 mb-1">Modéré</div>
+               <div className="text-sm text-gray-600">Temps d'écoute cette semaine</div>
+             </div>
+             <div className="text-center">
+               <div className="text-3xl font-bold text-blue-600 mb-1">Actif</div>
+               <div className="text-sm text-gray-600">Engagement musical</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-600 mb-1">Calme</div>

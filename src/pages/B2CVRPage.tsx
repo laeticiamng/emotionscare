@@ -263,20 +263,20 @@ const B2CVRPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600">24</div>
-              <div className="text-sm text-gray-600">Sessions complétées</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">6h 15min</div>
-              <div className="text-sm text-gray-600">Temps total immersion</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">89%</div>
-              <div className="text-sm text-gray-600">Score de relaxation</div>
+             <div className="text-2xl font-bold text-purple-600">Régulier</div>
+             <div className="text-sm text-gray-600">Engagement sessions</div>
+           </CardContent>
+         </Card>
+         <Card>
+           <CardContent className="p-4 text-center">
+             <div className="text-2xl font-bold text-blue-600">Modéré</div>
+             <div className="text-sm text-gray-600">Temps d'immersion</div>
+           </CardContent>
+         </Card>
+         <Card>
+           <CardContent className="p-4 text-center">
+             <div className="text-2xl font-bold text-green-600">Excellent</div>
+             <div className="text-sm text-gray-600">Score de relaxation</div>
             </CardContent>
           </Card>
           <Card>
