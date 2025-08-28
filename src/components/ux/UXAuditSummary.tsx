@@ -315,12 +315,12 @@ const UXAuditSummary: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-3 gap-4">
-                <Link to="/ux-dashboard">
+                <Link to={Routes.adminOptimization()}>
                   <Button className="w-full" size="lg">
                     📊 Dashboard UX Live
                   </Button>
                 </Link>
-                <Link to="/accessibility-audit">
+                <Link to={Routes.adminAccessibility()}>
                   <Button variant="outline" className="w-full" size="lg">
                     ♿ Audit Accessibilité  
                   </Button>

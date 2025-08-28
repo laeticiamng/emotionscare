@@ -153,7 +153,7 @@ const B2BUserLoginPage: React.FC = () => {
 
             {/* Links */}
             <div className="mt-6 space-y-2 text-center text-sm">
-              <Link to="/forgot-password" className="text-blue-600 hover:underline block">
+              <Link to={Routes.login()} className="text-blue-600 hover:underline block">
                 Mot de passe oublié ?
               </Link>
               <div className="text-gray-500">
@@ -165,7 +165,7 @@ const B2BUserLoginPage: React.FC = () => {
 
         {/* Retour */}
         <div className="mt-6 text-center">
-          <Link to="/b2b/selection" className="text-gray-600 hover:text-gray-800 text-sm">
+          <Link to={Routes.b2bLanding()} className="text-gray-600 hover:text-gray-800 text-sm">
             ← Retour à la sélection
           </Link>
         </div>

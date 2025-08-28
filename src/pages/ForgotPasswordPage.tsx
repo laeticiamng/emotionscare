@@ -279,7 +279,7 @@ const ForgotPasswordPage: React.FC = () => {
         <div className="text-center mt-6 text-sm text-muted-foreground">
           <p>
             Besoin d'aide ? {' '}
-            <Link to="/help" className="text-blue-500 hover:underline">
+            <Link to={Routes.help()} className="text-blue-500 hover:underline">
               Contactez le support
             </Link>
           </p>

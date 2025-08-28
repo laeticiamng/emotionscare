@@ -128,7 +128,7 @@ const B2CDashboardPage: React.FC = () => {
               </div>
             </div>
             <Button asChild variant="outline" className="w-full mt-4">
-              <Link to="/journal">Voir tout le journal</Link>
+              <Link to={Routes.journal()}>Voir tout le journal</Link>
             </Button>
           </CardContent>
         </Card>

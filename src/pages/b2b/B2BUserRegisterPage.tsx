@@ -204,7 +204,7 @@ const B2BUserRegisterPage: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Déjà inscrit ?{' '}
                 <Link
-                  to="/b2b/user/login"
+                  to={Routes.login({ segment: "b2b" })}
                   className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
                 >
                   Se connecter

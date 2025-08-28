@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,7 +136,7 @@ const B2BAdminLoginPage: React.FC = () => {
               <div className="flex items-center justify-center space-x-2">
                 <ArrowLeft className="h-4 w-4 text-gray-400" />
                 <Link
-                  to="/b2b/selection"
+                  to={Routes.b2bLanding()}
                   className="text-sm text-gray-600 hover:text-gray-700 hover:underline"
                 >
                   Retour à la sélection
