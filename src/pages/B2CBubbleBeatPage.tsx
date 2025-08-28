@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Heart, Play, Pause, Activity, Bluetooth, Watch } from 'lucide-react';
-import { PrivacyFallbacks } from '@/components/privacy/PrivacyFallbacks';
+import PrivacyFallback from '@/components/privacy/PrivacyFallbacks';
 import { analyticsService } from '@/services/analyticsService';
 import { useToast } from '@/hooks/use-toast';
 
@@ -140,11 +140,17 @@ const B2CBubbleBeatPage: React.FC = () => {
 
         {/* Privacy Fallback */}
         {!hrPermission && (
-          <PrivacyFallbacks 
-            type="SimHR"
-            message="Capteurs cardiaques non disponibles"
-            fallbackAction={() => setIsSimulation(true)}
-            fallbackLabel="Utiliser la simulation"
+          <PrivacyFallback 
+            type="hr"
+            fallbackContent={
+              <Button 
+                onClick={() => setIsSimulation(true)}
+                variant="outline"
+                className="w-full"
+              >
+                Utiliser la simulation à la place
+              </Button>
+            }
           />
         )}
 
