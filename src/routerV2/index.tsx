@@ -9,7 +9,7 @@ import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES, findRedirectFor } from './aliases';
 import { RouteGuard } from './guards';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import { EnhancedShell } from '@/components/layout/EnhancedShell';
+import EnhancedShell from '@/components/layout/EnhancedShell';
 
 // Feature flag pour activer RouterV2
 const FF_ROUTER_V2 = import.meta.env.VITE_FF_ROUTER_V2 === 'true' || process.env.NODE_ENV === 'development';
