@@ -91,15 +91,15 @@ const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
 
 export const buildUnifiedRoutes = (): RouteObject[] => {
   return [
+    // Public marketing route (no AppShell)
+    { 
+      path: OFFICIAL_ROUTES.HOME, 
+      element: <SuspenseWrapper><MarketingHome /></SuspenseWrapper> 
+    },
     {
       path: '/',
       element: <AppShell />,
       children: [
-        // Home (1 route) - Marketing landing
-        { 
-          path: OFFICIAL_ROUTES.HOME, 
-          element: <SuspenseWrapper><MarketingHome /></SuspenseWrapper> 
-        },
         
         // Mesure émotionnelle et biométrie (8 routes)
         { 
