@@ -13,6 +13,8 @@ import Footer from './Footer';
 import { DeletePendingBanner } from '@/components/account/DeletePendingBanner';
 import { useAccountDeletion } from '@/hooks/useAccountDeletion';
 import { cn } from '@/lib/utils';
+import { FeedbackFab } from '@/components/feedback/FeedbackFab';
+import { FeedbackModal } from '@/components/feedback/FeedbackModal';
 
 const AppShell: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -127,6 +129,10 @@ const AppShell: React.FC = () => {
       
       <Footer />
       <Toaster />
+      
+      {/* Feedback System */}
+      <FeedbackFab />
+      <FeedbackModal />
     </div>
   );
 };

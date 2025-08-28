@@ -37,6 +37,8 @@ const JournalPage = React.lazy(() => import('../pages/JournalPage'));
 const DataExportPage = React.lazy(() => import('../pages/DataExportPage'));
 const ActivityHistoryPage = React.lazy(() => import('../pages/ActivityHistoryPage'));
 const InAppFeedbackPage = React.lazy(() => import('../pages/InAppFeedbackPage'));
+const ActivityPage = React.lazy(() => import('../pages/ActivityPage'));
+const DashboardHome = React.lazy(() => import('../pages/DashboardHome'));
 
 // Onboarding, accès, préférences (9 routes)
 const OnboardingPage = React.lazy(() => import('../pages/onboarding/OnboardingPage'));
@@ -193,7 +195,7 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         },
         { 
           path: OFFICIAL_ROUTES.B2C_DASHBOARD, 
-          element: <SuspenseWrapper><B2CDashboardPage /></SuspenseWrapper> 
+          element: <SuspenseWrapper><DashboardHome /></SuspenseWrapper> 
         },
         { 
           path: OFFICIAL_ROUTES.PREFERENCES, 
@@ -209,7 +211,7 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         },
         { 
           path: OFFICIAL_ROUTES.ACTIVITY_HISTORY, 
-          element: <SuspenseWrapper><ActivityHistoryPage /></SuspenseWrapper> 
+          element: <SuspenseWrapper><ActivityPage /></SuspenseWrapper> 
         },
         { 
           path: OFFICIAL_ROUTES.NOTIFICATIONS, 
