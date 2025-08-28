@@ -6,6 +6,8 @@ const BossLevelGritPage = lazy(() => import('@/pages/BossLevelGritPage'));
 const MoodMixerPage = lazy(() => import('@/pages/motivation/MoodMixerPage'));
 const AmbitionArcadePage = lazy(() => import('@/pages/motivation/AmbitionArcadePage'));
 const BounceBackBattlePage = lazy(() => import('@/pages/motivation/BounceBackBattlePage'));
+const StoryLabPage = lazy(() => import('@/pages/StoryLabPage'));
+const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
 
 export const gamificationRoutes: RouteObject[] = [
   {
@@ -23,5 +25,13 @@ export const gamificationRoutes: RouteObject[] = [
   {
     path: '/bounce-back-battle',
     element: <BounceBackBattlePage />,
+  },
+  {
+    path: '/story-lab',
+    element: <StoryLabPage />,
+  },
+  {
+    path: '/flash-glow',
+    element: <FlashGlowPage />,
   }
 ];
