@@ -5,6 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Play, Pause, SkipForward, SkipBack, Volume2, Heart, Music, Headphones, Clock } from 'lucide-react';
+import MusicPlayer from './music/MusicPlayer';
+import PlaylistManager from './music/PlaylistManager';
+import MoodBasedRecommendations from './music/MoodBasedRecommendations';
 
 const MusicTherapyPage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);

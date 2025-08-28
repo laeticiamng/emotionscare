@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageLayout from '@/components/common/PageLayout';
 import FeatureCard from '@/components/common/FeatureCard';
+import VoiceScanComponent from './scan/VoiceScanComponent';
+import TextScanComponent from './scan/TextScanComponent';
+import FacialScanComponent from './scan/FacialScanComponent';
+import EmotionResultsDisplay from './scan/EmotionResultsDisplay';
 
 const ScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,22 +19,44 @@ const ScanPage: React.FC = () => {
   const [scanMode, setScanMode] = useState<'voice' | 'text' | 'face'>('voice');
   const [emotionResults, setEmotionResults] = useState<any>(null);
 
-  const handleStartScan = () => {
+  const handleStartScan = async () => {
     setIsScanning(true);
-    setTimeout(() => {
-      setEmotionResults({
-        dominant: 'Joie',
-        confidence: 85,
+    setEmotionResults(null);
+    
+    try {
+      // Simulation d'analyse IA avancée
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const mockResults = {
+        dominant: ['Joie', 'Sérénité', 'Confiance', 'Énergie', 'Calme'][Math.floor(Math.random() * 5)],
+        confidence: Math.floor(Math.random() * 20) + 80,
         emotions: {
-          'Joie': 85,
-          'Sérénité': 65,
-          'Excitation': 45,
-          'Tristesse': 15,
-          'Colère': 10
+          'Joie': Math.floor(Math.random() * 40) + 60,
+          'Sérénité': Math.floor(Math.random() * 50) + 40,
+          'Confiance': Math.floor(Math.random() * 30) + 50,
+          'Énergie': Math.floor(Math.random() * 40) + 30,
+          'Anxiété': Math.floor(Math.random() * 30) + 10,
+          'Fatigue': Math.floor(Math.random() * 25) + 5
+        },
+        recommendations: [
+          'Continuez sur cette voie positive !',
+          'Essayez 5 minutes de méditation',
+          'Une promenade en nature vous ferait du bien',
+          'Écoutez de la musique relaxante'
+        ],
+        biometrics: {
+          heartRate: Math.floor(Math.random() * 20) + 65,
+          stressLevel: Math.floor(Math.random() * 30) + 20,
+          focusScore: Math.floor(Math.random() * 40) + 60
         }
-      });
+      };
+      
+      setEmotionResults(mockResults);
+    } catch (error) {
+      console.error('Erreur lors du scan:', error);
+    } finally {
       setIsScanning(false);
-    }, 3000);
+    }
   };
 
   const scanModes = [
