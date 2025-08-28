@@ -3,9 +3,23 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Mic, Type, Camera, Play, Square, Zap, Target, BarChart3, TrendingUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Brain, 
+  Mic, 
+  Camera, 
+  FileText, 
+  Activity, 
+  Heart, 
+  Zap,
+  Target,
+  TrendingUp,
+  BarChart3,
+  Play,
+  Square,
+  RotateCcw
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageLayout from '@/components/common/PageLayout';
 import FeatureCard from '@/components/common/FeatureCard';
 import VoiceScanComponent from './scan/VoiceScanComponent';
@@ -13,78 +27,118 @@ import TextScanComponent from './scan/TextScanComponent';
 import FacialScanComponent from './scan/FacialScanComponent';
 import EmotionResultsDisplay from './scan/EmotionResultsDisplay';
 
-const ScanPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanMode, setScanMode] = useState<'voice' | 'text' | 'face'>('voice');
-  const [emotionResults, setEmotionResults] = useState<any>(null);
+type ScanType = 'voice' | 'text' | 'facial' | null;
 
-  const handleStartScan = async () => {
+interface EmotionResult {
+  emotion: string;
+  confidence: number;
+  intensity: number;
+  suggestions: string[];
+  timestamp: Date;
+}
+
+const ScanPage: React.FC = () => {
+  const [activeScan, setActiveScan] = useState<ScanType>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResults, setScanResults] = useState<EmotionResult | null>(null);
+  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
+
+  const scanTypes = [
+    {
+      id: 'voice' as ScanType,
+      title: 'Analyse Vocale',
+      description: 'Détection émotionnelle par analyse de la voix',
+      icon: Mic,
+      gradient: 'from-blue-500 to-cyan-500',
+      features: ['Tonalité', 'Rythme', 'Intonation', 'Stress vocal'],
+      accuracy: 94,
+      duration: '30-60s'
+    },
+    {
+      id: 'text' as ScanType,
+      title: 'Analyse Textuelle',
+      description: 'Analyse émotionnelle de vos écrits',
+      icon: FileText,
+      gradient: 'from-green-500 to-emerald-500',
+      features: ['Sentiment', 'Mots-clés', 'Structure', 'Contexte'],
+      accuracy: 89,
+      duration: 'Instantané'
+    },
+    {
+      id: 'facial' as ScanType,
+      title: 'Analyse Faciale',
+      description: 'Reconnaissance des micro-expressions',
+      icon: Camera,
+      gradient: 'from-purple-500 to-pink-500',
+      features: ['Expressions', 'Posture', 'Gestuelle', 'Regard'],
+      accuracy: 92,
+      duration: '15-30s'
+    }
+  ];
+
+  const startScan = (type: ScanType) => {
+    setActiveScan(type);
     setIsScanning(true);
-    setEmotionResults(null);
-    
-    try {
-      // Simulation d'analyse IA avancée
-      await new Promise(resolve => setTimeout(resolve, 3000));
+    setScanResults(null);
+
+    // Simulation du scan avec résultats aléatoires
+    setTimeout(() => {
+      const emotions = ['Joie', 'Tristesse', 'Colère', 'Peur', 'Surprise', 'Dégoût', 'Calme', 'Stress'];
+      const selectedEmotion = emotions[Math.floor(Math.random() * emotions.length)];
       
-      const mockResults = {
-        dominant: ['Joie', 'Sérénité', 'Confiance', 'Énergie', 'Calme'][Math.floor(Math.random() * 5)],
-        confidence: Math.floor(Math.random() * 20) + 80,
-        emotions: {
-          'Joie': Math.floor(Math.random() * 40) + 60,
-          'Sérénité': Math.floor(Math.random() * 50) + 40,
-          'Confiance': Math.floor(Math.random() * 30) + 50,
-          'Énergie': Math.floor(Math.random() * 40) + 30,
-          'Anxiété': Math.floor(Math.random() * 30) + 10,
-          'Fatigue': Math.floor(Math.random() * 25) + 5
-        },
-        recommendations: [
-          'Continuez sur cette voie positive !',
-          'Essayez 5 minutes de méditation',
-          'Une promenade en nature vous ferait du bien',
-          'Écoutez de la musique relaxante'
-        ],
-        biometrics: {
-          heartRate: Math.floor(Math.random() * 20) + 65,
-          stressLevel: Math.floor(Math.random() * 30) + 20,
-          focusScore: Math.floor(Math.random() * 40) + 60
-        }
+      const result: EmotionResult = {
+        emotion: selectedEmotion,
+        confidence: Math.floor(Math.random() * 30) + 70, // 70-100%
+        intensity: Math.floor(Math.random() * 40) + 30, // 30-70%
+        suggestions: getSuggestionsForEmotion(selectedEmotion),
+        timestamp: new Date()
       };
-      
-      setEmotionResults(mockResults);
-    } catch (error) {
-      console.error('Erreur lors du scan:', error);
-    } finally {
+
+      setScanResults(result);
+      setScanHistory(prev => [result, ...prev.slice(0, 4)]); // Garder les 5 derniers
       setIsScanning(false);
+    }, Math.random() * 3000 + 2000); // 2-5 secondes
+  };
+
+  const getSuggestionsForEmotion = (emotion: string): string[] => {
+    const suggestions: Record<string, string[]> = {
+      'Joie': ['Partagez cette énergie positive', 'Pratiquez la gratitude', 'Engagez-vous socialement'],
+      'Tristesse': ['Prenez du temps pour vous', 'Parlez à un proche', 'Pratiquez la méditation'],
+      'Colère': ['Respirez profondément', 'Faites du sport', 'Exprimez-vous dans votre journal'],
+      'Peur': ['Identifiez la source', 'Relaxation progressive', 'Affirmations positives'],
+      'Surprise': ['Explorez cette nouveauté', 'Restez ouvert', 'Adaptez-vous'],
+      'Dégoût': ['Éloignez-vous du déclencheur', 'Purifiez votre environnement', 'Focalisez sur le positif'],
+      'Calme': ['Maintenez cet équilibre', 'Pratiquez la pleine conscience', 'Savourez ce moment'],
+      'Stress': ['Techniques de respiration', 'Organisez vos priorités', 'Prenez des pauses']
+    };
+    
+    return suggestions[emotion] || ['Consultez votre coach IA', 'Pratiquez l\'auto-compassion', 'Restez à l\'écoute de vous'];
+  };
+
+  const stopScan = () => {
+    setIsScanning(false);
+    setActiveScan(null);
+  };
+
+  const resetScan = () => {
+    setActiveScan(null);
+    setIsScanning(false);
+    setScanResults(null);
+  };
+
+  const renderScanComponent = () => {
+    switch (activeScan) {
+      case 'voice':
+        return <VoiceScanComponent isScanning={isScanning} onComplete={() => setIsScanning(false)} />;
+      case 'text':
+        return <TextScanComponent isScanning={isScanning} onComplete={() => setIsScanning(false)} />;
+      case 'facial':
+        return <FacialScanComponent isScanning={isScanning} onComplete={() => setIsScanning(false)} />;
+      default:
+        return null;
     }
   };
 
-  const scanModes = [
-    {
-      id: 'voice',
-      title: 'Analyse Vocale',
-      description: 'Analyse de votre voix pour détecter les émotions',
-      icon: <Mic className="h-6 w-6" />,
-      gradient: 'from-blue-500 to-cyan-500',
-      tip: 'Parlez naturellement pendant 10-15 secondes'
-    },
-    {
-      id: 'text',
-      title: 'Analyse Textuelle',
-      description: 'Analyse de vos écrits et ressentis',
-      icon: <Type className="h-6 w-6" />,
-      gradient: 'from-green-500 to-emerald-500',
-      tip: 'Écrivez quelques phrases sur votre ressenti'
-    },
-    {
-      id: 'face',
-      title: 'Analyse Faciale',
-      description: 'Détection des micro-expressions',
-      icon: <Camera className="h-6 w-6" />,
-      gradient: 'from-purple-500 to-violet-500',
-      tip: 'Regardez la caméra avec une expression naturelle'
-    }
-  ];
 
   return (
     <PageLayout
@@ -123,170 +177,241 @@ const ScanPage: React.FC = () => {
         ],
         actions: [
           {
-            label: 'Démarrer Analyse',
-            onClick: handleStartScan,
-            variant: 'default',
-            icon: Play
+            label: isScanning ? 'Arrêter' : 'Nouveau Scan',
+            onClick: isScanning ? stopScan : resetScan,
+            variant: isScanning ? 'destructive' : 'default',
+            icon: isScanning ? Square : Play
           },
           {
-            label: 'Historique',
-            onClick: () => navigate('/scan/history'),
+            label: 'Réinitialiser',
+            onClick: resetScan,
             variant: 'outline',
-            icon: BarChart3
+            icon: RotateCcw,
+            disabled: isScanning
           }
         ]
       }}
       tips={{
-        title: 'Conseils pour une analyse optimale',
+        title: 'Conseils pour un scan optimal',
         items: [
           {
             title: 'Environnement',
-            content: 'Choisissez un endroit calme et bien éclairé',
-            icon: Target
+            content: 'Choisissez un endroit calme et bien éclairé pour de meilleurs résultats',
+            icon: Camera
           },
           {
-            title: 'Naturel',
-            content: 'Soyez vous-même, ne forcez pas vos expressions',
-            icon: Brain
+            title: 'Authenticité',
+            content: 'Soyez naturel et authentique lors de votre analyse',
+            icon: Heart
           },
           {
             title: 'Régularité',
-            content: 'Effectuez des scans réguliers pour suivre votre évolution',
-            icon: TrendingUp
+            content: 'Effectuez des scans réguliers pour suivre votre évolution émotionnelle',
+            icon: Zap
           }
         ],
         cta: {
-          label: 'Guide d\'utilisation du scanner',
-          onClick: () => console.log('Scanner guide')
+          label: 'Guide d\'utilisation du scan IA',
+          onClick: () => console.log('Scan guide')
         }
       }}
     >
-      <div className="space-y-8">
-        {/* Modes de Scan */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-foreground">Modes d'Analyse</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {scanModes.map((mode) => (
-              <FeatureCard
-                key={mode.id}
-                title={mode.title}
-                description={mode.description}
-                icon={mode.icon}
-                gradient={mode.gradient}
-                metadata={[{ label: 'Conseil', value: mode.tip }]}
-                action={{
-                  label: scanMode === mode.id ? 'Sélectionné' : 'Sélectionner',
-                  onClick: () => setScanMode(mode.id as any),
-                  variant: scanMode === mode.id ? 'default' : 'outline'
-                }}
-                className={scanMode === mode.id ? 'ring-2 ring-primary' : ''}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Zone de Scan et Résultats */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Panel de contrôle */}
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="h-6 w-6 text-primary" />
-                Mode: {scanModes.find(m => m.id === scanMode)?.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="text-center">
-                <Button
-                  onClick={handleStartScan}
-                  disabled={isScanning}
-                  size="lg"
-                  className="w-full"
-                >
-                  {isScanning ? (
-                    <>
-                      <Square className="mr-2 h-5 w-5" />
-                      Analyse en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="mr-2 h-5 w-5" />
-                      Commencer l'analyse
-                    </>
-                  )}
-                </Button>
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Types de scan */}
+        <div className="lg:col-span-2 space-y-6">
+          {!activeScan ? (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-foreground">Choisissez votre méthode d'analyse</h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                {scanTypes.map((scanType) => (
+                  <FeatureCard
+                    key={scanType.id}
+                    title={scanType.title}
+                    description={scanType.description}
+                    icon={<scanType.icon className="h-6 w-6" />}
+                    gradient={scanType.gradient}
+                    category={`${scanType.accuracy}% précision`}
+                    metadata={[
+                      { label: 'Durée', value: scanType.duration },
+                      { label: 'Fonctionnalités', value: scanType.features.length.toString() }
+                    ]}
+                    action={{
+                      label: 'Commencer',
+                      onClick: () => startScan(scanType.id),
+                      variant: 'default'
+                    }}
+                  />
+                ))}
               </div>
-
-              <div className="p-4 bg-muted/50 rounded-xl">
-                <p className="text-sm text-muted-foreground text-center">
-                  💡 {scanModes.find(m => m.id === scanMode)?.tip}
-                </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-foreground">
+                  {scanTypes.find(s => s.id === activeScan)?.title}
+                </h2>
+                <Badge variant={isScanning ? "default" : "secondary"}>
+                  {isScanning ? 'Analyse en cours...' : 'Prêt'}
+                </Badge>
               </div>
-            </CardContent>
-          </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  {renderScanComponent()}
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Résultats */}
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-6 w-6 text-primary" />
-                Résultats d'Analyse
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isScanning ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full mx-auto mb-4"></div>
-                  <p className="text-muted-foreground">Analyse en cours...</p>
-                </div>
-              ) : emotionResults ? (
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <Badge className="text-lg px-4 py-2 bg-primary text-primary-foreground">
-                      {emotionResults.dominant} ({emotionResults.confidence}%)
-                    </Badge>
-                  </div>
+          {scanResults && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <h2 className="text-2xl font-bold text-foreground">Résultats de votre analyse</h2>
+              <EmotionResultsDisplay result={scanResults} />
+            </motion.div>
+          )}
 
-                  <div className="space-y-3">
-                    {Object.entries(emotionResults.emotions).map(([emotion, score]) => (
-                      <div key={emotion} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-medium">{emotion}</span>
-                          <span>{score}%</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all duration-500"
-                            style={{ width: `${score}%` }}
-                          />
+          {/* Historique */}
+          {scanHistory.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Historique des Analyses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {scanHistory.map((result, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${
+                          result.emotion === 'Joie' || result.emotion === 'Calme' ? 'bg-green-500' :
+                          result.emotion === 'Tristesse' || result.emotion === 'Peur' ? 'bg-blue-500' :
+                          result.emotion === 'Colère' || result.emotion === 'Stress' ? 'bg-red-500' :
+                          'bg-yellow-500'
+                        }`} />
+                        <div>
+                          <p className="font-medium">{result.emotion}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {result.timestamp.toLocaleString('fr-FR')}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{result.confidence}%</p>
+                        <p className="text-xs text-muted-foreground">Confiance</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded-xl">
-                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">Recommandations</h4>
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      Votre état émotionnel indique une humeur positive ! 
-                      Continuez avec une musique énergisante ou une session de méditation.
+        {/* Panneau de monitoring */}
+        <div className="space-y-4">
+          <Card className="sticky top-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Monitoring Temps Réel
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isScanning ? (
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
+                    <p className="font-medium">Analyse en cours...</p>
+                    <p className="text-sm text-muted-foreground">
+                      IA en train d'analyser vos données
                     </p>
                   </div>
 
-                  <Button 
-                    onClick={() => navigate('/music')}
-                    className="w-full"
-                  >
-                    Écouter la musique recommandée
-                  </Button>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Progression</span>
+                      <span>85%</span>
+                    </div>
+                    <Progress value={85} className="h-2" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <p className="text-lg font-bold text-primary">127</p>
+                      <p className="text-xs text-muted-foreground">Points de données</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-primary">94%</p>
+                      <p className="text-xs text-muted-foreground">Confiance</p>
+                    </div>
+                  </div>
+                </div>
+              ) : scanResults ? (
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 ${
+                      scanResults.emotion === 'Joie' || scanResults.emotion === 'Calme' ? 'bg-green-100 dark:bg-green-900' :
+                      scanResults.emotion === 'Tristesse' || scanResults.emotion === 'Peur' ? 'bg-blue-100 dark:bg-blue-900' :
+                      scanResults.emotion === 'Colère' || scanResults.emotion === 'Stress' ? 'bg-red-100 dark:bg-red-900' :
+                      'bg-yellow-100 dark:bg-yellow-900'
+                    }`}>
+                      <Heart className={`h-8 w-8 ${
+                        scanResults.emotion === 'Joie' || scanResults.emotion === 'Calme' ? 'text-green-600 dark:text-green-400' :
+                        scanResults.emotion === 'Tristesse' || scanResults.emotion === 'Peur' ? 'text-blue-600 dark:text-blue-400' :
+                        scanResults.emotion === 'Colère' || scanResults.emotion === 'Stress' ? 'text-red-600 dark:text-red-400' :
+                        'text-yellow-600 dark:text-yellow-400'
+                      }`} />
+                    </div>
+                    <p className="font-medium">Analyse terminée</p>
+                    <p className="text-sm text-muted-foreground">
+                      Émotion détectée: {scanResults.emotion}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <p className="text-lg font-bold text-primary">{scanResults.confidence}%</p>
+                      <p className="text-xs text-muted-foreground">Confiance</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-primary">{scanResults.intensity}%</p>
+                      <p className="text-xs text-muted-foreground">Intensité</p>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Commencez une analyse pour voir vos résultats</p>
+                <div className="text-center text-muted-foreground">
+                  <Brain className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">Sélectionnez un type de scan pour commencer l'analyse</p>
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Conseils personnalisés */}
+          {scanResults && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Recommandations IA</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {scanResults.suggestions.map((suggestion, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2" />
+                      <p className="text-sm">{suggestion}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </PageLayout>
