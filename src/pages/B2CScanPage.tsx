@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Camera, Mic, Heart, Brain, Activity, 
          Smile, Frown, Meh, Zap, Calendar, TrendingUp } from 'lucide-react';
-import { PrivacyFallbacks } from '@/components/privacy/PrivacyFallbacks';
+import PrivacyFallback from '@/components/privacy/PrivacyFallbacks';
 import { LoadingStates } from '@/components/ui/LoadingStates';
 import { analyticsService } from '@/services/analyticsService';
 
@@ -187,20 +187,32 @@ const B2CScanPage: React.FC = () => {
           <CardContent>
             {/* Fallbacks privacy */}
             {scanType === 'facial' && !cameraPermission && (
-              <PrivacyFallbacks 
-                type="NoCam"
-                message="Caméra non disponible"
-                fallbackAction={() => setScanType('text')}
-                fallbackLabel="Utiliser le questionnaire"
+              <PrivacyFallback 
+                type="cam"
+                fallbackContent={
+                  <Button 
+                    onClick={() => setScanType('text')}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Utiliser le questionnaire à la place
+                  </Button>
+                }
               />
             )}
             
             {scanType === 'voice' && !micPermission && (
-              <PrivacyFallbacks 
-                type="NoMic"
-                message="Microphone non disponible"
-                fallbackAction={() => setScanType('text')}
-                fallbackLabel="Utiliser le questionnaire"
+              <PrivacyFallback 
+                type="mic"
+                fallbackContent={
+                  <Button 
+                    onClick={() => setScanType('text')}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Utiliser le questionnaire à la place
+                  </Button>
+                }
               />
             )}
             {!isScanning && !scanResult && (
