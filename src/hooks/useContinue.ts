@@ -17,12 +17,12 @@ const MOCK_CONTINUE_ITEMS = [
 ];
 
 export const useContinue = () => {
-  const { continueItem, loading, setContinueItem, setLoading } = useDashboardStore();
+  const store = useDashboardStore();
 
   useEffect(() => {
     const fetchContinue = async () => {
       try {
-        setLoading('continue', true);
+        store.setLoading('continue', true);
         
         // Mock API call
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -33,22 +33,22 @@ export const useContinue = () => {
           ? MOCK_CONTINUE_ITEMS[Math.floor(Math.random() * MOCK_CONTINUE_ITEMS.length)]
           : null;
           
-        setContinueItem(item);
+        store.setContinueItem(item);
       } catch (error) {
         console.error('Failed to fetch continue data:', error);
-        setContinueItem(null);
+        store.setContinueItem(null);
       } finally {
-        setLoading('continue', false);
+        store.setLoading('continue', false);
       }
     };
 
-    if (continueItem === null && !loading.continue) {
+    if (store.continueItem === null && !store.loading.continue) {
       fetchContinue();
     }
-  }, [continueItem, loading.continue, setContinueItem, setLoading]);
+  }, []); // Empty dependencies to run only once
 
   return {
-    item: continueItem,
-    loading: loading.continue
+    item: store.continueItem,
+    loading: store.loading.continue
   };
 };

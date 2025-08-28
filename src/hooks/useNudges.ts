@@ -25,12 +25,12 @@ const MOCK_NUDGES = [
 ];
 
 export const useNudges = () => {
-  const { nudge, loading, setNudge, setLoading } = useDashboardStore();
+  const store = useDashboardStore();
 
   useEffect(() => {
     const fetchNudge = async () => {
       try {
-        setLoading('nudge', true);
+        store.setLoading('nudge', true);
         
         // Mock API call
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -40,7 +40,7 @@ export const useNudges = () => {
         const shouldShowNudge = Math.random() > 0.3; // 70% chance
         
         if (!shouldShowNudge) {
-          setNudge(null);
+          store.setNudge(null);
           return;
         }
 
@@ -58,22 +58,22 @@ export const useNudges = () => {
         }
         
         const randomNudge = availableNudges[Math.floor(Math.random() * availableNudges.length)];
-        setNudge(randomNudge);
+        store.setNudge(randomNudge);
       } catch (error) {
         console.error('Failed to fetch nudge:', error);
-        setNudge(null);
+        store.setNudge(null);
       } finally {
-        setLoading('nudge', false);
+        store.setLoading('nudge', false);
       }
     };
 
-    if (nudge === null && !loading.nudge) {
+    if (store.nudge === null && !store.loading.nudge) {
       fetchNudge();
     }
-  }, [nudge, loading.nudge, setNudge, setLoading]);
+  }, []); // Empty dependencies to run only once
 
   return {
-    nudge,
-    loading: loading.nudge
+    nudge: store.nudge,
+    loading: store.loading.nudge
   };
 };

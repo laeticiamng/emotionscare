@@ -1,15 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMarketingStore, Segment, UTMParams } from '@/store/marketing.store';
 
 export const useSegment = () => {
   const [searchParams] = useSearchParams();
-  const { 
-    segment, 
-    utm, 
-    setSegment, 
-    setUTM 
-  } = useMarketingStore();
+  const store = useMarketingStore();
 
   // Capture UTM parameters from URL
   useEffect(() => {
@@ -23,19 +18,19 @@ export const useSegment = () => {
 
     // Only update if we have UTM params
     if (Object.values(utmParams).some(value => value)) {
-      setUTM(utmParams);
+      store.setUTM(utmParams);
     }
 
     // Check for segment parameter
     const segmentParam = searchParams.get('segment') as Segment;
     if (segmentParam && (segmentParam === 'b2c' || segmentParam === 'b2b')) {
-      setSegment(segmentParam);
+      store.setSegment(segmentParam);
     }
-  }, [searchParams, setUTM, setSegment]);
+  }, [searchParams]); // Remove functions from dependencies
 
   return {
-    segment,
-    utm,
-    setSegment
+    segment: store.segment,
+    utm: store.utm,
+    setSegment: store.setSegment
   };
 };
