@@ -1,4 +1,4 @@
-import useSWR, { mutate } from 'swr';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { JournalEntry, useJournalStore } from '@/store/journal.store';
 
@@ -17,15 +17,14 @@ const fetchJournalEntries = async (params: { from?: string; to?: string; q?: str
 
 export const useJournal = () => {
   const { setUploading, setCurrentEntry, addEntry } = useJournalStore();
+  const queryClient = useQueryClient();
 
-  const { data, error, isLoading } = useSWR(
-    ['journal-entries'],
-    () => fetchJournalEntries({}),
-    {
-      revalidateOnFocus: false,
-      refreshInterval: 0,
-    }
-  );
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['journal-entries'],
+    queryFn: () => fetchJournalEntries({}),
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
+  });
 
   const submitVoice = async (audioBlob: Blob): Promise<void> => {
     try {
@@ -78,7 +77,7 @@ export const useJournal = () => {
       const finalEntry = await checkResult();
       setCurrentEntry(finalEntry);
       addEntry(finalEntry);
-      mutate(['journal-entries']);
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
 
     } finally {
       setUploading(false);
@@ -131,7 +130,7 @@ export const useJournal = () => {
       const finalEntry = await checkResult();
       setCurrentEntry(finalEntry);
       addEntry(finalEntry);
-      mutate(['journal-entries']);
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
 
     } finally {
       setUploading(false);

@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useOrgStore, GroupBy } from '@/store/org.store';
 
@@ -72,14 +72,12 @@ export const useOrgWeekly = (params?: Partial<UseOrgWeeklyParams>) => {
     minN: params?.minN ?? filters.minN,
   };
 
-  return useSWR(
-    ['org-weekly', finalParams],
-    () => fetchOrgWeekly(finalParams),
-    {
-      revalidateOnFocus: false,
-      refreshInterval: 5 * 60 * 1000, // 5 minutes
-      errorRetryCount: 3,
-      errorRetryInterval: 1000,
-    }
-  );
+  return useQuery({
+    queryKey: ['org-weekly', finalParams],
+    queryFn: () => fetchOrgWeekly(finalParams),
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    retry: 3,
+    retryDelay: 1000,
+  });
 };
