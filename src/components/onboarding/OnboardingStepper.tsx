@@ -1,60 +1,58 @@
-
 import React from 'react';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react';
 
 interface OnboardingStepperProps {
   currentStep: number;
-  totalSteps: number;
-  onNext: () => void;
-  onPrev: () => void;
-  isLoading?: boolean;
-  isLastStep?: boolean;
-  onComplete?: () => void;
+  totalSteps?: number;
 }
 
-const OnboardingStepper: React.FC<OnboardingStepperProps> = ({
-  currentStep,
-  totalSteps,
-  onNext,
-  onPrev,
-  isLoading = false,
-  isLastStep = false,
-  onComplete
+export const OnboardingStepper: React.FC<OnboardingStepperProps> = ({ 
+  currentStep, 
+  totalSteps = 6 
 }) => {
-  const progress = ((currentStep + 1) / totalSteps) * 100;
-  
   return (
-    <div className="space-y-6">
-      <Progress value={progress} className="mb-8" />
-      
-      <div className="container max-w-5xl mx-auto flex justify-between">
-        <Button 
-          variant="ghost" 
-          onClick={onPrev}
-          disabled={currentStep === 0 || isLoading}
-        >
-          Précédent
-        </Button>
-        
-        {isLastStep ? (
-          <Button 
-            onClick={onComplete}
-            disabled={isLoading}
-          >
-            {isLoading ? "Chargement..." : "Terminer"}
-          </Button>
-        ) : (
-          <Button 
-            onClick={onNext}
-            disabled={isLoading}
-          >
-            {isLoading ? "Chargement..." : "Continuer"}
-          </Button>
-        )}
-      </div>
-    </div>
+    <nav aria-label="Progression de l'accueil" className="mb-8">
+      <ol className="flex items-center justify-center space-x-2">
+        {Array.from({ length: totalSteps }, (_, index) => {
+          const stepNum = index + 1;
+          const isCompleted = stepNum < currentStep;
+          const isCurrent = stepNum === currentStep;
+          
+          return (
+            <li key={stepNum} className="flex items-center">
+              <div
+                className={`
+                  w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                  ${isCompleted 
+                    ? 'bg-primary text-primary-foreground' 
+                    : isCurrent 
+                    ? 'bg-primary/20 text-primary border-2 border-primary' 
+                    : 'bg-muted text-muted-foreground'
+                  }
+                  transition-colors
+                `}
+                aria-current={isCurrent ? 'step' : undefined}
+              >
+                {isCompleted ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  stepNum
+                )}
+              </div>
+              
+              {index < totalSteps - 1 && (
+                <div 
+                  className={`
+                    w-8 h-0.5 ml-2
+                    ${isCompleted ? 'bg-primary' : 'bg-muted'}
+                    transition-colors
+                  `} 
+                />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
 };
-
-export default OnboardingStepper;

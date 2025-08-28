@@ -3,17 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { HealthBadge } from '@/components/system/HealthBadge';
 import { Toaster } from '@/components/ui/sonner';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
+import { DeletePendingBanner } from '@/components/account/DeletePendingBanner';
+import { useAccountDeletion } from '@/hooks/useAccountDeletion';
 import { cn } from '@/lib/utils';
 
 const AppShell: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { status: accountStatus } = useAccountDeletion();
 
   // Auto-collapse sidebar on smaller screens
   useEffect(() => {
@@ -42,6 +46,9 @@ const AppShell: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 w-full">
+      {/* Delete Pending Banner */}
+      {accountStatus === 'soft_deleted' && <DeletePendingBanner />}
+      
       {/* Header */}
       <header className="sticky top-0 z-50 h-16 bg-white/80 backdrop-blur border-b header-safe-area">
         <div className="flex items-center justify-between h-full px-4">
@@ -67,7 +74,10 @@ const AppShell: React.FC = () => {
             <Menu className="h-5 w-5" />
           </button>
 
-          <Header />
+          <div className="flex items-center gap-4">
+            <HealthBadge />
+            <Header />
+          </div>
         </div>
       </header>
 

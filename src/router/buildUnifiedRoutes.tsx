@@ -15,7 +15,7 @@ const BubbleBeatPage = React.lazy(() => import('../pages/BubbleBeatPage'));
 const ScreenSilkBreakPage = React.lazy(() => import('../pages/ScreenSilkBreakPage'));
 const VRGalactiquePage = React.lazy(() => import('../pages/VRGalactiquePage'));
 const VRHubPage = React.lazy(() => import('../pages/VRHubPage'));
-const BreathworkPage = React.lazy(() => import('../pages/BreathworkPage'));
+const BreathworkPage = React.lazy(() => import('../pages/BreathPage'));
 const InstantGlowPage = React.lazy(() => import('../pages/InstantGlowPage'));
 const PlatformStatusPage = React.lazy(() => import('../pages/PlatformStatusPage'));
 
@@ -39,14 +39,14 @@ const ActivityHistoryPage = React.lazy(() => import('../pages/ActivityHistoryPag
 const InAppFeedbackPage = React.lazy(() => import('../pages/InAppFeedbackPage'));
 
 // Onboarding, accès, préférences (9 routes)
-const OnboardingPage = React.lazy(() => import('../pages/OnboardingPage'));
+const OnboardingPage = React.lazy(() => import('../pages/onboarding/OnboardingPage'));
 const ChooseModePage = React.lazy(() => import('../pages/ChooseModePage'));
 const ProfileSettingsPage = React.lazy(() => import('../pages/ProfileSettingsPage'));
 const UserPreferencesPage = React.lazy(() => import('../pages/UserPreferencesPage'));
-const PrivacyTogglesPage = React.lazy(() => import('../pages/PrivacyTogglesPage'));
+const PrivacyTogglesPage = React.lazy(() => import('../pages/Settings/PrivacyPage'));
 const NotificationsPage = React.lazy(() => import('../pages/NotificationsPage'));
 const HelpCenterPage = React.lazy(() => import('../pages/HelpCenterPage'));
-const AccountDeletionPage = React.lazy(() => import('../pages/AccountDeletionPage'));
+const AccountDeletionPage = React.lazy(() => import('../pages/Settings/DeleteAccountPage'));
 
 // B2C (3 routes)
 const B2CLoginPage = React.lazy(() => import('../pages/B2CLoginPage'));
