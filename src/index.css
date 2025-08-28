@@ -4,6 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Accessibility styles */
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.high-contrast {
+  --border: hsl(var(--foreground) / 0.3);
+  --ring: hsl(var(--foreground) / 0.8);
+}
+
+.dyslexic-font {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Font scaling */
+:root {
+  --font-scale: 1;
+}
+
+body {
+  font-size: calc(1rem * var(--font-scale));
+}
+
 @layer base {
   /* Base reset & full-bleed setup */
   html, body {

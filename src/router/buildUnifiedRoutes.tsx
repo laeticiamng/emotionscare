@@ -44,7 +44,9 @@ const ChooseModePage = React.lazy(() => import('../pages/ChooseModePage'));
 const ProfileSettingsPage = React.lazy(() => import('../pages/ProfileSettingsPage'));
 const UserPreferencesPage = React.lazy(() => import('../pages/UserPreferencesPage'));
 const PrivacyTogglesPage = React.lazy(() => import('../pages/Settings/PrivacyPage'));
-const NotificationsPage = React.lazy(() => import('../pages/NotificationsPage'));
+const NotificationsPage = React.lazy(() => import('../pages/Settings/NotificationsPage'));
+const HelpHome = React.lazy(() => import('../pages/help/HelpHome'));
+const ProfileSettings = React.lazy(() => import('../pages/Settings/ProfileSettings'));
 const HelpCenterPage = React.lazy(() => import('../pages/HelpCenterPage'));
 const AccountDeletionPage = React.lazy(() => import('../pages/Settings/DeleteAccountPage'));
 
@@ -301,7 +303,15 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
         },
         { 
           path: OFFICIAL_ROUTES.HELP_CENTER, 
-          element: <SuspenseWrapper><HelpCenterPage /></SuspenseWrapper> 
+          element: <SuspenseWrapper><HelpHome /></SuspenseWrapper> 
+        },
+        { 
+          path: '/help', 
+          element: <SuspenseWrapper><HelpHome /></SuspenseWrapper> 
+        },
+        { 
+          path: '/settings/profile', 
+          element: <SuspenseWrapper><ProfileSettings /></SuspenseWrapper> 
         },
         
         // 404 catch-all
