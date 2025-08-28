@@ -15,6 +15,8 @@ const VRGalaxyPage = lazy(() => import('@/pages/VRGalaxyPage'));
 const GlowDashboardPage = lazy(() => import('@/pages/GlowDashboardPage'));
 const DashboardRH = lazy(() => import('@/pages/org/DashboardRH'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+const VRBreathPage = lazy(() => import('@/pages/VRBreathPage'));
 
 export const gamificationRoutes: RouteObject[] = [
   {
@@ -68,5 +70,13 @@ export const gamificationRoutes: RouteObject[] = [
   {
     path: '/journal',
     element: <JournalPage />,
+  },
+  {
+    path: '/leaderboard',
+    element: <LeaderboardPage />,
+  },
+  {
+    path: '/vr-breath',
+    element: <VRBreathPage />,
   }
 ];
