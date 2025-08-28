@@ -1,152 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useARStore, type VisionReading } from '@/store/ar.store';
 import { supabase } from '@/integrations/supabase/client';
 import { useCamera } from './useCamera';
+import { usePrivacyPrefs } from './usePrivacyPrefs';
 
 const FRAME_THROTTLE_MS = 1000; // 1 FPS
 
 export const useHumeVision = () => {
   const store = useARStore();
+  const { prefs } = usePrivacyPrefs();
   const { captureFrame } = useCamera();
-  const [wsConnection, setWsConnection] = useState<WebSocket | null>(null);
   const lastFrameTimeRef = useRef<number>(0);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const reconnectAttemptsRef = useRef(0);
-  const maxReconnectAttempts = 5;
 
-  // Start vision session
-  const startSession = useCallback(async (deviceId?: string) => {
-    try {
-      store.setError(null);
-      
-      const { data, error } = await supabase.functions.invoke('face-filter-start', {
-        body: { deviceId }
-      });
-
-      if (error || !data) {
-        throw new Error(error?.message || 'Failed to start face filter session');
-      }
-
-      const { session_id, ws_url } = data;
-      store.setSessionData(session_id, ws_url);
-      
-      // Connect to WebSocket
-      connectWebSocket(ws_url, session_id);
-      
-      console.log('Hume Vision session started:', session_id);
-      return { session_id, ws_url };
-
-    } catch (error: any) {
-      console.error('Error starting Hume Vision session:', error);
-      store.setError(error.message);
-      return null;
-    }
+  // Stop session and cleanup
+  const stopSession = useCallback(() => {
+    store.reset();
+    console.log('Hume Vision session stopped');
   }, [store]);
-
-  // Connect to WebSocket for real-time emotion detection
-  const connectWebSocket = useCallback((wsUrl: string, sessionId: string) => {
-    try {
-      // Use full WebSocket URL for the edge function
-      const fullWsUrl = wsUrl.startsWith('ws') ? wsUrl : 
-        `wss://yaincoxihiqdksxgrsrk.functions.supabase.co/functions/v1/hume-vision-ws`;
-      
-      const ws = new WebSocket(fullWsUrl);
-      
-      ws.onopen = () => {
-        console.log('Hume Vision WebSocket connected');
-        store.setConnected(true);
-        reconnectAttemptsRef.current = 0;
-        
-        // Send session ID
-        ws.send(JSON.stringify({ 
-          type: 'session',
-          session_id: sessionId 
-        }));
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log('Hume Vision response:', data);
-          
-          if (data.emotion && data.confidence !== undefined) {
-            const reading: VisionReading = {
-              emotion: data.emotion,
-              confidence: data.confidence,
-              ts: Date.now()
-            };
-            
-            store.setCurrentEmotion(reading);
-            
-            // Get comment for this emotion
-            getEmotionComment(data.emotion);
-          }
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('Hume Vision WebSocket error:', error);
-        store.setError('Connection error');
-      };
-
-      ws.onclose = (event) => {
-        console.log('Hume Vision WebSocket closed:', event.code);
-        store.setConnected(false);
-        setWsConnection(null);
-        
-        // Auto-reconnect with exponential backoff
-        if (reconnectAttemptsRef.current < maxReconnectAttempts) {
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 8000);
-          console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current + 1})`);
-          
-          reconnectTimeoutRef.current = setTimeout(() => {
-            reconnectAttemptsRef.current++;
-            connectWebSocket(wsUrl, sessionId);
-          }, delay);
-        } else {
-          store.setError('Connection lost - please refresh');
-        }
-      };
-
-      setWsConnection(ws);
-      
-    } catch (error: any) {
-      console.error('Error connecting WebSocket:', error);
-      store.setError('Failed to connect');
-    }
-  }, [store]);
-
-  // Send frame for analysis (throttled to 1 FPS)
-  const sendFrame = useCallback(() => {
-    const now = Date.now();
-    
-    if (now - lastFrameTimeRef.current < FRAME_THROTTLE_MS || !wsConnection || !store.isConnected) {
-      return;
-    }
-
-    const frameData = captureFrame();
-    if (!frameData || !store.sessionId) return;
-
-    try {
-      // Extract base64 data without the data URL prefix
-      const base64Data = frameData.split(',')[1];
-      
-      const message = {
-        type: 'frame',
-        session_id: store.sessionId,
-        frame: base64Data,
-        ts: now
-      };
-
-      wsConnection.send(JSON.stringify(message));
-      lastFrameTimeRef.current = now;
-      
-    } catch (error) {
-      console.error('Error sending frame:', error);
-    }
-  }, [wsConnection, store.isConnected, store.sessionId, captureFrame]);
 
   // Get emotion comment from backend
   const getEmotionComment = useCallback(async (emotion: string, context?: 'work' | 'study' | 'chill') => {
@@ -176,7 +46,7 @@ export const useHumeVision = () => {
   const sendMetrics = useCallback(async (emotion: string, confidence?: number, source: 'camera' | 'fallback' = 'camera') => {
     try {
       // Fire-and-forget metrics
-      supabase.functions.invoke('metrics-face-filter', {
+      supabase.functions.invoke('metrics/face_filter', {
         body: {
           emotion,
           confidence,
@@ -191,21 +61,82 @@ export const useHumeVision = () => {
     }
   }, []);
 
-  // Stop session and cleanup
-  const stopSession = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
+  // Start vision session
+  const startSession = useCallback(async (deviceId?: string) => {
+    // Check privacy preferences
+    if (!prefs.camera) {
+      console.log('Camera disabled by privacy preferences');
+      store.setSource('fallback');
+      return null;
     }
     
-    if (wsConnection) {
-      wsConnection.close();
-      setWsConnection(null);
+    try {
+      store.setError(null);
+      
+      const { data, error } = await supabase.functions.invoke('face-filter-start', {
+        body: { deviceId }
+      });
+
+      if (error || !data) {
+        throw new Error(error?.message || 'Failed to start face filter session');
+      }
+
+      const { session_id } = data;
+      store.setSessionData(session_id, '');
+      store.setSource('camera');
+      
+      console.log('Hume Vision session started:', session_id);
+      return { session_id };
+
+    } catch (error: any) {
+      console.error('Error starting Hume Vision session:', error);
+      store.setError(error.message);
+      return null;
     }
+  }, [store, prefs.camera]);
+
+  // Send frame for analysis (throttled to 1 FPS)
+  const sendFrame = useCallback(async () => {
+    const now = Date.now();
     
-    store.reset();
-    console.log('Hume Vision session stopped');
-  }, [wsConnection, store]);
+    if (now - lastFrameTimeRef.current < FRAME_THROTTLE_MS || !store.sessionId) {
+      return;
+    }
+
+    const frameData = captureFrame();
+    if (!frameData) return;
+
+    try {
+      // Send frame to Hume proxy with throttling
+      const { data, error } = await supabase.functions.invoke('hume-ws-proxy', {
+        body: { 
+          session_id: store.sessionId,
+          frame: frameData,
+          ts: now
+        }
+      });
+
+      if (!error && data) {
+        const reading: VisionReading = {
+          emotion: data.emotion,
+          confidence: data.confidence,
+          ts: now
+        };
+        
+        store.setCurrentEmotion(reading);
+        lastFrameTimeRef.current = now;
+        
+        // Get comment for this emotion
+        getEmotionComment(data.emotion);
+        
+        // Send metrics (fire-and-forget)
+        sendMetrics(data.emotion, data.confidence, 'camera');
+      }
+      
+    } catch (error) {
+      console.error('Error sending frame:', error);
+    }
+  }, [store.sessionId, captureFrame, getEmotionComment, sendMetrics]);
 
   // Auto-send frames when active
   useEffect(() => {
@@ -213,7 +144,7 @@ export const useHumeVision = () => {
 
     const interval = setInterval(() => {
       sendFrame();
-    }, 100); // Check every 100ms, but throttled internally to 1 FPS
+    }, FRAME_THROTTLE_MS); // Send at 1 FPS
 
     return () => {
       clearInterval(interval);
@@ -231,7 +162,6 @@ export const useHumeVision = () => {
     // State
     active: store.active,
     hasCamera: store.hasCamera,
-    isConnected: store.isConnected,
     currentEmotion: store.currentEmotion,
     comment: store.comment,
     error: store.error,

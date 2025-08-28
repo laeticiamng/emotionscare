@@ -1,6 +1,18 @@
 
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.face-filter-start]
+verify_jwt = false
+
+[functions.face-filter-comment]
+verify_jwt = false
+
+[functions.hume-ws-proxy]
+verify_jwt = false
+
+[functions.metrics]
+verify_jwt = false
+
 [functions.openai-realtime]
 verify_jwt = false
 

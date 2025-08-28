@@ -5,6 +5,8 @@ import BubbleBeat from '@/components/hr/BubbleBeat';
 import HRConnectButton from '@/components/hr/HRConnectButton';
 import { useHeartRate } from '@/hooks/useHeartRate';
 import { useSimulatedHR } from '@/hooks/useSimulatedHR';
+import { useARAnalytics } from '@/hooks/useARAnalytics';
+import { usePrivacyPrefs } from '@/hooks/usePrivacyPrefs';
 import { useHRStore } from '@/store/hr.store';
 
 const BubbleBeatPage: React.FC = () => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
 import { type Emotion } from '@/store/ar.store';
 
 interface EmotionBubbleProps {
@@ -39,11 +40,33 @@ const EmotionBubble: React.FC<EmotionBubbleProps> = ({ emotion, comment, classNa
     if (emotion) {
       setIsVisible(true);
       
-      // Use provided comment or pick a random default
-      const finalComment = comment || 
-        defaultComments[emotion][Math.floor(Math.random() * defaultComments[emotion].length)];
-      
-      setDisplayComment(finalComment);
+      // Try to get comment from backend, fallback to default
+      if (comment) {
+        setDisplayComment(comment);
+      } else {
+        // Fetch fresh comment from backend
+        const fetchComment = async () => {
+          try {
+            const { data, error } = await supabase.functions.invoke('face-filter-comment', {
+              body: { emotion, context: 'chill' }
+            });
+            
+            if (!error && data?.text) {
+              setDisplayComment(data.text);
+            } else {
+              // Fallback to default comments
+              const fallback = defaultComments[emotion][Math.floor(Math.random() * defaultComments[emotion].length)];
+              setDisplayComment(fallback);
+            }
+          } catch (err) {
+            console.warn('Failed to fetch comment:', err);
+            const fallback = defaultComments[emotion][Math.floor(Math.random() * defaultComments[emotion].length)];
+            setDisplayComment(fallback);
+          }
+        };
+        
+        fetchComment();
+      }
       
       // Auto-hide after 3 seconds if no new emotion
       const timer = setTimeout(() => {

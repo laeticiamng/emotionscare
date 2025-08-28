@@ -1,0 +1,41 @@
+{
+  "ar": {
+    "face": {
+      "title": "Filtres Visage AR", 
+      "enable": "Activer la caméra",
+      "noCam": "Pas de caméra ? Choisis ton humeur.",
+      "connected": "Caméra connectée",
+      "disconnected": "Caméra déconnectée",
+      "fallback": {
+        "title": "Choisis ton humeur",
+        "subtitle": "Sélectionne comment tu te sens"
+      },
+      "comments": {
+        "joy": "Tu rayonnes ✨",
+        "calm": "Zen attitude 🧘‍♀️",
+        "sad": "Petite baisse de moral ? 💙",
+        "anger": "On respire profondément ? 🌬️",
+        "fear": "Tout va bien se passer 🌱",
+        "surprise": "Quelle surprise ! 🎉",
+        "neutral": "Mode contemplation 🤔"
+      }
+    }
+  },
+  "hr": {
+    "connect": "Connecter un capteur cardiaque",
+    "connected": "Capteur connecté",
+    "demo": "Mode démo", 
+    "help": "Besoin d'aide ?",
+    "status": {
+      "connecting": "Connexion en cours...",
+      "failed": "Connexion échouée",
+      "disconnected": "Déconnecté"
+    }
+  },
+  "common": {
+    "enable": "Activer",
+    "disable": "Désactiver",
+    "retry": "Réessayer",
+    "close": "Fermer"
+  }
+}
