@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useHRStore } from '@/store/hr.store';
 
 interface Bubble {
@@ -28,13 +28,14 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
   const animationRef = useRef<number | null>(null);
   const bubblesRef = useRef<Bubble[]>([]);
   const lastBeatRef = useRef<number>(0);
+  const lastFrameTimeRef = useRef<number>(0);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Calculate beat interval from BPM
   const beatInterval = bpm ? (60 / bpm) * 1000 : 1000; // ms between beats
 
   // Initialize bubbles
-  const initializeBubbles = (canvas: HTMLCanvasElement) => {
+  const initializeBubbles = useCallback((canvas: HTMLCanvasElement) => {
     const bubbleCount = reducedMotion ? 40 : 80;
     bubblesRef.current = [];
 
@@ -51,10 +52,10 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
         pulseStrength: 0.5 + Math.random() * 0.5,
       });
     }
-  };
+  }, [reducedMotion]);
 
   // Update bubble physics
-  const updateBubbles = (canvas: HTMLCanvasElement, deltaTime: number) => {
+  const updateBubbles = useCallback((canvas: HTMLCanvasElement, deltaTime: number) => {
     const currentTime = Date.now();
     const timeSinceBeat = currentTime - lastBeatRef.current;
     const beatProgress = (timeSinceBeat % beatInterval) / beatInterval;
@@ -85,10 +86,10 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
       const heartPulse = pulseIntensity * bubble.pulseStrength * 0.3;
       bubble.radius = (8 + Math.random() * 12) * (1 + basePulse + heartPulse);
     });
-  };
+  }, [beatInterval, bpm, reducedMotion]);
 
   // Render bubbles
-  const renderBubbles = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+  const renderBubbles = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     // Clear canvas with subtle background
     ctx.fillStyle = 'rgba(15, 23, 42, 0.1)'; // Very subtle dark overlay
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -113,27 +114,26 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
       
       ctx.restore();
     });
-  };
+  }, []);
 
   // Animation loop
-  const animate = (currentTime: number) => {
+  const animate = useCallback((currentTime: number) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     
     if (!canvas || !ctx) return;
     
-    static let lastTime = currentTime;
-    const deltaTime = currentTime - lastTime;
-    lastTime = currentTime;
+    const deltaTime = currentTime - lastFrameTimeRef.current;
+    lastFrameTimeRef.current = currentTime;
     
     updateBubbles(canvas, deltaTime);
     renderBubbles(ctx, canvas);
     
     animationRef.current = requestAnimationFrame(animate);
-  };
+  }, [updateBubbles, renderBubbles]);
 
   // Handle canvas resize
-  const resizeCanvas = () => {
+  const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -159,7 +159,7 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
     
     // Reinitialize bubbles with new dimensions
     initializeBubbles(canvas);
-  };
+  }, [initializeBubbles]);
 
   // Initialize on mount
   useEffect(() => {
@@ -170,6 +170,7 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
     setIsInitialized(true);
     
     // Start animation
+    lastFrameTimeRef.current = performance.now();
     animationRef.current = requestAnimationFrame(animate);
     
     // Handle window resize
@@ -182,7 +183,7 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
       }
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [animate, resizeCanvas]);
 
   // Update beat timing when BPM changes
   useEffect(() => {
@@ -207,7 +208,7 @@ const BubbleBeat: React.FC<BubbleBeatProps> = ({
         </div>
         
         {/* Demo indicator */}
-        {!bmp && (
+        {!bpm && (
           <div className="absolute top-4 left-4">
             <div className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1">
               <span className="text-xs text-white/80">Mode démo</span>
