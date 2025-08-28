@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getEmotionIcon, getEmotionColor } from '@/lib/emotionUtils';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 
 interface JournalListViewProps {
   entries: JournalEntry[];
@@ -20,7 +21,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
     return (
       <div className="text-center p-8 border rounded-md border-dashed bg-muted/20">
         <p className="text-muted-foreground">Aucune entrée dans votre journal pour l'instant.</p>
-        <Link to="/journal/new" className="text-primary hover:underline mt-2 inline-block">
+        <Link to={routes.consumer.journal() + '/new'} className="text-primary hover:underline mt-2 inline-block">
           Créer ma première entrée
         </Link>
       </div>
@@ -67,7 +68,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
               </div>
             </CardContent>
             <CardFooter className="flex justify-end pt-0 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Link to={`/journal/${entry.id}`}>
+              <Link to={routes.consumer.journal() + '/' + entry.id}>
                 <Button variant="ghost" size="icon">
                   <Edit size={18} />
                 </Button>

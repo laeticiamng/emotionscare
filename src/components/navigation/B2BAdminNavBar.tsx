@@ -5,7 +5,7 @@ import { LayoutDashboard, Users, FileBarChart, Calendar, Settings, BookOpen, Sca
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
-import { ROUTES } from '@/types/navigation';
+import { routes } from '@/routerV2';
 import { useUserMode } from '@/contexts/UserModeContext';
 
 const B2BAdminNavBar: React.FC = () => {
@@ -22,21 +22,21 @@ const B2BAdminNavBar: React.FC = () => {
     await logout();
     clearUserMode();
     setShowConfirm(false);
-    window.location.href = ROUTES.b2bAdmin.login;
+    window.location.href = routes.manager.login();
   };
   
   return (
     <nav className="flex flex-col space-y-1 p-2 bg-slate-800 text-white border-r h-full">
-      <NavItem to={ROUTES.b2bAdmin.dashboard} isActive={isActive(ROUTES.b2bAdmin.dashboard)} icon={<LayoutDashboard className="h-5 w-5" />} label="Tableau de bord" />
-      <NavItem to={ROUTES.b2bAdmin.journal} isActive={isActive(ROUTES.b2bAdmin.journal)} icon={<BookOpen className="h-5 w-5" />} label="Journal" />
-      <NavItem to={ROUTES.b2bAdmin.scan} isActive={isActive(ROUTES.b2bAdmin.scan)} icon={<Scan className="h-5 w-5" />} label="Scan" />
-      <NavItem to={ROUTES.b2bAdmin.music} isActive={isActive(ROUTES.b2bAdmin.music)} icon={<Music className="h-5 w-5" />} label="Musique" />
-      <NavItem to={ROUTES.b2bAdmin.teams} isActive={isActive(ROUTES.b2bAdmin.teams)} icon={<Users className="h-5 w-5" />} label="Équipes" />
-      <NavItem to={ROUTES.b2bAdmin.reports} isActive={isActive(ROUTES.b2bAdmin.reports)} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
-      <NavItem to={ROUTES.b2bAdmin.events} isActive={isActive(ROUTES.b2bAdmin.events)} icon={<Calendar className="h-5 w-5" />} label="Événements" />
-      <NavItem to="/extensions" isActive={isActive('/extensions')} icon={<Box className="h-5 w-5" />} label="Extensions" />
-      <NavItem to={ROUTES.b2bAdmin.optimisation} isActive={isActive(ROUTES.b2bAdmin.optimisation)} icon={<FileBarChart className="h-5 w-5" />} label="Optimisation" />
-      <NavItem to={ROUTES.b2bAdmin.settings} isActive={isActive(ROUTES.b2bAdmin.settings)} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
+      <NavItem to={routes.manager.dashboard()} isActive={isActive(routes.manager.dashboard())} icon={<LayoutDashboard className="h-5 w-5" />} label="Tableau de bord" />
+      <NavItem to={routes.manager.journal()} isActive={isActive(routes.manager.journal())} icon={<BookOpen className="h-5 w-5" />} label="Journal" />
+      <NavItem to={routes.manager.scan()} isActive={isActive(routes.manager.scan())} icon={<Scan className="h-5 w-5" />} label="Scan" />
+      <NavItem to={routes.manager.music()} isActive={isActive(routes.manager.music())} icon={<Music className="h-5 w-5" />} label="Musique" />
+      <NavItem to={routes.manager.teams()} isActive={isActive(routes.manager.teams())} icon={<Users className="h-5 w-5" />} label="Équipes" />
+      <NavItem to={routes.manager.reports()} isActive={isActive(routes.manager.reports())} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
+      <NavItem to={routes.manager.events()} isActive={isActive(routes.manager.events())} icon={<Calendar className="h-5 w-5" />} label="Événements" />
+      <NavItem to={routes.manager.settings()} isActive={isActive(routes.manager.settings())} icon={<Box className="h-5 w-5" />} label="Extensions" />
+      <NavItem to={routes.manager.optimisation()} isActive={isActive(routes.manager.optimisation())} icon={<FileBarChart className="h-5 w-5" />} label="Optimisation" />
+      <NavItem to={routes.manager.settings()} isActive={isActive(routes.manager.settings())} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
       
       <button 
         onClick={() => setShowConfirm(true)}

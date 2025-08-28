@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Brain, Timer, Star } from "lucide-react";
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { mobileSpacing } from '@/utils/mobileOptimizations';
 
 interface MindfulnessModuleProps {
@@ -61,7 +62,7 @@ const MindfulnessModule: React.FC<MindfulnessModuleProps> = ({ className }) => {
           Voir le détail
         </Button>
         <Button size="sm" asChild className="w-full sm:w-auto">
-          <Link to="/vr">
+          <Link to={routes.consumer.vr()}>
             Commencer
           </Link>
         </Button>

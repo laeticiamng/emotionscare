@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Heart, Mail, Phone, Shield } from 'lucide-react';
@@ -19,7 +20,7 @@ const MainFooter: React.FC<MainFooterProps> = ({ className }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Brand Column */}
             <div>
-              <Link to="/" className="flex items-center space-x-2">
+              <Link to={routes.public.home()} className="flex items-center space-x-2">
                 <motion.div 
                   whileHover={{ rotate: 10 }}
                   transition={{ duration: 0.2 }}
@@ -39,22 +40,22 @@ const MainFooter: React.FC<MainFooterProps> = ({ className }) => {
               <h3 className="text-sm font-medium mb-4">Liens rapides</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link to="/about" className="hover:text-foreground transition-colors">
+                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
                     À propos
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal" className="hover:text-foreground transition-colors">
+                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
                     Mentions légales
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="hover:text-foreground transition-colors">
+                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
                     Politique de confidentialité
                   </Link>
                 </li>
                 <li>
-                  <Link to="/terms" className="hover:text-foreground transition-colors">
+                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
                     Conditions d'utilisation
                   </Link>
                 </li>

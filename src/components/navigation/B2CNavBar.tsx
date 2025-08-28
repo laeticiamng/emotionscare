@@ -21,7 +21,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useToast } from "@/hooks/use-toast";
-import { ROUTES } from "@/types/navigation";
+import { routes } from '@/routerV2';
 
 const B2CNavBar: React.FC = () => {
   const location = useLocation();
@@ -48,7 +48,7 @@ const B2CNavBar: React.FC = () => {
   return (
     <div className="h-full flex flex-col bg-muted/40 border-r">
       <div className="p-4 border-b">
-        <Link to={ROUTES.b2c.dashboard} className="flex items-center gap-2">
+        <Link to={routes.consumer.dashboard()} className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
             <User className="h-4 w-4 text-primary" />
           </div>
@@ -60,11 +60,11 @@ const B2CNavBar: React.FC = () => {
       </div>
       
       <nav className="flex-1 p-2 space-y-1">
-        <Link to={ROUTES.b2c.dashboard}>
+        <Link to={routes.consumer.dashboard()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.dashboard ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.dashboard() ? "default" : "ghost"}
             className={cn("w-full justify-start", {
-              "bg-accent": location.pathname === ROUTES.b2c.dashboard,
+              "bg-accent": location.pathname === routes.consumer.dashboard(),
             })}
           >
             <Home className="mr-2 h-4 w-4" />
@@ -72,9 +72,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
         
-        <Link to={ROUTES.b2c.journal}>
+        <Link to={routes.consumer.journal()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.journal ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.journal() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <BookOpen className="mr-2 h-4 w-4" />
@@ -82,9 +82,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
         
-        <Link to={ROUTES.b2c.music}>
+        <Link to={routes.consumer.music()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.music ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.music() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <Music className="mr-2 h-4 w-4" />
@@ -92,9 +92,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
         
-        <Link to={ROUTES.b2c.scan}>
+        <Link to={routes.consumer.scan()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.scan ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.scan() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <Heart className="mr-2 h-4 w-4" />
@@ -102,9 +102,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
 
-        <Link to={ROUTES.b2c.coach}>
+        <Link to={routes.consumer.coach()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.coach ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.coach() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <MessageSquare className="mr-2 h-4 w-4" />
@@ -112,9 +112,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
 
-        <Link to={ROUTES.b2c.vr}>
+        <Link to={routes.consumer.vr()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.vr ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.vr() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <Glasses className="mr-2 h-4 w-4" />
@@ -122,9 +122,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
 
-        <Link to={ROUTES.b2c.gamification}>
+        <Link to={routes.consumer.gamification()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.gamification ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.gamification() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <Trophy className="mr-2 h-4 w-4" />
@@ -132,9 +132,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
 
-        <Link to={ROUTES.b2c.cocon}>
+        <Link to={routes.consumer.socialCocon()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.cocon ? "default" : "ghost"}
+            variant={location.pathname === routes.consumer.socialCocon() ? "default" : "ghost"}
             className="w-full justify-start"
           >
             <HeartHandshake className="mr-2 h-4 w-4" />
@@ -142,9 +142,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
 
-        <Link to={ROUTES.b2c.marketplace}>
+        <Link to={routes.public.about()}>
           <Button
-            variant={location.pathname === ROUTES.b2c.marketplace ? 'default' : 'ghost'}
+            variant={location.pathname === routes.public.about() ? 'default' : 'ghost'}
             className="w-full justify-start"
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
@@ -152,9 +152,9 @@ const B2CNavBar: React.FC = () => {
           </Button>
         </Link>
 
-        <Link to="/extensions">
+        <Link to={routes.public.about()}>
           <Button
-            variant={location.pathname === '/extensions' ? 'default' : 'ghost'}
+            variant={location.pathname === routes.public.about() ? 'default' : 'ghost'}
             className="w-full justify-start"
           >
             <Box className="mr-2 h-4 w-4" />
@@ -165,7 +165,7 @@ const B2CNavBar: React.FC = () => {
       
       <div className="p-4 border-t mt-auto">
         <div className="space-y-2">
-          <Link to={ROUTES.b2c.preferences}>
+          <Link to={routes.consumer.preferences()}>
             <Button variant="ghost" className="w-full justify-start">
               <Settings className="mr-2 h-4 w-4" />
               Préférences

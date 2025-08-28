@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Button } from "@/components/ui/button";
 import { Brain, MessageCircle, History, ChevronLeft } from 'lucide-react';
 
@@ -38,33 +39,33 @@ const CoachNavigation: React.FC<CoachNavigationProps> = ({
       
       <div className="flex items-center gap-2">
         <Button 
-          variant={currentPath === '/coach' ? 'default' : 'outline'} 
+          variant={currentPath === routes.consumer.coach() ? 'default' : 'outline'} 
           size="sm"
           asChild
         >
-          <Link to="/coach">
+          <Link to={routes.consumer.coach()}>
             <Brain className="h-4 w-4 mr-1" />
             Accueil
           </Link>
         </Button>
         
         <Button 
-          variant={currentPath === '/coach-chat' ? 'default' : 'outline'} 
+          variant={currentPath === routes.consumer.coach() + '/chat' ? 'default' : 'outline'} 
           size="sm"
           asChild
         >
-          <Link to="/coach-chat">
+          <Link to={routes.consumer.coach() + '/chat'}>
             <MessageCircle className="h-4 w-4 mr-1" />
             Chat
           </Link>
         </Button>
         
         <Button 
-          variant={currentPath === '/coach/history' ? 'default' : 'outline'} 
+          variant={currentPath === routes.consumer.coach() + '/history' ? 'default' : 'outline'} 
           size="sm"
           asChild
         >
-          <Link to="/coach/history">
+          <Link to={routes.consumer.coach() + '/history'}>
             <History className="h-4 w-4 mr-1" />
             Historique
           </Link>

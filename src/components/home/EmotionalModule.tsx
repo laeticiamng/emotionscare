@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Heart, TrendingUp, BookOpen } from "lucide-react";
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 
 interface EmotionalModuleProps {
   className?: string;
@@ -60,7 +61,7 @@ const EmotionalModule: React.FC<EmotionalModuleProps> = ({ className }) => {
           Voir le détail
         </Button>
         <Button size="sm" asChild>
-          <Link to="/scan">
+          <Link to={routes.consumer.scan()}>
             Commencer
           </Link>
         </Button>
