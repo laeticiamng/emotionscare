@@ -12,12 +12,8 @@ import MusicProvider from './contexts/MusicContext';
 import { RootErrorBoundary } from './components/RootErrorBoundary';
 import AppProviders from './AppProviders';
 
-// Routers
-import AppRouter from './router/AppRouter';  // Legacy router
-import { routerV2 } from './routerV2';       // Nouveau RouterV2
-
-// Feature flag pour RouterV2
-const FF_ROUTER_V2 = import.meta.env.VITE_FF_ROUTER_V2 === 'true';
+// RouterV2 unifié - Plus de feature flag, toujours activé
+import { routerV2 } from './routerV2';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,11 +25,7 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
-  console.log(`🚀 App component mounting avec ${FF_ROUTER_V2 ? 'RouterV2' : 'Router Legacy'}...`);
-  
-  if (FF_ROUTER_V2) {
-    console.log('✨ RouterV2 activé - Architecture unifiée');
-  }
+  console.log('✨ App component mounting avec RouterV2 - Architecture unifiée');
 
   return (
     <RootErrorBoundary>
@@ -41,11 +33,7 @@ const App: React.FC = () => {
         <AppProviders>
           <MusicProvider>
             <RootErrorBoundary>
-              {FF_ROUTER_V2 ? (
-                <RouterProvider router={routerV2} />
-              ) : (
-                <AppRouter />
-              )}
+              <RouterProvider router={routerV2} />
             </RootErrorBoundary>
           </MusicProvider>
         </AppProviders>
