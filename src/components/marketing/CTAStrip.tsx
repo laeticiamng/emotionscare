@@ -124,6 +124,6 @@ export const CTAStrip: React.FC<CTAStripProps> = ({ segment }) => {
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 };
