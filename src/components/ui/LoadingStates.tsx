@@ -185,7 +185,7 @@ export const EmptyState: React.FC<{
 };
 
 // Hook pour gérer les états L/C/E/V
-export const useLoadingStates = <T>(
+export const useLoadingStates = <T extends unknown>(
   asyncFunction: () => Promise<T>,
   dependencies: unknown[] = []
 ) => {
