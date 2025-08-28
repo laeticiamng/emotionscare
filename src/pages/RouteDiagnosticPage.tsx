@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 
 const RouteDiagnosticPage: React.FC = () => {
   const routes = [
@@ -94,7 +101,7 @@ const RouteDiagnosticPage: React.FC = () => {
           </div>
           
           <div className="mt-6">
-            <Link to="/" className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            <Link to={Routes.home()} className="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
               Retour à l'accueil
             </Link>
           </div>

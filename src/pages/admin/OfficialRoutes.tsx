@@ -28,7 +28,7 @@ const OfficialRoutesPage: React.FC = () => {
   const isAdmin = user?.user_metadata?.role === 'b2b_admin' || user?.user_metadata?.role === 'admin';
   
   if (!isAdmin) {
-    return <Navigate to="/choose-mode" replace />;
+    return <Navigate to={Routes.home()} replace />;
   }
 
   return (

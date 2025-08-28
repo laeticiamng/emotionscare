@@ -18,7 +18,7 @@ const OrganizationPage: React.FC = () => {
       description: "Vous n'avez pas les permissions nécessaires pour accéder à cette page.",
       variant: "destructive"
     });
-    return <Navigate to="/" replace />;
+    return <Navigate to={Routes.home()} replace />;
   }
   
   // Show loading state

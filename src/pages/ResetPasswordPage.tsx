@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -79,7 +86,7 @@ const ResetPasswordPage: React.FC = () => {
                 <Button onClick={() => setIsSuccess(false)} variant="outline" className="w-full">
                   Renvoyer l'email
                 </Button>
-                <Link to="/login" className="block">
+                <Link to={Routes.login()} className="block">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Retour à la connexion
@@ -154,7 +161,7 @@ const ResetPasswordPage: React.FC = () => {
                 </p>
               </div>
               
-              <Link to="/login" className="inline-flex items-center text-sm text-blue-600 hover:underline">
+              <Link to={Routes.login()} className="inline-flex items-center text-sm text-blue-600 hover:underline">
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Retour à la connexion
               </Link>

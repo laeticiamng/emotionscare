@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Building2, Shield, Users, ArrowLeft } from 'lucide-react';
@@ -50,7 +57,7 @@ const B2BRoleSelectionPage: React.FC = () => {
                   Journal de réflexion professionnel
                 </li>
               </ul>
-              <Link to="/b2b/user/login" className="block">
+              <Link to={Routes.login({ segment: "b2b" })} className="block">
                 <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700">
                   Accès Collaborateur
                 </Button>
@@ -88,7 +95,7 @@ const B2BRoleSelectionPage: React.FC = () => {
                   Gestion des utilisateurs
                 </li>
               </ul>
-              <Link to="/b2b/admin/login" className="block">
+              <Link to={Routes.login({ segment: "b2b" })} className="block">
                 <Button className="w-full mt-6 bg-slate-600 hover:bg-slate-700">
                   Accès Administrateur
                 </Button>
@@ -98,7 +105,7 @@ const B2BRoleSelectionPage: React.FC = () => {
         </div>
 
         <div className="text-center">
-          <Link to="/choose-mode">
+          <Link to={Routes.home()}>
             <Button variant="outline" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Retour au choix de mode

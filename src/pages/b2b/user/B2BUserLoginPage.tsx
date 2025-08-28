@@ -9,6 +9,7 @@ import { Users, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin, FaMicrosoft } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 
 const B2BUserLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const B2BUserLoginPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement B2B user authentication
-    navigate('/b2b/user/dashboard');
+    navigate(Routes.employeeHome());
   };
 
   return (
@@ -143,11 +144,11 @@ const B2BUserLoginPage: React.FC = () => {
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
                 Pas encore de compte ?{' '}
-                <Link to="/b2b/user/register" className="text-blue-600 hover:underline font-medium">
+                <Link to={Routes.signup({ segment: "b2b" })} className="text-blue-600 hover:underline font-medium">
                   Demander l'accès
                 </Link>
               </p>
-              <Link to="/choose-mode" className="text-sm text-muted-foreground hover:underline">
+              <Link to={Routes.home()} className="text-sm text-muted-foreground hover:underline">
                 ← Retour au choix du mode
               </Link>
             </div>
