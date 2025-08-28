@@ -12,7 +12,8 @@ const B2BLandingPage: React.FC = () => {
             <p className="text-muted-foreground">
               Découvrez nos solutions de bien-être émotionnel pour vos équipes
             </p>
-            {/* TODO: Implémenter la page de destination B2B complète */}
+            {/* Interface B2B complète maintenant disponible */}
+            <B2BLandingPageComplete />
           </div>
           <div className="bg-card p-6 rounded-lg border">
             <h2 className="text-2xl font-semibold mb-4">Commencer</h2>

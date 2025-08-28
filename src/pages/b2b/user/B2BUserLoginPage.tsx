@@ -10,6 +10,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin, FaMicrosoft } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { Routes } from '@/routerV2';
+import { useAuthFlow } from '@/hooks/useAuth';
 
 const B2BUserLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,10 +21,11 @@ const B2BUserLoginPage: React.FC = () => {
     companyCode: ''
   });
 
+  const { login, isLoading } = useAuthFlow();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement B2B user authentication
-    navigate(Routes.employeeHome());
+    login({ ...formData, segment: 'b2b' });
   };
 
   return (
@@ -115,8 +117,8 @@ const B2BUserLoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
-                Se connecter
+              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700" disabled={isLoading}>
+                {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
             </form>
 

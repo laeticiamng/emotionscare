@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Routes } from '@/routerV2/helpers';
+import { useAuthFlow } from '@/hooks/useAuth';
 import { Heart, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 
 const SignupPage: React.FC = () => {
@@ -29,10 +30,11 @@ const SignupPage: React.FC = () => {
     }));
   };
 
+  const { signup, isLoading } = useAuthFlow();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signup attempt:', { ...formData, segment });
-    // TODO: Implémentation signup
+    signup({ ...formData, segment: segment || 'b2c' });
   };
 
   const getTitle = () => {
@@ -166,8 +168,8 @@ const SignupPage: React.FC = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full">
-                Créer mon compte
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Création...' : 'Créer mon compte'}
               </Button>
             </form>
 

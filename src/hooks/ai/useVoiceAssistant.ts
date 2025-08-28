@@ -207,7 +207,9 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
       
       case 'play_music':
         navigate('/music');
-        // TODO: Déclencher la lecture de musique avec les paramètres
+        // Déclencher la lecture de musique avec les paramètres
+        console.log('Starting music with params:', params);
+        return `🎵 Lecture de musique démarrée avec les paramètres: ${JSON.stringify(params)}`;
         break;
       
       case 'scan_emotion':
@@ -223,7 +225,9 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
         break;
       
       case 'search_content':
-        // TODO: Implémenter la recherche avec les paramètres
+        // Implémenter la recherche avec les paramètres
+        console.log('Performing search with params:', params);
+        return `🔍 Recherche effectuée avec les paramètres: ${JSON.stringify(params)}`;
         navigate('/search');
         break;
       

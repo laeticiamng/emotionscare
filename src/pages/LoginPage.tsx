@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Routes } from '@/routerV2/helpers';
+import { useAuthFlow } from '@/hooks/useAuth';
 import { Heart, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
@@ -30,10 +31,11 @@ const LoginPage: React.FC = () => {
     }));
   };
 
+  const { login, isLoading } = useAuthFlow();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { ...formData, segment });
-    // TODO: Implémentation login
+    login({ ...formData, segment: segment || 'b2c' });
   };
 
   const getTitle = () => {
@@ -147,8 +149,8 @@ const LoginPage: React.FC = () => {
                 </a>
               </div>
 
-              <Button type="submit" className="w-full">
-                Se connecter
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
             </form>
 

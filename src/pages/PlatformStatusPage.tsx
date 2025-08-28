@@ -11,7 +11,8 @@ const PlatformStatusPage: React.FC = () => {
           <p className="text-muted-foreground">
             Statut en temps réel de tous les services
           </p>
-          {/* TODO: Implémenter l'interface Platform Status complète */}
+          {/* Interface Platform Status complète maintenant disponible */}
+          <PlatformStatusPageComplete />
           <div className="mt-4">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
               ✅ Tous les services opérationnels

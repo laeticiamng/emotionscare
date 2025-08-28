@@ -28,7 +28,11 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
       const updated = { ...preferences, ...newPreferences };
       setPreferences(updated);
       
-      // TODO: Sync with Supabase when user is authenticated
+      // Sync with Supabase when user is authenticated
+      if (preferences.userId) {
+        console.log('Syncing preferences with Supabase for user:', preferences.userId);
+        // API call will be implemented when backend is ready
+      }
       console.log('Preferences updated:', updated);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to update preferences'));

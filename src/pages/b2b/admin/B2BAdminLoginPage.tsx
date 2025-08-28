@@ -9,6 +9,8 @@ import { Shield, Mail, Lock, Eye, EyeOff, Building } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin, FaMicrosoft } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import { Routes } from '@/routerV2';
+import { useAuthFlow } from '@/hooks/useAuth';
 
 const B2BAdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -19,10 +21,11 @@ const B2BAdminLoginPage: React.FC = () => {
     adminKey: ''
   });
 
+  const { login, isLoading } = useAuthFlow();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement B2B admin authentication
-    navigate('/b2b/admin/dashboard');
+    login({ ...formData, segment: 'b2b', adminKey: formData.adminKey });
   };
 
   return (
@@ -114,8 +117,8 @@ const B2BAdminLoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-slate-600 to-blue-700 hover:from-slate-700 hover:to-blue-800">
-                Accéder à la console
+              <Button type="submit" className="w-full bg-gradient-to-r from-slate-600 to-blue-700 hover:from-slate-700 hover:to-blue-800" disabled={isLoading}>
+                {isLoading ? 'Connexion...' : 'Accéder à la console'}
               </Button>
             </form>
 

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Users, Mail, User, Building, MessageSquare, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuthFlow } from '@/hooks/useAuth';
 
 const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -21,9 +22,11 @@ const B2BUserRegisterPage: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
 
+  const { signup, isLoading } = useAuthFlow();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration request
+    signup({ ...formData, segment: 'b2b' });
     setSubmitted(true);
   };
 
@@ -169,8 +172,8 @@ const B2BUserRegisterPage: React.FC = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
-                Envoyer la demande
+              <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700" disabled={isLoading}>
+                {isLoading ? 'Envoi...' : 'Envoyer la demande'}
               </Button>
             </form>
 
