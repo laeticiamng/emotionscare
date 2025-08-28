@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -42,7 +43,7 @@ const NavBar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
+          <Link to={routes.public.home()} className="flex items-center space-x-3 group">
             <motion.div 
               whileHover={{ rotate: 180 }}
               transition={{ duration: 0.3 }}

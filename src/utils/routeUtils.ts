@@ -1,4 +1,8 @@
 
+/**
+ * @deprecated Use RouterV2 instead - see src/routerV2/
+ */
+
 // Routes unifiées - TICKET FE-FINAL-ROUTE-COMPLETION (52 routes officielles)
 export const UNIFIED_ROUTES = {
   // Routes publiques (8)

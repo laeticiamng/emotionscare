@@ -1,5 +1,9 @@
 
-import { useNavigate, useLocation } from 'react-router-dom';
+/**
+ * @deprecated Use RouterV2 instead - see src/routerV2/
+ */
+
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';

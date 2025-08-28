@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Shield, Lock } from 'lucide-react';
@@ -78,7 +79,7 @@ const EnhancedProtectedRoute: React.FC<EnhancedProtectedRouteProps> = ({
 
   // Vérification de l'email si requis
   if (requireEmailVerified && user?.email && !user.email) {
-    return <Navigate to="/verify-email" state={{ from: location.pathname }} replace />;
+    return <Navigate to={routes.auth.verifyEmail()} state={{ from: location.pathname }} replace />;
   }
 
   // Tout est OK, afficher le contenu

@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, Home } from 'lucide-react';
@@ -21,7 +22,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex flex-col">
       {/* Header */}
       <header className="container flex justify-between items-center py-4 px-4">
-        <Link to="/" className="flex items-center">
+        <Link to={routes.public.home()} className="flex items-center">
           <span className="font-bold text-xl">EmotionsCare</span>
         </Link>
         <div className="flex space-x-2">
@@ -29,7 +30,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           <Button variant="ghost" size="icon" asChild>
-            <Link to="/">
+            <Link to={routes.public.home()}>
               <Home className="h-5 w-5" />
             </Link>
           </Button>
