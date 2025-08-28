@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { ArrowLeft, Home, User, Settings } from 'lucide-react';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 import { getUserModeDisplayName, getModeDashboardPath } from '@/utils/userModeHelpers';
 
 interface EnhancedPageLayoutProps {
@@ -40,7 +40,7 @@ const EnhancedPageLayout: React.FC<EnhancedPageLayoutProps> = ({
 
   const getBreadcrumbItems = () => {
     const items = [
-      { label: 'Accueil', href: UNIFIED_ROUTES.HOME, icon: Home }
+      { label: 'Accueil', href: Routes.home(), icon: Home }
     ];
 
     // Ajouter le dashboard selon le mode

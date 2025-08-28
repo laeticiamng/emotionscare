@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Building2, Mail, Lock, User, Phone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -58,7 +58,7 @@ const B2BUserRegisterPage: React.FC = () => {
         invitation_code: formData.invitationCode
       });
       
-      navigate(UNIFIED_ROUTES.B2B_USER_DASHBOARD);
+      navigate(Routes.employeeHome());
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la création du compte');
     } finally {
@@ -240,7 +240,7 @@ const B2BUserRegisterPage: React.FC = () => {
             <p className="text-sm text-gray-600">
               Vous avez déjà un compte ?{' '}
               <Link 
-                to={UNIFIED_ROUTES.B2B_USER_LOGIN} 
+                to={Routes.login({ segment: 'b2b' })} 
                 className="text-blue-600 hover:text-blue-800 font-medium"
               >
                 Se connecter
@@ -250,7 +250,7 @@ const B2BUserRegisterPage: React.FC = () => {
 
           <div className="mt-4 text-center">
             <Link 
-              to={UNIFIED_ROUTES.B2B_SELECTION} 
+              to={Routes.b2bLanding()} 
               className="text-sm text-gray-500 hover:text-gray-700"
             >
               ← Revenir à la sélection

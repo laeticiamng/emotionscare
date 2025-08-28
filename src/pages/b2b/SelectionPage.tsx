@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building2, Users, Shield, BarChart3, Settings, UserCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const B2BSelectionPage: React.FC = () => {
         'Suivi de progression',
         'Accès aux ressources'
       ],
-      route: UNIFIED_ROUTES.B2B_USER_LOGIN,
+      route: Routes.login({ segment: 'b2b' }),
       buttonText: 'Connexion Collaborateur'
     },
     {
@@ -40,7 +40,7 @@ const B2BSelectionPage: React.FC = () => {
         'Rapports détaillés',
         'Configuration système'
       ],
-      route: UNIFIED_ROUTES.B2B_ADMIN_LOGIN,
+      route: Routes.login({ segment: 'b2b' }),
       buttonText: 'Connexion Administrateur',
       premium: true
     }
@@ -131,7 +131,7 @@ const B2BSelectionPage: React.FC = () => {
                 Créez un compte pour votre organisation et commencez à prendre soin du bien-être de vos équipes
               </p>
               <Button 
-                onClick={() => navigate(UNIFIED_ROUTES.B2B_USER_REGISTER)}
+                onClick={() => navigate(Routes.signup({ segment: 'b2b' }))}
                 size="lg"
                 className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-8"
               >
@@ -182,7 +182,7 @@ const B2BSelectionPage: React.FC = () => {
         >
           <Button 
             variant="outline" 
-            onClick={() => navigate(UNIFIED_ROUTES.CHOOSE_MODE)}
+            onClick={() => navigate(Routes.b2cLanding())}
             className="px-8"
           >
             Retour au choix d'espace

@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { 
   CheckCircle, 
@@ -56,7 +56,12 @@ const PageAuditTool: React.FC = () => {
     setIsAuditing(true);
     setAuditProgress(0);
     
-    const routes = Object.values(UNIFIED_ROUTES);
+    const routes = [
+      Routes.home(), Routes.scan(), Routes.music(), Routes.coach(),
+      Routes.journal(), Routes.vr(), Routes.consumerHome(),
+      Routes.employeeHome(), Routes.managerHome(), Routes.teams(),
+      Routes.adminReports(), Routes.adminEvents(), Routes.settingsGeneral()
+    ];
     const results: RouteAuditResult[] = [];
     
     for (let i = 0; i < routes.length; i++) {

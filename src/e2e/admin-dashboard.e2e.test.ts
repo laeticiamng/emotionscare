@@ -1,20 +1,20 @@
 
 import { test, expect } from '@playwright/test';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 test.describe('Admin Dashboard E2E', () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin
-    await page.goto(UNIFIED_ROUTES.B2B_ADMIN_LOGIN);
+    await page.goto(Routes.login({ segment: 'b2b' }));
     await page.fill('input[name="email"]', 'admin@company.com');
     await page.fill('input[name="password"]', 'admin123');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD);
+    await expect(page).toHaveURL(Routes.managerHome());
   });
 
   test('team management functionality', async ({ page }) => {
     await page.click('[data-testid="teams-tab"]');
-    await expect(page).toHaveURL(UNIFIED_ROUTES.TEAMS);
+    await expect(page).toHaveURL(Routes.teams());
 
     // Test team creation
     await page.click('[data-testid="create-team-button"]');
@@ -33,7 +33,7 @@ test.describe('Admin Dashboard E2E', () => {
 
   test('reports and analytics access', async ({ page }) => {
     await page.click('[data-testid="reports-tab"]');
-    await expect(page).toHaveURL(UNIFIED_ROUTES.REPORTS);
+    await expect(page).toHaveURL(Routes.adminReports());
 
     // Test report generation
     await page.selectOption('[data-testid="report-type"]', 'emotional-health');
@@ -68,7 +68,7 @@ test.describe('Admin Dashboard E2E', () => {
 
   test('organization settings management', async ({ page }) => {
     await page.click('[data-testid="settings-tab"]');
-    await expect(page).toHaveURL(UNIFIED_ROUTES.SETTINGS);
+    await expect(page).toHaveURL(Routes.settingsGeneral());
 
     // Test organization info update
     await page.fill('[data-testid="org-name"]', 'TechCorp Updated');

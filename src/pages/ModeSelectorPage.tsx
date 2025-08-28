@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 import { Users, User } from 'lucide-react';
 
 /**
@@ -43,7 +43,7 @@ const ModeSelectorPage: React.FC = () => {
                 <li>• Journal personnel</li>
                 <li>• Expériences VR</li>
               </ul>
-              <Link to={UNIFIED_ROUTES.B2C_LOGIN} className="block">
+              <Link to={Routes.login({ segment: 'b2c' })} className="block">
                 <Button className="w-full" size="lg">
                   Accès Particulier
                 </Button>
@@ -70,7 +70,7 @@ const ModeSelectorPage: React.FC = () => {
                 <li>• Cocon social d'entreprise</li>
                 <li>• Rapports et optimisation</li>
               </ul>
-              <Link to={UNIFIED_ROUTES.B2B_SELECTION} className="block">
+              <Link to={Routes.b2bLanding()} className="block">
                 <Button className="w-full" variant="outline" size="lg">
                   Accès Entreprise
                 </Button>
@@ -81,7 +81,7 @@ const ModeSelectorPage: React.FC = () => {
 
         <div className="text-center mt-8">
           <Link 
-            to={UNIFIED_ROUTES.HOME} 
+            to={Routes.home()} 
             className="text-sm text-gray-500 hover:text-gray-700"
           >
             ← Retour à l'accueil

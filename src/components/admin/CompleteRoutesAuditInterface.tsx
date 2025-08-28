@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, XCircle, Route, Eye, Settings, FileX } from 'lucide-react';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 interface RouteAuditResult {
   path: string;
@@ -95,8 +95,13 @@ export const CompleteRoutesAuditInterface: React.FC = () => {
       const issues: string[] = [];
       let status: RouteAuditResult['status'] = 'valid';
       
-      // Vérifier les doublons dans UNIFIED_ROUTES
-      const unifiedRouteExists = Object.values(UNIFIED_ROUTES).includes(route.path as any);
+      // Vérifier avec RouterV2 Registry
+      const routerV2Routes = [
+        Routes.home(), Routes.scan(), Routes.music(), Routes.coach(),
+        Routes.journal(), Routes.vr(), Routes.consumerHome(),
+        Routes.employeeHome(), Routes.managerHome()
+      ];
+      const routerV2RouteExists = routerV2Routes.includes(route.path);
       
       // Vérifier l'accessibilité
       const isAccessible = await checkRouteAccessibility(route.path);

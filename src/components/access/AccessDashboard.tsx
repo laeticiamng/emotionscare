@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, AlertCircle, User, Shield, Users, Settings } from 'lucide-react';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 interface PageAccess {
   path: string;
@@ -32,14 +32,14 @@ const AccessDashboard: React.FC = () => {
     return [
       // Pages principales
       {
-        path: UNIFIED_ROUTES.HOME,
+        path: Routes.home(),
         name: 'Accueil',
         description: 'Page d\'accueil publique',
         accessible: true,
         category: 'core'
       },
       {
-        path: UNIFIED_ROUTES.CHOOSE_MODE,
+        path: Routes.b2cLanding(),
         name: 'Sélection du mode',
         description: 'Choix du mode utilisateur',
         accessible: isAuthenticated,
@@ -49,7 +49,7 @@ const AccessDashboard: React.FC = () => {
 
       // Dashboards
       {
-        path: UNIFIED_ROUTES.B2C_DASHBOARD,
+        path: Routes.consumerHome(),
         name: 'Dashboard B2C',
         description: 'Tableau de bord particulier',
         requiredMode: 'b2c',
@@ -58,7 +58,7 @@ const AccessDashboard: React.FC = () => {
         category: 'core'
       },
       {
-        path: UNIFIED_ROUTES.B2B_USER_DASHBOARD,
+        path: Routes.employeeHome(),
         name: 'Dashboard Collaborateur',
         description: 'Tableau de bord collaborateur',
         requiredMode: 'b2b_user',
@@ -67,7 +67,7 @@ const AccessDashboard: React.FC = () => {
         category: 'b2b'
       },
       {
-        path: UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD,
+        path: Routes.managerHome(),
         name: 'Dashboard Admin RH',
         description: 'Tableau de bord administrateur RH',
         requiredMode: 'b2b_admin',
@@ -78,7 +78,7 @@ const AccessDashboard: React.FC = () => {
 
       // Fonctionnalités communes
       {
-        path: UNIFIED_ROUTES.SCAN,
+        path: Routes.scan(),
         name: 'Scanner d\'émotions',
         description: 'Analyse des émotions',
         accessible: isAuthenticated,
@@ -86,7 +86,7 @@ const AccessDashboard: React.FC = () => {
         category: 'feature'
       },
       {
-        path: UNIFIED_ROUTES.MUSIC,
+        path: Routes.music(),
         name: 'Musicothérapie',
         description: 'Thérapie par la musique',
         accessible: isAuthenticated,
@@ -94,7 +94,7 @@ const AccessDashboard: React.FC = () => {
         category: 'feature'
       },
       {
-        path: UNIFIED_ROUTES.COACH,
+        path: Routes.coach(),
         name: 'Coach virtuel',
         description: 'Assistant bien-être IA',
         accessible: isAuthenticated,
@@ -102,7 +102,7 @@ const AccessDashboard: React.FC = () => {
         category: 'feature'
       },
       {
-        path: UNIFIED_ROUTES.JOURNAL,
+        path: Routes.journal(),
         name: 'Journal personnel',
         description: 'Journal intime numérique',
         accessible: isAuthenticated,
@@ -110,7 +110,7 @@ const AccessDashboard: React.FC = () => {
         category: 'feature'
       },
       {
-        path: UNIFIED_ROUTES.VR,
+        path: Routes.vr(),
         name: 'Réalité virtuelle',
         description: 'Expériences immersives VR',
         accessible: isAuthenticated,
@@ -118,7 +118,7 @@ const AccessDashboard: React.FC = () => {
         category: 'feature'
       },
       {
-        path: UNIFIED_ROUTES.GAMIFICATION,
+        path: Routes.leaderboard(),
         name: 'Gamification',
         description: 'Défis et récompenses',
         accessible: isAuthenticated,
@@ -126,7 +126,7 @@ const AccessDashboard: React.FC = () => {
         category: 'feature'
       },
       {
-        path: UNIFIED_ROUTES.SOCIAL_COCON,
+        path: Routes.socialCocon(),
         name: 'Cocon social',
         description: 'Communauté et échanges',
         accessible: isAuthenticated,
@@ -136,7 +136,7 @@ const AccessDashboard: React.FC = () => {
 
       // Pages administrateur
       {
-        path: UNIFIED_ROUTES.TEAMS,
+        path: Routes.teams(),
         name: 'Gestion des équipes',
         description: 'Administration des équipes',
         requiredRole: 'b2b_admin',
@@ -145,7 +145,7 @@ const AccessDashboard: React.FC = () => {
         category: 'admin'
       },
       {
-        path: UNIFIED_ROUTES.REPORTS,
+        path: Routes.adminReports(),
         name: 'Rapports',
         description: 'Rapports et analyses',
         requiredRole: 'b2b_admin',
@@ -154,7 +154,7 @@ const AccessDashboard: React.FC = () => {
         category: 'admin'
       },
       {
-        path: UNIFIED_ROUTES.EVENTS,
+        path: Routes.adminEvents(),
         name: 'Événements',
         description: 'Gestion des événements',
         requiredRole: 'b2b_admin',
@@ -163,7 +163,7 @@ const AccessDashboard: React.FC = () => {
         category: 'admin'
       },
       {
-        path: UNIFIED_ROUTES.OPTIMISATION,
+        path: Routes.adminOptimization(),
         name: 'Optimisation',
         description: 'Outils d\'optimisation',
         requiredRole: 'b2b_admin',
@@ -172,7 +172,7 @@ const AccessDashboard: React.FC = () => {
         category: 'admin'
       },
       {
-        path: UNIFIED_ROUTES.SETTINGS,
+        path: Routes.settingsGeneral(),
         name: 'Paramètres',
         description: 'Configuration système',
         accessible: isAuthenticated,

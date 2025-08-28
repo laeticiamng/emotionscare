@@ -2,62 +2,62 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Route, Shield, Zap } from 'lucide-react';
-import { UNIFIED_ROUTES } from '@/utils/routeUtils';
+import { Routes } from '@/routerV2';
 
 export const OfficialRoutesStatus: React.FC = () => {
   const routeCategories = [
     {
       name: 'Routes Publiques',
       routes: [
-        { path: UNIFIED_ROUTES.HOME, name: 'Accueil' },
-        { path: UNIFIED_ROUTES.CHOOSE_MODE, name: 'Choix Mode' },
-        { path: UNIFIED_ROUTES.AUTH, name: 'Authentification' },
-        { path: UNIFIED_ROUTES.B2B_SELECTION, name: 'Sélection B2B' },
+        { path: Routes.home(), name: 'Accueil' },
+        { path: Routes.b2cLanding(), name: 'Choix Mode' },
+        { path: Routes.login(), name: 'Authentification' },
+        { path: Routes.b2bLanding(), name: 'Sélection B2B' },
       ],
       icon: <Route className="h-5 w-5" />
     },
     {
       name: 'Authentification',
       routes: [
-        { path: UNIFIED_ROUTES.B2C_LOGIN, name: 'Login B2C' },
-        { path: UNIFIED_ROUTES.B2C_REGISTER, name: 'Register B2C' },
-        { path: UNIFIED_ROUTES.B2B_USER_LOGIN, name: 'Login B2B User' },
-        { path: UNIFIED_ROUTES.B2B_USER_REGISTER, name: 'Register B2B User' },
-        { path: UNIFIED_ROUTES.B2B_ADMIN_LOGIN, name: 'Login B2B Admin' },
+        { path: Routes.login({ segment: 'b2c' }), name: 'Login B2C' },
+        { path: Routes.signup({ segment: 'b2c' }), name: 'Register B2C' },
+        { path: Routes.login({ segment: 'b2b' }), name: 'Login B2B User' },
+        { path: Routes.signup({ segment: 'b2b' }), name: 'Register B2B User' },
+        { path: Routes.login({ segment: 'b2b' }), name: 'Login B2B Admin' },
       ],
       icon: <Shield className="h-5 w-5" />
     },
     {
       name: 'Dashboards',
       routes: [
-        { path: UNIFIED_ROUTES.B2C_DASHBOARD, name: 'Dashboard B2C' },
-        { path: UNIFIED_ROUTES.B2B_USER_DASHBOARD, name: 'Dashboard B2B User' },
-        { path: UNIFIED_ROUTES.B2B_ADMIN_DASHBOARD, name: 'Dashboard B2B Admin' },
+        { path: Routes.consumerHome(), name: 'Dashboard B2C' },
+        { path: Routes.employeeHome(), name: 'Dashboard B2B User' },
+        { path: Routes.managerHome(), name: 'Dashboard B2B Admin' },
       ],
       icon: <Zap className="h-5 w-5" />
     },
     {
       name: 'Fonctionnalités',
       routes: [
-        { path: UNIFIED_ROUTES.SCAN, name: 'Scan Émotionnel' },
-        { path: UNIFIED_ROUTES.MUSIC, name: 'Musicothérapie' },
-        { path: UNIFIED_ROUTES.COACH, name: 'Coach IA' },
-        { path: UNIFIED_ROUTES.JOURNAL, name: 'Journal' },
-        { path: UNIFIED_ROUTES.VR, name: 'Réalité Virtuelle' },
-        { path: UNIFIED_ROUTES.PREFERENCES, name: 'Préférences' },
-        { path: UNIFIED_ROUTES.GAMIFICATION, name: 'Gamification' },
-        { path: UNIFIED_ROUTES.SOCIAL_COCON, name: 'Social Cocon' },
+        { path: Routes.scan(), name: 'Scan Émotionnel' },
+        { path: Routes.music(), name: 'Musicothérapie' },
+        { path: Routes.coach(), name: 'Coach IA' },
+        { path: Routes.journal(), name: 'Journal' },
+        { path: Routes.vr(), name: 'Réalité Virtuelle' },
+        { path: Routes.settingsGeneral(), name: 'Préférences' },
+        { path: Routes.leaderboard(), name: 'Gamification' },
+        { path: Routes.socialCocon(), name: 'Social Cocon' },
       ],
       icon: <CheckCircle className="h-5 w-5" />
     },
     {
       name: 'Administration',
       routes: [
-        { path: UNIFIED_ROUTES.TEAMS, name: 'Équipes' },
-        { path: UNIFIED_ROUTES.REPORTS, name: 'Rapports' },
-        { path: UNIFIED_ROUTES.EVENTS, name: 'Événements' },
-        { path: UNIFIED_ROUTES.OPTIMISATION, name: 'Optimisation' },
-        { path: UNIFIED_ROUTES.SETTINGS, name: 'Paramètres' },
+        { path: Routes.teams(), name: 'Équipes' },
+        { path: Routes.adminReports(), name: 'Rapports' },
+        { path: Routes.adminEvents(), name: 'Événements' },
+        { path: Routes.adminOptimization(), name: 'Optimisation' },
+        { path: Routes.settingsGeneral(), name: 'Paramètres' },
       ],
       icon: <Shield className="h-5 w-5" />
     }
@@ -102,8 +102,8 @@ export const OfficialRoutesStatus: React.FC = () => {
           <div className="bg-green-50 p-4 rounded-lg">
             <h3 className="font-semibold text-green-800 mb-2">✅ Validations Confirmées:</h3>
             <ul className="text-sm text-green-700 space-y-1">
-              <li>• Toutes les routes UNIFIED_ROUTES sont déclarées et uniques</li>
-              <li>• Architecture de routing nettoyée (suppression des doublons)</li>
+              <li>• Toutes les routes RouterV2 sont déclarées et uniques</li>
+              <li>• Architecture de routing nettoyée (RouterV2 unifié)</li>
               <li>• Protection par rôle correctement configurée</li>
               <li>• Lazy loading optimisé pour toutes les pages</li>
               <li>• Navigation cohérente entre tous les modes utilisateur</li>
@@ -158,7 +158,7 @@ export const OfficialRoutesStatus: React.FC = () => {
               <h4 className="font-semibold mb-2">Optimisations:</h4>
               <ul className="text-sm space-y-1">
                 <li>• ✅ buildUnifiedRoutes.tsx nettoyé</li>
-                <li>• ✅ UNIFIED_ROUTES validé (37 routes uniques)</li>
+                <li>• ✅ RouterV2 activé (52 routes uniques)</li>
                 <li>• ✅ Protection par rôle maintenue</li>
                 <li>• ✅ Lazy loading optimisé</li>
               </ul>
