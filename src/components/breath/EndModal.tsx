@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Award, Sparkles, ArrowRight } from 'lucide-react';
-import { useRouter } from '@/hooks/useRouter';
+import { useRouter } from '@/hooks/router';
 
 interface EndModalProps {
   isOpen: boolean;
