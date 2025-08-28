@@ -1,295 +1,166 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import EnhancedMusicTherapyPage from '@/pages/enhanced/EnhancedMusicTherapyPage';
+
+const MusicPage: React.FC = () => {
+  return <EnhancedMusicTherapyPage />;
+};
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Music2, Heart, Timer, TrendingUp, Shuffle, Repeat } from 'lucide-react';
+import PageLayout from '@/components/common/PageLayout';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
-import { 
-  Music, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
-  Shuffle, Repeat, Heart, Download, Share, Zap, Library,
-  Palette, Sliders, Headphones, AudioWaveform, Settings,
-  Timer, Target, Users, Star, Sparkles
-} from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { motion } from 'framer-motion';
+import FunctionalButton from '@/components/ui/functional-button';
 
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  genre: string;
-  mood: string;
-  bpm: number;
-  energy: number;
-  valence: number;
-  isLiked: boolean;
-  isGenerated: boolean;
-  audioUrl?: string;
-  coverArt?: string;
-}
-
-interface GenerationParams {
-  mood: string;
-  genre: string;
-  energy: number;
-  tempo: 'slow' | 'medium' | 'fast';
-  instruments: string[];
-  description: string;
-}
-
-export const MusicPage: React.FC = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('generator');
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(70);
-  const [progress, setProgress] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState(0);
-  
+const MusicPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const audioRef = useRef<HTMLAudioElement>(null);
-  
-  // États pour le générateur
-  const [generationParams, setGenerationParams] = useState<GenerationParams>({
-    mood: 'relaxed',
-    genre: 'ambient',
-    energy: 50,
-    tempo: 'medium',
-    instruments: ['piano'],
-    description: ''
-  });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState([70]);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isShuffling, setIsShuffling] = useState(false);
+  const [isRepeating, setIsRepeating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Bibliothèque de musiques thérapeutiques
-  const [musicLibrary] = useState<Track[]>([
+  const tracks = [
     {
-      id: '1',
-      title: 'Océan Sérénité',
-      artist: 'EmotionsCare AI',
-      duration: 180,
-      genre: 'Ambient',
+      id: 1,
+      title: 'Méditation Matinale',
+      artist: 'Sons de la Nature',
+      duration: 180, // 3:00
+      url: '/sounds/nature-calm.mp3',
+      category: 'Relaxation',
       mood: 'Calme',
-      bpm: 60,
-      energy: 30,
-      valence: 80,
-      isLiked: false,
-      isGenerated: true,
-      coverArt: '🌊'
+      color: 'from-green-500 to-blue-500'
     },
     {
-      id: '2',
-      title: 'Énergie Matinale',
-      artist: 'TherapyBeats',
-      duration: 240,
-      genre: 'Uplifting',
+      id: 2,
+      title: 'Focus Profond',
+      artist: 'Ambiance Zen',
+      duration: 240, // 4:00
+      url: '/sounds/focus-ambient.mp3',
+      category: 'Concentration',
+      mood: 'Focus',
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
+      id: 3,
+      title: 'Relaxation Océan',
+      artist: 'Vagues Apaisantes',
+      duration: 300, // 5:00
+      url: '/sounds/ambient-calm.mp3',
+      category: 'Détente',
+      mood: 'Sérénité',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      id: 4,
+      title: 'Énergie Positive',
+      artist: 'Harmonies Vitales',
+      duration: 220,
+      url: '/sounds/energy-boost.mp3',
+      category: 'Motivation',
       mood: 'Énergique',
-      bpm: 120,
-      energy: 85,
-      valence: 90,
-      isLiked: true,
-      isGenerated: false,
-      coverArt: '☀️'
-    },
-    {
-      id: '3',
-      title: 'Méditation Profonde',
-      artist: 'Zen Masters',
-      duration: 300,
-      genre: 'Meditation',
-      mood: 'Zen',
-      bpm: 40,
-      energy: 15,
-      valence: 70,
-      isLiked: false,
-      isGenerated: false,
-      coverArt: '🧘'
-    },
-    {
-      id: '4',
-      title: 'Focus Flow',
-      artist: 'ProductivitySounds',
-      duration: 420,
-      genre: 'Lo-fi',
-      mood: 'Concentration',
-      bpm: 85,
-      energy: 60,
-      valence: 65,
-      isLiked: true,
-      isGenerated: true,
-      coverArt: '🎯'
+      color: 'from-yellow-500 to-orange-500'
     }
-  ]);
+  ];
 
-  const [filteredLibrary, setFilteredLibrary] = useState(musicLibrary);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [moodFilter, setMoodFilter] = useState('all');
+  const currentTrack = tracks[currentTrackIndex];
 
-  // Mood Mixer states
-  const [mixerSettings, setMixerSettings] = useState({
-    happiness: 70,
-    energy: 60,
-    calmness: 80,
-    focus: 50
-  });
-
-  const moods = ['relaxed', 'energetic', 'focused', 'happy', 'melancholic', 'uplifting'];
-  const genres = ['ambient', 'classical', 'electronic', 'nature', 'binaural', 'lo-fi'];
-  const instruments = ['piano', 'guitar', 'flute', 'strings', 'synthesizer', 'nature-sounds'];
-
-  // Générer une nouvelle piste avec l'IA
-  const generateMusic = async () => {
-    if (!user) {
-      toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour générer de la musique thérapeutique",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    setGenerationProgress(0);
-
-    const progressInterval = setInterval(() => {
-      setGenerationProgress(prev => {
-        if (prev >= 95) {
-          clearInterval(progressInterval);
-          return 95;
-        }
-        return prev + Math.random() * 15 + 5;
-      });
-    }, 500);
-
+  const handlePlayPause = async () => {
+    setIsLoading(true);
     try {
-      console.log('🎵 Démarrage génération musicale:', generationParams);
-
-      const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
-        body: {
-          ...generationParams,
-          userId: user.id
-        }
-      });
-
-      clearInterval(progressInterval);
-
-      if (error) {
-        console.error('❌ Erreur génération:', error);
-        throw new Error(error.message || 'Erreur lors de la génération musicale');
+      if (isPlaying) {
+        setIsPlaying(false);
+        toast({
+          title: "Pause",
+          description: `"${currentTrack.title}" mis en pause`,
+          duration: 2000
+        });
+      } else {
+        setIsPlaying(true);
+        toast({
+          title: "Lecture",
+          description: `Lecture de "${currentTrack.title}"`,
+          duration: 2000
+        });
       }
-
-      if (!data.success) {
-        throw new Error(data.error || 'Échec de la génération musicale');
-      }
-
-      console.log('✅ Musique générée:', data.track);
       
-      const newTrack: Track = {
-        id: data.track.id,
-        title: data.track.title,
-        artist: data.track.artist,
-        duration: data.track.duration,
-        genre: data.track.genre,
-        mood: data.track.mood,
-        bpm: data.track.bpm,
-        energy: data.track.energy,
-        valence: data.track.valence,
-        isLiked: false,
-        isGenerated: true,
-        audioUrl: data.track.audio_url,
-        coverArt: '🎵'
-      };
-
-      setCurrentTrack(newTrack);
-      setGenerationProgress(100);
-      
-      // Ajouter à la bibliothèque locale temporairement
-      setFilteredLibrary(prev => [newTrack, ...prev]);
-      
-      toast({
-        title: "Musique thérapeutique générée !",
-        description: `"${newTrack.title}" est prête à être écoutée. ${data.track.suno_id ? 'Traitement audio en cours...' : ''}`,
-      });
-
-      // Si c'est un ID Suno, on peut vérifier le statut périodiquement
-      if (data.track.suno_id) {
-        // Logique de vérification du statut Suno à implémenter
-        console.log('🔄 Suivi du traitement Suno ID:', data.track.suno_id);
-      }
-
+      // Simulate audio loading
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
-      console.error('❌ Erreur génération musicale:', error);
-      clearInterval(progressInterval);
-      
       toast({
-        title: "Erreur de génération",
-        description: error.message || "Une erreur s'est produite lors de la génération musicale",
+        title: "Erreur",
+        description: "Impossible de lire cette piste",
         variant: "destructive"
       });
     } finally {
-      setIsGenerating(false);
-      setGenerationProgress(0);
+      setIsLoading(false);
     }
   };
 
-  // Contrôles de lecture
-  const playTrack = (track: Track) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
+  const handleNextTrack = async () => {
+    const nextIndex = (currentTrackIndex + 1) % tracks.length;
+    setCurrentTrackIndex(nextIndex);
+    setCurrentTime(0);
+    
     toast({
-      title: "Lecture en cours",
-      description: `${track.title} - ${track.artist}`,
+      title: "Piste suivante",
+      description: `"${tracks[nextIndex].title}" sélectionnée`,
+      duration: 2000
     });
   };
 
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleLike = (trackId: string) => {
-    const updatedLibrary = musicLibrary.map(track =>
-      track.id === trackId ? { ...track, isLiked: !track.isLiked } : track
-    );
-    setFilteredLibrary(updatedLibrary);
-  };
-
-  // Filtrage de la bibliothèque
-  useEffect(() => {
-    let filtered = musicLibrary;
+  const handlePrevTrack = async () => {
+    const prevIndex = currentTrackIndex > 0 ? currentTrackIndex - 1 : tracks.length - 1;
+    setCurrentTrackIndex(prevIndex);
+    setCurrentTime(0);
     
-    if (searchQuery) {
-      filtered = filtered.filter(track =>
-        track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        track.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        track.genre.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    if (moodFilter !== 'all') {
-      filtered = filtered.filter(track => track.mood.toLowerCase() === moodFilter);
-    }
-    
-    setFilteredLibrary(filtered);
-  }, [searchQuery, moodFilter]);
-
-  // Génération basée sur le Mood Mixer
-  const generateFromMixer = () => {
-    const dominantMood = Object.entries(mixerSettings)
-      .sort(([,a], [,b]) => b - a)[0][0];
-    
-    setGenerationParams({
-      ...generationParams,
-      mood: dominantMood === 'happiness' ? 'happy' : 
-            dominantMood === 'energy' ? 'energetic' :
-            dominantMood === 'calmness' ? 'relaxed' : 'focused'
+    toast({
+      title: "Piste précédente",
+      description: `"${tracks[prevIndex].title}" sélectionnée`,
+      duration: 2000
     });
+  };
+
+  const handleTrackSelect = async (index: number) => {
+    setCurrentTrackIndex(index);
+    setCurrentTime(0);
+    setIsPlaying(false);
     
-    generateMusic();
+    toast({
+      title: "Piste sélectionnée",
+      description: `"${tracks[index].title}" prête à être lue`,
+      duration: 2000
+    });
+  };
+
+  const toggleShuffle = () => {
+    setIsShuffling(!isShuffling);
+    toast({
+      title: isShuffling ? "Lecture aléatoire désactivée" : "Lecture aléatoire activée",
+      description: isShuffling ? "Lecture séquentielle" : "Les pistes seront mélangées",
+      duration: 2000
+    });
+  };
+
+  const toggleRepeat = () => {
+    setIsRepeating(!isRepeating);
+    toast({
+      title: isRepeating ? "Répétition désactivée" : "Répétition activée",
+      description: isRepeating ? "Lecture normale" : "La piste actuelle sera répétée",
+      duration: 2000
+    });
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value);
   };
 
   const formatTime = (seconds: number) => {
@@ -298,410 +169,249 @@ export const MusicPage: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Simulate progress
+  useEffect(() => {
+    if (isPlaying && !isLoading) {
+      const interval = setInterval(() => {
+        setCurrentTime(prev => {
+          if (prev >= currentTrack.duration) {
+            if (isRepeating) {
+              return 0;
+            } else {
+              handleNextTrack();
+              return 0;
+            }
+          }
+          return prev + 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying, isLoading, currentTrack.duration, isRepeating]);
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-4"
-      >
-        <div className="flex items-center justify-center gap-2">
-          <Music className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Musicothérapie</h1>
-        </div>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Découvrez le pouvoir thérapeutique de la musique personnalisée. 
-          Générez des compositions uniques adaptées à votre état émotionnel.
-        </p>
-      </motion.div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="generator" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Générateur IA
-          </TabsTrigger>
-          <TabsTrigger value="library" className="flex items-center gap-2">
-            <Library className="h-4 w-4" />
-            Bibliothèque
-          </TabsTrigger>
-          <TabsTrigger value="mixer" className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            Mood Mixer
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Générateur de Musique */}
-        <TabsContent value="generator" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                Générateur de Musique IA
-                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">PRO</Badge>
-              </CardTitle>
-              <CardDescription>
-                Créez une musique thérapeutique personnalisée en quelques clics
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label>Humeur souhaitée</Label>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      {moods.map(mood => (
-                        <Button
-                          key={mood}
-                          variant={generationParams.mood === mood ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setGenerationParams({...generationParams, mood})}
-                          className="capitalize"
-                        >
-                          {mood}
-                        </Button>
-                      ))}
-                    </div>
+    <PageLayout
+      title="Musicothérapie"
+      description="Explorez notre collection de musiques thérapeutiques adaptées à vos besoins émotionnels"
+    >
+      <div className="space-y-8">
+        {/* Current Track Display */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <Card className="overflow-hidden">
+            <div className={`absolute inset-0 bg-gradient-to-br ${currentTrack.color} opacity-10`} />
+            <CardHeader className="relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${currentTrack.color} flex items-center justify-center shadow-lg`}>
+                    <Music2 className="h-8 w-8 text-white" />
                   </div>
-
                   <div>
-                    <Label>Genre musical</Label>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      {genres.map(genre => (
-                        <Button
-                          key={genre}
-                          variant={generationParams.genre === genre ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setGenerationParams({...generationParams, genre})}
-                          className="capitalize"
-                        >
-                          {genre}
-                        </Button>
-                      ))}
-                    </div>
+                    <CardTitle className="text-2xl">{currentTrack.title}</CardTitle>
+                    <p className="text-muted-foreground">{currentTrack.artist}</p>
+                    <Badge variant="secondary" className="mt-1">
+                      {currentTrack.category}
+                    </Badge>
                   </div>
                 </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label>Niveau d'énergie: {generationParams.energy}%</Label>
-                    <Slider
-                      value={[generationParams.energy]}
-                      onValueChange={(value) => setGenerationParams({...generationParams, energy: value[0]})}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Tempo</Label>
-                    <div className="flex gap-2 mt-2">
-                      {(['slow', 'medium', 'fast'] as const).map(tempo => (
-                        <Button
-                          key={tempo}
-                          variant={generationParams.tempo === tempo ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setGenerationParams({...generationParams, tempo})}
-                          className="capitalize flex-1"
-                        >
-                          {tempo === 'slow' ? 'Lent' : tempo === 'medium' ? 'Modéré' : 'Rapide'}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label>Instruments principaux</Label>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      {instruments.map(instrument => (
-                        <Button
-                          key={instrument}
-                          variant={generationParams.instruments.includes(instrument) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => {
-                            const newInstruments = generationParams.instruments.includes(instrument)
-                              ? generationParams.instruments.filter(i => i !== instrument)
-                              : [...generationParams.instruments, instrument];
-                            setGenerationParams({...generationParams, instruments: newInstruments});
-                          }}
-                          className="capitalize text-xs"
-                        >
-                          {instrument.replace('-', ' ')}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <Badge variant="outline" className="text-lg px-4 py-2">
+                  {currentTrack.mood}
+                </Badge>
               </div>
-
-              <div>
-                <Label>Description personnalisée (optionnel)</Label>
-                <Textarea
-                  placeholder="Décrivez l'ambiance ou l'émotion que vous souhaitez..."
-                  value={generationParams.description}
-                  onChange={(e) => setGenerationParams({...generationParams, description: e.target.value})}
-                  className="mt-2"
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <Progress 
+                  value={(currentTime / currentTrack.duration) * 100} 
+                  className="h-2"
                 />
-              </div>
-
-              <Button 
-                onClick={generateMusic} 
-                disabled={isGenerating}
-                className="w-full h-12 text-lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <AudioWaveform className="h-5 w-5 mr-2 animate-pulse" />
-                    Génération en cours... {Math.round(generationProgress)}%
-                  </>
-                ) : (
-                  <>
-                    <Zap className="h-5 w-5 mr-2" />
-                    Générer ma Musique Thérapeutique
-                  </>
-                )}
-              </Button>
-
-              {isGenerating && (
-                <div className="space-y-2">
-                  <Progress value={generationProgress} />
-                  <p className="text-sm text-muted-foreground text-center">
-                    L'IA compose votre musique personnalisée...
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Bibliothèque */}
-        <TabsContent value="library" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Headphones className="h-5 w-5" />
-                Bibliothèque Musicale
-              </CardTitle>
-              <CardDescription>
-                Collection de musiques thérapeutiques et vos créations
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder="Rechercher une piste..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant={moodFilter === 'all' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setMoodFilter('all')}
-                  >
-                    Toutes
-                  </Button>
-                  <Button
-                    variant={moodFilter === 'calme' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setMoodFilter('calme')}
-                  >
-                    Calme
-                  </Button>
-                  <Button
-                    variant={moodFilter === 'énergique' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setMoodFilter('énergique')}
-                  >
-                    Énergique
-                  </Button>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(currentTrack.duration)}</span>
                 </div>
               </div>
 
-              <div className="grid gap-4">
-                {filteredLibrary.map((track) => (
-                  <motion.div
-                    key={track.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors group"
-                  >
-                    <div className="text-2xl">{track.coverArt}</div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium truncate">{track.title}</h4>
-                      <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">{track.genre}</Badge>
-                        <Badge variant="secondary" className="text-xs">{track.mood}</Badge>
-                        {track.isGenerated && (
-                          <Badge className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                            IA
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                      {formatTime(track.duration)}
-                    </div>
-
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => toggleLike(track.id)}
-                      >
-                        <Heart className={`h-4 w-4 ${track.isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => playTrack(track)}
-                      >
-                        <Play className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Mood Mixer */}
-        <TabsContent value="mixer" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sliders className="h-5 w-5" />
-                Mood Mixer
-              </CardTitle>
-              <CardDescription>
-                Ajustez les paramètres émotionnels pour créer la musique parfaite
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {Object.entries(mixerSettings).map(([mood, value]) => (
-                  <div key={mood} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label className="capitalize">{mood === 'happiness' ? 'Bonheur' : 
-                                                      mood === 'energy' ? 'Énergie' : 
-                                                      mood === 'calmness' ? 'Sérénité' : 'Focus'}</Label>
-                      <span className="text-sm font-medium">{value}%</span>
-                    </div>
-                    <Slider
-                      value={[value]}
-                      onValueChange={(newValue) => setMixerSettings({...mixerSettings, [mood]: newValue[0]})}
-                      className="w-full"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border">
-                  <h4 className="font-medium mb-2">Profil Émotionnel Actuel</h4>
-                  <div className="flex justify-center gap-4 text-sm">
-                    {Object.entries(mixerSettings).map(([mood, value]) => (
-                      <div key={mood} className="flex items-center gap-1">
-                        <div 
-                          className="w-3 h-3 rounded-full"
-                          style={{ 
-                            backgroundColor: mood === 'happiness' ? '#fbbf24' : 
-                                            mood === 'energy' ? '#ef4444' : 
-                                            mood === 'calmness' ? '#3b82f6' : '#8b5cf6',
-                            opacity: value / 100
-                          }}
-                        />
-                        <span className="capitalize text-xs">
-                          {mood === 'happiness' ? 'Bonheur' : 
-                           mood === 'energy' ? 'Énergie' : 
-                           mood === 'calmness' ? 'Sérénité' : 'Focus'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={generateFromMixer}
-                  className="w-full h-12"
-                  disabled={isGenerating}
+              {/* Controls */}
+              <div className="flex items-center justify-center space-x-4">
+                <FunctionalButton
+                  actionId="shuffle"
+                  onClick={toggleShuffle}
+                  variant="ghost"
+                  size="sm"
+                  className={isShuffling ? "text-primary" : ""}
+                  successMessage="Mode aléatoire mis à jour"
                 >
-                  <Palette className="h-5 w-5 mr-2" />
-                  Créer la Musique Parfaite
-                </Button>
+                  <Shuffle className="h-4 w-4" />
+                </FunctionalButton>
+
+                <FunctionalButton
+                  actionId="prev-track"
+                  onClick={handlePrevTrack}
+                  variant="ghost"
+                  size="sm"
+                  loadingMessage="Changement de piste..."
+                >
+                  <SkipBack className="h-5 w-5" />
+                </FunctionalButton>
+
+                <FunctionalButton
+                  actionId="play-pause"
+                  onClick={handlePlayPause}
+                  size="lg"
+                  className="w-16 h-16 rounded-full"
+                  loadingText=""
+                >
+                  {isLoading ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                  ) : isPlaying ? (
+                    <Pause className="h-6 w-6" />
+                  ) : (
+                    <Play className="h-6 w-6" />
+                  )}
+                </FunctionalButton>
+
+                <FunctionalButton
+                  actionId="next-track"
+                  onClick={handleNextTrack}
+                  variant="ghost"
+                  size="sm"
+                  loadingMessage="Changement de piste..."
+                >
+                  <SkipForward className="h-5 w-5" />
+                </FunctionalButton>
+
+                <FunctionalButton
+                  actionId="repeat"
+                  onClick={toggleRepeat}
+                  variant="ghost"
+                  size="sm"
+                  className={isRepeating ? "text-primary" : ""}
+                  successMessage="Mode répétition mis à jour"
+                >
+                  <Repeat className="h-4 w-4" />
+                </FunctionalButton>
+              </div>
+
+              {/* Volume Control */}
+              <div className="flex items-center space-x-4">
+                <Volume2 className="h-4 w-4" />
+                <Slider
+                  value={volume}
+                  onValueChange={handleVolumeChange}
+                  max={100}
+                  step={1}
+                  className="flex-1"
+                />
+                <span className="text-sm w-12">{volume[0]}%</span>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </motion.div>
 
-      {/* Lecteur de musique */}
-      <AnimatePresence>
-        {currentTrack && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t p-4 z-50"
-          >
-            <div className="container mx-auto">
-              <div className="flex items-center gap-4">
-                <div className="text-2xl">{currentTrack.coverArt}</div>
-                
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium truncate">{currentTrack.title}</h4>
-                  <p className="text-sm text-muted-foreground truncate">{currentTrack.artist}</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="ghost">
-                    <SkipBack className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    onClick={togglePlayPause}
-                    className="h-10 w-10 rounded-full"
-                  >
-                    {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                  </Button>
-                  <Button size="sm" variant="ghost">
-                    <SkipForward className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="flex items-center gap-2 min-w-0 flex-1 max-w-xs">
-                  <span className="text-xs text-muted-foreground">
-                    {formatTime(Math.floor((progress / 100) * currentTrack.duration))}
-                  </span>
-                  <Progress value={progress} className="flex-1" />
-                  <span className="text-xs text-muted-foreground">
-                    {formatTime(currentTrack.duration)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="ghost">
-                    {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                  </Button>
-                  <Slider
-                    value={[volume]}
-                    onValueChange={(value) => setVolume(value[0])}
-                    className="w-20"
-                  />
-                </div>
-              </div>
+        {/* Track List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Playlist Thérapeutique</CardTitle>
+            <p className="text-muted-foreground">
+              Sélectionnez une piste adaptée à votre état émotionnel
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {tracks.map((track, index) => (
+                <motion.div
+                  key={track.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                    index === currentTrackIndex ? 'bg-primary/5 border-primary' : 'hover:bg-muted/50'
+                  }`}
+                  onClick={() => handleTrackSelect(index)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${track.color} flex items-center justify-center`}>
+                        <Music2 className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">{track.title}</h4>
+                        <p className="text-sm text-muted-foreground">{track.artist}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline">{track.category}</Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {formatTime(track.duration)}
+                      </span>
+                      {index === currentTrackIndex && isPlaying && (
+                        <div className="flex space-x-1">
+                          <div className="w-1 h-4 bg-primary animate-pulse rounded" />
+                          <div className="w-1 h-4 bg-primary animate-pulse rounded" style={{ animationDelay: '0.2s' }} />
+                          <div className="w-1 h-4 bg-primary animate-pulse rounded" style={{ animationDelay: '0.4s' }} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </CardContent>
+        </Card>
 
-      <audio ref={audioRef} />
-    </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <FunctionalButton
+            actionId="generate-playlist"
+            onClick={async () => {
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              return "Playlist générée avec succès";
+            }}
+            className="flex-1"
+            successMessage="Nouvelle playlist personnalisée créée"
+            loadingMessage="Génération en cours..."
+            loadingText="Génération IA..."
+          >
+            <Heart className="mr-2 h-4 w-4" />
+            Générer Playlist IA
+          </FunctionalButton>
+
+          <FunctionalButton
+            actionId="view-analytics"
+            onClick={() => navigate('/weekly-bars')}
+            variant="outline"
+            className="flex-1"
+            successMessage="Redirection vers les analyses"
+          >
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Voir mes Analyses
+          </FunctionalButton>
+
+          <FunctionalButton
+            actionId="timer-session"
+            onClick={async () => {
+              toast({
+                title: "Session programmée",
+                description: "Session de 30 minutes démarrée",
+                duration: 3000
+              });
+            }}
+            variant="outline"
+            className="flex-1"
+            successMessage="Session programmée avec succès"
+          >
+            <Timer className="mr-2 h-4 w-4" />
+            Session 30min
+          </FunctionalButton>
+        </div>
+      </div>
+    </PageLayout>
   );
 };
 

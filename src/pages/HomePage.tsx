@@ -1,1 +1,1 @@
-export { default } from './enhanced/UnifiedHomePage';
+export { default } from './enhanced/PremiumHomePage';

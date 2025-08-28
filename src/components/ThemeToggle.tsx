@@ -39,6 +39,3 @@ export function ModeToggle() {
     </Button>
   );
 }
-
-// Alias pour compatibilité avec l'architecture
-export const ThemeToggle = ModeToggle;

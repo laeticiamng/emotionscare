@@ -38,17 +38,10 @@ const addAccessibilityMeta = () => {
 
 addAccessibilityMeta();
 
-console.log('🚀 Début du rendu de l\'application');
-
-try {
-  ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-      <AppProviders>
-        <App />
-      </AppProviders>
-    </React.StrictMode>
-  );
-  console.log('✅ Application rendue avec succès');
-} catch (error) {
-  console.error('❌ Erreur lors du rendu:', error);
-}
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <AppProviders>
+      <App />
+    </AppProviders>
+  </React.StrictMode>
+);
