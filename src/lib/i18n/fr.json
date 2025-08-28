@@ -32,6 +32,38 @@
       "disconnected": "Déconnecté"
     }
   },
+  "silk": {
+    "title": "Screen-Silk Break",
+    "cta": {
+      "start": "Commencer"
+    },
+    "pause": "Pause",
+    "resume": "Reprendre", 
+    "done": "Beau reset ✨",
+    "phases": {
+      "inhale": "Inspire...",
+      "hold": "Tiens...",
+      "exhale": "Expire...",
+      "pause": "Pause..."
+    }
+  },
+  "vr": {
+    "title": "VR Galactique",
+    "cta": {
+      "enter": "Entrer en VR",
+      "start": "Démarrer",
+      "exit": "Quitter la VR"
+    },
+    "toast": {
+      "saved": "Session enregistrée ✨"
+    },
+    "phases": {
+      "inhale": "Inspire",
+      "hold": "Tiens",
+      "exhale": "Expire", 
+      "pause": "Pause"
+    }
+  },
   "common": {
     "enable": "Activer",
     "disable": "Désactiver",

@@ -10,6 +10,8 @@ const StoryLabPage = lazy(() => import('@/pages/StoryLabPage'));
 const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
 const FaceFilterPage = lazy(() => import('@/pages/FaceFilterPage'));
 const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
+const ScreenSilkPage = lazy(() => import('@/pages/ScreenSilkPage'));
+const VRGalaxyPage = lazy(() => import('@/pages/VRGalaxyPage'));
 
 export const gamificationRoutes: RouteObject[] = [
   {
@@ -43,5 +45,13 @@ export const gamificationRoutes: RouteObject[] = [
   {
     path: '/bubble-beat',
     element: <BubbleBeatPage />,
+  },
+  {
+    path: '/screen-silk',
+    element: <ScreenSilkPage />,
+  },
+  {
+    path: '/vr-galaxy',
+    element: <VRGalaxyPage />,
   }
 ];

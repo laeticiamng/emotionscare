@@ -16,6 +16,9 @@ verify_jwt = false
 [functions.micro-breaks]
 verify_jwt = false
 
+[functions.vr-galaxy-metrics]
+verify_jwt = false
+
 [functions.openai-realtime]
 verify_jwt = false
 
