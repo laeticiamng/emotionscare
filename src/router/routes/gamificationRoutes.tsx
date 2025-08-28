@@ -8,6 +8,8 @@ const AmbitionArcadePage = lazy(() => import('@/pages/motivation/AmbitionArcadeP
 const BounceBackBattlePage = lazy(() => import('@/pages/motivation/BounceBackBattlePage'));
 const StoryLabPage = lazy(() => import('@/pages/StoryLabPage'));
 const FlashGlowPage = lazy(() => import('@/pages/FlashGlowPage'));
+const FaceFilterPage = lazy(() => import('@/pages/FaceFilterPage'));
+const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
 
 export const gamificationRoutes: RouteObject[] = [
   {
@@ -33,5 +35,13 @@ export const gamificationRoutes: RouteObject[] = [
   {
     path: '/flash-glow',
     element: <FlashGlowPage />,
+  },
+  {
+    path: '/face-filter',
+    element: <FaceFilterPage />,
+  },
+  {
+    path: '/bubble-beat',
+    element: <BubbleBeatPage />,
   }
 ];
