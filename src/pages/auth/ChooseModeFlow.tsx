@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Building2, ArrowLeft } from 'lucide-react';
@@ -55,12 +56,12 @@ const ChooseModePage: React.FC = () => {
                 </li>
               </ul>
               <div className="space-y-2 pt-4">
-                <Link to="/b2c/login" className="block">
+                <Link to={routes.auth.b2cLogin()} className="block">
                   <Button className="w-full bg-pink-500 hover:bg-pink-600">
                     Se connecter
                   </Button>
                 </Link>
-                <Link to="/b2c/register" className="block">
+                <Link to={routes.auth.b2cRegister()} className="block">
                   <Button variant="outline" className="w-full border-pink-500 text-pink-500 hover:bg-pink-50">
                     Créer un compte
                   </Button>
@@ -104,7 +105,7 @@ const ChooseModePage: React.FC = () => {
                 </li>
               </ul>
               <div className="pt-4">
-                <Link to="/b2b/selection" className="block">
+                <Link to={routes.special.b2bSelection()} className="block">
                   <Button className="w-full bg-blue-600 hover:bg-blue-700">
                     Accéder à l'espace B2B
                   </Button>
@@ -115,7 +116,7 @@ const ChooseModePage: React.FC = () => {
         </div>
 
         <div className="text-center">
-          <Link to="/">
+          <Link to={routes.public.home()}>
             <Button variant="outline" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Retour à l'accueil

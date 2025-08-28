@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
@@ -20,7 +21,7 @@ const AppLayout: React.FC = () => {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={routes.auth.login()} replace />;
   }
 
   // Render the layout with the outlet for child routes

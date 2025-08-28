@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -39,7 +40,7 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
 
   // Vérification du mode utilisateur
   if (!userMode) {
-    return <Navigate to="/choose-mode" replace />;
+    return <Navigate to={routes.special.chooseMode()} replace />;
   }
 
   // Vérification des rôles autorisés
@@ -50,13 +51,13 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
       // Redirection selon le rôle de l'utilisateur
       switch (userRole) {
         case 'b2c':
-          return <Navigate to="/b2c/dashboard" replace />;
+          return <Navigate to={routes.b2c.dashboard()} replace />;
         case 'b2b_user':
-          return <Navigate to="/b2b/user/dashboard" replace />;
+          return <Navigate to={routes.b2b.user.dashboard()} replace />;
         case 'b2b_admin':
-          return <Navigate to="/b2b/admin/dashboard" replace />;
+          return <Navigate to={routes.b2b.admin.dashboard()} replace />;
         default:
-          return <Navigate to="/unauthorized" replace />;
+          return <Navigate to={routes.special.unauthorized()} replace />;
       }
     }
   }

@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -157,7 +158,7 @@ const RegisterPage: React.FC = () => {
               <div className="text-sm text-muted-foreground">
                 Vous avez déjà un compte ?{' '}
                 <Link
-                  to="/login"
+                  to={routes.auth.login()}
                   className="text-primary underline-offset-4 hover:underline cursor-pointer"
                 >
                   Se connecter

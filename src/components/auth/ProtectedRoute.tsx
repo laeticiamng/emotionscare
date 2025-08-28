@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/user';
 
@@ -26,14 +27,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (!isAuthenticated) {
     // Redirect to login if not authenticated
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to={routes.auth.login()} state={{ from: location.pathname }} replace />;
   }
 
   // If specific roles are required, check if user has one of them
   if (allowedRoles && allowedRoles.length > 0 && user) {
     if (!allowedRoles.includes(user.role)) {
       // Redirect to forbidden page if user doesn't have required role
-      return <Navigate to="/forbidden" replace />;
+      return <Navigate to={routes.special.forbidden()} replace />;
     }
   }
 

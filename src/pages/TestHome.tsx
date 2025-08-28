@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Brain, Users, Zap } from 'lucide-react';
@@ -18,12 +19,12 @@ const TestHome: React.FC = () => {
             Votre plateforme de bien-être émotionnel pour une vie plus épanouie et des équipes plus performantes
           </p>
           <div className="flex gap-4 justify-center">
-            <Link to="/choose-mode">
+            <Link to={routes.special.chooseMode()}>
               <Button size="lg" className="px-8 py-3">
                 Commencer maintenant
               </Button>
             </Link>
-            <Link to="/home">
+            <Link to={routes.public.home()}>
               <Button variant="outline" size="lg" className="px-8 py-3">
                 Découvrir la plateforme
               </Button>
@@ -89,16 +90,16 @@ const TestHome: React.FC = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
             {[
-              { path: '/scan', label: 'Scan' },
-              { path: '/journal', label: 'Journal' },
-              { path: '/coach', label: 'Coach' },
-              { path: '/music', label: 'Musique' },
-              { path: '/vr', label: 'VR' },
-              { path: '/meditation', label: 'Méditation' },
-              { path: '/community', label: 'Communauté' },
-              { path: '/gamification', label: 'Défis' },
-              { path: '/settings', label: 'Paramètres' },
-              { path: '/teams', label: 'Équipes' }
+              { path: routes.b2c.scan(), label: 'Scan' },
+              { path: routes.b2c.journal(), label: 'Journal' },
+              { path: routes.b2c.coach(), label: 'Coach' },
+              { path: routes.b2c.music(), label: 'Musique' },
+              { path: routes.b2c.vr(), label: 'VR' },
+              { path: routes.b2c.meditation(), label: 'Méditation' },
+              { path: routes.b2c.social(), label: 'Communauté' },
+              { path: routes.b2c.gamification(), label: 'Défis' },
+              { path: routes.b2c.settings(), label: 'Paramètres' },
+              { path: routes.b2b.teams(), label: 'Équipes' }
             ].map((item) => (
               <Link key={item.path} to={item.path}>
                 <Button variant="outline" className="w-full h-12">

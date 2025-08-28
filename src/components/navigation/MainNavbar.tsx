@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { Heart, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,7 +44,7 @@ const MainNavbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center" onClick={closeMobileMenu}>
+            <Link to={routes.public.home()} className="flex items-center" onClick={closeMobileMenu}>
               <Heart className="h-6 w-6 text-primary mr-2" />
               <span className="font-bold text-lg">Emotion Care</span>
             </Link>
@@ -53,14 +54,14 @@ const MainNavbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             <Button
               variant="ghost"
-              onClick={() => navigate('/pricing')}
+              onClick={() => navigate(routes.public.pricing())}
               className={isActive('/pricing') ? 'bg-accent' : ''}
             >
               Tarifs
             </Button>
             <Button
               variant="ghost"
-              onClick={() => navigate('/support')}
+              onClick={() => navigate(routes.public.support())}
               className={isActive('/support') ? 'bg-accent' : ''}
             >
               Support
@@ -85,12 +86,12 @@ const MainNavbar: React.FC = () => {
               <>
                 <Button
                   variant="ghost"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate(routes.auth.login())}
                 >
                   Connexion
                 </Button>
                 <Button
-                  onClick={() => navigate('/b2c/register')}
+                  onClick={() => navigate(routes.auth.b2cRegister())}
                 >
                   Essai gratuit
                 </Button>
@@ -131,7 +132,7 @@ const MainNavbar: React.FC = () => {
                 variant="ghost"
                 className="w-full justify-start"
                 onClick={() => {
-                  navigate('/pricing');
+                  navigate(routes.public.pricing());
                   closeMobileMenu();
                 }}
               >
@@ -141,7 +142,7 @@ const MainNavbar: React.FC = () => {
                 variant="ghost"
                 className="w-full justify-start"
                 onClick={() => {
-                  navigate('/support');
+                  navigate(routes.public.support());
                   closeMobileMenu();
                 }}
               >
@@ -171,7 +172,7 @@ const MainNavbar: React.FC = () => {
                     variant="ghost"
                     className="w-full justify-start"
                     onClick={() => {
-                      navigate('/login');
+                      navigate(routes.auth.login());
                       closeMobileMenu();
                     }}
                   >
@@ -180,7 +181,7 @@ const MainNavbar: React.FC = () => {
                   <Button
                     className="w-full justify-start"
                     onClick={() => {
-                      navigate('/b2c/register');
+                      navigate(routes.auth.b2cRegister());
                       closeMobileMenu();
                     }}
                   >

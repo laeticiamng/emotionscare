@@ -30,7 +30,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (!isAuthenticated) {
     // Sauvegarder la route demandée pour redirection après connexion
     const redirectPath = location.pathname + location.search;
-    return <Navigate to="/choose-mode" state={{ from: redirectPath }} replace />;
+    return <Navigate to={routes.special.chooseMode()} state={{ from: redirectPath }} replace />;
   }
 
   // Vérification des rôles si spécifiés
