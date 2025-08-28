@@ -1,5 +1,5 @@
 
-import { ROUTES_MANIFEST, validateRoutesManifest, type RouteManifestEntry } from '../router/buildUnifiedRoutes';
+import { ROUTE_MANIFEST } from '../router/buildUnifiedRoutes';
 
 export interface RouteHealthResponse {
   status: 'healthy' | 'error';
@@ -14,7 +14,7 @@ export interface RouteHealthResponse {
 }
 
 export interface RoutesApiResponse {
-  routes: RouteManifestEntry[];
+  routes: string[];
   meta: {
     totalRoutes: number;
     lastGenerated: string;
@@ -24,9 +24,9 @@ export interface RoutesApiResponse {
 
 export async function getRoutesManifest(): Promise<RoutesApiResponse> {
   return {
-    routes: ROUTES_MANIFEST,
+    routes: ROUTE_MANIFEST,
     meta: {
-      totalRoutes: ROUTES_MANIFEST.length,
+      totalRoutes: ROUTE_MANIFEST.length,
       lastGenerated: new Date().toISOString(),
       version: '1.0.0'
     }
@@ -34,15 +34,14 @@ export async function getRoutesManifest(): Promise<RoutesApiResponse> {
 }
 
 export async function getRoutesHealth(): Promise<RouteHealthResponse> {
-  const validation = validateRoutesManifest();
   const duplicates: string[] = [];
   const missingPages: string[] = [];
   
   // Détecter les doublons de chemins
   const pathCounts = new Map<string, number>();
-  ROUTES_MANIFEST.forEach(route => {
-    const count = pathCounts.get(route.path) || 0;
-    pathCounts.set(route.path, count + 1);
+  ROUTE_MANIFEST.forEach(route => {
+    const count = pathCounts.get(route) || 0;
+    pathCounts.set(route, count + 1);
   });
   
   pathCounts.forEach((count, path) => {
@@ -55,11 +54,14 @@ export async function getRoutesHealth(): Promise<RouteHealthResponse> {
   // avec accès au système de fichiers
   
   return {
-    status: validation.valid && duplicates.length === 0 ? 'healthy' : 'error',
-    totalRoutes: ROUTES_MANIFEST.length,
+    status: duplicates.length === 0 ? 'healthy' : 'error',
+    totalRoutes: ROUTE_MANIFEST.length,
     duplicates,
     missingPages,
-    validation,
+    validation: {
+      valid: duplicates.length === 0,
+      errors: duplicates.length > 0 ? [`Doublons détectés: ${duplicates.join(', ')}`] : []
+    },
     timestamp: new Date().toISOString()
   };
 }

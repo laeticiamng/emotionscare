@@ -102,6 +102,9 @@ export const ROUTE_MANIFEST = [
 export const buildUnifiedRoutes = (): RouteObject[] => {
   console.log('🚀 Building unified routes...');
 
+  // Importer le validateur de routes pour vérification
+  import('../utils/routeValidator').catch(console.error);
+
   return [
     // Routes publiques (sans Layout pour éviter les contextes d'auth)
     {
@@ -299,6 +302,12 @@ export const buildUnifiedRoutes = (): RouteObject[] => {
           element: <B2BAdminSettingsPage />
         }
       ]
+    },
+
+    // Route de validation des routes (dev uniquement)
+    {
+      path: '/route-validation',
+      element: lazy(() => import('@/pages/RouteValidationPage'))
     },
 
     // Route 404
