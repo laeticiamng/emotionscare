@@ -1,374 +1,219 @@
-import React, { useRef, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useEffect, useRef } from 'react';
+import { VRBreathPattern } from '@/store/vrbreath.store';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Square, Music, MusicOff } from 'lucide-react';
-import { type VRBreathPhase, type VRPattern } from '@/store/vr.store';
+import { Play, Pause, Square } from 'lucide-react';
 
 interface Fallback2DProps {
-  running: boolean;
-  paused: boolean;
-  phase: VRBreathPhase;
-  pattern: VRPattern;
-  progress: number; // Phase progress 0-1
-  elapsedTime: number;
-  duration: number;
-  musicEnabled: boolean;
-  reduceMotion: boolean;
+  pattern: VRBreathPattern;
+  reducedMotion: boolean;
   onStart: () => void;
   onPause: () => void;
-  onResume: () => void;
-  onStop: () => void;
-  onToggleMusic: () => void;
+  onFinish: () => void;
+  running?: boolean;
+  currentPhase?: { type: 'inhale' | 'hold' | 'exhale'; duration: number };
+  phaseProgress?: number;
 }
 
-// Phase colors for 2D fallback
-const PHASE_COLORS = {
-  inhale: '#3b82f6', // Blue
-  hold: '#8b5cf6',   // Purple  
-  exhale: '#06b6d4', // Cyan
-  pause: '#64748b',  // Slate
-} as const;
-
-// Phase names
-const PHASE_NAMES = {
-  inhale: 'Inspire',
-  hold: 'Tiens',
-  exhale: 'Expire', 
-  pause: 'Pause',
-} as const;
+const PATTERNS = {
+  '4-2-4': [
+    { type: 'inhale' as const, duration: 4 },
+    { type: 'hold' as const, duration: 2 },
+    { type: 'exhale' as const, duration: 4 }
+  ],
+  '4-6-8': [
+    { type: 'inhale' as const, duration: 4 },
+    { type: 'hold' as const, duration: 6 },
+    { type: 'exhale' as const, duration: 8 }
+  ],
+  '5-5': [
+    { type: 'inhale' as const, duration: 5 },
+    { type: 'exhale' as const, duration: 5 }
+  ]
+};
 
 export const Fallback2D: React.FC<Fallback2DProps> = ({
-  running,
-  paused,
-  phase,
   pattern,
-  progress,
-  elapsedTime,
-  duration,
-  musicEnabled,
-  reduceMotion,
+  reducedMotion,
   onStart,
   onPause,
-  onResume,
-  onStop,
-  onToggleMusic,
+  onFinish,
+  running = false,
+  currentPhase,
+  phaseProgress = 0
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
 
-  // Get breathing sphere properties
-  const getSphereProperties = useCallback(() => {
-    const baseRadius = 80;
-    let radius = baseRadius;
-    let opacity = 0.5;
-
-    switch (phase) {
-      case 'inhale':
-        radius = baseRadius + (progress * 40); // 80 to 120px
-        opacity = 0.4 + (progress * 0.4); // 0.4 to 0.8
-        break;
-      case 'hold':
-        radius = baseRadius + 40; // 120px
-        opacity = 0.8;
-        break;
-      case 'exhale':
-        radius = (baseRadius + 40) - (progress * 40); // 120 to 80px
-        opacity = 0.8 - (progress * 0.3); // 0.8 to 0.5
-        break;
-      case 'pause':
-        radius = baseRadius; // 80px
-        opacity = 0.5;
-        break;
-    }
-
-    return { radius, opacity, color: PHASE_COLORS[phase] };
-  }, [phase, progress]);
-
-  // Draw 2D breathing visualization
-  const drawBreathingSphere = useCallback(() => {
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const { width, height } = canvas;
-    const centerX = width / 2;
-    const centerY = height / 2;
+    const drawPacer = () => {
+      const { width, height } = canvas;
+      ctx.clearRect(0, 0, width, height);
 
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
+      // Center
+      const centerX = width / 2;
+      const centerY = height / 2;
 
-    // Draw galaxy background (simple starfield)
-    if (!reduceMotion) {
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 100; i++) {
-        const x = Math.random() * width;
-        const y = Math.random() * height;
-        const size = Math.random() * 2;
-        const alpha = Math.random() * 0.8 + 0.2;
+      // Base radius and animation
+      const baseRadius = Math.min(width, height) * 0.15;
+      let currentRadius = baseRadius;
+
+      if (running && currentPhase) {
+        const progress = phaseProgress;
         
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, 2 * Math.PI);
-        ctx.fill();
+        switch (currentPhase.type) {
+          case 'inhale':
+            currentRadius = baseRadius + (baseRadius * 0.5 * progress);
+            break;
+          case 'hold':
+            currentRadius = baseRadius * 1.5;
+            break;
+          case 'exhale':
+            currentRadius = baseRadius * 1.5 - (baseRadius * 0.5 * progress);
+            break;
+        }
       }
-      ctx.globalAlpha = 1;
-    }
 
-    // Get sphere properties
-    const { radius, opacity, color } = getSphereProperties();
-
-    // Draw outer glow ring
-    if (!reduceMotion) {
-      const gradient = ctx.createRadialGradient(
-        centerX, centerY, radius * 0.7,
-        centerX, centerY, radius * 1.4
-      );
-      gradient.addColorStop(0, `${color}30`); // 30% opacity
-      gradient.addColorStop(1, `${color}00`); // Transparent
-      
-      ctx.fillStyle = gradient;
+      // Draw pacer circle
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius * 1.4, 0, 2 * Math.PI);
+      ctx.arc(centerX, centerY, currentRadius, 0, Math.PI * 2);
+      
+      // Gradient based on phase
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, currentRadius);
+      
+      if (currentPhase) {
+        switch (currentPhase.type) {
+          case 'inhale':
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)'); // blue
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
+            break;
+          case 'hold':
+            gradient.addColorStop(0, 'rgba(168, 85, 247, 0.8)'); // purple
+            gradient.addColorStop(1, 'rgba(168, 85, 247, 0.2)');
+            break;
+          case 'exhale':
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.8)'); // green
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.2)');
+            break;
+        }
+      } else {
+        gradient.addColorStop(0, 'rgba(156, 163, 175, 0.8)'); // gray
+        gradient.addColorStop(1, 'rgba(156, 163, 175, 0.2)');
+      }
+
+      ctx.fillStyle = gradient;
       ctx.fill();
-    }
 
-    // Draw main breathing sphere
-    const sphereGradient = ctx.createRadialGradient(
-      centerX - radius * 0.3, centerY - radius * 0.3, 0,
-      centerX, centerY, radius
-    );
-    sphereGradient.addColorStop(0, `${color}CC`); // 80% opacity
-    sphereGradient.addColorStop(0.7, `${color}99`); // 60% opacity  
-    sphereGradient.addColorStop(1, `${color}66`); // 40% opacity
-
-    ctx.globalAlpha = opacity;
-    ctx.fillStyle = sphereGradient;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Draw inner core
-    ctx.fillStyle = `${color}DD`; // 87% opacity
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 0.3, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Draw breathing ring (outline)
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.6;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }, [getSphereProperties, reduceMotion]);
-
-  // Animation loop
-  const animate = useCallback(() => {
-    drawBreathingSphere();
-    
-    if (running && !paused) {
-      animationFrameRef.current = requestAnimationFrame(animate);
-    }
-  }, [drawBreathingSphere, running, paused]);
-
-  // Handle canvas resize
-  const handleResize = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const container = canvas.parentElement;
-    if (!container) return;
-
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    drawBreathingSphere();
-  }, [drawBreathingSphere]);
-
-  // Initialize canvas
-  useEffect(() => {
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      // Phase text
+      if (currentPhase) {
+        ctx.fillStyle = 'hsl(var(--foreground))';
+        ctx.font = '2rem system-ui';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const phaseText = currentPhase.type === 'inhale' ? 'Inspire' :
+                         currentPhase.type === 'hold' ? 'Retiens' : 'Expire';
+        
+        ctx.fillText(phaseText, centerX, centerY + currentRadius + 60);
       }
     };
-  }, [handleResize]);
 
-  // Start/stop animation
-  useEffect(() => {
-    if (running && !paused) {
-      animationFrameRef.current = requestAnimationFrame(animate);
-    } else {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
+    // Resize canvas to match display size
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const animate = () => {
+      drawPacer();
+      if (!reducedMotion) {
+        requestAnimationFrame(animate);
       }
-      drawBreathingSphere(); // Draw static state
-    }
-  }, [running, paused, animate, drawBreathingSphere]);
+    };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+    animate();
 
-  const sessionProgress = duration > 0 ? elapsedTime / duration : 0;
-  const isComplete = running && sessionProgress >= 1;
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [running, currentPhase, phaseProgress, reducedMotion]);
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      switch (e.code) {
+        case 'Space':
+        case 'KeyK':
+          e.preventDefault();
+          if (running) {
+            onPause();
+          } else {
+            onStart();
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onFinish();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [running, onStart, onPause, onFinish]);
 
   return (
-    <div className="w-full h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
-      {/* Canvas for 2D breathing visualization */}
+    <div className="relative w-full h-screen bg-gradient-to-b from-background to-muted">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
-        style={{ background: 'transparent' }}
+        style={{ touchAction: 'none' }}
       />
-
-      {/* Overlay UI */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-        
-        {/* Session Complete Overlay */}
-        {isComplete && (
-          <Card className="mb-8 bg-emerald-900/80 backdrop-blur-sm border-emerald-700/50">
-            <CardContent className="p-6 text-center text-white">
-              <div className="text-4xl mb-4">✨</div>
-              <h3 className="text-xl font-semibold mb-2">Session terminée !</h3>
-              <p className="text-emerald-200 text-sm">
-                Excellente séance de cohérence cardiaque
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Bottom Controls */}
-        <Card className="bg-black/60 backdrop-blur-sm border-white/20 mt-auto mb-8">
-          <CardContent className="p-4 min-w-80">
-            
-            {/* Session Info */}
-            <div className="text-center text-white mb-4">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Badge variant="outline" className="text-xs border-white/20 text-white">
-                  {pattern.replace('-', '–')}
-                </Badge>
-                <span className="text-xs text-white/60">•</span>
-                <span className="text-xs text-white/80">
-                  {formatTime(elapsedTime)} / {formatTime(duration)}
-                </span>
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="w-full bg-white/20 rounded-full h-1 mb-3">
-                <div 
-                  className="bg-white h-1 rounded-full transition-all duration-300"
-                  style={{ width: `${sessionProgress * 100}%` }}
-                />
-              </div>
-              
-              {/* Current Phase */}
-              {running && !isComplete && (
-                <div 
-                  className="text-lg font-medium transition-colors duration-300"
-                  style={{ color: PHASE_COLORS[phase] }}
-                >
-                  {PHASE_NAMES[phase]}...
-                </div>
-              )}
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center justify-center gap-3">
-              {!running ? (
-                <Button
-                  onClick={onStart}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
-                >
-                  <Play className="h-4 w-4" />
-                  Démarrer
-                </Button>
-              ) : !isComplete ? (
-                <>
-                  <Button
-                    onClick={paused ? onResume : onPause}
-                    variant="outline"
-                    className="border-white/20 text-white hover:bg-white/10 gap-2"
-                  >
-                    {paused ? (
-                      <>
-                        <Play className="h-4 w-4" />
-                        Reprendre
-                      </>
-                    ) : (
-                      <>
-                        <Pause className="h-4 w-4" />
-                        Pause
-                      </>
-                    )}
-                  </Button>
-                  
-                  <Button
-                    onClick={onStop}
-                    variant="destructive"
-                    className="gap-2"
-                  >
-                    <Square className="h-4 w-4" />
-                    Terminer
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={onStop}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white"
-                >
-                  Fermer
-                </Button>
-              )}
-              
-              {/* Music Toggle */}
-              <Button
-                onClick={onToggleMusic}
-                variant="ghost"
-                size="sm"
-                className={`text-white hover:bg-white/10 ${musicEnabled ? 'bg-white/10' : ''}`}
-              >
-                {musicEnabled ? (
-                  <Music className="h-4 w-4" />
-                ) : (
-                  <MusicOff className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            
-            {/* Instructions */}
-            {!running && (
-              <div className="text-center text-xs text-white/60 mt-3">
-                Regardez la sphère et suivez son rythme de respiration
-              </div>
-            )}
-            
-            {paused && (
-              <div className="text-center text-xs text-yellow-400 mt-3">
-                Session en pause - Espace pour reprendre
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      
+      {/* Controls overlay */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <div className="flex items-center gap-4 bg-background/80 backdrop-blur-sm rounded-full px-6 py-3 border">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={running ? onPause : onStart}
+            className="h-12 w-12"
+            aria-label={running ? 'Pause' : 'Démarrer'}
+          >
+            {running ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onFinish}
+            className="h-12 w-12"
+            aria-label="Arrêter"
+          >
+            <Square className="h-6 w-6" />
+          </Button>
+        </div>
       </div>
 
-      {/* WebXR Not Supported Notice */}
-      <div className="absolute top-4 left-4">
-        <Badge variant="secondary" className="text-xs">
-          Mode 2D • WebXR non supporté
-        </Badge>
+      {/* Pattern info */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+        <div className="bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2 border">
+          <p className="text-sm text-muted-foreground">Pattern {pattern}</p>
+        </div>
       </div>
     </div>
   );
 };
+
+export default Fallback2D;
