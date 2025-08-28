@@ -214,6 +214,8 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 // CRÉATION DU ROUTER
 // ═══════════════════════════════════════════════════════════
 
+// Export des routes helpers et du router
+export { routes } from './routes';
 export const routerV2 = createBrowserRouter([
   // Routes principales du registry
   ...ROUTES_REGISTRY.map(route => ({
