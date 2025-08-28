@@ -1,6 +1,5 @@
-
 /**
- * LoginPage - Page de connexion unifiée
+ * SignupPage - Page d'inscription unifiée
  * TICKET: FE/BE-Router-Cleanup-01
  */
 
@@ -12,40 +11,40 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Routes } from '@/routerV2/helpers';
 import { Heart, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 
-const LoginPage: React.FC = () => {
+const SignupPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const segment = searchParams.get('segment') as 'b2c' | 'b2b' | null;
 
   const [formData, setFormData] = React.useState({
+    name: '',
     email: '',
     password: '',
-    remember: false,
+    confirmPassword: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, type, checked, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [e.target.name]: e.target.value
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { ...formData, segment });
-    // TODO: Implémentation login
+    console.log('Signup attempt:', { ...formData, segment });
+    // TODO: Implémentation signup
   };
 
   const getTitle = () => {
     switch (segment) {
-      case 'b2c': return 'Connexion Particulier';
-      case 'b2b': return 'Connexion Professionnelle';
-      default: return 'Connexion';
+      case 'b2c': return 'Créer votre compte personnel';
+      case 'b2b': return 'Créer votre compte professionnel';
+      default: return 'Créer votre compte';
     }
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -64,37 +63,55 @@ const LoginPage: React.FC = () => {
         {!segment && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="text-center">Comment souhaitez-vous vous connecter ?</CardTitle>
+              <CardTitle className="text-center">Choisissez votre profil</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Link to={Routes.login({ segment: 'b2c' })}>
+              <Link to={Routes.signup({ segment: 'b2c' })}>
                 <Button variant="outline" className="w-full justify-start">
                   <User className="h-4 w-4 mr-2" />
-                  Compte Particulier
+                  Particulier - Usage personnel
                 </Button>
               </Link>
-              <Link to={Routes.login({ segment: 'b2b' })}>
+              <Link to={Routes.signup({ segment: 'b2b' })}>
                 <Button variant="outline" className="w-full justify-start">
                   <User className="h-4 w-4 mr-2" />
-                  Compte Professionnel
+                  Professionnel - Usage en équipe
                 </Button>
               </Link>
             </CardContent>
           </Card>
         )}
 
-        {/* Login Form */}
+        {/* Signup Form */}
         <Card>
           <CardHeader>
             <CardTitle className="text-center">{getTitle()}</CardTitle>
             {segment && (
               <p className="text-center text-sm text-gray-600">
-                Connectez-vous à votre espace {segment === 'b2c' ? 'personnel' : 'professionnel'}
+                Mode {segment === 'b2c' ? 'Particulier' : 'Professionnel'}
               </p>
             )}
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nom complet
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="pl-9"
+                    placeholder="Votre nom complet"
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
@@ -131,35 +148,37 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="remember"
-                    checked={formData.remember}
-                    onChange={handleChange}
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <span className="ml-2 text-sm text-gray-600">Se souvenir de moi</span>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirmer le mot de passe
                 </label>
-                <a href="#" className="text-sm text-primary hover:underline">
-                  Mot de passe oublié ?
-                </a>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="pl-9"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
               </div>
 
               <Button type="submit" className="w-full">
-                Se connecter
+                Créer mon compte
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Pas encore de compte ?{' '}
+                Déjà un compte ?{' '}
                 <Link 
-                  to={segment ? Routes.signup({ segment }) : Routes.signup()} 
+                  to={segment ? Routes.login({ segment }) : Routes.login()} 
                   className="text-primary hover:underline font-medium"
                 >
-                  S'inscrire
+                  Se connecter
                 </Link>
               </p>
             </div>
@@ -167,7 +186,7 @@ const LoginPage: React.FC = () => {
             {segment && (
               <div className="mt-4 text-center">
                 <Link 
-                  to={Routes.login()} 
+                  to={Routes.signup()} 
                   className="text-xs text-gray-500 hover:text-gray-700"
                 >
                   Changer de profil
@@ -176,9 +195,17 @@ const LoginPage: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Footer */}
+        <div className="mt-6 text-center text-xs text-gray-500">
+          En créant un compte, vous acceptez nos{' '}
+          <a href="#" className="underline">Conditions d'utilisation</a>
+          {' '}et notre{' '}
+          <a href="#" className="underline">Politique de confidentialité</a>
+        </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default SignupPage;
