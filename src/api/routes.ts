@@ -1,15 +1,14 @@
+/**
+ * Routes API - RouterV2 Compatible
+ * TICKET: FE/BE-Router-Cleanup-01
+ */
 
-import { ROUTE_MANIFEST } from '../router/buildUnifiedRoutes';
+import { ROUTES_REGISTRY } from '@/routerV2/registry';
 
 export interface RouteHealthResponse {
   status: 'healthy' | 'error';
   totalRoutes: number;
   duplicates: string[];
-  missingPages: string[];
-  validation: {
-    valid: boolean;
-    errors: string[];
-  };
   timestamp: string;
 }
 
@@ -18,63 +17,52 @@ export interface RoutesApiResponse {
   meta: {
     totalRoutes: number;
     lastGenerated: string;
-    version: string;
   };
 }
 
+// Extraire les paths du registry RouterV2
+const ROUTE_PATHS = ROUTES_REGISTRY.map(route => route.path);
+
 export async function getRoutesManifest(): Promise<RoutesApiResponse> {
   return {
-    routes: ROUTE_MANIFEST,
+    routes: ROUTE_PATHS,
     meta: {
-      totalRoutes: ROUTE_MANIFEST.length,
+      totalRoutes: ROUTE_PATHS.length,
       lastGenerated: new Date().toISOString(),
-      version: '1.0.0'
-    }
+    },
   };
 }
 
 export async function getRoutesHealth(): Promise<RouteHealthResponse> {
-  const duplicates: string[] = [];
-  const missingPages: string[] = [];
-  
-  // Détecter les doublons de chemins
+  // Vérifier les doublons dans RouterV2
   const pathCounts = new Map<string, number>();
-  ROUTE_MANIFEST.forEach(route => {
+  const duplicates: string[] = [];
+
+  ROUTE_PATHS.forEach(route => {
     const count = pathCounts.get(route) || 0;
     pathCounts.set(route, count + 1);
   });
-  
-  pathCounts.forEach((count, path) => {
+
+  pathCounts.forEach((count, route) => {
     if (count > 1) {
-      duplicates.push(path);
+      duplicates.push(route);
     }
   });
-  
-  // Note: La vérification des pages manquantes serait normalement faite côté serveur
-  // avec accès au système de fichiers
-  
+
   return {
     status: duplicates.length === 0 ? 'healthy' : 'error',
-    totalRoutes: ROUTE_MANIFEST.length,
+    totalRoutes: ROUTE_PATHS.length,
     duplicates,
-    missingPages,
-    validation: {
-      valid: duplicates.length === 0,
-      errors: duplicates.length > 0 ? [`Doublons détectés: ${duplicates.join(', ')}`] : []
-    },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
-// Simulation d'un endpoint API côté client
 export class RoutesApi {
   static async getManifest(): Promise<RoutesApiResponse> {
-    // En production, ceci ferait un appel HTTP vers /api/routes
     return getRoutesManifest();
   }
-  
+
   static async getHealth(): Promise<RouteHealthResponse> {
-    // En production, ceci ferait un appel HTTP vers /api/routes/health
     return getRoutesHealth();
   }
 }
