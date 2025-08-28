@@ -64,6 +64,27 @@
       "pause": "Pause"
     }
   },
+  "glow": {
+    "widget": {
+      "title": "Instant Glow",
+      "state": {
+        "low": "Recharge",
+        "medium": "Stable", 
+        "high": "Au top"
+      },
+      "tip": {
+        "cta": "Voir une suggestion"
+      }
+    }
+  },
+  "weekly": {
+    "title": "Ta semaine",
+    "summary": {
+      "up": "Tendance en hausse",
+      "down": "Tendance en baisse",
+      "flat": "Tendance stable"
+    }
+  },
   "common": {
     "enable": "Activer",
     "disable": "Désactiver",

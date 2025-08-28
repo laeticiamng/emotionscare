@@ -78,6 +78,11 @@
     --high-contrast-bg: 0 0% 100%;
     --high-contrast-fg: 0 0% 0%;
     --high-contrast-border: 0 0% 0%;
+    
+    /* Variables pour Glow Widget */
+    --glow-low: 38 92% 50%;
+    --glow-medium: 45 93% 47%;
+    --glow-high: 142 76% 36%;
   }
 
   .dark {
@@ -105,6 +110,11 @@
     --high-contrast-bg: 0 0% 0%;
     --high-contrast-fg: 0 0% 100%;
     --high-contrast-border: 0 0% 100%;
+    
+    /* Variables pour Glow Widget (dark mode) */
+    --glow-low: 38 92% 60%;
+    --glow-medium: 45 93% 57%;
+    --glow-high: 142 76% 46%;
   }
   
   /* Support du contraste élevé */

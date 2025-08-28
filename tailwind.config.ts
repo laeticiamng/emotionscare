@@ -104,6 +104,11 @@ const config: Config = {
         success: "hsl(142 76% 36%)",
         warning: "hsl(38 92% 50%)",
         info: "hsl(199 89% 48%)",
+        glow: {
+          low: "hsl(var(--glow-low))",
+          medium: "hsl(var(--glow-medium))",
+          high: "hsl(var(--glow-high))"
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

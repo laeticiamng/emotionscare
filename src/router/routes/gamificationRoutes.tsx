@@ -12,6 +12,7 @@ const FaceFilterPage = lazy(() => import('@/pages/FaceFilterPage'));
 const BubbleBeatPage = lazy(() => import('@/pages/BubbleBeatPage'));
 const ScreenSilkPage = lazy(() => import('@/pages/ScreenSilkPage'));
 const VRGalaxyPage = lazy(() => import('@/pages/VRGalaxyPage'));
+const GlowDashboardPage = lazy(() => import('@/pages/GlowDashboardPage'));
 
 export const gamificationRoutes: RouteObject[] = [
   {
@@ -53,5 +54,9 @@ export const gamificationRoutes: RouteObject[] = [
   {
     path: '/vr-galaxy',
     element: <VRGalaxyPage />,
+  },
+  {
+    path: '/glow-dashboard',
+    element: <GlowDashboardPage />,
   }
 ];
