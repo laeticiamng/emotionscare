@@ -1,48 +1,96 @@
 import React, { useState, useEffect } from 'react';
-import { PageRoot } from '@/components/common/PageRoot';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Sword, Shield, Crown, Target, Zap, Heart } from 'lucide-react';
-import { useMood } from '@/contexts/MoodContext';
-import { useActivityLogger } from '@/hooks/useActivityLogger';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
+import { Crown, Flame, Target } from 'lucide-react';
+import UnifiedShell from '@/components/unified/UnifiedShell';
+import { useGritStore } from '@/store/grit.store';
+import { ChallengeCard, ActiveSession, ProgressStats, AchievementsList } from '@/components/boss-level-grit';
+import { GritChallenge, GritStats } from '@/types/boss-level-grit';
 
 const BossLevelGritPage = () => {
-  const [currentQuest, setCurrentQuest] = useState<any>(null);
-  const [gritLevel, setGritLevel] = useState(1);
-  const [experience, setExperience] = useState(250);
-  const [isLoadingQuest, setIsLoadingQuest] = useState(false);
-  const [completedQuests, setCompletedQuests] = useState(0);
-  const { currentMood } = useMood();
-  const { logActivity } = useActivityLogger();
+  const [activeTab, setActiveTab] = useState('challenges');
+  const [selectedChallenge, setSelectedChallenge] = useState<GritChallenge | null>(null);
+  const gritStore = useGritStore();
+  
+  // Mock data pour la démo
+  const [gritStats] = useState<GritStats>({
+    totalXp: 2850,
+    currentLevel: {
+      id: '5',
+      name: 'Guerrier Déterminé',
+      description: 'Un combattant expérimenté',
+      minXp: 2500,
+      maxXp: 3500,
+      color: '#f59e0b',
+      icon: '⚔️',
+      benefits: ['Double XP weekend', 'Défis exclusifs', 'Mentoring'],
+      unlockedFeatures: ['Défis master', 'Stats avancées']
+    },
+    nextLevel: {
+      id: '6',
+      name: 'Maître de la Résilience',
+      description: 'Un expert en persévérance',
+      minXp: 3500,
+      maxXp: 5000,
+      color: '#8b5cf6',
+      icon: '🏆',
+      benefits: ['Triple XP events', 'Coaching personnalisé'],
+      unlockedFeatures: ['Défis legend', 'Leaderboard VIP']
+    },
+    completedChallenges: 47,
+    currentStreak: 12,
+    longestStreak: 28,
+    averageScore: 87,
+    totalSessionTime: 1840, // minutes
+    categoriesProgress: {
+      mental: 75,
+      physical: 60,
+      emotional: 85,
+      spiritual: 45
+    },
+    achievements: [
+      {
+        id: '1',
+        title: 'Premier Pas',
+        description: 'Complétez votre premier défi',
+        icon: 'trophy',
+        type: 'completion',
+        requirement: 1,
+        progress: 1,
+        unlocked: true,
+        unlockedAt: new Date('2024-01-15'),
+        reward: { xp: 100 }
+      }
+    ]
+  });
 
-  useEffect(() => {
-    logActivity('/boss-level-grit', 'grit_development_page');
-    loadPersonalizedQuest();
-  }, [logActivity]);
+  const [challenges] = useState<GritChallenge[]>([
+    {
+      id: '1',
+      title: 'Défi Matinal',
+      description: 'Commencez la journée avec 10 minutes de méditation',
+      difficulty: 'novice',
+      category: 'mental',
+      duration: 10,
+      xpReward: 50,
+      completionRate: 0,
+      status: 'available',
+      tags: ['méditation', 'matin', 'routine'],
+      createdAt: new Date()
+    }
+  ]);
 
   const startChallenge = (challenge: GritChallenge) => {
     setSelectedChallenge(challenge);
     setActiveTab('session');
   };
 
-  const completeChallenge = (score: number, insights: string[]) => {
-    if (selectedChallenge) {
-      console.log('Défi complété:', {
-        challenge: selectedChallenge.id,
-        score,
-        insights
-      });
-      
-      // Mise à jour du statut du défi
-      setSelectedChallenge(null);
-      setActiveTab('challenges');
-      
-      // Ici on mettrait à jour les stats et sauvegarderait en base
-    }
+  const completeChallenge = (score: number, insights?: string[]) => {
+    setSelectedChallenge(null);
+    setActiveTab('challenges');
   };
 
   const backToChallenges = () => {
@@ -131,7 +179,6 @@ const BossLevelGritPage = () => {
             <TabsTrigger value="achievements">Succès</TabsTrigger>
           </TabsList>
 
-          {/* Onglet Défis */}
           <TabsContent value="challenges" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
               {challenges.map((challenge) => (
@@ -144,7 +191,6 @@ const BossLevelGritPage = () => {
             </div>
           </TabsContent>
 
-          {/* Onglet Session Active */}
           <TabsContent value="session" className="space-y-6">
             <ActiveSession
               challenge={selectedChallenge}
@@ -153,12 +199,10 @@ const BossLevelGritPage = () => {
             />
           </TabsContent>
 
-          {/* Onglet Progression */}
           <TabsContent value="progress" className="space-y-6">
             <ProgressStats stats={gritStats} />
           </TabsContent>
 
-          {/* Onglet Succès */}
           <TabsContent value="achievements" className="space-y-6">
             <AchievementsList achievements={gritStats.achievements} />
           </TabsContent>

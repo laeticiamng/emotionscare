@@ -1,159 +1,121 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Play, 
-  RotateCcw, 
-  Trophy, 
-  Brain, 
-  Heart, 
-  Dumbbell, 
-  Sparkles,
-  Target
-} from 'lucide-react';
-import { GritChallenge } from '@/types/boss-level-grit';
+import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
+import { Clock, Star, Trophy, Zap } from 'lucide-react';
+
+interface GritChallenge {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'novice' | 'warrior' | 'master' | 'legend';
+  category: 'mental' | 'physical' | 'emotional' | 'spiritual';
+  duration: number;
+  xpReward: number;
+  completionRate: number;
+  status: 'locked' | 'available' | 'in_progress' | 'completed';
+}
 
 interface ChallengeCardProps {
   challenge: GritChallenge;
   onStart: (challenge: GritChallenge) => void;
+  disabled?: boolean;
 }
 
-const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, onStart }) => {
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'novice': return 'hsl(var(--muted))';
-      case 'warrior': return 'hsl(var(--primary))';
-      case 'master': return 'hsl(var(--accent))';
-      case 'legend': return 'hsl(var(--destructive))';
-      default: return 'hsl(var(--muted))';
-    }
-  };
+const difficultyColors = {
+  novice: 'bg-green-500',
+  warrior: 'bg-yellow-500', 
+  master: 'bg-orange-500',
+  legend: 'bg-purple-500'
+};
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'mental': return <Brain className="h-5 w-5" />;
-      case 'physical': return <Dumbbell className="h-5 w-5" />;
-      case 'emotional': return <Heart className="h-5 w-5" />;
-      case 'spiritual': return <Sparkles className="h-5 w-5" />;
-      default: return <Target className="h-5 w-5" />;
-    }
-  };
+const categoryIcons = {
+  mental: Zap,
+  physical: Trophy,
+  emotional: Star,
+  spiritual: Clock
+};
 
-  const getDifficultyLabel = (difficulty: string) => {
-    switch (difficulty) {
-      case 'novice': return 'Novice';
-      case 'warrior': return 'Guerrier';
-      case 'master': return 'Maître';
-      case 'legend': return 'Légende';
-      default: return difficulty;
-    }
-  };
-
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case 'mental': return 'Mental';
-      case 'physical': return 'Physique';
-      case 'emotional': return 'Émotionnel';
-      case 'spiritual': return 'Spirituel';
-      default: return category;
-    }
-  };
-
+const ChallengeCard: React.FC<ChallengeCardProps> = ({ 
+  challenge, 
+  onStart, 
+  disabled = false 
+}) => {
+  const IconComponent = categoryIcons[challenge.category];
+  const isLocked = challenge.status === 'locked';
+  const isCompleted = challenge.status === 'completed';
+  
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
+      whileHover={!disabled && !isLocked ? { scale: 1.02 } : {}}
+      whileTap={!disabled && !isLocked ? { scale: 0.98 } : {}}
     >
-      <Card className={`relative overflow-hidden ${challenge.status === 'locked' ? 'opacity-60' : ''}`}>
-        <div 
-          className="absolute top-0 left-0 w-full h-1"
-          style={{ backgroundColor: getDifficultyColor(challenge.difficulty) }}
-        />
-        
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+      <Card className={`transition-all duration-200 ${
+        isLocked ? 'opacity-60 cursor-not-allowed' : 
+        isCompleted ? 'border-green-500/50 bg-green-500/5' :
+        'hover:shadow-lg cursor-pointer'
+      }`}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
-              {getCategoryIcon(challenge.category)}
-              <span>{challenge.title}</span>
+              <IconComponent className="h-5 w-5 text-primary" />
+              <div>
+                <CardTitle className="text-lg">{challenge.title}</CardTitle>
+                <CardDescription className="text-sm">
+                  {challenge.description}
+                </CardDescription>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
               <Badge 
-                variant="outline"
-                style={{ borderColor: getDifficultyColor(challenge.difficulty) }}
+                variant="secondary"
+                className={`${difficultyColors[challenge.difficulty]} text-white`}
               >
-                {getDifficultyLabel(challenge.difficulty)}
+                {challenge.difficulty}
               </Badge>
-              {challenge.status === 'completed' && (
-                <Trophy className="h-4 w-4 text-accent" />
+              {isCompleted && (
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  ✓ Complété
+                </Badge>
               )}
             </div>
-          </CardTitle>
-          <div className="text-sm text-muted-foreground">
-            {getCategoryLabel(challenge.category)} • {challenge.duration} min • {challenge.xpReward} XP
           </div>
         </CardHeader>
         
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {challenge.description}
-          </p>
-          
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1">
-                📊 {challenge.completionRate}%
-              </span>
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              <span>{challenge.duration} min</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4" />
+              <span>{challenge.xpReward} XP</span>
             </div>
           </div>
           
-          <div className="flex flex-wrap gap-1">
-            {challenge.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-          
-          <div className="pt-2">
-            <Button
-              onClick={() => onStart(challenge)}
-              disabled={challenge.status === 'locked'}
-              className="w-full"
-              variant={challenge.status === 'completed' ? 'outline' : 'default'}
-            >
-              {challenge.status === 'locked' && (
-                <>🔒 Verrouillé</>
-              )}
-              {challenge.status === 'available' && (
-                <>
-                  <Play className="h-4 w-4 mr-2" />
-                  Commencer le Défi
-                </>
-              )}
-              {challenge.status === 'completed' && (
-                <>
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Refaire le Défi
-                </>
-              )}
-            </Button>
-          </div>
-          
-          {challenge.streakRequired && (
-            <div className="text-xs text-muted-foreground flex items-center gap-1">
-              🔥 Série de {challenge.streakRequired} jours requise
+          {challenge.completionRate > 0 && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs">
+                <span>Progression</span>
+                <span>{challenge.completionRate}%</span>
+              </div>
+              <Progress value={challenge.completionRate} className="h-2" />
             </div>
           )}
           
-          {challenge.prerequisites && challenge.prerequisites.length > 0 && (
-            <div className="text-xs text-muted-foreground">
-              📋 Prérequis: {challenge.prerequisites.join(', ')}
-            </div>
-          )}
+          <Button 
+            onClick={() => onStart(challenge)}
+            disabled={disabled || isLocked}
+            className="w-full"
+            variant={isCompleted ? "outline" : "default"}
+          >
+            {isLocked ? 'Verrouillé' : 
+             isCompleted ? 'Refaire' : 
+             challenge.status === 'in_progress' ? 'Continuer' : 'Commencer'}
+          </Button>
         </CardContent>
       </Card>
     </motion.div>
