@@ -1,5 +1,12 @@
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { Suspense, memo, lazy, ComponentType } from 'react';
 import { Navigate } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePerformance } from '@/contexts/PerformanceContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -67,11 +74,11 @@ const OptimizedRoute = memo<OptimizedRouteProps>(({
   }
   
   if (requireAuth && !isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to={Routes.login()} replace />;
   }
   
   if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to={Routes.unauthorized()} replace />;
   }
   
   return (

@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
@@ -22,11 +29,11 @@ const B2BRedirectPage: React.FC = () => {
 
   // Si l'utilisateur est déjà authentifié, le rediriger vers son dashboard approprié
   if (isAuthenticated) {
-    return <Navigate to="/b2b/user/dashboard" replace />;
+    return <Navigate to={Routes.employeeHome()} replace />;
   }
 
   // Sinon, rediriger vers la page de sélection B2B
-  return <Navigate to="/b2b/selection" replace />;
+  return <Navigate to={Routes.b2bLanding()} replace />;
 };
 
 export default B2BRedirectPage;

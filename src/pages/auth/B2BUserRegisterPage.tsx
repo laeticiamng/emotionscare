@@ -215,7 +215,7 @@ const B2BUserRegisterPage: React.FC = () => {
 
             <div className="text-center space-y-4">
               <Link
-                to="/b2b/user/login"
+                to={Routes.login({ segment: "b2b" })}
                 className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
               >
                 Déjà un compte ? Se connecter
@@ -224,7 +224,7 @@ const B2BUserRegisterPage: React.FC = () => {
               <div className="flex items-center justify-center space-x-2">
                 <ArrowLeft className="h-4 w-4 text-gray-400" />
                 <Link
-                  to="/b2b/selection"
+                  to={Routes.b2bLanding()}
                   className="text-sm text-gray-600 hover:text-gray-700 hover:underline"
                 >
                   Retour à la sélection

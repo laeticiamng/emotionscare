@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,7 +51,7 @@ const B2CLoginPage: React.FC = () => {
       
       if (formData.email === 'demo@example.com' && formData.password === 'password123') {
         toast.success('Connexion réussie !');
-        navigate('/b2c/dashboard');
+        navigate(Routes.consumerHome());
       } else {
         setError('Email ou mot de passe incorrect');
       }
@@ -72,7 +79,7 @@ const B2CLoginPage: React.FC = () => {
         {/* Back Button */}
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/choose-mode')}
+          onClick={() => navigate(Routes.home())}
           className="mb-6 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -168,7 +175,7 @@ const B2CLoginPage: React.FC = () => {
             </div>
 
             <div className="space-y-4 text-center">
-              <Link to="/forgot-password" className="text-sm text-gray-600 hover:text-gray-900">
+              <Link to={Routes.login()} className="text-sm text-gray-600 hover:text-gray-900">
                 Mot de passe oublié ?
               </Link>
 
@@ -178,7 +185,7 @@ const B2CLoginPage: React.FC = () => {
                 </p>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/b2c/register')}
+                  onClick={() => navigate(Routes.signup({ segment: "b2c" }))}
                   className="w-full"
                 >
                   Créer un compte

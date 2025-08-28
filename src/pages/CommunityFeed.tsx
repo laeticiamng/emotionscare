@@ -1,6 +1,13 @@
 
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getPosts, fetchUserById } from '@/lib/communityService';
@@ -89,7 +96,7 @@ const CommunityFeed: React.FC = () => {
       
       {/* Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Link to="/community">
+        <Link to={Routes.socialCocon()}>
           <Card className="h-full bg-gradient-to-br from-green-50 to-white hover:shadow-lg transition-all duration-200">
             <CardContent className="p-6 flex flex-col items-center justify-center">
               <MessageSquare className="h-10 w-10 text-green-600 mb-4" />
@@ -101,7 +108,7 @@ const CommunityFeed: React.FC = () => {
           </Card>
         </Link>
         
-        <Link to="/community/groups">
+        <Link to={Routes.teams()}>
           <Card className="h-full bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition-all duration-200">
             <CardContent className="p-6 flex flex-col items-center justify-center">
               <Users className="h-10 w-10 text-blue-600 mb-4" />
@@ -113,7 +120,7 @@ const CommunityFeed: React.FC = () => {
           </Card>
         </Link>
         
-        <Link to="/community/buddies">
+        <Link to={Routes.socialCocon()}>
           <Card className="h-full bg-gradient-to-br from-purple-50 to-white hover:shadow-lg transition-all duration-200">
             <CardContent className="p-6 flex flex-col items-center justify-center">
               <UserRound className="h-10 w-10 text-purple-600 mb-4" />
@@ -166,14 +173,14 @@ const CommunityFeed: React.FC = () => {
               </p>
               
               <div className="space-y-2">
-                <Link to="/community/groups">
+                <Link to={Routes.teams()}>
                   <Button variant="outline" className="w-full flex justify-between items-center">
                     <span>Explorer les groupes</span>
                     <Users size={16} />
                   </Button>
                 </Link>
                 
-                <Link to="/community/buddies">
+                <Link to={Routes.socialCocon()}>
                   <Button variant="outline" className="w-full flex justify-between items-center">
                     <span>Trouver un buddy</span>
                     <Share2 size={16} />

@@ -1,3 +1,9 @@
+/**
+ * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete
+ * All hardcoded links replaced with typed Routes.xxx() helpers
+ * TICKET: FE/BE-Router-Cleanup-02
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   Sheet,
@@ -11,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Routes } from '@/routerV2';
 import { useBranding } from '@/hooks/useBranding';
 import { cn } from '@/lib/utils';
 import { useNotificationBadge } from '@/hooks/useNotificationBadge';
@@ -42,18 +49,18 @@ export function MainNavigation() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate(Routes.login());
   };
 
   const navigationItems = [
-    { label: 'Accueil', href: '/', icon: <Home className="mr-2 h-4 w-4" /> },
-    { label: 'Profil', href: '/profile', icon: <User className="mr-2 h-4 w-4" /> },
-    { label: 'Paramètres', href: '/settings', icon: <Settings className="mr-2 h-4 w-4" /> },
-    { label: 'Dashboard', href: '/dashboard', icon: <BarChart className="mr-2 h-4 w-4" /> },
-    { label: 'Prédictif', href: '/predictive', icon: <Sparkles className="mr-2 h-4 w-4" /> },
-    { label: 'Équipe', href: '/team', icon: <Users className="mr-2 h-4 w-4" /> },
-    { label: 'Formations', href: '/training', icon: <GraduationCap className="mr-2 h-4 w-4" /> },
-    { label: 'Ressources', href: '/resources', icon: <BookOpenCheck className="mr-2 h-4 w-4" /> },
+    { label: 'Accueil', href: Routes.home(), icon: <Home className="mr-2 h-4 w-4" /> },
+    { label: 'Profil', href: Routes.settingsProfile(), icon: <User className="mr-2 h-4 w-4" /> },
+    { label: 'Paramètres', href: Routes.settingsGeneral(), icon: <Settings className="mr-2 h-4 w-4" /> },
+    { label: 'Dashboard', href: Routes.consumerHome(), icon: <BarChart className="mr-2 h-4 w-4" /> },
+    { label: 'Prédictif', href: Routes.adminReports(), icon: <Sparkles className="mr-2 h-4 w-4" /> },
+    { label: 'Équipe', href: Routes.teams(), icon: <Users className="mr-2 h-4 w-4" /> },
+    { label: 'Formations', href: Routes.adminEvents(), icon: <GraduationCap className="mr-2 h-4 w-4" /> },
+    { label: 'Ressources', href: Routes.help(), icon: <BookOpenCheck className="mr-2 h-4 w-4" /> },
   ];
 
   const renderNavItem = (item: any) => (
@@ -76,7 +83,7 @@ export function MainNavigation() {
   return (
     <div className="border-b">
       <div className="container flex h-16 items-center justify-between py-4">
-        <Link to="/" className="mr-4 flex items-center space-x-2">
+        <Link to={Routes.home()} className="mr-4 flex items-center space-x-2">
           {logoUrl && <img src={logoUrl} alt="Logo" className="h-8 w-auto" />}
           <span className="font-bold">{companyName || 'Nom de l\'entreprise'}</span>
         </Link>
