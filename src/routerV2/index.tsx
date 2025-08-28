@@ -62,11 +62,17 @@ const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
 
-// B2B Features
+// B2B Features - use new dedicated page for Teams, GenericPage for others
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
-const B2BSocialCoconPage = lazy(() => import('@/pages/B2BSocialCoconPage'));
-const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
-const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
+const B2BSocialCoconPage = lazy(() => import('@/pages/GenericPage').then(m => ({ default: m.B2BAdminSocialCoconPage })));
+const B2BReportsPage = lazy(() => import('@/pages/GenericPage').then(m => ({ default: m.B2BAdminReportsPage })));
+const B2BEventsPage = lazy(() => import('@/pages/GenericPage').then(m => ({ default: m.B2BAdminEventsPage })));
+
+// Additional B2B pages - use existing ones
+const B2BOptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
+const B2BSecurityPage = lazy(() => import('@/pages/SecurityPage'));  
+const B2BAuditPage = lazy(() => import('@/pages/AuditPage'));
+const B2BAccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
 
 // Pages système
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
@@ -126,6 +132,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BSocialCoconPage,
   B2BReportsPage,
   B2BEventsPage,
+  B2BOptimisationPage,
+  B2BSecurityPage,
+  B2BAuditPage,
+  B2BAccessibilityPage,
   
   // System
   UnauthorizedPage,
