@@ -55,16 +55,20 @@ export { default as B2BSocialCoconPage } from './B2BSocialCoconPage';
 export { default as B2BReportsPage } from './B2BReportsPage';
 export { default as B2BEventsPage } from './B2BEventsPage';
 
-// System & Admin
-export { default as SecurityPage } from './SecurityPage';
-export { default as OptimisationPage } from './OptimisationPage';
-export { default as AuditPage } from './AuditPage';
-export { default as AccessibilityPage } from './AccessibilityPage';
-export { default as TeamsPage } from './TeamsPage';
-export { default as ReportsPage } from './ReportsPage';
-export { default as EventsPage } from './EventsPage';
+// B2B Admin 
+export { default as B2BOptimisationPage } from './B2BOptimisationPage';
+export { default as B2BSecurityPage } from './B2BSecurityPage';
+export { default as B2BAuditPage } from './B2BAuditPage';
+export { default as B2BAccessibilityPage } from './B2BAccessibilityPage';
+
+// Additional pages
 export { default as OnboardingPage } from './OnboardingPage';
-export { default as NotificationDemoPage } from './NotificationDemoPage';
+export { default as ApiMonitoringPage } from './ApiMonitoringPage';
+
+// Missing exports for new pages
+export { default as B2CEmotionScanPage } from './B2CEmotionScanPage';
+export { default as B2CVoiceJournalPage } from './B2CVoiceJournalPage';
+export { default as B2CSocialCoconPage } from './B2CSocialCoconPage';
 
 // System & Error pages
 export { default as UnauthorizedPage } from './UnauthorizedPage';
