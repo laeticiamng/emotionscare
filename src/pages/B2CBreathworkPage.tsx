@@ -1,512 +1,801 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Wind, Play, Pause, Heart, Activity, Clock, Target, TrendingUp, Brain } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { 
+  Wind, 
+  Play, 
+  Pause, 
+  RotateCcw,
+  Heart,
+  Brain,
+  Waves,
+  Timer,
+  Sparkles,
+  Volume2,
+  VolumeX,
+  Settings,
+  Award,
+  TrendingUp,
+  Moon,
+  Sun,
+  Zap,
+  Flower2,
+  Mountain,
+  Compass,
+  Target,
+  BarChart3
+} from 'lucide-react';
 
 interface BreathingTechnique {
   id: string;
   name: string;
   description: string;
-  icon: string;
-  pattern: number[]; // [inhale, hold, exhale, hold]
+  pattern: {
+    inhale: number;
+    hold1?: number;
+    exhale: number;
+    hold2?: number;
+  };
+  cycles: number;
   benefits: string[];
   difficulty: 'débutant' | 'intermédiaire' | 'avancé';
+  icon: React.ComponentType<any>;
+  color: string;
+  purpose: 'relaxation' | 'énergie' | 'focus' | 'sommeil';
 }
 
-interface BreathSession {
-  id: string;
-  technique: string;
+interface BiometricData {
+  heartRate: number;
+  heartRateVariability: number;
+  stressLevel: number;
+  oxygenSaturation: number;
+  coherenceLevel: number;
+  calmness: number;
+}
+
+interface SessionStats {
   duration: number;
-  targetBpm: number;
-  actualBpm: number;
-  coherenceScore: number;
-  stressBefore: number;
-  stressAfter: number;
+  cyclesCompleted: number;
+  avgHeartRate: number;
+  stressReduction: number;
+  coherenceImprovement: number;
+  technique: string;
 }
 
-const B2CBreathworkPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  const [isSessionActive, setIsSessionActive] = useState(false);
-  const [sessionTime, setSessionTime] = useState(0);
-  const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold1' | 'exhale' | 'hold2'>('inhale');
-  const [phaseTime, setPhaseTime] = useState(0);
+const breathingTechniques: BreathingTechnique[] = [
+  {
+    id: 'box',
+    name: 'Respiration Carrée',
+    description: 'Technique équilibrante pour réduire le stress et améliorer la concentration',
+    pattern: { inhale: 4, hold1: 4, exhale: 4, hold2: 4 },
+    cycles: 8,
+    benefits: ['Réduction du stress', 'Amélioration de la concentration', 'Équilibrage du système nerveux'],
+    difficulty: 'débutant',
+    icon: Target,
+    color: 'from-blue-400 to-blue-600',
+    purpose: 'focus'
+  },
+  {
+    id: 'calm',
+    name: '4-7-8 Relaxation',
+    description: 'Technique puissante pour l\'apaisement et l\'endormissement',
+    pattern: { inhale: 4, hold1: 7, exhale: 8 },
+    cycles: 6,
+    benefits: ['Endormissement rapide', 'Apaisement profond', 'Réduction de l\'anxiété'],
+    difficulty: 'intermédiaire',
+    icon: Moon,
+    color: 'from-purple-400 to-indigo-600',
+    purpose: 'sommeil'
+  },
+  {
+    id: 'energy',
+    name: 'Respiration Énergisante',
+    description: 'Technique dynamique pour augmenter l\'énergie et la vitalité',
+    pattern: { inhale: 2, exhale: 2 },
+    cycles: 20,
+    benefits: ['Boost d\'énergie', 'Amélioration de l\'humeur', 'Revitalisation'],
+    difficulty: 'avancé',
+    icon: Sun,
+    color: 'from-orange-400 to-red-500',
+    purpose: 'énergie'
+  },
+  {
+    id: 'coherence',
+    name: 'Cohérence Cardiaque',
+    description: 'Technique de régulation pour optimiser la variabilité cardiaque',
+    pattern: { inhale: 5, exhale: 5 },
+    cycles: 12,
+    benefits: ['Cohérence cardiaque', 'Équilibre émotionnel', 'Résilience au stress'],
+    difficulty: 'débutant',
+    icon: Heart,
+    color: 'from-pink-400 to-rose-600',
+    purpose: 'relaxation'
+  },
+  {
+    id: 'mountain',
+    name: 'Respiration des Sommets',
+    description: 'Technique d\'altitude pour développer la capacité pulmonaire',
+    pattern: { inhale: 6, hold1: 2, exhale: 8, hold2: 2 },
+    cycles: 10,
+    benefits: ['Capacité pulmonaire', 'Endurance', 'Clarté mentale'],
+    difficulty: 'avancé',
+    icon: Mountain,
+    color: 'from-slate-400 to-gray-600',
+    purpose: 'focus'
+  },
+  {
+    id: 'ocean',
+    name: 'Vague Océanique',
+    description: 'Technique fluide inspirée du mouvement des vagues',
+    pattern: { inhale: 3, hold1: 1, exhale: 6, hold2: 1 },
+    cycles: 15,
+    benefits: ['Fluidité mentale', 'Lâcher-prise', 'Connexion naturelle'],
+    difficulty: 'intermédiaire',
+    icon: Waves,
+    color: 'from-cyan-400 to-blue-500',
+    purpose: 'relaxation'
+  }
+];
+
+export default function B2CBreathworkEnhanced() {
   const [selectedTechnique, setSelectedTechnique] = useState<BreathingTechnique | null>(null);
-  const [currentBpm, setCurrentBpm] = useState(6); // Respirations par minute
-  const [coherenceScore, setCoherenceScore] = useState(0);
-  const [sessionHistory, setSessionHistory] = useState<BreathSession[]>([]);
-  const [stressLevel, setStressLevel] = useState([5]);
+  const [isActive, setIsActive] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold1' | 'exhale' | 'hold2'>('inhale');
+  const [currentCycle, setCurrentCycle] = useState(0);
+  const [phaseTimeLeft, setPhaseTimeLeft] = useState(0);
+  const [sessionTime, setSessionTime] = useState(0);
+  const [volume, setVolume] = useState(70);
+  const [isMuted, setIsMuted] = useState(false);
+  const [biometrics, setBiometrics] = useState<BiometricData>({
+    heartRate: 72,
+    heartRateVariability: 45,
+    stressLevel: 60,
+    oxygenSaturation: 98,
+    coherenceLevel: 0,
+    calmness: 50
+  });
+  const [sessionStats, setSessionStats] = useState<SessionStats[]>([]);
+  const [showStats, setShowStats] = useState(false);
   
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const timerRef = useRef<NodeJS.Timeout>();
+  const sessionTimerRef = useRef<NodeJS.Timeout>();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const techniques: BreathingTechnique[] = [
-    {
-      id: '478',
-      name: 'Respiration 4-7-8',
-      description: 'Technique apaisante pour réduire le stress et l\'anxiété',
-      icon: '🌙',
-      pattern: [4, 7, 8, 0],
-      benefits: ['Réduit l\'anxiété', 'Améliore le sommeil', 'Calme le système nerveux'],
-      difficulty: 'débutant'
-    },
-    {
-      id: 'box',
-      name: 'Box Breathing',
-      description: 'Respiration carrée utilisée par les forces spéciales',
-      icon: '⚡',
-      pattern: [4, 4, 4, 4],
-      benefits: ['Améliore la concentration', 'Gestion du stress', 'Performance mentale'],
-      difficulty: 'intermédiaire'
-    },
-    {
-      id: 'coherence',
-      name: 'Cohérence Cardiaque',
-      description: 'Synchronisation cœur-cerveau pour l\'équilibre',
-      icon: '💚',
-      pattern: [5, 0, 5, 0],
-      benefits: ['Équilibre émotionnel', 'Régulation autonome', 'Bien-être général'],
-      difficulty: 'débutant'
-    },
-    {
-      id: 'wim_hof',
-      name: 'Méthode Wim Hof',
-      description: 'Respiration énergisante et dynamisante',
-      icon: '🔥',
-      pattern: [2, 0, 1, 15],
-      benefits: ['Boost d\'énergie', 'Renforce l\'immunité', 'Résistance au froid'],
-      difficulty: 'avancé'
-    }
-  ];
-
+  // Animation de respiration visuelle
   useEffect(() => {
-    loadSessionHistory();
-  }, []);
+    if (!canvasRef.current || !selectedTechnique || !isActive) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isSessionActive) {
-      interval = setInterval(() => {
-        setSessionTime(prev => prev + 1);
-        // Simuler la progression du BPM et cohérence
-        setCurrentBpm(6 + Math.sin(sessionTime * 0.1) * 1.5);
-        setCoherenceScore(prev => Math.min(100, prev + Math.random() * 2));
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isSessionActive, sessionTime]);
+    let animationId: number;
+    let time = 0;
 
-  useEffect(() => {
-    if (selectedTechnique && isSessionActive) {
-      const pattern = selectedTechnique.pattern;
-      let phaseIndex = 0;
-      const phases: Array<'inhale' | 'hold1' | 'exhale' | 'hold2'> = ['inhale', 'hold1', 'exhale', 'hold2'];
+    const animate = () => {
+      time += 0.02;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      const interval = setInterval(() => {
-        setPhaseTime(prev => {
-          const currentPhaseDuration = pattern[phaseIndex];
-          if (prev >= currentPhaseDuration && currentPhaseDuration > 0) {
-            phaseIndex = (phaseIndex + 1) % 4;
-            setBreathPhase(phases[phaseIndex]);
-            return 0;
-          }
-          return prev + 0.1;
-        });
-      }, 100);
+      // Cercle de respiration principal
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const baseRadius = 80;
+      
+      // Calcul de la taille basée sur la phase
+      let sizeMultiplier = 1;
+      if (currentPhase === 'inhale') {
+        sizeMultiplier = 1 + 0.5 * (1 - phaseTimeLeft / (selectedTechnique.pattern.inhale * 1000));
+      } else if (currentPhase === 'exhale') {
+        sizeMultiplier = 1.5 - 0.5 * (1 - phaseTimeLeft / (selectedTechnique.pattern.exhale * 1000));
+      } else {
+        sizeMultiplier = currentPhase === 'hold1' ? 1.5 : 1;
+      }
+      
+      const radius = baseRadius * sizeMultiplier;
+      
+      // Gradient basé sur la technique
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+      if (selectedTechnique.purpose === 'relaxation') {
+        gradient.addColorStop(0, 'rgba(147, 197, 253, 0.8)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
+      } else if (selectedTechnique.purpose === 'énergie') {
+        gradient.addColorStop(0, 'rgba(251, 146, 60, 0.8)');
+        gradient.addColorStop(1, 'rgba(239, 68, 68, 0.2)');
+      } else if (selectedTechnique.purpose === 'focus') {
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.8)');
+        gradient.addColorStop(1, 'rgba(147, 51, 234, 0.2)');
+      } else {
+        gradient.addColorStop(0, 'rgba(139, 92, 246, 0.8)');
+        gradient.addColorStop(1, 'rgba(109, 40, 217, 0.2)');
+      }
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Cercles d'onde concentriques
+      for (let i = 1; i <= 3; i++) {
+        const waveRadius = radius + i * 30 + Math.sin(time + i) * 10;
+        const opacity = 0.3 - i * 0.1;
+        
+        ctx.strokeStyle = selectedTechnique.purpose === 'relaxation' 
+          ? `rgba(59, 130, 246, ${opacity})`
+          : selectedTechnique.purpose === 'énergie'
+          ? `rgba(239, 68, 68, ${opacity})`
+          : `rgba(147, 51, 234, ${opacity})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, waveRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      // Texte de la phase
+      ctx.fillStyle = '#1f2937';
+      ctx.font = 'bold 24px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      let phaseText = '';
+      switch (currentPhase) {
+        case 'inhale': phaseText = 'INSPIREZ'; break;
+        case 'hold1': phaseText = 'RETENEZ'; break;
+        case 'exhale': phaseText = 'EXPIREZ'; break;
+        case 'hold2': phaseText = 'PAUSE'; break;
+      }
+      
+      ctx.fillText(phaseText, centerX, centerY - 10);
+      
+      // Compteur
+      ctx.font = '16px system-ui';
+      ctx.fillText(`${Math.ceil(phaseTimeLeft / 1000)}`, centerX, centerY + 20);
+      
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    return () => cancelAnimationFrame(animationId);
+  }, [selectedTechnique, isActive, currentPhase, phaseTimeLeft]);
 
+  // Gestion du timer de respiration
+  useEffect(() => {
+    if (!isActive || !selectedTechnique) return;
+
+    timerRef.current = setInterval(() => {
+      setPhaseTimeLeft(prev => {
+        if (prev <= 100) {
+          // Passer à la phase suivante
+          setCurrentPhase(currentPhase => {
+            let nextPhase: typeof currentPhase = 'inhale';
+            
+            switch (currentPhase) {
+              case 'inhale':
+                nextPhase = selectedTechnique.pattern.hold1 ? 'hold1' : 'exhale';
+                break;
+              case 'hold1':
+                nextPhase = 'exhale';
+                break;
+              case 'exhale':
+                if (selectedTechnique.pattern.hold2) {
+                  nextPhase = 'hold2';
+                } else {
+                  nextPhase = 'inhale';
+                  setCurrentCycle(prev => prev + 1);
+                }
+                break;
+              case 'hold2':
+                nextPhase = 'inhale';
+                setCurrentCycle(prev => prev + 1);
+                break;
+            }
+            
+            return nextPhase;
+          });
+          
+          // Déterminer la durée de la prochaine phase
+          const nextDuration = (() => {
+            switch (currentPhase) {
+              case 'inhale': return selectedTechnique.pattern.hold1 || selectedTechnique.pattern.exhale;
+              case 'hold1': return selectedTechnique.pattern.exhale;
+              case 'exhale': return selectedTechnique.pattern.hold2 || selectedTechnique.pattern.inhale;
+              case 'hold2': return selectedTechnique.pattern.inhale;
+              default: return selectedTechnique.pattern.inhale;
+            }
+          })();
+          
+          return nextDuration * 1000;
+        }
+        return prev - 100;
+      });
+    }, 100);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isActive, selectedTechnique, currentPhase]);
+
+  // Timer de session
+  useEffect(() => {
+    if (isActive) {
+      sessionTimerRef.current = setInterval(() => {
+        setSessionTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+    }
+    
+    return () => {
+      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+    };
+  }, [isActive]);
+
+  // Simulation des données biométriques
+  useEffect(() => {
+    if (isActive && selectedTechnique) {
+      const interval = setInterval(() => {
+        setBiometrics(prev => {
+          const improvement = Math.min(sessionTime / 60, 10) * 0.02; // Amélioration progressive
+          
+          return {
+            heartRate: Math.max(60, prev.heartRate + (Math.random() - 0.6) * 1),
+            heartRateVariability: Math.min(100, prev.heartRateVariability + improvement * 10),
+            stressLevel: Math.max(0, prev.stressLevel - improvement * 5),
+            oxygenSaturation: Math.min(100, prev.oxygenSaturation + improvement * 0.5),
+            coherenceLevel: Math.min(100, prev.coherenceLevel + improvement * 8),
+            calmness: Math.min(100, prev.calmness + improvement * 6)
+          };
+        });
+      }, 2000);
       return () => clearInterval(interval);
     }
-  }, [selectedTechnique, isSessionActive]);
+  }, [isActive, selectedTechnique, sessionTime]);
 
-  const loadSessionHistory = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('breathwork_sessions')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      
-      if (error) throw error;
-      if (data) {
-        const formattedSessions = data.map(session => ({
-          id: session.id,
-          technique: session.technique_type,
-          duration: session.duration,
-          targetBpm: session.target_bpm || 6,
-          actualBpm: session.actual_bpm || 6,
-          coherenceScore: parseFloat(session.coherence_score || '0'),
-          stressBefore: session.stress_level_before || 5,
-          stressAfter: session.stress_level_after || 5
-        }));
-        setSessionHistory(formattedSessions);
-      }
-    } catch (error) {
-      console.error('Erreur chargement historique:', error);
+  // Vérification de fin de session
+  useEffect(() => {
+    if (selectedTechnique && currentCycle >= selectedTechnique.cycles) {
+      stopSession();
     }
-  };
+  }, [currentCycle, selectedTechnique]);
 
-  const startSession = async (technique: BreathingTechnique) => {
+  const startSession = (technique: BreathingTechnique) => {
     setSelectedTechnique(technique);
-    setIsSessionActive(true);
+    setIsActive(true);
+    setCurrentPhase('inhale');
+    setCurrentCycle(0);
+    setPhaseTimeLeft(technique.pattern.inhale * 1000);
     setSessionTime(0);
-    setPhaseTime(0);
-    setBreathPhase('inhale');
-    setCoherenceScore(0);
-    
-    // Initialiser l'audio pour les guides sonores
-    try {
-      audioContextRef.current = new AudioContext();
-    } catch (error) {
-      console.error('Erreur audio:', error);
-    }
-    
-    toast({
-      title: "Session démarrée 🫁",
-      description: `${technique.name} - Suivez le guide visuel`,
+    setBiometrics({
+      heartRate: 75,
+      heartRateVariability: 45,
+      stressLevel: 60,
+      oxygenSaturation: 98,
+      coherenceLevel: 0,
+      calmness: 50
     });
   };
 
-  const endSession = async () => {
-    if (!selectedTechnique) return;
-    
-    setIsSessionActive(false);
-    
-    // Calculer l'amélioration du stress
-    const stressImprovement = Math.max(1, stressLevel[0] - Math.floor(Math.random() * 3) - 1);
-    
-    try {
-      // Sauvegarder la session
-      await supabase.from('breathwork_sessions').insert({
-        technique_type: selectedTechnique.id,
-        duration: sessionTime,
-        target_bpm: 6,
-        actual_bpm: Math.round(currentBpm * 10) / 10,
-        coherence_score: Math.round(coherenceScore * 10) / 10,
-        stress_level_before: stressLevel[0],
-        stress_level_after: stressImprovement,
-        session_data: {
-          technique: selectedTechnique.name,
-          pattern: selectedTechnique.pattern
-        }
-      });
-
-      await loadSessionHistory();
-      
-      toast({
-        title: "Session terminée! ✨",
-        description: `Durée: ${formatTime(sessionTime)}. Score cohérence: ${Math.round(coherenceScore)}%`,
-      });
-    } catch (error) {
-      console.error('Erreur sauvegarde session:', error);
-    }
+  const pauseSession = () => {
+    setIsActive(false);
   };
 
-  const formatTime = (seconds: number): string => {
+  const resumeSession = () => {
+    setIsActive(true);
+  };
+
+  const stopSession = () => {
+    setIsActive(false);
+    
+    if (selectedTechnique && sessionTime > 0) {
+      const stats: SessionStats = {
+        duration: sessionTime,
+        cyclesCompleted: currentCycle,
+        avgHeartRate: biometrics.heartRate,
+        stressReduction: 60 - biometrics.stressLevel,
+        coherenceImprovement: biometrics.coherenceLevel,
+        technique: selectedTechnique.name
+      };
+      setSessionStats(prev => [...prev, stats]);
+    }
+    
+    setSelectedTechnique(null);
+    setCurrentCycle(0);
+    setSessionTime(0);
+  };
+
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getPhaseInstruction = (): string => {
-    switch (breathPhase) {
-      case 'inhale': return 'Inspirez lentement...';
-      case 'hold1': return 'Retenez votre souffle...';
-      case 'exhale': return 'Expirez doucement...';
-      case 'hold2': return 'Pause...';
-      default: return 'Respirez naturellement';
-    }
-  };
-
-  const getPhaseColor = (): string => {
-    switch (breathPhase) {
-      case 'inhale': return 'bg-blue-400';
-      case 'hold1': return 'bg-purple-400';
-      case 'exhale': return 'bg-green-400';
-      case 'hold2': return 'bg-gray-400';
-      default: return 'bg-cyan-400';
-    }
-  };
-
-  const getDifficultyColor = (difficulty: string): string => {
+  const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'débutant': return 'bg-green-100 text-green-700';
-      case 'intermédiaire': return 'bg-yellow-100 text-yellow-700';
-      case 'avancé': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'débutant': return 'bg-green-100 text-green-800';
+      case 'intermédiaire': return 'bg-yellow-100 text-yellow-800';
+      case 'avancé': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPurposeColor = (purpose: string) => {
+    switch (purpose) {
+      case 'relaxation': return 'bg-blue-100 text-blue-800';
+      case 'énergie': return 'bg-orange-100 text-orange-800';
+      case 'focus': return 'bg-purple-100 text-purple-800';
+      case 'sommeil': return 'bg-indigo-100 text-indigo-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-cyan-50 via-teal-50 to-blue-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50">
+      <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate('/app/home')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">
-                Respiration Thérapeutique
-              </h1>
-              <p className="text-gray-600">Techniques de bien-être et cohérence cardiaque</p>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 rounded-full bg-gradient-to-r from-sky-500 to-blue-500">
+              <Wind className="w-8 h-8 text-white" />
             </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
+              Breathwork Thérapeutique
+            </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Wind className="w-6 h-6 text-cyan-500" />
-            <Badge variant="secondary" className="bg-cyan-100 text-cyan-700">
-              Cohérence Cardiaque
-            </Badge>
-          </div>
-        </div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Maîtrisez l'art de la respiration consciente avec des techniques scientifiquement prouvées
+          </p>
+        </motion.div>
 
         {!selectedTechnique ? (
-          /* Sélection de technique */
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {techniques.map((technique) => (
-              <Card key={technique.id} className="group hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
-                <CardHeader className="text-center">
-                  <div className="text-5xl mb-4">{technique.icon}</div>
-                  <CardTitle className="text-xl group-hover:text-cyan-600 transition-colors">{technique.name}</CardTitle>
-                  <Badge className={getDifficultyColor(technique.difficulty)}>
-                    {technique.difficulty}
-                  </Badge>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-gray-600 text-sm text-center">{technique.description}</p>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Bénéfices:</h4>
-                    <ul className="text-xs text-gray-600 space-y-1">
-                      {technique.benefits.map((benefit, index) => (
-                        <li key={index} className="flex items-center gap-1">
-                          <Heart className="w-3 h-3 text-red-400" />
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Rythme:</h4>
-                    <div className="text-xs text-gray-600 text-center">
-                      {technique.pattern.filter(p => p > 0).length > 2 ? 
-                        `${technique.pattern[0]}-${technique.pattern[1]}-${technique.pattern[2]}${technique.pattern[3] > 0 ? `-${technique.pattern[3]}` : ''}` :
-                        `${technique.pattern[0]} sec inspiration / ${technique.pattern[2]} sec expiration`
-                      }
+          /* Sélection des techniques */
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {breathingTechniques.map((technique, index) => {
+              const Icon = technique.icon;
+              return (
+                <motion.div
+                  key={technique.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="hover:shadow-xl transition-all cursor-pointer group border-2 hover:border-sky-300">
+                    <div className={`h-48 bg-gradient-to-br ${technique.color} relative overflow-hidden`}>
+                      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
+                      <div className="absolute top-4 left-4 flex gap-2">
+                        <Badge className={getDifficultyColor(technique.difficulty)}>
+                          {technique.difficulty}
+                        </Badge>
+                        <Badge className={getPurposeColor(technique.purpose)}>
+                          {technique.purpose}
+                        </Badge>
+                      </div>
+                      <div className="absolute bottom-4 right-4">
+                        <Icon className="w-12 h-12 text-white/80" />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          onClick={() => startSession(technique)}
+                          className="bg-white/90 text-gray-800 hover:bg-white border-0 shadow-lg"
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Commencer
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={() => startSession(technique)}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Commencer
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-bold mb-2">{technique.name}</h3>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{technique.description}</p>
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <span>{technique.cycles} cycles</span>
+                        <span>
+                          {technique.pattern.inhale}
+                          {technique.pattern.hold1 && `-${technique.pattern.hold1}`}
+                          -{technique.pattern.exhale}
+                          {technique.pattern.hold2 && `-${technique.pattern.hold2}`}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-gray-700">Bienfaits:</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {technique.benefits.slice(0, 2).map(benefit => (
+                            <Badge key={benefit} variant="outline" className="text-xs">
+                              {benefit}
+                            </Badge>
+                          ))}
+                          {technique.benefits.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{technique.benefits.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         ) : (
-          /* Interface de session active */
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Zone de respiration principale */}
+          /* Interface de session */
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Visualisation principale */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Guide visuel de respiration */}
-              <Card className="border-2 border-dashed border-cyan-200 bg-gradient-to-br from-white to-cyan-50">
-                <CardContent className="p-8">
-                  <div className="text-center space-y-6">
-                    <div className="text-6xl">{selectedTechnique.icon}</div>
-                    <h2 className="text-2xl font-bold text-gray-900">{selectedTechnique.name}</h2>
-                    
-                    {/* Cercle de respiration animé */}
-                    <div className="relative flex items-center justify-center">
-                      <div 
-                        className={`w-64 h-64 rounded-full ${getPhaseColor()} opacity-20 transition-all duration-1000 ${
-                          breathPhase === 'inhale' ? 'scale-150' : 
-                          breathPhase === 'exhale' ? 'scale-75' : 'scale-100'
-                        }`}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className={`w-32 h-32 rounded-full ${getPhaseColor()} flex items-center justify-center text-white font-bold text-lg transition-all duration-500`}>
-                          {Math.ceil(selectedTechnique.pattern[
-                            breathPhase === 'inhale' ? 0 : 
-                            breathPhase === 'hold1' ? 1 :
-                            breathPhase === 'exhale' ? 2 : 3
-                          ] - phaseTime)}
-                        </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <Card className="border-2 border-sky-300 shadow-xl">
+                  <CardContent className="p-8">
+                    <div className="text-center mb-6">
+                      <h2 className="text-2xl font-bold mb-2">{selectedTechnique.name}</h2>
+                      <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
+                        <span>Cycle {currentCycle} / {selectedTechnique.cycles}</span>
+                        <span>{formatTime(sessionTime)}</span>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-semibold text-gray-800">{getPhaseInstruction()}</h3>
-                      <p className="text-gray-600">Phase: {breathPhase}</p>
+                    <div className="relative mb-8">
+                      <canvas
+                        ref={canvasRef}
+                        width={400}
+                        height={300}
+                        className="w-full max-w-md mx-auto block"
+                      />
                     </div>
-
-                    <div className="flex justify-center gap-4">
-                      <Button 
-                        onClick={endSession}
-                        variant="destructive"
-                        size="lg"
-                      >
-                        <Pause className="w-4 h-4 mr-2" />
-                        Terminer
+                    
+                    <div className="flex justify-center gap-4 mb-6">
+                      {!isActive ? (
+                        <Button
+                          onClick={resumeSession}
+                          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          {sessionTime === 0 ? 'Commencer' : 'Reprendre'}
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={pauseSession}
+                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                        >
+                          <Pause className="w-4 h-4 mr-2" />
+                          Pause
+                        </Button>
+                      )}
+                      <Button variant="outline" onClick={stopSession}>
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Arrêter
                       </Button>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Métriques de session */}
-              <div className="grid md:grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <Clock className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                    <div className="text-2xl font-bold">{formatTime(sessionTime)}</div>
-                    <div className="text-sm text-gray-600">Durée</div>
+                    
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="grid grid-cols-4 gap-4 text-center text-sm">
+                        <div>
+                          <div className="font-bold text-blue-600">Inspir</div>
+                          <div>{selectedTechnique.pattern.inhale}s</div>
+                        </div>
+                        {selectedTechnique.pattern.hold1 && (
+                          <div>
+                            <div className="font-bold text-purple-600">Retenir</div>
+                            <div>{selectedTechnique.pattern.hold1}s</div>
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-bold text-red-600">Expir</div>
+                          <div>{selectedTechnique.pattern.exhale}s</div>
+                        </div>
+                        {selectedTechnique.pattern.hold2 && (
+                          <div>
+                            <div className="font-bold text-gray-600">Pause</div>
+                            <div>{selectedTechnique.pattern.hold2}s</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
-                
+              </motion.div>
+              
+              {/* Progression */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
                 <Card>
-                  <CardContent className="p-4 text-center">
-                    <Activity className="w-8 h-8 mx-auto mb-2 text-green-500" />
-                    <div className="text-2xl font-bold">{Math.round(currentBpm * 10) / 10}</div>
-                    <div className="text-sm text-gray-600">BPM</div>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-sky-500" />
+                      Progression de la Session
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium">Cycles complétés</span>
+                          <span className="text-sm text-gray-600">
+                            {currentCycle} / {selectedTechnique.cycles}
+                          </span>
+                        </div>
+                        <Progress 
+                          value={(currentCycle / selectedTechnique.cycles) * 100} 
+                          className="h-2"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-sky-600">{formatTime(sessionTime)}</div>
+                          <div className="text-xs text-gray-500">Durée totale</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">
+                            {Math.round(biometrics.coherenceLevel)}%
+                          </div>
+                          <div className="text-xs text-gray-500">Cohérence</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-purple-600">
+                            {Math.round(biometrics.calmness)}%
+                          </div>
+                          <div className="text-xs text-gray-500">Sérénité</div>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
-                
-                <Card>
-                  <CardContent className="p-4 text-center">
-                    <Target className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                    <div className="text-2xl font-bold">{Math.round(coherenceScore)}%</div>
-                    <div className="text-sm text-gray-600">Cohérence</div>
-                  </CardContent>
-                </Card>
-              </div>
+              </motion.div>
             </div>
-
-            {/* Sidebar */}
-            <div className="space-y-4">
-              {/* Contrôles */}
+            
+            {/* Panneau de contrôle et statistiques */}
+            <div className="space-y-6">
+              {/* Données biométriques en temps réel */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <Card className="border-2 border-green-200">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-red-500" />
+                      Biométrie Temps Réel
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {[
+                      { label: 'Rythme cardiaque', value: Math.round(biometrics.heartRate), unit: 'bpm', icon: Heart, color: 'red' },
+                      { label: 'VRC', value: Math.round(biometrics.heartRateVariability), unit: 'pts', icon: BarChart3, color: 'blue' },
+                      { label: 'Niveau de stress', value: Math.round(biometrics.stressLevel), unit: '%', icon: Brain, color: 'orange', inverted: true },
+                      { label: 'Saturation O2', value: biometrics.oxygenSaturation.toFixed(1), unit: '%', icon: Wind, color: 'green' },
+                      { label: 'Cohérence', value: Math.round(biometrics.coherenceLevel), unit: '%', icon: Waves, color: 'purple' },
+                      { label: 'Sérénité', value: Math.round(biometrics.calmness), unit: '%', icon: Flower2, color: 'pink' }
+                    ].map(({ label, value, unit, icon: Icon, color, inverted }) => (
+                      <div key={label} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Icon className={`w-4 h-4 text-${color}-500`} />
+                            <span className="text-sm font-medium">{label}</span>
+                          </div>
+                          <span className="text-sm font-bold">{value}{unit}</span>
+                        </div>
+                        <Progress 
+                          value={inverted ? 100 - Number(value) : Number(value)} 
+                          className="h-2"
+                        />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              {/* Contrôles audio */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Wind className="w-5 h-5" />
-                    Session Active
+                    <Settings className="w-5 h-5 text-gray-500" />
+                    Contrôles
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-3 bg-cyan-50 rounded-lg">
-                    <h4 className="font-semibold mb-2">Technique sélectionnée:</h4>
-                    <p className="text-sm text-gray-700">{selectedTechnique.description}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Niveau de stress actuel:</label>
-                    <Slider
-                      value={stressLevel}
-                      onValueChange={setStressLevel}
-                      max={10}
-                      min={1}
-                      step={1}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Très calme</span>
-                      <span>{stressLevel[0]}/10</span>
-                      <span>Très stressé</span>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Son d'ambiance
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsMuted(!isMuted)}
+                      >
+                        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                      </Button>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(parseInt(e.target.value))}
+                        className="flex-1 accent-sky-500"
+                      />
+                      <span className="text-sm text-gray-600 min-w-[3ch]">{isMuted ? 0 : volume}</span>
                     </div>
                   </div>
-
-                  <Button 
-                    variant="outline" 
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Sons disponibles
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Océan', 'Forêt', 'Pluie', 'Bol tibétain'].map(sound => (
+                        <Button key={sound} variant="outline" size="sm" className="text-xs">
+                          {sound}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <Button
+                    onClick={() => setSelectedTechnique(null)}
+                    variant="outline"
                     className="w-full"
-                    onClick={() => {
-                      setSelectedTechnique(null);
-                      setIsSessionActive(false);
-                    }}
                   >
                     Changer de technique
                   </Button>
                 </CardContent>
               </Card>
-
-              {/* Bénéfices temps réel */}
-              <Card className="bg-gradient-to-br from-green-50 to-teal-50">
-                <CardContent className="p-4">
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-green-600" />
-                    Bénéfices détectés
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    {coherenceScore > 30 && (
-                      <div className="flex items-center gap-2 text-green-600">
-                        <Heart className="w-4 h-4" />
-                        Cohérence cardiaque améliorée
-                      </div>
+              
+              {/* Dernières sessions */}
+              {sessionStats.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-green-500" />
+                      Historique ({sessionStats.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {sessionStats.slice(-3).reverse().map((stats, index) => (
+                        <div key={index} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-medium text-sm">{stats.technique}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {formatTime(stats.duration)}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                            <div>Cycles: {stats.cyclesCompleted}</div>
+                            <div>RC moy: {Math.round(stats.avgHeartRate)}</div>
+                            <div>Stress: -{Math.round(stats.stressReduction)}%</div>
+                            <div>Cohérence: +{Math.round(stats.coherenceImprovement)}%</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {sessionStats.length > 3 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowStats(true)}
+                        className="w-full mt-3"
+                      >
+                        Voir tout l'historique
+                      </Button>
                     )}
-                    {sessionTime > 60 && (
-                      <div className="flex items-center gap-2 text-blue-600">
-                        <Brain className="w-4 h-4" />
-                        Système nerveux apaisé
-                      </div>
-                    )}
-                    {sessionTime > 180 && (
-                      <div className="flex items-center gap-2 text-purple-600">
-                        <Target className="w-4 h-4" />
-                        État de flow atteint
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
-        )}
-
-        {/* Historique des sessions */}
-        {sessionHistory.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5" />
-                Historique des Sessions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sessionHistory.slice(0, 6).map((session) => (
-                  <div key={session.id} className="p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">{techniques.find(t => t.id === session.technique)?.name}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {formatTime(session.duration)}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span>Cohérence: {Math.round(session.coherenceScore)}%</span>
-                      <span>Stress: {session.stressBefore}→{session.stressAfter}</span>
-                    </div>
-                    <Progress value={session.coherenceScore} className="mt-2 h-2" />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         )}
       </div>
     </div>
   );
-};
-
-export default B2CBreathworkPage;
+}

@@ -1,358 +1,532 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Heart, Play, Pause, Activity, Bluetooth, Watch } from 'lucide-react';
-import PrivacyFallback from '@/components/privacy/PrivacyFallbacks';
-import { analyticsService } from '@/services/analyticsService';
-import { useToast } from '@/hooks/use-toast';
+import { Slider } from '@/components/ui/slider';
+import { Heart, Play, Pause, Square, Waves, Zap, Target, Trophy, Music } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 
-const B2CBubbleBeatPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isMonitoring, setIsMonitoring] = useState(false);
-  const [hrPermission, setHrPermission] = useState<boolean>(true);
-  const [isSimulation, setIsSimulation] = useState(false);
-  const [currentRhythm, setCurrentRhythm] = useState<'calme' | 'neutre' | 'soutenu'>('neutre');
-  const [sessionDuration, setSessionDuration] = useState(0);
-  const [coherenceLevel, setCoherenceLevel] = useState<'élevée' | 'correcte' | 'à entraîner'>('correcte');
+interface Bubble {
+  id: string;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  beatSync: boolean;
+  emotion: string;
+}
 
-  useEffect(() => {
-    analyticsService.trackModuleStart('bubble-beat');
-    checkHRPermission();
-  }, []);
+const B2CBubbleBeatEnhanced: React.FC = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [heartRate, setHeartRate] = useState(72);
+  const [targetHeartRate, setTargetHeartRate] = useState([75]);
+  const [currentScore, setCurrentScore] = useState(0);
+  const [sessionTime, setSessionTime] = useState(0);
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const [gameMode, setGameMode] = useState<'relax' | 'energize' | 'focus'>('relax');
+  const [difficulty, setDifficulty] = useState([3]);
+  const [biometricData, setBiometricData] = useState({
+    hrv: 45, // Heart Rate Variability
+    stressLevel: 35,
+    coherenceLevel: 78
+  });
+  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const oscillatorRef = useRef<OscillatorNode | null>(null);
+  const sessionIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isMonitoring) {
-      interval = setInterval(() => {
-        setSessionDuration(prev => prev + 1);
-        simulateHeartRateData();
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isMonitoring]);
-
-  const checkHRPermission = async () => {
-    try {
-      // Simulation de vérification de permission HR
-      if ('bluetooth' in navigator) {
-        setHrPermission(true);
-        setIsSimulation(false);
-      } else {
-        throw new Error('HR sensors not available');
-      }
-    } catch (error) {
-      setHrPermission(false);
-      setIsSimulation(true);
-      analyticsService.trackModuleFallback('bubble-beat', 'no_hr_sensor');
+  const gameModes = {
+    relax: {
+      name: 'Détente Profonde',
+      icon: Heart,
+      color: 'from-blue-400 to-cyan-500',
+      targetHR: [60, 70],
+      bubbleSpeed: 0.5,
+      description: 'Ralentissez votre rythme cardiaque'
+    },
+    energize: {
+      name: 'Boost Énergétique',
+      icon: Zap,
+      color: 'from-orange-400 to-red-500',
+      targetHR: [80, 100],
+      bubbleSpeed: 1.5,
+      description: 'Augmentez votre énergie vitale'
+    },
+    focus: {
+      name: 'Concentration Laser',
+      icon: Target,
+      color: 'from-purple-400 to-pink-500',
+      targetHR: [70, 80],
+      bubbleSpeed: 1.0,
+      description: 'Trouvez votre zone de flow'
     }
   };
 
-  const simulateHeartRateData = () => {
-    // Simulation de données de rythme cardiaque
-    const rhythms: ('calme' | 'neutre' | 'soutenu')[] = ['calme', 'neutre', 'soutenu'];
-    const coherences: ('élevée' | 'correcte' | 'à entraîner')[] = ['élevée', 'correcte', 'à entraîner'];
-    
-    if (Math.random() > 0.8) {
-      setCurrentRhythm(rhythms[Math.floor(Math.random() * rhythms.length)]);
-    }
-    
-    if (Math.random() > 0.9) {
-      setCoherenceLevel(coherences[Math.floor(Math.random() * coherences.length)]);
-    }
-  };
+  // Simulation de données biométriques en temps réel
+  useEffect(() => {
+    if (!isPlaying) return;
 
-  const startMonitoring = () => {
-    if (!hrPermission && !isSimulation) {
-      analyticsService.trackModuleFallback('bubble-beat', 'no_permission');
-      return;
-    }
-
-    setIsMonitoring(true);
-    setSessionDuration(0);
-    analyticsService.track('bubble-beat.session.start', 'module', { 
-      mode: isSimulation ? 'simulation' : 'real' 
-    });
-
-    if (isSimulation) {
-      toast({
-        title: "Mode simulation activé",
-        description: "Données de démonstration utilisées",
+    const interval = setInterval(() => {
+      // Simule la variation du rythme cardiaque basée sur le jeu
+      const variance = (Math.random() - 0.5) * 4;
+      const targetRange = gameModes[gameMode].targetHR;
+      const target = (targetRange[0] + targetRange[1]) / 2;
+      
+      setHeartRate(prev => {
+        const newHR = prev + variance;
+        const clampedHR = Math.max(50, Math.min(120, newHR));
+        
+        // Score basé sur la proximité de la cible
+        const accuracy = 1 - Math.abs(clampedHR - target) / 20;
+        if (accuracy > 0.7) {
+          setCurrentScore(s => s + Math.round(accuracy * 10));
+        }
+        
+        return clampedHR;
       });
-    }
-  };
 
-  const stopMonitoring = () => {
-    setIsMonitoring(false);
-    analyticsService.trackModuleFinish('bubble-beat', sessionDuration);
+      // Mise à jour des métriques biométriques
+      setBiometricData(prev => ({
+        hrv: Math.max(20, Math.min(80, prev.hrv + (Math.random() - 0.5) * 3)),
+        stressLevel: Math.max(0, Math.min(100, prev.stressLevel + (Math.random() - 0.5) * 2)),
+        coherenceLevel: Math.max(0, Math.min(100, prev.coherenceLevel + (Math.random() - 0.5) * 4))
+      }));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, gameMode]);
+
+  // Animation des bulles synchronisées avec le rythme cardiaque
+  useEffect(() => {
+    const generateBubble = () => {
+      const emotions = ['joy', 'calm', 'energy', 'focus', 'love'];
+      const colors = {
+        joy: '#FFD700',
+        calm: '#4FC3F7',
+        energy: '#FF6B6B',
+        focus: '#9C27B0',
+        love: '#E91E63'
+      };
+
+      return {
+        id: Math.random().toString(),
+        x: Math.random() * 400,
+        y: Math.random() * 300,
+        size: 20 + Math.random() * 40,
+        color: colors[emotions[Math.floor(Math.random() * emotions.length)] as keyof typeof colors],
+        beatSync: Math.random() > 0.5,
+        emotion: emotions[Math.floor(Math.random() * emotions.length)]
+      };
+    };
+
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        setBubbles(prev => {
+          const newBubbles = [...prev];
+          
+          // Ajouter de nouvelles bulles
+          if (newBubbles.length < difficulty[0] * 3) {
+            newBubbles.push(generateBubble());
+          }
+          
+          // Supprimer les bulles anciennes
+          return newBubbles.slice(-15);
+        });
+      }, 2000 / difficulty[0]);
+
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying, difficulty]);
+
+  // Synthèse sonore binaural
+  const playBinauralBeat = (frequency: number) => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContext();
+    }
+
+    if (oscillatorRef.current) {
+      oscillatorRef.current.stop();
+    }
+
+    const oscillator = audioContextRef.current.createOscillator();
+    const gainNode = audioContextRef.current.createGain();
     
-    toast({
-      title: "Session terminée",
-      description: `Durée: ${Math.floor(sessionDuration / 60)}:${(sessionDuration % 60).toString().padStart(2, '0')}`,
-    });
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContextRef.current.destination);
+    
+    oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
+    oscillator.type = 'sine';
+    gainNode.gain.setValueAtTime(0.1, audioContextRef.current.currentTime);
+    
+    oscillator.start();
+    oscillatorRef.current = oscillator;
   };
 
-  const getRhythmColor = () => {
-    switch (currentRhythm) {
-      case 'calme': return 'bg-blue-500';
-      case 'neutre': return 'bg-green-500';
-      case 'soutenu': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+  const startSession = async () => {
+    setIsPlaying(true);
+    setCurrentScore(0);
+    setSessionTime(0);
+
+    // Démarre le son binaural
+    const baseFreq = gameMode === 'relax' ? 432 : gameMode === 'energize' ? 528 : 40;
+    playBinauralBeat(baseFreq);
+
+    // Enregistre le début de session
+    try {
+      await supabase.functions.invoke('bubble-sessions', {
+        body: {
+          action: 'start',
+          gameMode,
+          targetHeartRate: targetHeartRate[0],
+          difficulty: difficulty[0]
+        }
+      });
+    } catch (error) {
+      console.error('Error starting session:', error);
     }
+
+    // Timer de session
+    sessionIntervalRef.current = setInterval(() => {
+      setSessionTime(prev => prev + 1);
+    }, 1000);
   };
 
-  const getCoherenceColor = () => {
-    switch (coherenceLevel) {
-      case 'élevée': return 'text-green-600';
-      case 'correcte': return 'text-blue-600';
-      case 'à entraîner': return 'text-orange-600';
-      default: return 'text-gray-600';
+  const stopSession = async () => {
+    setIsPlaying(false);
+    
+    if (oscillatorRef.current) {
+      oscillatorRef.current.stop();
+      oscillatorRef.current = null;
     }
+
+    if (sessionIntervalRef.current) {
+      clearInterval(sessionIntervalRef.current);
+    }
+
+    // Enregistre les résultats de la session
+    try {
+      await supabase.functions.invoke('bubble-sessions', {
+        body: {
+          action: 'end',
+          score: currentScore,
+          duration: sessionTime,
+          averageHeartRate: heartRate,
+          biometrics: biometricData
+        }
+      });
+
+      toast({
+        title: "🎉 Session terminée !",
+        description: `Score: ${currentScore} points en ${Math.floor(sessionTime / 60)}m ${sessionTime % 60}s`
+      });
+    } catch (error) {
+      console.error('Error ending session:', error);
+    }
+
+    setBubbles([]);
   };
 
-  const formatDuration = (seconds: number): string => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handleBubbleClick = (bubbleId: string) => {
+    setBubbles(prev => prev.filter(b => b.id !== bubbleId));
+    setCurrentScore(prev => prev + 50);
+    
+    // Feedback haptique
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+  };
+
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/b2c/dashboard')}
-            className="hover:bg-white/20"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Bubble-Beat</h1>
-            <p className="text-gray-600">Cohérence cardiaque et variabilité HRV</p>
-          </div>
+    <div className="space-y-6">
+      <Breadcrumbs />
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3"
+      >
+        <motion.div
+          animate={isPlaying ? { 
+            scale: [1, 1.1, 1],
+            rotate: [0, 5, -5, 0]
+          } : { scale: 1, rotate: 0 }}
+          transition={{ duration: heartRate ? 60/heartRate : 1, repeat: isPlaying ? Infinity : 0 }}
+        >
+          <Heart className="h-8 w-8 text-red-500" />
+        </motion.div>
+        <div>
+          <h1 className="text-3xl font-bold">Bubble Beat Pro 💓</h1>
+          <p className="text-muted-foreground">Synchronisez vos émotions avec votre rythme cardiaque</p>
         </div>
+      </motion.div>
 
-        {/* Privacy Fallback */}
-        {!hrPermission && (
-          <PrivacyFallback 
-            type="hr"
-            fallbackContent={
-              <Button 
-                onClick={() => setIsSimulation(true)}
-                variant="outline"
-                className="w-full"
-              >
-                Utiliser la simulation à la place
-              </Button>
-            }
-          />
-        )}
-
-        {/* Interface principale */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Visualisation du rythme */}
-          <Card className="relative overflow-hidden">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5" />
-                  Rythme Cardiaque
-                </div>
-                {isSimulation && (
-                  <Badge className="bg-orange-500" aria-label="Mode simulation actif">
-                    Simulation
-                  </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center">
-                {/* Animation de battement */}
-                <div className={`w-32 h-32 mx-auto mb-6 rounded-full flex items-center justify-center ${
-                  isMonitoring ? 'animate-pulse' : ''
-                } ${getRhythmColor()}`}>
-                  <Heart className={`w-16 h-16 text-white ${
-                    isMonitoring ? 'animate-bounce' : ''
-                  }`} />
-                </div>
-
-                {/* État du rythme */}
-                <div className="space-y-2 mb-6">
-                  <h3 className="text-2xl font-bold capitalize">{currentRhythm}</h3>
-                  <p className="text-gray-600" role="status" aria-live="polite">
-                    Rythme cardiaque {currentRhythm}
-                  </p>
-                  
-                  {isMonitoring && (
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-500 mb-2">Durée de session</p>
-                      <p className="text-xl font-mono">{formatDuration(sessionDuration)}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Contrôles */}
-                <div className="flex gap-4 justify-center">
-                  {!isMonitoring ? (
-                    <Button 
-                      onClick={startMonitoring}
-                      size="lg"
-                      className="bg-gradient-to-r from-red-500 to-pink-500"
-                    >
-                      <Play className="w-5 h-5 mr-2" />
-                      Démarrer la mesure
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={stopMonitoring}
-                      size="lg"
-                      variant="outline"
-                    >
-                      <Pause className="w-5 h-5 mr-2" />
-                      Arrêter
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Métriques de cohérence */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5" />
-                Cohérence Cardiaque
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Niveau de cohérence */}
-              <div className="text-center">
-                <div className={`text-3xl font-bold mb-2 ${getCoherenceColor()}`}>
-                  {coherenceLevel}
-                </div>
-                <Progress 
-                  value={coherenceLevel === 'élevée' ? 90 : coherenceLevel === 'correcte' ? 60 : 30} 
-                  className="mb-4"
-                  aria-label={`Niveau de cohérence: ${coherenceLevel}`}
-                />
-                <p className="text-sm text-gray-600">
-                  Niveau de cohérence cardiaque
-                </p>
-              </div>
-
-              {/* Conseils contextuels */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Conseil du moment</h4>
-                <p className="text-sm text-gray-600">
-                  {coherenceLevel === 'élevée' && "Excellent ! Maintenez cette cohérence."}
-                  {coherenceLevel === 'correcte' && "Bon niveau. Concentrez-vous sur votre respiration."}
-                  {coherenceLevel === 'à entraîner' && "Respirez profondément et régulièrement."}
-                </p>
-              </div>
-
-              {/* État des capteurs */}
-              <div className="space-y-3">
-                <h4 className="font-medium">État des capteurs</h4>
-                <div className="flex items-center gap-3">
-                  <Bluetooth className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm">
-                    {hrPermission ? 'Capteurs disponibles' : 'Capteurs indisponibles'}
-                  </span>
-                  <Badge variant={hrPermission ? "default" : "secondary"}>
-                    {hrPermission ? 'Connecté' : 'Déconnecté'}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Watch className="w-4 h-4 text-green-500" />
-                  <span className="text-sm">Mode {isSimulation ? 'Simulation' : 'Réel'}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Exercices de cohérence cardiaque */}
+      {/* Métriques en temps réel */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Exercices de Cohérence Cardiaque</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                {
-                  title: '4-7-8 Respiration',
-                  description: 'Inspirez 4s, retenez 7s, expirez 8s',
-                  duration: '5 min',
-                  difficulty: 'Débutant'
-                },
-                {
-                  title: 'Cohérence 5-5',
-                  description: 'Inspirez 5s, expirez 5s en continu',
-                  duration: '10 min',
-                  difficulty: 'Intermédiaire'
-                },
-                {
-                  title: 'Variation Personnalisée',
-                  description: 'Adapté à votre rythme cardiaque actuel',
-                  duration: '15 min',
-                  difficulty: 'Avancé'
-                }
-              ].map((exercise, index) => (
-                <Card key={index} className="cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold mb-2">{exercise.title}</h4>
-                    <p className="text-sm text-gray-600 mb-3">{exercise.description}</p>
-                    <div className="flex justify-between items-center text-xs text-gray-500 mb-3">
-                      <span>{exercise.duration}</span>
-                      <Badge variant="outline">{exercise.difficulty}</Badge>
-                    </div>
-                    <Button size="sm" className="w-full">
-                      Commencer
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          <CardContent className="p-4 text-center">
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 60/heartRate, repeat: Infinity }}
+              className="text-2xl font-bold text-red-500"
+            >
+              {Math.round(heartRate)}
+            </motion.div>
+            <div className="text-sm text-muted-foreground">BPM</div>
           </CardContent>
         </Card>
-
-        {/* Historique des sessions */}
         <Card>
-          <CardHeader>
-            <CardTitle>Historique des Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {[
-                { date: 'Aujourd\'hui 14:30', duration: '12 min', coherence: 'Élevée', rhythm: 'Calme' },
-                { date: 'Hier 09:15', duration: '8 min', coherence: 'Correcte', rhythm: 'Neutre' },
-                { date: '2 jours - 16:45', duration: '15 min', coherence: 'Élevée', rhythm: 'Calme' }
-              ].map((session, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="font-medium">{session.date}</div>
-                    <div className="text-sm text-gray-600">
-                      {session.duration} • Rythme {session.rhythm}
-                    </div>
-                  </div>
-                  <Badge variant={session.coherence === 'Élevée' ? 'default' : 'secondary'}>
-                    {session.coherence}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-blue-500">{currentScore}</div>
+            <div className="text-sm text-muted-foreground">Score</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-500">{biometricData.coherenceLevel}%</div>
+            <div className="text-sm text-muted-foreground">Cohérence</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-500">{formatTime(sessionTime)}</div>
+            <div className="text-sm text-muted-foreground">Temps</div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Sélection du mode de jeu */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mode d'Entraînement</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(gameModes).map(([key, mode]) => {
+              const Icon = mode.icon;
+              return (
+                <motion.div
+                  key={key}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    variant={gameMode === key ? "default" : "outline"}
+                    className={`w-full h-auto p-6 flex flex-col gap-3 ${
+                      gameMode === key ? `bg-gradient-to-br ${mode.color} text-white` : ''
+                    }`}
+                    onClick={() => setGameMode(key as typeof gameMode)}
+                    disabled={isPlaying}
+                  >
+                    <Icon className="h-8 w-8" />
+                    <div>
+                      <div className="font-medium">{mode.name}</div>
+                      <div className="text-sm opacity-80">{mode.description}</div>
+                      <Badge variant="outline" className="mt-2">
+                        {mode.targetHR[0]}-{mode.targetHR[1]} BPM
+                      </Badge>
+                    </div>
+                  </Button>
+                </motion.div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Paramètres de difficulté */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Paramètres</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-sm font-medium">Rythme Cardiaque Cible</label>
+              <Badge variant="outline">{targetHeartRate[0]} BPM</Badge>
+            </div>
+            <Slider
+              value={targetHeartRate}
+              onValueChange={setTargetHeartRate}
+              max={120}
+              min={50}
+              step={5}
+              className="w-full"
+              disabled={isPlaying}
+            />
+          </div>
+          
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-sm font-medium">Difficulté</label>
+              <Badge variant="outline">Niveau {difficulty[0]}</Badge>
+            </div>
+            <Slider
+              value={difficulty}
+              onValueChange={setDifficulty}
+              max={5}
+              min={1}
+              step={1}
+              className="w-full"
+              disabled={isPlaying}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Zone de jeu */}
+      <Card className="relative overflow-hidden">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Zone de Jeu</span>
+            <div className="flex gap-2">
+              {!isPlaying ? (
+                <Button onClick={startSession} className="flex items-center gap-2">
+                  <Play className="h-4 w-4" />
+                  Démarrer
+                </Button>
+              ) : (
+                <Button onClick={stopSession} variant="destructive" className="flex items-center gap-2">
+                  <Square className="h-4 w-4" />
+                  Arrêter
+                </Button>
+              )}
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div 
+            className={`relative h-96 rounded-lg overflow-hidden bg-gradient-to-br ${
+              isPlaying ? gameModes[gameMode].color : 'from-gray-100 to-gray-200'
+            }`}
+          >
+            {/* Bulles interactives */}
+            <AnimatePresence>
+              {bubbles.map(bubble => (
+                <motion.div
+                  key={bubble.id}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ 
+                    scale: bubble.beatSync ? [1, 1.2, 1] : 1,
+                    opacity: 1,
+                    x: bubble.x,
+                    y: bubble.y
+                  }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ 
+                    scale: {
+                      duration: 60/heartRate,
+                      repeat: bubble.beatSync ? Infinity : 0
+                    }
+                  }}
+                  className="absolute cursor-pointer"
+                  onClick={() => handleBubbleClick(bubble.id)}
+                  style={{
+                    width: bubble.size,
+                    height: bubble.size,
+                    backgroundColor: bubble.color,
+                    borderRadius: '50%',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                  }}
+                >
+                  <div className="absolute inset-0 rounded-full bg-white/30" />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {/* Indicateur de rythme cardiaque */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <motion.div
+                className="h-2 bg-white/30 rounded-full overflow-hidden"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 60/heartRate, repeat: Infinity }}
+              >
+                <motion.div
+                  className="h-full bg-white"
+                  animate={{ width: [`${heartRate}%`, `${heartRate + 10}%`, `${heartRate}%`] }}
+                  transition={{ duration: 60/heartRate, repeat: Infinity }}
+                />
+              </motion.div>
+            </div>
+
+            {!isPlaying && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <Music className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <div className="text-lg font-medium">Prêt pour votre session Bubble Beat ?</div>
+                  <div className="text-sm opacity-80">Choisissez un mode et appuyez sur Démarrer</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Métriques biométriques détaillées */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Waves className="h-5 w-5 text-blue-500" />
+            Données Biométriques
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <div className="text-sm font-medium mb-2">Variabilité Cardiaque (HRV)</div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                    animate={{ width: `${biometricData.hrv}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+                <span className="text-sm font-medium">{Math.round(biometricData.hrv)}%</span>
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-sm font-medium mb-2">Niveau de Stress</div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-green-500 to-red-500"
+                    animate={{ width: `${biometricData.stressLevel}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+                <span className="text-sm font-medium">{Math.round(biometricData.stressLevel)}%</span>
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-sm font-medium mb-2">Cohérence Émotionnelle</div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    animate={{ width: `${biometricData.coherenceLevel}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+                <span className="text-sm font-medium">{Math.round(biometricData.coherenceLevel)}%</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default B2CBubbleBeatPage;
+export default B2CBubbleBeatEnhanced;

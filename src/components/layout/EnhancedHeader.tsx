@@ -5,7 +5,8 @@ import { routes } from '@/routerV2';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Music, MessageCircle, Users, LayoutDashboard, Settings,
-  Bell, Search, Command, User, Sun, Moon, Menu, X 
+  Bell, Search, Command, User, Sun, Moon, Menu, X,
+  Brain, Compass
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -28,13 +29,14 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
 
-  // Navigation items avec RouterV2
+  // Navigation items avec RouterV2 - VERSION COMPLÈTE PREMIUM
   const navigationItems = [
     { to: routes.b2c.dashboard(), icon: <LayoutDashboard className="h-4 w-4 mr-2" />, label: "Dashboard" },
-    { to: routes.b2c.emotions(), icon: <Home className="h-4 w-4 mr-2" />, label: "Émotions" },
-    { to: routes.b2c.music(), icon: <Music className="h-4 w-4 mr-2" />, label: "Music" },
-    { to: routes.b2c.coach(), icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach" },
+    { to: routes.b2c.emotions(), icon: <Brain className="h-4 w-4 mr-2" />, label: "Émotions" },
+    { to: routes.b2c.music(), icon: <Music className="h-4 w-4 mr-2" />, label: "Musicothérapie" },
+    { to: routes.b2c.coach(), icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach IA" },
     { to: routes.b2c.community(), icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
+    { to: '/navigation', icon: <Compass className="h-4 w-4 mr-2" />, label: "Tous les Modules" },
     { to: routes.b2c.settings(), icon: <Settings className="h-4 w-4 mr-2" />, label: "Paramètres" }
   ];
 

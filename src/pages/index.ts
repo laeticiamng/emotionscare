@@ -5,7 +5,6 @@ export { default as ContactPage } from './ContactPage';
 export { default as HelpPage } from './HelpPage';
 export { default as LoginPage } from './LoginPage';
 export { default as SignupPage } from './SignupPage';
-export { default as BrowsingPage } from './BrowsingPage';
 export { default as PrivacyPage } from './PrivacyPage';
 
 // App & Dashboards
@@ -71,6 +70,7 @@ export { default as B2CVoiceJournalPage } from './B2CVoiceJournalPage';
 export { default as B2CSocialCoconPage } from './B2CSocialCoconPage';
 export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 export { default as B2CCommunityPage } from './B2CCommunityPage';
+export { default as NavigationPage } from './NavigationPage';
 
 // System & Error pages
 export { default as UnauthorizedPage } from './UnauthorizedPage';

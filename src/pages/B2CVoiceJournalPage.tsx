@@ -1,105 +1,128 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Mic, MicOff, Play, Pause, Save, FileText, Volume2, Brain, Heart, Sparkles } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Mic, MicOff, Play, Pause, Square, FileAudio, Brain, Heart, Wand2, Save, Volume2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 
-interface VoiceEntry {
-  id: string;
-  title: string;
-  audioBlob?: Blob;
-  transcription: string;
-  aiInsights: string;
-  emotion: string;
-  sentiment: number;
-  keywords: string[];
-  created_at: string;
-  duration: number;
-}
-
-const B2CVoiceJournalPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  
+const B2CVoiceJournalEnhanced: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [currentAudio, setCurrentAudio] = useState<Blob | null>(null);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [audioURL, setAudioURL] = useState('');
   const [transcription, setTranscription] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [entries, setEntries] = useState<VoiceEntry[]>([]);
-  const [selectedEntry, setSelectedEntry] = useState<VoiceEntry | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [editableText, setEditableText] = useState('');
+  const [recordingLevel, setRecordingLevel] = useState(0);
+  const [entries, setEntries] = useState<any[]>([]);
+  const [selectedMood, setSelectedMood] = useState('');
 
-  useEffect(() => {
-    loadEntries();
-  }, []);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
+  const moods = [
+    { value: 'joyful', label: 'Joyeux', emoji: '😊', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'calm', label: 'Calme', emoji: '😌', color: 'bg-blue-100 text-blue-800' },
+    { value: 'excited', label: 'Excité', emoji: '🤩', color: 'bg-orange-100 text-orange-800' },
+    { value: 'thoughtful', label: 'Pensif', emoji: '🤔', color: 'bg-purple-100 text-purple-800' },
+    { value: 'grateful', label: 'Reconnaissant', emoji: '🙏', color: 'bg-green-100 text-green-800' },
+    { value: 'stressed', label: 'Stressé', emoji: '😰', color: 'bg-red-100 text-red-800' }
+  ];
+
+  // Analyse du niveau audio en temps réel
+  const analyzeAudioLevel = () => {
+    if (!analyserRef.current) return;
+
+    const bufferLength = analyserRef.current.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyserRef.current.getByteFrequencyData(dataArray);
+
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      sum += dataArray[i];
     }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isRecording]);
+    const average = sum / bufferLength;
+    setRecordingLevel(average);
 
-  const loadEntries = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('voice_journal_entries')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      if (data) setEntries(data);
-    } catch (error) {
-      console.error('Erreur chargement entrées:', error);
+    if (isRecording) {
+      animationRef.current = requestAnimationFrame(analyzeAudioLevel);
     }
   };
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        }
+      });
+      
+      streamRef.current = stream;
 
+      // Configuration de l'analyseur audio
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      mediaRecorderRef.current = mediaRecorder;
+
+      const chunks: BlobPart[] = [];
+      
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+          chunks.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        setCurrentAudio(audioBlob);
-        processAudio(audioBlob);
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(audioBlob);
+        setAudioURL(url);
+        
+        // Convertir en base64 pour l'envoi
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result?.toString().split(',')[1];
+          if (base64) {
+            transcribeAudio(base64);
+          }
+        };
+        reader.readAsDataURL(audioBlob);
       };
 
       mediaRecorder.start();
       setIsRecording(true);
-      setRecordingTime(0);
+      setRecordingDuration(0);
       
-      toast({
-        title: "Enregistrement démarré 🎤",
-        description: "Exprimez-vous librement, l'IA vous écoute...",
-      });
+      analyzeAudioLevel();
+
+      // Timer pour la durée
+      intervalRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+
     } catch (error) {
-      console.error('Erreur enregistrement:', error);
+      console.error('Error starting recording:', error);
       toast({
-        title: "Erreur d'accès au microphone",
-        description: "Veuillez autoriser l'accès au microphone.",
+        title: "Erreur d'enregistrement",
+        description: "Impossible d'accéder au microphone",
         variant: "destructive"
       });
     }
@@ -108,373 +131,360 @@ const B2CVoiceJournalPage: React.FC = () => {
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
+      
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+
+      setRecordingLevel(0);
     }
   };
 
-  const simulateTranscriptionAndAnalysis = async (audioBlob: Blob): Promise<{
-    transcription: string;
-    emotion: string;
-    sentiment: number;
-    keywords: string[];
-    insights: string;
-  }> => {
-    // Simulation d'une transcription et analyse IA
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const sampleTranscriptions = [
-      "Aujourd'hui j'ai eu une journée plutôt productive. J'ai réussi à terminer mes projets en cours et je me sens satisfait du travail accompli.",
-      "Je ressens un peu de stress concernant mes prochains défis professionnels, mais je reste optimiste pour la suite.",
-      "Cette semaine a été riche en émotions. J'ai ressenti de la gratitude pour les moments partagés avec mes proches.",
-      "Je réfléchis beaucoup à mes objectifs personnels et je pense qu'il est temps de prendre de nouvelles décisions importantes."
-    ];
-    
-    const emotions = ['peaceful', 'focused', 'optimistic', 'grateful', 'determined'];
-    const transcription = sampleTranscriptions[Math.floor(Math.random() * sampleTranscriptions.length)];
-    const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-    const sentiment = Math.random() * 0.6 + 0.4; // Entre 0.4 et 1.0
-    
-    return {
-      transcription,
-      emotion,
-      sentiment,
-      keywords: ['productivité', 'projets', 'satisfaction', 'accomplissement'],
-      insights: `Votre voix révèle un état ${emotion}. Vous semblez ${sentiment > 0.7 ? 'très positif' : 'globalement serein'} aujourd'hui. Vos mots montrent une belle introspection et une conscience de vos émotions.`
-    };
-  };
-
-  const processAudio = async (audioBlob: Blob) => {
-    setIsProcessing(true);
-    
+  const transcribeAudio = async (audioBase64: string) => {
     try {
-      const analysis = await simulateTranscriptionAndAnalysis(audioBlob);
-      setTranscription(analysis.transcription);
+      setIsAnalyzing(true);
       
-      // Créer une nouvelle entrée
-      const newEntry: VoiceEntry = {
-        id: Date.now().toString(),
-        title: `Journal du ${new Date().toLocaleDateString()}`,
-        transcription: analysis.transcription,
-        aiInsights: analysis.insights,
-        emotion: analysis.emotion,
-        sentiment: analysis.sentiment,
-        keywords: analysis.keywords,
-        created_at: new Date().toISOString(),
-        duration: recordingTime
-      };
-      
-      // Sauvegarder en base
-      await supabase.from('voice_journal_entries').insert([{
-        title: newEntry.title,
-        transcription: newEntry.transcription,
-        ai_insights: newEntry.aiInsights,
-        emotion: newEntry.emotion,
-        sentiment: newEntry.sentiment,
-        keywords: newEntry.keywords,
-        duration: newEntry.duration
-      }]);
-      
-      setEntries(prev => [newEntry, ...prev]);
-      setSelectedEntry(newEntry);
-      
-      toast({
-        title: "Analyse terminée! ✨",
-        description: "Votre journal vocal a été traité avec succès.",
+      const { data, error } = await supabase.functions.invoke('openai-whisper', {
+        body: { audio: audioBase64 }
       });
+
+      if (error) throw error;
+
+      setTranscription(data.text);
+      setEditableText(data.text);
+      
+      // Analyse IA du contenu
+      await analyzeJournalEntry(data.text);
       
     } catch (error) {
-      console.error('Erreur traitement audio:', error);
+      console.error('Error transcribing audio:', error);
       toast({
-        title: "Erreur de traitement",
-        description: "Impossible de traiter l'enregistrement.",
+        title: "Erreur de transcription",
+        description: "Impossible de transcrire l'audio",
         variant: "destructive"
       });
     } finally {
-      setIsProcessing(false);
+      setIsAnalyzing(false);
     }
   };
 
-  const playAudio = async () => {
-    if (currentAudio && audioRef.current) {
-      const audioUrl = URL.createObjectURL(currentAudio);
-      audioRef.current.src = audioUrl;
+  const analyzeJournalEntry = async (text: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('journal-analysis', {
+        body: { 
+          text,
+          mood: selectedMood,
+          timestamp: new Date().toISOString()
+        }
+      });
+
+      if (error) throw error;
+      setAiAnalysis(data);
       
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error('Erreur lecture audio:', error);
-      }
+    } catch (error) {
+      console.error('Error analyzing journal entry:', error);
     }
   };
 
-  const pauseAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+  const saveEntry = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('journal-entry', {
+        body: {
+          text: editableText,
+          mood: selectedMood,
+          audio_url: audioURL,
+          analysis: aiAnalysis,
+          duration: recordingDuration
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "✅ Entrée sauvegardée",
+        description: "Votre journal vocal a été enregistré avec succès"
+      });
+
+      // Reset
+      setTranscription('');
+      setEditableText('');
+      setAudioURL('');
+      setAiAnalysis(null);
+      setRecordingDuration(0);
+      setSelectedMood('');
+      
+    } catch (error) {
+      console.error('Error saving entry:', error);
+      toast({
+        title: "Erreur de sauvegarde",
+        description: "Impossible de sauvegarder l'entrée",
+        variant: "destructive"
+      });
     }
   };
 
-  const formatTime = (seconds: number): string => {
+  const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getEmotionColor = (emotion: string): string => {
-    const colors: Record<string, string> = {
-      'peaceful': 'bg-blue-100 text-blue-700',
-      'focused': 'bg-purple-100 text-purple-700',
-      'optimistic': 'bg-green-100 text-green-700',
-      'grateful': 'bg-yellow-100 text-yellow-700',
-      'determined': 'bg-orange-100 text-orange-700'
-    };
-    return colors[emotion] || 'bg-gray-100 text-gray-700';
-  };
-
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 p-6">
-      <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
+    <div className="space-y-6">
+      <Breadcrumbs />
       
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate('/app/home')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Journal Vocal
-              </h1>
-              <p className="text-gray-600">Exprimez-vous, l'IA vous comprend</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Mic className="w-6 h-6 text-emerald-500" />
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
-              IA Transcription
-            </Badge>
-          </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3"
+      >
+        <motion.div
+          animate={isRecording ? { 
+            scale: [1, 1.2, 1],
+            rotate: [0, 10, -10, 0]
+          } : { scale: 1, rotate: 0 }}
+          transition={{ duration: 1, repeat: isRecording ? Infinity : 0 }}
+        >
+          <FileAudio className="h-8 w-8 text-purple-500" />
+        </motion.div>
+        <div>
+          <h1 className="text-3xl font-bold">Journal Vocal IA 🎙️</h1>
+          <p className="text-muted-foreground">Exprimez-vous, nous analysons vos émotions</p>
         </div>
+      </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Recording Area */}
-          <div className="lg:col-span-2 space-y-4">
-            <Card className="border-2 border-dashed border-emerald-200 bg-gradient-to-br from-white to-emerald-50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Volume2 className="w-5 h-5" />
-                  Studio d'Enregistrement
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Visualiseur de son */}
-                <div className="relative h-32 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg flex items-center justify-center overflow-hidden">
-                  {isRecording && (
-                    <div className="flex items-center space-x-1">
-                      {[...Array(20)].map((_, i) => (
-                        <div 
-                          key={i}
-                          className="bg-emerald-500 rounded-full animate-pulse"
-                          style={{
-                            width: '4px',
-                            height: `${Math.random() * 60 + 20}px`,
-                            animationDelay: `${i * 0.1}s`
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  
-                  {!isRecording && !isProcessing && (
-                    <div className="text-center text-gray-500">
-                      <Mic className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                      <p>Cliquez pour commencer l'enregistrement</p>
-                    </div>
-                  )}
+      {/* Sélection d'humeur */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Comment vous sentez-vous ?</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            {moods.map(mood => (
+              <motion.div
+                key={mood.value}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant={selectedMood === mood.value ? "default" : "outline"}
+                  className={`w-full h-auto p-3 flex flex-col gap-1 ${
+                    selectedMood === mood.value ? mood.color : ''
+                  }`}
+                  onClick={() => setSelectedMood(mood.value)}
+                >
+                  <span className="text-lg">{mood.emoji}</span>
+                  <span className="text-xs">{mood.label}</span>
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-                  {isProcessing && (
-                    <div className="text-center">
-                      <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                      <p className="text-emerald-600 font-medium">Analyse en cours...</p>
-                    </div>
-                  )}
+      {/* Zone d'enregistrement */}
+      <Card className="relative overflow-hidden">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Studio d'Enregistrement</span>
+            <Badge variant="outline">
+              {formatDuration(recordingDuration)}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          
+          {/* Visualiseur audio */}
+          <div className="relative h-32 bg-muted rounded-lg overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center">
+              {isRecording ? (
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1 + recordingLevel / 100, 1]
+                  }}
+                  transition={{ duration: 0.1 }}
+                  className="text-center"
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Mic className="h-12 w-12 text-red-500 mx-auto mb-2" />
+                  </motion.div>
+                  <div className="text-sm text-red-600 font-medium">EN COURS D'ENREGISTREMENT</div>
+                  <div className="text-xs text-muted-foreground">Parlez naturellement...</div>
+                </motion.div>
+              ) : audioURL ? (
+                <div className="text-center">
+                  <Volume2 className="h-12 w-12 text-green-500 mx-auto mb-2" />
+                  <div className="text-sm text-green-600 font-medium">ENREGISTREMENT TERMINÉ</div>
+                  <div className="text-xs text-muted-foreground">Durée: {formatDuration(recordingDuration)}</div>
                 </div>
-
-                {/* Contrôles d'enregistrement */}
-                <div className="flex items-center justify-center gap-4">
-                  {!isRecording ? (
-                    <Button 
-                      onClick={startRecording}
-                      size="lg"
-                      className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
-                    >
-                      <Mic className="w-4 h-4 mr-2" />
-                      Commencer
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={stopRecording}
-                      size="lg"
-                      variant="destructive"
-                    >
-                      <MicOff className="w-4 h-4 mr-2" />
-                      Arrêter
-                    </Button>
-                  )}
-
-                  {currentAudio && (
-                    <Button 
-                      onClick={isPlaying ? pauseAudio : playAudio}
-                      size="lg"
-                      variant="outline"
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                      {isPlaying ? 'Pause' : 'Écouter'}
-                    </Button>
-                  )}
+              ) : (
+                <div className="text-center">
+                  <MicOff className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                  <div className="text-sm text-muted-foreground">Appuyez pour commencer</div>
                 </div>
+              )}
+            </div>
 
-                {isRecording && (
-                  <div className="text-center">
-                    <div className="text-2xl font-mono text-emerald-600 font-bold">
-                      {formatTime(recordingTime)}
-                    </div>
-                    <p className="text-sm text-gray-500">Temps d'enregistrement</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Transcription et Analyse */}
-            {selectedEntry && (
-              <Card className="border-l-4 border-l-emerald-500">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    {selectedEntry.title}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getEmotionColor(selectedEntry.emotion)}>
-                      {selectedEntry.emotion}
-                    </Badge>
-                    <Badge variant="outline">
-                      {formatTime(selectedEntry.duration)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Transcription:</h4>
-                    <Textarea 
-                      value={selectedEntry.transcription}
-                      readOnly
-                      className="min-h-[100px] bg-gray-50"
-                    />
-                  </div>
-
-                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg">
-                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                      <Brain className="w-4 h-4" />
-                      Analyse IA:
-                    </h4>
-                    <p className="text-gray-700">{selectedEntry.aiInsights}</p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">Mots-clés:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedEntry.keywords.map((keyword, index) => (
-                        <Badge key={index} variant="secondary" className="bg-teal-100 text-teal-700">
-                          {keyword}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <Button className="flex-1 bg-blue-500 hover:bg-blue-600">
-                      <Heart className="w-4 h-4 mr-2" />
-                      Actions Bien-être
-                    </Button>
-                    <Button variant="outline" className="flex-1">
-                      <Save className="w-4 h-4 mr-2" />
-                      Sauvegarder
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Barres de niveau audio */}
+            {isRecording && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500">
+                <motion.div
+                  className="h-full bg-white/50"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(recordingLevel, 100)}%` }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
             )}
           </div>
 
-          {/* Sidebar - Historique */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Mes Entrées
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-                {entries.length > 0 ? (
-                  entries.map((entry) => (
-                    <div 
-                      key={entry.id}
-                      onClick={() => setSelectedEntry(entry)}
-                      className={`p-3 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                        selectedEntry?.id === entry.id 
-                          ? 'bg-emerald-100 border-2 border-emerald-300' 
-                          : 'bg-gray-50 hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-sm truncate">{entry.title}</span>
-                        <Badge size="sm" className={getEmotionColor(entry.emotion)}>
-                          {entry.emotion}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-gray-600 truncate">{entry.transcription}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-gray-500">
-                          {new Date(entry.created_at).toLocaleDateString()}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {formatTime(entry.duration)}
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-gray-500 py-8">
-                    <Mic className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>Aucune entrée</p>
-                    <p className="text-sm">Commencez votre premier enregistrement!</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          {/* Contrôles */}
+          <div className="flex justify-center gap-4">
+            <Button
+              onClick={isRecording ? stopRecording : startRecording}
+              size="lg"
+              variant={isRecording ? "destructive" : "default"}
+              className="flex items-center gap-2"
+            >
+              {isRecording ? (
+                <>
+                  <Square className="h-5 w-5" />
+                  Arrêter
+                </>
+              ) : (
+                <>
+                  <Mic className="h-5 w-5" />
+                  Enregistrer
+                </>
+              )}
+            </Button>
 
-            <Card className="bg-gradient-to-br from-teal-50 to-emerald-50">
-              <CardContent className="p-4 text-center">
-                <Sparkles className="w-8 h-8 mx-auto mb-2 text-emerald-500" />
-                <h3 className="font-semibold mb-2">Journal Intelligent</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  L'IA analyse vos émotions et vous propose des recommandations personnalisées
-                </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  Voir les Tendances
-                </Button>
-              </CardContent>
-            </Card>
+            {audioURL && (
+              <Button
+                onClick={() => {
+                  if (audioRef.current) {
+                    if (isPlaying) {
+                      audioRef.current.pause();
+                    } else {
+                      audioRef.current.play();
+                    }
+                    setIsPlaying(!isPlaying);
+                  }
+                }}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                Écouter
+              </Button>
+            )}
           </div>
-        </div>
-      </div>
+
+          <audio 
+            ref={audioRef} 
+            src={audioURL}
+            onEnded={() => setIsPlaying(false)}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Transcription et édition */}
+      {(transcription || editableText) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-blue-500" />
+              Transcription & Édition
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={editableText}
+              onChange={(e) => setEditableText(e.target.value)}
+              placeholder="Votre transcription apparaîtra ici..."
+              className="min-h-[120px]"
+            />
+            
+            {isAnalyzing && (
+              <div className="flex items-center gap-2 text-blue-600">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <Wand2 className="h-4 w-4" />
+                </motion.div>
+                <span className="text-sm">Analyse IA en cours...</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Analyse IA */}
+      {aiAnalysis && (
+        <Card className="bg-gradient-to-r from-purple-50 to-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-purple-500" />
+              Analyse Émotionnelle IA
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {aiAnalysis.emotions && Object.entries(aiAnalysis.emotions).map(([emotion, score]: [string, any]) => (
+                <div key={emotion} className="text-center">
+                  <div className="text-sm font-medium capitalize">{emotion}</div>
+                  <div className="text-lg font-bold text-purple-600">{Math.round(score * 100)}%</div>
+                </div>
+              ))}
+            </div>
+            
+            {aiAnalysis.insights && (
+              <div className="p-4 bg-white rounded-lg">
+                <div className="font-medium mb-2">Insights IA</div>
+                <div className="text-sm text-muted-foreground">{aiAnalysis.insights}</div>
+              </div>
+            )}
+
+            {aiAnalysis.recommendations && (
+              <div className="p-4 bg-white rounded-lg">
+                <div className="font-medium mb-2">Recommandations</div>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  {aiAnalysis.recommendations.map((rec: string, index: number) => (
+                    <li key={index}>• {rec}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Bouton de sauvegarde */}
+      {editableText && (
+        <Button 
+          onClick={saveEntry}
+          size="lg"
+          className="w-full"
+        >
+          <Save className="h-5 w-5 mr-2" />
+          Sauvegarder cette entrée
+        </Button>
+      )}
     </div>
   );
 };
 
-export default B2CVoiceJournalPage;
+export default B2CVoiceJournalEnhanced;

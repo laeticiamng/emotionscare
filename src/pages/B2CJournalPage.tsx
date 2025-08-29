@@ -1,687 +1,499 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Plus, BookOpen, Calendar as CalendarIcon, Search, Filter, 
-         Heart, Smile, Meh, Frown, Zap, Cloud, Save, Trash2, Edit, 
-         TrendingUp, BarChart3, Target, Award } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  BookOpen, 
+  Sparkles, 
+  Heart, 
+  Brain, 
+  TrendingUp,
+  Calendar,
+  Zap,
+  Moon,
+  Sun,
+  Cloud,
+  Rainbow,
+  Star,
+  Mic,
+  Image,
+  MapPin,
+  Lightbulb
+} from 'lucide-react';
 
 interface JournalEntry {
   id: string;
   title: string;
   content: string;
-  mood: 'happy' | 'neutral' | 'sad' | 'excited' | 'calm';
-  date: string;
-  tags: string[];
+  mood: string;
+  emotions: string[];
+  aiInsights: string[];
+  timestamp: Date;
+  weather?: string;
+  location?: string;
+  images?: string[];
+  voiceNote?: string;
   gratitude?: string[];
   goals?: string[];
+  energy: number;
+  stress: number;
+  happiness: number;
 }
 
-interface MoodStat {
-  mood: string;
-  count: number;
-  percentage: number;
-}
+const moodIcons = {
+  joyful: { icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-100' },
+  calm: { icon: Cloud, color: 'text-blue-500', bg: 'bg-blue-100' },
+  energetic: { icon: Zap, color: 'text-orange-500', bg: 'bg-orange-100' },
+  peaceful: { icon: Moon, color: 'text-purple-500', bg: 'bg-purple-100' },
+  inspired: { icon: Rainbow, color: 'text-pink-500', bg: 'bg-pink-100' },
+  grateful: { icon: Star, color: 'text-green-500', bg: 'bg-green-100' }
+};
 
-interface JournalChallenge {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  target: number;
-  reward: string;
-}
-
-const B2CJournalPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [isWriting, setIsWriting] = useState(false);
-  const [newEntry, setNewEntry] = useState({ 
-    title: '', 
-    content: '', 
-    mood: 'neutral' as const, 
-    tags: '',
+export default function B2CJournalEnhanced() {
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [currentEntry, setCurrentEntry] = useState<Partial<JournalEntry>>({
+    title: '',
+    content: '',
+    mood: 'calm',
+    emotions: [],
+    energy: 50,
+    stress: 50,
+    happiness: 50,
     gratitude: ['', '', ''],
     goals: ['']
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedMoodFilter, setSelectedMoodFilter] = useState<string>('all');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [activeTab, setActiveTab] = useState('entries');
+  const [isWriting, setIsWriting] = useState(false);
+  const [aiInsights, setAiInsights] = useState<string[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [entries] = useState<JournalEntry[]>([
-    {
-      id: '1',
-      title: 'Ma journée parfaite',
-      content: 'Aujourd\'hui a été une journée exceptionnelle. J\'ai commencé par une méditation matinale qui m\'a donné beaucoup d\'énergie positive. Le scan émotionnel de ce matin m\'a aidé à identifier mes priorités...',
-      mood: 'happy',
-      date: '2024-01-15T10:30:00',
-      tags: ['méditation', 'énergie', 'positivité'],
-      gratitude: ['Ma famille', 'Ma santé', 'Ce beau temps'],
-      goals: ['Méditer 20 minutes', 'Appeler maman']
-    },
-    {
-      id: '2',
-      title: 'Réflexions sur le stress au travail',
-      content: 'Cette semaine a été intense au bureau. J\'ai remarqué que je me sens plus stressé quand les deadlines s\'accumulent. Le coach IA m\'a donné de bons conseils pour gérer la pression...',
-      mood: 'neutral',
-      date: '2024-01-14T18:45:00',
-      tags: ['travail', 'stress', 'réflexion'],
-      gratitude: ['Mon équipe', 'Mes compétences', 'La stabilité financière'],
-      goals: ['Prendre des pauses régulières', 'Organiser mes priorités']
-    },
-    {
-      id: '3',
-      title: 'Moment de gratitude',
-      content: 'Je voulais prendre un moment pour noter tout ce pour quoi je suis reconnaissant aujourd\'hui. La session VR de ce matin m\'a vraiment aidé à me reconnecter avec l\'essentiel...',
-      mood: 'happy',
-      date: '2024-01-13T20:15:00',
-      tags: ['gratitude', 'famille', 'bonheur'],
-      gratitude: ['Les rires de mes enfants', 'Un toit au-dessus de ma tête', 'Mes amis fidèles'],
-      goals: ['Passer plus de temps en famille', 'Organiser un dîner entre amis']
-    }
-  ]);
-
-  const challenges: JournalChallenge[] = [
-    {
-      id: '1',
-      title: 'Gratitude quotidienne',
-      description: 'Noter 3 choses pour lesquelles vous êtes reconnaissant chaque jour',
-      progress: 18,
-      target: 30,
-      reward: 'Badge Cœur reconnaissant'
-    },
-    {
-      id: '2',
-      title: 'Écrivain régulier',
-      description: 'Écrire dans votre journal 5 jours par semaine',
-      progress: 12,
-      target: 20,
-      reward: 'Badge Plume d\'or'
-    },
-    {
-      id: '3',
-      title: 'Objectifs atteints',
-      description: 'Compléter 50 objectifs personnels définis dans le journal',
-      progress: 23,
-      target: 50,
-      reward: 'Badge Conquérant'
-    }
+  const emotionTags = [
+    'Gratitude', 'Joie', 'Sérénité', 'Confiance', 'Inspiration', 'Amour',
+    'Espoir', 'Fierté', 'Paix', 'Émerveillement', 'Reconnaissance', 'Bonheur'
   ];
 
-  const moodConfig = {
-    happy: { icon: Smile, color: 'bg-green-500', label: 'Heureux', emoji: '😊' },
-    excited: { icon: Zap, color: 'bg-yellow-500', label: 'Excité', emoji: '🤩' },
-    neutral: { icon: Meh, color: 'bg-blue-500', label: 'Neutre', emoji: '😐' },
-    calm: { icon: Cloud, color: 'bg-purple-500', label: 'Calme', emoji: '😌' },
-    sad: { icon: Frown, color: 'bg-gray-500', label: 'Triste', emoji: '😢' }
+  const generateAIInsights = async (content: string, mood: string, emotions: string[]) => {
+    setIsAnalyzing(true);
+    
+    // Simulation d'analyse IA
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const insights = [
+      `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
+      `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`,
+      `Je remarque des patterns de croissance personnelle dans vos mots`,
+      `Votre niveau de conscience émotionnelle s'approfondit`,
+      `Cette réflexion montre votre capacité d'introspection remarquable`
+    ];
+    
+    setAiInsights(insights.slice(0, 3));
+    setIsAnalyzing(false);
   };
 
-  const moodStats: MoodStat[] = [
-    { mood: 'happy', count: 12, percentage: 40 },
-    { mood: 'calm', count: 9, percentage: 30 },
-    { mood: 'neutral', count: 6, percentage: 20 },
-    { mood: 'excited', count: 2, percentage: 7 },
-    { mood: 'sad', count: 1, percentage: 3 }
-  ];
-
-  const handleSaveEntry = () => {
-    if (newEntry.title && newEntry.content) {
-      // Ici on sauvegarderait en base de données
-      console.log('Nouvelle entrée:', {
-        ...newEntry,
-        tags: newEntry.tags.split(',').map(tag => tag.trim()),
-        date: new Date().toISOString(),
-        gratitude: newEntry.gratitude.filter(g => g.trim()),
-        goals: newEntry.goals.filter(g => g.trim())
-      });
-      
-      setNewEntry({ 
-        title: '', 
-        content: '', 
-        mood: 'neutral', 
-        tags: '',
-        gratitude: ['', '', ''],
-        goals: ['']
-      });
-      setIsWriting(false);
-    }
+  const saveEntry = () => {
+    const entry: JournalEntry = {
+      id: Date.now().toString(),
+      title: currentEntry.title || `Réflexion du ${new Date().toLocaleDateString()}`,
+      content: currentEntry.content || '',
+      mood: currentEntry.mood || 'calm',
+      emotions: currentEntry.emotions || [],
+      aiInsights,
+      timestamp: new Date(),
+      energy: currentEntry.energy || 50,
+      stress: currentEntry.stress || 50,
+      happiness: currentEntry.happiness || 50,
+      gratitude: currentEntry.gratitude?.filter(g => g.trim()) || [],
+      goals: currentEntry.goals?.filter(g => g.trim()) || []
+    };
+    
+    setEntries(prev => [entry, ...prev]);
+    setCurrentEntry({
+      title: '', content: '', mood: 'calm', emotions: [],
+      energy: 50, stress: 50, happiness: 50,
+      gratitude: ['', '', ''], goals: ['']
+    });
+    setAiInsights([]);
+    setIsWriting(false);
   };
 
-  const addGratitudeField = () => {
-    setNewEntry(prev => ({
+  const toggleEmotion = (emotion: string) => {
+    setCurrentEntry(prev => ({
       ...prev,
-      gratitude: [...prev.gratitude, '']
-    }));
-  };
-
-  const addGoalField = () => {
-    setNewEntry(prev => ({
-      ...prev,
-      goals: [...prev.goals, '']
+      emotions: prev.emotions?.includes(emotion)
+        ? prev.emotions.filter(e => e !== emotion)
+        : [...(prev.emotions || []), emotion]
     }));
   };
 
   const updateGratitude = (index: number, value: string) => {
-    setNewEntry(prev => ({
+    setCurrentEntry(prev => ({
       ...prev,
-      gratitude: prev.gratitude.map((g, i) => i === index ? value : g)
+      gratitude: prev.gratitude?.map((g, i) => i === index ? value : g) || []
     }));
   };
 
   const updateGoal = (index: number, value: string) => {
-    setNewEntry(prev => ({
+    setCurrentEntry(prev => ({
       ...prev,
-      goals: prev.goals.map((g, i) => i === index ? value : g)
+      goals: prev.goals?.map((g, i) => i === index ? value : g) || []
     }));
   };
 
-  const filteredEntries = entries.filter(entry => {
-    const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         entry.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesMood = selectedMoodFilter === 'all' || entry.mood === selectedMoodFilter;
-    
-    return matchesSearch && matchesMood;
-  });
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const addGoal = () => {
+    setCurrentEntry(prev => ({
+      ...prev,
+      goals: [...(prev.goals || []), '']
+    }));
   };
 
-  if (isWriting) {
-    return (
-      <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => setIsWriting(false)}
-                className="hover:bg-white/20"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Nouvelle entrée</h1>
-                <p className="text-gray-600">Partagez vos pensées et réflexions</p>
-              </div>
-            </div>
-            <Button onClick={handleSaveEntry} className="bg-green-600 hover:bg-green-700">
-              <Save className="w-4 h-4 mr-2" />
-              Sauvegarder
-            </Button>
-          </div>
+  useEffect(() => {
+    if (currentEntry.content && currentEntry.content.length > 50) {
+      const timeoutId = setTimeout(() => {
+        generateAIInsights(
+          currentEntry.content || '',
+          currentEntry.mood || 'calm',
+          currentEntry.emotions || []
+        );
+      }, 3000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentEntry.content, currentEntry.mood, currentEntry.emotions]);
 
-          <Card className="shadow-lg">
-            <CardContent className="p-8 space-y-6">
-              {/* Titre et humeur */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  const selectedMoodData = moodIcons[currentEntry.mood as keyof typeof moodIcons] || moodIcons.calm;
+  const MoodIcon = selectedMoodData.icon;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
+              <BookOpen className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Journal Personnel IA
+            </h1>
+          </div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Explorez vos pensées avec l'assistance de l'IA pour des insights profonds et personnalisés
+          </p>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Écriture */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            <Card className="border-2 border-purple-200 shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                  Nouvelle Réflexion
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Titre */}
+                <Input
+                  placeholder="Titre de votre réflexion..."
+                  value={currentEntry.title}
+                  onChange={(e) => setCurrentEntry(prev => ({ ...prev, title: e.target.value }))}
+                  className="text-lg font-medium"
+                />
+
+                {/* Sélection d'humeur */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Titre de l'entrée</label>
-                  <Input
-                    value={newEntry.title}
-                    onChange={(e) => setNewEntry(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Comment résumer cette journée..."
-                    className="text-lg"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Humeur du moment</label>
-                  <div className="flex gap-2">
-                    {Object.entries(moodConfig).map(([key, config]) => {
-                      const IconComponent = config.icon;
+                  <label className="text-sm font-medium text-gray-700 mb-3 block">
+                    Comment vous sentez-vous ?
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {Object.entries(moodIcons).map(([mood, data]) => {
+                      const Icon = data.icon;
                       return (
-                        <Button
-                          key={key}
-                          variant={newEntry.mood === key ? "default" : "outline"}
-                          onClick={() => setNewEntry(prev => ({ ...prev, mood: key as any }))}
-                          className="flex flex-col items-center p-3 h-auto"
+                        <motion.button
+                          key={mood}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setCurrentEntry(prev => ({ ...prev, mood }))}
+                          className={`p-3 rounded-xl border-2 transition-all ${
+                            currentEntry.mood === mood
+                              ? `${data.bg} border-current ${data.color}`
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                          }`}
                         >
-                          <span className="text-lg mb-1">{config.emoji}</span>
-                          <span className="text-xs">{config.label}</span>
-                        </Button>
+                          <Icon className={`w-6 h-6 mx-auto mb-1 ${
+                            currentEntry.mood === mood ? data.color : 'text-gray-400'
+                          }`} />
+                          <span className="text-xs capitalize font-medium">{mood}</span>
+                        </motion.button>
                       );
                     })}
                   </div>
                 </div>
-              </div>
 
-              {/* Contenu principal */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Vos pensées</label>
-                <Textarea
-                  value={newEntry.content}
-                  onChange={(e) => setNewEntry(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="Décrivez votre journée, vos émotions, vos réflexions..."
-                  rows={8}
-                  className="resize-none"
-                />
-              </div>
-
-              {/* Section gratitude */}
-              <div>
-                <label className="block text-sm font-medium mb-2">3 choses pour lesquelles vous êtes reconnaissant</label>
-                <div className="space-y-2">
-                  {newEntry.gratitude.map((gratitude, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <span className="text-yellow-500">⭐</span>
-                      <Input
-                        value={gratitude}
-                        onChange={(e) => updateGratitude(index, e.target.value)}
-                        placeholder={`Gratitude ${index + 1}...`}
+                {/* Niveaux émotionnels */}
+                <div className="space-y-4">
+                  <h3 className="font-medium text-gray-700">État émotionnel</h3>
+                  {[
+                    { key: 'energy', label: 'Énergie', icon: Zap, color: 'orange' },
+                    { key: 'happiness', label: 'Bonheur', icon: Heart, color: 'pink' },
+                    { key: 'stress', label: 'Stress', icon: Brain, color: 'blue', inverted: true }
+                  ].map(({ key, label, icon: Icon, color, inverted }) => (
+                    <div key={key}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Icon className={`w-4 h-4 text-${color}-500`} />
+                          <span className="text-sm font-medium">{label}</span>
+                        </div>
+                        <span className="text-sm text-gray-500">{currentEntry[key as keyof typeof currentEntry]}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={currentEntry[key as keyof typeof currentEntry] as number}
+                        onChange={(e) => setCurrentEntry(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
+                        className={`w-full accent-${color}-500`}
                       />
                     </div>
                   ))}
-                  <Button 
-                    variant="ghost" 
-                    onClick={addGratitudeField}
-                    className="text-sm text-gray-600"
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Ajouter une gratitude
-                  </Button>
                 </div>
-              </div>
 
-              {/* Section objectifs */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Objectifs pour demain</label>
-                <div className="space-y-2">
-                  {newEntry.goals.map((goal, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <span className="text-blue-500">🎯</span>
-                      <Input
-                        value={goal}
-                        onChange={(e) => updateGoal(index, e.target.value)}
-                        placeholder={`Objectif ${index + 1}...`}
-                      />
+                {/* Contenu principal */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Vos pensées...
+                  </label>
+                  <Textarea
+                    ref={textareaRef}
+                    placeholder="Laissez vos pensées s'exprimer librement. L'IA analysera vos mots pour vous offrir des insights personnalisés..."
+                    value={currentEntry.content}
+                    onChange={(e) => setCurrentEntry(prev => ({ ...prev, content: e.target.value }))}
+                    className="min-h-[200px] resize-none"
+                    onFocus={() => setIsWriting(true)}
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-gray-500">
+                      {currentEntry.content?.length || 0} caractères
+                    </span>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Mic className="w-4 h-4 mr-1" />
+                        Vocal
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Image className="w-4 h-4 mr-1" />
+                        Photo
+                      </Button>
                     </div>
-                  ))}
-                  <Button 
-                    variant="ghost" 
-                    onClick={addGoalField}
-                    className="text-sm text-gray-600"
-                  >
-                    <Plus className="w-3 h-3 mr-1" />
-                    Ajouter un objectif
-                  </Button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Tags */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Tags (séparés par des virgules)</label>
-                <Input
-                  value={newEntry.tags}
-                  onChange={(e) => setNewEntry(prev => ({ ...prev, tags: e.target.value }))}
-                  placeholder="travail, famille, stress, bonheur..."
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/app/home')}
-              className="hover:bg-white/20"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Journal Personnel</h1>
-              <p className="text-gray-600">Votre espace de réflexion et de croissance</p>
-            </div>
-          </div>
-          
-          <Button onClick={() => setIsWriting(true)} className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Nouvelle entrée
-          </Button>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="entries" className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              Entrées
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Analyses
-            </TabsTrigger>
-            <TabsTrigger value="challenges" className="flex items-center gap-2">
-              <Award className="w-4 h-4" />
-              Défis
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4" />
-              Calendrier
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Entries Tab */}
-          <TabsContent value="entries" className="space-y-4">
-            {/* Filtres */}
-            <div className="flex gap-4 items-center">
-              <div className="flex-1">
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Rechercher dans vos entrées..."
-                  className="max-w-md"
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button
-                  variant={selectedMoodFilter === 'all' ? "default" : "outline"}
-                  onClick={() => setSelectedMoodFilter('all')}
-                  size="sm"
-                >
-                  Toutes
-                </Button>
-                {Object.entries(moodConfig).map(([key, config]) => (
-                  <Button
-                    key={key}
-                    variant={selectedMoodFilter === key ? "default" : "outline"}
-                    onClick={() => setSelectedMoodFilter(key)}
-                    size="sm"
-                  >
-                    {config.emoji}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Liste des entrées */}
-            <div className="space-y-4">
-              <AnimatePresence>
-                {filteredEntries.map((entry, index) => (
-                  <motion.div
-                    key={entry.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-xl font-semibold">{entry.title}</h3>
-                              <Badge className={`${moodConfig[entry.mood].color} text-white`}>
-                                {moodConfig[entry.mood].emoji} {moodConfig[entry.mood].label}
-                              </Badge>
-                            </div>
-                            <p className="text-gray-600 text-sm mb-3">
-                              {formatDate(entry.date)}
-                            </p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <p className="text-gray-800 mb-4 line-clamp-3">
-                          {entry.content}
-                        </p>
-                        
-                        {entry.gratitude && entry.gratitude.length > 0 && (
-                          <div className="mb-4">
-                            <h5 className="text-sm font-medium text-gray-700 mb-2">Gratitudes:</h5>
-                            <div className="flex flex-wrap gap-1">
-                              {entry.gratitude.map((gratitude, i) => (
-                                <span key={i} className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                  ⭐ {gratitude}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {entry.goals && entry.goals.length > 0 && (
-                          <div className="mb-4">
-                            <h5 className="text-sm font-medium text-gray-700 mb-2">Objectifs:</h5>
-                            <div className="flex flex-wrap gap-1">
-                              {entry.goals.map((goal, i) => (
-                                <span key={i} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                  🎯 {goal}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-1">
-                          {entry.tags.map((tag, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </TabsContent>
-
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Statistiques humeur */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Humeur cette semaine
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {moodStats.map((stat) => (
-                    <div key={stat.mood} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span>{moodConfig[stat.mood as keyof typeof moodConfig].emoji}</span>
-                        <span className="text-sm">{moodConfig[stat.mood as keyof typeof moodConfig].label}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full ${moodConfig[stat.mood as keyof typeof moodConfig].color}`}
-                            style={{ width: `${stat.percentage}%` }}
-                          />
-                        </div>
-                        <span className="text-xs font-medium">{stat.percentage}%</span>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Statistiques d'écriture */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Habitudes d'écriture</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">18</div>
-                    <div className="text-sm text-gray-600">Entrées ce mois</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">5</div>
-                    <div className="text-sm text-gray-600">Jours consécutifs</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600">247</div>
-                    <div className="text-sm text-gray-600">Mots en moyenne</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tags populaires */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Tags les plus utilisés</CardTitle>
-                </CardHeader>
-                <CardContent>
+                {/* Émotions */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-3 block">
+                    Émotions ressenties
+                  </label>
                   <div className="flex flex-wrap gap-2">
-                    {['travail', 'famille', 'stress', 'bonheur', 'méditation', 'gratitude'].map((tag, index) => (
-                      <Badge key={tag} variant="outline" className="text-sm">
-                        #{tag} ({Math.floor(Math.random() * 10 + 1)})
+                    {emotionTags.map(emotion => (
+                      <Badge
+                        key={emotion}
+                        variant={currentEntry.emotions?.includes(emotion) ? "default" : "outline"}
+                        className="cursor-pointer transition-all hover:scale-105"
+                        onClick={() => toggleEmotion(emotion)}
+                      >
+                        {emotion}
                       </Badge>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                </div>
 
-          {/* Challenges Tab */}
-          <TabsContent value="challenges" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {challenges.map((challenge) => (
-                <Card key={challenge.id} className="cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      {challenge.title}
-                      <Award className="w-5 h-5 text-yellow-500" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-gray-600">{challenge.description}</p>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Progression</span>
-                        <span>{challenge.progress}/{challenge.target}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: `${(challenge.progress / challenge.target) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="bg-yellow-50 p-3 rounded-lg">
-                      <div className="text-xs font-medium text-yellow-800 mb-1">Récompense:</div>
-                      <div className="text-sm text-yellow-700">{challenge.reward}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+                {/* Gratitude */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-3 block flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    Trois gratitudes du jour
+                  </label>
+                  <div className="space-y-2">
+                    {currentEntry.gratitude?.map((gratitude, index) => (
+                      <Input
+                        key={index}
+                        placeholder={`Gratitude ${index + 1}...`}
+                        value={gratitude}
+                        onChange={(e) => updateGratitude(index, e.target.value)}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-          {/* Calendar Tab */}
-          <TabsContent value="calendar" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Calendrier des entrées</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => date && setSelectedDate(date)}
-                      className="rounded-md border"
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <div className="lg:col-span-2 space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      Entrées du {selectedDate.toLocaleDateString('fr-FR')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Entrées pour la date sélectionnée */}
-                    <div className="space-y-3">
-                      {entries.filter(entry => {
-                        const entryDate = new Date(entry.date).toDateString();
-                        return entryDate === selectedDate.toDateString();
-                      }).map((entry) => (
-                        <div key={entry.id} className="border-l-4 border-blue-500 pl-4">
-                          <h4 className="font-medium">{entry.title}</h4>
-                          <p className="text-sm text-gray-600 line-clamp-2">{entry.content}</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span>{moodConfig[entry.mood].emoji}</span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(entry.date).toLocaleTimeString('fr-FR', { 
-                                hour: '2-digit', 
-                                minute: '2-digit' 
-                              })}
-                            </span>
+                {/* Objectifs */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-3 block flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-green-500" />
+                    Objectifs et intentions
+                  </label>
+                  <div className="space-y-2">
+                    {currentEntry.goals?.map((goal, index) => (
+                      <Input
+                        key={index}
+                        placeholder={`Objectif ${index + 1}...`}
+                        value={goal}
+                        onChange={(e) => updateGoal(index, e.target.value)}
+                      />
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={addGoal}
+                      className="w-full"
+                    >
+                      + Ajouter un objectif
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={saveEntry}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  disabled={!currentEntry.content?.trim()}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Sauvegarder la réflexion
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Analyse et Historique */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            {/* Insights IA */}
+            <AnimatePresence>
+              {(aiInsights.length > 0 || isAnalyzing) && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                >
+                  <Card className="border-2 border-blue-200 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Brain className="w-5 h-5 text-blue-500" />
+                        Insights IA
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {isAnalyzing ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                            <span className="text-sm text-gray-600">Analyse en cours...</span>
                           </div>
+                          {[1, 2, 3].map(i => (
+                            <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                          ))}
                         </div>
-                      ))}
-                      {entries.filter(entry => {
-                        const entryDate = new Date(entry.date).toDateString();
-                        return entryDate === selectedDate.toDateString();
-                      }).length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>Aucune entrée pour cette date</p>
-                          <Button 
-                            onClick={() => setIsWriting(true)} 
-                            className="mt-4"
-                            size="sm"
-                          >
-                            Créer une entrée
-                          </Button>
+                      ) : (
+                        <div className="space-y-3">
+                          {aiInsights.map((insight, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.2 }}
+                              className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg"
+                            >
+                              <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                              <p className="text-sm text-gray-700">{insight}</p>
+                            </motion.div>
+                          ))}
                         </div>
                       )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Historique */}
+            <Card className="border-2 border-green-200 shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-green-500" />
+                  Historique des réflexions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {entries.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Vos réflexions apparaîtront ici</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {entries.map((entry, index) => {
+                      const moodData = moodIcons[entry.mood as keyof typeof moodIcons];
+                      const MoodEntryIcon = moodData.icon;
+                      
+                      return (
+                        <motion.div
+                          key={entry.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-medium text-gray-800">{entry.title}</h3>
+                            <div className={`p-1 rounded ${moodData.bg}`}>
+                              <MoodEntryIcon className={`w-4 h-4 ${moodData.color}`} />
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {entry.content}
+                          </p>
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span>{entry.timestamp.toLocaleDateString()}</span>
+                            <div className="flex gap-1">
+                              {entry.emotions.slice(0, 2).map(emotion => (
+                                <Badge key={emotion} variant="outline" className="text-xs">
+                                  {emotion}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          {entry.aiInsights.length > 0 && (
+                            <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                              <div className="flex items-center gap-1 mb-1">
+                                <Brain className="w-3 h-3 text-blue-500" />
+                                <span className="font-medium">Insight IA:</span>
+                              </div>
+                              <p className="text-gray-600">{entry.aiInsights[0]}</p>
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default B2CJournalPage;
+}

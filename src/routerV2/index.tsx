@@ -10,6 +10,7 @@ import { ROUTE_ALIASES, findRedirectFor } from './aliases';
 import { RouteGuard } from './guards';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import EnhancedShell from '@/components/layout/EnhancedShell';
+import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 
 // RouterV2 est maintenant activé par défaut - plus de feature flag
 const FF_ROUTER_V2 = true;
@@ -86,6 +87,7 @@ const B2CEmotionScanPage = lazy(() => import('@/pages/B2CEmotionScanPage'));
 const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
 const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
 const B2CCommunityPage = lazy(() => import('@/pages/B2CCommunityPage'));
+const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
@@ -167,6 +169,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CVoiceJournalPage,
   B2CEmotionsPage,
   B2CCommunityPage,
+  NavigationPage,
   PrivacyPage,
   
   // System
@@ -203,6 +206,7 @@ const LayoutWrapper: React.FC<{
   return (
     <EnhancedShell>
       {children}
+      <FloatingActionMenu />
     </EnhancedShell>
   );
 };

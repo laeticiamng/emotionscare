@@ -134,6 +134,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/b2b/admin/dashboard'],
   },
 
+  {
+    name: 'navigation',
+    path: '/navigation',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'NavigationPage',
+    guard: true,
+    aliases: ['/modules', '/all-modules'],
+  },
+
   // ═══════════════════════════════════════════════════════════
   // MODULES FONCTIONNELS (CONSUMER)
   // ═══════════════════════════════════════════════════════════
