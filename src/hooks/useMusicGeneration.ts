@@ -31,13 +31,12 @@ export const useMusicGeneration = () => {
     try {
       console.log('🎵 Génération de musique EmotionsCare:', { emotion, customPrompt, mood, intensity });
       
-      const { data, error: functionError } = await supabase.functions.invoke('emotionscare-music-generator', {
+      const { data, error: functionError } = await supabase.functions.invoke('suno-music-generation', {
         body: {
           emotion: emotion,
           mood: mood,
           intensity: intensity,
           style: customPrompt || undefined,
-          rang: "A",
           lyrics: undefined // Instrumental par défaut pour EmotionsCare
         }
       });

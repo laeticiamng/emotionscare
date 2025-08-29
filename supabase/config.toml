@@ -44,7 +44,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.suno-music-generation]
-verify_jwt = false  
+verify_jwt = false
 
 [functions.emotion-analysis]
 verify_jwt = false

@@ -5,7 +5,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import openaiService from './openai';
-import musicGenService from './musicgen';  
 import humeAIService from './humeai';
 
 export interface ApiStatus {
@@ -68,8 +67,8 @@ class ApiMonitoringService {
       testFn: () => this.testHumeAIConnection(),
     },
     {
-      name: 'MusicGen Service',
-      testFn: () => this.testMusicGenConnection(),
+      name: 'SUNO API Service',
+      testFn: () => this.testSunoConnection(),
     }
   ];
 
@@ -224,17 +223,17 @@ class ApiMonitoringService {
   }
 
   /**
-   * Teste la fonction de génération musicale
+   * Teste la fonction de génération musicale SUNO
    */
   private async testMusicGenerationFunction(): Promise<{ success: boolean; responseTime: number; details?: any; error?: string }> {
     const startTime = performance.now();
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate-music', {
+      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
         body: { 
-          prompt: 'test connection',
-          duration: 5,
-          emotion: 'calm'
+          emotion: 'calm',
+          mood: 'peaceful',
+          intensity: 0.5
         }
       });
       
@@ -247,14 +246,14 @@ class ApiMonitoringService {
       return { 
         success: true, 
         responseTime,
-        details: { testResult: 'Music generation working' }
+        details: { testResult: 'SUNO music generation working' }
       };
     } catch (error) {
       const responseTime = performance.now() - startTime;
       return { 
         success: false, 
         responseTime, 
-        error: error instanceof Error ? error.message : 'Music generation failed' 
+        error: error instanceof Error ? error.message : 'SUNO music generation failed' 
       };
     }
   }
@@ -346,26 +345,35 @@ class ApiMonitoringService {
   }
 
   /**
-   * Teste MusicGen
+   * Teste SUNO API
    */
-  private async testMusicGenConnection(): Promise<{ success: boolean; responseTime: number; details?: any; error?: string }> {
+  private async testSunoConnection(): Promise<{ success: boolean; responseTime: number; details?: any; error?: string }> {
     const startTime = performance.now();
     
     try {
-      const isConnected = await musicGenService.checkApiConnection();
+      // Test direct de l'API SUNO via notre edge function
+      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+        body: { 
+          emotion: 'test',
+          mood: 'test', 
+          intensity: 0.5 
+        }
+      });
+      
       const responseTime = performance.now() - startTime;
       
       return { 
-        success: isConnected, 
+        success: !error, 
         responseTime,
-        details: { service: 'MusicGen API' }
+        details: { service: 'SUNO API via Edge Function' },
+        error: error?.message
       };
     } catch (error) {
       const responseTime = performance.now() - startTime;
       return { 
         success: false, 
         responseTime, 
-        error: error instanceof Error ? error.message : 'MusicGen connection failed' 
+        error: error instanceof Error ? error.message : 'SUNO API connection failed' 
       };
     }
   }
