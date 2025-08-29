@@ -1,429 +1,414 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Brain, Heart, Activity, Zap, Eye, Mic, Camera, 
-  TrendingUp, BarChart3, Sparkles, Star, Target,
-  PlayCircle, Music, Headphones, Waves, Circle,
-  Timer, Award, Trophy, Gamepad2, Compass
+  Heart, Brain, Smile, Frown, Meh, Angry, Surprised, Disgusted,
+  TrendingUp, Calendar, Clock, Zap, Star, Award, Target, Activity,
+  BarChart3, Sparkles, Timer, Trophy, Eye, Camera, Mic
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import PremiumBackground from '@/components/premium/PremiumBackground';
+import ImmersiveExperience from '@/components/premium/ImmersiveExperience';
+import EnhancedCard from '@/components/premium/EnhancedCard';
+import AnimatedButton from '@/components/premium/AnimatedButton';
+import GamificationSystem from '@/components/premium/GamificationSystem';
+import SmartRecommendations from '@/components/premium/SmartRecommendations';
+import { cn } from '@/lib/utils';
 
-interface EmotionMetric {
+interface Emotion {
+  id: string;
   name: string;
-  value: number;
-  trend: 'up' | 'down' | 'stable';
   icon: React.ReactNode;
   color: string;
+  intensity: number;
+  timestamp: Date;
+  context?: string;
 }
 
-interface BiometricData {
-  heartRate: number;
-  hrv: number;
-  stress: number;
-  energy: number;
-  focus: number;
-  coherence: number;
-}
-
-interface EmotionModule {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  status: 'available' | 'active' | 'completed';
-  progress: number;
-  xp: number;
-  category: string;
-  estimatedTime: number;
+interface EmotionStats {
+  dominant: string;
+  balance: number;
+  weeklyTrend: number;
+  dailyAverage: number;
 }
 
 const B2CEmotionsPage: React.FC = () => {
-  const { toast } = useToast();
-  const [selectedMode, setSelectedMode] = useState<'dashboard' | 'scan' | 'training'>('dashboard');
-  const [biometrics, setBiometrics] = useState<BiometricData>({
-    heartRate: 72,
-    hrv: 45,
-    stress: 25,
-    energy: 78,
-    focus: 82,
-    coherence: 89
+  const [currentEmotion, setCurrentEmotion] = useState<string>('');
+  const [emotionHistory, setEmotionHistory] = useState<Emotion[]>([]);
+  const [emotionStats, setEmotionStats] = useState<EmotionStats>({
+    dominant: 'Joy',
+    balance: 75,
+    weeklyTrend: 12,
+    dailyAverage: 6.8
   });
-  const [emotionMetrics] = useState<EmotionMetric[]>([
-    { name: 'Joie', value: 82, trend: 'up', icon: <Heart className="w-4 h-4" />, color: 'bg-green-500' },
-    { name: 'Sérénité', value: 75, trend: 'stable', icon: <Circle className="w-4 h-4" />, color: 'bg-blue-500' },
-    { name: 'Énergie', value: 68, trend: 'up', icon: <Zap className="w-4 h-4" />, color: 'bg-yellow-500' },
-    { name: 'Concentration', value: 85, trend: 'up', icon: <Target className="w-4 h-4" />, color: 'bg-purple-500' }
-  ]);
-  
-  const [modules] = useState<EmotionModule[]>([
-    {
-      id: 'scan-multimodal',
-      title: 'Scan Émotionnel 360°',
-      description: 'Analyse complète: facial, vocal, physiologique',
-      icon: <Brain className="w-6 h-6" />,
-      status: 'available',
-      progress: 0,
-      xp: 150,
-      category: 'Analyse',
-      estimatedTime: 5
-    },
-    {
-      id: 'voice-emotion',
-      title: 'Analyse Vocale Avancée',
-      description: 'IA d\'analyse prosodique et émotionnelle',
-      icon: <Mic className="w-6 h-6" />,
-      status: 'available',
-      progress: 0,
-      xp: 100,
-      category: 'Vocal',
-      estimatedTime: 3
-    },
-    {
-      id: 'facial-recognition',
-      title: 'Reconnaissance Faciale',
-      description: 'Détection micro-expressions et émotions',
-      icon: <Camera className="w-6 h-6" />,
-      status: 'available',
-      progress: 0,
-      xp: 120,
-      category: 'Visuel',
-      estimatedTime: 4
-    },
-    {
-      id: 'biometric-flow',
-      title: 'Flow Biométrique',
-      description: 'Cohérence cardiaque et état de flow',
-      icon: <Activity className="w-6 h-6" />,
-      status: 'available',
-      progress: 0,
-      xp: 200,
-      category: 'Physiologique',
-      estimatedTime: 10
-    },
-    {
-      id: 'emotion-training',
-      title: 'Entraînement Émotionnel',
-      description: 'Développement de l\'intelligence émotionnelle',
-      icon: <Trophy className="w-6 h-6" />,
-      status: 'available',
-      progress: 35,
-      xp: 250,
-      category: 'Formation',
-      estimatedTime: 15
-    },
-    {
-      id: 'music-therapy',
-      title: 'Thérapie Musicale Adaptative',
-      description: 'Musique générée selon votre état émotionnel',
-      icon: <Music className="w-6 h-6" />,
-      status: 'available',
-      progress: 0,
-      xp: 180,
-      category: 'Thérapie',
-      estimatedTime: 20
-    }
-  ]);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
 
-  // Simulation de données biométriques en temps réel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBiometrics(prev => ({
-        heartRate: prev.heartRate + (Math.random() - 0.5) * 4,
-        hrv: Math.max(20, Math.min(80, prev.hrv + (Math.random() - 0.5) * 6)),
-        stress: Math.max(0, Math.min(100, prev.stress + (Math.random() - 0.5) * 8)),
-        energy: Math.max(0, Math.min(100, prev.energy + (Math.random() - 0.5) * 3)),
-        focus: Math.max(0, Math.min(100, prev.focus + (Math.random() - 0.5) * 5)),
-        coherence: Math.max(0, Math.min(100, prev.coherence + (Math.random() - 0.5) * 4))
-      }));
-    }, 2000);
+  const emotions = [
+    { id: 'joy', name: 'Joie', icon: <Smile className="w-6 h-6" />, color: 'bg-yellow-500', textColor: 'text-yellow-600' },
+    { id: 'sadness', name: 'Tristesse', icon: <Frown className="w-6 h-6" />, color: 'bg-blue-500', textColor: 'text-blue-600' },
+    { id: 'anger', name: 'Colère', icon: <Angry className="w-6 h-6" />, color: 'bg-red-500', textColor: 'text-red-600' },
+    { id: 'fear', name: 'Peur', icon: <Surprised className="w-6 h-6" />, color: 'bg-purple-500', textColor: 'text-purple-600' },
+    { id: 'disgust', name: 'Dégoût', icon: <Disgusted className="w-6 h-6" />, color: 'bg-green-500', textColor: 'text-green-600' },
+    { id: 'neutral', name: 'Neutre', icon: <Meh className="w-6 h-6" />, color: 'bg-gray-500', textColor: 'text-gray-600' }
+  ];
 
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleModuleStart = (moduleId: string) => {
-    const module = modules.find(m => m.id === moduleId);
-    if (module) {
-      toast({
-        title: `${module.title} démarré`,
-        description: `Durée estimée: ${module.estimatedTime} minutes`,
-      });
+  const handleEmotionSelect = (emotionId: string) => {
+    setCurrentEmotion(emotionId);
+    const emotion = emotions.find(e => e.id === emotionId);
+    if (emotion) {
+      const newEmotion: Emotion = {
+        id: emotionId,
+        name: emotion.name,
+        icon: emotion.icon,
+        color: emotion.color,
+        intensity: Math.random() * 100,
+        timestamp: new Date(),
+        context: 'Manuel'
+      };
+      setEmotionHistory(prev => [newEmotion, ...prev.slice(0, 9)]);
     }
   };
 
-  const renderDashboard = () => (
-    <div className="space-y-8">
-      {/* Métriques émotionnelles en temps réel */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {emotionMetrics.map((metric, index) => (
-          <motion.div
-            key={metric.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className="relative overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className={`p-2 rounded-lg ${metric.color} bg-opacity-20`}>
-                    {metric.icon}
-                  </div>
-                  <Badge variant={metric.trend === 'up' ? 'default' : 'secondary'}>
-                    {metric.trend === 'up' ? '↗' : metric.trend === 'down' ? '↘' : '→'}
-                  </Badge>
-                </div>
-                <h3 className="font-semibold text-sm">{metric.name}</h3>
-                <div className="flex items-center mt-2">
-                  <span className="text-2xl font-bold">{metric.value}%</span>
-                </div>
-                <Progress value={metric.value} className="mt-2 h-1" />
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+  const startAIAnalysis = () => {
+    setIsScanning(true);
+    setTimeout(() => {
+      setIsScanning(false);
+      setShowAnalysis(true);
+      setEmotionStats(prev => ({
+        ...prev,
+        balance: Math.random() * 100,
+        weeklyTrend: (Math.random() - 0.5) * 40,
+        dailyAverage: 3 + Math.random() * 5
+      }));
+    }, 3000);
+  };
 
-      {/* Données biométriques */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Activity className="w-5 h-5 mr-2" />
-            État Biométrique Temps Réel
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Fréquence Cardiaque</span>
-                <span className="text-lg font-bold text-red-500">{Math.round(biometrics.heartRate)} BPM</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <motion.div
-                  className="bg-red-500 h-2 rounded-full"
-                  style={{ width: `${(biometrics.heartRate / 120) * 100}%` }}
-                  animate={{ width: `${(biometrics.heartRate / 120) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Variabilité Cardiaque</span>
-                <span className="text-lg font-bold text-green-500">{Math.round(biometrics.hrv)}</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <motion.div
-                  className="bg-green-500 h-2 rounded-full"
-                  style={{ width: `${biometrics.hrv}%` }}
-                  animate={{ width: `${biometrics.hrv}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Niveau de Stress</span>
-                <span className="text-lg font-bold text-orange-500">{Math.round(biometrics.stress)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <motion.div
-                  className="bg-orange-500 h-2 rounded-full"
-                  style={{ width: `${biometrics.stress}%` }}
-                  animate={{ width: `${biometrics.stress}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Énergie</span>
-                <span className="text-lg font-bold text-yellow-500">{Math.round(biometrics.energy)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <motion.div
-                  className="bg-yellow-500 h-2 rounded-full"
-                  style={{ width: `${biometrics.energy}%` }}
-                  animate={{ width: `${biometrics.energy}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Focus</span>
-                <span className="text-lg font-bold text-purple-500">{Math.round(biometrics.focus)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <motion.div
-                  className="bg-purple-500 h-2 rounded-full"
-                  style={{ width: `${biometrics.focus}%` }}
-                  animate={{ width: `${biometrics.focus}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Cohérence</span>
-                <span className="text-lg font-bold text-blue-500">{Math.round(biometrics.coherence)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <motion.div
-                  className="bg-blue-500 h-2 rounded-full"
-                  style={{ width: `${biometrics.coherence}%` }}
-                  animate={{ width: `${biometrics.coherence}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Modules d'analyse émotionnelle */}
-      <div>
-        <h2 className="text-2xl font-bold mb-6 flex items-center">
-          <Sparkles className="w-6 h-6 mr-2" />
-          Modules d'Analyse Émotionnelle
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((module, index) => (
-            <motion.div
-              key={module.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                        {module.icon}
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{module.title}</CardTitle>
-                        <Badge variant="outline">{module.category}</Badge>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center text-sm text-yellow-600">
-                        <Star className="w-4 h-4 mr-1" />
-                        {module.xp} XP
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Timer className="w-4 h-4 mr-1" />
-                        {module.estimatedTime}min
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">{module.description}</p>
-                  
-                  {module.progress > 0 && (
-                    <div className="mb-4">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Progression</span>
-                        <span>{module.progress}%</span>
-                      </div>
-                      <Progress value={module.progress} />
-                    </div>
-                  )}
-
-                  <Button 
-                    className="w-full" 
-                    variant={module.status === 'active' ? 'default' : 'outline'}
-                    onClick={() => handleModuleStart(module.id)}
-                  >
-                    <PlayCircle className="w-4 h-4 mr-2" />
-                    {module.status === 'active' ? 'Continuer' : 'Commencer'}
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  const quickActions = [
+    {
+      title: "Scan Émotionnel IA",
+      description: "Analyse faciale en temps réel",
+      icon: <Camera className="w-5 h-5" />,
+      action: startAIAnalysis,
+      color: "bg-blue-500"
+    },
+    {
+      title: "Journal Vocal",
+      description: "Analysez vos émotions par la voix",
+      icon: <Mic className="w-5 h-5" />,
+      action: () => window.open('/app/voice-journal', '_blank'),
+      color: "bg-purple-500"
+    },
+    {
+      title: "Exercice de Régulation",
+      description: "Techniques de gestion émotionnelle",
+      icon: <Heart className="w-5 h-5" />,
+      action: () => window.open('/app/breath', '_blank'),
+      color: "bg-pink-500"
+    },
+    {
+      title: "Suivi Détaillé",
+      description: "Voir l'analyse complète",
+      icon: <BarChart3 className="w-5 h-5" />,
+      action: () => setShowAnalysis(!showAnalysis),
+      color: "bg-green-500"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-            Centre d'Analyse Émotionnelle
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Explorez et développez votre intelligence émotionnelle avec des outils d'analyse avancés et de l'IA
-          </p>
-        </motion.div>
+    <div className="min-h-screen relative" data-testid="page-root">
+      <PremiumBackground />
+      
+      <div className="relative z-10 p-6 max-w-7xl mx-auto">
+        <ImmersiveExperience
+          title="Centre Émotionnel IA"
+          subtitle="Explorez et comprenez vos émotions avec l'intelligence artificielle avancée"
+          variant="emotions"
+        />
 
-        {/* Mode Selector */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-1 shadow-lg">
-            {[
-              { key: 'dashboard', label: 'Tableau de Bord', icon: <BarChart3 className="w-4 h-4" /> },
-              { key: 'scan', label: 'Scan Rapide', icon: <Eye className="w-4 h-4" /> },
-              { key: 'training', label: 'Entraînement', icon: <Gamepad2 className="w-4 h-4" /> }
-            ].map((mode) => (
-              <button
-                key={mode.key}
-                onClick={() => setSelectedMode(mode.key as any)}
-                className={`px-6 py-3 rounded-md flex items-center space-x-2 transition-all ${
-                  selectedMode === mode.key
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {mode.icon}
-                <span>{mode.label}</span>
-              </button>
-            ))}
+        <div className="grid gap-8 mt-8">
+          {/* Interface de sélection d'émotion */}
+          <EnhancedCard title="Comment vous sentez-vous maintenant ?" icon={Heart}>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+              {emotions.map(emotion => (
+                <motion.div
+                  key={emotion.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={cn(
+                    "p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover-scale",
+                    currentEmotion === emotion.id
+                      ? `${emotion.color} text-white border-white shadow-lg shadow-${emotion.color.split('-')[1]}-500/25`
+                      : "bg-card hover:bg-accent border-border hover:border-primary/30"
+                  )}
+                  onClick={() => handleEmotionSelect(emotion.id)}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <motion.div
+                      animate={currentEmotion === emotion.id ? { rotate: [0, 10, -10, 0] } : {}}
+                      transition={{ duration: 0.5 }}
+                    >
+                      {emotion.icon}
+                    </motion.div>
+                    <span className="text-sm font-medium">{emotion.name}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Scan IA en cours */}
+            <AnimatePresence>
+              {isScanning && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-200"
+                >
+                  <div className="flex items-center justify-center mb-4">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
+                    />
+                    <Brain className="w-8 h-8 text-blue-500 ml-4" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-semibold text-blue-700 mb-2">Analyse IA en cours...</h3>
+                    <p className="text-sm text-blue-600">L'IA analyse vos expressions et patterns émotionnels</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Actions rapides */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {quickActions.map((action, index) => (
+                <motion.div
+                  key={action.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <AnimatedButton
+                    onClick={action.action}
+                    variant="outline"
+                    className="w-full h-auto p-4 flex flex-col items-center gap-2 hover-scale"
+                    disabled={isScanning && index === 0}
+                  >
+                    <div className={cn("p-2 rounded-full text-white", action.color)}>
+                      {action.icon}
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium text-sm">{action.title}</div>
+                      <div className="text-xs text-muted-foreground">{action.description}</div>
+                    </div>
+                  </AnimatedButton>
+                </motion.div>
+              ))}
+            </div>
+          </EnhancedCard>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Statistiques émotionnelles */}
+            <EnhancedCard title="Équilibre Émotionnel" icon={Brain} className="lg:col-span-2">
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <motion.div 
+                    className="text-center p-4 rounded-lg bg-primary/5"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="text-2xl font-bold text-primary">{emotionStats.balance}%</div>
+                    <div className="text-sm text-muted-foreground">Équilibre</div>
+                  </motion.div>
+                  <motion.div 
+                    className="text-center p-4 rounded-lg bg-green-50"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="text-2xl font-bold text-green-600">+{emotionStats.weeklyTrend}%</div>
+                    <div className="text-sm text-muted-foreground">Cette semaine</div>
+                  </motion.div>
+                  <motion.div 
+                    className="text-center p-4 rounded-lg bg-blue-50"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="text-2xl font-bold text-blue-600">{emotionStats.dailyAverage}</div>
+                    <div className="text-sm text-muted-foreground">Moy. quotidienne</div>
+                  </motion.div>
+                  <motion.div 
+                    className="text-center p-4 rounded-lg bg-purple-50"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="text-2xl font-bold text-purple-600">{emotionStats.dominant}</div>
+                    <div className="text-sm text-muted-foreground">Dominante</div>
+                  </motion.div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Progression hebdomadaire</span>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 animate-pulse">
+                      <TrendingUp className="w-3 h-3 mr-1" />
+                      Amélioration
+                    </Badge>
+                  </div>
+                  <Progress value={emotionStats.balance} className="h-3" />
+                </div>
+              </div>
+            </EnhancedCard>
+
+            {/* Gamification */}
+            <div className="space-y-6">
+              <GamificationSystem 
+                currentXP={1250}
+                level={8}
+                nextLevelXP={1500}
+                achievements={[
+                  { name: "Explorateur Émotionnel", description: "100 scans réalisés", icon: "🔍" },
+                  { name: "Maître Zen", description: "30 jours consécutifs", icon: "🧘" }
+                ]}
+                compact
+              />
+
+              <SmartRecommendations 
+                recommendations={[
+                  {
+                    title: "Méditation Guidée",
+                    description: "Basée sur votre profil émotionnel",
+                    confidence: 92,
+                    action: () => window.open('/app/coach', '_blank')
+                  },
+                  {
+                    title: "Exercice de Respiration",
+                    description: "Pour réguler votre stress",
+                    confidence: 87,
+                    action: () => window.open('/app/breath', '_blank')
+                  }
+                ]}
+                compact
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedMode}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {selectedMode === 'dashboard' && renderDashboard()}
-            {selectedMode === 'scan' && (
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold mb-4">Scan Rapide Émotionnel</h2>
-                <p className="text-muted-foreground mb-8">Fonctionnalité en cours de développement</p>
-                <Button size="lg">
-                  <Eye className="w-5 h-5 mr-2" />
-                  Lancer le Scan
-                </Button>
-              </div>
+          {/* Historique récent */}
+          <EnhancedCard title="Historique Récent" icon={Clock}>
+            <AnimatePresence>
+              {emotionHistory.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {emotionHistory.map((emotion, index) => (
+                    <motion.div
+                      key={`${emotion.id}-${emotion.timestamp.getTime()}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="p-3 rounded-lg bg-accent/30 border border-border hover-scale"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <motion.div
+                          animate={{ rotate: [0, 5, -5, 0] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >
+                          {emotion.icon}
+                        </motion.div>
+                        <span className="font-medium text-sm">{emotion.name}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {emotion.timestamp.toLocaleTimeString()}
+                      </div>
+                      <div className="mt-2">
+                        <Progress value={emotion.intensity} className="h-1" />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-8 text-muted-foreground"
+                >
+                  <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Commencez à enregistrer vos émotions pour voir l'historique</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </EnhancedCard>
+
+          {/* Analyse IA détaillée */}
+          <AnimatePresence>
+            {showAnalysis && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="animate-fade-in"
+              >
+                <EnhancedCard title="Analyse IA Personnalisée" icon={Zap} className="border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        Insights Personnalisés
+                      </h4>
+                      <ul className="space-y-2 text-sm">
+                        <motion.li 
+                          initial={{ x: -20, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.1 }}
+                          className="flex items-start gap-2"
+                        >
+                          <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+                          <span>Votre équilibre émotionnel s'améliore de <strong>12%</strong> cette semaine</span>
+                        </motion.li>
+                        <motion.li 
+                          initial={{ x: -20, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                          className="flex items-start gap-2"
+                        >
+                          <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                          <span>Les moments de <strong>joie</strong> sont plus fréquents l'après-midi</span>
+                        </motion.li>
+                        <motion.li 
+                          initial={{ x: -20, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                          className="flex items-start gap-2"
+                        >
+                          <div className="w-2 h-2 rounded-full bg-purple-500 mt-2"></div>
+                          <span>Nous recommandons des exercices de <strong>respiration</strong> le matin</span>
+                        </motion.li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold mb-3 flex items-center gap-2">
+                        <Award className="w-4 h-4 text-purple-500" />
+                        Actions Recommandées
+                      </h4>
+                      <div className="space-y-2">
+                        {['Méditation matinale', 'Journaling émotionnel', 'Exercices de gratitude', 'Respiration guidée'].map((rec, i) => (
+                          <motion.div
+                            key={rec}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: i * 0.1 }}
+                          >
+                            <Badge variant="outline" className="mr-2 mb-2 hover-scale cursor-pointer">{rec}</Badge>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </EnhancedCard>
+              </motion.div>
             )}
-            {selectedMode === 'training' && (
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold mb-4">Entraînement Émotionnel</h2>
-                <p className="text-muted-foreground mb-8">Développez vos compétences émotionnelles</p>
-                <Button size="lg">
-                  <Trophy className="w-5 h-5 mr-2" />
-                  Commencer l'Entraînement
-                </Button>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
