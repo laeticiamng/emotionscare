@@ -21,42 +21,42 @@ const B2CDashboardPage: React.FC = () => {
     { 
       title: "Scan Émotionnel", 
       icon: Scan, 
-      path: "/b2c/scan", 
+      path: "/app/scan", 
       description: "Analysez votre état émotionnel actuel",
       color: "bg-blue-500" 
     },
     { 
       title: "Journal Personnel", 
       icon: BookOpen, 
-      path: "/b2c/journal", 
+      path: "/app/journal", 
       description: "Notez vos pensées et émotions",
       color: "bg-green-500" 
     },
     { 
       title: "Musicothérapie", 
       icon: Music, 
-      path: "/b2c/music", 
+      path: "/app/music", 
       description: "Musique adaptée à votre humeur",
       color: "bg-purple-500" 
     },
     { 
       title: "Coach IA", 
       icon: MessageCircle, 
-      path: "/b2c/coach", 
+      path: "/app/coach", 
       description: "Conversations avec votre coach virtuel",
       color: "bg-orange-500" 
     },
     { 
-      title: "Expérience VR", 
+      title: "Expérience VR",
       icon: Globe, 
-      path: "/b2c/vr", 
+      path: "/app/vr", 
       description: "Immersion dans des environnements apaisants",
       color: "bg-cyan-500" 
     },
     { 
       title: "Cocon Social", 
       icon: Users, 
-      path: "/b2c/social-cocon", 
+      path: "/app/social", 
       description: "Connectez avec la communauté",
       color: "bg-pink-500" 
     },
@@ -76,11 +76,11 @@ const B2CDashboardPage: React.FC = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={() => navigate('/b2c/preferences')} variant="outline">
+            <Button onClick={() => navigate('/settings/general')} variant="outline">
               <Settings className="w-4 h-4 mr-2" />
               Préférences
             </Button>
-            <Button onClick={() => navigate('/b2c/scan')} className="bg-gradient-to-r from-blue-500 to-purple-500">
+            <Button onClick={() => navigate('/app/scan')} className="bg-gradient-to-r from-blue-500 to-purple-500">
               <Heart className="w-4 h-4 mr-2" />
               Scan Rapide
             </Button>
@@ -202,7 +202,7 @@ const B2CDashboardPage: React.FC = () => {
                   <div className="text-sm text-gray-600">Jours de suite</div>
                 </div>
               </div>
-              <Button onClick={() => navigate('/b2c/gamification')} variant="outline">
+              <Button onClick={() => navigate('/app/leaderboard')} variant="outline">
                 Voir tout
               </Button>
             </div>
