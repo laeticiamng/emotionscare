@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,8 @@ import {
   Server,
   Eye,
   Zap,
-  BarChart3
+  BarChart3,
+  Building
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -32,101 +32,154 @@ interface AuditItem {
   priority: 'low' | 'medium' | 'high' | 'critical';
   lastChecked: Date;
   recommendation?: string;
+  businessImpact?: string;
 }
 
-const AuditPage: React.FC = () => {
+const B2BAuditPage: React.FC = () => {
   const [auditResults, setAuditResults] = useState<AuditItem[]>([]);
   const [isRunningAudit, setIsRunningAudit] = useState(false);
   const [auditProgress, setAuditProgress] = useState(0);
 
   const auditCategories = [
-    { name: 'Sécurité', icon: Shield, color: 'text-red-600' },
+    { name: 'Sécurité Entreprise', icon: Shield, color: 'text-red-600' },
+    { name: 'Conformité RGPD', icon: FileText, color: 'text-blue-600' },
     { name: 'Performance', icon: Zap, color: 'text-yellow-600' },
-    { name: 'Données', icon: Database, color: 'text-blue-600' },
     { name: 'Infrastructure', icon: Server, color: 'text-green-600' },
-    { name: 'Conformité', icon: FileText, color: 'text-purple-600' }
+    { name: 'Gouvernance', icon: Building, color: 'text-purple-600' }
   ];
 
-  const mockAuditResults: AuditItem[] = [
+  const enterpriseAuditResults: AuditItem[] = [
     {
       id: '1',
-      category: 'Sécurité',
-      title: 'Certificats SSL',
-      description: 'Vérification de la validité des certificats SSL',
+      category: 'Sécurité Entreprise',
+      title: 'Authentification SSO',
+      description: 'Vérification de l\'intégration SSO avec Active Directory',
       status: 'pass',
       priority: 'high',
       lastChecked: new Date(),
-      recommendation: 'Certificats valides jusqu\'en 2025'
+      recommendation: 'SSO fonctionnel, aucune action requise',
+      businessImpact: 'Sécurité optimale pour 500+ utilisateurs'
     },
     {
       id: '2',
-      category: 'Sécurité',
-      title: 'Authentification forte',
-      description: 'Vérification de l\'implémentation de l\'authentification à deux facteurs',
+      category: 'Conformité RGPD',
+      title: 'Consentement utilisateur',
+      description: 'Vérification des mécanismes de consentement et retrait',
       status: 'warning',
-      priority: 'medium',
+      priority: 'high',
       lastChecked: new Date(),
-      recommendation: 'Encourager l\'adoption de l\'A2F pour tous les utilisateurs'
+      recommendation: 'Améliorer la granularité des consentements',
+      businessImpact: 'Risque réglementaire de €4M d\'amende'
     },
     {
       id: '3',
       category: 'Performance',
-      title: 'Temps de réponse API',
-      description: 'Mesure des temps de réponse des endpoints critiques',
+      title: 'Temps de réponse Enterprise',
+      description: 'Mesure des performances sous charge enterprise (1000+ utilisateurs)',
       status: 'pass',
       priority: 'medium',
       lastChecked: new Date(),
-      recommendation: 'Performances optimales maintenues'
+      recommendation: 'Performances optimales maintenues',
+      businessImpact: 'Productivité équipes préservée'
     },
     {
       id: '4',
-      category: 'Données',
-      title: 'Sauvegarde automatique',
-      description: 'Vérification de l\'intégrité des sauvegardes',
-      status: 'fail',
+      category: 'Infrastructure',
+      title: 'Haute Disponibilité',
+      description: 'Vérification des systèmes de failover et redondance',
+      status: 'pass',
       priority: 'critical',
       lastChecked: new Date(),
-      recommendation: 'Corriger immédiatement le processus de sauvegarde'
+      recommendation: 'SLA 99.9% respecté',
+      businessImpact: 'Continuité de service garantie'
     },
     {
       id: '5',
-      category: 'Infrastructure',
-      title: 'Monitoring système',
-      description: 'État des services de surveillance',
+      category: 'Gouvernance',
+      title: 'Traçabilité des actions',
+      description: 'Audit trail de toutes les actions administrateur',
       status: 'pass',
       priority: 'high',
       lastChecked: new Date(),
-      recommendation: 'Surveillance active et fonctionnelle'
+      recommendation: 'Logs complets et conformes SOX',
+      businessImpact: 'Conformité audit externe'
     },
     {
       id: '6',
-      category: 'Conformité',
-      title: 'RGPD',
-      description: 'Conformité aux réglementations de protection des données',
-      status: 'warning',
-      priority: 'high',
+      category: 'Sécurité Entreprise',
+      title: 'Chiffrement données sensibles',
+      description: 'Vérification du chiffrement AES-256 des données RH',
+      status: 'pass',
+      priority: 'critical',
       lastChecked: new Date(),
-      recommendation: 'Mettre à jour les politiques de confidentialité'
+      recommendation: 'Chiffrement end-to-end opérationnel',
+      businessImpact: 'Protection données confidentielles'
+    },
+    {
+      id: '7',
+      category: 'Conformité RGPD',
+      title: 'Droit à l\'effacement',
+      description: 'Processus de suppression des données personnelles',
+      status: 'warning',
+      priority: 'medium',
+      lastChecked: new Date(),
+      recommendation: 'Automatiser le processus de suppression',
+      businessImpact: 'Réduction du risque de non-conformité'
     }
   ];
 
-  const runAudit = async () => {
+  const complianceFrameworks = [
+    {
+      name: 'ISO 27001',
+      status: 'certified',
+      score: 94,
+      expiry: '2024-12-31',
+      controls: 114,
+      passed: 108
+    },
+    {
+      name: 'SOC 2 Type II',
+      status: 'certified', 
+      score: 96,
+      expiry: '2024-10-15',
+      controls: 64,
+      passed: 61
+    },
+    {
+      name: 'RGPD/GDPR',
+      status: 'compliant',
+      score: 88,
+      expiry: 'Permanent',
+      controls: 32,
+      passed: 28
+    },
+    {
+      name: 'SOX (Sarbanes-Oxley)',
+      status: 'compliant',
+      score: 92,
+      expiry: 'Annual',
+      controls: 24,
+      passed: 22
+    }
+  ];
+
+  const runEnterpriseAudit = async () => {
     setIsRunningAudit(true);
     setAuditProgress(0);
     
-    // Simulation du processus d'audit
+    // Simulation d'un audit enterprise plus long et détaillé
     const interval = setInterval(() => {
       setAuditProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsRunningAudit(false);
-          setAuditResults(mockAuditResults);
-          toast.success('Audit terminé avec succès !');
+          setAuditResults(enterpriseAuditResults);
+          toast.success('Audit Enterprise terminé avec succès !');
           return 100;
         }
-        return prev + 12.5;
+        return prev + 8.33; // 12 étapes pour audit complet
       });
-    }, 800);
+    }, 1200);
   };
 
   const getStatusColor = (status: string) => {
@@ -157,8 +210,8 @@ const AuditPage: React.FC = () => {
     }
   };
 
-  const exportReport = () => {
-    toast.success('Rapport d\'audit exporté avec succès !');
+  const exportEnterpriseReport = () => {
+    toast.success('Rapport d\'audit Enterprise exporté avec succès !');
   };
 
   const auditStats = {
@@ -172,7 +225,7 @@ const AuditPage: React.FC = () => {
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <motion.div
@@ -185,11 +238,11 @@ const AuditPage: React.FC = () => {
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Audit de Conformité
+              Audit Enterprise B2B
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Évaluation complète de la sécurité, performance et conformité du système EmotionsCare.
+            Évaluation complète de conformité, sécurité et gouvernance pour environnements Enterprise.
           </p>
         </motion.div>
 
@@ -198,7 +251,7 @@ const AuditPage: React.FC = () => {
           <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mb-8">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-6">
                   <div className="text-center">
                     <p className="text-sm text-gray-600">Dernier audit</p>
                     <p className="font-medium">
@@ -206,26 +259,34 @@ const AuditPage: React.FC = () => {
                     </p>
                   </div>
                   {auditResults.length > 0 && (
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600">Score global</p>
-                      <Badge className={auditStats.score >= 80 ? 'bg-green-100 text-green-800' : 
-                                      auditStats.score >= 60 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}>
-                        {auditStats.score}%
-                      </Badge>
-                    </div>
+                    <>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Score Enterprise</p>
+                        <Badge className={auditStats.score >= 90 ? 'bg-green-100 text-green-800' : 
+                                        auditStats.score >= 75 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}>
+                          {auditStats.score}%
+                        </Badge>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-600">Conformité</p>
+                        <Badge variant="outline">
+                          {Math.round(complianceFrameworks.reduce((acc, fw) => acc + fw.score, 0) / complianceFrameworks.length)}%
+                        </Badge>
+                      </div>
+                    </>
                   )}
                 </div>
                 
                 <div className="flex gap-3">
                   {auditResults.length > 0 && (
-                    <Button variant="outline" onClick={exportReport}>
+                    <Button variant="outline" onClick={exportEnterpriseReport}>
                       <Download className="h-4 w-4 mr-2" />
-                      Exporter le rapport
+                      Exporter Rapport Enterprise
                     </Button>
                   )}
-                  <Button onClick={runAudit} disabled={isRunningAudit} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={runEnterpriseAudit} disabled={isRunningAudit} className="bg-blue-600 hover:bg-blue-700">
                     <BarChart3 className="h-4 w-4 mr-2" />
-                    {isRunningAudit ? 'Audit en cours...' : 'Lancer un audit'}
+                    {isRunningAudit ? 'Audit Enterprise en cours...' : 'Lancer Audit Enterprise'}
                   </Button>
                 </div>
               </div>
@@ -233,10 +294,13 @@ const AuditPage: React.FC = () => {
               {isRunningAudit && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Progression de l'audit</span>
-                    <span className="text-sm font-medium">{auditProgress}%</span>
+                    <span className="text-sm text-gray-600">Progression de l'audit Enterprise</span>
+                    <span className="text-sm font-medium">{Math.round(auditProgress)}%</span>
                   </div>
-                  <Progress value={auditProgress} className="h-2" />
+                  <Progress value={auditProgress} className="h-3" />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Analyse approfondie: sécurité, conformité, performance, gouvernance...
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -250,31 +314,69 @@ const AuditPage: React.FC = () => {
                   <CardContent className="p-6 text-center">
                     <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-green-600">{auditStats.passed}</div>
-                    <p className="text-sm text-gray-600">Réussis</p>
+                    <p className="text-sm text-gray-600">Contrôles Réussis</p>
                   </CardContent>
                 </Card>
                 <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <AlertTriangle className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-yellow-600">{auditStats.warnings}</div>
-                    <p className="text-sm text-gray-600">Avertissements</p>
+                    <p className="text-sm text-gray-600">À Améliorer</p>
                   </CardContent>
                 </Card>
                 <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-red-600">{auditStats.failed}</div>
-                    <p className="text-sm text-gray-600">Échecs</p>
+                    <p className="text-sm text-gray-600">Non Conformes</p>
                   </CardContent>
                 </Card>
                 <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-blue-600">{auditStats.score}%</div>
-                    <p className="text-sm text-gray-600">Score global</p>
+                    <p className="text-sm text-gray-600">Score Global</p>
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Compliance Frameworks */}
+              <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mb-8">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-purple-600" />
+                    Frameworks de Conformité Enterprise
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {complianceFrameworks.map((framework) => (
+                      <div key={framework.name} className="p-4 border rounded-lg bg-gray-50">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">{framework.name}</h4>
+                          <Badge variant={
+                            framework.status === 'certified' ? 'default' : 'secondary'
+                          }>
+                            {framework.status === 'certified' ? 'Certifié' : 'Conforme'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Score:</span>
+                            <span className="font-medium">{framework.score}%</span>
+                          </div>
+                          <Progress value={framework.score} className="h-2" />
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>{framework.passed}/{framework.controls} contrôles</span>
+                            <span>Exp: {framework.expiry}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Audit Results */}
               <Tabs defaultValue="all" className="space-y-6">
@@ -309,9 +411,16 @@ const AuditPage: React.FC = () => {
                                   </div>
                                   <p className="text-gray-600 mb-3">{item.description}</p>
                                   {item.recommendation && (
-                                    <div className="p-3 bg-blue-50 rounded-lg">
+                                    <div className="p-3 bg-blue-50 rounded-lg mb-3">
                                       <p className="text-sm text-blue-800">
                                         <strong>Recommandation:</strong> {item.recommendation}
+                                      </p>
+                                    </div>
+                                  )}
+                                  {item.businessImpact && (
+                                    <div className="p-3 bg-purple-50 rounded-lg">
+                                      <p className="text-sm text-purple-800">
+                                        <strong>Impact Business:</strong> {item.businessImpact}
                                       </p>
                                     </div>
                                   )}
@@ -354,9 +463,16 @@ const AuditPage: React.FC = () => {
                                       </div>
                                       <p className="text-gray-600 mb-3">{item.description}</p>
                                       {item.recommendation && (
-                                        <div className="p-3 bg-blue-50 rounded-lg">
+                                        <div className="p-3 bg-blue-50 rounded-lg mb-3">
                                           <p className="text-sm text-blue-800">
                                             <strong>Recommandation:</strong> {item.recommendation}
+                                          </p>
+                                        </div>
+                                      )}
+                                      {item.businessImpact && (
+                                        <div className="p-3 bg-purple-50 rounded-lg">
+                                          <p className="text-sm text-purple-800">
+                                            <strong>Impact Business:</strong> {item.businessImpact}
                                           </p>
                                         </div>
                                       )}
@@ -379,4 +495,4 @@ const AuditPage: React.FC = () => {
   );
 };
 
-export default AuditPage;
+export default B2BAuditPage;
