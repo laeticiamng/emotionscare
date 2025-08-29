@@ -84,6 +84,8 @@ const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CEmotionScanPage = lazy(() => import('@/pages/B2CEmotionScanPage'));
 const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
+const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
+const B2CCommunityPage = lazy(() => import('@/pages/B2CCommunityPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
@@ -163,6 +165,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CStorySynthLabPage,
   B2CEmotionScanPage,
   B2CVoiceJournalPage,
+  B2CEmotionsPage,
+  B2CCommunityPage,
   PrivacyPage,
   
   // System

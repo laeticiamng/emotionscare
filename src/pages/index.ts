@@ -69,6 +69,8 @@ export { default as ApiMonitoringPage } from './ApiMonitoringPage';
 export { default as B2CEmotionScanPage } from './B2CEmotionScanPage';
 export { default as B2CVoiceJournalPage } from './B2CVoiceJournalPage';
 export { default as B2CSocialCoconPage } from './B2CSocialCoconPage';
+export { default as B2CEmotionsPage } from './B2CEmotionsPage';
+export { default as B2CCommunityPage } from './B2CCommunityPage';
 
 // System & Error pages
 export { default as UnauthorizedPage } from './UnauthorizedPage';
