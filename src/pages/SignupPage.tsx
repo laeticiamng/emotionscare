@@ -9,7 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Routes } from '@/routerV2/helpers';
-import { useAuthFlow } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAuthNavigation } from '@/hooks/useAuthNavigation';
+import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
+import { toast } from '@/hooks/use-toast';
 import { Heart, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 
 const SignupPage: React.FC = () => {
@@ -30,11 +33,42 @@ const SignupPage: React.FC = () => {
     }));
   };
 
-  const { signup, isLoading } = useAuthFlow();
+  const { register, isLoading } = useAuth();
+  const { navigateAfterLogin } = useAuthNavigation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    signup({ ...formData, segment: segment || 'b2c' });
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Erreur",
+        description: "Les mots de passe ne correspondent pas",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await register(formData.email, formData.password);
+      
+      toast({
+        title: "Inscription réussie",
+        description: "Vérifiez votre email pour confirmer votre compte.",
+      });
+      
+      // Redirection automatique après inscription
+      navigateAfterLogin();
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      
+      const { message } = getFriendlyAuthError(error);
+      
+      toast({
+        title: "Erreur d'inscription",
+        description: message,
+        variant: "destructive",
+      });
+    }
   };
 
   const getTitle = () => {
