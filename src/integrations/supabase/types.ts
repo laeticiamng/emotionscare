@@ -6677,6 +6677,51 @@ export type Database = {
           },
         ]
       }
+      voice_journal_entries: {
+        Row: {
+          ai_insights: string | null
+          audio_url: string | null
+          created_at: string
+          duration: number | null
+          emotion: string | null
+          id: string
+          keywords: string[] | null
+          sentiment: number | null
+          title: string
+          transcription: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ai_insights?: string | null
+          audio_url?: string | null
+          created_at?: string
+          duration?: number | null
+          emotion?: string | null
+          id?: string
+          keywords?: string[] | null
+          sentiment?: number | null
+          title: string
+          transcription: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ai_insights?: string | null
+          audio_url?: string | null
+          created_at?: string
+          duration?: number | null
+          emotion?: string | null
+          id?: string
+          keywords?: string[] | null
+          sentiment?: number | null
+          title?: string
+          transcription?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       vr_sessions: {
         Row: {
           category: string | null

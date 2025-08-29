@@ -53,13 +53,13 @@ const B2CDashboardPage: React.FC = () => {
       description: "Immersion dans des environnements apaisants",
       color: "bg-cyan-500" 
     },
-    { 
-      title: "Cocon Social", 
-      icon: Users, 
-      path: "/app/social", 
-      description: "Connectez avec la communauté",
-      color: "bg-pink-500" 
-    },
+            { 
+              title: "Cocon Social", 
+              icon: Users, 
+              path: "/app/social-cocon", 
+              description: "Connectez avec la communauté",
+              color: "bg-pink-500" 
+            },
   ];
 
   return (
