@@ -48,12 +48,12 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
   if (isAuthenticated && (requiredRole || allowedRoles.length > 0)) {
     const currentRole = normalizeRole(user?.role || userMode);
     
-    // Rôle spécifique requis
+    // Rôle spécifique requis (accès exclusif)
     if (requiredRole && currentRole !== requiredRole) {
       return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
     }
     
-    // Liste de rôles autorisés
+    // Liste de rôles autorisés (accès multiple)
     if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
       return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
     }
