@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Play, Pause, RotateCw, Volume2, VolumeOff, Sparkles, Globe, Zap, Heart, Brain, Stars } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCw, Volume2, VolumeX, Sparkles, Globe, Zap, Heart, Brain, Stars } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -405,7 +405,7 @@ const B2CVRGalactiquePage: React.FC = () => {
                         onClick={() => setSoundEnabled(!soundEnabled)}
                         className="text-white hover:bg-white/10 rounded-full"
                       >
-                        {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeOff className="w-4 h-4" />}
+                        {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                       </Button>
                     </div>
                   </div>

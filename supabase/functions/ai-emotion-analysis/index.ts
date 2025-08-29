@@ -1,0 +1,163 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import "https://deno.land/x/xhr@0.1.0/mod.ts"
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+interface EmotionAnalysisRequest {
+  text: string;
+  context?: string;
+  previousEmotions?: Record<string, number>;
+}
+
+interface EmotionAnalysisResponse {
+  emotions: Record<string, number>;
+  dominantEmotion: string;
+  confidence: number;
+  insights: string[];
+  recommendations: string[];
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+
+  try {
+    const { text, context, previousEmotions }: EmotionAnalysisRequest = await req.json()
+    
+    if (!text?.trim()) {
+      throw new Error('Texte requis pour l\'analyse')
+    }
+
+    console.log('🧠 Analyse d\'émotion:', { text: text.substring(0, 50), context })
+
+    // Configuration OpenAI
+    const openAIKey = Deno.env.get('OPENAI_API_KEY')
+    if (!openAIKey) {
+      throw new Error('Clé OpenAI manquante')
+    }
+
+    // Prompt d'analyse émotionnelle avancée
+    const analysisPrompt = `
+Analyse les émotions dans ce texte avec précision et nuance.
+
+Texte à analyser: "${text}"
+${context ? `Contexte: ${context}` : ''}
+${previousEmotions ? `Émotions précédentes: ${JSON.stringify(previousEmotions)}` : ''}
+
+Retourne une analyse JSON avec:
+1. emotions: Scores 0-10 pour joie, tristesse, colère, peur, surprise, dégoût, anticipation, confiance
+2. dominantEmotion: L'émotion principale détectée
+3. confidence: Niveau de confiance de l'analyse (0-1)
+4. insights: 3 observations psychologiques sur l'état émotionnel
+5. recommendations: 3 conseils personnalisés pour améliorer le bien-être
+
+Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
+`
+
+    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'Tu es un expert en analyse émotionnelle et psychologie positive. Réponds uniquement en JSON valide.'
+          },
+          {
+            role: 'user',
+            content: analysisPrompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1000
+      }),
+    })
+
+    if (!openAIResponse.ok) {
+      const error = await openAIResponse.text()
+      console.error('❌ Erreur OpenAI:', error)
+      throw new Error('Échec de l\'analyse OpenAI')
+    }
+
+    const openAIResult = await openAIResponse.json()
+    const analysis = JSON.parse(openAIResult.choices[0].message.content)
+
+    // Validation et enrichissement de l'analyse
+    const emotions = {
+      joie: Math.max(0, Math.min(10, analysis.emotions?.joie || 5)),
+      tristesse: Math.max(0, Math.min(10, analysis.emotions?.tristesse || 3)),
+      colere: Math.max(0, Math.min(10, analysis.emotions?.colere || 2)),
+      peur: Math.max(0, Math.min(10, analysis.emotions?.peur || 3)),
+      surprise: Math.max(0, Math.min(10, analysis.emotions?.surprise || 4)),
+      degout: Math.max(0, Math.min(10, analysis.emotions?.degout || 1)),
+      anticipation: Math.max(0, Math.min(10, analysis.emotions?.anticipation || 6)),
+      confiance: Math.max(0, Math.min(10, analysis.emotions?.confiance || 5))
+    }
+
+    // Trouver l'émotion dominante
+    const dominantEmotion = Object.entries(emotions)
+      .reduce((a, b) => emotions[a[0]] > emotions[b[0]] ? a : b)[0]
+
+    // Calcul de la confiance basé sur la clarté émotionnelle
+    const emotionVariance = Object.values(emotions)
+      .reduce((sum, val, _, arr) => {
+        const mean = arr.reduce((a, b) => a + b, 0) / arr.length
+        return sum + Math.pow(val - mean, 2)
+      }, 0) / Object.values(emotions).length
+
+    const confidence = Math.min(1, Math.max(0.3, emotionVariance / 20))
+
+    // Insights et recommandations par défaut si manquants
+    const insights = analysis.insights?.length > 0 ? analysis.insights : [
+      `L'émotion dominante détectée est ${dominantEmotion}`,
+      `Niveau de complexité émotionnelle: ${Object.values(emotions).filter(v => v > 5).length > 3 ? 'Élevé' : 'Modéré'}`,
+      `Équilibre émotionnel: ${emotions.joie + emotions.confiance > emotions.tristesse + emotions.peur ? 'Positif' : 'Négatif'}`
+    ]
+
+    const recommendations = analysis.recommendations?.length > 0 ? analysis.recommendations : [
+      emotions.joie < 5 ? "Pratiquez la gratitude quotidienne pour cultiver la joie" : "Maintenez votre état positif avec des activités plaisantes",
+      emotions.confiance < 5 ? "Renforcez votre confiance par des petits succès quotidiens" : "Partagez votre confiance en aidant les autres",
+      emotions.tristesse > 7 ? "Accordez-vous du temps pour exprimer et accepter vos émotions" : "Utilisez la méditation pour maintenir votre équilibre émotionnel"
+    ]
+
+    const result: EmotionAnalysisResponse = {
+      emotions,
+      dominantEmotion,
+      confidence: Math.round(confidence * 100) / 100,
+      insights: insights.slice(0, 3),
+      recommendations: recommendations.slice(0, 3)
+    }
+
+    console.log('✅ Analyse terminée:', { dominantEmotion, confidence: result.confidence })
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+
+  } catch (error) {
+    console.error('❌ Erreur analyse émotion:', error)
+    
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      emotions: {
+        joie: 5, tristesse: 3, colere: 2, peur: 3,
+        surprise: 4, degout: 1, anticipation: 6, confiance: 5
+      },
+      dominantEmotion: 'neutral',
+      confidence: 0.5,
+      insights: ['Analyse indisponible temporairement'],
+      recommendations: ['Réessayez dans quelques instants']
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+})
