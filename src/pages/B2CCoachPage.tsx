@@ -4,15 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Send, Mic, MicOff, Bot, User, Heart, 
-         Brain, Target, Lightbulb, BookOpen, Clock, MoreVertical } from 'lucide-react';
+         Brain, Target, Lightbulb, BookOpen, Clock, MoreVertical, 
+         TrendingUp, Zap, Users, Calendar, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'coach';
   timestamp: Date;
-  type?: 'text' | 'suggestion' | 'exercise';
+  type?: 'text' | 'suggestion' | 'exercise' | 'goal';
 }
 
 interface CoachSession {
@@ -22,6 +26,23 @@ interface CoachSession {
   duration: string;
   topic: string;
   messages: number;
+  mood: 'improved' | 'stable' | 'needs_support';
+}
+
+interface Goal {
+  id: string;
+  title: string;
+  description: string;
+  progress: number;
+  deadline: string;
+  category: 'stress' | 'confidence' | 'relationships' | 'work-life';
+}
+
+interface PersonalityInsight {
+  trait: string;
+  score: number;
+  description: string;
+  recommendations: string[];
 }
 
 const B2CCoachPage: React.FC = () => {
@@ -31,6 +52,7 @@ const B2CCoachPage: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [coachMode, setCoachMode] = useState<'empathetic' | 'motivational' | 'analytical'>('empathetic');
+  const [activeTab, setActiveTab] = useState('chat');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const coachModes = {
@@ -70,7 +92,8 @@ const B2CCoachPage: React.FC = () => {
       date: 'Aujourd\'hui',
       duration: '25 min',
       topic: 'Stress',
-      messages: 18
+      messages: 18,
+      mood: 'improved'
     },
     {
       id: '2',
@@ -78,7 +101,8 @@ const B2CCoachPage: React.FC = () => {
       date: 'Hier',
       duration: '30 min',
       topic: 'Confiance',
-      messages: 22
+      messages: 22,
+      mood: 'improved'
     },
     {
       id: '3',
@@ -86,7 +110,56 @@ const B2CCoachPage: React.FC = () => {
       date: 'Il y a 2 jours',
       duration: '20 min',
       topic: 'Équilibre',
-      messages: 15
+      messages: 15,
+      mood: 'stable'
+    }
+  ];
+
+  const goals: Goal[] = [
+    {
+      id: '1',
+      title: 'Réduire le stress quotidien',
+      description: 'Pratiquer 15 minutes de méditation par jour',
+      progress: 75,
+      deadline: '2024-02-15',
+      category: 'stress'
+    },
+    {
+      id: '2',
+      title: 'Améliorer la confiance en public',
+      description: 'Participer à 3 présentations ce mois',
+      progress: 33,
+      deadline: '2024-02-28',
+      category: 'confidence'
+    },
+    {
+      id: '3',
+      title: 'Équilibre travail-famille',
+      description: 'Établir des limites claires entre travail et vie privée',
+      progress: 60,
+      deadline: '2024-03-01',
+      category: 'work-life'
+    }
+  ];
+
+  const personalityInsights: PersonalityInsight[] = [
+    {
+      trait: 'Résilience émotionnelle',
+      score: 78,
+      description: 'Vous avez une bonne capacité à rebondir après les difficultés',
+      recommendations: ['Continuez les exercices de gratitude', 'Pratiquez la visualisation positive']
+    },
+    {
+      trait: 'Ouverture d\'esprit',
+      score: 85,
+      description: 'Vous êtes très ouverts aux nouvelles expériences et idées',
+      recommendations: ['Explorez de nouvelles techniques de bien-être', 'Participez à des groupes de discussion']
+    },
+    {
+      trait: 'Gestion du stress',
+      score: 65,
+      description: 'Votre gestion du stress peut être améliorée',
+      recommendations: ['Techniques de respiration', 'Sessions VR de relaxation', 'Planification des pauses']
     }
   ];
 
@@ -98,112 +171,122 @@ const B2CCoachPage: React.FC = () => {
           id: '1',
           content: 'Bonjour ! Je suis votre coach IA personnel. Je suis là pour vous accompagner dans votre bien-être émotionnel. 😊',
           sender: 'coach',
-          timestamp: new Date()
+          timestamp: new Date(),
+          type: 'text'
         },
         {
           id: '2',
-          content: 'Comment vous sentez-vous aujourd\'hui ? Y a-t-il quelque chose de particulier dont vous aimeriez parler ?',
+          content: 'J\'ai analysé vos dernières données et je vois que vous travaillez sur la gestion du stress. Comment vous sentez-vous aujourd\'hui ?',
           sender: 'coach',
-          timestamp: new Date()
+          timestamp: new Date(),
+          type: 'text'
         }
       ];
       setMessages(welcomeMessages);
     }
   }, []);
 
-  // Auto-scroll vers le bas
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = (content: string = currentMessage) => {
-    if (!content.trim()) return;
+  const handleSendMessage = async () => {
+    if (!currentMessage.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content,
+      content: currentMessage,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      type: 'text'
     };
 
     setMessages(prev => [...prev, userMessage]);
     setCurrentMessage('');
     setIsTyping(true);
 
-    // Simulation de réponse du coach
+    // Simulation de réponse du coach IA
     setTimeout(() => {
-      const coachResponse = generateCoachResponse(content);
-      const coachMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: coachResponse,
-        sender: 'coach',
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, coachMessage]);
+      const coachResponse = generateCoachResponse(currentMessage, coachMode);
+      setMessages(prev => [...prev, coachResponse]);
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
+    }, 1500);
   };
 
-  const generateCoachResponse = (userMessage: string): string => {
+  const generateCoachResponse = (userMessage: string, mode: string): Message => {
     const responses = {
       empathetic: [
-        "Je comprends que ce soit difficile pour vous. Vos sentiments sont tout à fait valides.",
-        "Merci de partager cela avec moi. Comment puis-je vous soutenir davantage ?",
-        "C'est courageux de votre part d'exprimer ces émotions. Vous n'êtes pas seul(e) dans cette situation.",
-        "Je sens que c'est important pour vous. Prenez votre temps pour me raconter.",
+        "Je comprends ce que vous ressentez. C'est tout à fait normal d'avoir ces émotions.",
+        "Merci de partager cela avec moi. Voulez-vous que nous explorions ensemble ce qui pourrait vous aider ?",
+        "Vos sentiments sont valides. Prenons le temps d'analyser la situation ensemble."
       ],
       motivational: [
-        "Vous avez déjà fait un grand pas en reconnaissant cette situation ! C'est le début du changement.",
-        "Je crois en votre capacité à surmonter cela. Quels sont vos points forts sur lesquels nous pouvons nous appuyer ?",
-        "Chaque défi est une opportunité de grandir. Comment pourriez-vous transformer cette difficulté en force ?",
-        "Vous êtes plus resilient(e) que vous ne le pensez. Rappelons-nous vos succès passés.",
+        "C'est formidable que vous preniez conscience de cela ! C'est le premier pas vers le changement.",
+        "Vous avez déjà montré beaucoup de courage en partageant cela. Fixons-nous un objectif ensemble !",
+        "Je crois en votre capacité à surmonter cela. Quelles actions concrètes pouvons-nous mettre en place ?"
       ],
       analytical: [
-        "Analysons cette situation ensemble. Quels sont les facteurs principaux qui contribuent à ce problème ?",
-        "Identifions les solutions concrètes. Quelles options avez-vous déjà envisagées ?",
-        "Établissons un plan d'action étape par étape. Quelle serait la première action réalisable ?",
-        "Examinons les causes et effets. Y a-t-il des schémas récurrents que vous avez remarqués ?",
+        "Analysons cette situation étape par étape. Quels sont les facteurs déclencheurs que vous avez identifiés ?",
+        "Basé sur vos données, je recommande une approche structurée. Voici ce que je propose...",
+        "Examinons les patterns dans votre comportement. Avez-vous remarqué des récurrences ?"
       ]
     };
 
-    const modeResponses = responses[coachMode];
-    return modeResponses[Math.floor(Math.random() * modeResponses.length)];
+    const modeResponses = responses[mode as keyof typeof responses];
+    const randomResponse = modeResponses[Math.floor(Math.random() * modeResponses.length)];
+
+    return {
+      id: Date.now().toString(),
+      content: randomResponse,
+      sender: 'coach',
+      timestamp: new Date(),
+      type: 'text'
+    };
   };
 
-  const startVoiceInput = () => {
-    setIsListening(!isListening);
-    // Ici on intégrerait l'API de reconnaissance vocale
-    if (!isListening) {
-      setTimeout(() => {
-        setIsListening(false);
-        setCurrentMessage("Message vocal transcrit automatiquement");
-      }, 3000);
+  const handleQuickTopic = (topic: any) => {
+    const topicMessage = `Je voudrais parler de ${topic.label.toLowerCase()}`;
+    setCurrentMessage(topicMessage);
+    handleSendMessage();
+  };
+
+  const startVoiceMessage = () => {
+    setIsListening(true);
+    // Simulation de reconnaissance vocale
+    setTimeout(() => {
+      setIsListening(false);
+      setCurrentMessage("Message vocal transcrit automatiquement...");
+    }, 3000);
+  };
+
+  const getMoodColor = (mood: string) => {
+    switch (mood) {
+      case 'improved': return 'text-green-600 bg-green-100';
+      case 'stable': return 'text-blue-600 bg-blue-100';
+      case 'needs_support': return 'text-orange-600 bg-orange-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
-  const handleQuickTopic = (topic: string) => {
-    const topicMessages = {
-      stress: "Je me sens stressé(e) en ce moment et j'aimerais apprendre à mieux gérer cette situation.",
-      motivation: "J'ai du mal à rester motivé(e) ces derniers temps. Pouvez-vous m'aider à retrouver ma motivation ?",
-      relationships: "J'ai des difficultés dans mes relations personnelles et j'aimerais en parler.",
-      work: "Mon environnement de travail me pose des défis et j'aimerais des conseils.",
-      sleep: "J'ai des problèmes de sommeil qui affectent mon bien-être quotidien.",
-      confidence: "Je manque de confiance en moi et j'aimerais travailler sur cet aspect."
-    };
-    
-    sendMessage(topicMessages[topic as keyof typeof topicMessages]);
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'stress': return 'bg-red-100 text-red-800';
+      case 'confidence': return 'bg-blue-100 text-blue-800';
+      case 'relationships': return 'bg-pink-100 text-pink-800';
+      case 'work-life': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/b2c/dashboard')}
+              onClick={() => navigate('/app/home')}
               className="hover:bg-white/20"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -211,228 +294,355 @@ const B2CCoachPage: React.FC = () => {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Coach IA Personnel</h1>
-              <p className="text-gray-600">Accompagnement personnalisé pour votre bien-être</p>
+              <p className="text-gray-600">Votre accompagnement bien-être personnalisé</p>
             </div>
           </div>
           
-          {/* Sélecteur de mode du coach */}
+          {/* Mode du coach */}
           <div className="flex gap-2">
-            {Object.entries(coachModes).map(([mode, config]) => (
+            {Object.entries(coachModes).map(([key, mode]) => (
               <Button
-                key={mode}
-                variant={coachMode === mode ? "default" : "outline"}
-                onClick={() => setCoachMode(mode as any)}
-                className="flex flex-col items-center gap-1 h-auto py-2 px-3"
-                size="sm"
+                key={key}
+                variant={coachMode === key ? "default" : "outline"}
+                onClick={() => setCoachMode(key as any)}
+                className="flex items-center gap-2"
               >
-                <span className="text-lg">{config.icon}</span>
-                <span className="text-xs">{config.name}</span>
+                <span>{mode.icon}</span>
+                {mode.name}
               </Button>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Zone de chat principale */}
-          <div className="lg:col-span-2">
-            <Card className="h-[600px] flex flex-col">
-              <CardHeader className="border-b">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Bot className="w-5 h-5" />
-                    Coach {coachModes[coachMode].name}
-                  </CardTitle>
-                  <Badge className={`${coachModes[coachMode].color} text-white`}>
-                    En ligne
-                  </Badge>
-                </div>
-                <p className="text-sm text-gray-600">{coachModes[coachMode].description}</p>
-              </CardHeader>
-              
-              {/* Messages */}
-              <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] p-3 rounded-lg ${
-                      message.sender === 'user' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gray-100 text-gray-900'
-                    }`}>
-                      <div className="flex items-start gap-2 mb-2">
-                        {message.sender === 'coach' ? (
-                          <Bot className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        ) : (
-                          <User className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        )}
-                        <span className="text-xs opacity-75">
-                          {message.sender === 'coach' ? 'Coach IA' : 'Vous'}
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed">{message.content}</p>
-                      <span className="text-xs opacity-50 mt-2 block">
-                        {message.timestamp.toLocaleTimeString('fr-FR', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                
-                {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-100 p-3 rounded-lg flex items-center gap-2">
-                      <Bot className="w-4 h-4" />
-                      <span className="text-sm text-gray-600">Le coach est en train d'écrire...</span>
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </CardContent>
-              
-              {/* Zone de saisie */}
-              <div className="border-t p-4">
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <Input
-                      value={currentMessage}
-                      onChange={(e) => setCurrentMessage(e.target.value)}
-                      placeholder="Tapez votre message ici..."
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      className="resize-none"
-                    />
-                  </div>
-                  <Button
-                    onClick={startVoiceInput}
-                    variant="outline"
-                    size="sm"
-                    className={isListening ? 'bg-red-100 border-red-300' : ''}
-                  >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </Button>
-                  <Button onClick={() => sendMessage()} disabled={!currentMessage.trim()}>
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="chat" className="flex items-center gap-2">
+              <Bot className="w-4 h-4" />
+              Chat
+            </TabsTrigger>
+            <TabsTrigger value="goals" className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              Objectifs
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              Profil
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Historique
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Panneau latéral */}
-          <div className="space-y-6">
-            {/* Sujets rapides */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  Sujets rapides
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-2">
-                  {quickTopics.map((topic) => (
-                    <Button
-                      key={topic.id}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleQuickTopic(topic.id)}
-                      className="flex flex-col items-center gap-1 h-auto py-3"
-                    >
-                      <span className="text-lg">{topic.icon}</span>
-                      <span className="text-xs text-center leading-tight">{topic.label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Suggestions d'exercices */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="w-5 h-5" />
-                  Exercices suggérés
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { title: 'Respiration 4-7-8', duration: '5 min', type: 'Relaxation' },
-                  { title: 'Gratitude quotidienne', duration: '3 min', type: 'Mindfulness' },
-                  { title: 'Scan corporel', duration: '10 min', type: 'Méditation' }
-                ].map((exercise, index) => (
-                  <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="font-medium text-sm">{exercise.title}</h4>
-                      <Badge variant="secondary" className="text-xs">{exercise.type}</Badge>
+          {/* Chat Tab */}
+          <TabsContent value="chat" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Chat principal */}
+              <div className="lg:col-span-3">
+                <Card className="h-[600px] flex flex-col">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Bot className="w-5 h-5 text-blue-600" />
+                        Coach {coachModes[coachMode].name}
+                      </CardTitle>
+                      <Badge className={coachModes[coachMode].color}>
+                        {coachModes[coachMode].description}
+                      </Badge>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                      <Clock className="w-3 h-3" />
-                      {exercise.duration}
+                  </CardHeader>
+                  
+                  <CardContent className="flex-1 flex flex-col">
+                    {/* Messages */}
+                    <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                      <AnimatePresence>
+                        {messages.map((message) => (
+                          <motion.div
+                            key={message.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <div className={`max-w-[80%] p-3 rounded-lg ${
+                              message.sender === 'user'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-white border border-gray-200'
+                            }`}>
+                              <div className="flex items-start gap-2">
+                                {message.sender === 'coach' && (
+                                  <Bot className="w-4 h-4 mt-1 text-blue-600" />
+                                )}
+                                <div className="flex-1">
+                                  <p className="text-sm">{message.content}</p>
+                                  <p className={`text-xs mt-1 ${
+                                    message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                                  }`}>
+                                    {message.timestamp.toLocaleTimeString('fr-FR', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                      
+                      {isTyping && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex justify-start"
+                        >
+                          <div className="bg-white border border-gray-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <Bot className="w-4 h-4 text-blue-600" />
+                              <div className="flex gap-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                      <div ref={messagesEndRef} />
                     </div>
-                    <Button size="sm" variant="ghost" className="w-full mt-2 text-xs">
-                      Commencer l'exercice
-                    </Button>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Sessions récentes */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  Sessions récentes
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {recentSessions.map((session) => (
-                  <div key={session.id} className="p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="font-medium text-sm line-clamp-1">{session.title}</h4>
-                      <Button variant="ghost" size="sm" className="w-5 h-5 p-0">
-                        <MoreVertical className="w-3 h-3" />
+                    
+                    {/* Input message */}
+                    <div className="flex gap-2">
+                      <Input
+                        value={currentMessage}
+                        onChange={(e) => setCurrentMessage(e.target.value)}
+                        placeholder="Tapez votre message..."
+                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={startVoiceMessage}
+                        variant="outline"
+                        size="icon"
+                        className={isListening ? 'bg-red-100 text-red-600' : ''}
+                      >
+                        {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                      </Button>
+                      <Button onClick={handleSendMessage} disabled={!currentMessage.trim()}>
+                        <Send className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="text-xs text-gray-600 space-y-1">
-                      <div>{session.date} • {session.duration}</div>
-                      <div>{session.messages} messages • Sujet: {session.topic}</div>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Sidebar sujets rapides */}
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Sujets rapides</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {quickTopics.map((topic) => (
+                      <Button
+                        key={topic.id}
+                        variant="ghost"
+                        onClick={() => handleQuickTopic(topic)}
+                        className="w-full justify-start text-left"
+                      >
+                        <span className="mr-2">{topic.icon}</span>
+                        {topic.label}
+                      </Button>
+                    ))}
+                  </CardContent>
+                </Card>
 
-            {/* Statistiques */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5" />
-                  Vos progrès
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">15</div>
-                  <div className="text-xs text-gray-600">Sessions complétées</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">8h 23min</div>
-                  <div className="text-xs text-gray-600">Temps d'accompagnement</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">73%</div>
-                  <div className="text-xs text-gray-600">Amélioration bien-être</div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Statut aujourd'hui</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Humeur</span>
+                      <Badge className="bg-green-100 text-green-800">Positive</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Stress</span>
+                      <Badge className="bg-yellow-100 text-yellow-800">Modéré</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Énergie</span>
+                      <Badge className="bg-blue-100 text-blue-800">Élevée</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Goals Tab */}
+          <TabsContent value="goals" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {goals.map((goal) => (
+                <Card key={goal.id} className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg">{goal.title}</CardTitle>
+                      <Badge className={getCategoryColor(goal.category)}>
+                        {goal.category}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-gray-600">{goal.description}</p>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Progression</span>
+                        <span>{goal.progress}%</span>
+                      </div>
+                      <Progress value={goal.progress} className="h-2" />
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500">Échéance:</span>
+                      <span className="font-medium">
+                        {new Date(goal.deadline).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                    
+                    <Button className="w-full" size="sm">
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                      Mettre à jour
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Insights Tab */}
+          <TabsContent value="insights" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5" />
+                    Profil de personnalité
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {personalityInsights.map((insight, index) => (
+                    <div key={index} className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium">{insight.trait}</h4>
+                        <Badge variant="outline">{insight.score}/100</Badge>
+                      </div>
+                      <Progress value={insight.score} className="h-2" />
+                      <p className="text-sm text-gray-600">{insight.description}</p>
+                      <div className="space-y-1">
+                        <h5 className="text-xs font-medium text-gray-700">Recommandations:</h5>
+                        {insight.recommendations.map((rec, i) => (
+                          <p key={i} className="text-xs text-gray-600">• {rec}</p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5" />
+                      Évolution cette semaine
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Sessions coach</span>
+                        <span className="font-bold text-blue-600">+3</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Objectifs atteints</span>
+                        <span className="font-bold text-green-600">2/3</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Humeur moyenne</span>
+                        <span className="font-bold text-orange-600">+15%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5" />
+                      Suggestion du jour
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg">
+                      <p className="text-sm mb-3">
+                        Basé sur votre profil, essayez une session de méditation de 10 minutes 
+                        avant votre réunion importante cet après-midi.
+                      </p>
+                      <Button size="sm" className="w-full">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Programmer maintenant
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-4">
+            <div className="space-y-4">
+              {recentSessions.map((session) => (
+                <Card key={session.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg mb-1">{session.title}</h3>
+                        <p className="text-sm text-gray-600 mb-2">{session.topic}</p>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {session.date}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {session.duration}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Bot className="w-3 h-3" />
+                            {session.messages} messages
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getMoodColor(session.mood)}>
+                          {session.mood === 'improved' && '📈 Amélioré'}
+                          {session.mood === 'stable' && '➡️ Stable'}
+                          {session.mood === 'needs_support' && '🤝 À suivre'}
+                        </Badge>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
