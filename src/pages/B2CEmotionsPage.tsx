@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Heart, Brain, Smile, Frown, Meh, Angry, Surprised, Disgusted,
+  Heart, Brain, Smile, Frown, Meh, Angry, AlertCircle, XCircle,
   TrendingUp, Calendar, Clock, Zap, Star, Award, Target, Activity,
   BarChart3, Sparkles, Timer, Trophy, Eye, Camera, Mic
 } from 'lucide-react';
@@ -51,8 +51,8 @@ const B2CEmotionsPage: React.FC = () => {
     { id: 'joy', name: 'Joie', icon: <Smile className="w-6 h-6" />, color: 'bg-yellow-500', textColor: 'text-yellow-600' },
     { id: 'sadness', name: 'Tristesse', icon: <Frown className="w-6 h-6" />, color: 'bg-blue-500', textColor: 'text-blue-600' },
     { id: 'anger', name: 'Colère', icon: <Angry className="w-6 h-6" />, color: 'bg-red-500', textColor: 'text-red-600' },
-    { id: 'fear', name: 'Peur', icon: <Surprised className="w-6 h-6" />, color: 'bg-purple-500', textColor: 'text-purple-600' },
-    { id: 'disgust', name: 'Dégoût', icon: <Disgusted className="w-6 h-6" />, color: 'bg-green-500', textColor: 'text-green-600' },
+    { id: 'fear', name: 'Peur', icon: <AlertCircle className="w-6 h-6" />, color: 'bg-purple-500', textColor: 'text-purple-600' },
+    { id: 'disgust', name: 'Dégoût', icon: <XCircle className="w-6 h-6" />, color: 'bg-green-500', textColor: 'text-green-600' },
     { id: 'neutral', name: 'Neutre', icon: <Meh className="w-6 h-6" />, color: 'bg-gray-500', textColor: 'text-gray-600' }
   ];
 
