@@ -27,10 +27,10 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14', // Modèle recommandé le plus récent
+        model: 'gpt-5-2025-08-07', // Modèle GPT-5 flagship
         messages: messages,
-        max_tokens: 1000,
-        temperature: 0.7,
+        max_completion_tokens: 1000,
+        // Note: GPT-5 ne supporte pas le paramètre temperature
       }),
     })
 

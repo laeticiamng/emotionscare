@@ -35,7 +35,7 @@ serve(async (req) => {
     })
 
     const response = await openai.embeddings.create({
-      model: model || 'text-embedding-ada-002',
+      model: model || 'text-embedding-3-small',
       input: input.trim(),
     })
 
