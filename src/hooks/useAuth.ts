@@ -1,11 +1,12 @@
 /**
- * Hook d'authentification unifié
+ * Hook d'authentification unifié avec Supabase
  */
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Routes } from '@/routerV2';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginData {
   email: string;
@@ -32,74 +33,47 @@ interface SignupData {
 export const useAuthFlow = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login: authLogin, register: authRegister, logout: authLogout } = useAuth();
 
   const login = useCallback(async (data: LoginData) => {
     setIsLoading(true);
     
     try {
-      // Simulation authentification
-      console.log('Authenticating user:', data);
+      await authLogin(data.email, data.password);
       
-      // Simulation délai API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulation réussie
-      const mockUser = {
-        id: '1',
-        email: data.email,
-        role: data.segment === 'b2c' ? 'consumer' : 
-              data.adminKey ? 'manager' : 'employee',
-        name: data.email.split('@')[0]
-      };
-      
-      // Sauvegarder dans localStorage
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
-      localStorage.setItem('auth_token', 'mock_jwt_token');
-      
-      // Rediriger selon le rôle
-      switch (mockUser.role) {
-        case 'consumer':
-          navigate(Routes.consumerHome());
-          break;
-        case 'employee':
-          navigate(Routes.employeeHome());
-          break;
-        case 'manager':
-          navigate(Routes.managerHome());
-          break;
-        default:
-          navigate(Routes.home());
+      // Rediriger selon le segment
+      if (data.segment === 'b2c') {
+        navigate(Routes.consumerHome());
+      } else {
+        navigate(Routes.employeeHome());
       }
       
       toast({
         title: 'Connexion réussie',
-        description: `Bienvenue ${mockUser.name} !`,
+        description: 'Bienvenue !',
       });
       
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Erreur de connexion',
-        description: 'Vérifiez vos identifiants',
+        description: error.message || 'Vérifiez vos identifiants',
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, authLogin]);
 
   const signup = useCallback(async (data: SignupData) => {
     setIsLoading(true);
     
     try {
-      console.log('Creating account:', data);
-      
       // Validation
       if (data.password !== data.confirmPassword) {
         throw new Error('Les mots de passe ne correspondent pas');
       }
       
-      // Simulation délai API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await authRegister(data.email, data.password);
       
       if (data.segment === 'b2b') {
         // B2B : Demande d'accès
@@ -111,45 +85,42 @@ export const useAuthFlow = () => {
         navigate(Routes.home());
       } else {
         // B2C : Compte créé directement
-        const mockUser = {
-          id: '1',
-          email: data.email,
-          role: 'consumer',
-          name: data.name || `${data.firstName} ${data.lastName}`.trim()
-        };
-        
-        localStorage.setItem('auth_user', JSON.stringify(mockUser));
-        localStorage.setItem('auth_token', 'mock_jwt_token');
-        
         toast({
           title: 'Compte créé',
-          description: 'Votre compte a été créé avec succès !',
+          description: 'Votre compte a été créé avec succès ! Vérifiez votre email.',
         });
         
         navigate(Routes.consumerHome());
       }
       
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Erreur',
-        description: error instanceof Error ? error.message : 'Une erreur est survenue',
+        description: error.message || 'Une erreur est survenue',
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, authRegister]);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('auth_user');
-    localStorage.removeItem('auth_token');
-    navigate(Routes.home());
-    
-    toast({
-      title: 'Déconnexion',
-      description: 'À bientôt !',
-    });
-  }, [navigate]);
+  const logout = useCallback(async () => {
+    try {
+      await authLogout();
+      navigate(Routes.home());
+      
+      toast({
+        title: 'Déconnexion',
+        description: 'À bientôt !',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Problème de déconnexion',
+        variant: 'destructive',
+      });
+    }
+  }, [navigate, authLogout]);
 
   const resetPassword = useCallback(async (email: string) => {
     setIsLoading(true);
