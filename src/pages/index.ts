@@ -1,40 +1,39 @@
 
-// Auth Pages
-export { default as B2CLoginPage } from './b2c/LoginPage';
-export { default as B2CRegisterPage } from './b2c/RegisterPage';
-export { default as B2CDashboardPage } from './b2c/DashboardPage';
-
-export { default as B2BSelectionPage } from './b2b/SelectionPage';
-export { default as B2BUserLoginPage } from './b2b/user/LoginPage';
-export { default as B2BUserRegisterPage } from './b2b/user/RegisterPage';
-export { default as B2BUserDashboardPage } from './b2b/user/DashboardPage';
-export { default as B2BAdminLoginPage } from './b2b/admin/LoginPage';
-export { default as B2BAdminDashboardPage } from './b2b/admin/DashboardPage';
-export { default as B2BDashboardPage } from './b2b/DashboardPage';
-
-// Main Pages
+// Pages principales existantes seulement
 export { default as HomePage } from './HomePage';
 export { default as AboutPage } from './AboutPage';
-export { default as ContactPage } from './ContactPage';
-export { default as BrowsingPage } from './BrowsingPage';
-export { default as PrivacyPage } from './PrivacyPage';
 export { default as LoginPage } from './LoginPage';
+export { default as SignupPage } from './SignupPage';
+export { default as NotFoundPage } from './NotFoundPage';
+export { default as PrivacyPage } from './PrivacyPage';
+export { default as BrowsingPage } from './BrowsingPage';
 
-// Feature Pages
-export { default as ScanPage } from './ScanPage';
-export { default as JournalPage } from './JournalPage';
-export { default as CoachPage } from './CoachPage';
-export { default as MusicTherapyPage } from './MusicTherapyPage';
-export { default as CommunityPage } from './CommunityPage';
-export { default as SettingsPage } from './SettingsPage';
+// Pages B2C
+export { default as B2CDashboardPage } from './B2CDashboardPage';
+export { default as B2CRegisterPage } from './B2CRegisterPage';
+export { default as B2CScanPage } from './B2CScanPage';
+export { default as B2CMusicPage } from './B2CMusicPage';
+export { default as B2CCoachPage } from './B2CCoachPage';
+export { default as B2CJournalPage } from './B2CJournalPage';
+export { default as B2CVRPage } from './B2CVRPage';
+export { default as B2CSettingsPage } from './B2CSettingsPage';
 
-// Admin Pages
+// Pages B2B
+export { default as B2BUserDashboardPage } from './B2BUserDashboardPage';
+export { default as B2BAdminDashboardPage } from './B2BAdminDashboardPage';
+export { default as B2BSelectionPage } from './B2BSelectionPage';
+export { default as B2BTeamsPage } from './B2BTeamsPage';
+
+// Pages système
+export { default as AuditPage } from './AuditPage';
+export { default as OptimisationPage } from './OptimisationPage';
 export { default as TeamsPage } from './TeamsPage';
 export { default as ReportsPage } from './ReportsPage';
 export { default as EventsPage } from './EventsPage';
-export { default as OptimisationPage } from './OptimisationPage';
-
-// System Pages
 export { default as OnboardingPage } from './OnboardingPage';
 export { default as NotificationDemoPage } from './NotificationDemoPage';
-export { default as AuditPage } from './AuditPage';
+
+// Pages d'erreur
+export { default as UnauthorizedPage } from './UnauthorizedPage';
+export { default as ForbiddenPage } from './errors/ForbiddenPage';
+export { default as ServerErrorPage } from './ServerErrorPage';

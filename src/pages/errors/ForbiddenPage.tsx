@@ -69,11 +69,7 @@ const ForbiddenPage: React.FC = () => {
             transition={{ delay: 0.7, duration: 0.5 }}
           >
             <p className="text-sm text-muted-foreground">
-              Si vous pensez qu'il s'agit d'une erreur, veuillez contacter 
-              <Link to={Routes.help()} className="text-primary hover:underline mx-1">
-                notre support
-              </Link>
-              pour obtenir de l'aide.
+              Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre support.
             </p>
           </motion.div>
         </motion.div>
