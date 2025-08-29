@@ -10,7 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Routes } from '@/routerV2/helpers';
-import { useAuthFlow } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAuthNavigation } from '@/hooks/useAuthNavigation';
+import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
+import { toast } from '@/hooks/use-toast';
 import { Heart, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
@@ -31,11 +34,33 @@ const LoginPage: React.FC = () => {
     }));
   };
 
-  const { login, isLoading } = useAuthFlow();
+  const { login, isLoading } = useAuth();
+  const { navigateAfterLogin } = useAuthNavigation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login({ ...formData, segment: segment || 'b2c' });
+    try {
+      await login(formData.email, formData.password);
+      
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue !",
+      });
+      
+      // Redirection automatique après connexion
+      navigateAfterLogin();
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Utilisation du service d'erreur pour des messages UX-friendly
+      const { message } = getFriendlyAuthError(error);
+      
+      toast({
+        title: "Erreur de connexion",
+        description: message,
+        variant: "destructive",
+      });
+    }
   };
 
   const getTitle = () => {
