@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { registerSchema, type RegisterFormData } from '@/lib/validations/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
 
 interface RegisterFormProps {
   onToggleMode: () => void;
@@ -28,10 +29,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await register(data.email, data.password);
+      toast({
+        title: "Inscription réussie",
+        description: "Vérifiez votre email pour confirmer votre compte.",
+      });
     } catch (error: any) {
+      const { message } = getFriendlyAuthError(error);
       toast({
         title: "Erreur d'inscription",
-        description: error.message || "Une erreur est survenue",
+        description: message,
         variant: "destructive",
       });
     }
