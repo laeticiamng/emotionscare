@@ -21,7 +21,7 @@ const FF_ROUTER_V2 = true;
 // Pages publiques
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
-const ContactPage = lazy(() => import('@/pages/GenericPage'));
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
 
 // Auth & Landing  
