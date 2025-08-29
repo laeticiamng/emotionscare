@@ -17,6 +17,7 @@ import {
   Sparkles, Target, Flame, Waves, Filter, ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import RouteValidator from '@/components/navigation/RouteValidator';
 
 interface NavigationCategory {
   name: string;
@@ -105,6 +106,7 @@ export default function CompleteNavigationMenu() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showValidator, setShowValidator] = useState(false);
 
   // Filtrer les routes selon la recherche
   const filteredCategories = navigationCategories.map(category => ({
@@ -259,11 +261,18 @@ export default function CompleteNavigationMenu() {
           ))}
         </div>
 
+        {/* Validator des routes */}
+        {showValidator && (
+          <div className="space-y-6">
+            <RouteValidator />
+          </div>
+        )}
+
         {/* Actions rapides */}
         <Card className="bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10">
           <CardContent className="p-6">
             <div className="text-center space-y-4">
-              <h3 className="text-xl font-semibold">Actions Rapides</h3>
+              <h3 className="text-xl font-semibold">Actions Avancées</h3>
               <div className="flex flex-wrap justify-center gap-3">
                 <Button 
                   onClick={() => navigate('/app/home')}
@@ -278,6 +287,13 @@ export default function CompleteNavigationMenu() {
                 >
                   <Brain className="h-4 w-4 mr-2" />
                   Scan Express
+                </Button>
+                <Button 
+                  onClick={() => setShowValidator(!showValidator)}
+                  variant="ghost"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  {showValidator ? 'Masquer' : 'Tester'} Routes
                 </Button>
                 <Button 
                   onClick={() => navigate('/settings/general')}
