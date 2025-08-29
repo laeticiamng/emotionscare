@@ -2,7 +2,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
-import GlowBreathPage from '@/pages/GlowBreathPage';
+import B2CFlashGlowPage from '@/pages/B2CFlashGlowPage';
 
 // Mock the store
 vi.mock('@/store/useGlowBreathStore', () => ({
@@ -32,9 +32,9 @@ const renderWithRouter = (component: React.ReactElement) => {
   );
 };
 
-describe('GlowBreathPage', () => {
+describe('B2CFlashGlowPage', () => {
   it('renders KPIs after fetch', async () => {
-    renderWithRouter(<GlowBreathPage />);
+    renderWithRouter(<B2CFlashGlowPage />);
     
     expect(screen.getByText(/mon souffle/i)).toBeInTheDocument();
     
@@ -47,7 +47,7 @@ describe('GlowBreathPage', () => {
   });
 
   it('shows call to action button', async () => {
-    renderWithRouter(<GlowBreathPage />);
+    renderWithRouter(<B2CFlashGlowPage />);
     
     await waitFor(() => {
       expect(screen.getByText(/nouvelle pause glow/i)).toBeVisible();

@@ -62,11 +62,11 @@ const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
 
-// B2B Features - use new dedicated page for Teams, GenericPage for others
+// B2B Features - use dedicated pages
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
-const B2BSocialCoconPage = lazy(() => import('@/pages/GenericPage').then(m => ({ default: m.B2BAdminSocialCoconPage })));
-const B2BReportsPage = lazy(() => import('@/pages/GenericPage').then(m => ({ default: m.B2BAdminReportsPage })));
-const B2BEventsPage = lazy(() => import('@/pages/GenericPage').then(m => ({ default: m.B2BAdminEventsPage })));
+const B2BSocialCoconPage = lazy(() => import('@/pages/B2BSocialCoconPage'));
+const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
+const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
 
 // Additional B2B pages - use existing ones
 const B2BOptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
