@@ -3830,6 +3830,48 @@ export type Database = {
           },
         ]
       }
+      med_mng_generation_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          generation_time_ms: number | null
+          generation_type: string
+          id: string
+          metadata: Json | null
+          prompt: string | null
+          response_data: Json | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          generation_time_ms?: number | null
+          generation_type: string
+          id?: string
+          metadata?: Json | null
+          prompt?: string | null
+          response_data?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          generation_time_ms?: number | null
+          generation_type?: string
+          id?: string
+          metadata?: Json | null
+          prompt?: string | null
+          response_data?: Json | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       med_mng_listening_events: {
         Row: {
           event_type: string

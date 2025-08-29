@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Heart, MessageCircle, Share2, ThumbsUp, Star, 
-  Trophy, Zap, Calendar, Filter, Search, Plus, Fire,
+  Trophy, Zap, Calendar, Filter, Search, Plus, Flame,
   UserCheck, Globe, Lock, Sparkles, Award, BookHeart,
   Camera, Video, Mic, Send, Image, Smile, TrendingUp
 } from 'lucide-react';
@@ -573,7 +573,7 @@ const B2CCommunityPage: React.FC = () => {
                     Organiser un événement
                   </AnimatedButton>
                   <AnimatedButton variant="outline" className="w-full justify-start hover-scale">
-                    <Fire className="w-4 h-4 mr-2" />
+                    <Flame className="w-4 h-4 mr-2" />
                     Challenges du jour
                   </AnimatedButton>
                   <AnimatedButton variant="outline" className="w-full justify-start hover-scale">
