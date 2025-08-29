@@ -25,9 +25,10 @@ serve(async (req) => {
       const {
         pattern,
         duration_sec,
-        events,
-        self_report,
-        hrv
+        cycles_completed,
+        perfect_breaths,
+        score,
+        hr_data
       } = await req.json();
 
       console.log('Flash Glow session completed:', {
@@ -39,12 +40,14 @@ serve(async (req) => {
         hrv
       });
 
-      // Here we would save to database
-      // For now, just simulate badge assignment
-      let badgeId = null;
-      if (duration_sec >= 60 && events.some(e => e.type === 'finish')) {
-        badgeId = 'instant_glow';
-      }
+      // Determine achievements based on performance
+      let achievements = [];
+      if (perfect_breaths >= 5) achievements.push('streak_master');
+      if (cycles_completed >= 8) achievements.push('first_session');
+      if (score >= 200) achievements.push('high_scorer');
+
+      // Calculate final score with bonuses
+      const final_score = score + (hr_data?.connected ? 50 : 0);
 
       return new Response(JSON.stringify({
         ok: true,
