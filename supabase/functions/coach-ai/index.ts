@@ -23,7 +23,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const { emotionData, userProfile, requestType } = await req.json();
+    const { userMessage, personality, context, conversationHistory, isOpening } = await req.json();
 
     if (!openAIApiKey) {
       // Fallback coaching advice
@@ -34,7 +34,7 @@ serve(async (req) => {
       );
     }
 
-    const prompt = buildCoachingPrompt(emotionData, userProfile, requestType);
+    const prompt = buildCoachingPrompt(userMessage, personality, context, conversationHistory, isOpening);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -61,7 +61,9 @@ serve(async (req) => {
     const coaching = data.choices[0].message.content;
 
     // Parse the response to extract structured coaching advice
-    const structuredCoaching = parseCoachingResponse(coaching);
+    return new Response(JSON.stringify({ response: coaching }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
     return new Response(
       JSON.stringify(structuredCoaching),
@@ -115,39 +117,22 @@ Format de réponse attendu :
 Réponds toujours en français avec bienveillance et professionnalisme.`;
 }
 
-function buildCoachingPrompt(emotionData: any, userProfile: any, requestType: string): string {
-  let prompt = `Analyse émotionnelle récente :
-- Score global : ${emotionData.score || 'Non disponible'}
-- Émotion principale : ${emotionData.primaryEmotion || 'Non identifiée'}
-- Contexte : ${emotionData.text || 'Expression non verbale'}
-
-`;
-
-  if (userProfile) {
-    prompt += `Profil utilisateur :
-- Nom : ${userProfile.name || 'Non précisé'}
-- Objectifs : ${userProfile.goals || 'Non définis'}
-- Préférences : ${userProfile.preferences || 'Non spécifiées'}
-
-`;
+function buildCoachingPrompt(userMessage: string, personality: any, context: any, history: any[], isOpening: boolean): string {
+  if (isOpening) {
+    return `Tu es ${personality.name} avec une approche ${personality.approach}. 
+    Commence une conversation d'accueil chaleureuse selon ton style ${personality.tone}.
+    Objectif de la conversation: ${context.conversationGoal}.`;
   }
 
-  switch (requestType) {
-    case 'immediate_support':
-      prompt += 'L\'utilisateur a besoin d\'un soutien immédiat. Propose des techniques de gestion émotionnelle rapides et efficaces.';
-      break;
-    case 'long_term_coaching':
-      prompt += 'L\'utilisateur cherche un accompagnement à long terme. Propose un plan de développement personnel progressif.';
-      break;
-    case 'stress_management':
-      prompt += 'L\'utilisateur souhaite des techniques spécifiques de gestion du stress. Concentre-toi sur des méthodes anti-stress.';
-      break;
-    case 'mood_improvement':
-      prompt += 'L\'utilisateur veut améliorer son humeur. Propose des activités et exercices pour cultiver les émotions positives.';
-      break;
-    default:
-      prompt += 'Fournis un coaching général adapté à l\'état émotionnel actuel de l\'utilisateur.';
-  }
+  let prompt = `Tu es ${personality.name} avec les spécialités: ${personality.specialties.join(', ')}.
+  
+Message utilisateur: "${userMessage}"
+État émotionnel: ${context.userMood}
+Niveau de stress: ${Math.round(context.stressLevel * 100)}%
+
+${history.length > 0 ? `Historique récent: ${JSON.stringify(history)}` : ''}
+
+Réponds avec empathie selon ton approche ${personality.approach} et ton ton ${personality.tone}.`;
 
   return prompt;
 }

@@ -28,18 +28,35 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const analysisPrompt = `Analyse cette entrée de journal personnel et fournis :
+    const { content, userId, previousEntries } = await req.json();
+
+    const analysisPrompt = `Analyse cette entrée de journal personnel et fournis une analyse complète :
     
     Contenu : "${content}"
-    
-    1. L'humeur principale détectée
-    2. Un feedback bienveillant et constructif
-    3. Des insights sur les patterns émotionnels
+    ${previousEntries ? `Historique récent : ${JSON.stringify(previousEntries)}` : ''}
     
     Réponds en JSON avec cette structure :
     {
       "mood": "string (ex: Joyeux, Pensif, Stressé)",
-      "feedback": "string (2-3 phrases de feedback bienveillant)"
+      "emotional_tags": ["tag1", "tag2", "tag3"],
+      "insights": ["insight1", "insight2"],
+      "suggestions": [
+        {
+          "type": "reflection|action|technique|resource",
+          "title": "titre",
+          "content": "description détaillée",
+          "priority": "low|medium|high",
+          "category": "catégorie"
+        }
+      ],
+      "patterns": [
+        {
+          "pattern": "description du pattern",
+          "frequency": 3,
+          "trend": "increasing|decreasing|stable",
+          "recommendation": "recommandation"
+        }
+      ]
     }`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
