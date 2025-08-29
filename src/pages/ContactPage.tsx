@@ -1,15 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageCircle, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
 
 const ContactPage: React.FC = () => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState<any>(null);
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement contact form submission
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      
+      const contactData = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        subject: formData.get('subject') as string,
+        message: formData.get('message') as string,
+        type: 'general' as const,
+        priority: 'medium' as const
+      };
+
+      const { data, error } = await supabase.functions.invoke('contact-form', {
+        body: contactData
+      });
+
+      if (error) throw error;
+
+      setIsSubmitted(true);
+      setSubmissionResult(data);
+      
+      // Reset form
+      (e.target as HTMLFormElement).reset();
+      
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi:', error);
+      setSubmissionResult({
+        success: false,
+        message: 'Erreur lors de l\'envoi de votre message. Veuillez réessayer.',
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,33 +88,73 @@ const ContactPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {isSubmitted && submissionResult?.success ? (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <h3 className="font-medium text-green-800">Message envoyé avec succès !</h3>
+                      </div>
+                      <p className="text-sm text-green-700 mb-3">{submissionResult.message}</p>
+                      {submissionResult.data && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">Ticket: {submissionResult.data.ticketId}</Badge>
+                            <Badge variant="secondary">Réponse: {submissionResult.data.estimatedResponse}</Badge>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                  
+                  {submissionResult && !submissionResult.success ? (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle className="w-5 h-5 text-red-600" />
+                        <h3 className="font-medium text-red-800">Erreur d'envoi</h3>
+                      </div>
+                      <p className="text-sm text-red-700">{submissionResult.message}</p>
+                    </div>
+                  ) : null}
+                  
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium mb-2">
-                        Prénom
+                      <label htmlFor="name" className="block text-sm font-medium mb-2">
+                        Nom complet
                       </label>
-                      <Input id="firstName" name="firstName" required />
+                      <Input 
+                        id="name" 
+                        name="name" 
+                        placeholder="Votre nom complet"
+                        required 
+                        disabled={isLoading}
+                      />
                     </div>
                     <div>
-                      <label htmlFor="lastName" className="block text-sm font-medium mb-2">
-                        Nom
+                      <label htmlFor="email" className="block text-sm font-medium mb-2">
+                        Email
                       </label>
-                      <Input id="lastName" name="lastName" required />
+                      <Input 
+                        id="email" 
+                        name="email" 
+                        type="email" 
+                        placeholder="votre@email.com"
+                        required 
+                        disabled={isLoading}
+                      />
                     </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-2">
-                      Email
-                    </label>
-                    <Input id="email" name="email" type="email" required />
                   </div>
 
                   <div>
                     <label htmlFor="subject" className="block text-sm font-medium mb-2">
                       Sujet
                     </label>
-                    <Input id="subject" name="subject" required />
+                    <Input 
+                      id="subject" 
+                      name="subject" 
+                      placeholder="Résumé de votre demande"
+                      required 
+                      disabled={isLoading}
+                    />
                   </div>
 
                   <div>
@@ -85,14 +165,28 @@ const ContactPage: React.FC = () => {
                       id="message" 
                       name="message" 
                       rows={5}
-                      placeholder="Décrivez votre demande..."
+                      placeholder="Décrivez votre demande en détail..."
                       required 
+                      disabled={isLoading}
                     />
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    <Send className="w-4 h-4 mr-2" />
-                    Envoyer le message
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        Envoi en cours...
+                      </div>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Envoyer le message
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>

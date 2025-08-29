@@ -43,7 +43,10 @@ verify_jwt = false
 [functions.openai-realtime]
 verify_jwt = false
 
-[functions.suno-music-generation]
+[functions.contact-form]
+verify_jwt = false
+
+[functions.emotion-analytics]
 verify_jwt = false
 
 [functions.emotion-analysis]
