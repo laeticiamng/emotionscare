@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { authorizeRole } from '../_shared/auth.ts';
 
 const sunoApiKey = Deno.env.get('SUNO_API_KEY');
 
