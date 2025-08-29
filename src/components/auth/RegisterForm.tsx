@@ -14,7 +14,7 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
-  const { signUp } = useAuth();
+  const { register } = useAuth();
   
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -27,7 +27,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await signUp(data.email, data.password);
+      await register(data.email, data.password);
     } catch (error: any) {
       toast({
         title: "Erreur d'inscription",
