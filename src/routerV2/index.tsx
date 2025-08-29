@@ -68,11 +68,11 @@ const B2BSocialCoconPage = lazy(() => import('@/pages/B2BSocialCoconPage'));
 const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
 const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
 
-// Additional B2B pages - use existing ones
-const B2BOptimisationPage = lazy(() => import('@/pages/OptimisationPage'));
-const B2BSecurityPage = lazy(() => import('@/pages/SecurityPage'));  
-const B2BAuditPage = lazy(() => import('@/pages/AuditPage'));
-const B2BAccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
+// Additional B2B pages - use correct paths
+const B2BOptimisationPage = lazy(() => import('@/pages/B2BOptimisationPage'));
+const B2BSecurityPage = lazy(() => import('@/pages/B2BSecurityPage'));  
+const B2BAuditPage = lazy(() => import('@/pages/B2BAuditPage'));
+const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 
 // Pages orphelines à intégrer
 const ApiMonitoringPage = lazy(() => import('@/pages/ApiMonitoringPage'));
