@@ -41,8 +41,8 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CMusicPage = lazy(() => import('@/pages/B2CMusicPage'));
-const B2CCoachPage = lazy(() => import('@/pages/B2CCoachPage'));
+const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRPage = lazy(() => import('@/pages/B2CVRPage'));
 
@@ -90,7 +90,7 @@ const B2CEmotionScanPage = lazy(() => import('@/pages/B2CEmotionScanPage'));
 const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
 const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
 const B2CCommunityPage = lazy(() => import('@/pages/B2CCommunityPage'));
-const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
+const CompleteNavigationMenu = lazy(() => import('@/components/navigation/CompleteNavigationMenu'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
@@ -126,8 +126,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
-  B2CMusicPage,
-  B2CCoachPage,
+  B2CMusicEnhanced,
+  B2CAICoachPage,
   B2CJournalPage,
   B2CVRPage,
   
@@ -175,7 +175,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CVoiceJournalPage,
   B2CEmotionsPage,
   B2CCommunityPage,
-  NavigationPage,
+  CompleteNavigationMenu,
   PrivacyPage,
   
   // System
