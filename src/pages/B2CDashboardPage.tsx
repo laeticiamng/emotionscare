@@ -1,264 +1,311 @@
-
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Heart, Brain, Music, BookOpen, Globe, Trophy, Users, Settings, 
-         Scan, Play, MessageCircle, Target, Clock, TrendingUp, Zap, Wind, Mic } from 'lucide-react';
+import { 
+  Heart, Brain, Music, MessageCircle, Users, Activity,
+  TrendingUp, Star, Zap, Sparkles, Target, Award,
+  PlayCircle, Headphones, BookOpen, Calendar
+} from 'lucide-react';
+import PremiumBackground from '@/components/premium/PremiumBackground';
+import ImmersiveExperience from '@/components/premium/ImmersiveExperience';
+import GamificationSystem from '@/components/premium/GamificationSystem';
+import SmartRecommendations from '@/components/premium/SmartRecommendations';
+import AnimatedButton from '@/components/premium/AnimatedButton';
+import QuickActions from '@/components/premium/QuickActions';
+import { useNavigate } from 'react-router-dom';
 
-const B2CDashboardPage: React.FC = () => {
+export default function B2CDashboardPage() {
+  const [showWelcome, setShowWelcome] = useState(false);
   const navigate = useNavigate();
-  const [wellbeingScore, setWellbeingScore] = useState(78);
+  const [wellbeingScore, setWellbeingScore] = useState(85);
   const [todaysGoals] = useState([
     { id: 1, title: "Méditation matinale", completed: true },
-    { id: 2, title: "Scan émotionnel", completed: false },
+    { id: 2, title: "Scan émotionnel", completed: true },
     { id: 3, title: "15 min d'exercice", completed: false },
   ]);
 
-  const quickActions = [
-    { 
-      title: "Scan Émotionnel", 
-      icon: Scan, 
-      path: "/app/scan", 
-      description: "Analysez votre état émotionnel actuel",
-      color: "bg-blue-500" 
-    },
-    { 
-      title: "Journal Personnel", 
-      icon: BookOpen, 
-      path: "/app/journal", 
-      description: "Notez vos pensées et émotions",
-      color: "bg-green-500" 
-    },
-    { 
-      title: "Musicothérapie", 
-      icon: Music, 
-      path: "/app/music", 
-      description: "Musique adaptée à votre humeur",
-      color: "bg-purple-500" 
-    },
-    { 
-      title: "Coach IA", 
-      icon: MessageCircle, 
-      path: "/app/coach", 
-      description: "Conversations avec votre coach virtuel",
-      color: "bg-orange-500" 
-    },
-    { 
-      title: "Expérience VR",
-      icon: Globe, 
-      path: "/app/vr", 
-      description: "Immersion dans des environnements apaisants",
-      color: "bg-cyan-500" 
-    },
-            { 
-              title: "Cocon Social", 
-              icon: Users, 
-              path: "/app/social-cocon", 
-              description: "Connectez avec la communauté",
-              color: "bg-pink-500" 
-            },
-  ];
+  const completedGoals = todaysGoals.filter(goal => goal.completed).length;
+  const progressPercentage = (completedGoals / todaysGoals.length) * 100;
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header avec accueil personnalisé */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">
-              Bonjour ! 👋
-            </h1>
-            <p className="text-gray-600 text-lg mt-2">
-              Comment vous sentez-vous aujourd'hui ?
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button onClick={() => navigate('/settings/general')} variant="outline">
-              <Settings className="w-4 h-4 mr-2" />
-              Préférences
-            </Button>
-            <Button onClick={() => navigate('/app/scan')} className="bg-gradient-to-r from-blue-500 to-purple-500">
-              <Heart className="w-4 h-4 mr-2" />
-              Scan Rapide
-            </Button>
-          </div>
-        </div>
-
-        {/* Score de bien-être */}
-        <Card className="border-none shadow-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Score de Bien-être</h3>
-                <div className="flex items-center gap-4">
-                  <span className="text-4xl font-bold">{wellbeingScore}%</span>
-                  <div className="flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-1" />
-                    <span className="text-sm">+5% cette semaine</span>
-                  </div>
+    <>
+      <PremiumBackground variant="particles" intensity="medium">
+        <div className="min-h-screen p-6">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {/* Header Premium avec gradient */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-indigo-600/20 backdrop-blur-xl border border-white/10 p-8"
+            >
+              <div className="flex justify-between items-center relative z-10">
+                <div>
+                  <motion.h1 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-4xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent"
+                  >
+                    Bonjour ! ✨
+                  </motion.h1>
+                  <motion.p 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-white/80 text-lg mt-2"
+                  >
+                    Votre bien-être émotionnel vous attend
+                  </motion.p>
+                </div>
+                <div className="flex gap-3">
+                  <AnimatedButton
+                    variant="premium"
+                    animation="glow"
+                    onClick={() => navigate('/settings/general')}
+                    leftIcon={<Target className="w-4 h-4" />}
+                  >
+                    Préférences
+                  </AnimatedButton>
+                  <AnimatedButton
+                    variant="magical"
+                    animation="shimmer"
+                    particles={true}
+                    onClick={() => navigate('/app/scan')}
+                    leftIcon={<Heart className="w-4 h-4" />}
+                  >
+                    Scan Express
+                  </AnimatedButton>
                 </div>
               </div>
-              <div className="text-right">
-                <Progress value={wellbeingScore} className="w-32 mb-2" />
-                <Badge variant="secondary" className="text-blue-600">
-                  Excellent progrès
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Objectifs du jour */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Target className="w-5 h-5 mr-2" />
-              Objectifs du jour
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {todaysGoals.map((goal) => (
-                <div key={goal.id} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-                  <input 
-                    type="checkbox" 
-                    checked={goal.completed}
-                    className="w-5 h-5 text-blue-600"
-                    readOnly
+              
+              {/* Particules décoratives */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-1 h-1 bg-white/30 rounded-full"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                    }}
+                    animate={{
+                      y: [0, -10, 0],
+                      opacity: [0.3, 0.8, 0.3],
+                      scale: [1, 1.2, 1]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      delay: i * 0.1
+                    }}
                   />
-                  <span className={`flex-1 ${goal.completed ? 'line-through text-gray-500' : ''}`}>
-                    {goal.title}
-                  </span>
-                  <Clock className="w-4 h-4 text-gray-400" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions rapides */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Actions Rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickActions.map((action, index) => {
-              const IconComponent = action.icon;
-              return (
-                <Card 
-                  key={index}
-                  className="group hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                  onClick={() => navigate(action.path)}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className={`p-3 rounded-xl ${action.color} text-white group-hover:scale-110 transition-transform`}>
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <CardTitle className="text-lg">{action.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      {action.description}
-                    </p>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Commencer
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Modules Fun-First */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Modules Fun-First</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { title: "Flash Glow", icon: Zap, path: "/app/flash-glow", description: "Boost d'énergie instantané", color: "bg-yellow-500" },
-              { title: "Breathwork", icon: Wind, path: "/app/breath", description: "Techniques de respiration", color: "bg-cyan-500" },
-              { title: "Emotion Scan", icon: Scan, path: "/app/emotion-scan", description: "Analyse émotionnelle avancée", color: "bg-indigo-500" },
-              { title: "VR Galaxy", icon: Globe, path: "/app/vr-galaxy", description: "Voyage cosmique immersif", color: "bg-purple-500" },
-              { title: "Mood Mixer", icon: Music, path: "/app/mood-mixer", description: "DJ personnalisé émotionnel", color: "bg-pink-500" },
-              { title: "Voice Journal", icon: Mic, path: "/app/voice-journal", description: "Journal vocal intelligent", color: "bg-green-500" },
-              { title: "Bounce Back", icon: Target, path: "/app/bounce-back", description: "Battle de résilience", color: "bg-red-500" },
-              { title: "Boss Grit", icon: Trophy, path: "/app/boss-grit", description: "Niveau de détermination", color: "bg-orange-500" }
-            ].map((module, index) => {
-              const IconComponent = module.icon;
-              return (
-                <Card 
-                  key={index}
-                  className="group hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                  onClick={() => navigate(module.path)}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className={`p-3 rounded-xl ${module.color} text-white group-hover:scale-110 transition-transform`}>
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <CardTitle className="text-lg">{module.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      {module.description}
-                    </p>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Découvrir
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Section Gamification */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Trophy className="w-5 h-5 mr-2" />
-              Vos Récompenses
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-500">12</div>
-                  <div className="text-sm text-gray-600">Badges</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-500">847</div>
-                  <div className="text-sm text-gray-600">Points</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-500">7</div>
-                  <div className="text-sm text-gray-600">Jours de suite</div>
-                </div>
+                ))}
               </div>
-              <Button onClick={() => navigate('/app/leaderboard')} variant="outline">
-                Voir tout
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
+            </motion.div>
 
-export default B2CDashboardPage;
+            {/* Score de bien-être premium */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-background/95 to-teal-500/10 border-emerald-500/20 shadow-emerald-500/10 shadow-2xl">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-full bg-emerald-500/20">
+                          <TrendingUp className="w-8 h-8 text-emerald-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-emerald-400">Score de Bien-être</h3>
+                          <p className="text-sm text-muted-foreground">Votre évolution aujourd'hui</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <span className="text-5xl font-bold text-emerald-400">{wellbeingScore}%</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-emerald-400">
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                            <span className="text-sm font-medium">+8% cette semaine</span>
+                          </div>
+                          <Badge variant="outline" className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
+                            ⭐ Performance exceptionnelle
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right space-y-4">
+                      <div className="w-32">
+                        <Progress value={wellbeingScore} className="h-3" />
+                      </div>
+                      <AnimatedButton
+                        variant="success"
+                        size="sm"
+                        leftIcon={<Activity className="w-4 h-4" />}
+                        onClick={() => navigate('/app/activity')}
+                      >
+                        Voir Détails
+                      </AnimatedButton>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Objectifs du jour premium */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="bg-gradient-to-br from-background/95 to-accent/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Target className="w-5 h-5 text-primary" />
+                      Objectifs du jour
+                    </div>
+                    <Badge variant="outline" className="bg-primary/10">
+                      {completedGoals}/{todaysGoals.length} complétés
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span>Progression du jour</span>
+                        <span>{Math.round(progressPercentage)}%</span>
+                      </div>
+                      <Progress value={progressPercentage} className="h-2" />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {todaysGoals.map((goal, index) => (
+                        <motion.div
+                          key={goal.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.6 + index * 0.1 }}
+                          className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-accent/5 to-transparent hover:from-accent/10 transition-all"
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <input 
+                              type="checkbox" 
+                              checked={goal.completed}
+                              className="w-5 h-5 text-primary rounded focus:ring-primary"
+                              readOnly
+                            />
+                          </motion.div>
+                          <span className={`flex-1 font-medium ${goal.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                            {goal.title}
+                          </span>
+                          {goal.completed && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                              ✓ Terminé
+                            </Badge>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Actions rapides premium */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <QuickActions context="dashboard" />
+            </motion.div>
+
+            {/* Système de gamification compact */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <GamificationSystem compact currentXP={2150} currentLevel={4} />
+            </motion.div>
+
+            {/* Recommandations IA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <SmartRecommendations 
+                maxRecommendations={3} 
+                currentEmotion="energetic"
+                timeOfDay="afternoon"
+              />
+            </motion.div>
+
+            {/* Stats rapides */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            >
+              {[
+                { label: "Sessions", value: "47", icon: PlayCircle, color: "text-blue-400" },
+                { label: "Streak", value: "12j", icon: Flame, color: "text-orange-400" },
+                { label: "Niveau", value: "4", icon: Star, color: "text-amber-400" },
+                { label: "Badges", value: "18", icon: Award, color: "text-purple-400" }
+              ].map((stat, index) => (
+                <Card key={index} className="bg-gradient-to-br from-background/95 to-accent/5 hover:shadow-lg transition-all">
+                  <CardContent className="p-4 text-center">
+                    <div className={`inline-flex p-3 rounded-full bg-accent/10 ${stat.color} mb-3`}>
+                      <stat.icon className="w-5 h-5" />
+                    </div>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </PremiumBackground>
+
+      {/* Expérience immersive de bienvenue */}
+      {showWelcome && (
+        <ImmersiveExperience
+          variant="welcome"
+          title="Bienvenue dans EmotionsCare Premium"
+          subtitle="Votre plateforme de bien-être émotionnel nouvelle génération"
+          onComplete={() => setShowWelcome(false)}
+        >
+          <div className="text-center space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Découvrez une expérience personnalisée avec l'IA, des recommandations intelligentes 
+              et un système de gamification pour booster votre bien-être.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Badge variant="outline" className="bg-white/10 border-white/20">
+                🧠 IA Personnalisée
+              </Badge>
+              <Badge variant="outline" className="bg-white/10 border-white/20">
+                🎵 Musicothérapie
+              </Badge>
+              <Badge variant="outline" className="bg-white/10 border-white/20">
+                🏆 Gamification
+              </Badge>
+            </div>
+          </div>
+        </ImmersiveExperience>
+      )}
+    </>
+  );
+}
