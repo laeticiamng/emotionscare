@@ -98,6 +98,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_coach_sessions: {
+        Row: {
+          coach_personality: string | null
+          created_at: string | null
+          emotions_detected: Json | null
+          id: string
+          messages_count: number | null
+          resources_provided: Json | null
+          session_duration: number | null
+          session_notes: string | null
+          techniques_suggested: string[] | null
+          updated_at: string | null
+          user_id: string | null
+          user_satisfaction: number | null
+        }
+        Insert: {
+          coach_personality?: string | null
+          created_at?: string | null
+          emotions_detected?: Json | null
+          id?: string
+          messages_count?: number | null
+          resources_provided?: Json | null
+          session_duration?: number | null
+          session_notes?: string | null
+          techniques_suggested?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_satisfaction?: number | null
+        }
+        Update: {
+          coach_personality?: string | null
+          created_at?: string | null
+          emotions_detected?: Json | null
+          id?: string
+          messages_count?: number | null
+          resources_provided?: Json | null
+          session_duration?: number | null
+          session_notes?: string | null
+          techniques_suggested?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_satisfaction?: number | null
+        }
+        Relationships: []
+      }
       ai_generated_content: {
         Row: {
           content: Json
@@ -2559,6 +2604,48 @@ export type Database = {
         }
         Relationships: []
       }
+      gamification_activities: {
+        Row: {
+          achievements_unlocked: string[] | null
+          activity_name: string
+          activity_type: string
+          completion_percentage: number | null
+          created_at: string | null
+          difficulty_level: string | null
+          duration: number | null
+          id: string
+          points_earned: number | null
+          session_data: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          achievements_unlocked?: string[] | null
+          activity_name: string
+          activity_type: string
+          completion_percentage?: number | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          duration?: number | null
+          id?: string
+          points_earned?: number | null
+          session_data?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          achievements_unlocked?: string[] | null
+          activity_name?: string
+          activity_type?: string
+          completion_percentage?: number | null
+          created_at?: string | null
+          difficulty_level?: string | null
+          duration?: number | null
+          id?: string
+          points_earned?: number | null
+          session_data?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       generated_ambient_images: {
         Row: {
           created_at: string
@@ -4661,6 +4748,51 @@ export type Database = {
           },
         ]
       }
+      music_playlists: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          mood: string | null
+          name: string
+          play_count: number | null
+          tags: string[] | null
+          total_duration: number | null
+          tracks: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          mood?: string | null
+          name: string
+          play_count?: number | null
+          tags?: string[] | null
+          total_duration?: number | null
+          tracks?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          mood?: string | null
+          name?: string
+          play_count?: number | null
+          tags?: string[] | null
+          total_duration?: number | null
+          tracks?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       music_sessions: {
         Row: {
           created_at: string | null
@@ -6447,6 +6579,51 @@ export type Database = {
           preferences?: Json
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences_advanced: {
+        Row: {
+          accessibility_settings: Json | null
+          created_at: string | null
+          daily_reminders: boolean | null
+          data_sharing_consent: boolean | null
+          id: string
+          notification_preferences: Json | null
+          preferred_coach_personality: string | null
+          privacy_settings: Json | null
+          ui_customization: Json | null
+          updated_at: string | null
+          user_id: string | null
+          wellbeing_goals: Json | null
+        }
+        Insert: {
+          accessibility_settings?: Json | null
+          created_at?: string | null
+          daily_reminders?: boolean | null
+          data_sharing_consent?: boolean | null
+          id?: string
+          notification_preferences?: Json | null
+          preferred_coach_personality?: string | null
+          privacy_settings?: Json | null
+          ui_customization?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          wellbeing_goals?: Json | null
+        }
+        Update: {
+          accessibility_settings?: Json | null
+          created_at?: string | null
+          daily_reminders?: boolean | null
+          data_sharing_consent?: boolean | null
+          id?: string
+          notification_preferences?: Json | null
+          preferred_coach_personality?: string | null
+          privacy_settings?: Json | null
+          ui_customization?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          wellbeing_goals?: Json | null
         }
         Relationships: []
       }
