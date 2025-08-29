@@ -25,7 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { routes } from '@/routerV2/routes';
+import { Routes } from '@/routerV2/helpers';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
@@ -71,7 +71,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Tableau de Bord',
           description: 'Vue d\'ensemble de votre bien-être',
           icon: <BarChart3 className="w-5 h-5" />,
-          path: routes.b2c.dashboard(),
+          path: Routes.consumerHome(),
           category: 'core',
           xp: 50,
           segment: 'consumer'
@@ -81,7 +81,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Centre Émotionnel',
           description: 'Analyse et développement émotionnel',
           icon: <Brain className="w-5 h-5" />,
-          path: routes.b2c.emotions(),
+          path: '/app/emotions',
           category: 'core',
           new: true,
           xp: 150,
@@ -92,7 +92,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Scan Rapide',
           description: 'Analyse instantanée de votre état',
           icon: <Eye className="w-5 h-5" />,
-          path: routes.b2c.scan(),
+          path: Routes.scan(),
           category: 'core',
           xp: 75,
           segment: 'consumer'
@@ -102,7 +102,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Communauté',
           description: 'Connectez-vous et partagez',
           icon: <Users className="w-5 h-5" />,
-          path: routes.b2c.community(),
+          path: '/app/community',
           category: 'core',
           badge: '2.4k',
           xp: 100,
@@ -121,7 +121,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Musicothérapie IA',
           description: 'Musique adaptative pour votre humeur',
           icon: <Music className="w-5 h-5" />,
-          path: routes.b2c.music(),
+          path: Routes.music(),
           category: 'therapy',
           premium: true,
           xp: 200,
@@ -132,7 +132,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Coach IA Personnel',
           description: 'Accompagnement personnalisé 24/7',
           icon: <MessageCircle className="w-5 h-5" />,
-          path: routes.b2c.coach(),
+          path: Routes.coach(),
           category: 'therapy',
           premium: true,
           xp: 180,
@@ -143,7 +143,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Respiration Thérapeutique',
           description: 'Techniques avancées de respiration',
           icon: <Wind className="w-5 h-5" />,
-          path: routes.b2c.breathwork(),
+          path: Routes.breath(),
           category: 'therapy',
           xp: 120,
           segment: 'consumer'
@@ -153,7 +153,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Expérience VR Immersive',
           description: 'Environnements virtuels thérapeutiques',
           icon: <Compass className="w-5 h-5" />,
-          path: routes.b2c.vr(),
+          path: Routes.vr(),
           category: 'therapy',
           premium: true,
           new: true,
@@ -173,7 +173,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Journal Intelligent',
           description: 'Journaling avec IA émotionnelle',
           icon: <BookOpen className="w-5 h-5" />,
-          path: routes.b2c.journal(),
+          path: Routes.journal(),
           category: 'creative',
           xp: 90,
           segment: 'consumer'
@@ -212,7 +212,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Flash Glow Boost',
           description: 'Boost d\'énergie instantané',
           icon: <Zap className="w-5 h-5" />,
-          path: routes.b2c.flashGlow(),
+          path: Routes.flashGlow(),
           category: 'games',
           xp: 80,
           segment: 'consumer'
@@ -222,7 +222,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Bubble Beat Sync',
           description: 'Jeu rythmique anti-stress',
           icon: <Activity className="w-5 h-5" />,
-          path: routes.b2c.bubbleBeat(),
+          path: Routes.bubbleBeat(),
           category: 'games',
           xp: 100,
           segment: 'consumer'
@@ -232,7 +232,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Mood Mixer DJ',
           description: 'DJ personnel émotionnel',
           icon: <Headphones className="w-5 h-5" />,
-          path: routes.b2c.moodMixer(),
+          path: Routes.moodMixer(),
           category: 'games',
           xp: 130,
           segment: 'consumer'
@@ -242,7 +242,7 @@ const PremiumNavigation: React.FC = () => {
           title: 'Boss Level Grit',
           description: 'Développement de la détermination',
           icon: <Target className="w-5 h-5" />,
-          path: routes.b2c.bossLevel(),
+          path: Routes.bossGrit(),
           category: 'games',
           premium: true,
           xp: 200,
