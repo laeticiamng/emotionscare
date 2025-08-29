@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  VrHeadset, 
+  Headphones, 
   Play, 
   Pause, 
   RotateCcw,
@@ -295,7 +295,7 @@ export default function B2CVRExperienceEnhanced() {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-blue-500">
-              <VrHeadset className="w-8 h-8 text-white" />
+              <Headphones className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Expérience VR Thérapeutique
@@ -446,7 +446,7 @@ export default function B2CVRExperienceEnhanced() {
                       size="sm"
                       className={vrConnected ? "bg-green-600 hover:bg-green-700" : "border-gray-600"}
                     >
-                      <VrHeadset className="w-4 h-4 mr-2" />
+                      <Headphones className="w-4 h-4 mr-2" />
                       {vrConnected ? "VR Connecté" : "Connecter VR"}
                     </Button>
                   </div>
