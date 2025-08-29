@@ -38,6 +38,20 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'HelpPage',
   },
   {
+    name: 'demo',
+    path: '/demo',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'DemoPage',
+  },
+  {
+    name: 'onboarding',
+    path: '/onboarding',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'OnboardingPage',
+  },
+  {
     name: 'privacy',
     path: '/privacy',
     segment: 'public',
@@ -439,6 +453,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CNotificationsPage',
     guard: true,
     aliases: ['/notifications'],
+  },
+  {
+    name: 'settings-data-privacy',
+    path: '/settings/data-privacy',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CDataPrivacyPage',
+    guard: true,
+    aliases: ['/data-privacy'],
   },
 
   // ═══════════════════════════════════════════════════════════

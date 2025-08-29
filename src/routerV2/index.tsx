@@ -24,6 +24,8 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
+const DemoPage = lazy(() => import('@/pages/DemoPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
 // Auth & Landing  
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
@@ -62,6 +64,7 @@ const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage'));
 const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
+const B2CDataPrivacyPage = lazy(() => import('@/pages/B2CDataPrivacyPage'));
 
 // B2B Features - use dedicated pages
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
@@ -110,6 +113,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   AboutPage,
   ContactPage,
   HelpPage,
+  DemoPage,
+  OnboardingPage,
   LoginPage,
   SignupPage,
   
@@ -144,6 +149,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CProfileSettingsPage,
   B2CPrivacyTogglesPage,
   B2CNotificationsPage,
+  B2CDataPrivacyPage,
   
   // B2B
   B2BTeamsPage,
