@@ -78,12 +78,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...enhancedProps}
       >
         {children}
-        {/* Indicateur visuel pour les boutons disabled (lecteurs d'écran) */}
-        {disabled && (
-          <span className="sr-only">
-            Ce bouton est actuellement désactivé
-          </span>
-        )}
       </Comp>
     )
   }
