@@ -23,7 +23,7 @@ import {
   Database,
   Server,
   Settings,
-  FileShield
+  FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -70,7 +70,7 @@ const B2BSecurityPage: React.FC = () => {
       description: 'Traçabilité complète de toutes les actions utilisateurs',
       enabled: auditLogs,
       onToggle: setAuditLogs,
-      icon: <FileShield className="h-5 w-5" />,
+      icon: <FileText className="h-5 w-5" />,
       status: auditLogs ? 'active' : 'inactive',
       compliance: ['SOC 2', 'ISO 27001']
     },
