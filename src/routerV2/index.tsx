@@ -74,6 +74,18 @@ const B2BSecurityPage = lazy(() => import('@/pages/SecurityPage'));
 const B2BAuditPage = lazy(() => import('@/pages/AuditPage'));
 const B2BAccessibilityPage = lazy(() => import('@/pages/AccessibilityPage'));
 
+// Pages orphelines à intégrer
+const ApiMonitoringPage = lazy(() => import('@/pages/ApiMonitoringPage'));
+const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage'));
+const B2CBossLevelGritPage = lazy(() => import('@/pages/B2CBossLevelGritPage'));
+const B2CBounceBackBattlePage = lazy(() => import('@/pages/B2CBounceBackBattlePage'));
+const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
+const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
+const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
+const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+
 // Pages système
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
@@ -136,6 +148,18 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BSecurityPage,
   B2BAuditPage,
   B2BAccessibilityPage,
+  B2BLandingPage,
+  B2BSelectionPage,
+  
+  // Pages orphelines intégrées
+  ApiMonitoringPage,
+  B2CAmbitionArcadePage,
+  B2CBossLevelGritPage,
+  B2CBounceBackBattlePage,
+  B2CMoodMixerPage,
+  B2CSocialCoconPage,
+  B2CStorySynthLabPage,
+  PrivacyPage,
   
   // System
   UnauthorizedPage,

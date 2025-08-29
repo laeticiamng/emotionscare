@@ -17,38 +17,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'HomePage',
   },
   {
-    name: 'b2c-landing',
-    path: '/b2c',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'HomeB2C',
-    aliases: ['/choose-mode'],
-  },
-  {
-    name: 'b2b-landing',
-    path: '/entreprise',
-    segment: 'public', 
-    layout: 'marketing',
-    component: 'HomeB2B',
-    aliases: ['/b2b', '/b2b/selection'],
-  },
-  {
-    name: 'login',
-    path: '/login',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'LoginPage',
-    aliases: ['/auth', '/b2c/login', '/b2b/user/login', '/b2b/admin/login'],
-  },
-  {
-    name: 'signup',
-    path: '/signup',
-    segment: 'public',
-    layout: 'marketing', 
-    component: 'SignupPage',
-    aliases: ['/register', '/b2c/register', '/b2b/user/register'],
-  },
-  {
     name: 'about',
     path: '/about',
     segment: 'public',
@@ -68,11 +36,64 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'HelpPage',
-    aliases: ['/help-center'],
+  },
+  {
+    name: 'privacy',
+    path: '/privacy',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'PrivacyPage',
+  },
+  {
+    name: 'b2c-landing',
+    path: '/b2c',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'HomeB2C',
+    aliases: ['/choose-mode'],
+  },
+  {
+    name: 'b2b-landing',
+    path: '/entreprise',
+    segment: 'public', 
+    layout: 'marketing',
+    component: 'HomeB2B',
+    aliases: ['/b2b'],
+  },
+  {
+    name: 'b2b-landing-detailed',
+    path: '/b2b/landing',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'B2BLandingPage',
+  },
+  {
+    name: 'b2b-selection',
+    path: '/b2b/selection',
+    segment: 'b2b',
+    layout: 'app',
+    guard: true,
+    component: 'B2BSelectionPage',
+  },
+  {
+    name: 'login',
+    path: '/login',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LoginPage',
+    aliases: ['/auth', '/b2c/login', '/b2b/user/login', '/b2b/admin/login'],
+  },
+  {
+    name: 'signup',
+    path: '/signup',
+    segment: 'public',
+    layout: 'marketing', 
+    component: 'SignupPage',
+    aliases: ['/register', '/b2c/register', '/b2b/user/register'],
   },
 
   // ═══════════════════════════════════════════════════════════
-  // APP DISPATCHER
+  // APP DISPATCHER & DASHBOARDS
   // ═══════════════════════════════════════════════════════════
   {
     name: 'app-gate',
@@ -82,10 +103,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'AppGatePage',
     guard: true,
   },
-
-  // ═══════════════════════════════════════════════════════════
-  // DASHBOARDS PRINCIPAUX
-  // ═══════════════════════════════════════════════════════════
   {
     name: 'consumer-home',
     path: '/app/home',
@@ -284,6 +301,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/story-synth-lab'],
   },
+  {
+    name: 'social-cocon-b2c',
+    path: '/app/social-cocon',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CSocialCoconPage',
+    guard: true,
+    aliases: ['/social-cocon'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // ANALYTICS & DATA (CONSUMER)
@@ -377,14 +404,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/teams'],
   },
   {
-    name: 'social-cocon',
+    name: 'social-cocon-b2b',
     path: '/app/social',
     segment: 'employee',
     role: 'employee',
     layout: 'app',
     component: 'B2BSocialCoconPage',
     guard: true,
-    aliases: ['/social-cocon'],
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -449,6 +475,19 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2BAccessibilityPage',
     guard: true,
     aliases: ['/accessibility'],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // SYSTÈME & MONITORING
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'api-monitoring',
+    path: '/system/api-monitoring',
+    segment: 'system',
+    layout: 'app',
+    guard: true,
+    role: 'admin',
+    component: 'ApiMonitoringPage',
   },
 
   // ═══════════════════════════════════════════════════════════
