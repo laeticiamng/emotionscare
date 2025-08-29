@@ -1,41 +1,50 @@
-import { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { usePageMetadata } from '@/hooks/usePageMetadata';
+import { ArrowLeft, Wind, Play } from 'lucide-react';
 
-const B2CBreathworkPage = () => {
-  usePageMetadata('Breathwork', 'Exercices de respiration guidés', '/b2c/breathwork', 'calm');
+const B2CBreathworkPage: React.FC = () => {
+  const navigate = useNavigate();
 
-  const [isBreathing, setIsBreathing] = useState(false);
+  const techniques = [
+    { id: '1', name: 'Respiration 4-7-8', description: 'Technique apaisante', icon: '🌙' },
+    { id: '2', name: 'Box Breathing', description: 'Respiration carrée', icon: '⚡' },
+    { id: '3', name: 'Cohérence Cardiaque', description: 'Synchronisation cardiaque', icon: '💚' }
+  ];
 
   return (
-    <div data-testid="page-root" className="container mx-auto px-4 py-8 space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Breathwork</h1>
-        <p className="text-muted-foreground">Techniques de respiration pour le bien-être</p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Exercice de Respiration</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-center space-y-4">
-            {!isBreathing ? (
-              <Button onClick={() => setIsBreathing(true)}>
-                Commencer l'exercice
-              </Button>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-lg">Respirez profondément...</div>
-                <Button onClick={() => setIsBreathing(false)}>
-                  Arrêter
-                </Button>
-              </div>
-            )}
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => navigate('/app/home')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Respiration Thérapeutique</h1>
+            <p className="text-gray-600">Techniques de bien-être</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {techniques.map((technique) => (
+            <Card key={technique.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader className="text-center">
+                <div className="text-4xl mb-3">{technique.icon}</div>
+                <CardTitle>{technique.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">{technique.description}</p>
+                <Button className="w-full">
+                  <Play className="w-4 h-4 mr-2" />
+                  Commencer
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Heart, Brain, Music, BookOpen, Globe, Trophy, Users, Settings, 
-         Scan, Play, MessageCircle, Target, Clock, TrendingUp } from 'lucide-react';
+         Scan, Play, MessageCircle, Target, Clock, TrendingUp, Zap, Wind, Mic } from 'lucide-react';
 
 const B2CDashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -142,7 +142,7 @@ const B2CDashboardPage: React.FC = () => {
         {/* Actions rapides */}
         <div>
           <h2 className="text-2xl font-bold mb-6">Actions Rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions.map((action, index) => {
               const IconComponent = action.icon;
               return (
@@ -170,6 +170,54 @@ const B2CDashboardPage: React.FC = () => {
                     >
                       <Play className="w-4 h-4 mr-2" />
                       Commencer
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Modules Fun-First */}
+        <div>
+          <h2 className="text-2xl font-bold mb-6">Modules Fun-First</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Flash Glow", icon: Zap, path: "/app/flash-glow", description: "Boost d'énergie instantané", color: "bg-yellow-500" },
+              { title: "Breathwork", icon: Wind, path: "/app/breath", description: "Techniques de respiration", color: "bg-cyan-500" },
+              { title: "Emotion Scan", icon: Scan, path: "/app/emotion-scan", description: "Analyse émotionnelle avancée", color: "bg-indigo-500" },
+              { title: "VR Galaxy", icon: Globe, path: "/app/vr-galaxy", description: "Voyage cosmique immersif", color: "bg-purple-500" },
+              { title: "Mood Mixer", icon: Music, path: "/app/mood-mixer", description: "DJ personnalisé émotionnel", color: "bg-pink-500" },
+              { title: "Voice Journal", icon: Mic, path: "/app/voice-journal", description: "Journal vocal intelligent", color: "bg-green-500" },
+              { title: "Bounce Back", icon: Target, path: "/app/bounce-back", description: "Battle de résilience", color: "bg-red-500" },
+              { title: "Boss Grit", icon: Trophy, path: "/app/boss-grit", description: "Niveau de détermination", color: "bg-orange-500" }
+            ].map((module, index) => {
+              const IconComponent = module.icon;
+              return (
+                <Card 
+                  key={index}
+                  className="group hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                  onClick={() => navigate(module.path)}
+                >
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className={`p-3 rounded-xl ${module.color} text-white group-hover:scale-110 transition-transform`}>
+                        <IconComponent className="w-6 h-6" />
+                      </div>
+                      <CardTitle className="text-lg">{module.title}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      {module.description}
+                    </p>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full group-hover:bg-primary group-hover:text-primary-foreground"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Découvrir
                     </Button>
                   </CardContent>
                 </Card>
