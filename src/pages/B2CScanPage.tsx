@@ -4,7 +4,7 @@ import {
   Camera, Eye, Brain, Heart, Zap, Play, Square, RotateCcw,
   CheckCircle, AlertCircle, Sparkles, TrendingUp, Star,
   Activity, Smile, Frown, Meh, Timer, Target, Award,
-  Mic, Settings, Volume2, VolumeX, RefreshCw, Download
+  Mic, Settings, Volume2, VolumeX, RefreshCw, Download, BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
