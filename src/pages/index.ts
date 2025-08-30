@@ -91,3 +91,15 @@ export { default as UnauthorizedPage } from './UnauthorizedPage';
 export { default as NotFoundPage } from './NotFoundPage';
 export { default as ServerErrorPage } from './ServerErrorPage';
 export { default as ForbiddenPage } from './ForbiddenPage';
+
+// Development & Missing pages
+export { default as DemoPage } from './DemoPage';
+export { default as ValidationStatusPage } from './ValidationStatusPage';
+export { default as SystemValidationPage } from './SystemValidationPage';
+export { default as DiagnosticPage } from './DiagnosticPage';
+export { default as SystemRepairPage } from './SystemRepairPage';
+export { default as MissingPagesManifest } from './MissingPagesManifest';
+export { default as B2CDataPrivacyPage } from './B2CDataPrivacyPage';
+
+// Music page export
+export { default as B2CMusicEnhanced } from './B2CMusicEnhanced';
