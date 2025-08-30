@@ -29,6 +29,9 @@ export const Routes = {
   about: () => '/about',
   contact: () => '/contact',
   help: () => '/help',
+  demo: () => '/demo',
+  onboarding: () => '/onboarding',
+  privacy: () => '/privacy',
 
   // ═══════════════════════════════════════════════════════════
   // APP & DASHBOARDS
@@ -63,6 +66,9 @@ export const Routes = {
   ambitionArcade: () => '/app/ambition-arcade',
   bounceBack: () => '/app/bounce-back',
   storySynth: () => '/app/story-synth',
+  emotions: () => '/app/emotions',
+  community: () => '/app/community',
+  socialCoconB2C: () => '/app/social-cocon',
 
   // ═══════════════════════════════════════════════════════════
   // ANALYTICS & DATA
@@ -78,12 +84,15 @@ export const Routes = {
   settingsProfile: () => '/settings/profile',
   settingsPrivacy: () => '/settings/privacy',
   settingsNotifications: () => '/settings/notifications',
+  settingsDataPrivacy: () => '/settings/data-privacy',
 
   // ═══════════════════════════════════════════════════════════
   // B2B FEATURES
   // ═══════════════════════════════════════════════════════════
   teams: () => '/app/teams',
-  socialCocon: () => '/app/social',
+  socialCoconB2B: () => '/app/social',
+  b2bSelection: () => '/b2b/selection',
+  b2bLandingDetailed: () => '/b2b/landing',
 
   // ═══════════════════════════════════════════════════════════
   // B2B ADMIN
@@ -94,6 +103,12 @@ export const Routes = {
   adminSecurity: () => '/app/security',
   adminAudit: () => '/app/audit',
   adminAccessibility: () => '/app/accessibility',
+  apiMonitoring: () => '/system/api-monitoring',
+
+  // ═══════════════════════════════════════════════════════════
+  // NAVIGATION & SYSTEM
+  // ═══════════════════════════════════════════════════════════
+  navigation: () => '/navigation',
 
   // ═══════════════════════════════════════════════════════════
   // PAGES SYSTÈME

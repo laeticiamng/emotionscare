@@ -565,10 +565,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'api-monitoring',
     path: '/system/api-monitoring',
-    segment: 'system',
+    segment: 'manager',
     layout: 'app',
     guard: true,
-    role: 'admin',
+    role: 'manager',
     component: 'ApiMonitoringPage',
   },
 
