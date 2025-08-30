@@ -10,7 +10,6 @@ import {
   TrendingUp, Calendar, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import AnimatedButton from './AnimatedButton';
 
 interface Achievement {
   id: string;
@@ -375,22 +374,20 @@ const GamificationSystem: React.FC<GamificationSystemProps> = ({
 
       {/* Actions rapides */}
       <div className="flex gap-4 justify-center">
-        <AnimatedButton
-          variant="premium"
-          animation="glow"
-          particles={true}
-          leftIcon={<Gift className="w-4 h-4" />}
+        <Button
+          variant="default"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
         >
+          <Gift className="w-4 h-4 mr-2" />
           Réclamer Récompenses
-        </AnimatedButton>
+        </Button>
         
-        <AnimatedButton
-          variant="magical"
-          animation="shimmer"
-          leftIcon={<Activity className="w-4 h-4" />}
+        <Button
+          variant="outline"
         >
+          <Activity className="w-4 h-4 mr-2" />
           Voir Statistiques
-        </AnimatedButton>
+        </Button>
       </div>
     </div>
   );

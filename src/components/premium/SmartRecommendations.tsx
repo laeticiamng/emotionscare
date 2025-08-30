@@ -10,8 +10,6 @@ import {
   BookOpen, Headphones, Activity, Smile
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import AnimatedButton from './AnimatedButton';
-import EnhancedCard from './EnhancedCard';
 
 interface Recommendation {
   id: string;
@@ -301,14 +299,11 @@ const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: index * 0.1 }}
             >
-              <EnhancedCard
-                variant="premium"
-                interactive={true}
-                glowEffect={true}
-                className="h-full"
+              <Card className="h-full bg-gradient-to-br from-background/95 to-primary/5 border-primary/20 hover:shadow-lg transition-all"
               >
-                <div className="space-y-4">
-                  {/* Header avec type et confiance */}
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {/* Header avec type et confiance */}
                   <div className="flex items-start justify-between">
                     <div className={cn(
                       "p-2 rounded-lg flex items-center gap-2",
@@ -376,23 +371,23 @@ const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2">
-                    <AnimatedButton
-                      variant="premium"
-                      size="sm"
-                      className="flex-1"
-                      leftIcon={<PlayCircle className="w-4 h-4" />}
-                    >
-                      Commencer
-                    </AnimatedButton>
-                    
-                    <Button variant="outline" size="sm">
-                      <Heart className="w-4 h-4" />
-                    </Button>
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                      >
+                        <PlayCircle className="w-4 h-4 mr-2" />
+                        Commencer
+                      </Button>
+                      
+                      <Button variant="outline" size="sm">
+                        <Heart className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </EnhancedCard>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -400,13 +395,12 @@ const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
 
       {/* Action pour plus de recommandations */}
       <div className="text-center">
-        <AnimatedButton
-          variant="magical"
-          animation="shimmer"
-          leftIcon={<TrendingUp className="w-4 h-4" />}
+        <Button
+          className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white"
         >
+          <TrendingUp className="w-4 h-4 mr-2" />
           Générer Plus de Recommandations IA
-        </AnimatedButton>
+        </Button>
       </div>
     </div>
   );

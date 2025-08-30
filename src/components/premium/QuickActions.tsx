@@ -9,7 +9,6 @@ import {
   Settings, Share2, Download, Star, Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import AnimatedButton from './AnimatedButton';
 
 interface QuickAction {
   id: string;
@@ -263,15 +262,15 @@ const QuickActions: React.FC<QuickActionsProps> = ({
                 transition={{ delay: index * 0.05 }}
                 className="relative"
               >
-                <AnimatedButton
-                  variant={action.premium ? "premium" : "default"}
+                <Button
+                  variant={action.premium ? "default" : "outline"}
                   size="sm"
                   onClick={action.onClick}
-                  particles={activeAction === action.id}
                   className={cn(
-                    "w-full h-auto flex-col gap-2 p-3 relative",
+                    "w-full h-auto flex-col gap-2 p-3 relative transition-all",
                     action.bgColor,
                     action.color,
+                    action.premium && "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white",
                     activeAction === action.id && "scale-95"
                   )}
                 >
@@ -290,7 +289,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
                       {action.shortcut}
                     </Badge>
                   )}
-                </AnimatedButton>
+                </Button>
 
                 {action.badge && (
                   <Badge 
