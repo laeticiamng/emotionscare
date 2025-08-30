@@ -249,6 +249,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/flash-glow', '/instant-glow', '/b2c-flash-glow'],
   },
   {
+    name: 'flash-glow-advanced',
+    path: '/app/flash-glow-advanced',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CFlashGlowAdvancedPage',
+    guard: true,
+    aliases: ['/flash-glow-velours'],
+  },
+  {
     name: 'breath',
     path: '/app/breath',
     segment: 'consumer',
@@ -259,14 +269,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/breathwork'],
   },
   {
-    name: 'vr-breath',
-    path: '/app/vr-breath',
+    name: 'breathwork-adaptive',
+    path: '/app/breathwork-adaptive',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CBreathVRPage',
+    component: 'B2CBreathworkAdaptivePage',
     guard: true,
-    aliases: ['/vr-respiration'],
+    aliases: ['/breathwork-micro'],
   },
   {
     name: 'face-ar',
@@ -277,6 +287,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CARFiltersPage',
     guard: true,
     aliases: ['/ar-filters'],
+  },
+  {
+    name: 'bubble-beat',
+    path: '/app/bubble-beat',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CBubbleBeatPage',
+    guard: true,
+    aliases: ['/bubble-beat'],
   },
   // Redirections vers routes principales (garder aliases pour 301)
   {
