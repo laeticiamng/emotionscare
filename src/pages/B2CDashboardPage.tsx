@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { 
   Heart, Brain, Music, MessageCircle, Users, Activity,
   TrendingUp, Star, Zap, Sparkles, Target, Award,
-  PlayCircle, Headphones, BookOpen, Calendar
+  PlayCircle, Headphones, BookOpen, Calendar, Flame
 } from 'lucide-react';
 import PremiumBackground from '@/components/premium/PremiumBackground';
 import ImmersiveExperience from '@/components/premium/ImmersiveExperience';
