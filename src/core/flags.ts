@@ -10,10 +10,10 @@ interface FeatureFlags {
 
 // Default flags - can be overridden by API
 const DEFAULT_FLAGS: FeatureFlags = {
-  FF_PREMIUM_SUNO: false,
-  FF_VR: false,
-  FF_COMMUNITY: false,
-  FF_MANAGER_DASH: false,
+  FF_PREMIUM_SUNO: true,
+  FF_VR: true,
+  FF_COMMUNITY: true,
+  FF_MANAGER_DASH: true,
 };
 
 let flagsCache: FeatureFlags | null = null;

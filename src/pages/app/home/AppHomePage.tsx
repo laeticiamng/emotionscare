@@ -17,9 +17,17 @@ import {
 } from "lucide-react";
 
 export default function AppHomePage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const flags = useFlags();
   const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <main data-testid="page-root" className="min-h-screen bg-background">
+        <AsyncState.Loading />
+      </main>
+    );
+  }
 
   const modules = [
     // Mesure
@@ -190,7 +198,7 @@ export default function AppHomePage() {
                     onClick={() => navigate(categorizedModules.mesure[0].path)}>
                 <CardHeader>
                   <div className="flex items-center space-x-2">
-                    <categorizedModules.mesure[0].icon className="h-6 w-6 text-primary" />
+                    <Heart className="h-6 w-6 text-primary" />
                     <CardTitle>Mesure</CardTitle>
                   </div>
                   <CardDescription>Scanner votre état émotionnel</CardDescription>
@@ -289,17 +297,20 @@ export default function AppHomePage() {
 
           {/* Accès rapide aux autres modules */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categorizedModules.other.map((module) => (
-              <Button 
-                key={module.path}
-                variant="outline" 
-                className="h-auto p-4 flex flex-col items-center space-y-2"
-                onClick={() => navigate(module.path)}
-              >
-                <module.icon className="h-5 w-5" />
-                <span className="text-sm">{module.title}</span>
-              </Button>
-            ))}
+            {categorizedModules.other.map((module) => {
+              const IconComponent = module.icon;
+              return (
+                <Button 
+                  key={module.path}
+                  variant="outline" 
+                  className="h-auto p-4 flex flex-col items-center space-y-2"
+                  onClick={() => navigate(module.path)}
+                >
+                  <IconComponent className="h-5 w-5" />
+                  <span className="text-sm">{module.title}</span>
+                </Button>
+              );
+            })}
           </div>
         </AsyncState.Content>
       </div>
