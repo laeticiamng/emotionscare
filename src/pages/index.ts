@@ -10,10 +10,11 @@ export { default as PrivacyPage } from './PrivacyPage';
 // App & Dashboards
 export { default as AppGatePage } from './AppGatePage';
 export { default as HomeB2CPage } from './HomeB2CPage';
-export { default as HomeB2BPage } from './HomeB2BPage';
 export { default as B2CDashboardPage } from './B2CDashboardPage';
 export { default as B2BUserDashboardPage } from './B2BUserDashboardPage';
 export { default as B2BAdminDashboardPage } from './B2BAdminDashboardPage';
+export { default as B2BCollabDashboard } from './B2BCollabDashboard';
+export { default as B2BRHDashboard } from './B2BRHDashboard';
 
 // Modules B2C Core  
 export { default as B2CScanPage } from './B2CScanPage';
@@ -54,15 +55,10 @@ export { default as B2CDataPrivacyPage } from './B2CDataPrivacyPage';
 // B2B Features
 export { default as B2BTeamsPage } from './B2BTeamsPage';
 export { default as B2BSelectionPage } from './B2BSelectionPage';
-export { default as B2BLandingPage } from './B2BLandingPage';
 export { default as B2BEntreprisePage } from './B2BEntreprisePage';
 export { default as B2BSocialCoconPage } from './B2BSocialCoconPage';
 export { default as B2BReportsPage } from './B2BReportsPage';
 export { default as B2BEventsPage } from './B2BEventsPage';
-
-// B2B Dashboards
-export { default as B2BCollabDashboard } from './B2BCollabDashboard';
-export { default as B2BRHDashboard } from './B2BRHDashboard';
 
 // B2B Admin 
 export { default as B2BOptimisationPage } from './B2BOptimisationPage';
@@ -74,14 +70,11 @@ export { default as B2BAccessibilityPage } from './B2BAccessibilityPage';
 export { default as B2CMusicEnhanced } from './B2CMusicEnhanced';
 export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 
-// Navigation & Analytics
-export { default as NavigationPage } from './NavigationPage';
-export { default as CompleteFeatureMatrix } from './CompleteFeatureMatrix';
-
 // Additional pages
 export { default as OnboardingPage } from './OnboardingPage';
 export { default as ApiMonitoringPage } from './ApiMonitoringPage';
 export { default as SubscribePage } from './SubscribePage';
+export { default as DemoPage } from './DemoPage';
 
 // Legal pages
 export { default as LegalTermsPage } from './LegalTermsPage';
@@ -94,8 +87,5 @@ export { default as ServerErrorPage } from './ServerErrorPage';
 export { default as ForbiddenPage } from './ForbiddenPage';
 
 // Development pages
-export { default as DemoPage } from './DemoPage';
-export { default as ValidationStatusPage } from './ValidationStatusPage';
-export { default as SystemValidationPage } from './SystemValidationPage';
-export { default as DiagnosticPage } from './DiagnosticPage';
-export { default as SystemRepairPage } from './SystemRepairPage';
+export { default as ValidationPage } from './ValidationPage';
+export { default as B2CNyveeCoconPage } from './B2CNyveeCoconPage';

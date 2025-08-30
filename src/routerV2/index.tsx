@@ -32,7 +32,6 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const HomeB2CPage = lazy(() => import('@/pages/HomeB2CPage'));
-const HomeB2BPage = lazy(() => import('@/pages/HomeB2BPage'));
 
 // Dashboards
 const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
@@ -42,11 +41,11 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CEmotionalScanPage = lazy(() => import('@/pages/B2CEmotionalScanPage'));
 const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
-const B2CVRPage = lazy(() => import('@/pages/B2CVRPage'));
+const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
+const B2CVRGalaxyPage = lazy(() => import('@/pages/B2CVRGalaxyPage'));
 
 // Modules Fun-First
 const B2CFlashGlowPage = lazy(() => import('@/pages/B2CFlashGlowPage'));
@@ -54,7 +53,6 @@ const B2CBreathworkPage = lazy(() => import('@/pages/B2CBreathworkPage'));
 const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
-const B2CVRGalactiquePage = lazy(() => import('@/pages/B2CVRGalactiquePage'));
 
 // Analytics
 const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
@@ -88,29 +86,13 @@ const B2CBounceBackBattlePage = lazy(() => import('@/pages/B2CBounceBackBattlePa
 const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
-const B2CEmotionScanPage = lazy(() => import('@/pages/B2CEmotionScanPage'));
-const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
 const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
-const B2CCommunityPage = lazy(() => import('@/pages/B2CCommunityPage'));
-const CompleteNavigationMenu = lazy(() => import('@/components/navigation/CompleteNavigationMenu'));
-const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
-const CompleteFeatureMatrix = lazy(() => import('@/pages/CompleteFeatureMatrix'));
-const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
-const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
+const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
-
-// Pages nouvelles créées
-const B2CBreathVRPage = lazy(() => import('@/pages/B2CBreathVRPage'));
-const B2CActivityHistoryPage = lazy(() => import('@/pages/B2CActivityHistoryPage'));
 const B2BEntreprisePage = lazy(() => import('@/pages/B2BEntreprisePage'));
 const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
 const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
-const ValidationStatusPage = lazy(() => import('@/pages/ValidationStatusPage'));
-const SystemValidationPage = lazy(() => import('@/pages/SystemValidationPage'));
-const DiagnosticPage = lazy(() => import('@/pages/DiagnosticPage'));
-const SystemRepairPage = lazy(() => import('@/pages/SystemRepairPage'));
-const MissingPagesManifest = lazy(() => import('@/pages/MissingPagesManifest'));
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 
@@ -134,13 +116,10 @@ const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectT
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
 
-const DebugDashboard = lazy(() => import('@/pages/DebugDashboard'));
-
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public
   HomePage,
   HomeB2C: HomeB2CPage,
-  HomeB2B: HomeB2BPage,
   AboutPage,
   ContactPage,
   HelpPage,
@@ -150,7 +129,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   SignupPage,
   
   // App
-  DebugDashboard,
   AppGatePage,
   B2CDashboardPage,
   B2BUserDashboardPage,
@@ -158,11 +136,11 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
-  B2CEmotionalScanPage,
   B2CMusicEnhanced,
   B2CAICoachPage,
   B2CJournalPage,
-  B2CVRPage,
+  B2CVRBreathGuidePage,
+  B2CVRGalaxyPage,
   
   // Fun-First
   B2CFlashGlowPage,
@@ -170,7 +148,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CARFiltersPage,
   B2CBubbleBeatPage,
   B2CScreenSilkBreakPage,
-  B2CVRGalactiquePage,
   
   // Analytics
   B2CGamificationPage,
@@ -193,10 +170,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BSecurityPage,
   B2BAuditPage,
   B2BAccessibilityPage,
-  B2BLandingPage,
   B2BSelectionPage,
   
-  // Pages orphelines intégrées
+  // Pages intégrées
   ApiMonitoringPage,
   B2CAmbitionArcadePage,
   B2CBossLevelGritPage,
@@ -204,27 +180,14 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CMoodMixerPage,
   B2CSocialCoconPage,
   B2CStorySynthLabPage,
-  B2CEmotionScanPage,
-  B2CVoiceJournalPage,
   B2CEmotionsPage,
-  B2CCommunityPage,
-  CompleteNavigationMenu,
-  NavigationPage,
-  CompleteFeatureMatrix,
-  PrivacyPage,
+  B2CCommunautePage,
+  SubscribePage,
   
   // Pages nouvelles 
-  B2CBreathVRPage,
-  B2CActivityHistoryPage,
   B2BEntreprisePage,
   B2BCollabDashboard,
   B2BRHDashboard,
-  SubscribePage,
-  ValidationStatusPage,
-  SystemValidationPage,
-  DiagnosticPage,
-  SystemRepairPage,
-  MissingPagesManifest,
   B2CNyveeCoconPage,
   ValidationPage,
   
