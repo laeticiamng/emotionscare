@@ -82,6 +82,10 @@ export { default as B2CActivityHistoryPage } from './B2CActivityHistoryPage';
 // Billing & Subscription
 export { default as SubscribePage } from './SubscribePage';
 
+// Legal pages
+export { default as LegalTermsPage } from './LegalTermsPage';
+export { default as LegalPrivacyPage } from './LegalPrivacyPage';
+
 // System & Error pages
 export { default as UnauthorizedPage } from './UnauthorizedPage';
 export { default as NotFoundPage } from './NotFoundPage';
