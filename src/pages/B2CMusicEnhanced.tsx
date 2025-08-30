@@ -9,7 +9,7 @@ import {
   Heart, Share2, Download, Shuffle, Repeat, Radio,
   Headphones, Zap, Brain, Sparkles, Star, TrendingUp, Clock
 } from 'lucide-react';
-import { PremiumGate } from '@/hooks/usePremiumAccess';
+
 
 export default function B2CMusicEnhanced() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -20,8 +20,7 @@ export default function B2CMusicEnhanced() {
   };
 
   return (
-    <PremiumGate feature="music">
-      <div data-testid="page-root" className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-white to-purple-50">
+    <div data-testid="page-root" className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-white to-purple-50">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header avec badge Premium */}
           <div className="text-center mb-8">
@@ -259,6 +258,5 @@ export default function B2CMusicEnhanced() {
         </Card>
       </div>
     </div>
-    </PremiumGate>
   );
 }
