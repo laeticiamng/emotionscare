@@ -1,207 +1,266 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-/**
- * Page de gamification B2C
- */
+interface Achievement {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  progress: number;
+  maxProgress: number;
+  unlocked: boolean;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+}
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Trophy, Star, Target, Zap, Crown, Award } from "lucide-react";
+const B2CGamificationPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [selectedTab, setSelectedTab] = useState<'achievements' | 'rewards' | 'leaderboard'>('achievements');
+  const [streak, setStreak] = useState(7);
+  const [level, setLevel] = useState(12);
+  const [experience, setExperience] = useState(2340);
+  const [nextLevelXp, setNextLevelXp] = useState(3000);
 
-const B2CGamificationPage = () => {
-  const userStats = {
-    level: 12,
-    xp: 3420,
-    nextLevelXp: 4000,
-    streak: 15,
-    achievements: 8,
-    rank: "Gold"
+  const achievements: Achievement[] = [
+    {
+      id: '1',
+      name: 'Première Lueur',
+      icon: '✨',
+      description: 'Complète ta première séance',
+      progress: 1,
+      maxProgress: 1,
+      unlocked: true,
+      rarity: 'common'
+    },
+    {
+      id: '2',
+      name: 'Gardien de la Flamme',
+      icon: '🔥',
+      description: 'Maintiens une série de 7 jours',
+      progress: 7,
+      maxProgress: 7,
+      unlocked: true,
+      rarity: 'rare'
+    },
+    {
+      id: '3',
+      name: 'Maître Zen',
+      icon: '🧘',
+      description: 'Complète 50 séances de méditation',
+      progress: 32,
+      maxProgress: 50,
+      unlocked: false,
+      rarity: 'epic'
+    },
+    {
+      id: '4',
+      name: 'Légende Émotionnelle',
+      icon: '👑',
+      description: 'Atteins le niveau 25',
+      progress: 12,
+      maxProgress: 25,
+      unlocked: false,
+      rarity: 'legendary'
+    }
+  ];
+
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return 'from-gray-400 to-gray-500';
+      case 'rare': return 'from-blue-400 to-blue-600';
+      case 'epic': return 'from-purple-400 to-purple-600';
+      case 'legendary': return 'from-yellow-400 to-orange-500';
+      default: return 'from-gray-400 to-gray-500';
+    }
   };
 
-  const achievements = [
-    { id: 1, title: "Premier Scan", description: "Effectuer votre premier scan d'émotion", unlocked: true, icon: "🎯" },
-    { id: 2, title: "Série de 7", description: "7 jours consécutifs d'activité", unlocked: true, icon: "🔥" },
-    { id: 3, title: "Explorateur VR", description: "Essayer l'expérience VR", unlocked: true, icon: "🥽" },
-    { id: 4, title: "Musicothérapeute", description: "Compléter 5 sessions musicales", unlocked: false, icon: "🎵" },
-    { id: 5, title: "Coach Émotionnel", description: "Interagir avec l'IA 20 fois", unlocked: false, icon: "🤖" }
-  ];
+  const getRarityBorder = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return 'border-gray-300';
+      case 'rare': return 'border-blue-300';
+      case 'epic': return 'border-purple-300';
+      case 'legendary': return 'border-yellow-300';
+      default: return 'border-gray-300';
+    }
+  };
 
-  const leaderboard = [
-    { rank: 1, name: "Alex M.", level: 18, xp: 5240 },
-    { rank: 2, name: "Emma D.", level: 15, xp: 4890 },
-    { rank: 3, name: "Vous", level: 12, xp: 3420 },
-    { rank: 4, name: "Lucas T.", level: 11, xp: 3100 },
-    { rank: 5, name: "Sophie L.", level: 10, xp: 2950 }
-  ];
+  const progressPercentage = (experience / nextLevelXp) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            <Trophy className="inline-block mr-3 text-yellow-600" />
-            Espace Gamification
-          </h1>
-          <p className="text-xl text-gray-600">
-            Votre progression et récompenses EmotionsCare
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm border-b border-white/20">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-full bg-white/50 hover:bg-white/70 transition-all duration-200"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h1 className="text-lg font-medium">Progression</h1>
+        <div className="w-9" />
+      </div>
 
-        {/* Stats utilisateur */}
-        <Card className="shadow-lg mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <Crown className="text-yellow-600" />
-              Votre Progression
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">Niveau {userStats.level}</div>
-                <p className="text-sm text-gray-600">Rang actuel</p>
-                <Badge className="mt-2 bg-yellow-100 text-yellow-800">{userStats.rank}</Badge>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{userStats.xp}</div>
-                <p className="text-sm text-gray-600">Points d'expérience</p>
-                <Progress value={(userStats.xp / userStats.nextLevelXp) * 100} className="mt-2" />
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-2">{userStats.streak}</div>
-                <p className="text-sm text-gray-600">Jours consécutifs</p>
-                <div className="text-2xl mt-2">🔥</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">{userStats.achievements}</div>
-                <p className="text-sm text-gray-600">Succès débloqués</p>
-                <Award className="mx-auto mt-2 text-green-600" size={24} />
-              </div>
+      {/* Stats Header */}
+      <div className="p-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+          {/* Level & Progress */}
+          <div className="text-center mb-6">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.2 }}
+              className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg"
+            >
+              <Crown className="w-10 h-10 text-white" />
+            </motion.div>
+            <h2 className="text-2xl font-bold">Niveau {level}</h2>
+            <div className="w-full bg-gray-200 rounded-full h-3 mt-3 mb-2">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full"
+              />
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-sm text-gray-600">{experience} / {nextLevelXp} XP</p>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Succès */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="text-yellow-600" />
-                Succès & Récompenses
-              </CardTitle>
-              <CardDescription>Débloquez des récompenses en utilisant EmotionsCare</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {achievements.map((achievement) => (
-                  <div key={achievement.id} className={`p-4 border rounded-lg ${
-                    achievement.unlocked ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{achievement.icon}</span>
-                        <div>
-                          <h3 className={`font-medium ${achievement.unlocked ? 'text-green-800' : 'text-gray-600'}`}>
-                            {achievement.title}
-                          </h3>
-                          <p className="text-sm text-gray-600">{achievement.description}</p>
-                        </div>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Flame className="w-6 h-6 text-orange-500" />
+              </div>
+              <div className="text-xl font-bold">{streak}</div>
+              <div className="text-xs text-gray-600">jours de série</div>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+              </div>
+              <div className="text-xl font-bold">{achievements.filter(a => a.unlocked).length}</div>
+              <div className="text-xs text-gray-600">succès obtenus</div>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Zap className="w-6 h-6 text-blue-500" />
+              </div>
+              <div className="text-xl font-bold">{experience}</div>
+              <div className="text-xs text-gray-600">points XP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="px-4 mb-4">
+        <div className="flex bg-white/50 rounded-2xl p-1">
+          {[
+            { key: 'achievements', label: 'Succès', icon: Star },
+            { key: 'rewards', label: 'Récompenses', icon: Gift },
+            { key: 'leaderboard', label: 'Classement', icon: Trophy }
+          ].map(({ key, label, icon: Icon }) => (
+            <motion.button
+              key={key}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedTab(key as any)}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all duration-200 ${
+                selectedTab === key 
+                  ? 'bg-white shadow-sm text-purple-600' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span className="text-sm font-medium">{label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="px-4 pb-6">
+        <AnimatePresence mode="wait">
+          {selectedTab === 'achievements' && (
+            <motion.div
+              key="achievements"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-3"
+            >
+              {achievements.map((achievement, index) => (
+                <motion.div
+                  key={achievement.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`bg-white/80 backdrop-blur-sm rounded-2xl p-4 border-2 ${getRarityBorder(achievement.rarity)} ${
+                    achievement.unlocked ? 'shadow-lg' : 'opacity-75'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${getRarityColor(achievement.rarity)} flex items-center justify-center text-2xl shadow-lg ${
+                      !achievement.unlocked ? 'grayscale' : ''
+                    }`}>
+                      {achievement.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold">{achievement.name}</h3>
+                        {achievement.unlocked && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
                       </div>
-                      {achievement.unlocked ? (
-                        <Badge className="bg-green-100 text-green-800">Débloqué</Badge>
-                      ) : (
-                        <Badge variant="secondary">Verrouillé</Badge>
+                      <p className="text-sm text-gray-600 mb-2">{achievement.description}</p>
+                      {!achievement.unlocked && (
+                        <div>
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Progression</span>
+                            <span>{achievement.progress}/{achievement.maxProgress}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`bg-gradient-to-r ${getRarityColor(achievement.rarity)} h-2 rounded-full transition-all duration-500`}
+                              style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
 
-          {/* Classement */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="text-blue-600" />
-                Classement Communautaire
-              </CardTitle>
-              <CardDescription>Votre position dans la communauté EmotionsCare</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {leaderboard.map((player) => (
-                  <div key={player.rank} className={`flex items-center justify-between p-3 rounded-lg ${
-                    player.name === "Vous" ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
-                  }`}>
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                        player.rank === 1 ? 'bg-yellow-100 text-yellow-800' :
-                        player.rank === 2 ? 'bg-gray-100 text-gray-600' :
-                        player.rank === 3 ? 'bg-orange-100 text-orange-600' :
-                        'bg-blue-100 text-blue-600'
-                      }`}>
-                        {player.rank}
-                      </div>
-                      <div>
-                        <p className="font-medium">{player.name}</p>
-                        <p className="text-sm text-gray-600">Niveau {player.level}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold">{player.xp.toLocaleString()} XP</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          {selectedTab === 'rewards' && (
+            <motion.div
+              key="rewards"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-center py-12"
+            >
+              <Gift className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Récompenses à venir</h3>
+              <p className="text-gray-600">Bientôt disponible !</p>
+            </motion.div>
+          )}
 
-        {/* Défis quotidiens */}
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="text-purple-600" />
-              Défis Quotidiens
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border rounded-lg bg-blue-50">
-                <h3 className="font-medium text-blue-800 mb-2">Scanner 3 émotions</h3>
-                <p className="text-sm text-blue-600 mb-3">Progression: 1/3</p>
-                <Progress value={33} className="mb-2" />
-                <Badge className="bg-blue-100 text-blue-800">+50 XP</Badge>
-              </div>
-              <div className="p-4 border rounded-lg bg-green-50">
-                <h3 className="font-medium text-green-800 mb-2">Session VR complète</h3>
-                <p className="text-sm text-green-600 mb-3">Progression: 0/1</p>
-                <Progress value={0} className="mb-2" />
-                <Badge className="bg-green-100 text-green-800">+100 XP</Badge>
-              </div>
-              <div className="p-4 border rounded-lg bg-purple-50">
-                <h3 className="font-medium text-purple-800 mb-2">Coach IA utilisé</h3>
-                <p className="text-sm text-purple-600 mb-3">Progression: 1/1</p>
-                <Progress value={100} className="mb-2" />
-                <Badge className="bg-purple-100 text-purple-800">Terminé ✓</Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions */}
-        <div className="text-center">
-          <Button size="lg" className="mr-4">
-            Voir Plus de Défis
-          </Button>
-          <Button variant="outline" size="lg">
-            Historique des Récompenses
-          </Button>
-        </div>
+          {selectedTab === 'leaderboard' && (
+            <motion.div
+              key="leaderboard"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-center py-12"
+            >
+              <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Classement</h3>
+              <p className="text-gray-600">Bientôt disponible !</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -445,6 +445,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/social-cocon'],
   },
+  {
+    name: 'communaute-b2c',
+    path: '/app/communaute',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CCommunautePage',
+    guard: true,
+    aliases: ['/communaute'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // ANALYTICS & DATA (CONSUMER)
@@ -465,7 +475,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CActivityHistoryPage',
+    component: 'B2CActivitePage',
     guard: true,
     aliases: ['/weekly-bars', '/activity-history'],
   },
