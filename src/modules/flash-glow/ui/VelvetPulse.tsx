@@ -220,7 +220,7 @@ const VelvetPulse: React.FC<VelvetPulseProps> = ({
             </div>
             <p className="text-sm">Prêt pour le Flash Glow</p>
           </motion.div>
-        )}
+        </div>
       )}
     </div>
   );
