@@ -16,13 +16,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'HomePage',
   },
-  {
-    name: 'home-redirect',
-    path: '/home',
-    segment: 'public',
-    layout: 'app',
-    component: 'AppGatePage',
-  },
+  // /home redirect supprimé - confus et inutile
   {
     name: 'about',
     path: '/about',
@@ -81,12 +75,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2BEntreprisePage',
     aliases: ['/b2b'],
   },
+  // /b2b/landing -> redirection vers /entreprise
   {
-    name: 'b2b-landing-detailed',
+    name: 'b2b-landing-redirect',
     path: '/b2b/landing',
     segment: 'public',
     layout: 'marketing',
-    component: 'B2BLandingPage',
+    component: 'RedirectToEntreprise',
+    deprecated: true,
   },
   {
     name: 'b2b-selection',
@@ -128,9 +124,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     name: 'consumer-home',
     path: '/app/home',
     segment: 'consumer',
+    role: 'consumer',
     layout: 'app',
     component: 'B2CDashboardPage',
-    guard: false,
+    guard: true,
     aliases: ['/b2c/dashboard', '/dashboard'],
   },
   {
@@ -154,27 +151,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/b2b/admin/dashboard'],
   },
 
-  {
-    name: 'navigation',
-    path: '/navigation',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'CompleteNavigationMenu',
-    guard: true,
-    aliases: ['/modules', '/all-modules'],
-  },
-  {
-    name: 'feature-matrix',
-    path: '/feature-matrix',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'CompleteFeatureMatrix',
-    guard: true,
-    aliases: ['/test-features', '/validation'],
-  },
-
   // ═══════════════════════════════════════════════════════════
   // MODULES FONCTIONNELS (CONSUMER)
   // ═══════════════════════════════════════════════════════════
@@ -195,7 +171,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     role: 'consumer',
     layout: 'app',
     component: 'B2CMusicEnhanced',
-    guard: false,
+    guard: true,
     aliases: ['/music'],
   },
   {
@@ -272,45 +248,52 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/ar-filters'],
   },
+  // Redirections vers routes principales (garder aliases pour 301)
   {
-    name: 'emotion-scan',
+    name: 'emotion-scan-redirect',
     path: '/app/emotion-scan',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CEmotionScanPage',
+    component: 'RedirectToScan',
     guard: true,
     aliases: ['/emotion-scan'],
+    deprecated: true,
   },
   {
-    name: 'voice-journal',
+    name: 'voice-journal-redirect',
     path: '/app/voice-journal',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CVoiceJournalPage',
+    component: 'RedirectToJournal',
     guard: true,
     aliases: ['/voice-journal'],
+    deprecated: true,
   },
+  // emotions route obsolète - alias vers scan
   {
-    name: 'emotions',
+    name: 'emotions-redirect',
     path: '/app/emotions',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CEmotionsPage',
+    component: 'RedirectToScan',
     guard: true,
     aliases: ['/emotions'],
+    deprecated: true,
   },
+  // community -> social-cocon
   {
-    name: 'community',
+    name: 'community-redirect',
     path: '/app/community',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CCommunityPage',
+    component: 'RedirectToSocialCocon',
     guard: true,
     aliases: ['/community'],
+    deprecated: true,
   },
   {
     name: 'bubble-beat',
@@ -429,8 +412,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'heatmap',
     path: '/app/heatmap',
-    segment: 'consumer',
-    role: 'consumer',
+    segment: 'manager',
+    role: 'manager',
     layout: 'app',
     component: 'B2CHeatmapVibesPage',
     guard: true,
@@ -468,7 +451,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2CPrivacyTogglesPage',
     guard: true,
-    aliases: ['/privacy-toggles'],
+    aliases: ['/privacy-toggles', '/settings/data-privacy'],
   },
   {
     name: 'settings-notifications',
@@ -479,16 +462,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CNotificationsPage',
     guard: true,
     aliases: ['/notifications'],
-  },
-  {
-    name: 'settings-data-privacy',
-    path: '/settings/data-privacy',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CDataPrivacyPage',
-    guard: true,
-    aliases: ['/data-privacy'],
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -580,26 +553,55 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
 
   
   // ═══════════════════════════════════════════════════════════
-  // VALIDATION & MONITORING
+  // DEV-ONLY ROUTES (Masquées en production)
   // ═══════════════════════════════════════════════════════════
-  {
-    name: 'validation-status',
-    path: '/system/validation',
-    segment: 'consumer',
-    layout: 'app',
-    guard: true,
-    component: 'ValidationStatusPage',
-    aliases: ['/validation', '/system-check'],
-  },
-  {
-    name: 'api-monitoring',
-    path: '/system/api-monitoring',
-    segment: 'manager',
-    layout: 'app',
-    guard: true,
-    role: 'manager',
-    component: 'ApiMonitoringPage',
-  },
+  ...(import.meta.env.DEV ? [
+    {
+      name: 'navigation',
+      path: '/navigation',
+      segment: 'consumer',
+      role: 'consumer',
+      layout: 'app',
+      component: 'CompleteNavigationMenu',
+      guard: true,
+      aliases: ['/modules', '/all-modules'],
+    },
+    {
+      name: 'feature-matrix',
+      path: '/feature-matrix',
+      segment: 'consumer',
+      role: 'consumer',
+      layout: 'app',
+      component: 'CompleteFeatureMatrix',
+      guard: true,
+      aliases: ['/test-features', '/validation'],
+    },
+    {
+      name: 'validation-status',
+      path: '/system/validation',
+      segment: 'consumer',
+      layout: 'app',
+      guard: true,
+      component: 'ValidationStatusPage',
+      aliases: ['/validation', '/system-check'],
+    },
+    {
+      name: 'diagnostic',
+      path: '/diagnostic',
+      segment: 'public',
+      layout: 'app',
+      component: 'DiagnosticPage',
+      guard: false,
+    },
+    {
+      name: 'system-repair',
+      path: '/repair',
+      segment: 'public',
+      layout: 'app',
+      component: 'SystemRepairPage',
+      guard: false,
+    },
+  ] : []),
 
   // ═══════════════════════════════════════════════════════════
   // PAGES SYSTÈME
@@ -621,6 +623,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'not-found',
     path: '/404',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'NotFoundPage',
+  },
+  {
+    name: 'catch-all',
+    path: '*',
     segment: 'public',
     layout: 'marketing',
     component: 'NotFoundPage',
@@ -664,21 +673,5 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'SubscribePage',
     guard: true,
     aliases: ['/billing', '/plans'],
-  },
-  {
-    name: 'diagnostic',
-    path: '/diagnostic',
-    segment: 'public',
-    layout: 'app',
-    component: 'DiagnosticPage',
-    guard: false,
-  },
-  {
-    name: 'system-repair',
-    path: '/repair',
-    segment: 'public',
-    layout: 'app',
-    component: 'SystemRepairPage',
-    guard: false,
   },
 ];

@@ -34,6 +34,7 @@ test.describe('RouterV2 - Validation Complete', () => {
     await page.goto('/route-inexistante-test-404');
     
     await expect(page.locator('[data-testid="page-root"]')).toBeVisible({ timeout: 5000 });
-    await expect(page.locator('text=404 - Page introuvable')).toBeVisible();
+    await expect(page.locator('text=404')).toBeVisible();
+    await expect(page.locator('text=Page introuvable')).toBeVisible();
   });
 });
