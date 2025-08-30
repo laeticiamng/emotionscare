@@ -38,10 +38,14 @@ export const ROUTE_ALIASES = [
   // MODULES FONCTIONNELS
   // ═══════════════════════════════════════════════════════════
   { from: '/scan', to: '/app/scan' },
+  { from: '/emotions', to: '/app/scan' }, // Redirection pour l'ancienne route emotions
+  { from: '/emotion-scan', to: '/app/scan' }, // Redirection pour l'ancienne route emotion-scan
   { from: '/music', to: '/app/music' },
   { from: '/coach', to: '/app/coach' },
   { from: '/journal', to: '/app/journal' },
+  { from: '/voice-journal', to: '/app/journal' }, // Redirection pour l'ancienne route voice-journal
   { from: '/vr', to: '/app/vr' },
+  { from: '/community', to: '/app/social-cocon' }, // Redirection pour l'ancienne route community
 
   // ═══════════════════════════════════════════════════════════
   // MODULES FUN-FIRST
