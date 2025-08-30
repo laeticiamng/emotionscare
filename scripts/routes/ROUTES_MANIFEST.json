@@ -1,70 +1,406 @@
 {
-  "hash_note": "Verrouillé en CI. Modifier ce fichier ⇒ MAJ ROUTES_LOCK.",
+  "version": "2.0.0",
+  "generated": "2025-01-30T12:00:00Z",
   "routes": [
-    {"path": "/", "role":"public", "buttons_from":["header:Entrer","home:Découvrir B2C","home:Entreprise","footer:Aide"]},
-    {"path": "/b2c", "role":"public", "buttons_from":["/:Découvrir B2C"]},
-    {"path": "/entreprise", "role":"public", "buttons_from":["/:Entreprise"]},
-    {"path": "/help", "role":"public", "buttons_from":["footer:Aide"]},
-    {"path": "/login", "role":"public", "buttons_from":["/:Entrer","/b2c:Créer mon espace"]},
-    {"path": "/signup", "role":"public", "buttons_from":["/b2c:Créer mon espace"]},
-    {"path": "/legal/terms", "role":"public", "buttons_from":["footer:Conditions"]},
-    {"path": "/legal/privacy", "role":"public", "buttons_from":["footer:Confidentialité"]},
-    {"path": "/401", "role":"public", "buttons_from":["auto-redirect"]},
-    {"path": "/403", "role":"public", "buttons_from":["auto-redirect"]},
-    {"path": "/404", "role":"public", "buttons_from":["auto-redirect"]},
-    {"path": "/503", "role":"public", "buttons_from":["header:HealthBadge"]},
-
-    {"path": "/app", "role":"any", "buttons_from":["after-login:dispatcher"]},
-    {"path": "/app/home", "role":"consumer", "buttons_from":["/app:dispatcher","header:logo"]},
-    {"path": "/app/nyvee", "role":"any", "buttons_from":["fab:Nyvée"]},
-    {"path": "/app/scan", "role":"consumer", "buttons_from":["home:Mesure émotionnelle"]},
-    {"path": "/app/music", "role":"consumer", "feature_flag":"FF_PREMIUM_SUNO", "buttons_from":["home:Musique apaisante"]},
-    {"path": "/app/coach", "role":"consumer", "buttons_from":["home:Carte 1-minute","journal:CTA carte"]},
-    {"path": "/app/journal", "role":"consumer", "buttons_from":["home:Écrire / Dicter"]},
-    {"path": "/app/vr-breath", "role":"consumer", "feature_flag":"FF_VR", "buttons_from":["home:Respiration VR"]},
-    {"path": "/app/vr-galaxy", "role":"consumer", "feature_flag":"FF_VR", "buttons_from":["home:Galaxie VR"]},
-    {"path": "/app/flash-glow", "role":"consumer", "buttons_from":["home:Flash Glow","scan:CTA Apaiser 2 min","bubble-beat:Fin→Flash"]},
-    {"path": "/app/breath", "role":"consumer", "buttons_from":["home:Respirer"]},
-    {"path": "/app/face-ar", "role":"consumer", "buttons_from":["home:AR Filters"]},
-    {"path": "/app/bubble-beat", "role":"consumer", "sensor_gates":["hr"], "buttons_from":["home:Bubble Beat"]},
-    {"path": "/app/boss-grit", "role":"consumer", "buttons_from":["home:Boss Grit"]},
-    {"path": "/app/mood-mixer", "role":"consumer", "feature_flag":"FF_PREMIUM_SUNO", "buttons_from":["home:Mood Mixer","music:Varier"]},
-    {"path": "/app/ambition-arcade", "role":"consumer", "buttons_from":["home:Ambition Arcade"]},
-    {"path": "/app/bounce-back", "role":"consumer", "buttons_from":["home:Bounce Back"]},
-    {"path": "/app/story-synth", "role":"consumer", "buttons_from":["home:Story Synth"]},
-    {"path": "/app/community", "role":"employee", "feature_flag":"FF_COMMUNITY", "buttons_from":["collab:Communauté"]},
-    {"path": "/app/social-cocon", "role":"employee", "buttons_from":["collab:Social Cocon"]},
-    {"path": "/app/leaderboard", "role":"any", "buttons_from":["home:Auras"]},
-    {"path": "/app/activity", "role":"consumer", "buttons_from":["home:Activité"]},
-    {"path": "/app/screen-silk", "role":"consumer", "buttons_from":["home:Screen Silk"]},
-    {"path": "/app/weekly-bars", "role":"consumer", "buttons_from":["activity:Voir semaine"]},
-
-    {"path": "/settings/general", "role":"any", "buttons_from":["userMenu:Paramètres"]},
-    {"path": "/settings/profile", "role":"any", "buttons_from":["settings:Profil"]},
-    {"path": "/settings/privacy", "role":"any", "buttons_from":["settings:Confidentialité"]},
-    {"path": "/settings/notifications", "role":"any", "buttons_from":["settings:Notifications"]},
-    {"path": "/settings/data", "role":"any", "buttons_from":["settings:Données"]},
-
-    {"path": "/app/collab", "role":"employee", "buttons_from":["/app:dispatcher"]},
-    {"path": "/app/teams", "role":"employee", "buttons_from":["collab:Créer une équipe"]},
-
-    {"path": "/app/rh", "role":"manager", "feature_flag":"FF_MANAGER_DASH", "buttons_from":["/app:dispatcher","manager:Heatmap"]},
-    {"path": "/app/reports", "role":"manager", "buttons_from":["manager:Reports"]},
-    {"path": "/app/events", "role":"manager", "buttons_from":["manager:Planifier une pause"]},
-    {"path": "/app/optimization", "role":"manager", "buttons_from":["manager:Optimisation"]},
-    {"path": "/app/security", "role":"manager", "buttons_from":["manager:Sécurité"]},
-    {"path": "/app/audit", "role":"manager", "buttons_from":["manager:Audit"]},
-    {"path": "/app/accessibility", "role":"manager", "buttons_from":["manager:Accessibilité"]},
-
-    {"path": "/onboarding", "role":"any", "buttons_from":["firstLogin:auto"]},
-    {"path": "/system/api-monitoring", "role":"any", "buttons_from":["header:HealthBadge click"]}
+    {
+      "name": "home",
+      "path": "/",
+      "component": "HomePage",
+      "segment": "public",
+      "layout": "marketing"
+    },
+    {
+      "name": "about",
+      "path": "/about",
+      "component": "AboutPage",
+      "segment": "public",
+      "layout": "marketing"
+    },
+    {
+      "name": "contact",
+      "path": "/contact",
+      "component": "ContactPage", 
+      "segment": "public",
+      "layout": "marketing"
+    },
+    {
+      "name": "help",
+      "path": "/help",
+      "component": "HelpPage",
+      "segment": "public", 
+      "layout": "marketing"
+    },
+    {
+      "name": "login",
+      "path": "/login",
+      "component": "LoginPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "signup", 
+      "path": "/signup",
+      "component": "SignupPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "privacy",
+      "path": "/privacy",
+      "component": "PrivacyPage",
+      "segment": "public",
+      "layout": "marketing"
+    },
+    {
+      "name": "legal-terms",
+      "path": "/legal/terms",
+      "component": "LegalTermsPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "legal-privacy",
+      "path": "/legal/privacy", 
+      "component": "LegalPrivacyPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "app-gate",
+      "path": "/app-gate",
+      "component": "AppGatePage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "consumer-home",
+      "path": "/app/home",
+      "component": "HomeB2CPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "employee-home",
+      "path": "/app/collab",
+      "component": "B2BCollabDashboard",
+      "segment": "employee", 
+      "role": "employee",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "manager-home",
+      "path": "/app/rh",
+      "component": "B2BRHDashboard",
+      "segment": "manager",
+      "role": "manager", 
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "scan",
+      "path": "/app/scan",
+      "component": "B2CScanPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/scan", "/emotion-scan"]
+    },
+    {
+      "name": "coach",
+      "path": "/app/coach",
+      "component": "B2CAICoachPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app", 
+      "guard": true
+    },
+    {
+      "name": "journal",
+      "path": "/app/journal",
+      "component": "B2CJournalPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/journal", "/voice-journal"]
+    },
+    {
+      "name": "vr-breath",
+      "path": "/app/vr-breath",
+      "component": "B2CVRBreathGuidePage",
+      "segment": "consumer", 
+      "role": "consumer",
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/vr"]
+    },
+    {
+      "name": "vr-galaxy",
+      "path": "/app/vr-galaxy",
+      "component": "B2CVRGalaxyPage",
+      "segment": "consumer",
+      "role": "consumer", 
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "flash-glow",
+      "path": "/app/flash-glow",
+      "component": "B2CFlashGlowPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/flash-glow", "/flash-glow-advanced"]
+    },
+    {
+      "name": "breath",
+      "path": "/app/breath",
+      "component": "B2CBreathworkPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/breathwork", "/breathwork-adaptive"]
+    },
+    {
+      "name": "bubble-beat",
+      "path": "/app/bubble-beat",
+      "component": "B2CBubbleBeatPage", 
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "screen-silk",
+      "path": "/app/screen-silk",
+      "component": "B2CScreenSilkBreakPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "music",
+      "path": "/app/music",
+      "component": "B2CMusicEnhanced",
+      "segment": "consumer",
+      "role": "consumer", 
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/music"]
+    },
+    {
+      "name": "social-cocon",
+      "path": "/app/social-cocon",
+      "component": "B2CSocialCoconPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app", 
+      "guard": true,
+      "aliases": ["/social"]
+    },
+    {
+      "name": "community",
+      "path": "/app/community",
+      "component": "B2CCommunautePage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true,
+      "aliases": ["/community"]
+    },
+    {
+      "name": "activity",
+      "path": "/app/activity",
+      "component": "B2CActivitePage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "weekly-bars",
+      "path": "/app/weekly-bars", 
+      "component": "B2CWeeklyBarsPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "leaderboard",
+      "path": "/app/leaderboard",
+      "component": "B2CGamificationPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "settings",
+      "path": "/app/settings",
+      "component": "B2CSettingsPage",
+      "segment": "consumer",
+      "role": "consumer",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "b2b-selection",
+      "path": "/b2b/selection",
+      "component": "B2BSelectionPage",
+      "segment": "employee",
+      "layout": "marketing"
+    },
+    {
+      "name": "entreprise",
+      "path": "/entreprise",
+      "component": "B2BEntreprisePage",
+      "segment": "public",
+      "layout": "marketing",
+      "aliases": ["/b2b/landing"]
+    },
+    {
+      "name": "teams",
+      "path": "/teams",
+      "component": "B2BTeamsPage",
+      "segment": "employee",
+      "allowedRoles": ["employee", "manager"],
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "reports",
+      "path": "/reports",
+      "component": "B2BReportsPage", 
+      "segment": "manager",
+      "role": "manager",
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "events",
+      "path": "/events",
+      "component": "B2BEventsPage",
+      "segment": "employee",
+      "allowedRoles": ["employee", "manager"],
+      "layout": "app",
+      "guard": true
+    },
+    {
+      "name": "api-monitoring",
+      "path": "/system/api-monitoring",
+      "component": "ApiMonitoringPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "subscribe",
+      "path": "/subscribe",
+      "component": "SubscribePage",
+      "segment": "public",
+      "layout": "marketing"
+    },
+    {
+      "name": "demo",
+      "path": "/demo",
+      "component": "DemoPage",
+      "segment": "public",
+      "layout": "marketing"
+    },
+    {
+      "name": "onboarding",
+      "path": "/onboarding",
+      "component": "OnboardingPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "unauthorized",
+      "path": "/unauthorized",
+      "component": "UnauthorizedPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "forbidden",
+      "path": "/forbidden",
+      "component": "ForbiddenPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "server-error",
+      "path": "/503",
+      "component": "ServerErrorPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "not-found",
+      "path": "/404",
+      "component": "NotFoundPage",
+      "segment": "public",
+      "layout": "simple"
+    },
+    {
+      "name": "catch-all",
+      "path": "*",
+      "component": "NotFoundPage",
+      "segment": "public",
+      "layout": "simple"
+    }
   ],
   "aliases": [
-    {"from":"/home","to":"/"},
-    {"from":"/scan","to":"/app/scan"},
-    {"from":"/music","to":"/app/music"},
-    {"from":"/vr","to":"/app/vr-breath"},
-    {"from":"/social","to":"/app/social-cocon"},
-    {"from":"/b2b/landing","to":"/entreprise"}
+    {
+      "from": "/scan",
+      "to": "/app/scan"
+    },
+    {
+      "from": "/music",
+      "to": "/app/music"
+    },
+    {
+      "from": "/vr",
+      "to": "/app/vr-breath"
+    },
+    {
+      "from": "/social",
+      "to": "/app/social-cocon"
+    },
+    {
+      "from": "/journal",
+      "to": "/app/journal"
+    },
+    {
+      "from": "/voice-journal",
+      "to": "/app/journal"
+    },
+    {
+      "from": "/flash-glow-advanced",
+      "to": "/app/flash-glow"
+    },
+    {
+      "from": "/breathwork-adaptive",
+      "to": "/app/breath"
+    },
+    {
+      "from": "/community",
+      "to": "/app/community"
+    },
+    {
+      "from": "/b2b/landing",
+      "to": "/entreprise"
+    },
+    {
+      "from": "/home",
+      "to": "/"
+    }
   ]
 }

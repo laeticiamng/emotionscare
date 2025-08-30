@@ -286,10 +286,15 @@ export default function B2CJournalEnhanced() {
                     <span className="text-xs text-gray-500">
                       {currentEntry.content?.length || 0} caractères
                     </span>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                  <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setIsRecording(!isRecording)}
+                        className={isRecording ? 'bg-red-500 text-white' : ''}
+                      >
                         <Mic className="w-4 h-4 mr-1" />
-                        Vocal
+                        {isRecording ? 'Arrêter' : 'Vocal'}
                       </Button>
                       <Button variant="outline" size="sm">
                         <Image className="w-4 h-4 mr-1" />

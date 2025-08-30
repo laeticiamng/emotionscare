@@ -60,6 +60,28 @@ const B2CFlashGlowPage: React.FC = () => {
       description: 'Amour et compassion',
       particles: '💝',
       defaultDuration: 110
+    },
+    // Advanced modes from Flash Glow Advanced
+    doux: {
+      icon: Heart,
+      color: 'from-blue-300 via-cyan-400 to-teal-300',
+      description: 'Velours léger apaisant',
+      particles: '💙',
+      defaultDuration: 90
+    },
+    standard: {
+      icon: Sparkles,
+      color: 'from-yellow-300 via-orange-400 to-amber-300',
+      description: 'Velours équilibré',
+      particles: '✨',
+      defaultDuration: 120
+    },
+    tonique: {
+      icon: Zap,
+      color: 'from-green-300 via-emerald-400 to-teal-300',
+      description: 'Velours dynamique',
+      particles: '⚡',
+      defaultDuration: 90
     }
   };
 
