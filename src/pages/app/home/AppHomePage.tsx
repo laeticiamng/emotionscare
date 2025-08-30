@@ -1,4 +1,4 @@
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/core/auth";
 import { useFlags } from "@/core/flags";
 import { AsyncState, CopyBadge } from "@/components/transverse";
 import { Button } from "@/components/ui/button";

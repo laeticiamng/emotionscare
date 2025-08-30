@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/core/auth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MoodProvider } from '@/contexts/MoodContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
