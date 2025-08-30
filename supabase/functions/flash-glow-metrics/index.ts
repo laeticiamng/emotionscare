@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { authorizeRole } from '../_shared/auth.ts';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,63 +8,129 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
-    if (!user) {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Get user from JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'No authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status,
+        status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (req.method === 'POST') {
+      const body = await req.json();
       const {
-        pattern,
-        duration_sec,
-        cycles_completed,
-        perfect_breaths,
-        score,
-        hr_data
-      } = await req.json();
+        duration_s,
+        label,
+        glow_type = 'energy',
+        intensity = 75,
+        result = 'completed',
+        metadata = {}
+      } = body;
 
-      console.log('Flash Glow session completed:', {
+      console.log('Flash Glow session:', {
         user_id: user.id,
-        pattern,
-        duration_sec,
-        events_count: events?.length || 0,
-        self_report,
-        hrv
+        duration_s,
+        label,
+        glow_type,
+        intensity,
+        result
       });
 
-      // Determine achievements based on performance
-      let achievements = [];
-      if (perfect_breaths >= 5) achievements.push('streak_master');
-      if (cycles_completed >= 8) achievements.push('first_session');
-      if (score >= 200) achievements.push('high_scorer');
+      // Enregistrer les métriques dans Supabase
+      const { error: insertError } = await supabase
+        .from('user_metrics')
+        .insert({
+          user_id: user.id,
+          metric_type: 'flash_glow',
+          value: duration_s,
+          metadata: {
+            glow_type,
+            intensity,
+            result,
+            label,
+            ...metadata
+          },
+          created_at: new Date().toISOString()
+        });
 
-      // Calculate final score with bonuses
-      const final_score = score + (hr_data?.connected ? 50 : 0);
+      if (insertError) {
+        console.error('Error inserting flash glow metrics:', insertError);
+        return new Response(JSON.stringify({ error: 'Failed to save metrics' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Retourner une réponse de succès avec recommandation
+      let recommendation = '';
+      if (label === 'gain') {
+        recommendation = 'Excellent ! Votre énergie rayonne ✨';
+      } else if (label === 'léger') {
+        recommendation = 'Progrès en douceur, continuez 🌟';
+      } else {
+        recommendation = 'Chaque glow compte, félicitations 💫';
+      }
 
       return new Response(JSON.stringify({
-        ok: true,
-        badge_id: badgeId
+        success: true,
+        message: recommendation,
+        next_session_in: '4h'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (req.method === 'GET') {
-      // Optional: return breath recommendation
-      const recommendation = {
-        pattern: '4-6-8',
-        reason: 'Optimal for energy boost and focus'
-      };
+      // Récupérer les statistiques Flash Glow de l'utilisateur
+      const { data: metrics, error: metricsError } = await supabase
+        .from('user_metrics')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('metric_type', 'flash_glow')
+        .order('created_at', { ascending: false })
+        .limit(10);
 
-      return new Response(JSON.stringify(recommendation), {
+      if (metricsError) {
+        console.error('Error fetching flash glow metrics:', metricsError);
+        return new Response(JSON.stringify({ error: 'Failed to fetch metrics' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const totalSessions = metrics?.length || 0;
+      const avgDuration = metrics?.length 
+        ? Math.round(metrics.reduce((sum, m) => sum + (m.value || 0), 0) / metrics.length)
+        : 0;
+
+      return new Response(JSON.stringify({
+        total_sessions: totalSessions,
+        avg_duration: avgDuration,
+        recent_sessions: metrics?.slice(0, 5) || []
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
