@@ -1,285 +1,262 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Volume2, Save, Play, Pause } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Music, Palette, Zap, Heart, Volume2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
-import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import { usePageMetadata } from '@/hooks/usePageMetadata';
+import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+
+interface MoodVibe {
+  id: string;
+  name: string;
+  softness: number;
+  clarity: number;
+  description: string;
+}
 
 const B2CMoodMixerPage: React.FC = () => {
-  const [energyLevel, setEnergyLevel] = useState([65]);
-  const [calmLevel, setCalmLevel] = useState([70]);
-  const [focusLevel, setFocusLevel] = useState([80]);
+  const navigate = useNavigate();
+  const { shouldAnimate, getDuration } = useMotionPrefs();
+  const [softness, setSoftness] = useState([50]);
+  const [clarity, setClarity] = useState([50]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentMix, setCurrentMix] = useState('');
-  const { loadingState } = usePageMetadata();
+  const [currentVibe, setCurrentVibe] = useState<string>('');
+  const [savedVibes, setSavedVibes] = useState<MoodVibe[]>([
+    { id: '1', name: 'brise lagon', softness: 70, clarity: 30, description: 'Douceur marine' },
+    { id: '2', name: 'verre poli', softness: 40, clarity: 80, description: 'Netteté cristalline' }
+  ]);
+  const [dustParticles, setDustParticles] = useState<Array<{ x: number; y: number; opacity: number }>>([]);
 
-  if (loadingState === 'loading') return <LoadingState type="dashboard" />;
-  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
-
-  const generateMix = () => {
-    const energy = energyLevel[0];
-    const calm = calmLevel[0];
-    const focus = focusLevel[0];
+  // Générateur de nom de vibe basé sur les sliders
+  const generateVibeName = (soft: number, clear: number) => {
+    const softWords = ['coton', 'soie', 'velours', 'brise', 'mousse'];
+    const clearWords = ['cristal', 'acier', 'diamant', 'verre', 'lumière'];
+    const neutralWords = ['sable', 'terre', 'bois', 'pierre', 'eau'];
     
-    let mixName = '';
-    let mixColor = '';
-    
-    if (energy > 80 && calm < 40) {
-      mixName = 'Énergie Explosive 🔥';
-      mixColor = 'from-red-500 to-orange-500';
-    } else if (calm > 80 && energy < 40) {
-      mixName = 'Sérénité Profonde 🌊';
-      mixColor = 'from-blue-500 to-cyan-500';
-    } else if (focus > 80) {
-      mixName = 'Focus Laser 🎯';
-      mixColor = 'from-purple-500 to-pink-500';
-    } else if (energy > 60 && calm > 60) {
-      mixName = 'Équilibre Parfait ⚖️';
-      mixColor = 'from-green-500 to-blue-500';
+    if (soft > 60 && clear < 40) {
+      return `${softWords[Math.floor(Math.random() * softWords.length)]} ${['pâle', 'doux', 'tendre'][Math.floor(Math.random() * 3)]}`;
+    } else if (clear > 60 && soft < 40) {
+      return `${clearWords[Math.floor(Math.random() * clearWords.length)]} ${['vif', 'net', 'pur'][Math.floor(Math.random() * 3)]}`;
     } else {
-      mixName = 'Mix Personnalisé ✨';
-      mixColor = 'from-indigo-500 to-purple-500';
+      return `${neutralWords[Math.floor(Math.random() * neutralWords.length)]} ${['équilibré', 'stable', 'calme'][Math.floor(Math.random() * 3)]}`;
     }
+  };
+
+  // Animation des particules de poussière
+  useEffect(() => {
+    if (!shouldAnimate) return;
     
-    setCurrentMix(mixName);
-    setIsPlaying(true);
-    setTimeout(() => setIsPlaying(false), 30000); // Arrêt auto après 30s
+    const generateParticles = () => {
+      const particles = [];
+      for (let i = 0; i < 5; i++) {
+        particles.push({
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          opacity: Math.random() * 0.3
+        });
+      }
+      setDustParticles(particles);
+    };
+
+    generateParticles();
+    const interval = setInterval(generateParticles, 3000);
+    return () => clearInterval(interval);
+  }, [shouldAnimate]);
+
+  // Mise à jour du nom de vibe en temps réel
+  useEffect(() => {
+    const vibeName = generateVibeName(softness[0], clarity[0]);
+    setCurrentVibe(vibeName);
+  }, [softness, clarity]);
+
+  const handlePlay = () => {
+    setIsPlaying(!isPlaying);
+    // Simulation de lecture audio avec crossfade
+  };
+
+  const saveCurrentVibe = () => {
+    const newVibe: MoodVibe = {
+      id: Date.now().toString(),
+      name: currentVibe,
+      softness: softness[0],
+      clarity: clarity[0],
+      description: `Mix personnel ${softness[0]}% doux, ${clarity[0]}% clair`
+    };
+    
+    setSavedVibes(prev => [newVibe, ...prev].slice(0, 6)); // Garder max 6 vibes
+    
+    // Animation de sauvegarde
+    if (shouldAnimate) {
+      const duration = getDuration(600);
+      // Effet visuel de sauvegarde
+    }
+  };
+
+  const loadVibe = (vibe: MoodVibe) => {
+    setSoftness([vibe.softness]);
+    setClarity([vibe.clarity]);
+    setCurrentVibe(vibe.name);
+  };
+
+  const getVibeColor = () => {
+    const soft = softness[0];
+    const clear = clarity[0];
+    
+    // Couleur basée sur le mix des sliders
+    const hue = (soft + clear) / 2 * 3.6; // 0-360
+    const saturation = Math.abs(soft - clear) / 100 * 70 + 20; // 20-90%
+    const lightness = 45 + (soft / 100) * 30; // 45-75%
+    
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   };
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs />
-      
-      <div className="flex items-center gap-3">
-        <Palette className="h-8 w-8 text-purple-500" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4 relative overflow-hidden">
+      {/* Particules de poussière */}
+      {shouldAnimate && dustParticles.map((particle, index) => (
+        <div
+          key={index}
+          className="absolute w-1 h-1 bg-foreground/10 rounded-full animate-pulse"
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            opacity: particle.opacity,
+            animationDuration: '3s',
+            animationDelay: `${index * 0.5}s`
+          }}
+        />
+      ))}
+
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8 relative z-10">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => navigate('/dashboard')}
+          className="hover:bg-white/10 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <div>
-          <h1 className="text-3xl font-bold">Mood Mixer</h1>
-          <p className="text-muted-foreground">Créez votre ambiance sonore personnalisée</p>
+          <h1 className="text-2xl font-semibold text-foreground">Mood Mixer</h1>
+          <p className="text-sm text-muted-foreground">Climat sur deux sliders</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Contrôles du Mixer */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Music className="h-6 w-6 text-blue-500" />
-              Table de Mixage Émotionnelle
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            {/* Slider Énergie */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-500" />
-                  Énergie
-                </label>
-                <Badge variant="outline">{energyLevel[0]}%</Badge>
+      <div className="max-w-md mx-auto space-y-6 relative z-10">
+        {/* Zone de mix principal */}
+        <Card 
+          className="p-6 bg-card/80 backdrop-blur-sm border-border/50 relative overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, ${getVibeColor()}15, ${getVibeColor()}05)`
+          }}
+        >
+          {/* Nom de la vibe actuelle */}
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-light text-foreground mb-1" style={{ color: getVibeColor() }}>
+              {currentVibe}
+            </h2>
+            <p className="text-xs text-muted-foreground">Votre climat sonore</p>
+          </div>
+
+          {/* Sliders */}
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-foreground">Plus doux</label>
+                <span className="text-xs text-muted-foreground">{softness[0]}%</span>
               </div>
               <Slider
-                value={energyLevel}
-                onValueChange={setEnergyLevel}
+                value={softness}
+                onValueChange={setSoftness}
                 max={100}
-                step={5}
+                step={1}
                 className="w-full"
               />
             </div>
 
-            {/* Slider Calme */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-blue-500" />
-                  Calme
-                </label>
-                <Badge variant="outline">{calmLevel[0]}%</Badge>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-foreground">Plus clair</label>
+                <span className="text-xs text-muted-foreground">{clarity[0]}%</span>
               </div>
               <Slider
-                value={calmLevel}
-                onValueChange={setCalmLevel}
+                value={clarity}
+                onValueChange={setClarity}
                 max={100}
-                step={5}
+                step={1}
                 className="w-full"
               />
             </div>
+          </div>
 
-            {/* Slider Focus */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-purple-500" />
-                  Focus
-                </label>
-                <Badge variant="outline">{focusLevel[0]}%</Badge>
-              </div>
-              <Slider
-                value={focusLevel}
-                onValueChange={setFocusLevel}
-                max={100}
-                step={5}
-                className="w-full"
-              />
-            </div>
-
-            <Button 
-              onClick={generateMix}
-              disabled={isPlaying}
-              size="lg"
-              className="w-full"
+          {/* Contrôles */}
+          <div className="flex items-center gap-3 mt-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handlePlay}
+              className="hover:bg-white/10"
             >
-              {isPlaying ? (
-                <>
-                  <Volume2 className="h-5 w-5 mr-2 animate-pulse" />
-                  Mix en cours...
-                </>
-              ) : (
-                <>
-                  <Music className="h-5 w-5 mr-2" />
-                  Générer le Mix
-                </>
-              )}
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
-          </CardContent>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={saveCurrentVibe}
+              className="hover:bg-white/10"
+            >
+              <Save className="h-4 w-4" />
+            </Button>
+            <div className="flex-1 text-center">
+              <Volume2 className="h-4 w-4 text-muted-foreground mx-auto" />
+            </div>
+          </div>
         </Card>
 
-        {/* Visualiseur */}
-        <Card className="relative overflow-hidden">
-          <CardHeader>
-            <CardTitle>Visualiseur d'Humeur</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {isPlaying && (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="text-center"
+        {/* Bibliothèque de vibes */}
+        <div>
+          <h3 className="text-sm font-medium text-foreground mb-3">Vos vibes sauvées</h3>
+          <div className="space-y-2">
+            {savedVibes.map((vibe) => (
+              <Card 
+                key={vibe.id}
+                className="p-3 bg-card/40 backdrop-blur-sm border-border/30 hover:bg-card/60 transition-all cursor-pointer group"
+                onClick={() => loadVibe(vibe)}
               >
-                <Badge variant="default" className="mb-4 px-4 py-2">
-                  {currentMix}
-                </Badge>
-              </motion.div>
-            )}
-
-            <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
-              {isPlaying ? (
-                <motion.div
-                  animate={{
-                    background: [
-                      'linear-gradient(45deg, rgb(139, 69, 19), rgb(255, 140, 0))',
-                      'linear-gradient(90deg, rgb(34, 197, 94), rgb(59, 130, 246))',
-                      'linear-gradient(135deg, rgb(168, 85, 247), rgb(236, 72, 153))'
-                    ]
-                  }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute inset-0"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-muted-foreground">
-                    <Music className="h-12 w-12 mx-auto mb-2" />
-                    <p>Ajustez les niveaux et générez votre mix</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
+                      {vibe.name}
+                    </h4>
+                    <p className="text-xs text-muted-foreground">{vibe.description}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full border border-border/50" 
+                         style={{ 
+                           backgroundColor: `hsl(${(vibe.softness + vibe.clarity) / 2 * 3.6}, 50%, 60%)`
+                         }} 
+                    />
                   </div>
                 </div>
-              )}
-              
-              {isPlaying && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 360]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
-                  >
-                    <Volume2 className="h-12 w-12 text-white" />
-                  </motion.div>
-                </div>
-              )}
-            </div>
+              </Card>
+            ))}
+          </div>
+        </div>
 
-            {/* Métriques du Mix */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-lg font-bold text-yellow-500">{energyLevel[0]}%</div>
-                <div className="text-xs text-muted-foreground">Énergie</div>
-              </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-lg font-bold text-blue-500">{calmLevel[0]}%</div>
-                <div className="text-xs text-muted-foreground">Calme</div>
-              </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-lg font-bold text-purple-500">{focusLevel[0]}%</div>
-                <div className="text-xs text-muted-foreground">Focus</div>
-              </div>
+        {/* Option de défaut pour demain */}
+        <Card className="p-4 bg-primary/5 border-primary/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Garder comme ambiance par défaut ?</p>
+              <p className="text-xs text-muted-foreground">Pour demain matin</p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Presets de Mix */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Mix Populaires</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col gap-2"
-              onClick={() => {
-                setEnergyLevel([90]);
-                setCalmLevel([30]);
-                setFocusLevel([70]);
-              }}
-            >
-              <div className="text-xl">🔥</div>
-              <div className="text-sm font-medium">Motivation</div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col gap-2"
-              onClick={() => {
-                setEnergyLevel([30]);
-                setCalmLevel([90]);
-                setFocusLevel([60]);
-              }}
-            >
-              <div className="text-xl">🌊</div>
-              <div className="text-sm font-medium">Détente</div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col gap-2"
-              onClick={() => {
-                setEnergyLevel([60]);
-                setCalmLevel([50]);
-                setFocusLevel([95]);
-              }}
-            >
-              <div className="text-xl">🎯</div>
-              <div className="text-sm font-medium">Concentration</div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col gap-2"
-              onClick={() => {
-                setEnergyLevel([75]);
-                setCalmLevel([75]);
-                setFocusLevel([75]);
-              }}
-            >
-              <div className="text-xl">⚖️</div>
-              <div className="text-sm font-medium">Équilibre</div>
+            <Button variant="ghost" size="sm" className="text-primary">
+              Oui ✨
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };

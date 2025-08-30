@@ -1,185 +1,237 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Shield, Sparkles, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Trophy, Target, Zap, Flame, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
-import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import { usePageMetadata } from '@/hooks/usePageMetadata';
+import { Card } from '@/components/ui/card';
+import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+
+interface GritChallenge {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'novice' | 'warrior' | 'master' | 'legend';
+  duration: number; // en minutes
+  category: 'mental' | 'physical' | 'emotional' | 'spiritual';
+  status: 'available' | 'in_progress' | 'completed';
+}
 
 const B2CBossLevelGritPage: React.FC = () => {
-  const [gritLevel, setGritLevel] = useState(72);
-  const [isTraining, setIsTraining] = useState(false);
-  const [achievements, setAchievements] = useState(['Déterminé', 'Résilient']);
-  const { loadingState } = usePageMetadata();
+  const navigate = useNavigate();
+  const { shouldAnimate, getDuration } = useMotionPrefs();
+  const [selectedChallenge, setSelectedChallenge] = useState<GritChallenge | null>(null);
+  const [sessionActive, setSessionActive] = useState(false);
+  const [sessionTime, setSessionTime] = useState(0);
+  const [auraGlow, setAuraGlow] = useState(0);
 
-  if (loadingState === 'loading') return <LoadingState type="dashboard" />;
-  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
+  const dailyChallenges: GritChallenge[] = [
+    {
+      id: '1',
+      title: 'Minute de gratitude',
+      description: 'Noter 3 choses simples qui ont aidé aujourd\'hui',
+      difficulty: 'novice',
+      duration: 3,
+      category: 'mental',
+      status: 'available'
+    },
+    {
+      id: '2', 
+      title: 'Ancrage épaules',
+      description: 'Relâcher les tensions, 5 respirations profondes',
+      difficulty: 'warrior',
+      duration: 4,
+      category: 'physical',
+      status: 'available'
+    }
+  ];
 
-  const handleTraining = () => {
-    setIsTraining(true);
-    setTimeout(() => {
-      setGritLevel(prev => Math.min(100, prev + 8));
-      setIsTraining(false);
-      if (gritLevel >= 90 && !achievements.includes('Boss Level')) {
-        setAchievements(prev => [...prev, 'Boss Level']);
-      }
-    }, 2000);
+  const [challenges] = useState<GritChallenge[]>(dailyChallenges);
+
+  const startChallenge = (challenge: GritChallenge) => {
+    setSelectedChallenge(challenge);
+    setSessionActive(true);
+    setSessionTime(0);
   };
 
-  const challengesMastered = Math.floor(gritLevel / 15);
-  const nextMilestone = Math.ceil(gritLevel / 25) * 25;
+  const completeChallenge = () => {
+    if (selectedChallenge) {
+      setSessionActive(false);
+      setAuraGlow(prev => Math.min(prev + 20, 100));
+      // Micro-son de réussite (simulé)
+      if (shouldAnimate) {
+        // Animation de confetti coton
+        const duration = getDuration(800);
+        if (duration > 0) {
+          setTimeout(() => setAuraGlow(prev => prev * 0.8), duration);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (sessionActive && selectedChallenge) {
+      timer = setInterval(() => {
+        setSessionTime(prev => {
+          if (prev >= selectedChallenge.duration * 60) {
+            setSessionActive(false);
+            completeChallenge();
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [sessionActive, selectedChallenge]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'novice': return 'text-green-300';
+      case 'warrior': return 'text-blue-300';
+      case 'master': return 'text-purple-300';
+      case 'legend': return 'text-amber-300';
+      default: return 'text-muted-foreground';
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs />
-      
-      <div className="flex items-center gap-3">
-        <Trophy className="h-8 w-8 text-amber-500" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => navigate('/dashboard')}
+          className="hover:bg-white/10 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <div>
-          <h1 className="text-3xl font-bold">Boss Level Grit</h1>
-          <p className="text-muted-foreground">Développez votre détermination ultime</p>
+          <h1 className="text-2xl font-semibold text-foreground">Boss Level Grit</h1>
+          <p className="text-sm text-muted-foreground">Un petit boss par jour, même fatigué·e</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Panel Principal Grit */}
-        <Card className="relative overflow-hidden">
-          <motion.div 
-            className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-red-500/5"
-            animate={isTraining ? { scale: 1.02 } : { scale: 1 }}
-          />
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Flame className="h-6 w-6 text-red-500" />
-              Niveau de Détermination
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-center">
-              <motion.div
-                animate={isTraining ? { scale: 1.1 } : { scale: 1 }}
-                className="text-6xl font-bold text-amber-500 mb-2"
+      {!sessionActive ? (
+        <>
+          {/* Aura du joueur */}
+          <Card className="p-6 mb-6 bg-card/80 backdrop-blur-sm border-border/50">
+            <div className="flex items-center gap-4">
+              <div 
+                className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center"
+                style={{ 
+                  boxShadow: `0 0 ${auraGlow}px hsl(var(--primary) / 0.3)`,
+                  filter: `brightness(${1 + auraGlow / 200})`
+                }}
               >
-                {gritLevel}%
-              </motion.div>
-              <Progress value={gritLevel} className="w-full h-3" />
-              <p className="text-sm text-muted-foreground mt-2">
-                Prochain palier: {nextMilestone}%
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">Votre constance</h3>
+                <p className="text-sm text-muted-foreground">Éclat doux, sans pression</p>
+                {auraGlow > 0 && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <Sparkles className="h-3 w-3 text-primary" />
+                    <span className="text-xs text-primary">Aura brillante</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* Défis du jour */}
+          <div className="space-y-4 mb-6">
+            <h2 className="text-lg font-medium text-foreground">Défis du jour</h2>
+            {challenges.map((challenge) => (
+              <Card 
+                key={challenge.id}
+                className="p-4 bg-card/60 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all cursor-pointer group"
+                onClick={() => startChallenge(challenge)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Target className="h-4 w-4 text-primary" />
+                      <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                        {challenge.title}
+                      </h3>
+                      <span className={`text-xs ${getDifficultyColor(challenge.difficulty)}`}>
+                        {challenge.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">{challenge.description}</p>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>{challenge.duration} min</span>
+                      <span className="capitalize">{challenge.category}</span>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" className="hover:bg-primary/10">
+                    Commencer
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Message d'encouragement */}
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <p className="text-sm text-muted-foreground text-center">
+              ✨ Rater ≠ reset. Votre streak de compassion continue.
+            </p>
+          </Card>
+        </>
+      ) : (
+        /* Session active */
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <Card className="p-8 bg-card/80 backdrop-blur-sm border-border/50 text-center max-w-md">
+            <div className="mb-6">
+              <Target className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-foreground mb-2">
+                {selectedChallenge?.title}
+              </h2>
+              <p className="text-muted-foreground">
+                {selectedChallenge?.description}
               </p>
             </div>
 
-            <Button 
-              onClick={handleTraining}
-              disabled={isTraining}
-              size="lg"
-              className="w-full"
-              variant={gritLevel >= 90 ? "default" : "outline"}
-            >
-              {isTraining ? (
-                <>
-                  <Zap className="h-5 w-5 mr-2 animate-spin" />
-                  Entraînement en cours...
-                </>
-              ) : (
-                <>
-                  <Target className="h-5 w-5 mr-2" />
-                  Entraîner la Détermination
-                </>
-              )}
-            </Button>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-amber-500">{challengesMastered}</div>
-                <div className="text-sm text-muted-foreground">Défis Maîtrisés</div>
+            <div className="mb-6">
+              <div className="text-3xl font-light text-primary mb-2">
+                {formatTime(sessionTime)}
               </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-red-500">{100 - gritLevel}</div>
-                <div className="text-sm text-muted-foreground">Points Restants</div>
+              <div className="w-full bg-muted/30 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-primary/60 to-primary h-full rounded-full transition-all duration-1000"
+                  style={{ 
+                    width: selectedChallenge ? `${Math.min((sessionTime / (selectedChallenge.duration * 60)) * 100, 100)}%` : '0%'
+                  }}
+                />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Panel Achievements */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-6 w-6 text-yellow-500" />
-              Accomplissements
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <AnimatePresence>
-                {achievements.map((achievement, index) => (
-                  <motion.div
-                    key={achievement}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <Badge 
-                      variant={achievement === 'Boss Level' ? 'default' : 'secondary'}
-                      className="w-full justify-center py-2"
-                    >
-                      {achievement === 'Boss Level' && <Trophy className="h-4 w-4 mr-2" />}
-                      {achievement}
-                    </Badge>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-semibold text-sm">Prochains Objectifs</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Guerrier</span>
-                  <span className="text-xs text-muted-foreground">80%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Champion</span>
-                  <span className="text-xs text-muted-foreground">90%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-semibold text-amber-600">Boss Final</span>
-                  <span className="text-xs text-amber-600 font-semibold">100%</span>
-                </div>
-              </div>
+              <Button onClick={completeChallenge} className="w-full">
+                Boss battu ✨
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setSessionActive(false);
+                  setSelectedChallenge(null);
+                }}
+                className="w-full"
+              >
+                Pause bienveillante
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Défis du jour */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Défis Grit du Jour</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-              <div className="text-lg mb-2">🎯 Défi Focus</div>
-              <h4 className="font-semibold text-sm">Méditation 10min</h4>
-              <p className="text-xs text-muted-foreground">Restez concentré sans interruption</p>
-            </div>
-            <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-              <div className="text-lg mb-2">💪 Défi Physique</div>
-              <h4 className="font-semibold text-sm">20 Pompes</h4>
-              <p className="text-xs text-muted-foreground">Développez votre force mentale</p>
-            </div>
-            <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-              <div className="text-lg mb-2">🧠 Défi Mental</div>
-              <h4 className="font-semibold text-sm">Problème Complexe</h4>
-              <p className="text-xs text-muted-foreground">Persévérez face à la difficulté</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
