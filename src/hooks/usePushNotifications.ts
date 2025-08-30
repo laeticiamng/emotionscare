@@ -5,8 +5,8 @@
 import { useState, useEffect } from 'react';
 
 interface PushNotificationState {
-  isSupported: boolean;
-  isSubscribed: boolean;
+  supported: boolean;
+  enabled: boolean;
   permission: NotificationPermission;
   isLoading: boolean;
   error?: string;
@@ -14,25 +14,28 @@ interface PushNotificationState {
 
 export const usePushNotifications = () => {
   const [state, setState] = useState<PushNotificationState>({
-    isSupported: false,
-    isSubscribed: false,
+    supported: false,
+    enabled: false,
     permission: 'default',
     isLoading: false,
   });
 
   useEffect(() => {
     // Vérifier le support des notifications
-    const isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
+    const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+    const permission = Notification.permission;
+    const enabled = permission === 'granted';
     
     setState(prev => ({
       ...prev,
-      isSupported,
-      permission: Notification.permission,
+      supported,
+      enabled,
+      permission,
     }));
   }, []);
 
   const requestPermission = async (): Promise<boolean> => {
-    if (!state.isSupported) {
+    if (!state.supported) {
       setState(prev => ({ ...prev, error: 'Notifications non supportées' }));
       return false;
     }
@@ -41,9 +44,16 @@ export const usePushNotifications = () => {
       setState(prev => ({ ...prev, isLoading: true }));
       
       const permission = await Notification.requestPermission();
-      setState(prev => ({ ...prev, permission, isLoading: false }));
+      const enabled = permission === 'granted';
       
-      return permission === 'granted';
+      setState(prev => ({ 
+        ...prev, 
+        permission, 
+        enabled,
+        isLoading: false 
+      }));
+      
+      return enabled;
     } catch (error) {
       setState(prev => ({ 
         ...prev, 
@@ -54,13 +64,18 @@ export const usePushNotifications = () => {
     }
   };
 
-  const sendTestNotification = (): boolean => {
-    if (!state.isSupported || state.permission !== 'granted') {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Permission requise pour les notifications' 
-      }));
+  const sendTestNotification = async (): Promise<boolean> => {
+    if (!state.supported) {
+      console.warn('[Push] Notifications non supportées');
       return false;
+    }
+
+    if (state.permission !== 'granted') {
+      const granted = await requestPermission();
+      if (!granted) {
+        console.warn('[Push] Permission refusée');
+        return false;
+      }
     }
 
     try {
@@ -76,6 +91,7 @@ export const usePushNotifications = () => {
       console.log('[Push] Notification de test envoyée');
       return true;
     } catch (error) {
+      console.error('[Push] Erreur lors de l\'envoi:', error);
       setState(prev => ({ 
         ...prev, 
         error: 'Erreur lors de l\'envoi de la notification' 
@@ -84,23 +100,25 @@ export const usePushNotifications = () => {
     }
   };
 
-  const getFallbackMessage = (): string => {
-    if (!state.isSupported) {
-      return 'Notifications non supportées par ce navigateur';
-    }
-    if (state.permission === 'denied') {
-      return 'Notifications bloquées - veuillez autoriser dans les paramètres du navigateur';
-    }
-    if (state.permission === 'default') {
-      return 'Permission de notification requise';
-    }
-    return 'Notifications disponibles';
+  const fallbackAlert = (): void => {
+    const message = state.supported 
+      ? state.permission === 'denied'
+        ? 'Notifications bloquées - veuillez autoriser dans les paramètres du navigateur'
+        : 'Permission de notification requise'
+      : 'Notifications non supportées par ce navigateur';
+    
+    alert(`📱 Fallback Notification:\n\n${message}\n\nEmotionsCare - Système de fallback activé`);
+    console.log('[Push] Fallback alert affiché:', message);
   };
 
   return {
-    ...state,
+    supported: state.supported,
+    enabled: state.enabled,
+    permission: state.permission,
+    isLoading: state.isLoading,
+    error: state.error,
     requestPermission,
     sendTestNotification,
-    getFallbackMessage,
+    fallbackAlert,
   };
 };
