@@ -60,7 +60,7 @@ const ImmersiveExperience: React.FC<ImmersiveExperienceProps> = ({
     }
   };
 
-  const currentVariant = variants[variant];
+  const currentVariant = variants[variant] || variants.welcome;
 
   if (!isVisible) return null;
 
