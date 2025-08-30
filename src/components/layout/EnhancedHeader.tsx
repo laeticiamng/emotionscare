@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, NavLink } from 'react-router-dom';
+import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { Routes } from '@/routerV2/helpers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -27,6 +27,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
 
   // Navigation items avec RouterV2 - VERSION COMPLÈTE PREMIUM
@@ -143,18 +144,35 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
           </Button>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" aria-label="Notifications">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            aria-label="Notifications"
+            onClick={() => {
+              if (isAuthenticated) {
+                // Créer une notification toast pour indiquer que c'est fonctionnel
+                alert('Notifications : Fonctionnalité prochainement disponible !');
+                // navigate('/notifications'); // Décommenter quand la page existe
+              } else {
+                navigate('/login');
+              }
+            }}
+          >
             <Bell className="h-5 w-5" />
           </Button>
 
           {/* User Menu or Profile Button */}
           {isAuthenticated ? (
-            <Avatar className="h-8 w-8 cursor-pointer">
-              <AvatarImage src={user?.avatar} alt={user?.name || 'Utilisateur'} />
-              <AvatarFallback>
-                {user?.name?.charAt(0) || 'U'}
-              </AvatarFallback>
-            </Avatar>
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/settings/profile" aria-label="Profil utilisateur">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.avatar} alt={user?.name || 'Utilisateur'} />
+                  <AvatarFallback>
+                    {user?.name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </Button>
           ) : (
             <Button variant="outline" size="sm" asChild>
               <Link to={Routes.login()}>Se connecter</Link>
