@@ -470,7 +470,7 @@ const B2CCommunityPage: React.FC = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Statistiques communauté */}
-              <EnhancedCard title="Communauté Active" icon={Users}>
+              <EnhancedCard title="Communauté Active" icon={<Users className="w-5 h-5" />}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Membres connectés</span>
@@ -510,7 +510,7 @@ const B2CCommunityPage: React.FC = () => {
               />
 
               {/* Top membres */}
-              <EnhancedCard title="Membres Inspirants" icon={Trophy}>
+              <EnhancedCard title="Membres Inspirants" icon={<Trophy className="w-5 h-5" />}>
                 <div className="space-y-3">
                   {topMembers.map((member, index) => (
                     <motion.div 
@@ -560,7 +560,7 @@ const B2CCommunityPage: React.FC = () => {
               </EnhancedCard>
 
               {/* Actions rapides */}
-              <EnhancedCard title="Actions Rapides" icon={Zap}>
+              <EnhancedCard title="Actions Rapides" icon={<Zap className="w-5 h-5" />}>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start">
                     <BookHeart className="w-4 h-4 mr-2" />
