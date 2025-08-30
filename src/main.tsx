@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { RouterProvider } from 'react-router-dom';
+import { routerV2 } from './routerV2';
 import AppProviders from './AppProviders';
 import './index.css';
 
@@ -41,7 +42,7 @@ addAccessibilityMeta();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppProviders>
-      <App />
+      <RouterProvider router={routerV2} />
     </AppProviders>
   </React.StrictMode>
 );

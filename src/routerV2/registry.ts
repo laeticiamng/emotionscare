@@ -212,17 +212,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2CJournalPage',
     guard: true,
-    aliases: ['/journal'],
-  },
-  {
-    name: 'voice-journal',
-    path: '/app/voice-journal-new',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CVoiceJournalPage',
-    guard: true,
-    aliases: ['/voice-journal-90s'],
+    aliases: ['/journal', '/voice-journal'],
   },
   {
     name: 'vr',
@@ -246,17 +236,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2CFlashGlowPage',
     guard: true,
-    aliases: ['/flash-glow', '/instant-glow', '/b2c-flash-glow'],
-  },
-  {
-    name: 'flash-glow-advanced',
-    path: '/app/flash-glow-advanced',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CFlashGlowAdvancedPage',
-    guard: true,
-    aliases: ['/flash-glow-velours'],
+    aliases: ['/flash-glow', '/instant-glow', '/b2c-flash-glow', '/flash-glow-advanced'],
   },
   {
     name: 'breath',
@@ -266,17 +246,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2CBreathworkPage',
     guard: true,
-    aliases: ['/breathwork'],
-  },
-  {
-    name: 'breathwork-adaptive',
-    path: '/app/breathwork-adaptive',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CBreathworkAdaptivePage',
-    guard: true,
-    aliases: ['/breathwork-micro'],
+    aliases: ['/breathwork', '/breathwork-adaptive'],
   },
   {
     name: 'face-ar',
@@ -344,16 +314,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/community'],
     deprecated: true,
-  },
-  {
-    name: 'bubble-beat',
-    path: '/app/bubble-beat',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CBubbleBeatPage',
-    guard: true,
-    aliases: ['/bubble-beat'],
   },
   {
     name: 'screen-silk',
@@ -724,13 +684,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'NotFoundPage',
   },
   {
-    name: 'catch-all',
-    path: '*',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'NotFoundPage',
-  },
-  {
     name: 'server-error',
     path: '/503',
     segment: 'public',
@@ -775,7 +728,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // 404 FALLBACK ROUTE (must be last)
   // ═══════════════════════════════════════════════════════════
   {
-    name: 'not-found',
+    name: 'catch-all',
     path: '*',
     segment: 'public',
     layout: 'simple',
