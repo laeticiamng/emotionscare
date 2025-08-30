@@ -90,3 +90,13 @@ export { default as ForbiddenPage } from './ForbiddenPage';
 // Development pages
 export { default as ValidationPage } from './ValidationPage';
 export { default as B2CNyveeCoconPage } from './B2CNyveeCoconPage';
+
+// Pages manquantes créées
+export { default as CoachChatPage } from './CoachChatPage';
+export { default as VRSessionsPage } from './VRSessionsPage';
+export { default as JournalNewPage } from './JournalNewPage';
+export { default as ReportingPage } from './ReportingPage';
+export { default as ExportPage } from './ExportPage';
+export { default as NavigationPage } from './NavigationPage';
+export { default as LeaderboardPage } from './LeaderboardPage';
+export { default as HeatmapPage } from './HeatmapPage';
