@@ -7,6 +7,7 @@ import EnhancedHeader from './EnhancedHeader';
 import EnhancedFooter from './EnhancedFooter';
 import CommandMenu from './CommandMenu';
 import NotificationToast from './NotificationToast';
+import MainNavigationHub from '@/components/navigation/MainNavigationHub';
 import { cn } from '@/lib/utils';
 
 interface EnhancedShellProps {
@@ -141,6 +142,9 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       
       {/* Floating Notification Container */}
       <NotificationToast />
+      
+      {/* Navigation Hub */}
+      <MainNavigationHub />
     </div>
   );
 };

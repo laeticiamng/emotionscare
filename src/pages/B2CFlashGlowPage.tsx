@@ -10,7 +10,7 @@ import { toast } from '@/hooks/use-toast';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
 import { usePageMetadata } from '@/hooks/usePageMetadata';
 
-const B2CFlashGlowEnhanced: React.FC = () => {
+const B2CFlashGlowPage: React.FC = () => {
   const [isGlowing, setIsGlowing] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState([75]);
   const [glowDuration, setGlowDuration] = useState([30]);
@@ -354,4 +354,4 @@ const B2CFlashGlowEnhanced: React.FC = () => {
   );
 };
 
-export default B2CFlashGlowEnhanced;
+export default B2CFlashGlowPage;

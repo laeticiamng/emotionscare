@@ -129,7 +129,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/app/home',
     segment: 'consumer',
     layout: 'app',
-    component: 'TestDashboard',
+    component: 'B2CDashboardPage',
     guard: false,
     aliases: ['/b2c/dashboard', '/dashboard'],
   },
@@ -240,7 +240,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app',
     component: 'B2CFlashGlowPage',
     guard: true,
-    aliases: ['/flash-glow', '/instant-glow'],
+    aliases: ['/flash-glow', '/instant-glow', '/b2c-flash-glow'],
   },
   {
     name: 'breath',

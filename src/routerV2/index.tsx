@@ -96,7 +96,7 @@ const CompleteFeatureMatrix = lazy(() => import('@/pages/CompleteFeatureMatrix')
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
-const TestDashboard = lazy(() => import('@/pages/TestDashboard'));
+
 
 // Pages système
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
@@ -182,7 +182,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   NavigationPage,
   CompleteFeatureMatrix,
   PrivacyPage,
-  TestDashboard,
+  
   
   // System
   UnauthorizedPage,
