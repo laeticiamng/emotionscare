@@ -500,12 +500,7 @@ const B2CCommunityPage: React.FC = () => {
               {/* Gamification compacte */}
               <GamificationSystem 
                 currentXP={890}
-                level={12}
-                nextLevelXP={1000}
-                achievements={[
-                  { name: "Connecteur Social", description: "50 interactions", icon: "🤝" },
-                  { name: "Inspirateur", description: "10 posts appréciés", icon: "✨" }
-                ]}
+                currentLevel={12}
                 compact
               />
 
