@@ -55,25 +55,25 @@ const CommandMenu: React.FC<CommandMenuProps> = ({
             <span>Accueil</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/dashboard'))}
+            onSelect={() => runCommand(() => navigate('/app/home'))}
           >
             <BarChart className="mr-2 h-4 w-4" />
             <span>Tableau de bord</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/music'))}
+            onSelect={() => runCommand(() => navigate('/app/music'))}
           >
             <Music className="mr-2 h-4 w-4" />
             <span>Musique</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/coach'))}
+            onSelect={() => runCommand(() => navigate('/app/coach'))}
           >
             <MessageCircle className="mr-2 h-4 w-4" />
             <span>Coach IA</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/community'))}
+            onSelect={() => runCommand(() => navigate('/app/community'))}
           >
             <Users className="mr-2 h-4 w-4" />
             <span>Communauté</span>

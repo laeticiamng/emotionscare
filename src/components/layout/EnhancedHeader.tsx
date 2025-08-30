@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, NavLink } from 'react-router-dom';
-import { routes } from '@/routerV2';
+import { Routes } from '@/routerV2/helpers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, Music, MessageCircle, Users, LayoutDashboard, Settings,
@@ -31,13 +31,13 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
 
   // Navigation items avec RouterV2 - VERSION COMPLÈTE PREMIUM
   const navigationItems = [
-    { to: routes.b2c.dashboard(), icon: <LayoutDashboard className="h-4 w-4 mr-2" />, label: "Dashboard" },
-    { to: routes.b2c.emotions(), icon: <Brain className="h-4 w-4 mr-2" />, label: "Émotions" },
-    { to: routes.b2c.music(), icon: <Music className="h-4 w-4 mr-2" />, label: "Musicothérapie" },
-    { to: routes.b2c.coach(), icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach IA" },
-    { to: routes.b2c.community(), icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
-    { to: '/navigation', icon: <Compass className="h-4 w-4 mr-2" />, label: "Tous les Modules" },
-    { to: routes.b2c.settings(), icon: <Settings className="h-4 w-4 mr-2" />, label: "Paramètres" }
+    { to: Routes.consumerHome(), icon: <LayoutDashboard className="h-4 w-4 mr-2" />, label: "Dashboard" },
+    { to: Routes.emotions(), icon: <Brain className="h-4 w-4 mr-2" />, label: "Émotions" },
+    { to: Routes.music(), icon: <Music className="h-4 w-4 mr-2" />, label: "Musicothérapie" },
+    { to: Routes.coach(), icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach IA" },
+    { to: Routes.community(), icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
+    { to: Routes.navigation(), icon: <Compass className="h-4 w-4 mr-2" />, label: "Tous les Modules" },
+    { to: Routes.settingsGeneral(), icon: <Settings className="h-4 w-4 mr-2" />, label: "Paramètres" }
   ];
 
   const toggleTheme = () => {
@@ -57,7 +57,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
       <div className="container mx-auto h-full flex items-center justify-between px-4">
         {/* Logo & Brand */}
         <div className="flex items-center">
-          <Link to={routes.public.home()} className="flex items-center space-x-2">
+          <Link to={Routes.home()} className="flex items-center space-x-2">
             <motion.div
               whileHover={{ rotate: 10 }}
               transition={{ duration: 0.2 }}
@@ -159,7 +159,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
             </Avatar>
           ) : (
             <Button variant="outline" size="sm" asChild>
-              <Link to={routes.auth.login()}>Se connecter</Link>
+              <Link to={Routes.login()}>Se connecter</Link>
             </Button>
           )}
 
