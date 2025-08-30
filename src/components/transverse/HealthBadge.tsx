@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, AlertTriangle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 type HealthState = "online" | "degraded" | "offline";
 
@@ -10,75 +10,65 @@ export function HealthBadge() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkHealth = async () => {
+    let timer: NodeJS.Timeout;
+    
+    const ping = async () => {
       try {
-        const response = await fetch('/healthz', { 
-          signal: AbortSignal.timeout(5000) 
+        const response = await fetch("/healthz", { 
+          method: "GET", 
+          cache: "no-store",
+          signal: AbortSignal.timeout(5000)
         });
         
         if (response.ok) {
-          const data = await response.json();
-          setState(data.degraded ? "degraded" : "online");
+          setState("online");
         } else {
           setState("degraded");
         }
       } catch (error) {
         setState("offline");
       }
+      
+      timer = setTimeout(ping, 60000);
     };
 
-    // Check immediately and then every 60 seconds
-    checkHealth();
-    const interval = setInterval(checkHealth, 60000);
-
-    return () => clearInterval(interval);
+    ping();
+    return () => clearTimeout(timer);
   }, []);
 
-  const handleClick = () => {
-    navigate('/system/api-monitoring');
-  };
-
-  const config = {
-    online: {
-      icon: Wifi,
-      text: "En ligne",
-      variant: "secondary" as const,
-      className: "text-green-600 border-green-200"
-    },
-    degraded: {
-      icon: AlertTriangle,
-      text: "Dégradé",
-      variant: "outline" as const,
-      className: "text-yellow-600 border-yellow-200"
-    },
-    offline: {
-      icon: WifiOff,
-      text: "Hors ligne",
-      variant: "destructive" as const,
-      className: "text-red-600"
+  const getIcon = () => {
+    switch (state) {
+      case "online": return <Wifi className="h-3 w-3" />;
+      case "degraded": return <AlertTriangle className="h-3 w-3" />;
+      case "offline": return <WifiOff className="h-3 w-3" />;
     }
   };
 
-  const current = config[state];
-  const Icon = current.icon;
+  const getLabel = () => {
+    switch (state) {
+      case "online": return "En ligne";
+      case "degraded": return "Dégradé";
+      case "offline": return "Hors ligne";
+    }
+  };
+
+  const getVariant = () => {
+    switch (state) {
+      case "online": return "secondary" as const;
+      case "degraded": return "outline" as const;
+      case "offline": return "destructive" as const;
+    }
+  };
 
   return (
     <Badge
-      variant={current.variant}
-      className={`cursor-pointer hover:opacity-80 transition-opacity ${current.className}`}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleClick();
-        }
-      }}
-      aria-label={`État du système: ${current.text}. Cliquer pour voir les détails.`}
+      variant={getVariant()}
+      className="cursor-pointer hover:opacity-80 transition-opacity"
+      onClick={() => navigate("/system/api-monitoring")}
+      aria-label={`Santé du système: ${getLabel()}`}
     >
-      <Icon className="h-3 w-3 mr-1" />
-      {current.text}
+      {getIcon()}
+      <span className="ml-1">{getLabel()}</span>
     </Badge>
   );
 }

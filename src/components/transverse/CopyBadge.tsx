@@ -3,53 +3,33 @@ import { TrendingUp, Zap, Clock } from "lucide-react";
 
 interface CopyBadgeProps {
   kind: "progression" | "intensité" | "durée";
-  value?: number;
+  idx?: number;
   className?: string;
 }
 
-const badgeConfig = {
-  progression: {
-    icon: TrendingUp,
-    getText: (value?: number) => {
-      if (!value) return "Progression";
-      if (value < 25) return "Début de parcours";
-      if (value < 50) return "En progression";
-      if (value < 75) return "Bien avancé";
-      return "Maîtrise développée";
-    }
-  },
-  intensité: {
-    icon: Zap,
-    getText: (value?: number) => {
-      if (!value) return "Intensité";
-      if (value < 30) return "Doux";
-      if (value < 60) return "Modéré";
-      if (value < 80) return "Intense";
-      return "Très intense";
-    }
-  },
-  durée: {
-    icon: Clock,
-    getText: (value?: number) => {
-      if (!value) return "Durée";
-      if (value < 5) return "Flash";
-      if (value < 15) return "Bref";
-      if (value < 30) return "Équilibré";
-      return "Approfondi";
-    }
-  }
+const COPY_MAP = {
+  progression: ["commence", "en cours", "ça vient", "beau progrès", "au top"],
+  intensité: ["très doux", "doux", "modéré", "soutenu"],
+  durée: ["une minute", "un petit moment", "quelques minutes"]
+} as const;
+
+const ICON_MAP = {
+  progression: TrendingUp,
+  intensité: Zap,
+  durée: Clock
 };
 
-export function CopyBadge({ kind, value, className = "" }: CopyBadgeProps) {
-  const config = badgeConfig[kind];
-  const Icon = config.icon;
-  const text = config.getText(value);
+export function CopyBadge({ kind, idx = 0, className = "" }: CopyBadgeProps) {
+  const copyArray = COPY_MAP[kind];
+  const Icon = ICON_MAP[kind];
+  const safeIndex = Math.max(0, Math.min(copyArray.length - 1, idx));
+  const text = copyArray[safeIndex];
 
   return (
     <Badge 
       variant="secondary" 
       className={`flex items-center space-x-1 ${className}`}
-      aria-label={`${kind}: ${text}${value ? ` (${value})` : ''}`}
+      aria-label={`${kind}: ${text}`}
     >
       <Icon className="h-3 w-3" />
       <span>{text}</span>

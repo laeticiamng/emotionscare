@@ -1,58 +1,50 @@
-import { Loader2, AlertCircle, CheckCircle, Wifi } from "lucide-react";
-import { motion } from "framer-motion";
-
-interface AsyncStateProps {
-  message?: string;
-  className?: string;
-}
+import { Loader2, AlertCircle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const AsyncState = {
-  Loading: ({ message = "Chargement...", className = "" }: AsyncStateProps) => (
-    <div className={`flex items-center justify-center min-h-[200px] ${className}`}>
-      <div className="flex flex-col items-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {message}
-        </p>
-      </div>
-    </div>
-  ),
-
-  Complete: ({ message = "Terminé", className = "" }: AsyncStateProps) => (
-    <motion.div 
-      className={`flex items-center justify-center min-h-[200px] ${className}`}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
+  Loading: ({ message }: { message?: string } = {}) => (
+    <div 
+      role="status" 
+      aria-live="polite" 
+      className="flex flex-col items-center justify-center p-8 text-center"
     >
-      <div className="flex flex-col items-center space-y-4">
-        <CheckCircle className="h-8 w-8 text-green-500" />
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {message}
-        </p>
-      </div>
-    </motion.div>
-  ),
-
-  Error: ({ message = "Une erreur s'est produite", className = "" }: AsyncStateProps) => (
-    <div className={`flex items-center justify-center min-h-[200px] ${className}`}>
-      <div className="flex flex-col items-center space-y-4">
-        <AlertCircle className="h-8 w-8 text-destructive" />
-        <p className="text-sm text-muted-foreground" aria-live="assertive">
-          {message}
-        </p>
-      </div>
+      <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+      <p className="text-muted-foreground">
+        {message || "On prépare le cocon…"}
+      </p>
     </div>
   ),
 
-  Void: ({ message = "Aucun élément trouvé", className = "" }: AsyncStateProps) => (
-    <div className={`flex items-center justify-center min-h-[200px] ${className}`}>
-      <div className="flex flex-col items-center space-y-4">
-        <Wifi className="h-8 w-8 text-muted-foreground opacity-50" />
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {message}
-        </p>
-      </div>
+  Empty: ({ children }: { children?: React.ReactNode }) => (
+    <div 
+      aria-live="polite" 
+      className="flex flex-col items-center justify-center p-8 text-center"
+    >
+      <Clock className="h-12 w-12 text-muted-foreground mb-4" />
+      <p className="text-muted-foreground">
+        {children || "Rien à afficher pour l'instant."}
+      </p>
     </div>
+  ),
+
+  Error: ({ onRetry, message }: { onRetry?: () => void; message?: string }) => (
+    <div 
+      aria-live="polite" 
+      className="flex flex-col items-center justify-center p-8 text-center"
+    >
+      <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+      <p className="text-foreground mb-4">
+        {message || "Oups, ça coince — on réessaie."}
+      </p>
+      {onRetry && (
+        <Button onClick={onRetry} variant="outline">
+          Réessayer
+        </Button>
+      )}
+    </div>
+  ),
+
+  Content: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
   )
 };

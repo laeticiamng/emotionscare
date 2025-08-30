@@ -2,94 +2,78 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Accessibility Tests', () => {
-  test('homepage passes accessibility checks', async ({ page }) => {
+  test('homepage has no accessibility violations', async ({ page }) => {
     await page.goto('/');
     
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();
     
-    // No critical violations allowed
-    const criticalViolations = accessibilityScanResults.violations.filter(
-      violation => violation.impact === 'critical'
-    );
-    
-    expect(criticalViolations).toHaveLength(0);
-    
-    if (criticalViolations.length > 0) {
-      console.error('Critical accessibility violations:', criticalViolations);
-    }
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 
-  test('login page passes accessibility checks', async ({ page }) => {
-    await page.goto('/login');
-    
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-      .analyze();
-    
-    const criticalViolations = accessibilityScanResults.violations.filter(
-      violation => violation.impact === 'critical'
-    );
-    
-    expect(criticalViolations).toHaveLength(0);
-  });
-
-  test('keyboard navigation works', async ({ page }) => {
+  test('focus trap and skip link functionality', async ({ page }) => {
     await page.goto('/');
     
     // Test skip link
     await page.keyboard.press('Tab');
-    const skipLink = page.locator('[href="#main-content"]');
-    if (await skipLink.isVisible()) {
-      expect(await skipLink.isFocused()).toBeTruthy();
-    }
+    const skipLink = page.locator('text=Skip to content');
+    await expect(skipLink).toBeVisible();
     
-    // Test basic tab navigation
-    await page.keyboard.press('Tab');
-    const focusedElement = await page.locator(':focus').first();
-    expect(await focusedElement.isVisible()).toBeTruthy();
+    // Test focus is visible
+    const focusedElement = page.locator(':focus');
+    await expect(focusedElement).toBeVisible();
   });
 
-  test('focus visible on interactive elements', async ({ page }) => {
-    await page.goto('/');
+  test('app pages have proper ARIA labels', async ({ page }) => {
+    await page.goto('/app/home');
     
-    // Check buttons have focus styles
-    const buttons = page.locator('button, [role="button"]');
-    const buttonCount = await buttons.count();
+    // Wait for page to load
+    await expect(page.locator('[data-testid="page-root"]')).toBeVisible();
     
-    if (buttonCount > 0) {
-      const firstButton = buttons.first();
-      await firstButton.focus();
+    // Check for proper main landmark
+    const main = page.locator('main');
+    await expect(main).toBeVisible();
+    
+    // Check for proper heading structure
+    const h1 = page.locator('h1').first();
+    await expect(h1).toBeVisible();
+  });
+
+  test('form controls have proper labels', async ({ page }) => {
+    await page.goto('/login');
+    
+    // Check that form inputs have associated labels
+    const inputs = page.locator('input[type="email"], input[type="password"]');
+    const count = await inputs.count();
+    
+    for (let i = 0; i < count; i++) {
+      const input = inputs.nth(i);
+      const ariaLabel = await input.getAttribute('aria-label');
+      const ariaLabelledby = await input.getAttribute('aria-labelledby');
+      const id = await input.getAttribute('id');
       
-      // Check focus is visible (this may need to be adapted based on your styles)
-      const focusStyles = await firstButton.evaluate(el => {
-        const styles = window.getComputedStyle(el, ':focus');
-        return {
-          outline: styles.outline,
-          boxShadow: styles.boxShadow
-        };
-      });
+      // Input should have either aria-label, aria-labelledby, or associated label
+      const hasLabel = ariaLabel || ariaLabelledby || 
+        (id && await page.locator(`label[for="${id}"]`).count() > 0);
       
-      // Should have some focus indication
-      expect(focusStyles.outline !== 'none' || focusStyles.boxShadow !== 'none').toBeTruthy();
+      expect(hasLabel).toBeTruthy();
     }
   });
 
-  test('images have alt text', async ({ page }) => {
+  test('color contrast meets WCAG standards', async ({ page }) => {
     await page.goto('/');
     
-    const images = page.locator('img');
-    const imageCount = await images.count();
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2aa'])
+      .include('body')
+      .analyze();
     
-    for (let i = 0; i < imageCount; i++) {
-      const img = images.nth(i);
-      const alt = await img.getAttribute('alt');
-      const ariaLabel = await img.getAttribute('aria-label');
-      const ariaLabelledby = await img.getAttribute('aria-labelledby');
-      
-      // Should have alt text or aria labeling
-      expect(alt !== null || ariaLabel !== null || ariaLabelledby !== null).toBeTruthy();
-    }
+    // Filter for color contrast violations specifically
+    const contrastViolations = accessibilityScanResults.violations.filter(
+      violation => violation.id === 'color-contrast'
+    );
+    
+    expect(contrastViolations).toEqual([]);
   });
 });
