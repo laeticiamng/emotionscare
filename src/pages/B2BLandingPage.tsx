@@ -1,5 +1,6 @@
 
 import React from 'react';
+import B2BLandingPageComplete from '@/components/b2b/B2BLandingPageComplete';
 
 const B2BLandingPage: React.FC = () => {
   return (

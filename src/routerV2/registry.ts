@@ -78,7 +78,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/entreprise',
     segment: 'public', 
     layout: 'marketing',
-    component: 'HomeB2B',
+    component: 'B2BEntreprisePage',
     aliases: ['/b2b'],
   },
   {
@@ -139,7 +139,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'employee',
     role: 'employee',
     layout: 'app',
-    component: 'B2BUserDashboardPage',
+    component: 'B2BCollabDashboard',
     guard: true,
     aliases: ['/b2b/user/dashboard'],
   },
@@ -149,7 +149,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'manager',
     role: 'manager',
     layout: 'app',
-    component: 'B2BAdminDashboardPage',
+    component: 'B2BRHDashboard',
     guard: true,
     aliases: ['/b2b/admin/dashboard'],
   },
@@ -251,6 +251,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CBreathworkPage',
     guard: true,
     aliases: ['/breathwork'],
+  },
+  {
+    name: 'vr-breath',
+    path: '/app/vr-breath',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CBreathVRPage',
+    guard: true,
+    aliases: ['/vr-respiration'],
   },
   {
     name: 'face-ar',
@@ -412,7 +422,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CWeeklyBarsPage',
+    component: 'B2CActivityHistoryPage',
     guard: true,
     aliases: ['/weekly-bars', '/activity-history'],
   },
@@ -568,9 +578,19 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/accessibility'],
   },
 
+  
   // ═══════════════════════════════════════════════════════════
-  // SYSTÈME & MONITORING
+  // VALIDATION & MONITORING
   // ═══════════════════════════════════════════════════════════
+  {
+    name: 'validation-status',
+    path: '/system/validation',
+    segment: 'consumer',
+    layout: 'app',
+    guard: true,
+    component: 'ValidationStatusPage',
+    aliases: ['/validation', '/system-check'],
+  },
   {
     name: 'api-monitoring',
     path: '/system/api-monitoring',
@@ -611,5 +631,18 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'ServerErrorPage',
+  },
+  
+  // ═══════════════════════════════════════════════════════════
+  // BILLING & SUBSCRIPTION
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'subscribe',
+    path: '/subscribe',
+    segment: 'consumer',
+    layout: 'app',
+    component: 'SubscribePage',
+    guard: true,
+    aliases: ['/billing', '/plans'],
   },
 ];

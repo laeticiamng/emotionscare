@@ -97,6 +97,14 @@ const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 
+// Pages nouvelles créées
+const B2CBreathVRPage = lazy(() => import('@/pages/B2CBreathVRPage'));
+const B2CActivityHistoryPage = lazy(() => import('@/pages/B2CActivityHistoryPage'));
+const B2BEntreprisePage = lazy(() => import('@/pages/B2BEntreprisePage'));
+const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
+const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
+const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
+const ValidationStatusPage = lazy(() => import('@/pages/ValidationStatusPage'));
 
 // Pages système
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
@@ -183,6 +191,14 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CompleteFeatureMatrix,
   PrivacyPage,
   
+  // Pages nouvelles 
+  B2CBreathVRPage,
+  B2CActivityHistoryPage,
+  B2BEntreprisePage,
+  B2BCollabDashboard,
+  B2BRHDashboard,
+  SubscribePage,
+  ValidationStatusPage,
   
   // System
   UnauthorizedPage,

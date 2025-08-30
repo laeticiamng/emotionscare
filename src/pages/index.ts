@@ -76,6 +76,8 @@ export { default as CompleteFeatureMatrix } from './CompleteFeatureMatrix';
 export { default as B2BEntreprisePage } from './B2BEntreprisePage';
 export { default as B2BCollabDashboard } from './B2BCollabDashboard';
 export { default as B2BRHDashboard } from './B2BRHDashboard';
+export { default as B2CBreathVRPage } from './B2CBreathVRPage';
+export { default as B2CActivityHistoryPage } from './B2CActivityHistoryPage';
 
 // Billing & Subscription
 export { default as SubscribePage } from './SubscribePage';
