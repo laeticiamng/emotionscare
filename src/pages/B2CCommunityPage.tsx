@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PremiumBackground from '@/components/premium/PremiumBackground';
 import ImmersiveExperience from '@/components/premium/ImmersiveExperience';
 import EnhancedCard from '@/components/premium/EnhancedCard';
-import AnimatedButton from '@/components/premium/AnimatedButton';
+
 import GamificationSystem from '@/components/premium/GamificationSystem';
 import { cn } from '@/lib/utils';
 

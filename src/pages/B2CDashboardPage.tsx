@@ -13,7 +13,7 @@ import PremiumBackground from '@/components/premium/PremiumBackground';
 import ImmersiveExperience from '@/components/premium/ImmersiveExperience';
 import GamificationSystem from '@/components/premium/GamificationSystem';
 import SmartRecommendations from '@/components/premium/SmartRecommendations';
-import AnimatedButton from '@/components/premium/AnimatedButton';
+
 import QuickActions from '@/components/premium/QuickActions';
 import { useNavigate } from 'react-router-dom';
 

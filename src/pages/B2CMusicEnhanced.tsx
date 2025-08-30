@@ -11,7 +11,7 @@ import {
   Headphones, Zap, Brain, Sparkles, Star, TrendingUp, Clock
 } from 'lucide-react';
 import PremiumBackground from '@/components/premium/PremiumBackground';
-import AnimatedButton from '@/components/premium/AnimatedButton';
+
 import QuickActions from '@/components/premium/QuickActions';
 import SmartRecommendations from '@/components/premium/SmartRecommendations';
 import { cn } from '@/lib/utils';
