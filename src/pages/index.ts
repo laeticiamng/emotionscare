@@ -72,6 +72,14 @@ export { default as B2CCommunityPage } from './B2CCommunityPage';
 export { default as NavigationPage } from './NavigationPage';
 export { default as CompleteFeatureMatrix } from './CompleteFeatureMatrix';
 
+// B2B Missing Pages
+export { default as B2BEntreprisePage } from './B2BEntreprisePage';
+export { default as B2BCollabDashboard } from './B2BCollabDashboard';
+export { default as B2BRHDashboard } from './B2BRHDashboard';
+
+// Billing & Subscription
+export { default as SubscribePage } from './SubscribePage';
+
 // System & Error pages
 export { default as UnauthorizedPage } from './UnauthorizedPage';
 export { default as NotFoundPage } from './NotFoundPage';
