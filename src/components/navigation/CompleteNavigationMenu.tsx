@@ -58,6 +58,7 @@ const navigationCategories: NavigationCategory[] = [
       { name: 'Breathwork', path: '/app/breath', icon: Wind, description: 'Techniques de respiration' },
       { name: 'AR Filters', path: '/app/face-ar', icon: Camera, description: 'Filtres émotionnels AR' },
       { name: 'Bubble Beat', path: '/app/bubble-beat', icon: Waves, description: 'Jeu rythmique interactif' },
+      { name: 'Screen Silk', path: '/app/screen-silk', icon: Monitor, description: 'Pauses écran thérapeutiques' },
       { name: 'VR Galaxy', path: '/app/vr-galaxy', icon: Star, description: 'Exploration spatiale 3D' },
       { name: 'Boss Level Grit', path: '/app/boss-grit', icon: Target, description: 'Défis de résilience' },
       { name: 'Mood Mixer', path: '/app/mood-mixer', icon: Palette, description: 'Mélangeur d\'émotions' },
@@ -83,9 +84,8 @@ const navigationCategories: NavigationCategory[] = [
     routes: [
       { name: 'Activité', path: '/app/activity', icon: BarChart3, description: 'Historique détaillé' },
       { name: 'Heatmap Vibes', path: '/app/heatmap', icon: Filter, description: 'Cartographie émotionnelle' },
-      { name: 'Voice Journal', path: '/app/voice-journal', icon: Headphones, description: 'Journal vocal IA' },
-      { name: 'Emotion Scan', path: '/app/emotion-scan', icon: Brain, description: 'Analyse faciale avancée' },
-      { name: 'Screen Silk', path: '/app/screen-silk', icon: Monitor, description: 'Pauses écran thérapeutiques' },
+      { name: 'Scanner Émotions', path: '/app/scan', icon: Brain, description: 'Analyse faciale avancée' },
+      { name: 'Journal Vocal', path: '/app/journal', icon: Headphones, description: 'Journal vocal IA' },
     ]
   },
   {

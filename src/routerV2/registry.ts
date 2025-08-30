@@ -555,52 +555,9 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)
   // ═══════════════════════════════════════════════════════════
+  // Routes de développement masquées en production
   ...(import.meta.env.DEV ? [
-    {
-      name: 'navigation',
-      path: '/navigation',
-      segment: 'consumer',
-      role: 'consumer',
-      layout: 'app',
-      component: 'CompleteNavigationMenu',
-      guard: true,
-      aliases: ['/modules', '/all-modules'],
-    },
-    {
-      name: 'feature-matrix',
-      path: '/feature-matrix',
-      segment: 'consumer',
-      role: 'consumer',
-      layout: 'app',
-      component: 'CompleteFeatureMatrix',
-      guard: true,
-      aliases: ['/test-features', '/validation'],
-    },
-    {
-      name: 'system-validation',
-      path: '/system/validation',
-      segment: 'consumer',
-      layout: 'app',
-      guard: true,
-      component: 'SystemValidationPage',
-      aliases: ['/validation', '/system-check'],
-    },
-    {
-      name: 'diagnostic',
-      path: '/diagnostic',
-      segment: 'public',
-      layout: 'app',
-      component: 'DiagnosticPage',
-      guard: false,
-    },
-    {
-      name: 'system-repair',
-      path: '/repair',
-      segment: 'public',
-      layout: 'app',
-      component: 'SystemRepairPage',
-      guard: false,
-    },
+    // Ces routes ne sont accessibles qu'en mode développement
   ] : []),
 
   // ═══════════════════════════════════════════════════════════
