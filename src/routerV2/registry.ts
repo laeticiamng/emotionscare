@@ -165,6 +165,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/modules', '/all-modules'],
   },
+  {
+    name: 'feature-matrix',
+    path: '/feature-matrix',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'CompleteFeatureMatrix',
+    guard: true,
+    aliases: ['/test-features', '/validation'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // MODULES FONCTIONNELS (CONSUMER)

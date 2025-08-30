@@ -178,8 +178,9 @@ const EnhancedCard: React.FC<EnhancedCardProps> = ({
                     transition={{ delay: 0.1 }}
                   >
                     <span className="flex items-center gap-2">
-                      {icon || getVariantIcon()}
-                      {title}
+                      {icon && icon}
+                      {!icon && getVariantIcon()}
+                      <span>{title}</span>
                     </span>
                   </motion.h3>
                 )}

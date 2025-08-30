@@ -71,6 +71,7 @@ export { default as B2CSocialCoconPage } from './B2CSocialCoconPage';
 export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 export { default as B2CCommunityPage } from './B2CCommunityPage';
 export { default as NavigationPage } from './NavigationPage';
+export { default as CompleteFeatureMatrix } from './CompleteFeatureMatrix';
 
 // System & Error pages
 export { default as UnauthorizedPage } from './UnauthorizedPage';

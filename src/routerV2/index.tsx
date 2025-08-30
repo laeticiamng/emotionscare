@@ -91,6 +91,7 @@ const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
 const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
 const B2CCommunityPage = lazy(() => import('@/pages/B2CCommunityPage'));
 const CompleteNavigationMenu = lazy(() => import('@/components/navigation/CompleteNavigationMenu'));
+const CompleteFeatureMatrix = lazy(() => import('@/pages/CompleteFeatureMatrix'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2BLandingPage = lazy(() => import('@/pages/B2BLandingPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
@@ -176,6 +177,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CEmotionsPage,
   B2CCommunityPage,
   CompleteNavigationMenu,
+  CompleteFeatureMatrix,
   PrivacyPage,
   
   // System
