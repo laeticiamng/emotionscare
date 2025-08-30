@@ -674,4 +674,19 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/billing', '/plans'],
   },
+
+  // ═══════════════════════════════════════════════════════════
+  // 404 FALLBACK ROUTE (must be last)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'not-found',
+    path: '*',
+    segment: 'public',
+    layout: 'simple',
+    component: 'NotFoundPage',
+    meta: {
+      title: 'Page introuvable - EmotionsCare',
+      description: 'Cette page n\'existe pas',
+    },
+  },
 ];
