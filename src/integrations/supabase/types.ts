@@ -1329,6 +1329,39 @@ export type Database = {
         }
         Relationships: []
       }
+      data_exports: {
+        Row: {
+          completed_at: string | null
+          expires_at: string | null
+          export_type: string
+          file_url: string | null
+          id: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          expires_at?: string | null
+          export_type?: string
+          file_url?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          expires_at?: string | null
+          export_type?: string
+          file_url?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       data_integrity_checks: {
         Row: {
           batch_id: string | null
@@ -2024,6 +2057,36 @@ export type Database = {
           subject?: string
           updated_at?: string | null
           variables?: Json | null
+        }
+        Relationships: []
+      }
+      emotion_metrics: {
+        Row: {
+          confidence_score: number | null
+          context: Json | null
+          created_at: string
+          emotion_type: string
+          id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          context?: Json | null
+          created_at?: string
+          emotion_type: string
+          id?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          context?: Json | null
+          created_at?: string
+          emotion_type?: string
+          id?: string
+          session_id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -5435,6 +5498,68 @@ export type Database = {
         }
         Relationships: []
       }
+      org_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          role: string
+          team_name: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          role: string
+          team_name?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          role?: string
+          team_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          created_at: string
+          domain: string | null
+          id: string
+          name: string
+          settings: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain?: string | null
+          id?: string
+          name: string
+          settings?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string | null
+          id?: string
+          name?: string
+          settings?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       page_analytics: {
         Row: {
           id: string
@@ -5645,6 +5770,54 @@ export type Database = {
         }
         Relationships: []
       }
+      personalized_recommendations: {
+        Row: {
+          acted_upon: boolean | null
+          ai_confidence: number | null
+          created_at: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          priority_score: number | null
+          reasoning: string | null
+          recommendation_type: string
+          target_activity: string | null
+          title: string
+          user_id: string
+          viewed: boolean | null
+        }
+        Insert: {
+          acted_upon?: boolean | null
+          ai_confidence?: number | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          priority_score?: number | null
+          reasoning?: string | null
+          recommendation_type: string
+          target_activity?: string | null
+          title: string
+          user_id: string
+          viewed?: boolean | null
+        }
+        Update: {
+          acted_upon?: boolean | null
+          ai_confidence?: number | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          priority_score?: number | null
+          reasoning?: string | null
+          recommendation_type?: string
+          target_activity?: string | null
+          title?: string
+          user_id?: string
+          viewed?: boolean | null
+        }
+        Relationships: []
+      }
       points_history: {
         Row: {
           challenge_id: string | null
@@ -5703,6 +5876,42 @@ export type Database = {
           id?: string
           image_url?: string | null
           reactions?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      privacy_consents: {
+        Row: {
+          consent_type: string
+          created_at: string
+          granted: boolean
+          granted_at: string
+          id: string
+          metadata: Json | null
+          revoked_at: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          consent_type: string
+          created_at?: string
+          granted?: boolean
+          granted_at?: string
+          id?: string
+          metadata?: Json | null
+          revoked_at?: string | null
+          source?: string
+          user_id: string
+        }
+        Update: {
+          consent_type?: string
+          created_at?: string
+          granted?: boolean
+          granted_at?: string
+          id?: string
+          metadata?: Json | null
+          revoked_at?: string | null
+          source?: string
           user_id?: string
         }
         Relationships: []
@@ -6533,6 +6742,72 @@ export type Database = {
         }
         Relationships: []
       }
+      user_activity_preferences: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          id: string
+          preferences: Json
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          id?: string
+          preferences?: Json
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          id?: string
+          preferences?: Json
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_activity_sessions: {
+        Row: {
+          activity_type: string
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          mood_after: string | null
+          mood_before: string | null
+          satisfaction_score: number | null
+          session_data: Json
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          mood_after?: string | null
+          mood_before?: string | null
+          satisfaction_score?: number | null
+          session_data?: Json
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          mood_after?: string | null
+          mood_before?: string | null
+          satisfaction_score?: number | null
+          session_data?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_analytics: {
         Row: {
           analytics_data: Json | null
@@ -6633,6 +6908,57 @@ export type Database = {
           rang?: string
           title?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_goals: {
+        Row: {
+          category: string
+          created_at: string | null
+          current_progress: number | null
+          description: string | null
+          end_date: string | null
+          id: string
+          reward_points: number | null
+          start_date: string
+          status: string | null
+          target_value: number | null
+          title: string
+          unit: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          current_progress?: number | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          reward_points?: number | null
+          start_date: string
+          status?: string | null
+          target_value?: number | null
+          title: string
+          unit?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          current_progress?: number | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          reward_points?: number | null
+          start_date?: string
+          status?: string | null
+          target_value?: number | null
+          title?: string
+          unit?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -6940,6 +7266,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rewards: {
+        Row: {
+          activity_related: string | null
+          badge_icon: string | null
+          earned_at: string | null
+          id: string
+          points_earned: number | null
+          reward_description: string | null
+          reward_name: string
+          reward_type: string
+          user_id: string
+        }
+        Insert: {
+          activity_related?: string | null
+          badge_icon?: string | null
+          earned_at?: string | null
+          id?: string
+          points_earned?: number | null
+          reward_description?: string | null
+          reward_name: string
+          reward_type: string
+          user_id: string
+        }
+        Update: {
+          activity_related?: string | null
+          badge_icon?: string | null
+          earned_at?: string | null
+          id?: string
+          points_earned?: number | null
+          reward_description?: string | null
+          reward_name?: string
+          reward_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_sessions: {
         Row: {
           created_at: string | null
@@ -7215,6 +7577,25 @@ export type Database = {
           violation_count: number | null
         }
         Relationships: []
+      }
+      team_emotion_summary: {
+        Row: {
+          avg_confidence: number | null
+          count: number | null
+          date: string | null
+          emotion_type: string | null
+          org_id: string | null
+          team_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       v_competences_parsed: {
         Row: {
@@ -7735,6 +8116,20 @@ export type Database = {
       get_security_status: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_team_analytics: {
+        Args: {
+          p_end_date?: string
+          p_org_id: string
+          p_start_date?: string
+          p_team_name?: string
+        }
+        Returns: {
+          avg_confidence: number
+          date: string
+          emotion_type: string
+          user_count: number
+        }[]
       }
       get_user_active_room_ids: {
         Args: { p_user_id?: string }
