@@ -8,7 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { 
   Music, Play, Pause, SkipForward, SkipBack, Volume2, 
   Heart, Share2, Download, Shuffle, Repeat, Radio,
-  Headphones, Zap, Brain, Sparkles, Star, TrendingUp
+  Headphones, Zap, Brain, Sparkles, Star, TrendingUp, Clock
 } from 'lucide-react';
 import PremiumBackground from '@/components/premium/PremiumBackground';
 import AnimatedButton from '@/components/premium/AnimatedButton';
