@@ -113,18 +113,12 @@ export const specialRoutes = {
 // OBJET ROUTES PRINCIPAL
 // ═══════════════════════════════════════════════════════════
 
-// Routes helpers supplémentaires
-import { Routes } from './helpers';
-
 export const routes = {
   public: publicRoutes,
   auth: authRoutes,
   b2c: b2cRoutes,
   b2b: b2bRoutes,
   special: specialRoutes,
-  
-  // Helpers directs pour compatibilité
-  ...Routes,
 } as const;
 
 // ═══════════════════════════════════════════════════════════
