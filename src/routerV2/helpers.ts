@@ -55,6 +55,7 @@ export const Routes = {
   // ═══════════════════════════════════════════════════════════
   flashGlow: () => '/app/flash-glow',
   breath: () => '/app/breath',
+  vrBreath: () => '/app/vr-breath',
   faceAR: () => '/app/face-ar',
   emotionScan: () => '/app/emotion-scan',
   voiceJournal: () => '/app/voice-journal',

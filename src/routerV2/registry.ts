@@ -553,11 +553,62 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
 
   
   // ═══════════════════════════════════════════════════════════
+  // TOOLS & NAVIGATION PAGES
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'navigation',
+    path: '/navigation',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'NavigationPage',
+    guard: true,
+  },
+  {
+    name: 'feature-matrix',
+    path: '/feature-matrix',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'CompleteFeatureMatrix',
+    guard: true,
+  },
+  {
+    name: 'missing-pages-manifest',
+    path: '/missing-pages',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MissingPagesManifest',
+    guard: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)
   // ═══════════════════════════════════════════════════════════
   // Routes de développement masquées en production
   ...(import.meta.env.DEV ? [
-    // Ces routes ne sont accessibles qu'en mode développement
+    {
+      name: 'diagnostic',
+      path: '/diagnostic',
+      segment: 'public',
+      layout: 'simple',
+      component: 'DiagnosticPage',
+    },
+    {
+      name: 'system-validation',
+      path: '/system/validation',
+      segment: 'public',
+      layout: 'simple',
+      component: 'SystemValidationPage',
+    },
+    {
+      name: 'system-repair',
+      path: '/system/repair',
+      segment: 'public',
+      layout: 'simple',
+      component: 'SystemRepairPage',
+    },
   ] : []),
 
   // ═══════════════════════════════════════════════════════════
