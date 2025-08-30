@@ -14,6 +14,7 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 
 // RouterV2 est maintenant activé par défaut - plus de feature flag
 const FF_ROUTER_V2 = true;
+console.log('🚀 RouterV2: FF_ROUTER_V2 activé, aliases disponibles:', FF_ROUTER_V2);
 
 // ═══════════════════════════════════════════════════════════
 // LAZY IMPORTS DES PAGES
@@ -41,6 +42,7 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
+const B2CEmotionalScanPage = lazy(() => import('@/pages/B2CEmotionalScanPage'));
 const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
@@ -156,6 +158,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
+  B2CEmotionalScanPage,
   B2CMusicEnhanced,
   B2CAICoachPage,
   B2CJournalPage,
@@ -323,10 +326,13 @@ export const routerV2 = createBrowserRouter([
   })),
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
-  ...(FF_ROUTER_V2 ? ROUTE_ALIASES.map(alias => ({
-    path: alias.from,
-    element: <Navigate to={alias.to} replace />,
-  })) : []),
+  ...(FF_ROUTER_V2 ? ROUTE_ALIASES.map(alias => {
+    console.log(`🔀 Alias configuré: ${alias.from} -> ${alias.to}`);
+    return {
+      path: alias.from,
+      element: <Navigate to={alias.to} replace />,
+    };
+  }) : []),
 
   // Fallback 404 pour toutes les autres routes
   {
