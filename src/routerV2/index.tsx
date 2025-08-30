@@ -109,6 +109,7 @@ const SystemValidationPage = lazy(() => import('@/pages/SystemValidationPage'));
 const DiagnosticPage = lazy(() => import('@/pages/DiagnosticPage'));
 const SystemRepairPage = lazy(() => import('@/pages/SystemRepairPage'));
 const MissingPagesManifest = lazy(() => import('@/pages/MissingPagesManifest'));
+const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 
 // Legal pages
@@ -221,6 +222,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   DiagnosticPage,
   SystemRepairPage,
   MissingPagesManifest,
+  B2CNyveeCoconPage,
   ValidationPage,
   
   // Legal pages

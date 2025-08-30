@@ -598,6 +598,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // Routes de développement masquées en production
   ...(import.meta.env.DEV ? [
     {
+      name: 'nyvee-cocon',
+      path: '/app/nyvee',
+      segment: 'consumer',
+      role: 'consumer',
+      layout: 'app',
+      component: 'B2CNyveeCoconPage',
+      guard: true,
+    },
+    {
       name: 'diagnostic',
       path: '/diagnostic',
       segment: 'public',
