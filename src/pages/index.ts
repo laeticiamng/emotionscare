@@ -98,7 +98,6 @@ export { default as ValidationStatusPage } from './ValidationStatusPage';
 export { default as SystemValidationPage } from './SystemValidationPage';
 export { default as DiagnosticPage } from './DiagnosticPage';
 export { default as SystemRepairPage } from './SystemRepairPage';
-export { default as MissingPagesManifest } from './MissingPagesManifest';
 export { default as B2CDataPrivacyPage } from './B2CDataPrivacyPage';
 
 // Music page export
