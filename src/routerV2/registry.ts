@@ -665,4 +665,12 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/billing', '/plans'],
   },
+  {
+    name: 'diagnostic',
+    path: '/diagnostic',
+    segment: 'public',
+    layout: 'app',
+    component: 'DiagnosticPage',
+    guard: false,
+  },
 ];

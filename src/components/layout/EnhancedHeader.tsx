@@ -78,7 +78,6 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-1">
-          <AnimatePresence mode="wait">
             {navigationItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -105,7 +104,6 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
                 )}
               </NavLink>
             ))}
-          </AnimatePresence>
         </nav>
 
         {/* Right Controls */}

@@ -53,7 +53,6 @@ const EnhancedAdminDashboard: React.FC = () => {
         </motion.div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <AnimatePresence mode="wait">
             <motion.div
               key={`weather-widget`}
               initial={{ opacity: 0, y: 20 }}
@@ -63,10 +62,8 @@ const EnhancedAdminDashboard: React.FC = () => {
             >
               <EmotionalWeatherWidget />
             </motion.div>
-          </AnimatePresence>
           
-          <AnimatePresence mode="wait">
-            <motion.div
+          <motion.div
               key={`org-stats`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -85,7 +82,6 @@ const EnhancedAdminDashboard: React.FC = () => {
                 </CardContent>
               </Card>
             </motion.div>
-          </AnimatePresence>
         </div>
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
