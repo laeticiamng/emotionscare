@@ -64,7 +64,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/b2c',
     segment: 'public',
     layout: 'marketing',
-    component: 'HomeB2C',
+    component: 'HomeB2CPage',
     aliases: ['/choose-mode'],
   },
   {
@@ -117,7 +117,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/app',
     segment: 'consumer',
     layout: 'app',
-    component: 'DebugDashboard',
+    component: 'AppGatePage',
     guard: false,
   },
   {
@@ -160,7 +160,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CEmotionalScanPage',
+    component: 'B2CScanPage',
     guard: true,
     aliases: ['/scan'],
   },
@@ -220,7 +220,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CVRPage',
+    component: 'B2CVRBreathGuidePage',
     guard: true,
     aliases: ['/vr'],
   },
@@ -585,42 +585,23 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // TOOLS & NAVIGATION PAGES
   // ═══════════════════════════════════════════════════════════
-  {
-    name: 'navigation',
-    path: '/navigation',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'NavigationPage',
-    guard: true,
-  },
-  {
-    name: 'feature-matrix',
-    path: '/feature-matrix',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'CompleteFeatureMatrix',
-    guard: true,
-  },
-  {
-    name: 'missing-pages-manifest',
-    path: '/missing-pages',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'MissingPagesManifest',
-    guard: true,
-  },
-  {
-    name: 'platform-validator',
-    path: '/validation',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'ValidationPage',
-    guard: true,
-  },
+  // Routes supprimées (pages orphelines nettoyées)
+  // - NavigationPage (supprimée)
+  // - CompleteFeatureMatrix (supprimée) 
+  // - MissingPagesManifest (supprimée)
+
+  // ═══════════════════════════════════════════════════════════
+  // DÉVELOPPEMENT (UNIQUEMENT SI DEBUG)
+  // ═══════════════════════════════════════════════════════════
+  ...(process.env.NODE_ENV === 'development' ? [
+    {
+      name: 'validation',
+      path: '/validation',
+      segment: 'public',
+      layout: 'simple',
+      component: 'ValidationPage',
+    }
+  ] : []),
 
   // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)
@@ -636,27 +617,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'B2CNyveeCoconPage',
       guard: true,
     },
-    {
-      name: 'diagnostic',
-      path: '/diagnostic',
-      segment: 'public',
-      layout: 'simple',
-      component: 'DiagnosticPage',
-    },
-    {
-      name: 'system-validation',
-      path: '/system/validation',
-      segment: 'public',
-      layout: 'simple',
-      component: 'SystemValidationPage',
-    },
-    {
-      name: 'system-repair',
-      path: '/system/repair',
-      segment: 'public',
-      layout: 'simple',
-      component: 'SystemRepairPage',
-    },
+  // Routes de debug supprimées (pages orphelines nettoyées)
+  // - DiagnosticPage (supprimée)
+  // - SystemValidationPage (supprimée) 
+  // - SystemRepairPage (supprimée)
   ] : []),
 
   // ═══════════════════════════════════════════════════════════
