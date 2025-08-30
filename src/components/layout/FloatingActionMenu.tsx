@@ -32,7 +32,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'emotions',
       icon: <Brain className="w-5 h-5" />,
       label: 'Analyse Émotions',
-      path: Routes.emotions(),
+      path: Routes.scan(), // Utilise scan au lieu d'emotions
       color: 'bg-purple-500',
       gradient: 'from-purple-400 to-purple-600'
     },
@@ -56,7 +56,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'community',
       icon: <Heart className="w-5 h-5" />,
       label: 'Communauté',
-      path: Routes.community(),
+      path: Routes.socialCoconB2C(), // Utilise socialCoconB2C au lieu de community
       color: 'bg-pink-500',
       gradient: 'from-pink-400 to-rose-600'
     }

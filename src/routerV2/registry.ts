@@ -582,6 +582,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'MissingPagesManifest',
     guard: true,
   },
+  {
+    name: 'platform-validator',
+    path: '/validation',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'ValidationPage',
+    guard: true,
+  },
 
   // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)

@@ -14,7 +14,8 @@ import {
   Search, Grid3X3, Heart, Brain, Music, Gamepad2, Camera,
   Zap, Wind, Palette, Trophy, BarChart3, Settings, Users,
   FileText, Calendar, Shield, Monitor, Headphones, Star,
-  Sparkles, Target, Flame, Waves, Filter, ArrowRight
+  Sparkles, Target, Flame, Waves, Filter, ArrowRight,
+  CheckCircle, Navigation
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import RouteValidator from '@/components/navigation/RouteValidator';
@@ -98,6 +99,16 @@ const navigationCategories: NavigationCategory[] = [
       { name: 'Confidentialité', path: '/settings/privacy', icon: Shield, description: 'Contrôles de confidentialité' },
       { name: 'Notifications', path: '/settings/notifications', icon: Sparkles, description: 'Préférences de notifications' },
       { name: 'Données', path: '/settings/data-privacy', icon: Shield, description: 'Gestion des données' },
+    ]
+  },
+  {
+    name: 'Outils de Développement',
+    icon: Monitor,
+    color: 'from-slate-500 to-gray-500',
+    routes: [
+      { name: 'Validateur Complet', path: '/validation', icon: CheckCircle, description: 'Test de toutes les routes' },
+      { name: 'Navigation Tools', path: '/navigation', icon: Navigation, description: 'Menu complet de navigation' },
+      { name: 'Feature Matrix', path: '/feature-matrix', icon: Grid3X3, description: 'Matrice des fonctionnalités' },
     ]
   },
 ];
