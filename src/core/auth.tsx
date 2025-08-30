@@ -43,12 +43,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 session.user.user_metadata?.role || 
                 'consumer';
               
-              // Normalize role
-              const normalizedRole = userRole === 'b2c' ? 'consumer' :
-                userRole === 'b2b_user' ? 'employee' :
-                userRole === 'b2b_admin' ? 'manager' :
-                userRole;
+              // Normalize role properly
+              const normalizedRole = userRole === 'b2c' || userRole === 'consumer' ? 'consumer' :
+                userRole === 'b2b_user' || userRole === 'employee' ? 'employee' :
+                userRole === 'b2b_admin' || userRole === 'manager' ? 'manager' :
+                'consumer'; // default fallback
               
+              console.log('Role normalized:', userRole, '->', normalizedRole);
               setRole(normalizedRole);
             } catch (error) {
               console.warn('Role fetch failed:', error);

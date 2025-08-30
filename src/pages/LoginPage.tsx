@@ -39,6 +39,8 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Tentative de connexion avec:', formData.email);
+    
     try {
       await login(formData.email, formData.password);
       
@@ -47,8 +49,13 @@ const LoginPage: React.FC = () => {
         description: "Bienvenue !",
       });
       
-      // Redirection automatique après connexion
-      navigateAfterLogin();
+      console.log('Login réussi, navigation...');
+      
+      // Délai pour laisser le temps au rôle de se charger
+      setTimeout(() => {
+        navigateAfterLogin();
+      }, 1000);
+      
     } catch (error: any) {
       console.error('Login error:', error);
       

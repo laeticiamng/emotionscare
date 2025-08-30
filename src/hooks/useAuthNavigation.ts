@@ -5,22 +5,33 @@ import { getDashboardRoute } from '@/routerV2/helpers';
 
 export const useAuthNavigation = () => {
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user, role, loading } = useAuth();
 
   const navigateAfterLogin = () => {
+    console.log('Navigation après login - Role:', role, 'User:', user?.id);
+    
+    // Wait for role to be loaded
+    if (loading) {
+      console.log('Chargement en cours...');
+      return;
+    }
+    
     if (role) {
       const dashboardRoute = getDashboardRoute(role);
-      navigate(dashboardRoute);
+      console.log('Redirection vers:', dashboardRoute);
+      navigate(dashboardRoute, { replace: true });
     } else if (user) {
       // Fallback if role is not yet loaded
-      navigate('/app');
+      console.log('Redirection fallback vers /app');
+      navigate('/app', { replace: true });
     } else {
-      navigate('/');
+      console.log('Pas d\'utilisateur, redirection vers /');
+      navigate('/', { replace: true });
     }
   };
 
   const navigateAfterLogout = () => {
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   return {
