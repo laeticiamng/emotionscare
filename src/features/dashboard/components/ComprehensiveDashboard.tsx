@@ -153,28 +153,28 @@ export function ComprehensiveDashboard() {
             <StatsCard
               title="Score Bien-être"
               value={`${stats?.wellbeingScore || 0}/10`}
-              icon={Heart}
+              icon={<Heart className="w-5 h-5" />}
               trend="+0.5 vs hier"
               color="text-green-600"
             />
             <StatsCard
               title="Sessions"
               value={stats?.totalSessions || 0}
-              icon={Activity}
+              icon={<Activity className="w-5 h-5" />}
               trend="Cette semaine"
               color="text-blue-600"
             />
             <StatsCard
               title="Série"
               value={`${stats?.streakDays || 0} jours`}
-              icon={Zap}
+              icon={<Zap className="w-5 h-5" />}
               trend="Record: 12j"
               color="text-orange-600"
             />
             <StatsCard
               title="Objectifs"
               value={`${stats?.completedGoals || 0}/5`}
-              icon={Target}
+              icon={<Target className="w-5 h-5" />}
               trend="Ce mois"
               color="text-purple-600"
             />

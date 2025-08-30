@@ -286,7 +286,7 @@ const B2CScanPage: React.FC = () => {
             {/* Interface de scan principale */}
             <div className="lg:col-span-2 space-y-6">
               {/* Sélection du mode de scan */}
-              <EnhancedCard title="Mode d'Analyse" icon={Settings}>
+              <EnhancedCard title="Mode d'Analyse" icon={<Settings className="w-5 h-5" />}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {scanModes.map(mode => (
                     <motion.div
@@ -325,7 +325,7 @@ const B2CScanPage: React.FC = () => {
               </EnhancedCard>
 
               {/* Interface de scan */}
-              <EnhancedCard title="Scanner Émotionnel IA" icon={Eye} className="h-fit">
+              <EnhancedCard title="Scanner Émotionnel IA" icon={<Eye className="w-5 h-5" />} className="h-fit">
                 <div className="space-y-6">
                   {/* Zone de capture/résultat */}
                   <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden">
@@ -553,7 +553,7 @@ const B2CScanPage: React.FC = () => {
                     exit={{ opacity: 0, y: -20 }}
                     className="animate-fade-in"
                   >
-                    <EnhancedCard title="Analyse Détaillée" icon={Brain}>
+                    <EnhancedCard title="Analyse Détaillée" icon={<Brain className="w-5 h-5" />}>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Métriques principales */}
                         <div className="space-y-4">
@@ -630,7 +630,7 @@ const B2CScanPage: React.FC = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Statistiques rapides */}
-              <EnhancedCard title="Vos Stats Aujourd'hui" icon={Activity}>
+              <EnhancedCard title="Vos Stats Aujourd'hui" icon={<Activity className="w-5 h-5" />}>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Scans effectués</span>
@@ -692,7 +692,7 @@ const B2CScanPage: React.FC = () => {
               />
 
               {/* Actions rapides */}
-              <EnhancedCard title="Actions Recommandées" icon={Zap}>
+              <EnhancedCard title="Actions Recommandées" icon={<Zap className="w-5 h-5" />}>
                 <div className="space-y-2">
                   <Button variant="outline" className="w-full justify-start" size="sm">
                     <Heart className="w-4 h-4 mr-2" />
@@ -716,7 +716,7 @@ const B2CScanPage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="history" className="animate-fade-in">
-            <EnhancedCard title="Historique des Scans" icon={Timer}>
+            <EnhancedCard title="Historique des Scans" icon={<Timer className="w-5 h-5" />}>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {scanHistory.map((scan, index) => (
                   <motion.div

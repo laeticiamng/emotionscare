@@ -21,7 +21,7 @@ const TestFeatureCard: React.FC = () => {
       <FeatureCard
         title="Test Component Reference"
         description="Icon as component reference"
-        icon={Zap}
+        icon={<Zap className="w-5 h-5" />}
         gradient="from-red-500 to-orange-500"
       />
       

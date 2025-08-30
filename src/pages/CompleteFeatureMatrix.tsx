@@ -179,7 +179,7 @@ const CompleteFeatureMatrix: React.FC = () => {
         </div>
 
         {/* Contrôles globaux */}
-        <EnhancedCard title="Contrôles de Test" icon={Play} className="mb-8">
+        <EnhancedCard title="Contrôles de Test" icon={<Play className="w-5 h-5" />} className="mb-8">
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-primary mb-2">
@@ -312,7 +312,7 @@ const CompleteFeatureMatrix: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-8"
           >
-            <EnhancedCard title="Résumé des Tests" icon={BarChart3} variant="exclusive">
+            <EnhancedCard title="Résumé des Tests" icon={<BarChart3 className="w-5 h-5" />} variant="exclusive">
               <div className="grid md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">
