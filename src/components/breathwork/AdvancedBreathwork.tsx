@@ -33,7 +33,7 @@ interface BreathingPattern {
   cycles: number;
   benefits: string[];
   difficulty: 'beginner' | 'intermediate' | 'advanced';
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   color: string;
   background: string;
 }

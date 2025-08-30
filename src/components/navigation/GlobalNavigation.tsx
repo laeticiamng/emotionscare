@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { LucideIconType } from '@/types/common';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Routes } from '@/routerV2';
@@ -31,7 +32,7 @@ import {
 interface NavigationItem {
   title: string;
   route: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   description?: string;
 }
 

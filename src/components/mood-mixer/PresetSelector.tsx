@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { LucideIconType } from '@/types/common';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +26,7 @@ interface MoodPreset {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   gradient: string;
   blend: BlendState;
   tags: string[];

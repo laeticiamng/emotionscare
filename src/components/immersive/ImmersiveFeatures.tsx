@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LucideIconType } from '@/types/common';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Zap, Eye, Headphones, Gamepad2, 
@@ -15,7 +16,7 @@ interface ImmersiveFeature {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   status: 'active' | 'inactive' | 'loading';
   level: number;
   color: string;

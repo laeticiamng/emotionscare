@@ -33,7 +33,7 @@ interface EmotionComponent {
   arousal: number; // 0 to 1 (calm to energetic)
   dominance: number; // 0 to 1 (submissive to dominant)
   description: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   soundFreq?: number;
   visualEffect: 'particles' | 'waves' | 'pulse' | 'flow';
 }

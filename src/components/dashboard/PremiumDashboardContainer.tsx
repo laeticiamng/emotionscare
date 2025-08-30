@@ -30,7 +30,7 @@ interface DashboardWidget {
   id: string;
   type: 'kpi' | 'chart' | 'activity' | 'quick-action' | 'insight';
   title: string;
-  component: React.ComponentType<any>;
+  component: ComponentTypeGeneric;
   props?: any;
   size: 'small' | 'medium' | 'large' | 'xl';
   priority: number;

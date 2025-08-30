@@ -27,7 +27,7 @@ interface EmotionFilter {
   name: string;
   description: string;
   emotion: 'joy' | 'calm' | 'energetic' | 'confident' | 'dreamy' | 'focused';
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   effects: {
     particleColor: string;
     particleShape: 'heart' | 'star' | 'sparkle' | 'dot' | 'diamond';

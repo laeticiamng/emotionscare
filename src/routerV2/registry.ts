@@ -673,4 +673,12 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'DiagnosticPage',
     guard: false,
   },
+  {
+    name: 'system-repair',
+    path: '/repair',
+    segment: 'public',
+    layout: 'app',
+    component: 'SystemRepairPage',
+    guard: false,
+  },
 ];

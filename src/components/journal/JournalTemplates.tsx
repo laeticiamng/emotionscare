@@ -21,7 +21,7 @@ interface JournalTemplate {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
   color: string;
   category: 'daily' | 'weekly' | 'monthly' | 'special';
   prompts: string[];

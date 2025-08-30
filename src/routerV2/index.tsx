@@ -106,6 +106,7 @@ const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const ValidationStatusPage = lazy(() => import('@/pages/ValidationStatusPage'));
 const DiagnosticPage = lazy(() => import('@/pages/DiagnosticPage'));
+const SystemRepairPage = lazy(() => import('@/pages/SystemRepairPage'));
 
 // Legal pages
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
@@ -205,6 +206,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   SubscribePage,
   ValidationStatusPage,
   DiagnosticPage,
+  SystemRepairPage,
   
   // Legal pages
   LegalTermsPage,

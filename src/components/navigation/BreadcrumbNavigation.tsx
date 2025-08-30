@@ -1,4 +1,5 @@
 import React from 'react';
+import { LucideIconType } from '@/types/common';
 import { useLocation, Link } from 'react-router-dom';
 import {
   Breadcrumb,
@@ -14,7 +15,7 @@ import { ChevronRight, Home } from 'lucide-react';
 interface RouteInfo {
   path: string;
   label: string;
-  icon?: React.ComponentType<any>;
+  icon?: LucideIconType;
 }
 
 const BreadcrumbNavigation: React.FC = () => {

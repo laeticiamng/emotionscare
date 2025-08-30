@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LucideIconType } from '@/types/common';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +50,7 @@ interface Quest {
     title?: string;
   };
   flavor: string;
-  icon: React.ComponentType<any>;
+  icon: LucideIconType;
 }
 
 interface Artifact {
