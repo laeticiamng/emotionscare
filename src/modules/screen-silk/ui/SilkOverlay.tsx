@@ -185,7 +185,7 @@ export const SilkOverlay: React.FC<SilkOverlayProps> = ({
                 className="text-sm"
               >
                 Appuyez sur Échap pour interrompre
-              </p>
+              </motion.p>
             </motion.div>
           </div>
 
