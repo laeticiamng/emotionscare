@@ -577,12 +577,12 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       aliases: ['/test-features', '/validation'],
     },
     {
-      name: 'validation-status',
+      name: 'system-validation',
       path: '/system/validation',
       segment: 'consumer',
       layout: 'app',
       guard: true,
-      component: 'ValidationStatusPage',
+      component: 'SystemValidationPage',
       aliases: ['/validation', '/system-check'],
     },
     {
