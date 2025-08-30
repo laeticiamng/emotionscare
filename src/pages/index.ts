@@ -15,10 +15,9 @@ export { default as B2CDashboardPage } from './B2CDashboardPage';
 export { default as B2BUserDashboardPage } from './B2BUserDashboardPage';
 export { default as B2BAdminDashboardPage } from './B2BAdminDashboardPage';
 
-// Modules B2C Core
+// Modules B2C Core  
 export { default as B2CScanPage } from './B2CScanPage';
-export { default as B2CMusicPage } from './B2CMusicPage';
-export { default as B2CCoachPage } from './B2CCoachPage';
+export { default as B2CAICoachPage } from './B2CAICoachPage';
 export { default as B2CJournalPage } from './B2CJournalPage';
 export { default as B2CVRPage } from './B2CVRPage';
 

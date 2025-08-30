@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Heart, Sparkles, Users, Lock, Brain, Shield, Zap, Star, Play, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Routes } from '@/routerV2';
+import GlobalNavigationWidget from '@/components/navigation/GlobalNavigationWidget';
 
 const HomePage: React.FC = () => {
   const { scrollYProgress } = useScroll();
@@ -360,6 +361,11 @@ const HomePage: React.FC = () => {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Widget de Navigation Globale */}
+      <section className="py-16 bg-white">
+        <GlobalNavigationWidget />
       </section>
 
       {/* CTA Final */}
