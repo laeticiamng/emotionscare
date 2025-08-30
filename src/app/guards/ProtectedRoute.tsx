@@ -3,7 +3,11 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFlags } from "@/core/flags";
 import { usePrivacy } from "@/core/privacy";
-import { AsyncState, NoCamVariant, NoMicVariant, SimHRVariant, EmptyFeature } from "@/components/transverse";
+import { AsyncState } from "@/components/transverse/AsyncState";
+import { NoCamVariant } from "@/components/transverse/NoCamVariant";
+import { NoMicVariant } from "@/components/transverse/NoMicVariant";
+import { SimHRVariant } from "@/components/transverse/SimHRVariant";
+import { EmptyFeature } from "@/components/transverse/EmptyFeature";
 
 interface ProtectedRouteProps {
   role: "any" | "consumer" | "employee" | "manager";
