@@ -391,7 +391,7 @@ const HomePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button asChild size="lg" className="text-lg px-8 py-4 bg-white text-blue-600 hover:bg-gray-100 rounded-2xl shadow-xl">
-                  <Link to={Routes.login()}>
+                  <Link to="/b2c">
                     <Sparkles className="w-6 h-6 mr-3" />
                     Commencer Maintenant
                     <ArrowRight className="w-6 h-6 ml-3" />
@@ -401,7 +401,7 @@ const HomePage: React.FC = () => {
               
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button asChild variant="outline" size="lg" className="text-lg px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-blue-600 rounded-2xl">
-                  <Link to={Routes.b2bLanding()}>
+                  <Link to="/entreprise">
                     <Lock className="w-6 h-6 mr-3" />
                     Solutions Entreprise
                   </Link>

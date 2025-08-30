@@ -634,6 +634,26 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   
   // ═══════════════════════════════════════════════════════════
+  // LEGAL & COMPLIANCE PAGES
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'legal-terms',
+    path: '/legal/terms',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalTermsPage',
+    aliases: ['/terms', '/conditions'],
+  },
+  {
+    name: 'legal-privacy',
+    path: '/legal/privacy',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalPrivacyPage',
+    aliases: ['/privacy-policy'],
+  },
+  
+  // ═══════════════════════════════════════════════════════════
   // BILLING & SUBSCRIPTION
   // ═══════════════════════════════════════════════════════════
   {

@@ -106,6 +106,10 @@ const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const ValidationStatusPage = lazy(() => import('@/pages/ValidationStatusPage'));
 
+// Legal pages
+const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
+const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+
 // Pages système
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
@@ -199,6 +203,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BRHDashboard,
   SubscribePage,
   ValidationStatusPage,
+  
+  // Legal pages
+  LegalTermsPage,
+  LegalPrivacyPage,
   
   // System
   UnauthorizedPage,
