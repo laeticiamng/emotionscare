@@ -61,23 +61,20 @@ export default function B2CDashboardPage() {
                   </motion.p>
                 </div>
                 <div className="flex gap-3">
-                  <AnimatedButton
-                    variant="premium"
-                    animation="glow"
+                  <Button
                     onClick={() => navigate('/settings/general')}
-                    leftIcon={<Target className="w-4 h-4" />}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                   >
+                    <Target className="w-4 h-4 mr-2" />
                     Préférences
-                  </AnimatedButton>
-                  <AnimatedButton
-                    variant="magical"
-                    animation="shimmer"
-                    particles={true}
+                  </Button>
+                  <Button
                     onClick={() => navigate('/app/scan')}
-                    leftIcon={<Heart className="w-4 h-4" />}
+                    className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white"
                   >
+                    <Heart className="w-4 h-4 mr-2" />
                     Scan Express
-                  </AnimatedButton>
+                  </Button>
                 </div>
               </div>
               
@@ -142,14 +139,14 @@ export default function B2CDashboardPage() {
                       <div className="w-32">
                         <Progress value={wellbeingScore} className="h-3" />
                       </div>
-                      <AnimatedButton
-                        variant="success"
+                      <Button
                         size="sm"
-                        leftIcon={<Activity className="w-4 h-4" />}
                         onClick={() => navigate('/app/activity')}
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
                       >
+                        <Activity className="w-4 h-4 mr-2" />
                         Voir Détails
-                      </AnimatedButton>
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

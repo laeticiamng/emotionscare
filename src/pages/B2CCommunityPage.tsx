@@ -288,15 +288,13 @@ const B2CCommunityPage: React.FC = () => {
                         className="pl-10"
                       />
                     </div>
-                    <AnimatedButton
+                    <Button
                       onClick={() => setShowNewPostDialog(true)}
-                      variant="gradient"
-                      size="sm"
-                      className="hover-scale"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Publier
-                    </AnimatedButton>
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -350,10 +348,10 @@ const B2CCommunityPage: React.FC = () => {
                               <Button variant="outline" onClick={() => setShowNewPostDialog(false)}>
                                 Annuler
                               </Button>
-                              <AnimatedButton onClick={handleNewPost} disabled={!newPost.trim()}>
+                              <Button onClick={handleNewPost} disabled={!newPost.trim()}>
                                 <Send className="w-4 h-4 mr-2" />
                                 Publier
-                              </AnimatedButton>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -564,22 +562,22 @@ const B2CCommunityPage: React.FC = () => {
               {/* Actions rapides */}
               <EnhancedCard title="Actions Rapides" icon={Zap}>
                 <div className="space-y-2">
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale">
+                  <Button variant="outline" className="w-full justify-start">
                     <BookHeart className="w-4 h-4 mr-2" />
                     Créer un groupe
-                  </AnimatedButton>
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale">
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
                     <Calendar className="w-4 h-4 mr-2" />
                     Organiser un événement
-                  </AnimatedButton>
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale">
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
                     <Flame className="w-4 h-4 mr-2" />
                     Challenges du jour
-                  </AnimatedButton>
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale">
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
                     <Users className="w-4 h-4 mr-2" />
                     Trouver des amis
-                  </AnimatedButton>
+                  </Button>
                 </div>
               </EnhancedCard>
             </div>
@@ -618,9 +616,9 @@ const B2CCommunityPage: React.FC = () => {
                           <Globe className="w-4 h-4 text-muted-foreground" />
                         )}
                       </div>
-                      <AnimatedButton className="w-full" variant="outline">
+                      <Button className="w-full" variant="outline">
                         Rejoindre le groupe
-                      </AnimatedButton>
+                      </Button>
                     </div>
                   </EnhancedCard>
                 </motion.div>

@@ -429,10 +429,10 @@ const B2CScanPage: React.FC = () => {
                               </Badge>
                             )}
                           </div>
-                          <AnimatedButton onClick={exportResults} variant="ghost" size="sm">
+                          <Button onClick={exportResults} variant="ghost" size="sm">
                             <Download className="w-4 h-4 mr-2" />
                             Exporter les résultats
-                          </AnimatedButton>
+                          </Button>
                         </motion.div>
                       </div>
                     ) : (
@@ -458,35 +458,34 @@ const B2CScanPage: React.FC = () => {
                   {/* Contrôles principaux */}
                   <div className="flex justify-center gap-4">
                     {!isScanning && !currentResult && (
-                      <AnimatedButton 
+                      <Button 
                         onClick={startScan} 
-                        variant="gradient" 
                         size="lg"
                         disabled={!scanModes.find(m => m.id === scanType)?.permission}
-                        className="hover-scale"
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                       >
                         <Play className="w-5 h-5 mr-2" />
                         Démarrer le Scan
-                      </AnimatedButton>
+                      </Button>
                     )}
                     
                     {isScanning && (
-                      <AnimatedButton onClick={stopScan} variant="destructive" size="lg" className="hover-scale">
+                      <Button onClick={stopScan} variant="destructive" size="lg">
                         <Square className="w-5 h-5 mr-2" />
                         Arrêter
-                      </AnimatedButton>
+                      </Button>
                     )}
                     
                     {currentResult && (
                       <>
-                        <AnimatedButton onClick={restartScan} variant="outline" size="lg" className="hover-scale">
+                        <Button onClick={restartScan} variant="outline" size="lg">
                           <RotateCcw className="w-5 h-5 mr-2" />
                           Nouveau Scan
-                        </AnimatedButton>
-                        <AnimatedButton onClick={() => checkPermissions()} variant="ghost" size="lg" className="hover-scale">
+                        </Button>
+                        <Button onClick={() => checkPermissions()} variant="ghost" size="lg">
                           <RefreshCw className="w-5 h-5 mr-2" />
                           Recalibrer
-                        </AnimatedButton>
+                        </Button>
                       </>
                     )}
                   </div>
@@ -695,22 +694,22 @@ const B2CScanPage: React.FC = () => {
               {/* Actions rapides */}
               <EnhancedCard title="Actions Recommandées" icon={Zap}>
                 <div className="space-y-2">
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale" size="sm">
+                  <Button variant="outline" className="w-full justify-start" size="sm">
                     <Heart className="w-4 h-4 mr-2" />
                     Méditation 5min
-                  </AnimatedButton>
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale" size="sm">
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" size="sm">
                     <Zap className="w-4 h-4 mr-2" />
                     Boost d'énergie
-                  </AnimatedButton>
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale" size="sm">
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" size="sm">
                     <Brain className="w-4 h-4 mr-2" />
                     Exercice de focus
-                  </AnimatedButton>
-                  <AnimatedButton variant="outline" className="w-full justify-start hover-scale" size="sm">
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" size="sm">
                     <Activity className="w-4 h-4 mr-2" />
                     Voir l'historique
-                  </AnimatedButton>
+                  </Button>
                 </div>
               </EnhancedCard>
             </div>

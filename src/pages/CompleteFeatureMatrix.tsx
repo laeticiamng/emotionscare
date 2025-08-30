@@ -245,10 +245,11 @@ const CompleteFeatureMatrix: React.FC = () => {
 
           {Object.entries(categories).map(([categoryKey, category]) => (
             <TabsContent key={categoryKey} value={categoryKey}>
-              <EnhancedCard 
-                title={`${category.name} (${category.count} features)`}
-                variant="premium"
-              >
+              <Card>
+                <CardHeader>
+                  <CardTitle>{category.name} ({category.count} features)</CardTitle>
+                </CardHeader>
+                <CardContent>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {allFeatures
                     .filter(feature => feature.category === categoryKey)
@@ -298,7 +299,8 @@ const CompleteFeatureMatrix: React.FC = () => {
                       );
                     })}
                 </div>
-              </EnhancedCard>
+                </CardContent>
+              </Card>
             </TabsContent>
           ))}
         </Tabs>

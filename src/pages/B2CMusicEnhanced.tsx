@@ -245,30 +245,28 @@ export default function B2CMusicEnhanced() {
 
                       {/* Contrôles */}
                       <div className="flex items-center justify-center gap-3">
-                        <AnimatedButton
-                          variant="default"
+                        <Button
+                          variant="outline"
                           size="sm"
                           className="rounded-full w-12 h-12"
                         >
                           <SkipBack className="w-5 h-5" />
-                        </AnimatedButton>
+                        </Button>
 
-                        <AnimatedButton
-                          variant="premium"
-                          animation="pulse"
+                        <Button
                           onClick={togglePlayPause}
-                          className="rounded-full w-16 h-16"
+                          className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                         >
                           {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-                        </AnimatedButton>
+                        </Button>
 
-                        <AnimatedButton
-                          variant="default"
+                        <Button
+                          variant="outline"
                           size="sm"
                           className="rounded-full w-12 h-12"
                         >
                           <SkipForward className="w-5 h-5" />
-                        </AnimatedButton>
+                        </Button>
                       </div>
 
                       {/* Contrôles secondaires */}
