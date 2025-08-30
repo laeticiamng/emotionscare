@@ -1,169 +1,183 @@
 
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Bell, Search, User, Menu, LogOut, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { APP_CONFIG } from '@/lib/constants';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { useNotifications } from '@/contexts/NotificationContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
+import { HealthBadge } from "@/components/transverse";
+import { 
+  Home, 
+  Sparkles, 
+  Settings, 
+  User, 
+  Database, 
+  LogOut,
+  Bell,
+  Shield
+} from "lucide-react";
+import { motion } from "framer-motion";
 
-interface HeaderProps {
-  onMenuToggle?: () => void;
-}
-
-/**
- * Header premium avec notifications et menu utilisateur
- * Point 7: Layout & Navigation Core - Header avec notifications
- */
-const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
+export function Header() {
+  const { isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
-  const { userMode } = useUserMode();
-  const { unreadCount } = useNotifications();
-  const { toast } = useToast();
+  const [nyveePressed, setNyveePressed] = useState(false);
 
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Déconnexion",
-        description: "À bientôt sur EmotionsCare !",
-      });
-      navigate('/');
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Erreur lors de la déconnexion",
-        variant: "destructive",
-      });
+    await signOut();
+    navigate('/');
+  };
+
+  // Nyvée FAB - long press handler
+  const handleNyveePress = () => {
+    setNyveePressed(true);
+    setTimeout(() => {
+      if (nyveePressed) {
+        navigate('/app/nyvee');
+      }
+      setNyveePressed(false);
+    }, 1000); // 1 second long press
+  };
+
+  const getUserInitials = (user: any) => {
+    if (user?.user_metadata?.name) {
+      return user.user_metadata.name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
     }
-  };
-
-  const getPageTitle = () => {
-    const path = location.pathname;
-    if (path.includes('dashboard')) return 'Tableau de bord';
-    if (path.includes('scan')) return 'Scan émotionnel';
-    if (path.includes('journal')) return 'Journal';
-    if (path.includes('coach')) return 'Coach IA';
-    if (path.includes('music')) return 'Musicothérapie';
-    if (path.includes('vr')) return 'VR Galactique';
-    if (path.includes('breath')) return 'Respiration';
-    if (path.includes('community')) return 'Communauté';
-    if (path.includes('settings')) return 'Paramètres';
-    return 'EmotionsCare';
-  };
-
-  const getUserDisplayName = () => {
-    return user?.user_metadata?.name || user?.email?.split('@')[0] || 'Utilisateur';
+    return user?.email?.charAt(0).toUpperCase() || 'U';
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-between px-6 py-3">
-        {/* Logo & Brand */}
-        <div className="flex items-center gap-3">
-          {onMenuToggle && (
-            <Button variant="ghost" size="icon" onClick={onMenuToggle} className="lg:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
-          
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">E</span>
-            </div>
-            <div>
-              <span className="font-bold text-xl text-foreground">{APP_CONFIG.name}</span>
-              <p className="text-xs text-muted-foreground hidden sm:block">{getPageTitle()}</p>
-            </div>
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
+        {/* Logo / Home Link */}
+        <Link 
+          to={isAuthenticated ? "/app/home" : "/"} 
+          className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+          aria-label="Retour à l'accueil"
+        >
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+            <Home className="h-5 w-5 text-primary-foreground" />
           </div>
-        </div>
+          <span className="font-bold text-xl">EmotionsCare</span>
+        </Link>
 
-        {/* Search */}
-        <div className="hidden md:flex items-center gap-4 flex-1 max-w-md mx-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Rechercher..." 
-              className="pl-10 bg-muted/50"
-            />
+        {/* Center - Nyvée FAB (only when authenticated) */}
+        {isAuthenticated && (
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <motion.button
+              onMouseDown={handleNyveePress}
+              onMouseUp={() => setNyveePressed(false)}
+              onMouseLeave={() => setNyveePressed(false)}
+              onTouchStart={handleNyveePress}
+              onTouchEnd={() => setNyveePressed(false)}
+              className={`
+                relative h-12 w-12 rounded-full bg-gradient-to-r from-primary to-primary/80 
+                text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200
+                ${nyveePressed ? 'scale-95 shadow-md' : 'hover:scale-105'}
+              `}
+              aria-label="Assistant Nyvée - Appuyez longuement"
+              title="Nyvée Assistant (appui long 1s)"
+            >
+              <Sparkles className="h-6 w-6 mx-auto" />
+              {nyveePressed && (
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-primary-foreground"
+                  initial={{ scale: 1, opacity: 0.5 }}
+                  animate={{ scale: 1.2, opacity: 0 }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              )}
+            </motion.button>
           </div>
-        </div>
+        )}
 
-        {/* Actions */}
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="relative"
-            onClick={() => navigate('/notifications')}
-          >
-            <Bell className="h-5 w-5" />
-            {unreadCount > 0 && (
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-              >
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </Badge>
-            )}
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="h-8 w-8 cursor-pointer">
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback>
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end">
-              <div className="flex items-center justify-start gap-2 p-2">
-                <div className="flex flex-col space-y-1 leading-none">
-                  <p className="font-medium text-sm">{getUserDisplayName()}</p>
-                  <p className="text-xs text-muted-foreground">{user?.email}</p>
-                  {userMode && (
-                    <p className="text-xs text-muted-foreground">
-                      {userMode === 'b2c' ? 'Personnel' : userMode === 'b2b_user' ? 'Employé' : 'Admin'}
-                    </p>
-                  )}
+        {/* Right side - Health Badge & User Menu */}
+        <div className="flex items-center space-x-4">
+          {/* Health Badge */}
+          <HealthBadge />
+
+          {/* Authentication */}
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex flex-col space-y-1 leading-none p-2">
+                  <p className="font-medium">{user?.user_metadata?.name || 'Utilisateur'}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user?.email}
+                  </p>
                 </div>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/settings')}>
-                <Settings className="mr-2 h-4 w-4" />
-                Paramètres
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
-                <User className="mr-2 h-4 w-4" />
-                Profil
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
-                Déconnexion
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuItem asChild>
+                  <Link to="/settings/profile" className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profil</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem asChild>
+                  <Link to="/settings/general" className="flex items-center">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Paramètres</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem asChild>
+                  <Link to="/settings/privacy" className="flex items-center">
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Confidentialité</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem asChild>
+                  <Link to="/settings/notifications" className="flex items-center">
+                    <Bell className="mr-2 h-4 w-4" />
+                    <span>Notifications</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem asChild>
+                  <Link to="/settings/data" className="flex items-center">
+                    <Database className="mr-2 h-4 w-4" />
+                    <span>Mes Données</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Déconnexion</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" asChild>
+                <Link to="/help">Aide</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/login">Entrer</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>
   );
-};
-
-export default Header;
+}
