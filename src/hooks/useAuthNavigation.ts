@@ -8,7 +8,7 @@ export const useAuthNavigation = () => {
   const { user, role, loading } = useAuth();
 
   const navigateAfterLogin = () => {
-    console.log('Navigation après login - Role:', role, 'User:', user?.id);
+    console.log('Navigation après login - Role:', role, 'User:', user?.id, 'Loading:', loading);
     
     // Wait for role to be loaded
     if (loading) {
@@ -18,14 +18,15 @@ export const useAuthNavigation = () => {
     
     if (role) {
       const dashboardRoute = getDashboardRoute(role);
-      console.log('Redirection vers:', dashboardRoute);
+      console.log('getDashboardRoute result:', dashboardRoute, 'for role:', role);
+      console.log('Navigating to:', dashboardRoute);
       navigate(dashboardRoute, { replace: true });
     } else if (user) {
       // Fallback if role is not yet loaded
-      console.log('Redirection fallback vers /app');
-      navigate('/app', { replace: true });
+      console.log('No role, fallback to /app/home');
+      navigate('/app/home', { replace: true });
     } else {
-      console.log('Pas d\'utilisateur, redirection vers /');
+      console.log('No user, redirect to /');
       navigate('/', { replace: true });
     }
   };
