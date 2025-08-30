@@ -121,8 +121,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/app',
     segment: 'consumer',
     layout: 'app',
-    component: 'AppGatePage',
-    guard: true,
+    component: 'DebugDashboard',
+    guard: false,
   },
   {
     name: 'consumer-home',
@@ -130,7 +130,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     layout: 'app',
     component: 'B2CDashboardPage',
-    guard: true,
+    guard: false,
     aliases: ['/b2c/dashboard', '/dashboard'],
   },
   {
@@ -195,7 +195,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     role: 'consumer',
     layout: 'app',
     component: 'B2CMusicEnhanced',
-    guard: true,
+    guard: false,
     aliases: ['/music'],
   },
   {

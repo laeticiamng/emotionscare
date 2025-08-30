@@ -122,6 +122,8 @@ const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
 
+const DebugDashboard = lazy(() => import('@/pages/DebugDashboard'));
+
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public
   HomePage,
@@ -136,6 +138,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   SignupPage,
   
   // App
+  DebugDashboard,
   AppGatePage,
   B2CDashboardPage,
   B2BUserDashboardPage,

@@ -1,3 +1,6 @@
+/**
+ * UserModeContext avec mode par défaut pour debug
+ */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
@@ -12,7 +15,7 @@ interface UserModeContextType {
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>(null);
+  const [userMode, setUserMode] = useState<UserMode>('b2c'); // Par défaut b2c pour debug
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,8 +23,13 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const savedMode = localStorage.getItem('userMode') as UserMode;
     if (savedMode) {
       setUserMode(savedMode);
+    } else {
+      // Mode par défaut pour debug
+      setUserMode('b2c');
+      localStorage.setItem('userMode', 'b2c');
     }
     setIsLoading(false);
+    console.log('🔧 Debug: Mode utilisateur défini à b2c par défaut');
   }, []);
 
   const handleSetUserMode = (mode: UserMode) => {
