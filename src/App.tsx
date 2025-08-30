@@ -1,6 +1,5 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/core/auth';
 import { AsyncState, QueueFlusher } from '@/components/transverse';
 import ProtectedRoute from '@/app/guards/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
@@ -31,8 +30,7 @@ const SettingsPrivacyPage = lazy(() => import('@/pages/settings/PrivacyPage'));
  */
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
         <Suspense fallback={<main data-testid="page-root"><AsyncState.Loading /></main>}>
           <Routes>
             {/* Routes publiques */}
@@ -159,7 +157,6 @@ function App() {
         <QueueFlusher />
         <Toaster />
       </BrowserRouter>
-    </AuthProvider>
   );
 }
 
