@@ -100,3 +100,5 @@ export { default as ExportPage } from './ExportPage';
 export { default as NavigationPage } from './NavigationPage';
 export { default as LeaderboardPage } from './LeaderboardPage';
 export { default as HeatmapPage } from './HeatmapPage';
+export { default as GamificationPage } from './GamificationPage';
+export { default as ChooseModePage } from './ChooseModePage';

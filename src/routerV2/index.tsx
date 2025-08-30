@@ -191,6 +191,18 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CNyveeCoconPage,
   ValidationPage,
   
+  // Pages manquantes ajoutées
+  ChooseModePage,
+  CoachChatPage,
+  VRSessionsPage,
+  JournalNewPage,
+  ReportingPage,
+  ExportPage,
+  NavigationPage,
+  LeaderboardPage,
+  GamificationPage,
+  HeatmapPage,
+  
   // Legal pages
   LegalTermsPage,
   LegalPrivacyPage,
