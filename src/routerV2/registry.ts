@@ -128,10 +128,9 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     name: 'consumer-home',
     path: '/app/home',
     segment: 'consumer',
-    role: 'consumer',
     layout: 'app',
-    component: 'B2CDashboardPage',
-    guard: true,
+    component: 'TestDashboard',
+    guard: false,
     aliases: ['/b2c/dashboard', '/dashboard'],
   },
   {

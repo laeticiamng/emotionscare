@@ -23,7 +23,7 @@ interface EnhancedCardProps {
   badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
-const EnhancedCard: React.FC<EnhancedCardProps> = ({
+export const EnhancedCard: React.FC<EnhancedCardProps> = ({
   title,
   subtitle,
   description,
