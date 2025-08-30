@@ -105,6 +105,7 @@ const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
 const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const ValidationStatusPage = lazy(() => import('@/pages/ValidationStatusPage'));
+const SystemValidationPage = lazy(() => import('@/pages/SystemValidationPage'));
 const DiagnosticPage = lazy(() => import('@/pages/DiagnosticPage'));
 const SystemRepairPage = lazy(() => import('@/pages/SystemRepairPage'));
 
@@ -117,6 +118,12 @@ const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
+
+// Composants de redirection  
+const RedirectToScan = lazy(() => import('@/components/redirects/RedirectToScan'));
+const RedirectToJournal = lazy(() => import('@/components/redirects/RedirectToJournal'));
+const RedirectToSocialCocon = lazy(() => import('@/components/redirects/RedirectToSocialCocon'));
+const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectToEntreprise'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -208,6 +215,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BRHDashboard,
   SubscribePage,
   ValidationStatusPage,
+  SystemValidationPage,
   DiagnosticPage,
   SystemRepairPage,
   
@@ -220,6 +228,12 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ForbiddenPage,
   NotFoundPage,
   ServerErrorPage,
+  
+  // Composants de redirection
+  RedirectToScan,
+  RedirectToJournal, 
+  RedirectToSocialCocon,
+  RedirectToEntreprise,
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -240,9 +254,9 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 const LayoutWrapper: React.FC<{ 
   children: React.ReactNode; 
-  layout?: 'marketing' | 'app' 
+  layout?: 'marketing' | 'app' | 'simple'
 }> = ({ children, layout = 'app' }) => {
-  if (layout === 'marketing') {
+  if (layout === 'marketing' || layout === 'simple') {
     return <>{children}</>;
   }
   
