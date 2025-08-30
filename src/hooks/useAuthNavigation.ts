@@ -5,14 +5,17 @@ import { getDashboardRoute } from '@/routerV2/helpers';
 
 export const useAuthNavigation = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   const navigateAfterLogin = () => {
-    if (user?.role) {
-      const dashboardRoute = getDashboardRoute(user.role as 'b2c' | 'b2b_user' | 'b2b_admin');
+    if (role) {
+      const dashboardRoute = getDashboardRoute(role);
       navigate(dashboardRoute);
+    } else if (user) {
+      // Fallback if role is not yet loaded
+      navigate('/app');
     } else {
-      navigate('/home');
+      navigate('/');
     }
   };
 
