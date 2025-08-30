@@ -85,7 +85,6 @@ const navigationCategories: NavigationCategory[] = [
     routes: [
       { name: 'Activité', path: '/app/activity', icon: BarChart3, description: 'Historique détaillé' },
       { name: 'Heatmap Vibes', path: '/app/heatmap', icon: Filter, description: 'Cartographie émotionnelle' },
-      { name: 'Scanner Émotions', path: '/app/scan', icon: Brain, description: 'Analyse faciale avancée' },
       { name: 'Journal Vocal', path: '/app/journal', icon: Headphones, description: 'Journal vocal IA' },
     ]
   },
