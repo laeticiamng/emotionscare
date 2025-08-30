@@ -116,7 +116,7 @@ export default function PrivacyPage() {
                     🏢 <strong>Données d'équipe</strong> : agrégées et anonymisées (minimum 5 personnes).
                   </p>
                   <p>
-                    📤 <strong>Export RGPD</strong> disponible à tout moment dans Paramètres > Données.
+                    📤 <strong>Export RGPD</strong> disponible à tout moment dans Paramètres &gt; Données.
                   </p>
                 </div>
               </CardContent>
