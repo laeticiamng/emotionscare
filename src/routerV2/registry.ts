@@ -17,6 +17,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'HomePage',
   },
   {
+    name: 'home-redirect',
+    path: '/home',
+    segment: 'public',
+    layout: 'app',
+    component: 'AppGatePage',
+  },
+  {
     name: 'about',
     path: '/about',
     segment: 'public',
