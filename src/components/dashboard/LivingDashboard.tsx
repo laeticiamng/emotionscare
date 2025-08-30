@@ -167,7 +167,7 @@ const LivingDashboard: React.FC = () => {
         subtitle: 'Quand tu n\'en peux plus',
         duration: '6min',
         icon: Star,
-        path: '/app/nyvee',
+        path: '/app/scan',
         tone: 'soft',
         color: 'from-indigo-400 to-purple-400',
         urgency: 1 // Toujours prioritaire
@@ -361,7 +361,7 @@ const LivingDashboard: React.FC = () => {
             className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg hover:shadow-xl"
             onClick={() => {
               playMicroSound('tap');
-              navigate('/app/nyvee');
+              navigate('/app/scan');
             }}
             onMouseEnter={() => playMicroSound('hover')}
           >

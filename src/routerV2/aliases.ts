@@ -37,8 +37,8 @@ export const ROUTE_ALIASES = [
   // ═══════════════════════════════════════════════════════════
   // MODULES FONCTIONNELS
   // ═══════════════════════════════════════════════════════════
+  { from: '/emotions', to: '/app/scan' }, // Route directe emotions vers scan
   { from: '/scan', to: '/app/scan' },
-  { from: '/emotions', to: '/app/scan' }, // Redirection pour l'ancienne route emotions
   { from: '/emotion-scan', to: '/app/scan' }, // Redirection pour l'ancienne route emotion-scan
   { from: '/music', to: '/app/music' },
   { from: '/coach', to: '/app/coach' },
