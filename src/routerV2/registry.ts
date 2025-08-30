@@ -220,7 +220,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CVRBreathGuidePage',
+    component: 'B2CVRGalaxyPage',
     guard: true,
     aliases: ['/vr'],
   },
