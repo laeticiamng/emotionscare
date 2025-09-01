@@ -131,7 +131,7 @@ const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectT
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public
   HomePage,
-  HomeB2C: HomeB2CPage,
+  HomeB2CPage,
   AboutPage,
   ContactPage,
   HelpPage,
