@@ -54,21 +54,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               console.log('Role normalized:', userRole, '->', normalizedRole);
               setRole(normalizedRole);
               
-              // Auto-redirect after successful login
-              if (event === 'SIGNED_IN' && window.location.pathname === '/login') {
+              // Auto-redirect after successful login or if already logged in
+              const isLoginPage = window.location.pathname === '/login' || 
+                                 window.location.pathname.startsWith('/login?');
+              
+              if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && isLoginPage) {
                 console.log('Auto-redirecting to dashboard for role:', normalizedRole);
                 const dashboardRoute = normalizedRole === 'consumer' ? '/app/home' :
                                      normalizedRole === 'employee' ? '/app/collab' :
                                      normalizedRole === 'manager' ? '/app/rh' : '/app/home';
                 
-                window.location.href = dashboardRoute;
+                // Prevent multiple redirections
+                setTimeout(() => {
+                  if (window.location.pathname === '/login' || window.location.pathname.startsWith('/login?')) {
+                    window.location.href = dashboardRoute;
+                  }
+                }, 100);
               }
             } catch (error) {
               console.warn('Role fetch failed:', error);
               setRole('consumer');
-              // Still redirect on login
-              if (event === 'SIGNED_IN' && window.location.pathname === '/login') {
-                window.location.href = '/app/home';
+              // Still redirect on login (with same logic as above)
+              const isLoginPage = window.location.pathname === '/login' || 
+                                 window.location.pathname.startsWith('/login?');
+              
+              if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && isLoginPage) {
+                setTimeout(() => {
+                  if (window.location.pathname === '/login' || window.location.pathname.startsWith('/login?')) {
+                    window.location.href = '/app/home';
+                  }
+                }, 100);
               }
             }
           }, 0);
