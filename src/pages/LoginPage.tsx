@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const LoginPage: React.FC = () => {
@@ -7,42 +7,72 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
+  // Désactiver tous les listeners existants au montage
+  useEffect(() => {
+    console.log('LoginPage: Désactivation des listeners auth existants');
+    
+    // Vider tous les listeners auth existants
+    supabase.auth.onAuthStateChange(() => {
+      // Listener vide pour intercepter les autres
+    });
+    
+    return () => {
+      console.log('LoginPage: Nettoyage');
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (loading) return; // Éviter les clics multiples
+    // Empêcher les soumissions multiples
+    if (loading) {
+      console.log('Soumission ignorée - déjà en cours');
+      return;
+    }
     
     setLoading(true);
-    setMessage('Connexion en cours...');
+    setMessage('🔄 Connexion en cours...');
+    
+    // Petite pause pour éviter les conflits
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     try {
-      console.log('Connexion avec:', email);
+      console.log('=== CONNEXION DIRECTE ===');
+      console.log('Email:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password
       });
       
+      console.log('Réponse auth:', { error: error?.message, session: !!data.session });
+      
       if (error) {
-        console.error('Erreur:', error);
-        setMessage(`Erreur: ${error.message}`);
+        setMessage(`❌ Erreur: ${error.message}`);
         setLoading(false);
         return;
       }
       
-      if (data.session) {
-        setMessage('✅ Connexion réussie! Redirection...');
+      if (data.session && data.user) {
+        console.log('Session OK, utilisateur:', data.user.id);
+        setMessage('✅ Connexion réussie!');
         
-        // Attendre un peu puis rediriger UNE SEULE FOIS
-        setTimeout(() => {
-          // Désactiver complètement React Router pour cette redirection
-          window.location.replace('/app/home');
-        }, 1000);
+        // Attendre puis redirection brutale
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log('REDIRECTION FORCÉE vers /app/home');
+        
+        // Redirection la plus brutale possible
+        document.location.href = '/app/home';
+        
+      } else {
+        setMessage('❌ Pas de session créée');
+        setLoading(false);
       }
       
     } catch (error: any) {
       console.error('Exception:', error);
-      setMessage(`Erreur: ${error.message || 'Erreur inconnue'}`);
+      setMessage(`❌ Exception: ${error.message}`);
       setLoading(false);
     }
   };
@@ -50,112 +80,93 @@ const LoginPage: React.FC = () => {
   return (
     <div data-testid="page-root" style={{ 
       minHeight: '100vh', 
-      backgroundColor: '#f8fafc', 
+      backgroundColor: '#ffffff', 
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center',
       padding: '20px',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
+      fontFamily: 'Arial, sans-serif'
     }}>
       <div style={{
         width: '100%',
         maxWidth: '400px',
         backgroundColor: '#ffffff',
-        borderRadius: '12px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         padding: '40px',
-        border: '1px solid #e2e8f0'
+        border: '1px solid #e0e0e0'
       }}>
         
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            backgroundColor: '#3b82f6',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px auto',
-            fontSize: '24px'
-          }}>
-            💙
-          </div>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: '700', 
-            margin: '0 0 8px 0',
-            color: '#1e293b'
+            fontSize: '24px', 
+            fontWeight: 'bold', 
+            margin: '0 0 10px 0',
+            color: '#333333'
           }}>
             EmotionsCare
           </h1>
           <p style={{ 
-            color: '#64748b', 
+            color: '#666666', 
             margin: '0',
-            fontSize: '16px'
+            fontSize: '14px'
           }}>
-            Connexion à votre espace personnel
+            Connexion Particulier
           </p>
         </div>
 
-        {/* Message de statut */}
         {message && (
           <div style={{
-            padding: '16px',
-            marginBottom: '24px',
-            backgroundColor: message.includes('Erreur') ? '#fef2f2' : '#eff6ff',
-            color: message.includes('Erreur') ? '#dc2626' : '#1d4ed8',
-            borderRadius: '8px',
+            padding: '15px',
+            marginBottom: '20px',
+            backgroundColor: message.includes('❌') ? '#ffe6e6' : '#e6f3ff',
+            color: message.includes('❌') ? '#cc0000' : '#0066cc',
+            borderRadius: '5px',
             fontSize: '14px',
-            border: `1px solid ${message.includes('Erreur') ? '#fecaca' : '#bfdbfe'}`,
             textAlign: 'center',
-            fontWeight: '500'
+            fontWeight: 'bold'
           }}>
             {message}
           </div>
         )}
 
-        {/* Formulaire */}
-        <form onSubmit={handleSubmit} style={{ display: loading ? 'none' : 'block' }}>
+        <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>
             <label style={{ 
               display: 'block', 
               fontSize: '14px', 
-              fontWeight: '600', 
-              marginBottom: '8px',
-              color: '#374151'
+              fontWeight: 'bold', 
+              marginBottom: '5px',
+              color: '#333333'
             }}>
-              Adresse email
+              Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
               style={{
                 width: '100%',
-                padding: '12px 16px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
+                padding: '12px',
+                border: '2px solid #dddddd',
+                borderRadius: '5px',
                 fontSize: '16px',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
-                outline: 'none'
+                backgroundColor: loading ? '#f5f5f5' : '#ffffff'
               }}
               placeholder="votre@email.com"
               required
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
 
-          <div style={{ marginBottom: '28px' }}>
+          <div style={{ marginBottom: '25px' }}>
             <label style={{ 
               display: 'block', 
               fontSize: '14px', 
-              fontWeight: '600', 
-              marginBottom: '8px',
-              color: '#374151'
+              fontWeight: 'bold', 
+              marginBottom: '5px',
+              color: '#333333'
             }}>
               Mot de passe
             </label>
@@ -163,20 +174,18 @@ const LoginPage: React.FC = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
               style={{
                 width: '100%',
-                padding: '12px 16px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
+                padding: '12px',
+                border: '2px solid #dddddd',
+                borderRadius: '5px',
                 fontSize: '16px',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
-                outline: 'none'
+                backgroundColor: loading ? '#f5f5f5' : '#ffffff'
               }}
               placeholder="••••••••"
               required
-              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
 
@@ -185,78 +194,28 @@ const LoginPage: React.FC = () => {
             disabled={loading}
             style={{
               width: '100%',
-              backgroundColor: '#3b82f6',
+              backgroundColor: loading ? '#cccccc' : '#0066cc',
               color: '#ffffff',
-              padding: '16px',
+              padding: '15px',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '5px',
               fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              textTransform: 'none'
+              fontWeight: 'bold',
+              cursor: loading ? 'not-allowed' : 'pointer'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
           >
-            Se connecter
+            {loading ? '🔄 Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        {/* Chargement */}
-        {loading && (
-          <div style={{
-            textAlign: 'center',
-            padding: '40px 20px'
-          }}>
-            <div style={{
-              display: 'inline-block',
-              width: '40px',
-              height: '40px',
-              border: '4px solid #e5e7eb',
-              borderTop: '4px solid #3b82f6',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }} />
-            <p style={{ 
-              marginTop: '16px', 
-              color: '#64748b',
-              fontSize: '14px'
-            }}>
-              Connexion en cours...
-            </p>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div style={{ marginTop: '32px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 12px 0' }}>
-            Pas encore de compte ?{' '}
-            <a href="/signup" style={{ 
-              color: '#3b82f6', 
-              textDecoration: 'none',
-              fontWeight: '500'
-            }}>
-              S'inscrire
+        <div style={{ marginTop: '25px', textAlign: 'center' }}>
+          <p style={{ fontSize: '14px', color: '#666666', margin: '0' }}>
+            <a href="/" style={{ color: '#0066cc', textDecoration: 'none' }}>
+              ← Retour à l'accueil
             </a>
           </p>
-          <a href="/" style={{ 
-            fontSize: '13px', 
-            color: '#9ca3af', 
-            textDecoration: 'none'
-          }}>
-            ← Retour à l'accueil
-          </a>
         </div>
       </div>
-
-      {/* Styles pour l'animation */}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };
