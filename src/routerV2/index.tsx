@@ -30,6 +30,7 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
 // Auth & Landing  
 const TestLogin = lazy(() => import('@/pages/TestLogin'));
+const ForceLogout = lazy(() => import('@/pages/ForceLogout'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const HomeB2CPage = lazy(() => import('@/pages/HomeB2CPage'));
 
@@ -138,6 +139,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   DemoPage,
   OnboardingPage,
   LoginPage: TestLogin,
+  ForceLogout,
   SignupPage,
   
   // App

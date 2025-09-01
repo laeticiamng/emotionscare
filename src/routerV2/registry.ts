@@ -101,6 +101,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/auth', '/b2c/login', '/b2b/user/login', '/b2b/admin/login'],
   },
   {
+    name: 'force-logout',
+    path: '/force-logout',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'ForceLogout',
+  },
+  {
     name: 'signup',
     path: '/signup',
     segment: 'public',
