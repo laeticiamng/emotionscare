@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const LoginPage: React.FC = () => {
@@ -6,81 +6,81 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-
-  // Désactiver tous les listeners existants au montage
-  useEffect(() => {
-    console.log('LoginPage: Désactivation des listeners auth existants');
-    
-    // Vider tous les listeners auth existants
-    supabase.auth.onAuthStateChange(() => {
-      // Listener vide pour intercepter les autres
-    });
-    
-    return () => {
-      console.log('LoginPage: Nettoyage');
-    };
-  }, []);
+  const submittedRef = useRef(false);
+  const [clickCount, setClickCount] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
-    // Empêcher les soumissions multiples
-    if (loading) {
-      console.log('Soumission ignorée - déjà en cours');
-      return;
+    // Compteur de clics pour debug
+    const currentClick = clickCount + 1;
+    setClickCount(currentClick);
+    console.log(`🔴 CLIC #${currentClick} détecté`);
+    
+    // Bloquer COMPLÈTEMENT si déjà soumis
+    if (submittedRef.current || loading) {
+      console.log(`❌ CLIC #${currentClick} BLOQUÉ - Déjà en cours`);
+      setMessage(`⚠️ Clic #${currentClick} bloqué - Déjà en traitement`);
+      return false;
     }
     
+    // Marquer comme soumis IMMÉDIATEMENT
+    submittedRef.current = true;
     setLoading(true);
-    setMessage('🔄 Connexion en cours...');
+    setMessage(`🔄 Traitement du clic #${currentClick}...`);
     
-    // Petite pause pour éviter les conflits
-    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log(`✅ TRAITEMENT CLIC #${currentClick}`);
     
     try {
-      console.log('=== CONNEXION DIRECTE ===');
-      console.log('Email:', email);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Délai visible
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password
       });
       
-      console.log('Réponse auth:', { error: error?.message, session: !!data.session });
-      
       if (error) {
+        console.log(`❌ Erreur clic #${currentClick}:`, error.message);
         setMessage(`❌ Erreur: ${error.message}`);
+        // Réinitialiser pour permettre un nouveau essai
+        submittedRef.current = false;
         setLoading(false);
         return;
       }
       
-      if (data.session && data.user) {
-        console.log('Session OK, utilisateur:', data.user.id);
-        setMessage('✅ Connexion réussie!');
+      if (data.session) {
+        console.log(`✅ Succès clic #${currentClick} - Session créée`);
+        setMessage(`✅ Connexion réussie! (clic #${currentClick})`);
         
-        // Attendre puis redirection brutale
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Attendre puis redirection
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(`🚀 Redirection après clic #${currentClick}`);
         
-        console.log('REDIRECTION FORCÉE vers /app/home');
-        
-        // Redirection la plus brutale possible
-        document.location.href = '/app/home';
-        
-      } else {
-        setMessage('❌ Pas de session créée');
-        setLoading(false);
+        // Redirection définitive
+        window.location.replace('/app/home');
       }
       
     } catch (error: any) {
-      console.error('Exception:', error);
-      setMessage(`❌ Exception: ${error.message}`);
+      console.log(`💥 Exception clic #${currentClick}:`, error);
+      setMessage(`💥 Exception: ${error.message}`);
+      submittedRef.current = false;
       setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    console.log('🔄 Reset du formulaire');
+    submittedRef.current = false;
+    setLoading(false);
+    setMessage('');
+    setClickCount(0);
   };
 
   return (
     <div data-testid="page-root" style={{ 
       minHeight: '100vh', 
-      backgroundColor: '#ffffff', 
+      backgroundColor: '#f9f9f9', 
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center',
@@ -89,55 +89,72 @@ const LoginPage: React.FC = () => {
     }}>
       <div style={{
         width: '100%',
-        maxWidth: '400px',
+        maxWidth: '450px',
         backgroundColor: '#ffffff',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+        borderRadius: '10px',
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
         padding: '40px',
-        border: '1px solid #e0e0e0'
+        border: '2px solid #e0e0e0'
       }}>
         
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h1 style={{ 
-            fontSize: '24px', 
+            fontSize: '28px', 
             fontWeight: 'bold', 
             margin: '0 0 10px 0',
-            color: '#333333'
+            color: '#2c3e50'
           }}>
             EmotionsCare
           </h1>
           <p style={{ 
-            color: '#666666', 
+            color: '#7f8c8d', 
             margin: '0',
-            fontSize: '14px'
+            fontSize: '16px'
           }}>
             Connexion Particulier
           </p>
         </div>
 
+        {/* Debug info */}
+        <div style={{
+          padding: '10px',
+          marginBottom: '20px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '5px',
+          fontSize: '12px',
+          color: '#6c757d',
+          textAlign: 'center'
+        }}>
+          Clics détectés: {clickCount} | Statut: {loading ? 'EN COURS' : 'PRÊT'}
+        </div>
+
         {message && (
           <div style={{
             padding: '15px',
-            marginBottom: '20px',
-            backgroundColor: message.includes('❌') ? '#ffe6e6' : '#e6f3ff',
-            color: message.includes('❌') ? '#cc0000' : '#0066cc',
-            borderRadius: '5px',
+            marginBottom: '25px',
+            backgroundColor: message.includes('❌') ? '#ffe6e6' : 
+                           message.includes('⚠️') ? '#fff3cd' : '#e6f3ff',
+            color: message.includes('❌') ? '#cc0000' : 
+                   message.includes('⚠️') ? '#856404' : '#0066cc',
+            borderRadius: '8px',
             fontSize: '14px',
             textAlign: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            border: '1px solid ' + (message.includes('❌') ? '#ff9999' : 
+                                   message.includes('⚠️') ? '#ffd966' : '#99ccff')
           }}>
             {message}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ opacity: loading ? 0.6 : 1 }}>
           <div style={{ marginBottom: '20px' }}>
             <label style={{ 
               display: 'block', 
-              fontSize: '14px', 
+              fontSize: '15px', 
               fontWeight: 'bold', 
-              marginBottom: '5px',
-              color: '#333333'
+              marginBottom: '8px',
+              color: '#2c3e50'
             }}>
               Email
             </label>
@@ -148,25 +165,26 @@ const LoginPage: React.FC = () => {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '2px solid #dddddd',
-                borderRadius: '5px',
+                padding: '15px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
                 fontSize: '16px',
                 boxSizing: 'border-box',
-                backgroundColor: loading ? '#f5f5f5' : '#ffffff'
+                backgroundColor: loading ? '#ecf0f1' : '#ffffff',
+                color: loading ? '#7f8c8d' : '#2c3e50'
               }}
               placeholder="votre@email.com"
               required
             />
           </div>
 
-          <div style={{ marginBottom: '25px' }}>
+          <div style={{ marginBottom: '30px' }}>
             <label style={{ 
               display: 'block', 
-              fontSize: '14px', 
+              fontSize: '15px', 
               fontWeight: 'bold', 
-              marginBottom: '5px',
-              color: '#333333'
+              marginBottom: '8px',
+              color: '#2c3e50'
             }}>
               Mot de passe
             </label>
@@ -177,12 +195,13 @@ const LoginPage: React.FC = () => {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '12px',
-                border: '2px solid #dddddd',
-                borderRadius: '5px',
+                padding: '15px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
                 fontSize: '16px',
                 boxSizing: 'border-box',
-                backgroundColor: loading ? '#f5f5f5' : '#ffffff'
+                backgroundColor: loading ? '#ecf0f1' : '#ffffff',
+                color: loading ? '#7f8c8d' : '#2c3e50'
               }}
               placeholder="••••••••"
               required
@@ -191,29 +210,60 @@ const LoginPage: React.FC = () => {
 
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || submittedRef.current}
             style={{
               width: '100%',
-              backgroundColor: loading ? '#cccccc' : '#0066cc',
+              backgroundColor: loading ? '#95a5a6' : '#3498db',
               color: '#ffffff',
-              padding: '15px',
+              padding: '18px',
               border: 'none',
-              borderRadius: '5px',
+              borderRadius: '8px',
               fontSize: '16px',
               fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer'
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'background-color 0.3s',
+              opacity: loading ? 0.7 : 1
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) e.target.style.backgroundColor = '#2980b9';
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) e.target.style.backgroundColor = '#3498db';
             }}
           >
-            {loading ? '🔄 Connexion...' : 'Se connecter'}
+            {loading ? '🔄 Connexion en cours...' : 'Se connecter'}
           </button>
         </form>
 
+        {/* Bouton de reset pour debug */}
+        {(loading || message) && (
+          <button 
+            onClick={resetForm}
+            style={{
+              width: '100%',
+              backgroundColor: '#e74c3c',
+              color: '#ffffff',
+              padding: '10px',
+              border: 'none',
+              borderRadius: '5px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              marginTop: '15px'
+            }}
+          >
+            🔄 Reset (Debug)
+          </button>
+        )}
+
         <div style={{ marginTop: '25px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: '#666666', margin: '0' }}>
-            <a href="/" style={{ color: '#0066cc', textDecoration: 'none' }}>
-              ← Retour à l'accueil
-            </a>
-          </p>
+          <a href="/" style={{ 
+            color: '#3498db', 
+            textDecoration: 'none',
+            fontSize: '14px'
+          }}>
+            ← Retour à l'accueil
+          </a>
         </div>
       </div>
     </div>
