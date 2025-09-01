@@ -10,9 +10,10 @@ export const useAuthNavigation = () => {
   const navigateAfterLogin = () => {
     console.log('Navigation après login - Role:', role, 'User:', user?.id, 'Loading:', loading);
     
-    // Wait for role to be loaded
+    // If auth is still loading, wait and retry
     if (loading) {
-      console.log('Chargement en cours...');
+      console.log('Chargement en cours, attente...');
+      setTimeout(() => navigateAfterLogin(), 500);
       return;
     }
     
@@ -22,9 +23,9 @@ export const useAuthNavigation = () => {
       console.log('Navigating to:', dashboardRoute);
       navigate(dashboardRoute, { replace: true });
     } else if (user) {
-      // Fallback if role is not yet loaded
-      console.log('No role, fallback to /app/home');
-      navigate('/app/home', { replace: true });
+      // If user exists but no role yet, wait a bit for role to load
+      console.log('User found but no role yet, retrying...');
+      setTimeout(() => navigateAfterLogin(), 200);
     } else {
       console.log('No user, redirect to /');
       navigate('/', { replace: true });

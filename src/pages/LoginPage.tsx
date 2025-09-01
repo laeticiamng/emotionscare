@@ -51,10 +51,8 @@ const LoginPage: React.FC = () => {
       
       console.log('Login réussi, navigation...');
       
-      // Délai pour laisser le temps au rôle de se charger
-      setTimeout(() => {
-        navigateAfterLogin();
-      }, 1000);
+      // Navigation immédiate après le login réussi
+      navigateAfterLogin();
       
     } catch (error: any) {
       console.error('Login error:', error);
