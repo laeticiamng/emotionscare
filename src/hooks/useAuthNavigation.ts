@@ -21,7 +21,10 @@ export const useAuthNavigation = () => {
       const dashboardRoute = getDashboardRoute(role);
       console.log('getDashboardRoute result:', dashboardRoute, 'for role:', role);
       console.log('Navigating to:', dashboardRoute);
-      navigate(dashboardRoute, { replace: true });
+      
+      // Force navigation
+      window.location.href = dashboardRoute;
+      
     } else if (user) {
       // If user exists but no role yet, wait a bit for role to load
       console.log('User found but no role yet, retrying...');
