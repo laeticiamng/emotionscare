@@ -29,7 +29,7 @@ const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
 // Auth & Landing  
-const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const LoginPage = lazy(() => import('@/pages/SimpleLogin'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const HomeB2CPage = lazy(() => import('@/pages/HomeB2CPage'));
 
