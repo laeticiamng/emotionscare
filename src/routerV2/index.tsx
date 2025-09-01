@@ -29,8 +29,7 @@ const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
 // Auth & Landing  
-const TestLogin = lazy(() => import('@/pages/TestLogin'));
-const ForceLogout = lazy(() => import('@/pages/ForceLogout'));
+const SimpleLogin = lazy(() => import('@/pages/SimpleLogin'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const HomeB2CPage = lazy(() => import('@/pages/HomeB2CPage'));
 
@@ -138,8 +137,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   HelpPage,
   DemoPage,
   OnboardingPage,
-  LoginPage: TestLogin,
-  ForceLogout,
+  LoginPage: SimpleLogin,
   SignupPage,
   
   // App

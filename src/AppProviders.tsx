@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
-import { AuthProvider } from '@/core/auth';
+import { SimpleAuthProvider } from '@/contexts/SimpleAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MoodProvider } from '@/contexts/MoodContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
@@ -14,7 +14,7 @@ interface AppProvidersProps {
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="ui-theme">
-      <AuthProvider>
+      <SimpleAuthProvider>
         <UserModeProvider>
           <MoodProvider>
             <NotificationProvider>
@@ -23,7 +23,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
             </NotificationProvider>
           </MoodProvider>
         </UserModeProvider>
-      </AuthProvider>
+      </SimpleAuthProvider>
     </ThemeProvider>
   );
 };

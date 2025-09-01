@@ -1,2 +1,2 @@
-// Re-export from core/auth for backwards compatibility
-export { AuthProvider, useAuth } from '@/core/auth';
+// Re-export from SimpleAuth for backwards compatibility
+export { SimpleAuthProvider as AuthProvider, useSimpleAuth as useAuth } from './SimpleAuth';
