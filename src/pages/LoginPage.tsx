@@ -1,4 +1,3 @@
-
 /**
  * LoginPage - Page de connexion unifiée
  * TICKET: FE/BE-Router-Cleanup-01
@@ -11,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Routes } from '@/routerV2/helpers';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAuthNavigation } from '@/hooks/useAuthNavigation';
 import { getFriendlyAuthError } from '@/lib/auth/authErrorService';
 import { toast } from '@/hooks/use-toast';
 import { Heart, Mail, Lock, User, ArrowLeft } from 'lucide-react';
@@ -35,7 +33,6 @@ const LoginPage: React.FC = () => {
   };
 
   const { login, isLoading } = useAuth();
-  const { navigateAfterLogin } = useAuthNavigation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
