@@ -46,13 +46,10 @@ const LoginPage: React.FC = () => {
       
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue !",
+        description: "Redirection en cours...",
       });
       
-      console.log('Login réussi, navigation...');
-      
-      // Navigation immédiate après le login réussi
-      navigateAfterLogin();
+      // La redirection est maintenant gérée automatiquement par AuthContext
       
     } catch (error: any) {
       console.error('Login error:', error);

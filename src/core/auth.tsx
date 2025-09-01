@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -51,9 +53,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               
               console.log('Role normalized:', userRole, '->', normalizedRole);
               setRole(normalizedRole);
+              
+              // Auto-redirect after successful login
+              if (event === 'SIGNED_IN' && window.location.pathname === '/login') {
+                console.log('Auto-redirecting to dashboard for role:', normalizedRole);
+                const dashboardRoute = normalizedRole === 'consumer' ? '/app/home' :
+                                     normalizedRole === 'employee' ? '/app/collab' :
+                                     normalizedRole === 'manager' ? '/app/rh' : '/app/home';
+                
+                window.location.href = dashboardRoute;
+              }
             } catch (error) {
               console.warn('Role fetch failed:', error);
               setRole('consumer');
+              // Still redirect on login
+              if (event === 'SIGNED_IN' && window.location.pathname === '/login') {
+                window.location.href = '/app/home';
+              }
             }
           }, 0);
         } else {
@@ -108,8 +124,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const isAuthenticated = !!session && !!user;
+
   return (
-    <AuthContext.Provider value={{ session, user, role, loading, isLoading, login, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      role, 
+      loading, 
+      isLoading, 
+      login, 
+      signUp, 
+      signOut,
+      isAuthenticated 
+    }}>
       {children}
     </AuthContext.Provider>
   );
