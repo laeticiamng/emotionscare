@@ -1,64 +1,30 @@
 import React from 'react';
+import { useSimpleAuth } from '@/contexts/SimpleAuth';
 
-// Page de connexion ULTRA simple sans aucune dépendance
+// Page de connexion avec SimpleAuth
 const SimpleLogin: React.FC = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [status, setStatus] = React.useState('');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { signIn, loading } = useSimpleAuth();
 
-  // Fonction de connexion directe sans contextes
+  // Fonction de connexion avec SimpleAuth
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Empêcher absolument les re-soumissions
-    if (isSubmitting) {
-      console.log('BLOQUÉ - Déjà en cours');
+    if (loading) {
+      console.log('Chargement en cours...');
       return;
     }
     
-    setIsSubmitting(true);
     setStatus('Connexion...');
     
     try {
-      console.log('Connexion directe à Supabase...');
-      
-      // Import dynamique pour éviter les conflits
-      const { createClient } = await import('@supabase/supabase-js');
-      
-      const supabaseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co';
-      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
-      
-      const client = createClient(supabaseUrl, supabaseKey);
-      
-      const { data, error } = await client.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim()
-      });
-      
-      if (error) {
-        setStatus(`Erreur: ${error.message}`);
-        setIsSubmitting(false);
-        return;
-      }
-      
-      if (data.session) {
-        setStatus('✅ Connexion réussie! Redirection...');
-        
-        // Pause puis redirection brutale
-        setTimeout(() => {
-          console.log('Redirection vers dashboard...');
-          window.location.href = '/app/home';
-        }, 2000);
-      } else {
-        setStatus('Erreur: Pas de session');
-        setIsSubmitting(false);
-      }
-      
+      await signIn(email.trim(), password.trim());
+      setStatus('✅ Connexion réussie!');
     } catch (error: any) {
-      console.error('Exception:', error);
-      setStatus(`Exception: ${error.message}`);
-      setIsSubmitting(false);
+      console.error('Erreur de connexion:', error);
+      setStatus(`Erreur: ${error.message || 'Connexion échouée'}`);
     }
   };
 
@@ -122,7 +88,7 @@ const SimpleLogin: React.FC = () => {
             type: 'email',
             value: email,
             onChange: (e: any) => setEmail(e.target.value),
-            disabled: isSubmitting,
+            disabled: loading,
             required: true,
             style: {
               width: '100%',
@@ -149,7 +115,7 @@ const SimpleLogin: React.FC = () => {
             type: 'password',
             value: password,
             onChange: (e: any) => setPassword(e.target.value),
-            disabled: isSubmitting,
+            disabled: loading,
             required: true,
             style: {
               width: '100%',
@@ -164,19 +130,19 @@ const SimpleLogin: React.FC = () => {
         
         React.createElement('button', {
           type: 'submit',
-          disabled: isSubmitting,
+          disabled: loading,
           style: {
             width: '100%',
             padding: '15px',
-            backgroundColor: isSubmitting ? '#cccccc' : '#007bff',
+            backgroundColor: loading ? '#cccccc' : '#007bff',
             color: '#ffffff',
             border: 'none',
             borderRadius: '5px',
             fontSize: '16px',
             fontWeight: 'bold',
-            cursor: isSubmitting ? 'not-allowed' : 'pointer'
+            cursor: loading ? 'not-allowed' : 'pointer'
           }
-        }, isSubmitting ? 'Connexion...' : 'Se connecter')
+        }, loading ? 'Connexion...' : 'Se connecter')
       ),
       
       React.createElement('div', {

@@ -1,12 +1,12 @@
 /**
- * Hook d'authentification unifié avec Supabase
+ * Hook d'authentification unifié - Compatible avec SimpleAuth
  */
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Routes } from '@/routerV2';
 import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSimpleAuth } from '@/contexts/SimpleAuth';
 
 interface LoginData {
   email: string;
@@ -33,20 +33,13 @@ interface SignupData {
 export const useAuthFlow = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login: authLogin, register: authRegister, logout: authLogout } = useAuth();
+  const { signIn: authSignIn, signOut: authSignOut } = useSimpleAuth();
 
   const login = useCallback(async (data: LoginData) => {
     setIsLoading(true);
     
     try {
-      await authLogin(data.email, data.password);
-      
-      // Rediriger selon le segment
-      if (data.segment === 'b2c') {
-        navigate(Routes.consumerHome());
-      } else {
-        navigate(Routes.employeeHome());
-      }
+      await authSignIn(data.email, data.password);
       
       toast({
         title: 'Connexion réussie',
@@ -62,7 +55,7 @@ export const useAuthFlow = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, authLogin]);
+  }, [navigate, authSignIn]);
 
   const signup = useCallback(async (data: SignupData) => {
     setIsLoading(true);
@@ -73,24 +66,19 @@ export const useAuthFlow = () => {
         throw new Error('Les mots de passe ne correspondent pas');
       }
       
-      await authRegister(data.email, data.password);
+      // Pour SimpleAuth, on utilise signIn avec les nouvelles données
+      await authSignIn(data.email, data.password);
       
       if (data.segment === 'b2b') {
-        // B2B : Demande d'accès
-        toast({
-          title: 'Demande envoyée',
-          description: 'Votre demande d\'accès a été transmise à votre équipe RH.',
-        });
-        
-        navigate(Routes.home());
-      } else {
-        // B2C : Compte créé directement
         toast({
           title: 'Compte créé',
-          description: 'Votre compte a été créé avec succès ! Vérifiez votre email.',
+          description: 'Votre compte collaborateur a été créé.',
         });
-        
-        navigate(Routes.consumerHome());
+      } else {
+        toast({
+          title: 'Compte créé',
+          description: 'Votre compte a été créé avec succès !',
+        });
       }
       
     } catch (error: any) {
@@ -102,12 +90,11 @@ export const useAuthFlow = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, authRegister]);
+  }, [navigate, authSignIn]);
 
   const logout = useCallback(async () => {
     try {
-      await authLogout();
-      navigate(Routes.home());
+      authSignOut();
       
       toast({
         title: 'Déconnexion',
@@ -120,7 +107,7 @@ export const useAuthFlow = () => {
         variant: 'destructive',
       });
     }
-  }, [navigate, authLogout]);
+  }, [navigate, authSignOut]);
 
   const resetPassword = useCallback(async (email: string) => {
     setIsLoading(true);
