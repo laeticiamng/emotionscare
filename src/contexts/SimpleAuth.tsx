@@ -30,43 +30,62 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // Check localStorage for existing session
     const storedUser = localStorage.getItem('simple_auth_user');
     if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      setIsAuthenticated(true);
-      setRole(userData.role || 'consumer');
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        setIsAuthenticated(true);
+        setRole(userData.role || 'consumer');
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        localStorage.removeItem('simple_auth_user');
+      }
     }
     setLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // Simple mock authentication
-    const mockUser = {
-      id: 'user-123',
-      email,
-      role: email.includes('manager') ? 'manager' : 
-            email.includes('employee') ? 'employee' : 'consumer',
-      name: 'Demo User'
-    };
+    try {
+      // Simple mock authentication
+      const mockUser = {
+        id: 'user-123',
+        email,
+        role: email.includes('manager') ? 'manager' : 
+              email.includes('employee') ? 'employee' : 'consumer',
+        name: 'Demo User'
+      };
 
-    setUser(mockUser);
-    setIsAuthenticated(true);
-    setRole(mockUser.role);
-    localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
+      setUser(mockUser);
+      setIsAuthenticated(true);
+      setRole(mockUser.role);
+      localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
 
-    // Navigate based on role using window.location
-    const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
-                          mockUser.role === 'employee' ? '/app/collab' :
-                          mockUser.role === 'manager' ? '/app/rh' : '/app/home';
-    
-    window.location.href = dashboardRoute;
+      // Navigate based on role using window.location
+      setTimeout(() => {
+        const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
+                              mockUser.role === 'employee' ? '/app/collab' :
+                              mockUser.role === 'manager' ? '/app/rh' : '/app/home';
+        
+        window.location.href = dashboardRoute;
+      }, 100);
+    } catch (error) {
+      console.error('SignIn error:', error);
+      throw error;
+    }
   };
 
   const signOut = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    setRole(null);
-    localStorage.removeItem('simple_auth_user');
-    window.location.href = '/';
+    try {
+      setUser(null);
+      setIsAuthenticated(false);
+      setRole(null);
+      localStorage.removeItem('simple_auth_user');
+      
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
+    } catch (error) {
+      console.error('SignOut error:', error);
+    }
   };
 
   const value = {
