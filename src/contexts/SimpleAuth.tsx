@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface SimpleAuthContextType {
   isAuthenticated: boolean;
@@ -26,7 +25,6 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [user, setUser] = useState<any | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Check localStorage for existing session
@@ -55,12 +53,12 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setRole(mockUser.role);
     localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
 
-    // Navigate based on role
+    // Navigate based on role using window.location
     const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
                           mockUser.role === 'employee' ? '/app/collab' :
                           mockUser.role === 'manager' ? '/app/rh' : '/app/home';
     
-    navigate(dashboardRoute, { replace: true });
+    window.location.href = dashboardRoute;
   };
 
   const signOut = () => {
@@ -68,7 +66,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setIsAuthenticated(false);
     setRole(null);
     localStorage.removeItem('simple_auth_user');
-    navigate('/', { replace: true });
+    window.location.href = '/';
   };
 
   const value = {
