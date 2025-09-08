@@ -60,7 +60,7 @@ interface NotificationState {
 interface DashboardState {
   widgets: any[];
   layout: string;
-  preferences: Record<string, any>;
+  dashboardPreferences: Record<string, any>;
 }
 
 // Combined Store State
@@ -152,7 +152,7 @@ export const useAppStore = create<AppStore>()(
       // Initial Dashboard State
       widgets: [],
       layout: 'grid',
-      preferences: {},
+      dashboardPreferences: {},
 
       // Auth Actions
       setUser: (user) => {
@@ -339,8 +339,8 @@ export const useAppStore = create<AppStore>()(
       setDashboardLayout: (layout) => set({ layout }),
 
       setDashboardPreferences: (preferences) => {
-        const current = get().preferences;
-        set({ preferences: { ...current, ...preferences } });
+        const current = get().dashboardPreferences;
+        set({ dashboardPreferences: { ...current, ...preferences } });
       },
     }),
     {
@@ -426,7 +426,7 @@ export const useNotifications = () => useAppStore((state) => ({
 export const useDashboard = () => useAppStore((state) => ({
   widgets: state.widgets,
   layout: state.layout,
-  preferences: state.preferences,
+  preferences: state.dashboardPreferences,
   addWidget: state.addWidget,
   removeWidget: state.removeWidget,
   updateWidget: state.updateWidget,
