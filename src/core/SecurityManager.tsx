@@ -369,19 +369,7 @@ const SecurityMonitoringComponent: React.FC = () => {
       return originalFetch.apply(this, args);
     };
 
-    // Monitor console usage (potential script injection)
-    const originalConsoleLog = console.log;
-    console.log = function(...args) {
-      const message = args.join(' ');
-      if (message.includes('eval(') || message.includes('Function(')) {
-        logSecurityEvent({
-          type: 'suspicious_activity',
-          details: { action: 'suspicious_console_usage', message: message.substring(0, 100) },
-          risk: 'medium'
-        });
-      }
-      return originalConsoleLog.apply(this, args);
-    };
+    // Console monitoring disabled to prevent "Illegal invocation" errors
 
     // Monitor for unusual DOM modifications
     const observer = new MutationObserver((mutations) => {
@@ -416,7 +404,6 @@ const SecurityMonitoringComponent: React.FC = () => {
       // Restore original functions
       Element.prototype.innerHTML = originalInnerHTML;
       window.fetch = originalFetch;
-      console.log = originalConsoleLog;
     };
   }, [reportThreat, logSecurityEvent]);
 

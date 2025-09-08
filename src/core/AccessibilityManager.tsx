@@ -328,7 +328,7 @@ const AccessibilityComponents: React.FC = () => {
             key={link.id}
             href={`#${link.target}`}
             className="skip-link sr-only-focusable"
-            onFocus={() => console.log(`Focus on skip link: ${link.label}`)}
+            onFocus={() => {/* Focus handled by accessibility manager */}}
           >
             {link.label}
           </a>

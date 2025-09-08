@@ -234,12 +234,6 @@ const ForbiddenPage = createLazyRoute(
   'Interdit - EmotionsCare'
 );
 
-const ForbiddenPage = createLazyRoute(
-  () => import('@/pages/403Page'),
-  '403',
-  'Interdit - EmotionsCare'
-);
-
 // ==================== ROUTER CONFIGURATION ====================
 
 export const unifiedRouter = createBrowserRouter(
