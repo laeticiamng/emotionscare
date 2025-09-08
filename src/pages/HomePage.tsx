@@ -132,7 +132,7 @@ const STATS: Stat[] = [
   }
 ];
 
-export const HomePage: React.FC = () => {
+const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -336,4 +336,6 @@ export const HomePage: React.FC = () => {
       <Footer />
     </div>
   );
-}
+};
+
+export default HomePage;
