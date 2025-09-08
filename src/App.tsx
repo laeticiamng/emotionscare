@@ -4,7 +4,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Toaster } from '@/components/ui/toaster';
 
 // Import direct de la page principale
-import HomePage from '@/pages/index';
+import { HomePage } from '@/pages/index';
 
 // Pages d'erreur simples
 const Page404 = () => (
