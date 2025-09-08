@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AsyncState, QueueFlusher } from '@/components/transverse';
 import ProtectedRoute from '@/app/guards/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
-import { AccessibilityEnhancer } from '@/components/ui/AccessibilityEnhancer';
+import { AccessibilityEnhancer, AccessibilityProvider } from '@/components/accessibility';
 import { UnifiedSidebarProvider } from '@/components/ui/UnifiedSidebar';
 import OptimizedLayout from '@/components/common/OptimizedLayout';
 import { createRouteComponent } from '@/core/LazyLoadingUnified';
@@ -92,7 +92,8 @@ function App() {
   return (
     <UnifiedSidebarProvider>
       <BrowserRouter>
-        <OptimizedLayout enableAccessibility enableMonitoring>
+        <AccessibilityProvider>
+          <OptimizedLayout enableAccessibility enableMonitoring>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
@@ -237,6 +238,7 @@ function App() {
           <Toaster />
           <AccessibilityEnhancer />
         </OptimizedLayout>
+        </AccessibilityProvider>
       </BrowserRouter>
     </UnifiedSidebarProvider>
   );
