@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -88,8 +88,7 @@ const Page404 = () => (
  */
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
         {/* Skip links pour l'accessibilité */}
         <a 
           href="#main-content"
@@ -152,8 +151,7 @@ function App() {
         
         {/* Toast notifications accessibles */}
         <Toaster />
-      </div>
-    </BrowserRouter>
+    </div>
   );
 }
 
