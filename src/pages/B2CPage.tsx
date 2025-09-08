@@ -1,398 +1,362 @@
 /**
- * B2CPage - Page principale pour les consommateurs
- * 100% accessible avec fonctionnalités complètes
+ * PAGE B2C PREMIUM - PLATEFORME EMOTIONSCARE
+ * Page de présentation complète avec intégrations Suno, Hume et OpenAI
  */
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
-  Heart, 
   Music, 
   Brain, 
-  Scan, 
-  Activity, 
-  Gamepad2, 
+  Heart, 
+  Zap, 
+  Shield, 
   Users, 
-  Star,
+  TrendingUp,
+  Sparkles,
   ArrowRight,
-  PlayCircle,
+  Play,
+  Mic,
+  Camera,
+  MessageSquare,
   Headphones,
-  Wind,
-  Eye,
-  Trophy
+  Activity,
+  Star,
+  CheckCircle
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
-interface FeatureCard {
-  title: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  premium?: boolean;
-  progress?: number;
-  badge?: string;
-  color: string;
-}
-
-const features: FeatureCard[] = [
+// === DONNÉES DES FONCTIONNALITÉS ===
+const features = [
   {
-    title: 'Scanner Émotionnel',
-    description: 'Analysez vos émotions en temps réel avec l\'IA',
-    icon: Scan,
-    path: '/app/scan',
-    color: 'bg-blue-500/10 text-blue-600 border-blue-200',
-    progress: 85
-  },
-  {
-    title: 'Coach IA Personnel',
-    description: 'Accompagnement personnalisé 24h/24',
     icon: Brain,
-    path: '/app/coach',
-    color: 'bg-purple-500/10 text-purple-600 border-purple-200',
-    badge: 'IA Avancée',
-    progress: 92
+    title: 'Analyse Émotionnelle IA',
+    description: 'Détection d\'émotions en temps réel via Hume AI - facial, vocal et textuel',
+    tech: 'Hume AI',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-50 dark:bg-blue-950',
+    benefits: ['Précision 95%+', 'Temps réel', 'Multi-modal']
   },
   {
-    title: 'Thérapie Musicale',
-    description: 'Musique générative adaptée à vos émotions',
     icon: Music,
-    path: '/app/music',
-    premium: true,
-    color: 'bg-green-500/10 text-green-600 border-green-200',
-    badge: 'Premium',
-    progress: 78
+    title: 'Musicothérapie Adaptive',
+    description: 'Génération musicale thérapeutique personnalisée via Suno AI',
+    tech: 'Suno AI',
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-50 dark:bg-purple-950',
+    benefits: ['Musique unique', 'Thérapeutique', 'Adaptative']
   },
   {
-    title: 'Respiration Guidée',
-    description: 'Exercices de respiration immersifs',
-    icon: Wind,
-    path: '/app/breath',
-    color: 'bg-cyan-500/10 text-cyan-600 border-cyan-200',
-    progress: 88
+    icon: MessageSquare,
+    title: 'Coach IA Personnel',
+    description: 'Accompagnement bienveillant et conseils personnalisés via OpenAI',
+    tech: 'OpenAI GPT',
+    color: 'text-green-500',
+    bgColor: 'bg-green-50 dark:bg-green-950',
+    benefits: ['24/7 disponible', 'Personnalisé', 'Bienveillant']
   },
   {
-    title: 'Journal Émotionnel',
-    description: 'Suivez votre évolution au quotidien',
-    icon: Heart,
-    path: '/app/journal',
-    color: 'bg-pink-500/10 text-pink-600 border-pink-200',
-    progress: 95
-  },
-  {
-    title: 'Jeux Thérapeutiques',
-    description: 'Gamification pour votre bien-être',
-    icon: Gamepad2,
-    path: '/app/gamification',
-    color: 'bg-orange-500/10 text-orange-600 border-orange-200',
-    badge: 'Nouveauté',
-    progress: 72
-  },
-  {
-    title: 'Méditation VR',
-    description: 'Immersion totale en réalité virtuelle',
-    icon: Eye,
-    path: '/app/vr-breath',
-    premium: true,
-    color: 'bg-indigo-500/10 text-indigo-600 border-indigo-200',
-    badge: 'VR',
-    progress: 65
-  },
-  {
-    title: 'Activités Bien-être',
-    description: 'Exercices personnalisés pour votre équilibre',
     icon: Activity,
-    path: '/app/activity',
-    color: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
-    progress: 80
+    title: 'Biométrie Avancée',
+    description: 'Suivi du rythme cardiaque, respiration et patterns physiologiques',
+    tech: 'WebXR + Sensors',
+    color: 'text-red-500',
+    bgColor: 'bg-red-50 dark:bg-red-950',
+    benefits: ['Précis', 'Non-invasif', 'Temps réel']
+  },
+  {
+    icon: TrendingUp,
+    title: 'Analytics Prédictifs',
+    description: 'Prédiction et prévention des états émotionnels difficiles',
+    tech: 'ML Custom',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50 dark:bg-orange-950',
+    benefits: ['Prédictif', 'Préventif', 'Intelligent']
+  },
+  {
+    icon: Shield,
+    title: 'Confidentialité Totale',
+    description: 'Chiffrement bout-en-bout et conformité RGPD complète',
+    tech: 'Security First',
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-50 dark:bg-indigo-950',
+    benefits: ['RGPD', 'Chiffré', 'Privé']
   }
 ];
 
 const testimonials = [
   {
     name: 'Marie L.',
-    role: 'Utilisatrice Premium',
-    content: 'EmotionsCare a transformé ma gestion du stress. Les exercices de respiration sont incroyables !',
-    rating: 5
+    role: 'Manager',
+    content: 'EmotionsCare a transformé ma gestion du stress. La musique thérapeutique est incroyable.',
+    rating: 5,
+    emotion: 'calm'
   },
   {
-    name: 'Thomas R.',
-    role: 'Coach Certifié',
-    content: 'L\'IA comprend vraiment mes besoins. C\'est comme avoir un thérapeute personnel.',
-    rating: 5
+    name: 'Thomas K.',
+    role: 'Étudiant',
+    content: 'L\'analyse émotionnelle m\'aide à comprendre mes patterns et à mieux gérer mes émotions.',
+    rating: 5,
+    emotion: 'happy'
   },
   {
     name: 'Sophie M.',
-    role: 'Manager',
-    content: 'Les analyses émotionnelles m\'aident à mieux comprendre mon équipe.',
-    rating: 4
+    role: 'Psychologue',
+    content: 'Un outil remarquable pour le suivi de mes patients. Très complet et respectueux.',
+    rating: 5,
+    emotion: 'focused'
   }
 ];
 
-export default function B2CPage() {
-  const navigate = useNavigate();
+const B2CPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState(0);
+  const [activeDemo, setActiveDemo] = useState<string | null>(null);
 
   useEffect(() => {
     setIsVisible(true);
-    const interval = setInterval(() => {
-      setSelectedFeature(prev => (prev + 1) % features.length);
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
 
-  return (
-    <main data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Skip link for accessibility */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded z-50"
-      >
-        Aller au contenu principal
-      </a>
+  const handleDemoClick = (demoType: string) => {
+    setActiveDemo(demoType);
+    // Ici on pourrait lancer une vraie démo
+    setTimeout(() => setActiveDemo(null), 3000);
+  };
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
-        <div className="container mx-auto max-w-6xl" id="main-content">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <Badge className="mb-6 px-4 py-2" variant="outline">
-              <Star className="w-4 h-4 mr-2" />
-              Plateforme N°1 du Bien-être Émotionnel
+  return (
+    <main className="min-h-screen bg-background">
+      {/* === HERO SECTION === */}
+      <section className="relative py-20 px-4 overflow-hidden">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
+        
+        <div className="relative max-w-7xl mx-auto text-center">
+          <div className={cn(
+            'transition-all duration-1000 transform',
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          )}>
+            <Badge variant="outline" className="mb-6 px-4 py-2">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Plateforme de Bien-être Émotionnel Premium
             </Badge>
             
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Votre Parcours Bien-être
-              <br />
-              <span className="text-foreground">Commence Ici</span>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
+              EmotionsCare
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-              Découvrez une approche révolutionnaire du bien-être émotionnel avec notre IA avancée, 
-              la thérapie musicale personnalisée et des outils scientifiquement prouvés.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+              L'intelligence artificielle au service de votre bien-être émotionnel. 
+              Analyse, musique thérapeutique et coaching personnalisé.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                size="lg" 
-                className="px-8 py-4 text-lg"
-                onClick={() => navigate('/signup')}
-              >
-                <PlayCircle className="w-5 h-5 mr-2" />
-                Commencer Gratuitement
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <Button size="lg" className="px-8 py-3" asChild>
+                <Link to="/app">
+                  <Play className="w-5 h-5 mr-2" />
+                  Commencer gratuitement
+                </Link>
               </Button>
               
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="px-8 py-4 text-lg"
-                onClick={() => navigate('/login')}
-              >
-                <Users className="w-5 h-5 mr-2" />
-                Se Connecter
+              <Button variant="outline" size="lg" className="px-8 py-3">
+                <Camera className="w-5 h-5 mr-2" />
+                Voir la démo
               </Button>
             </div>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center mb-20"
-          >
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">50K+</div>
-              <div className="text-muted-foreground">Utilisateurs Actifs</div>
+            
+            {/* Démos rapides */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+              <Button
+                variant="ghost"
+                className="p-6 h-auto flex-col space-y-2"
+                onClick={() => handleDemoClick('facial')}
+                disabled={activeDemo === 'facial'}
+              >
+                <Camera className={cn(
+                  'w-8 h-8',
+                  activeDemo === 'facial' ? 'animate-pulse text-primary' : 'text-muted-foreground'
+                )} />
+                <span className="text-sm">Analyse Faciale</span>
+                {activeDemo === 'facial' && (
+                  <Badge variant="secondary" className="text-xs">
+                    Détection en cours...
+                  </Badge>
+                )}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="p-6 h-auto flex-col space-y-2"
+                onClick={() => handleDemoClick('voice')}
+                disabled={activeDemo === 'voice'}
+              >
+                <Mic className={cn(
+                  'w-8 h-8',
+                  activeDemo === 'voice' ? 'animate-pulse text-primary' : 'text-muted-foreground'
+                )} />
+                <span className="text-sm">Analyse Vocale</span>
+                {activeDemo === 'voice' && (
+                  <Badge variant="secondary" className="text-xs">
+                    Écoute active...
+                  </Badge>
+                )}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className="p-6 h-auto flex-col space-y-2"
+                onClick={() => handleDemoClick('music')}
+                disabled={activeDemo === 'music'}
+              >
+                <Headphones className={cn(
+                  'w-8 h-8',
+                  activeDemo === 'music' ? 'animate-pulse text-primary' : 'text-muted-foreground'
+                )} />
+                <span className="text-sm">Musique IA</span>
+                {activeDemo === 'music' && (
+                  <Badge variant="secondary" className="text-xs">
+                    Génération...
+                  </Badge>
+                )}
+              </Button>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">95%</div>
-              <div className="text-muted-foreground">Satisfaction</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-muted-foreground">Support IA</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary mb-2">12</div>
-              <div className="text-muted-foreground">Langues</div>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* === FONCTIONNALITÉS PRINCIPALES === */}
       <section className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold mb-6">
-              Fonctionnalités Premium
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Technologie de Pointe
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Des outils scientifiquement validés pour transformer votre bien-être émotionnel
+              Découvrez comment nous révolutionnons le bien-être émotionnel avec l'IA
             </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
+              <Card 
+                key={index} 
+                className={cn(
+                  'relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1',
+                  'border-0 bg-background'
+                )}
               >
-                <Card 
-                  className={`h-full cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
-                    selectedFeature === index ? 'ring-2 ring-primary shadow-xl' : ''
-                  }`}
-                  onClick={() => navigate(feature.path)}
-                  onMouseEnter={() => setSelectedFeature(index)}
-                >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between">
-                      <div className={`p-3 rounded-lg ${feature.color}`}>
-                        <feature.icon className="w-6 h-6" />
-                      </div>
-                      {feature.badge && (
-                        <Badge variant={feature.premium ? 'default' : 'secondary'}>
-                          {feature.badge}
-                        </Badge>
-                      )}
+                <div className={cn('absolute inset-0 opacity-50', feature.bgColor)} />
+                
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={cn('p-2 rounded-lg', feature.bgColor)}>
+                      <feature.icon className={cn('w-6 h-6', feature.color)} />
                     </div>
-                    
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
-                    <CardDescription className="text-base">
-                      {feature.description}
-                    </CardDescription>
-                  </CardHeader>
+                    <Badge variant="secondary" className="text-xs">
+                      {feature.tech}
+                    </Badge>
+                  </div>
                   
-                  <CardContent>
-                    {feature.progress && (
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm mb-2">
-                          <span>Efficacité prouvée</span>
-                          <span>{feature.progress}%</span>
-                        </div>
-                        <Progress value={feature.progress} className="h-2" />
-                      </div>
-                    )}
-                    
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-between"
-                      aria-label={`Accéder à ${feature.title}`}
-                    >
-                      <span>Découvrir</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <CardDescription className="text-base">
+                    {feature.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="relative">
+                  <div className="flex flex-wrap gap-2">
+                    {feature.benefits.map((benefit, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        {benefit}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* === TÉMOIGNAGES === */}
       <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold mb-6">
-              Ce que disent nos utilisateurs
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ils nous font confiance
             </h2>
             <p className="text-xl text-muted-foreground">
-              Rejoignez des milliers de personnes qui ont transformé leur vie
+              Découvrez comment EmotionsCare transforme des vies
             </p>
-          </motion.div>
-
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-                transition={{ duration: 0.6, delay: 0.2 * index }}
-              >
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+              <Card key={index} className="bg-background border-0 shadow-lg">
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h4 className="font-semibold">{testimonial.name}</h4>
+                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    </div>
+                    <div className="flex">
+                      {Array.from({ length: testimonial.rating }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
-                    <CardDescription className="text-base italic">
-                      "{testimonial.content}"
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div>
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  <p className="text-muted-foreground italic">
+                    "{testimonial.content}"
+                  </p>
+                  <Badge variant="outline" className="mt-4">
+                    <Heart className="w-3 h-3 mr-1" />
+                    {testimonial.emotion}
+                  </Badge>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-primary/5">
-        <div className="container mx-auto max-w-4xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            <h2 className="text-4xl font-bold mb-6">
-              Prêt à transformer votre bien-être ?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Commencez votre parcours dès aujourd'hui avec un essai gratuit de 14 jours
-            </p>
+      {/* === CTA FINAL === */}
+      <section className="py-20 px-4 bg-primary text-primary-foreground">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Commencez votre parcours de bien-être aujourd'hui
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Rejoignez des milliers d'utilisateurs qui transforment leur vie émotionnelle avec EmotionsCare
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" variant="secondary" className="px-8 py-3" asChild>
+              <Link to="/signup">
+                <Zap className="w-5 h-5 mr-2" />
+                Inscription gratuite
+              </Link>
+            </Button>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="px-8 py-4 text-lg"
-                onClick={() => navigate('/signup')}
-              >
-                <Trophy className="w-5 h-5 mr-2" />
-                Commencer Maintenant
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="px-8 py-4 text-lg"
-                onClick={() => navigate('/pricing')}
-              >
-                <Headphones className="w-5 h-5 mr-2" />
-                Voir les Prix
-              </Button>
-            </div>
-          </motion.div>
+            <Button size="lg" variant="outline" className="px-8 py-3 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+              <Link to="/entreprise">
+                <Users className="w-5 h-5 mr-2" />
+                Version Entreprise
+              </Link>
+            </Button>
+          </div>
+          
+          <p className="text-sm mt-6 opacity-75">
+            Aucun engagement • 30 jours d'essai • Support 24/7
+          </p>
         </div>
       </section>
     </main>
   );
-}
+};
+
+export default B2CPage;
