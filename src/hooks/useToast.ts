@@ -1,99 +1,78 @@
+import { toast as sonnerToast } from 'sonner'
+import { useCallback } from 'react'
 
-import { useState, useCallback } from 'react';
-
-interface Toast {
-  id: string;
-  title?: string;
-  description?: string;
-  variant?: 'default' | 'destructive';
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
+export interface ToastOptions {
+  title?: string
+  description?: string
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info'
+  duration?: number
 }
 
-interface ToastState {
-  toasts: Toast[];
+export interface UseToastReturn {
+  toast: (options: ToastOptions) => string
+  success: (options: ToastOptions) => string
+  error: (options: ToastOptions) => string
+  warning: (options: ToastOptions) => string
+  info: (options: ToastOptions) => string
+  dismiss: (id?: string) => void
 }
 
-let toastCount = 0;
-
-export function useToast() {
-  const [state, setState] = useState<ToastState>({ toasts: [] });
-
-  const toast = useCallback(({
-    title,
-    description,
-    variant = 'default',
-    action,
-    ...props
-  }: Omit<Toast, 'id'>) => {
-    const id = (++toastCount).toString();
+export function useToast(): UseToastReturn {
+  const toast = useCallback((options: ToastOptions) => {
+    const { variant = 'default', ...rest } = options
     
-    const newToast: Toast = {
-      id,
-      title,
-      description,
-      variant,
-      action,
-      ...props,
-    };
+    switch (variant) {
+      case 'success':
+        return sonnerToast.success(options.title || options.description, rest)
+      case 'destructive':
+        return sonnerToast.error(options.title || options.description, rest)
+      case 'warning':
+        return sonnerToast.warning(options.title || options.description, rest)
+      case 'info':
+        return sonnerToast.info(options.title || options.description, rest)
+      default:
+        return sonnerToast(options.title || options.description, rest)
+    }
+  }, [])
 
-    setState((state) => ({
-      ...state,
-      toasts: [...state.toasts, newToast],
-    }));
+  const success = useCallback((options: ToastOptions) => {
+    return toast({ ...options, variant: 'success' })
+  }, [toast])
 
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      setState((state) => ({
-        ...state,
-        toasts: state.toasts.filter((t) => t.id !== id),
-      }));
-    }, 5000);
+  const error = useCallback((options: ToastOptions) => {
+    return toast({ ...options, variant: 'destructive' })
+  }, [toast])
 
-    return {
-      id,
-      dismiss: () => {
-        setState((state) => ({
-          ...state,
-          toasts: state.toasts.filter((t) => t.id !== id),
-        }));
-      },
-    };
-  }, []);
+  const warning = useCallback((options: ToastOptions) => {
+    return toast({ ...options, variant: 'warning' })
+  }, [toast])
 
-  const dismiss = useCallback((toastId?: string) => {
-    setState((state) => ({
-      ...state,
-      toasts: toastId
-        ? state.toasts.filter((t) => t.id !== toastId)
-        : [],
-    }));
-  }, []);
+  const info = useCallback((options: ToastOptions) => {
+    return toast({ ...options, variant: 'info' })
+  }, [toast])
 
-  return {
-    ...state,
-    toast,
-    dismiss,
-  };
+  const dismiss = useCallback((id?: string) => {
+    sonnerToast.dismiss(id)
+  }, [])
+
+  return { toast, success, error, warning, info, dismiss }
 }
 
-// Export a convenience function for one-off toasts
-export const toast = ({
-  title,
-  description,
-  variant = 'default',
-  action,
-}: Omit<Toast, 'id'>) => {
-  const id = (++toastCount).toString();
+export const toast = (options: ToastOptions) => {
+  const { variant = 'default', ...rest } = options
   
-  // Create a temporary event for this toast
-  const event = new CustomEvent('toast', {
-    detail: { id, title, description, variant, action }
-  });
-  
-  window.dispatchEvent(event);
-  
-  return { id };
-};
+  switch (variant) {
+    case 'success':
+      return sonnerToast.success(options.title || options.description, rest)
+    case 'destructive':
+      return sonnerToast.error(options.title || options.description, rest)
+    case 'warning':
+      return sonnerToast.warning(options.title || options.description, rest)
+    case 'info':
+      return sonnerToast.info(options.title || options.description, rest)
+    default:
+      return sonnerToast(options.title || options.description, rest)
+  }
+}
+
+export default useToast
