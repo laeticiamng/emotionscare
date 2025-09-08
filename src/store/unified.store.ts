@@ -48,7 +48,7 @@ interface CoachState {
 // Notifications State
 interface NotificationState {
   notifications: any[];
-  notificationPreferences: {
+  preferences: {
     push: boolean;
     email: boolean;
     sound: boolean;
@@ -60,7 +60,7 @@ interface NotificationState {
 interface DashboardState {
   widgets: any[];
   layout: string;
-  dashboardPreferences: Record<string, any>;
+  preferences: Record<string, any>;
 }
 
 // Combined Store State
@@ -98,7 +98,7 @@ interface AppStore extends AuthState, ThemeState, MusicState, CoachState, Notifi
   addNotification: (notification: any) => void;
   removeNotification: (id: string) => void;
   markAsRead: (id: string) => void;
-  setNotificationPreferences: (prefs: Partial<NotificationState['notificationPreferences']>) => void;
+  setNotificationPreferences: (prefs: Partial<NotificationState['preferences']>) => void;
 
   // Dashboard Actions
   addWidget: (widget: any) => void;
@@ -142,7 +142,7 @@ export const useAppStore = create<AppStore>()(
 
       // Initial Notifications State
       notifications: [],
-      notificationPreferences: {
+      preferences: {
         push: true,
         email: true,
         sound: true,
@@ -152,7 +152,7 @@ export const useAppStore = create<AppStore>()(
       // Initial Dashboard State
       widgets: [],
       layout: 'grid',
-      dashboardPreferences: {},
+      preferences: {},
 
       // Auth Actions
       setUser: (user) => {
@@ -312,8 +312,8 @@ export const useAppStore = create<AppStore>()(
       },
 
       setNotificationPreferences: (prefs) => {
-        const { notificationPreferences } = get();
-        set({ notificationPreferences: { ...notificationPreferences, ...prefs } });
+        const { preferences } = get();
+        set({ preferences: { ...preferences, ...prefs } });
       },
 
       // Dashboard Actions
@@ -339,8 +339,8 @@ export const useAppStore = create<AppStore>()(
       setDashboardLayout: (layout) => set({ layout }),
 
       setDashboardPreferences: (preferences) => {
-        const current = get().dashboardPreferences;
-        set({ dashboardPreferences: { ...current, ...preferences } });
+        const current = get().preferences;
+        set({ preferences: { ...current, ...preferences } });
       },
     }),
     {
@@ -416,7 +416,7 @@ export const useCoach = () => useAppStore((state) => ({
 
 export const useNotifications = () => useAppStore((state) => ({
   notifications: state.notifications,
-  preferences: state.notificationPreferences,
+  preferences: state.preferences,
   addNotification: state.addNotification,
   removeNotification: state.removeNotification,
   markAsRead: state.markAsRead,
@@ -426,7 +426,7 @@ export const useNotifications = () => useAppStore((state) => ({
 export const useDashboard = () => useAppStore((state) => ({
   widgets: state.widgets,
   layout: state.layout,
-  preferences: state.dashboardPreferences,
+  preferences: state.preferences,
   addWidget: state.addWidget,
   removeWidget: state.removeWidget,
   updateWidget: state.updateWidget,

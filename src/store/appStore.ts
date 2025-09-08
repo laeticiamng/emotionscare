@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
 // Types pour le store global
 export interface User {
@@ -137,46 +138,57 @@ const defaultState: AppState = {
 // Store principal avec persistance
 export const useAppStore = create<AppStore>()(
   persist(
-    (set, get) => ({
+    immer((set, get) => ({
       ...defaultState,
       
       // Authentification Actions
-      setUser: (user) => set({ user }),
+      setUser: (user) => set((state) => {
+        state.user = user;
+      }),
       
-      setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+      setAuthenticated: (isAuthenticated) => set((state) => {
+        state.isAuthenticated = isAuthenticated;
+      }),
       
-      setLoading: (isLoading) => set({ isLoading }),
+      setLoading: (isLoading) => set((state) => {
+        state.isLoading = isLoading;
+      }),
       
       // UI Actions
-      setTheme: (theme) => set({ theme }),
+      setTheme: (theme) => set((state) => {
+        state.theme = theme;
+      }),
       
-      toggleSidebar: () => set((state) => ({ 
-        sidebarCollapsed: !state.sidebarCollapsed 
-      })),
+      toggleSidebar: () => set((state) => {
+        state.sidebarCollapsed = !state.sidebarCollapsed;
+      }),
       
-      setActiveModule: (module) => set({ activeModule: module }),
+      setActiveModule: (module) => set((state) => {
+        state.activeModule = module;
+      }),
       
       // Cache Actions
-      setCache: (key, value) => set((state) => ({
-        cache: { ...state.cache, [key]: value },
-        cacheTimestamps: { ...state.cacheTimestamps, [key]: Date.now() }
-      })),
+      setCache: (key, value) => set((state) => {
+        state.cache[key] = value;
+        state.cacheTimestamps[key] = Date.now();
+      }),
       
       getCache: (key) => {
         const state = get();
         return state.cache[key];
       },
       
-      clearCache: (key) => set((state) => ({
-        cache: key ? 
-          Object.fromEntries(Object.entries(state.cache).filter(([k]) => k !== key)) :
-          {},
-        cacheTimestamps: key ?
-          Object.fromEntries(Object.entries(state.cacheTimestamps).filter(([k]) => k !== key)) :
-          {}
-      })),
+      clearCache: (key) => set((state) => {
+        if (key) {
+          delete state.cache[key];
+          delete state.cacheTimestamps[key];
+        } else {
+          state.cache = {};
+          state.cacheTimestamps = {};
+        }
+      }),
       
-      isCacheValid: (key, maxAge = 5 * 60 * 1000) => {
+      isCacheValid: (key, maxAge = 5 * 60 * 1000) => { // 5 minutes par défaut
         const state = get();
         const timestamp = state.cacheTimestamps[key];
         if (!timestamp) return false;
@@ -184,42 +196,30 @@ export const useAppStore = create<AppStore>()(
       },
       
       // Préférences
-      updatePreferences: (preferences) => set((state) => ({
-        preferences: { ...state.preferences, ...preferences }
-      })),
+      updatePreferences: (preferences) => set((state) => {
+        Object.assign(state.preferences, preferences);
+      }),
       
       // Modules Actions
-      updateMusicState: (musicState) => set((state) => ({
-        modules: {
-          ...state.modules,
-          music: { ...state.modules.music, ...musicState }
-        }
-      })),
+      updateMusicState: (musicState) => set((state) => {
+        Object.assign(state.modules.music, musicState);
+      }),
       
-      updateEmotionState: (emotionState) => set((state) => ({
-        modules: {
-          ...state.modules,
-          emotion: { ...state.modules.emotion, ...emotionState }
-        }
-      })),
+      updateEmotionState: (emotionState) => set((state) => {
+        Object.assign(state.modules.emotion, emotionState);
+      }),
       
-      updateJournalState: (journalState) => set((state) => ({
-        modules: {
-          ...state.modules,
-          journal: { ...state.modules.journal, ...journalState }
-        }
-      })),
+      updateJournalState: (journalState) => set((state) => {
+        Object.assign(state.modules.journal, journalState);
+      }),
       
-      updateCoachState: (coachState) => set((state) => ({
-        modules: {
-          ...state.modules,
-          coach: { ...state.modules.coach, ...coachState }
-        }
-      })),
+      updateCoachState: (coachState) => set((state) => {
+        Object.assign(state.modules.coach, coachState);
+      }),
       
       // Reset
-      reset: () => set({ ...defaultState }),
-    }),
+      reset: () => set(() => ({ ...defaultState })),
+    })),
     {
       name: 'emotionscare-store',
       storage: createJSONStorage(() => localStorage),

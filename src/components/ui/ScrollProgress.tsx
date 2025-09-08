@@ -37,4 +37,3 @@ const ScrollProgress: React.FC<ScrollProgressProps> = ({
 };
 
 export default ScrollProgress;
-export { ScrollProgress };

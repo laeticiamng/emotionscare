@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { EmotionResult, EmotionRecommendation, ScanSession, EmotionGoal } from '@/types/emotion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import useLogger from '@/hooks/useLogger';
+import { useLogger } from '@/lib/logger';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UseScanPageReturn {
@@ -21,7 +21,7 @@ interface UseScanPageReturn {
 }
 
 export function useScanPage(): UseScanPageReturn {
-  const logger = useLogger('ScanPage');
+  const logger = useLogger();
   const queryClient = useQueryClient();
   
   // États locaux
