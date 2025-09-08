@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
-import { premiumRouter } from './core/PremiumRouter';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
 import AppProviders from './AppProviders';
 import './index.css';
 import './styles/accessibility.css';
 
 // Production optimizations avec protection
-import { logProductionEvent } from './utils/consoleCleanup';
+import { logProductionEvent, initProductionConsole } from './utils/consoleCleanup';
+
+// Initialize safe console handling
+initProductionConsole();
 
 // Configuration de l'attribut lang pour l'accessibilité
 document.documentElement.lang = 'fr';
@@ -141,11 +144,13 @@ if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', handleUnhandledRejection);
 }
 
-// Render App with Premium Router
+// Render App with Simple Router
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppProviders>
-      <RouterProvider router={premiumRouter} />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </AppProviders>
   </React.StrictMode>
 );

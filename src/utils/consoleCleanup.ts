@@ -1,35 +1,39 @@
 /**
- * Console Cleanup - Production Ready
- * Systematically removes all development console statements
+ * Production console cleanup utility
+ * Safe console handling without "Illegal invocation" errors
  */
 
-export const cleanupConsoleStatements = () => {
-  // Disabled to prevent "Illegal invocation" errors
-  // Console cleanup is handled by the build process instead
-  if (false && process.env.NODE_ENV === 'production') {
-    // This code is intentionally disabled
+/**
+ * Safe production event logger
+ */
+export const logProductionEvent = (
+  event: string, 
+  data?: unknown, 
+  level: 'info' | 'warn' | 'error' = 'info'
+): void => {
+  if (process.env.NODE_ENV === 'development') {
+    const logMethod = console[level].bind(console);
+    logMethod(`[${event}]`, data);
   }
 };
 
-// Development helper to find console statements
-export const logProductionEvent = (event: string, data?: any, level: 'info' | 'warn' | 'error' = 'info') => {
-  if (process.env.NODE_ENV === 'development') {
-    console[level](`[${event}]`, data);
-  } else if (level === 'error' || level === 'warn') {
-    // Only log warnings and errors in production
-    console[level](`[PROD-${event}]`, data);
-  }
-};
-
-// Replace console.log with this in components
-export const devLog = (...args: any[]) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(...args);
-  }
-};
-
-export const debugLog = (context: string, data?: any) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[DEBUG-${context}]`, data);
+/**
+ * Safe console initialization for production
+ */
+export const initProductionConsole = (): void => {
+  if (import.meta.env.PROD) {
+    // Safe noop replacement
+    const noop = () => {};
+    
+    // Override console methods safely
+    Object.assign(console, {
+      log: noop,
+      debug: noop,
+      info: noop,
+      warn: noop,
+      group: noop,
+      groupCollapsed: noop,
+      groupEnd: noop
+    });
   }
 };
