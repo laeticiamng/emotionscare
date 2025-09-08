@@ -99,14 +99,14 @@ const ScanPage = createLazyRoute(
 );
 
 const JournalPage = createLazyRoute(
-  () => import('@/pages/B2CJournalPageEnhanced'),
+  () => import('@/pages/JournalPage'),
   'journal',
   'Journal Émotionnel - EmotionsCare',
   'Tenez un journal de vos émotions et suivez votre progression vers un meilleur bien-être.'
 );
 
 const CoachPage = createLazyRoute(
-  () => import('@/pages/B2CAICoachPage'),
+  () => import('@/pages/CoachPage'),
   'coach',
   'Coach IA - EmotionsCare',
   'Bénéficiez d\'un coaching personnalisé par intelligence artificielle pour votre bien-être émotionnel.'
@@ -115,7 +115,7 @@ const CoachPage = createLazyRoute(
 // ==================== WELLNESS FEATURES ====================
 
 const BreathworkPage = createLazyRoute(
-  () => import('@/pages/B2CBreathworkPageEnhanced'),
+  () => import('@/pages/B2CActivityPage'),
   'breath',
   'Exercices Respiratoires - EmotionsCare',
   'Techniques de respiration guidées pour gérer le stress et améliorer votre bien-être.'
@@ -129,7 +129,7 @@ const ActivityPage = createLazyRoute(
 );
 
 const MusicPage = createLazyRoute(
-  () => import('@/pages/B2CMusicEnhancedComplete'),
+  () => import('@/pages/B2CMusicTherapyPage'),
   'music',
   'Thérapie Musicale - EmotionsCare',
   'Musique adaptative générée par IA pour améliorer votre humeur et votre bien-être.'
@@ -168,7 +168,7 @@ const SocialPage = createLazyRoute(
 );
 
 const TeamsPage = createLazyRoute(
-  () => import('@/pages/B2CTeamsPageEnhanced'),
+  () => import('@/pages/TeamsPage'),
   'teams',
   'Équipes - EmotionsCare',
   'Outils collaboratifs pour le bien-être d\'équipe et l\'intelligence émotionnelle collective.'

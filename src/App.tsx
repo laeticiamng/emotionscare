@@ -30,12 +30,12 @@ const AppDispatcher = createRouteComponent(() => import('@/pages/AppDispatcher')
 // Core App Pages - Critical Path
 const AppHomePage = createRouteComponent(() => import('@/pages/app/home/AppHomePage'), 'app-home');
 const ScanPage = createRouteComponent(() => import('@/pages/ScanPage'), 'scan');
-const B2CAICoachPage = createRouteComponent(() => import('@/pages/B2CAICoachPage'), 'coach');
-const B2CJournalPage = createRouteComponent(() => import('@/pages/B2CJournalPage'), 'journal');
+const CoachPage = createRouteComponent(() => import('@/pages/CoachPage'), 'coach');
+const JournalPage = createRouteComponent(() => import('@/pages/JournalPage'), 'journal');
 
 // Wellness Features  
-const B2CBreathworkPage = createRouteComponent(() => import('@/pages/B2CBreathworkPage'), 'breath');
-const B2CMusicTherapyPage = createRouteComponent(() => import('@/pages/B2CMusicTherapyPage'), 'music');
+const ActivityPage = createRouteComponent(() => import('@/pages/B2CActivityPage'), 'breath');
+const MusicTherapyPage = createRouteComponent(() => import('@/pages/B2CMusicTherapyPage'), 'music');
 const B2CActivityPage = createRouteComponent(() => import('@/pages/B2CActivityPage'), 'activity');
 const B2CVRBreathPage = createRouteComponent(() => import('@/pages/B2CVRBreathPage'), 'vr-breath');
 const B2CVRGalaxyPage = createRouteComponent(() => import('@/pages/B2CVRGalaxyPage'), 'vr-galaxy');
@@ -121,16 +121,17 @@ function App() {
               {/* Core Features - All Users */}
               <Route path="home" element={<AppHomePage />} />
               <Route path="scan" element={<ScanPage />} />
-              <Route path="journal" element={<B2CJournalPage />} />
-              <Route path="coach" element={<B2CAICoachPage />} />
+              <Route path="journal" element={<JournalPage />} />
+              <Route path="coach" element={<CoachPage />} />
               <Route path="nyvee" element={<B2CNyveeCoconPage />} />
               <Route path="leaderboard" element={<LeaderboardPage />} />
               
               {/* Wellness Features */}
-              <Route path="breath" element={<B2CBreathworkPage />} />
+              <Route path="breath" element={<ActivityPage />} />
               <Route path="activity" element={<B2CActivityPage />} />
               <Route path="screen-silk" element={<B2CScreenSilkBreakPage />} />
               <Route path="weekly-bars" element={<B2CActivityPage />} />
+              <Route path="music" element={<MusicTherapyPage />} />
               
               {/* Gaming & Challenges */}
               <Route path="gamification" element={<B2CGamificationPage />} />

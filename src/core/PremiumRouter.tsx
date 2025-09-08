@@ -375,7 +375,7 @@ const routes: PremiumRoute[] = [
     keywords: ['journal', 'diary', 'écriture thérapeutique', 'insights IA'],
     roles: ['consumer', 'employee', 'manager'],
     priority: 'medium',
-    component: lazy(() => import('../pages/B2CJournalPageEnhanced'))
+    component: lazy(() => import('../pages/JournalPage'))
   },
 
   {
@@ -388,7 +388,7 @@ const routes: PremiumRoute[] = [
     roles: ['consumer', 'employee', 'manager'],
     featureFlags: ['premium_coaching'],
     priority: 'high',
-    component: lazy(() => import('../pages/B2CAICoachPage'))
+    component: lazy(() => import('../pages/CoachPage'))
   },
 
   // Wellness & Therapy
@@ -402,7 +402,7 @@ const routes: PremiumRoute[] = [
     roles: ['consumer', 'employee', 'manager'],
     featureFlags: ['premium_music'],
     priority: 'medium',
-    component: lazy(() => import('../pages/B2CMusicEnhancedComplete'))
+    component: lazy(() => import('../pages/B2CMusicTherapyPage'))
   },
 
   {
@@ -414,7 +414,7 @@ const routes: PremiumRoute[] = [
     keywords: ['respiration', 'méditation', 'gestion stress', 'relaxation'],
     roles: ['consumer', 'employee', 'manager'],
     priority: 'medium',
-    component: lazy(() => import('../pages/B2CBreathworkPageEnhanced'))
+    component: lazy(() => import('../pages/B2CActivityPage'))
   },
 
   {
@@ -440,7 +440,7 @@ const routes: PremiumRoute[] = [
     keywords: ['équipes', 'collaboration', 'bien-être équipe', 'management'],
     roles: ['employee', 'manager'],
     priority: 'medium',
-    component: lazy(() => import('../pages/B2CTeamsPageEnhanced'))
+    component: lazy(() => import('../pages/TeamsPage'))
   },
 
   {
