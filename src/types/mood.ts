@@ -1,18 +1,11 @@
 
-export interface MoodData {
-  id: string;
-  userId: string;
-  date: string | Date;
-  mood: number;
-  energy?: number;
-  anxiety?: number;
-  notes?: string;
-  tags?: string[];
-  sentiment?: string; // positive, negative, neutral
-  emotions?: Record<string, number>;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-}
+/**
+ * @deprecated Ce fichier est remplacé par src/types/index.ts
+ * Utilisez les types unifiés depuis src/types/index.ts
+ */
+
+// Réexportation pour compatibilité ascendante
+export * from './index';
 
 export interface EmotionPrediction {
   emotion: string;

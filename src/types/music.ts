@@ -1,17 +1,11 @@
 
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist?: string;
-  duration: number; // en secondes
-  url: string;
-  coverUrl?: string;
-  emotion: string; // calm, happy, energetic, sad, etc.
-  genre?: string;
-  bpm?: number;
-  energy?: number; // 0-1
-  valence?: number; // 0-1 (negative to positive)
-}
+/**
+ * @deprecated Ce fichier est remplacé par src/types/index.ts
+ * Utilisez les types unifiés depuis src/types/index.ts
+ */
+
+// Réexportation pour compatibilité ascendante
+export * from './index';
 
 export interface Playlist {
   id: string;

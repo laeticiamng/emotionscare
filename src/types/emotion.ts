@@ -1,8 +1,10 @@
-// Types d'émotions enrichis pour EmotionsCare
+/**
+ * @deprecated Ce fichier est remplacé par src/types/index.ts
+ * Utilisez les types unifiés depuis src/types/index.ts
+ */
 
-export type EmotionCategory = 'positive' | 'negative' | 'neutral' | 'mixed' | 'intense';
-export type EmotionSource = 'facial_analysis' | 'voice_analysis' | 'text_analysis' | 'multimodal' | 'biometric';
-export type ScanMode = 'facial' | 'voice' | 'text' | 'combined' | 'realtime';
+// Réexportation pour compatibilité ascendante
+export * from './index';
 
 export interface EmotionVector {
   valence: number; // -1 à 1 (négatif à positif)
