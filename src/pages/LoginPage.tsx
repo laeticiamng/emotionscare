@@ -1,271 +1,420 @@
-import React, { useState, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+/**
+ * LOGIN PAGE PREMIUM - EMOTIONSCARE
+ * Page de connexion moderne, accessible et sécurisée
+ */
+
+import React, { useState } from 'react';
+import { Link, useSearchParams, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
+import { 
+  Heart, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  ArrowLeft, 
+  Sparkles, 
+  Shield, 
+  Zap,
+  Chrome,
+  Apple,
+  Github
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface LoginFormData {
+  email: string;
+  password: string;
+  remember?: boolean;
+}
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const submittedRef = useRef(false);
-  const [clickCount, setClickCount] = useState(0);
+  const [searchParams] = useSearchParams();
+  const segment = searchParams.get('segment') as 'b2c' | 'b2b' | null;
+  
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: '',
+    password: '',
+    remember: false
+  });
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  
+  const { signIn, isLoading, isAuthenticated, user } = useAuth();
+
+  // Rediriger si déjà connecté
+  if (isAuthenticated && user) {
+    return <Navigate to="/app/home" replace />;
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     
-    // Compteur de clics pour debug
-    const currentClick = clickCount + 1;
-    setClickCount(currentClick);
-    console.log(`🔴 CLIC #${currentClick} détecté`);
+    if (submitted || isLoading) return;
     
-    // Bloquer COMPLÈTEMENT si déjà soumis
-    if (submittedRef.current || loading) {
-      console.log(`❌ CLIC #${currentClick} BLOQUÉ - Déjà en cours`);
-      setMessage(`⚠️ Clic #${currentClick} bloqué - Déjà en traitement`);
-      return false;
-    }
-    
-    // Marquer comme soumis IMMÉDIATEMENT
-    submittedRef.current = true;
-    setLoading(true);
-    setMessage(`🔄 Traitement du clic #${currentClick}...`);
-    
-    console.log(`✅ TRAITEMENT CLIC #${currentClick}`);
+    setSubmitted(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Délai visible
+      await signIn(formData.email.trim(), formData.password);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue sur EmotionsCare !",
       });
       
-      if (error) {
-        console.log(`❌ Erreur clic #${currentClick}:`, error.message);
-        setMessage(`❌ Erreur: ${error.message}`);
-        // Réinitialiser pour permettre un nouveau essai
-        submittedRef.current = false;
-        setLoading(false);
-        return;
-      }
-      
-      if (data.session) {
-        console.log(`✅ Succès clic #${currentClick} - Session créée`);
-        setMessage(`✅ Connexion réussie! (clic #${currentClick})`);
-        
-        // Attendre puis redirection
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log(`🚀 Redirection après clic #${currentClick}`);
-        
-        // Redirection définitive
-        window.location.replace('/app/home');
-      }
-      
     } catch (error: any) {
-      console.log(`💥 Exception clic #${currentClick}:`, error);
-      setMessage(`💥 Exception: ${error.message}`);
-      submittedRef.current = false;
-      setLoading(false);
+      console.error('Erreur de connexion:', error);
+      
+      const errorMessages: Record<string, string> = {
+        'Invalid login credentials': 'Email ou mot de passe incorrect',
+        'Email not confirmed': 'Veuillez confirmer votre email',
+        'Too many requests': 'Trop de tentatives, réessayez plus tard',
+        'User not found': 'Aucun compte trouvé avec cet email'
+      };
+      
+      const message = errorMessages[error.message] || error.message || 'Une erreur est survenue';
+      
+      toast({
+        title: "Erreur de connexion",
+        description: message,
+        variant: "destructive",
+      });
+      
+      setSubmitted(false);
     }
   };
 
-  const resetForm = () => {
-    console.log('🔄 Reset du formulaire');
-    submittedRef.current = false;
-    setLoading(false);
-    setMessage('');
-    setClickCount(0);
+  const handleSocialLogin = async (provider: 'google' | 'github') => {
+    toast({
+      title: "Bientôt disponible",
+      description: `Connexion via ${provider} sera disponible prochainement`,
+    });
+  };
+
+  const getTitle = () => {
+    switch (segment) {
+      case 'b2c': return 'Connexion Particulier';
+      case 'b2b': return 'Connexion Entreprise';
+      default: return 'Connexion';
+    }
+  };
+
+  const getDescription = () => {
+    switch (segment) {
+      case 'b2c': return 'Accédez à votre espace personnel de bien-être émotionnel';
+      case 'b2b': return 'Accédez à votre espace professionnel EmotionsCare';
+      default: return 'Accédez à votre compte EmotionsCare';
+    }
   };
 
   return (
-    <div data-testid="page-root" style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#f9f9f9', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      padding: '20px',
-      fontFamily: 'Arial, sans-serif'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '450px',
-        backgroundColor: '#ffffff',
-        borderRadius: '10px',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-        padding: '40px',
-        border: '2px solid #e0e0e0'
-      }}>
-        
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold', 
-            margin: '0 0 10px 0',
-            color: '#2c3e50'
-          }}>
-            EmotionsCare
-          </h1>
-          <p style={{ 
-            color: '#7f8c8d', 
-            margin: '0',
-            fontSize: '16px'
-          }}>
-            Connexion Particulier
-          </p>
-        </div>
-
-        {/* Debug info */}
-        <div style={{
-          padding: '10px',
-          marginBottom: '20px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '5px',
-          fontSize: '12px',
-          color: '#6c757d',
-          textAlign: 'center'
-        }}>
-          Clics détectés: {clickCount} | Statut: {loading ? 'EN COURS' : 'PRÊT'}
-        </div>
-
-        {message && (
-          <div style={{
-            padding: '15px',
-            marginBottom: '25px',
-            backgroundColor: message.includes('❌') ? '#ffe6e6' : 
-                           message.includes('⚠️') ? '#fff3cd' : '#e6f3ff',
-            color: message.includes('❌') ? '#cc0000' : 
-                   message.includes('⚠️') ? '#856404' : '#0066cc',
-            borderRadius: '8px',
-            fontSize: '14px',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            border: '1px solid ' + (message.includes('❌') ? '#ff9999' : 
-                                   message.includes('⚠️') ? '#ffd966' : '#99ccff')
-          }}>
-            {message}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        {/* Navigation Header */}
+        <div className="text-center mb-8">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 group"
+          >
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <span>Retour à l'accueil</span>
+          </Link>
+          
+          {/* Logo Premium */}
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg">
+                <Heart className="h-6 w-6 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+            </div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              EmotionsCare
+            </h1>
+            <Badge variant="secondary" className="text-xs">Premium</Badge>
           </div>
+          
+          {segment && (
+            <Badge variant="outline" className="mb-4">
+              <Shield className="w-3 h-3 mr-1" />
+              Mode {segment === 'b2c' ? 'Particulier' : 'Entreprise'}
+            </Badge>
+          )}
+        </div>
+
+        {/* Segment Selection */}
+        {!segment && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <Card className="mb-6 border-2 border-muted hover:border-primary/20 transition-colors">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-center flex items-center justify-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  Choisissez votre espace
+                </CardTitle>
+                <CardDescription className="text-center">
+                  Sélectionnez le type de compte adapté à vos besoins
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Link to="/login?segment=b2c" className="block">
+                  <Button variant="outline" className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30">
+                    <Heart className="h-5 w-5 mr-3 text-primary" />
+                    <div className="text-left">
+                      <div className="font-medium">Particulier</div>
+                      <div className="text-xs text-muted-foreground">Usage personnel</div>
+                    </div>
+                  </Button>
+                </Link>
+                <Link to="/login?segment=b2b" className="block">
+                  <Button variant="outline" className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30">
+                    <Shield className="h-5 w-5 mr-3 text-primary" />
+                    <div className="text-left">
+                      <div className="font-medium">Entreprise</div>
+                      <div className="text-xs text-muted-foreground">Usage professionnel</div>
+                    </div>
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ opacity: loading ? 0.6 : 1 }}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ 
-              display: 'block', 
-              fontSize: '15px', 
-              fontWeight: 'bold', 
-              marginBottom: '8px',
-              color: '#2c3e50'
-            }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '15px',
-                border: '2px solid #bdc3c7',
-                borderRadius: '8px',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                backgroundColor: loading ? '#ecf0f1' : '#ffffff',
-                color: loading ? '#7f8c8d' : '#2c3e50'
-              }}
-              placeholder="votre@email.com"
-              required
-            />
-          </div>
+        {/* Main Login Form */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: segment ? 0 : 0.4 }}
+        >
+          <Card className="shadow-xl border-2 border-muted hover:border-primary/20 transition-colors">
+            <CardHeader className="space-y-1 pb-4">
+              <CardTitle className="text-2xl font-bold text-center">
+                {getTitle()}
+              </CardTitle>
+              <CardDescription className="text-center">
+                {getDescription()}
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              {/* Social Login Options */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => handleSocialLogin('google')}
+                  className="h-11 hover:bg-muted/50"
+                  disabled={isLoading}
+                >
+                  <Chrome className="w-4 h-4 mr-2" />
+                  Google
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleSocialLogin('github')}
+                  className="h-11 hover:bg-muted/50"
+                  disabled={isLoading}
+                >
+                  <Github className="w-4 h-4 mr-2" />
+                  GitHub
+                </Button>
+              </div>
 
-          <div style={{ marginBottom: '30px' }}>
-            <label style={{ 
-              display: 'block', 
-              fontSize: '15px', 
-              fontWeight: 'bold', 
-              marginBottom: '8px',
-              color: '#2c3e50'
-            }}>
-              Mot de passe
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '15px',
-                border: '2px solid #bdc3c7',
-                borderRadius: '8px',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                backgroundColor: loading ? '#ecf0f1' : '#ffffff',
-                color: loading ? '#7f8c8d' : '#2c3e50'
-              }}
-              placeholder="••••••••"
-              required
-            />
-          </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    OU CONTINUER AVEC EMAIL
+                  </span>
+                </div>
+              </div>
 
-          <button 
-            type="submit" 
-            disabled={loading || submittedRef.current}
-            style={{
-              width: '100%',
-              backgroundColor: loading ? '#95a5a6' : '#3498db',
-              color: '#ffffff',
-              padding: '18px',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.3s',
-              opacity: loading ? 0.7 : 1
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) e.target.style.backgroundColor = '#2980b9';
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) e.target.style.backgroundColor = '#3498db';
-            }}
+              {/* Email/Password Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="email" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Adresse email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="pl-10 h-11 border-2 focus:border-primary"
+                      placeholder="votre@email.com"
+                      required
+                      disabled={isLoading || submitted}
+                      autoComplete="email"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="password" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Mot de passe
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="pl-10 pr-10 h-11 border-2 focus:border-primary"
+                      placeholder="••••••••"
+                      required
+                      disabled={isLoading || submitted}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      name="remember"
+                      checked={formData.remember}
+                      onChange={handleChange}
+                      className="rounded border-2 border-muted"
+                      disabled={isLoading || submitted}
+                    />
+                    <span className="text-muted-foreground">Se souvenir de moi</span>
+                  </label>
+                  
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary hover:underline focus:underline"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className={cn(
+                    "w-full h-12 text-base font-semibold transition-all",
+                    "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl",
+                    (isLoading || submitted) && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={isLoading || submitted}
+                >
+                  {isLoading || submitted ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Connexion en cours...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      Se connecter
+                    </div>
+                  )}
+                </Button>
+              </form>
+
+              {/* Footer Links */}
+              <div className="space-y-4 pt-4">
+                <Separator />
+                
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Pas encore de compte ?{' '}
+                    <Link 
+                      to={segment ? `/signup?segment=${segment}` : '/signup'} 
+                      className="text-primary hover:underline font-medium focus:underline"
+                    >
+                      Créer un compte
+                    </Link>
+                  </p>
+                </div>
+
+                {segment && (
+                  <div className="text-center">
+                    <Link 
+                      to="/login" 
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Changer de type de compte
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Security Notice */}
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
+                <Shield className="w-3 h-3" />
+                <span>Connexion sécurisée • Chiffrement SSL • RGPD conforme</span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Demo Info */}
+        {process.env.NODE_ENV === 'development' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.8 }}
+            className="mt-6"
           >
-            {loading ? '🔄 Connexion en cours...' : 'Se connecter'}
-          </button>
-        </form>
-
-        {/* Bouton de reset pour debug */}
-        {(loading || message) && (
-          <button 
-            onClick={resetForm}
-            style={{
-              width: '100%',
-              backgroundColor: '#e74c3c',
-              color: '#ffffff',
-              padding: '10px',
-              border: 'none',
-              borderRadius: '5px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              marginTop: '15px'
-            }}
-          >
-            🔄 Reset (Debug)
-          </button>
+            <Card className="bg-muted/30 border-dashed">
+              <CardContent className="pt-4">
+                <div className="text-center space-y-2">
+                  <Badge variant="outline" className="text-xs">
+                    Mode Développement
+                  </Badge>
+                  <p className="text-xs text-muted-foreground">
+                    Créez un compte ou utilisez test@example.com / password123
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
-
-        <div style={{ marginTop: '25px', textAlign: 'center' }}>
-          <a href="/" style={{ 
-            color: '#3498db', 
-            textDecoration: 'none',
-            fontSize: '14px'
-          }}>
-            ← Retour à l'accueil
-          </a>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
