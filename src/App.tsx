@@ -3,6 +3,17 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AsyncState, QueueFlusher } from '@/components/transverse';
 import ProtectedRoute from '@/app/guards/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
+import { 
+  HelpPage, 
+  ApiDocumentationPage, 
+  PricingPage, 
+  TermsPage, 
+  PrivacyPage,
+  ProfileSettingsPage,
+  DataSettingsPage,
+  PrivacySettingsPage,
+  NotificationSettingsPage
+} from '@/components/pages';
 
 // Lazy load pages for better performance
 const HomePage = lazy(() => import('@/pages/index'));
@@ -37,13 +48,15 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/b2c" element={<B2CPage />} />
             <Route path="/entreprise" element={<EntreprisePage />} />
-            <Route path="/help" element={<div data-testid="page-root">Help Page - TODO</div>} />
+            <Route path="/help" element={<HelpPage data-testid="page-root" />} />
+            <Route path="/api" element={<ApiDocumentationPage data-testid="page-root" />} />
+            <Route path="/pricing" element={<PricingPage data-testid="page-root" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             
             {/* Pages légales */}
-            <Route path="/legal/terms" element={<div data-testid="page-root">Terms - TODO</div>} />
-            <Route path="/legal/privacy" element={<div data-testid="page-root">Privacy - TODO</div>} />
+            <Route path="/legal/terms" element={<TermsPage data-testid="page-root" />} />
+            <Route path="/legal/privacy" element={<PrivacyPage data-testid="page-root" />} />
             
             {/* Pages d'erreur */}
             <Route path="/401" element={<Page401 />} />
@@ -124,10 +137,10 @@ function App() {
             {/* Routes settings */}
             <Route path="/settings" element={<ProtectedRoute role="any" />}>
               <Route path="general" element={<SettingsGeneralPage />} />
-              <Route path="profile" element={<div data-testid="page-root">Profile Settings - TODO</div>} />
-              <Route path="privacy" element={<SettingsPrivacyPage />} />
-              <Route path="notifications" element={<div data-testid="page-root">Notifications Settings - TODO</div>} />
-              <Route path="data" element={<div data-testid="page-root">Data Settings - TODO</div>} />
+              <Route path="profile" element={<ProfileSettingsPage data-testid="page-root" />} />
+              <Route path="privacy" element={<PrivacySettingsPage data-testid="page-root" />} />
+              <Route path="notifications" element={<NotificationSettingsPage data-testid="page-root" />} />
+              <Route path="data" element={<DataSettingsPage data-testid="page-root" />} />
             </Route>
             
             {/* Onboarding */}
