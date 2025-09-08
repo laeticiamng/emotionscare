@@ -4,7 +4,7 @@
  */
 
 import React, { Suspense, ComponentType, lazy, useEffect, useState } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { logProductionEvent } from '@/utils/consoleCleanup';
 
@@ -80,17 +80,17 @@ export const createLazyComponent = <T extends ComponentType<any>>(
       </div>
     ));
     
-    const ErrorFallback = ({ error, resetErrorBoundary }: any) => (
+    const ErrorFallback = ({ error, resetError }: { error?: Error; resetError: () => void }) => (
       <div className="flex items-center justify-center p-8 bg-destructive/10 rounded-lg">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-destructive mb-2">
             Erreur de chargement
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            {error.message || 'Une erreur est survenue lors du chargement du composant'}
+            {error?.message || 'Une erreur est survenue lors du chargement du composant'}
           </p>
           <button
-            onClick={resetErrorBoundary}
+            onClick={resetError}
             className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
           >
             Réessayer
@@ -100,11 +100,11 @@ export const createLazyComponent = <T extends ComponentType<any>>(
     );
     
     return (
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <EnhancedErrorBoundary fallback={ErrorFallback}>
         <Suspense fallback={<Fallback />}>
           <LazyComponent {...props} />
         </Suspense>
-      </ErrorBoundary>
+      </EnhancedErrorBoundary>
     );
   };
   
