@@ -64,12 +64,6 @@ export const createLazyComponent = <T extends ComponentType<any>>(
   }
   
   const WrappedComponent: ComponentType<any> = (props) => {
-    const [loadState, setLoadState] = useState<LazyLoadState>({
-      isLoading: true,
-      isLoaded: false,
-      error: null,
-      retryCount: 0
-    });
     
     const Fallback = CustomFallback || (() => (
       <div className="flex items-center justify-center p-8">
