@@ -26,6 +26,14 @@ const AppHomePage = lazy(() => import('@/pages/app/home/AppHomePage'));
 const CollabPage = lazy(() => import('@/pages/app/collab/CollabPage'));
 const RhPage = lazy(() => import('@/pages/app/rh/RhPage'));
 
+// Enhanced B2C Pages
+const ScanPage = lazy(() => import('@/pages/ScanPage'));
+const B2CJournalPageEnhanced = lazy(() => import('@/pages/B2CJournalPageEnhanced'));
+const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
+const B2CBreathworkPageEnhanced = lazy(() => import('@/pages/B2CBreathworkPageEnhanced'));
+const B2CLeaderboardPageEnhanced = lazy(() => import('@/pages/B2CLeaderboardPageEnhanced'));
+const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
+
 // Error pages
 const Page401 = lazy(() => import('@/pages/401Page'));
 const Page403 = lazy(() => import('@/pages/403Page'));
@@ -69,16 +77,16 @@ function App() {
               <Route index element={<AppDispatcher />} />
               
               {/* Pages communes (any role) */}
-              <Route path="nyvee" element={<div data-testid="page-root">Nyvée - TODO</div>} />
-              <Route path="leaderboard" element={<div data-testid="page-root">Leaderboard - TODO</div>} />
+              <Route path="nyvee" element={<B2CNyveeCoconPage />} />
+              <Route path="leaderboard" element={<B2CLeaderboardPageEnhanced />} />
               
               {/* Routes consumer */}
               <Route path="" element={<ProtectedRoute role="consumer" />}>
                 <Route path="home" element={<AppHomePage />} />
-                <Route path="scan" element={<div data-testid="page-root">Scan Page - TODO</div>} />
-                <Route path="journal" element={<div data-testid="page-root">Journal Page - TODO</div>} />
-                <Route path="coach" element={<div data-testid="page-root">Coach Page - TODO</div>} />
-                <Route path="breath" element={<div data-testid="page-root">Breath Page - TODO</div>} />
+                <Route path="scan" element={<ScanPage />} />
+                <Route path="journal" element={<B2CJournalPageEnhanced />} />
+                <Route path="coach" element={<B2CAICoachPage />} />
+                <Route path="breath" element={<B2CBreathworkPageEnhanced />} />
                 <Route path="flash-glow" element={<div data-testid="page-root">Flash Glow - TODO</div>} />
                 <Route path="face-ar" element={<div data-testid="page-root">Face AR - TODO</div>} />
                 <Route path="boss-grit" element={<div data-testid="page-root">Boss Grit - TODO</div>} />
