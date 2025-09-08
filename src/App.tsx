@@ -35,6 +35,9 @@ const B2CLeaderboardPageEnhanced = lazy(() => import('@/pages/B2CLeaderboardPage
 const B2CGamificationPageEnhanced = lazy(() => import('@/pages/B2CGamificationPageEnhanced'));
 const B2CFlashGlowPageEnhanced = lazy(() => import('@/pages/B2CFlashGlowPageEnhanced'));
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
+const B2CMusicEnhancedComplete = lazy(() => import('@/pages/B2CMusicEnhancedComplete'));
+const B2CActivityPageEnhanced = lazy(() => import('@/pages/B2CActivityPageEnhanced'));
+const B2CScreenSilkPageEnhanced = lazy(() => import('@/pages/B2CScreenSilkPageEnhanced'));
 
 // Error pages
 const Page401 = lazy(() => import('@/pages/401Page'));
@@ -96,13 +99,13 @@ function App() {
                 <Route path="ambition-arcade" element={<B2CAmbitionArcadePageEnhanced />} />
                 <Route path="bounce-back" element={<B2CBounceBackPageEnhanced />} />
                 <Route path="story-synth" element={<B2CStorySynthPageEnhanced />} />
-                <Route path="activity" element={<div data-testid="page-root">Activity - TODO</div>} />
-                <Route path="screen-silk" element={<div data-testid="page-root">Screen Silk - TODO</div>} />
-                <Route path="weekly-bars" element={<div data-testid="page-root">Weekly Bars - TODO</div>} />
+                <Route path="activity" element={<B2CActivityPageEnhanced />} />
+                <Route path="screen-silk" element={<B2CScreenSilkPageEnhanced />} />
+                <Route path="weekly-bars" element={<B2CActivityPageEnhanced />} />
                 
                 {/* Pages avec feature flags */}
                 <Route path="music" element={<ProtectedRoute role="consumer" neededFlags={["FF_PREMIUM_SUNO"]} />}>
-                  <Route index element={<div data-testid="page-root">Music Page - TODO</div>} />
+                  <Route index element={<B2CMusicEnhancedComplete />} />
                 </Route>
                 <Route path="mood-mixer" element={<ProtectedRoute role="consumer" neededFlags={["FF_PREMIUM_SUNO"]} />}>
                   <Route index element={<div data-testid="page-root">Mood Mixer - TODO</div>} />

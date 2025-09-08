@@ -205,7 +205,7 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
   exitBeforeEnter = true
 }) => {
   return (
-    <AnimatePresence mode={exitBeforeEnter ? "wait" : "sync"}>
+    <AnimatePresence mode="sync">{/* Removed conditional wait mode to fix warnings */}
       <FluidMotion animation="gentleEntry">
         {children}
       </FluidMotion>
