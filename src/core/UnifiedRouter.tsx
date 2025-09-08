@@ -41,7 +41,7 @@ const createLazyRoute = (
 
 // Public Pages
 const HomePage = createLazyRoute(
-  () => import('@/pages/index'),
+  () => import('@/pages/HomePage'),
   'home',
   'EmotionsCare - Plateforme d\'Intelligence Émotionnelle',
   'Découvrez EmotionsCare, votre plateforme premium d\'intelligence émotionnelle pour le bien-être personnel et professionnel.'
@@ -55,7 +55,7 @@ const B2CPage = createLazyRoute(
 );
 
 const EntreprisePage = createLazyRoute(
-  () => import('@/pages/EntreprisePage'),
+  () => import('@/pages/B2BEntreprisePage'),
   'enterprise',
   'Solutions Entreprise - EmotionsCare',
   'Transformez le bien-être de vos équipes avec notre plateforme d\'intelligence émotionnelle entreprise.'
@@ -226,6 +226,12 @@ const UnauthorizedPage = createLazyRoute(
   () => import('@/pages/401Page'),
   '401',
   'Accès Refusé - EmotionsCare'
+);
+
+const ForbiddenPage = createLazyRoute(
+  () => import('@/pages/403Page'),
+  '403',
+  'Interdit - EmotionsCare'
 );
 
 const ForbiddenPage = createLazyRoute(
