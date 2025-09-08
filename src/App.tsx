@@ -31,35 +31,35 @@ const AppDispatcher = createRouteComponent(() => import('@/pages/AppDispatcher')
 const AppHomePage = createRouteComponent(() => import('@/pages/app/home/AppHomePage'), 'app-home');
 const ScanPage = createRouteComponent(() => import('@/pages/ScanPage'), 'scan');
 const B2CAICoachPage = createRouteComponent(() => import('@/pages/B2CAICoachPage'), 'coach');
-const B2CJournalPageEnhanced = createRouteComponent(() => import('@/pages/B2CJournalPageEnhanced'), 'journal');
+const B2CJournalPage = createRouteComponent(() => import('@/pages/B2CJournalPage'), 'journal');
 
-// Wellness Features
-const B2CBreathworkPageEnhanced = createRouteComponent(() => import('@/pages/B2CBreathworkPageEnhanced'), 'breath');
-const B2CMusicEnhancedComplete = createRouteComponent(() => import('@/pages/B2CMusicEnhancedComplete'), 'music');
-const B2CActivityPageEnhanced = createRouteComponent(() => import('@/pages/B2CActivityPageEnhanced'), 'activity');
-const B2CVRBreathPageEnhanced = createRouteComponent(() => import('@/pages/B2CVRBreathPageEnhanced'), 'vr-breath');
-const B2CVRGalaxyPageEnhanced = createRouteComponent(() => import('@/pages/B2CVRGalaxyPageEnhanced'), 'vr-galaxy');
+// Wellness Features  
+const B2CBreathworkPage = createRouteComponent(() => import('@/pages/B2CBreathworkPage'), 'breath');
+const B2CMusicTherapyPage = createRouteComponent(() => import('@/pages/B2CMusicTherapyPage'), 'music');
+const B2CActivityPage = createRouteComponent(() => import('@/pages/B2CActivityPage'), 'activity');
+const B2CVRBreathPage = createRouteComponent(() => import('@/pages/B2CVRBreathPage'), 'vr-breath');
+const B2CVRGalaxyPage = createRouteComponent(() => import('@/pages/B2CVRGalaxyPage'), 'vr-galaxy');
 
 // Gaming & Challenges
-const B2CGamificationPageEnhanced = createRouteComponent(() => import('@/pages/B2CGamificationPageEnhanced'), 'games');
-const B2CFlashGlowPageEnhanced = createRouteComponent(() => import('@/pages/B2CFlashGlowPageEnhanced'), 'flash-glow');
-const B2CBubbleBeatPageEnhanced = createRouteComponent(() => import('@/pages/B2CBubbleBeatPageEnhanced'), 'bubble-beat');
-const B2CBossGritPageEnhanced = createRouteComponent(() => import('@/pages/B2CBossGritPageEnhanced'), 'boss-grit');
-const B2CAmbitionArcadePageEnhanced = createRouteComponent(() => import('@/pages/B2CAmbitionArcadePageEnhanced'), 'ambition');
-const B2CBounceBackPageEnhanced = createRouteComponent(() => import('@/pages/B2CBounceBackPageEnhanced'), 'bounce-back');
-const B2CStorySynthPageEnhanced = createRouteComponent(() => import('@/pages/B2CStorySynthPageEnhanced'), 'story-synth');
+const B2CGamificationPage = createRouteComponent(() => import('@/pages/B2CGamificationPage'), 'games');
+const B2CFlashGlowPage = createRouteComponent(() => import('@/pages/B2CFlashGlowPage'), 'flash-glow');
+const B2CBubbleBeatPage = createRouteComponent(() => import('@/pages/B2CBubbleBeatPage'), 'bubble-beat');
+const B2CBossLevelGritPage = createRouteComponent(() => import('@/pages/B2CBossLevelGritPage'), 'boss-grit');
+const B2CAmbitionArcadePage = createRouteComponent(() => import('@/pages/B2CAmbitionArcadePage'), 'ambition');
+const B2CBounceBackBattlePage = createRouteComponent(() => import('@/pages/B2CBounceBackBattlePage'), 'bounce-back');
+const B2CStorySynthLabPage = createRouteComponent(() => import('@/pages/B2CStorySynthLabPage'), 'story-synth');
 
 // Advanced Features
-const B2CFaceARPageEnhanced = createRouteComponent(() => import('@/pages/B2CFaceARPageEnhanced'), 'face-ar');
-const B2CLeaderboardPageEnhanced = createRouteComponent(() => import('@/pages/B2CLeaderboardPageEnhanced'), 'leaderboard');
-const B2CMoodMixerPageEnhanced = createRouteComponent(() => import('@/pages/B2CMoodMixerPageEnhanced'), 'mood-mixer');
-const B2CScreenSilkPageEnhanced = createRouteComponent(() => import('@/pages/B2CScreenSilkPageEnhanced'), 'screen-silk');
+const B2CARFiltersPage = createRouteComponent(() => import('@/pages/B2CARFiltersPage'), 'face-ar');
+const LeaderboardPage = createRouteComponent(() => import('@/pages/LeaderboardPage'), 'leaderboard');
+const B2CMoodMixerPage = createRouteComponent(() => import('@/pages/B2CMoodMixerPage'), 'mood-mixer');
+const B2CScreenSilkBreakPage = createRouteComponent(() => import('@/pages/B2CScreenSilkBreakPage'), 'screen-silk');
 const B2CNyveeCoconPage = createRouteComponent(() => import('@/pages/B2CNyveeCoconPage'), 'nyvee');
 
 // Social & Team Features
 const CollabPage = createRouteComponent(() => import('@/pages/app/collab/CollabPage'), 'collab');
-const B2CSocialCoconPageEnhanced = createRouteComponent(() => import('@/pages/B2CSocialCoconPageEnhanced'), 'social');
-const B2CTeamsPageEnhanced = createRouteComponent(() => import('@/pages/B2CTeamsPageEnhanced'), 'teams');
+const B2CSocialCoconPage = createRouteComponent(() => import('@/pages/B2CSocialCoconPage'), 'social');
+const B2CTeamsPage = createRouteComponent(() => import('@/pages/B2CTeamsPage'), 'teams');
 const CommunityPageEnhanced = createRouteComponent(() => import('@/pages/manager/CommunityPageEnhanced'), 'community');
 
 // Management Pages
@@ -121,45 +121,45 @@ function App() {
               {/* Core Features - All Users */}
               <Route path="home" element={<AppHomePage />} />
               <Route path="scan" element={<ScanPage />} />
-              <Route path="journal" element={<B2CJournalPageEnhanced />} />
+              <Route path="journal" element={<B2CJournalPage />} />
               <Route path="coach" element={<B2CAICoachPage />} />
               <Route path="nyvee" element={<B2CNyveeCoconPage />} />
-              <Route path="leaderboard" element={<B2CLeaderboardPageEnhanced />} />
+              <Route path="leaderboard" element={<LeaderboardPage />} />
               
               {/* Wellness Features */}
-              <Route path="breath" element={<B2CBreathworkPageEnhanced />} />
-              <Route path="activity" element={<B2CActivityPageEnhanced />} />
-              <Route path="screen-silk" element={<B2CScreenSilkPageEnhanced />} />
-              <Route path="weekly-bars" element={<B2CActivityPageEnhanced />} />
+              <Route path="breath" element={<B2CBreathworkPage />} />
+              <Route path="activity" element={<B2CActivityPage />} />
+              <Route path="screen-silk" element={<B2CScreenSilkBreakPage />} />
+              <Route path="weekly-bars" element={<B2CActivityPage />} />
               
               {/* Gaming & Challenges */}
-              <Route path="gamification" element={<B2CGamificationPageEnhanced />} />
-              <Route path="flash-glow" element={<B2CFlashGlowPageEnhanced />} />
-              <Route path="face-ar" element={<B2CFaceARPageEnhanced />} />
-              <Route path="boss-grit" element={<B2CBossGritPageEnhanced />} />
-              <Route path="ambition-arcade" element={<B2CAmbitionArcadePageEnhanced />} />
-              <Route path="bounce-back" element={<B2CBounceBackPageEnhanced />} />
-              <Route path="story-synth" element={<B2CStorySynthPageEnhanced />} />
+              <Route path="gamification" element={<B2CGamificationPage />} />
+              <Route path="flash-glow" element={<B2CFlashGlowPage />} />
+              <Route path="face-ar" element={<B2CARFiltersPage />} />
+              <Route path="boss-grit" element={<B2CBossLevelGritPage />} />
+              <Route path="ambition-arcade" element={<B2CAmbitionArcadePage />} />
+              <Route path="bounce-back" element={<B2CBounceBackBattlePage />} />
+              <Route path="story-synth" element={<B2CStorySynthLabPage />} />
               
               {/* Premium Features with Guards */}
               <Route path="music" element={<ProtectedRoute role="consumer" neededFlags={["FF_PREMIUM_SUNO"]} />}>
-                <Route index element={<B2CMusicEnhancedComplete />} />
+                <Route index element={<B2CMusicTherapyPage />} />
               </Route>
               <Route path="mood-mixer" element={<ProtectedRoute role="consumer" neededFlags={["FF_PREMIUM_SUNO"]} />}>
-                <Route index element={<B2CMoodMixerPageEnhanced />} />
+                <Route index element={<B2CMoodMixerPage />} />
               </Route>
               
               {/* VR Features */}
               <Route path="vr-breath" element={<ProtectedRoute role="consumer" neededFlags={["FF_VR"]} />}>
-                <Route index element={<B2CVRBreathPageEnhanced />} />
+                <Route index element={<B2CVRBreathPage />} />
               </Route>
               <Route path="vr-galaxy" element={<ProtectedRoute role="consumer" neededFlags={["FF_VR"]} />}>
-                <Route index element={<B2CVRGalaxyPageEnhanced />} />
+                <Route index element={<B2CVRGalaxyPage />} />
               </Route>
               
               {/* Sensor-Based Features */}
               <Route path="bubble-beat" element={<ProtectedRoute role="consumer" sensorGates={["hr"]} />}>
-                <Route index element={<B2CBubbleBeatPageEnhanced />} />
+                <Route index element={<B2CBubbleBeatPage />} />
               </Route>
               
               {/* Employee Features */}
@@ -167,10 +167,10 @@ function App() {
                 <Route index element={<CollabPage />} />
               </Route>
               <Route path="social-cocon" element={<ProtectedRoute role="employee" />}>
-                <Route index element={<B2CSocialCoconPageEnhanced />} />
+                <Route index element={<B2CSocialCoconPage />} />
               </Route>
               <Route path="teams" element={<ProtectedRoute role="employee" />}>
-                <Route index element={<B2CTeamsPageEnhanced />} />
+                <Route index element={<B2CTeamsPage />} />
               </Route>
               <Route path="community" element={<ProtectedRoute role="employee" neededFlags={["FF_COMMUNITY"]} />}>
                 <Route index element={<CommunityPageEnhanced />} />
