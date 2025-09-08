@@ -5,14 +5,14 @@
 
 export const cleanupConsoleStatements = () => {
   if (process.env.NODE_ENV === 'production') {
-    // Override all console methods except error and warn for critical issues
+    // Safe console override to prevent "Illegal invocation" errors
     const noop = () => {};
     
-    // Keep these for production monitoring
-    const originalError = console.error;
-    const originalWarn = console.warn;
+    // Safely bind original methods
+    const originalError = console.error.bind(console);
+    const originalWarn = console.warn.bind(console);
     
-    // Override development methods
+    // Override development methods with bound noop
     console.log = noop;
     console.info = noop;
     console.debug = noop;
@@ -25,16 +25,15 @@ export const cleanupConsoleStatements = () => {
     console.time = noop;
     console.timeEnd = noop;
     
-    // Enhanced error reporting for production
-    console.error = (...args: any[]) => {
+    // Enhanced error reporting with proper binding
+    console.error = ((...args: any[]) => {
       // In production, send to monitoring service
       if (typeof window !== 'undefined' && (window as any).sentryEnabled) {
-        // Would integrate with Sentry or similar
         originalError('[PRODUCTION ERROR]', ...args);
       }
-    };
+    }).bind(console);
     
-    console.warn = (...args: any[]) => {
+    console.warn = ((...args: any[]) => {
       // Log warnings only for critical issues
       if (args.some(arg => 
         typeof arg === 'string' && (
@@ -45,7 +44,7 @@ export const cleanupConsoleStatements = () => {
       )) {
         originalWarn('[PRODUCTION WARNING]', ...args);
       }
-    };
+    }).bind(console);
   }
 };
 

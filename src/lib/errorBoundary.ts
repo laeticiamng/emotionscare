@@ -62,20 +62,25 @@ class GlobalErrorService {
 
 export const globalErrorService = new GlobalErrorService();
 
-// Capturer les erreurs non gérées
-window.addEventListener('error', (event) => {
-  globalErrorService.reportError(
-    new Error(event.message),
-    `Erreur globale: ${event.filename}:${event.lineno}`
-  );
-});
+// Safely capture unhandled errors
+if (typeof window !== 'undefined') {
+  window.addEventListener('error', (event) => {
+    globalErrorService.reportError(
+      new Error(event.message),
+      `Erreur globale: ${event.filename}:${event.lineno}`
+    );
+  });
 
-// Capturer les promesses rejetées
-window.addEventListener('unhandledrejection', (event) => {
-  globalErrorService.reportError(
-    new Error(event.reason?.message || 'Promise rejetée'),
-    'Promise non gérée'
-  );
-});
+  // Capture rejected promises
+  window.addEventListener('unhandledrejection', (event) => {
+    globalErrorService.reportError(
+      new Error(event.reason?.message || 'Promise rejetée'),
+      'Promise non gérée'
+    );
+  });
 
-console.log('Service global d\'erreurs initialisé');
+  // Safe console log for initialization
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Service global d\'erreurs initialisé');
+  }
+}
