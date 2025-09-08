@@ -69,6 +69,9 @@ export { default as B2BAccessibilityPage } from './B2BAccessibilityPage';
 // Music & Enhanced Features
 export { default as B2CMusicEnhanced } from './B2CMusicEnhanced';
 export { default as B2CMusicTherapyPremiumPage } from './B2CMusicTherapyPremiumPage';
+
+// Additional B2C Pages
+export { default as B2CAICoachMicroPage } from './B2CAICoachMicroPage';
 export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 
 // Additional pages
