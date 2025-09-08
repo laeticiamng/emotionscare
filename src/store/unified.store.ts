@@ -38,7 +38,7 @@ interface CoachState {
   conversations: any[];
   currentConversation: any | null;
   isLoading: boolean;
-  preferences: {
+  coachPreferences: {
     personality: 'empathetic' | 'analytical' | 'motivational';
     language: string;
     responseLength: 'short' | 'medium' | 'long';
@@ -48,7 +48,7 @@ interface CoachState {
 // Notifications State
 interface NotificationState {
   notifications: any[];
-  preferences: {
+  notificationPreferences: {
     push: boolean;
     email: boolean;
     sound: boolean;
@@ -60,7 +60,7 @@ interface NotificationState {
 interface DashboardState {
   widgets: any[];
   layout: string;
-  preferences: Record<string, any>;
+  dashboardPreferences: Record<string, any>;
 }
 
 // Combined Store State
@@ -92,13 +92,13 @@ interface AppStore extends AuthState, ThemeState, MusicState, CoachState, Notifi
   setCurrentConversation: (conversation: any) => void;
   updateConversation: (id: string, updates: any) => void;
   deleteConversation: (id: string) => void;
-  setCoachePreferences: (prefs: Partial<CoachState['preferences']>) => void;
+  setCoachPreferences: (prefs: Partial<CoachState['coachPreferences']>) => void;
 
   // Notifications Actions
   addNotification: (notification: any) => void;
   removeNotification: (id: string) => void;
   markAsRead: (id: string) => void;
-  setNotificationPreferences: (prefs: Partial<NotificationState['preferences']>) => void;
+  setNotificationPreferences: (prefs: Partial<NotificationState['notificationPreferences']>) => void;
 
   // Dashboard Actions
   addWidget: (widget: any) => void;
@@ -134,7 +134,7 @@ export const useAppStore = create<AppStore>()(
       // Initial Coach State
       conversations: [],
       currentConversation: null,
-      preferences: {
+      coachPreferences: {
         personality: 'empathetic',
         language: 'fr',
         responseLength: 'medium',
@@ -142,7 +142,7 @@ export const useAppStore = create<AppStore>()(
 
       // Initial Notifications State
       notifications: [],
-      preferences: {
+      notificationPreferences: {
         push: true,
         email: true,
         sound: true,
@@ -152,7 +152,7 @@ export const useAppStore = create<AppStore>()(
       // Initial Dashboard State
       widgets: [],
       layout: 'grid',
-      preferences: {},
+      dashboardPreferences: {},
 
       // Auth Actions
       setUser: (user) => {
@@ -279,9 +279,9 @@ export const useAppStore = create<AppStore>()(
         logger.info('Coach conversation deleted', { id }, 'COACH');
       },
 
-      setCoachePreferences: (prefs) => {
-        const { preferences } = get();
-        set({ preferences: { ...preferences, ...prefs } });
+      setCoachPreferences: (prefs) => {
+        const { coachPreferences } = get();
+        set({ coachPreferences: { ...coachPreferences, ...prefs } });
       },
 
       // Notifications Actions
@@ -312,8 +312,8 @@ export const useAppStore = create<AppStore>()(
       },
 
       setNotificationPreferences: (prefs) => {
-        const { preferences } = get();
-        set({ preferences: { ...preferences, ...prefs } });
+        const { notificationPreferences } = get();
+        set({ notificationPreferences: { ...notificationPreferences, ...prefs } });
       },
 
       // Dashboard Actions
@@ -339,8 +339,8 @@ export const useAppStore = create<AppStore>()(
       setDashboardLayout: (layout) => set({ layout }),
 
       setDashboardPreferences: (preferences) => {
-        const current = get().preferences;
-        set({ preferences: { ...current, ...preferences } });
+        const current = get().dashboardPreferences;
+        set({ dashboardPreferences: { ...current, ...preferences } });
       },
     }),
     {
@@ -355,7 +355,9 @@ export const useAppStore = create<AppStore>()(
         volume: state.volume,
         repeat: state.repeat,
         shuffle: state.shuffle,
-        preferences: state.preferences,
+        coachPreferences: state.coachPreferences,
+        notificationPreferences: state.notificationPreferences,
+        dashboardPreferences: state.dashboardPreferences,
         layout: state.layout,
       }),
     }
@@ -406,17 +408,17 @@ export const useCoach = () => useAppStore((state) => ({
   conversations: state.conversations,
   currentConversation: state.currentConversation,
   isLoading: state.isLoading,
-  preferences: state.preferences,
+  coachPreferences: state.coachPreferences,
   addConversation: state.addConversation,
   setCurrentConversation: state.setCurrentConversation,
   updateConversation: state.updateConversation,
   deleteConversation: state.deleteConversation,
-  setCoachePreferences: state.setCoachePreferences,
+  setCoachPreferences: state.setCoachPreferences,
 }));
 
 export const useNotifications = () => useAppStore((state) => ({
   notifications: state.notifications,
-  preferences: state.preferences,
+  notificationPreferences: state.notificationPreferences,
   addNotification: state.addNotification,
   removeNotification: state.removeNotification,
   markAsRead: state.markAsRead,
@@ -426,7 +428,7 @@ export const useNotifications = () => useAppStore((state) => ({
 export const useDashboard = () => useAppStore((state) => ({
   widgets: state.widgets,
   layout: state.layout,
-  preferences: state.preferences,
+  dashboardPreferences: state.dashboardPreferences,
   addWidget: state.addWidget,
   removeWidget: state.removeWidget,
   updateWidget: state.updateWidget,

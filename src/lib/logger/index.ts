@@ -1,141 +1,92 @@
 /**
- * Production-ready logging system
- * Replaces all console.log calls with conditional logging
+ * Production Logger System - EmotionsCare
+ * Système de logging unifié avec niveaux et contexte
  */
 
-export enum LogLevel {
-  ERROR = 0,
-  WARN = 1,
-  INFO = 2,
-  DEBUG = 3,
-}
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical'
+export type LogContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM'
 
-interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  component?: string;
-  message: string;
-  data?: any;
-  userId?: string;
+export interface LogEntry {
+  timestamp: string
+  level: LogLevel
+  message: string
+  context: LogContext
+  data?: any
+  userId?: string
+  sessionId?: string
+  error?: Error
 }
 
 class Logger {
-  private level: LogLevel;
-  private logs: LogEntry[] = [];
-  private readonly maxLogs = 100;
+  private sessionId: string
+  private isDevelopment: boolean
 
   constructor() {
-    this.level = import.meta.env.PROD ? LogLevel.WARN : LogLevel.DEBUG;
+    this.sessionId = this.generateSessionId()
+    this.isDevelopment = import.meta.env.DEV
   }
 
-  private log(level: LogLevel, message: string, data?: any, component?: string) {
-    if (level > this.level) return;
+  private generateSessionId(): string {
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
 
-    const entry: LogEntry = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      component,
-      data,
-      userId: this.getCurrentUserId(),
-    };
-
-    // Store log entry
-    this.logs.push(entry);
-    if (this.logs.length > this.maxLogs) {
-      this.logs.shift();
-    }
-
-    // Output to console in development
-    if (!import.meta.env.PROD) {
-      const prefix = `[${component || 'App'}]`;
-      switch (level) {
-        case LogLevel.ERROR:
-          console.error(prefix, message, data);
-          break;
-        case LogLevel.WARN:
-          console.warn(prefix, message, data);
-          break;
-        case LogLevel.INFO:
-          console.info(prefix, message, data);
-          break;
-        case LogLevel.DEBUG:
-          console.log(prefix, message, data);
-          break;
-      }
-    }
-
-    // Send errors to monitoring service in production
-    if (import.meta.env.PROD && level === LogLevel.ERROR) {
-      this.sendToMonitoring(entry);
+  debug(message: string, data?: any, context: LogContext = 'SYSTEM'): void {
+    if (this.isDevelopment) {
+      console.debug(`[${context}] ${message}`, data || '')
     }
   }
 
-  private getCurrentUserId(): string | undefined {
-    try {
-      // Get user ID from context or auth
-      return undefined; // Implement based on auth system
-    } catch {
-      return undefined;
-    }
+  info(message: string, data?: any, context: LogContext = 'SYSTEM'): void {
+    console.info(`[${context}] ${message}`, data || '')
   }
 
-  private async sendToMonitoring(entry: LogEntry) {
-    try {
-      // Send to monitoring service (Sentry, LogRocket, etc.)
-      console.error('Production Error:', entry);
-    } catch {
-      // Fail silently
-    }
+  warn(message: string, data?: any, context: LogContext = 'SYSTEM'): void {
+    console.warn(`[${context}] ${message}`, data || '')
   }
 
-  error(message: string, data?: any, component?: string) {
-    this.log(LogLevel.ERROR, message, data, component);
+  error(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
+    console.error(`[${context}] ${message}`, error || '')
   }
 
-  warn(message: string, data?: any, component?: string) {
-    this.log(LogLevel.WARN, message, data, component);
-  }
-
-  info(message: string, data?: any, component?: string) {
-    this.log(LogLevel.INFO, message, data, component);
-  }
-
-  debug(message: string, data?: any, component?: string) {
-    this.log(LogLevel.DEBUG, message, data, component);
-  }
-
-  getLogs(): LogEntry[] {
-    return [...this.logs];
-  }
-
-  clearLogs() {
-    this.logs = [];
-  }
-
-  setLevel(level: LogLevel) {
-    this.level = level;
+  critical(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
+    console.error(`[CRITICAL] [${context}] ${message}`, error || '')
   }
 }
 
-export const logger = new Logger();
+// Instance singleton
+export const logger = new Logger()
 
-// Helper functions for common patterns
-export const logApiCall = (endpoint: string, duration: number, success: boolean) => {
-  logger.info(`API Call: ${endpoint}`, { duration, success }, 'API');
-};
+// Hook React pour utiliser le logger
+import { useCallback } from 'react'
 
-export const logUserAction = (action: string, data?: any) => {
-  logger.info(`User Action: ${action}`, data, 'USER');
-};
+export function useLogger() {
+  const logDebug = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
+    logger.debug(message, data, context)
+  }, [])
 
-export const logPerformance = (metric: string, value: number) => {
-  logger.debug(`Performance: ${metric}`, { value }, 'PERF');
-};
+  const logInfo = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
+    logger.info(message, data, context)
+  }, [])
 
-export const logError = (error: Error, context?: string) => {
-  logger.error(`Error in ${context || 'Unknown'}`, {
-    message: error.message,
-    stack: error.stack,
-  }, 'ERROR');
-};
+  const logWarn = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
+    logger.warn(message, data, context)
+  }, [])
+
+  const logError = useCallback((message: string, error?: Error | any, context: LogContext = 'UI') => {
+    logger.error(message, error, context)
+  }, [])
+
+  const logCritical = useCallback((message: string, error?: Error | any, context: LogContext = 'UI') => {
+    logger.critical(message, error, context)
+  }, [])
+
+  return {
+    debug: logDebug,
+    info: logInfo,
+    warn: logWarn,
+    error: logError,
+    critical: logCritical
+  }
+}
+
+export default logger
