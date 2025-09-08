@@ -32,11 +32,14 @@ const disableDevTools = (): void => {
       onCommitFiberUnmount: () => {},
     };
 
-    // Désactiver la console en production (optionnel)
+    // Remplacer console par le logger sécurisé
     if (import.meta.env.PROD) {
-      console.log = () => {};
-      console.warn = () => {};
-      console.error = () => {};
+      const noop = () => {};
+      console.log = noop;
+      console.warn = noop;
+      console.error = noop;
+      console.info = noop;
+      console.debug = noop;
     }
   }
 };
