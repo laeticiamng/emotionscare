@@ -12,7 +12,7 @@ import { PremiumNavigation } from './PremiumNavigation';
 import { PremiumSidebar } from './PremiumSidebar';
 import { PremiumFooter } from './PremiumFooter';
 import { ScrollProgress } from '@/components/ui/ScrollProgress';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
 

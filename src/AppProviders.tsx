@@ -16,18 +16,6 @@ import { PerformanceProvider } from '@/components/performance/PerformanceProvide
 import { AccessibilityProvider } from '@/core/AccessibilityManager';
 import { SecurityProvider } from '@/core/SecurityManager';
 
-// Outils d'audit et d'optimisation
-import { PremiumOptimizerPanel } from '@/audit/PremiumOptimizer';
-import { CodeAuditPanel } from '@/audit/CodeAuditManager';
-import { initializeAutoCleanup } from '@/audit/CodeCleanupUtilities';
-
-// Initialisation différée et sécurisée du nettoyage automatique
-setTimeout(() => {
-  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-    initializeAutoCleanup();
-  }
-}, 2000); // Délai pour s'assurer que l'app est complètement chargée
-
 interface AppProvidersProps {
   children: React.ReactNode;
 }
@@ -66,14 +54,8 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                         duration: 5000,
                       }}
                     />
-                    
-                    {/* Outils d'audit et d'optimisation premium (temporairement désactivés) */}
-                    {false && process.env.NODE_ENV === 'development' && (
-                      <>
-                        <PremiumOptimizerPanel />
-                        <CodeAuditPanel />
-                      </>
-                    )}
+                     
+                     {/* Tous les outils d'audit sont désactivés pour éviter l'erreur "Illegal invocation" */}
                        </PerformanceProvider>
                     </AccessibilityProvider>
                   </SecurityProvider>
