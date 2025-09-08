@@ -6,37 +6,7 @@
 // Pages principales
 export { ProfileSettingsPage } from './ProfileSettingsPage';
 export { DataSettingsPage } from './DataSettingsPage';
-
-// Pages de contenu
-export const HelpPage = ({ 'data-testid': testId }: { 'data-testid'?: string }) => (
-  <div className="container mx-auto py-8" data-testid={testId}>
-    <h1 className="text-3xl font-bold mb-6">Centre d'aide</h1>
-    <div className="grid gap-6 md:grid-cols-2">
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Questions fréquentes</h2>
-        <div className="space-y-2">
-          <details className="border rounded p-4">
-            <summary className="cursor-pointer font-medium">Comment utiliser le coach IA ?</summary>
-            <p className="mt-2 text-muted-foreground">Le coach IA vous accompagne dans votre bien-être émotionnel...</p>
-          </details>
-          <details className="border rounded p-4">
-            <summary className="cursor-pointer font-medium">Comment modifier mes préférences ?</summary>
-            <p className="mt-2 text-muted-foreground">Rendez-vous dans les paramètres de votre profil...</p>
-          </details>
-        </div>
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Guides d'utilisation</h2>
-        <div className="space-y-2">
-          <a href="#" className="block border rounded p-4 hover:bg-muted">
-            <h3 className="font-medium">Guide de démarrage</h3>
-            <p className="text-sm text-muted-foreground">Premiers pas avec EmotionsCare</p>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+export { HelpPage } from './HelpPage';
 
 export const ApiDocumentationPage = ({ 'data-testid': testId }: { 'data-testid'?: string }) => (
   <div className="container mx-auto py-8" data-testid={testId}>
