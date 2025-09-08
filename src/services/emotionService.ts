@@ -1,8 +1,17 @@
 
+/**
+ * ⚠️ SERVICE DÉPRÉCIÉ - Utiliser UnifiedServiceManager à la place
+ * @deprecated Utilisez serviceManager.analyzeEmotion() du UnifiedServiceManager
+ */
+
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
+import { serviceManager } from './UnifiedServiceManager';
 
 export class EmotionService {
+  /**
+   * @deprecated Utilisez serviceManager.analyzeEmotion() à la place
+   */
   static async analyzeText(text: string): Promise<EmotionResult> {
     try {
       const { data, error } = await supabase.functions.invoke('analyze-emotion', {

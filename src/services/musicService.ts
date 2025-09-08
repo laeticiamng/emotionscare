@@ -1,5 +1,11 @@
 
+/**
+ * ⚠️ SERVICE DÉPRÉCIÉ - Utiliser UnifiedServiceManager à la place
+ * @deprecated Utilisez serviceManager.generateMusic() du UnifiedServiceManager
+ */
+
 import { supabase } from '@/integrations/supabase/client';
+import { serviceManager } from './UnifiedServiceManager';
 
 export interface MusicTrack {
   id: string;
