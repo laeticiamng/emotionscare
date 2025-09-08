@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { EmotionTrend, EmotionPattern, EmotionResult, EmotionInsight } from '@/types/emotion';
 import { supabase } from '@/integrations/supabase/client';
-import { useLogger } from '@/lib/logger';
+import useLogger from '@/hooks/useLogger';
 
 interface WeeklyEmotionStats {
   totalScans: number;
@@ -25,7 +25,7 @@ interface UseEmotionAnalyticsReturn {
 }
 
 export const useEmotionAnalytics = (): UseEmotionAnalyticsReturn => {
-  const logger = useLogger();
+  const logger = useLogger('EmotionAnalytics');
   
   const [emotionTrends, setEmotionTrends] = useState<EmotionTrend[]>([]);
   const [weeklyStats, setWeeklyStats] = useState<WeeklyEmotionStats | null>(null);
