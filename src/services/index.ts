@@ -1,10 +1,15 @@
 
 /**
- * Services d'API centralisés
- * 
- * Ce fichier exporte tous les services API dans une interface unifiée.
- * Il assure que les appels API sont cohérents, traçables et maintenables.
+ * 🔧 SERVICES EXPORTS
+ * Point d'entrée unifié pour tous les services
  */
+
+// API Services
+export * from './api';
+
+// Unified Services
+export { UnifiedEmotionService } from './UnifiedEmotionService';
+export { UnifiedMusicService } from './UnifiedMusicService';
 
 // Import de tous les services API
 import openaiService from './openai';

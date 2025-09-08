@@ -1,42 +1,15 @@
 
-// Re-export all types from respective type files
-export type {
-  User,
-  UserPreferences,
-  PrivacySettings,
-  AuthState,
-  LoginFormData,
-  RegisterFormData,
-  UserMode
-} from './auth';
+/**
+ * 📝 TYPES EXPORTS
+ * Point d'entrée unifié pour tous les types
+ */
 
-export type {
-  LayoutContextType,
-  LayoutProviderProps,
-  ShellProps,
-  NavigationItem,
-  NavigationSection
-} from './layout';
+// Core types
+export * from './coach';
+export * from './emotion';
 
-export type {
-  Theme,
-  ThemeContextType,
-  ThemeOption,
-  FontFamily,
-  FontSize,
-  ThemeName
-} from './theme';
-
-export type {
-  SidebarContextType,
-  SidebarProviderProps,
-  SidebarItem,
-  SidebarSection
-} from './sidebar';
-
-export type {
-  UserModeType
-} from './userMode';
+// Unified types
+export * from './unified-emotions';
 
 // Types globaux de l'application
 export interface Module {

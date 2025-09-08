@@ -1,28 +1,26 @@
+/**
+ * 🎨 UI COMPONENTS EXPORTS
+ * Point d'entrée unifié pour tous les composants UI
+ */
+
+// Core UI Components
 export * from './button';
 export * from './card';
-export * from './form';
 export * from './input';
 export * from './label';
-export * from './skeleton';
+export * from './textarea';
+export * from './select';
+export * from './switch';
+export * from './slider';
+export * from './progress';
+export * from './badge';
+export * from './avatar';
+export * from './tabs';
+export * from './dialog';
 export * from './toast';
 export * from './toaster';
-export * from './loading-spinner';
-export * from './loading-animation';
-export * from './enhanced-error-boundary';
-export * from './loading-illustration';
-export * from './badge';
-export * from './sheet';
-export * from './tabs';
-export * from './separator';
-export * from './switch';
-export * from './card';
-export * from './form';
 
-// Notifications
-export * from '../notifications';
-
-// Preferences
-export * from '../preferences';
-
-// Select component
-export * from './select';
+// Premium UI Components
+export { PremiumErrorBoundary } from './PremiumErrorBoundary';
+export { PremiumLoadingFallback } from './PremiumLoadingFallback';
+export { ScrollProgress } from './ScrollProgress';

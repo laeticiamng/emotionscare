@@ -1,7 +1,15 @@
 /**
- * HOOKS UNIFIÉS - Index central pour tous les hooks
- * Architecture premium avec accessibilité WCAG AAA
+ * 🪝 HOOKS EXPORTS
+ * Point d'entrée unifié pour tous les hooks premium
  */
+
+// Core hooks
+export { useAccessibility } from './useAccessibility';
+export { useGamification } from './useGamification';
+
+// Unified Premium hooks
+export { useUnifiedEmotion } from './useUnifiedEmotion';
+export { useUnifiedMusic } from './useUnifiedMusic';
 
 // Export du store unifié
 export { 

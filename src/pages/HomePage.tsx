@@ -1,49 +1,150 @@
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Header, Footer } from "@/components/layout";
+/**
+ * 🏠 HOME PAGE PREMIUM
+ * Page d'accueil optimisée pour EmotionsCare
+ */
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
-  ArrowRight, 
-  Heart, 
   Brain, 
+  Heart, 
+  Music, 
+  Sparkles, 
+  ArrowRight, 
   Users, 
   Shield, 
   Zap, 
-  Music,
-  Camera,
-  MessageCircle,
-  Star
-} from "lucide-react";
-import { Link } from "react-router-dom";
+  Play,
+  CheckCircle,
+  Star,
+  Globe,
+  TrendingUp
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-export default function HomePage() {
-  const features = [
-    {
-      icon: Brain,
-      title: "IA Personnalisée",
-      description: "Coach virtuel adapté à vos besoins émotionnels",
-      color: "text-blue-500"
-    },
-    {
-      icon: Music,
-      title: "Musique Thérapeutique",
-      description: "Compositions générées selon votre état émotionnel",
-      color: "text-purple-500"
-    },
-    {
-      icon: Camera,
-      title: "Analyse Faciale",
-      description: "Détection d'émotions en temps réel",
-      color: "text-green-500"
-    },
-    {
-      icon: MessageCircle,
-      title: "Journal Privé",
-      description: "Espace sécurisé pour vos pensées",
-      color: "text-orange-500"
-    }
-  ];
+interface FeatureCard {
+  icon: React.ComponentType<any>;
+  title: string;
+  description: string;
+  benefits: string[];
+  color: string;
+}
+
+interface Testimonial {
+  name: string;
+  role: string;
+  company: string;
+  avatar: string;
+  content: string;
+  rating: number;
+}
+
+interface Stat {
+  value: string;
+  label: string;
+  description: string;
+}
+
+const FEATURES: FeatureCard[] = [
+  {
+    icon: Brain,
+    title: 'Analyse Émotionnelle IA',
+    description: 'Technologie avancée pour comprendre vos émotions en temps réel',
+    benefits: ['Analyse multi-modale', 'Précision 95%+', 'Insights personnalisés'],
+    color: 'from-blue-500 to-purple-600'
+  },
+  {
+    icon: Music,
+    title: 'Musicothérapie Adaptative',
+    description: 'Musique thérapeutique générée par IA selon votre état émotionnel',
+    benefits: ['Génération personnalisée', 'Effets prouvés', 'Bibliothèque infinie'],
+    color: 'from-purple-500 to-pink-600'
+  },
+  {
+    icon: Users,
+    title: 'Bien-être d\'Équipe',
+    description: 'Solutions collaboratives pour l\'intelligence émotionnelle collective',
+    benefits: ['Analytics équipe', 'Coaching collectif', 'Performance RH'],
+    color: 'from-green-500 to-blue-600'
+  },
+  {
+    icon: Shield,
+    title: 'Confidentialité Totale',
+    description: 'Vos données émotionnelles sont protégées par cryptage avancé',
+    benefits: ['Chiffrement E2E', 'RGPD compliant', 'Contrôle total'],
+    color: 'from-red-500 to-orange-600'
+  }
+];
+
+const TESTIMONIALS: Testimonial[] = [
+  {
+    name: 'Marie Dubois',
+    role: 'Directrice RH',
+    company: 'TechCorp',
+    avatar: 'MD',
+    content: 'EmotionsCare a transformé notre approche du bien-être au travail. Nos équipes sont plus épanouies et productives.',
+    rating: 5
+  },
+  {
+    name: 'Thomas Martin',
+    role: 'Coach Personnel',
+    company: 'Indépendant',
+    avatar: 'TM',
+    content: 'Un outil révolutionnaire pour mes clients. L\'IA d\'analyse émotionnelle est d\'une précision remarquable.',
+    rating: 5
+  },
+  {
+    name: 'Sarah Johnson',
+    role: 'Psychologue',
+    company: 'Clinique Wellness',
+    avatar: 'SJ',
+    content: 'La musicothérapie adaptive aide mes patients à mieux gérer stress et anxiété. Résultats impressionnants.',
+    rating: 5
+  }
+];
+
+const STATS: Stat[] = [
+  {
+    value: '50K+',
+    label: 'Utilisateurs actifs',
+    description: 'Professionnels et particuliers nous font confiance'
+  },
+  {
+    value: '95%',
+    label: 'Précision IA',
+    description: 'Reconnaissance émotionnelle de pointe'
+  },
+  {
+    value: '85%',
+    label: 'Amélioration',
+    description: 'Du bien-être utilisateur en 30 jours'
+  },
+  {
+    value: '24/7',
+    label: 'Disponibilité',
+    description: 'Support et coaching permanent'
+  }
+];
+
+export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+    
+    // Auto-rotate testimonials
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const stats = [
     { label: "Utilisateurs Actifs", value: "10K+", description: "Personnes accompagnées" },
