@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
-import { routerV2 } from './routerV2';
+import App from './App';
 import AppProviders from './AppProviders';
 import './index.css';
 import './styles/accessibility.css';
@@ -108,7 +107,7 @@ window.addEventListener('unhandledrejection', (event) => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppProviders>
-      <RouterProvider router={routerV2} />
+      <App />
     </AppProviders>
   </React.StrictMode>
 );
