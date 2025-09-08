@@ -52,6 +52,10 @@ const CommunityPageEnhanced = lazy(() => import('@/pages/manager/CommunityPageEn
 const ReportsPageEnhanced = lazy(() => import('@/pages/manager/ReportsPageEnhanced'));
 const EventsPageEnhanced = lazy(() => import('@/pages/manager/EventsPageEnhanced'));
 const OptimizationPageEnhanced = lazy(() => import('@/pages/manager/OptimizationPageEnhanced'));
+const SecurityPageEnhanced = lazy(() => import('@/pages/manager/SecurityPageEnhanced'));
+const AuditPageEnhanced = lazy(() => import('@/pages/manager/AuditPageEnhanced'));
+const AccessibilityPageEnhanced = lazy(() => import('@/pages/manager/AccessibilityPageEnhanced'));
+const APIMonitoringPageEnhanced = lazy(() => import('@/pages/manager/APIMonitoringPageEnhanced'));
 
 // Missing enhanced pages - Additional implementations
 const B2CFaceARPageEnhanced = lazy(() => import('@/pages/B2CFaceARPageEnhanced'));
@@ -163,9 +167,9 @@ function App() {
                 <Route path="reports" element={<ReportsPageEnhanced />} />
                 <Route path="events" element={<EventsPageEnhanced />} />
                 <Route path="optimization" element={<OptimizationPageEnhanced />} />
-                <Route path="security" element={<div data-testid="page-root">Security - TODO</div>} />
-                <Route path="audit" element={<div data-testid="page-root">Audit - TODO</div>} />
-                <Route path="accessibility" element={<div data-testid="page-root">Accessibility - TODO</div>} />
+                <Route path="security" element={<SecurityPageEnhanced />} />
+                <Route path="audit" element={<AuditPageEnhanced />} />
+                <Route path="accessibility" element={<AccessibilityPageEnhanced />} />
               </Route>
             </Route>
             
@@ -185,7 +189,7 @@ function App() {
             
             {/* System pages */}
             <Route path="/system/api-monitoring" element={<ProtectedRoute role="any" />}>
-              <Route index element={<div data-testid="page-root">API Monitoring - TODO</div>} />
+              <Route index element={<APIMonitoringPageEnhanced />} />
             </Route>
             
             {/* Aliases (redirects) */}

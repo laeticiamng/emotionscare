@@ -1,4 +1,3 @@
 
-// This file re-exports the useCoach hook from contexts/coach
-// for backward compatibility
-export { useCoach } from '@/contexts/coach';
+// Re-export unified coach functionality from the new unified context
+export { useCoach } from '@/contexts/coach/CoachContextUnified';

@@ -1,77 +1,61 @@
-
-/* Styles d'accessibilité pour EmotionsCare */
-
-/* Focus visible amélioré */
-*:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-  border-radius: 4px;
+/* Production-Ready Accessibility Stylesheet */
+:root {
+  --accessibility-focus-outline: 3px solid hsl(var(--primary));
+  --accessibility-focus-offset: 2px;
 }
 
-/* Respect des préférences de mouvement réduit */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* High Contrast Mode */
+.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --primary: 210 100% 50%;
+  --border: 0 0% 30%;
 }
 
-/* Amélioration du contraste pour le mode sombre */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground: 210 40% 98%;
-    --muted-foreground: 215 20.2% 65.1%;
-  }
+/* Large Text Mode */
+.large-text {
+  font-size: 1.25rem;
+  line-height: 1.6;
 }
 
-/* Texte pour lecteurs d'écran uniquement */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.large-text button,
+.large-text input {
+  min-height: 44px;
+  font-size: 1.125rem;
 }
 
-/* Focus skip link */
+/* Reduced Motion */
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Enhanced Focus */
+.enhanced-focus *:focus {
+  outline: var(--accessibility-focus-outline);
+  outline-offset: var(--accessibility-focus-offset);
+}
+
+/* Skip Links */
 .skip-link {
   position: absolute;
   top: -40px;
   left: 6px;
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  padding: 8px;
-  text-decoration: none;
-  border-radius: 4px;
-  z-index: 1000;
+  padding: 8px 16px;
+  z-index: 9999;
 }
 
 .skip-link:focus {
   top: 6px;
 }
 
-/* Amélioration des formulaires */
-input:invalid {
-  border-color: hsl(var(--destructive));
-}
-
-input:valid {
-  border-color: hsl(var(--success, 142 76% 36%));
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  :root {
-    --border: 0 0% 20%;
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-  }
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
 }
