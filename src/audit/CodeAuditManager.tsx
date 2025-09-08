@@ -88,39 +88,53 @@ export const useCodeAudit = () => {
   const auditAccessibility = (): AuditResult[] => {
     const results: AuditResult[] = [];
     
-    // Vérification des éléments sans labels
-    const unlabeledInputs = document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])');
-    if (unlabeledInputs.length > 0) {
-      results.push({
-        category: 'Accessibilité',
-        severity: 'high',
-        message: `${unlabeledInputs.length} champs de saisie sans label détectés`,
-        suggestion: 'Ajouter aria-label ou aria-labelledby à tous les champs',
-        autoFixAvailable: true
-      });
+    // Vérification sécurisée de l'environnement
+    if (typeof document === 'undefined') {
+      return results;
     }
 
-    // Vérification du contraste
-    const lowContrastElements = document.querySelectorAll('[data-low-contrast]');
-    if (lowContrastElements.length > 0) {
-      results.push({
-        category: 'Accessibilité',
-        severity: 'medium',
-        message: `${lowContrastElements.length} éléments avec contraste insuffisant`,
-        suggestion: 'Améliorer le contraste pour respecter WCAG AAA (7:1)',
-        autoFixAvailable: true
-      });
-    }
+    try {
+      // Vérification des éléments sans labels
+      const unlabeledInputs = document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])');
+      if (unlabeledInputs.length > 0) {
+        results.push({
+          category: 'Accessibilité',
+          severity: 'high',
+          message: `${unlabeledInputs.length} champs de saisie sans label détectés`,
+          suggestion: 'Ajouter aria-label ou aria-labelledby à tous les champs',
+          autoFixAvailable: true
+        });
+      }
 
-    // Vérification des skip links
-    const skipLinks = document.querySelectorAll('.skip-link');
-    if (skipLinks.length === 0) {
+      // Vérification du contraste
+      const lowContrastElements = document.querySelectorAll('[data-low-contrast]');
+      if (lowContrastElements.length > 0) {
+        results.push({
+          category: 'Accessibilité',
+          severity: 'medium',
+          message: `${lowContrastElements.length} éléments avec contraste insuffisant`,
+          suggestion: 'Améliorer le contraste pour respecter WCAG AAA (7:1)',
+          autoFixAvailable: true
+        });
+      }
+
+      // Vérification des skip links
+      const skipLinks = document.querySelectorAll('.skip-link');
+      if (skipLinks.length === 0) {
+        results.push({
+          category: 'Accessibilité',
+          severity: 'medium',
+          message: 'Aucun skip link détecté',
+          suggestion: 'Ajouter des skip links pour la navigation au clavier',
+          autoFixAvailable: true
+        });
+      }
+    } catch (error) {
       results.push({
         category: 'Accessibilité',
-        severity: 'medium',
-        message: 'Aucun skip link détecté',
-        suggestion: 'Ajouter des skip links pour la navigation au clavier',
-        autoFixAvailable: true
+        severity: 'low',
+        message: 'Erreur lors de l\'audit d\'accessibilité',
+        suggestion: 'Vérifier la compatibilité navigateur'
       });
     }
 
@@ -130,39 +144,53 @@ export const useCodeAudit = () => {
   const auditPerformance = (): AuditResult[] => {
     const results: AuditResult[] = [];
     
-    // Vérification du temps de chargement
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    if (navigation && navigation.loadEventEnd - navigation.fetchStart > 3000) {
-      results.push({
-        category: 'Performance',
-        severity: 'high',
-        message: 'Temps de chargement initial trop lent (>3s)',
-        suggestion: 'Implémenter du lazy loading et optimiser les ressources critiques',
-        autoFixAvailable: true
-      });
+    // Vérification sécurisée de l'environnement
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return results;
     }
 
-    // Vérification des images non optimisées
-    const images = document.querySelectorAll('img:not([loading="lazy"])');
-    if (images.length > 5) {
-      results.push({
-        category: 'Performance',
-        severity: 'medium',
-        message: `${images.length} images sans lazy loading détectées`,
-        suggestion: 'Ajouter loading="lazy" aux images non critiques',
-        autoFixAvailable: true
-      });
-    }
+    try {
+      // Vérification du temps de chargement
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigation && navigation.loadEventEnd - navigation.fetchStart > 3000) {
+        results.push({
+          category: 'Performance',
+          severity: 'high',
+          message: 'Temps de chargement initial trop lent (>3s)',
+          suggestion: 'Implémenter du lazy loading et optimiser les ressources critiques',
+          autoFixAvailable: true
+        });
+      }
 
-    // Vérification mémoire
-    const memory = (performance as any).memory;
-    if (memory && memory.usedJSHeapSize > 100 * 1024 * 1024) {
+      // Vérification des images non optimisées
+      const images = document.querySelectorAll('img:not([loading="lazy"])');
+      if (images.length > 5) {
+        results.push({
+          category: 'Performance',
+          severity: 'medium',
+          message: `${images.length} images sans lazy loading détectées`,
+          suggestion: 'Ajouter loading="lazy" aux images non critiques',
+          autoFixAvailable: true
+        });
+      }
+
+      // Vérification mémoire
+      const memory = (performance as any).memory;
+      if (memory && memory.usedJSHeapSize > 100 * 1024 * 1024) {
+        results.push({
+          category: 'Performance',
+          severity: 'medium',
+          message: 'Utilisation mémoire élevée (>100MB)',
+          suggestion: 'Optimiser la gestion mémoire et nettoyer les listeners',
+          autoFixAvailable: false
+        });
+      }
+    } catch (error) {
       results.push({
         category: 'Performance',
-        severity: 'medium',
-        message: 'Utilisation mémoire élevée (>100MB)',
-        suggestion: 'Optimiser la gestion mémoire et nettoyer les listeners',
-        autoFixAvailable: false
+        severity: 'low',
+        message: 'Erreur lors de l\'audit de performance',
+        suggestion: 'Vérifier les API Performance disponibles'
       });
     }
 
@@ -218,25 +246,39 @@ export const useCodeAudit = () => {
   const auditBestPractices = (): AuditResult[] => {
     const results: AuditResult[] = [];
     
-    // Vérification des meta tags essentiels
-    if (!document.querySelector('meta[name="description"]')) {
-      results.push({
-        category: 'SEO/Best Practices',
-        severity: 'medium',
-        message: 'Meta description manquante',
-        suggestion: 'Ajouter une meta description optimisée',
-        autoFixAvailable: true
-      });
+    // Vérification sécurisée de l'environnement
+    if (typeof document === 'undefined') {
+      return results;
     }
 
-    // Vérification viewport
-    if (!document.querySelector('meta[name="viewport"]')) {
+    try {
+      // Vérification des meta tags essentiels
+      if (!document.querySelector('meta[name="description"]')) {
+        results.push({
+          category: 'SEO/Best Practices',
+          severity: 'medium',
+          message: 'Meta description manquante',
+          suggestion: 'Ajouter une meta description optimisée',
+          autoFixAvailable: true
+        });
+      }
+
+      // Vérification viewport
+      if (!document.querySelector('meta[name="viewport"]')) {
+        results.push({
+          category: 'SEO/Best Practices',
+          severity: 'high',
+          message: 'Meta viewport manquante',
+          suggestion: 'Ajouter meta viewport pour la responsivité',
+          autoFixAvailable: true
+        });
+      }
+    } catch (error) {
       results.push({
         category: 'SEO/Best Practices',
-        severity: 'high',
-        message: 'Meta viewport manquante',
-        suggestion: 'Ajouter meta viewport pour la responsivité',
-        autoFixAvailable: true
+        severity: 'low',
+        message: 'Erreur lors de l\'audit SEO',
+        suggestion: 'Vérifier l\'accès au DOM'
       });
     }
 

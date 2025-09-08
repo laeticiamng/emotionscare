@@ -21,10 +21,12 @@ import { PremiumOptimizerPanel } from '@/audit/PremiumOptimizer';
 import { CodeAuditPanel } from '@/audit/CodeAuditManager';
 import { initializeAutoCleanup } from '@/audit/CodeCleanupUtilities';
 
-// Initialisation du nettoyage automatique
-if (typeof window !== 'undefined') {
-  initializeAutoCleanup();
-}
+// Initialisation différée et sécurisée du nettoyage automatique
+setTimeout(() => {
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    initializeAutoCleanup();
+  }
+}, 2000); // Délai pour s'assurer que l'app est complètement chargée
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -65,8 +67,8 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                       }}
                     />
                     
-                    {/* Outils d'audit et d'optimisation premium (dev uniquement) */}
-                    {process.env.NODE_ENV === 'development' && (
+                    {/* Outils d'audit et d'optimisation premium (temporairement désactivés) */}
+                    {false && process.env.NODE_ENV === 'development' && (
                       <>
                         <PremiumOptimizerPanel />
                         <CodeAuditPanel />

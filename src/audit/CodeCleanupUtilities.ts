@@ -45,42 +45,44 @@ export class CodeCleanupManager {
   }
 
   /**
-   * Nettoie les console.log et statements de debug
+   * Nettoie les console.log et statements de debug - VERSION SÉCURISÉE
    */
   public cleanupConsoleStatements(): void {
     if (!this.options.removeConsoleStatements) return;
 
     try {
-      // En production, remplace les console.log par des noops
-      if (process.env.NODE_ENV === 'production') {
-        const originalMethods = {
-          log: console.log,
-          info: console.info,
-          debug: console.debug,
-          trace: console.trace,
-          table: console.table,
-          group: console.group,
-          groupCollapsed: console.groupCollapsed,
-          groupEnd: console.groupEnd,
-          count: console.count,
-          time: console.time,
-          timeEnd: console.timeEnd
+      // En production, utilise une approche sécurisée pour remplacer console
+      if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined') {
+        // Sauvegarde sécurisée des méthodes originales avec binding correct
+        const originalConsole = {
+          log: console.log.bind(console),
+          info: console.info.bind(console),
+          debug: console.debug.bind(console),
+          trace: console.trace.bind(console),
+          table: console.table.bind(console),
+          group: console.group.bind(console),
+          groupCollapsed: console.groupCollapsed.bind(console),
+          groupEnd: console.groupEnd.bind(console),
+          count: console.count.bind(console),
+          time: console.time.bind(console),
+          timeEnd: console.timeEnd.bind(console)
         };
 
-        // Garde seulement error et warn pour le monitoring
-        console.log = () => {};
-        console.info = () => {};
-        console.debug = () => {};
-        console.trace = () => {};
-        console.table = () => {};
-        console.group = () => {};
-        console.groupCollapsed = () => {};
-        console.groupEnd = () => {};
-        console.count = () => {};
-        console.time = () => {};
-        console.timeEnd = () => {};
+        // Remplacement sécurisé avec binding correct
+        const noop = function() {};
+        Object.defineProperty(console, 'log', { value: noop, writable: true });
+        Object.defineProperty(console, 'info', { value: noop, writable: true });
+        Object.defineProperty(console, 'debug', { value: noop, writable: true });
+        Object.defineProperty(console, 'trace', { value: noop, writable: true });
+        Object.defineProperty(console, 'table', { value: noop, writable: true });
+        Object.defineProperty(console, 'group', { value: noop, writable: true });
+        Object.defineProperty(console, 'groupCollapsed', { value: noop, writable: true });
+        Object.defineProperty(console, 'groupEnd', { value: noop, writable: true });
+        Object.defineProperty(console, 'count', { value: noop, writable: true });
+        Object.defineProperty(console, 'time', { value: noop, writable: true });
+        Object.defineProperty(console, 'timeEnd', { value: noop, writable: true });
 
-        this.results.issuesFixed += Object.keys(originalMethods).length;
+        this.results.issuesFixed += Object.keys(originalConsole).length;
         this.addToSummary('Console statements nettoyés pour la production');
       }
     } catch (error) {
@@ -123,45 +125,57 @@ export class CodeCleanupManager {
   }
 
   /**
-   * Applique automatiquement le lazy loading aux images
+   * Applique automatiquement le lazy loading aux images - VERSION SÉCURISÉE
    */
   private setupAutomaticLazyLoading(): void {
-    const images = document.querySelectorAll('img:not([loading])');
-    let count = 0;
+    if (typeof document === 'undefined') return;
 
-    images.forEach((img, index) => {
-      // Skip les images above-the-fold (première vue)
-      if (index > 2 && !img.closest('[data-critical]')) {
-        img.setAttribute('loading', 'lazy');
-        count++;
+    try {
+      const images = document.querySelectorAll('img:not([loading])');
+      let count = 0;
+
+      images.forEach((img, index) => {
+        // Skip les images above-the-fold (première vue)
+        if (index > 2 && !img.closest('[data-critical]')) {
+          img.setAttribute('loading', 'lazy');
+          count++;
+        }
+      });
+
+      if (count > 0) {
+        this.results.issuesFixed += count;
+        this.addToSummary(`${count} images optimisées avec lazy loading`);
       }
-    });
-
-    if (count > 0) {
-      this.results.issuesFixed += count;
-      this.addToSummary(`${count} images optimisées avec lazy loading`);
+    } catch (error) {
+      this.results.errors.push(`Erreur lors du lazy loading: ${error}`);
     }
   }
 
   /**
-   * Configure les préconnexions DNS
+   * Configure les préconnexions DNS - VERSION SÉCURISÉE
    */
   private setupDNSPrefetch(): void {
-    const criticalDomains = [
-      'https://fonts.googleapis.com',
-      'https://fonts.gstatic.com',
-      'https://yaincoxihiqdksxgrsrk.supabase.co'
-    ];
+    if (typeof document === 'undefined') return;
 
-    criticalDomains.forEach(domain => {
-      if (!document.querySelector(`link[rel="dns-prefetch"][href="${domain}"]`)) {
-        const link = document.createElement('link');
-        link.rel = 'dns-prefetch';
-        link.href = domain;
-        document.head.appendChild(link);
-        this.results.issuesFixed++;
-      }
-    });
+    try {
+      const criticalDomains = [
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
+        'https://yaincoxihiqdksxgrsrk.supabase.co'
+      ];
+
+      criticalDomains.forEach(domain => {
+        if (!document.querySelector(`link[rel="dns-prefetch"][href="${domain}"]`)) {
+          const link = document.createElement('link');
+          link.rel = 'dns-prefetch';
+          link.href = domain;
+          document.head.appendChild(link);
+          this.results.issuesFixed++;
+        }
+      });
+    } catch (error) {
+      this.results.errors.push(`Erreur lors de la configuration DNS prefetch: ${error}`);
+    }
   }
 
   /**
@@ -400,21 +414,47 @@ export const useCodeCleanup = () => {
 };
 
 /**
- * Initialise le nettoyage automatique au démarrage
+ * Initialise le nettoyage automatique au démarrage - VERSION SÉCURISÉE
  */
 export const initializeAutoCleanup = () => {
-  // Nettoyage au chargement de la page
-  if (typeof window !== 'undefined') {
-    window.addEventListener('load', () => {
-      codeCleanupManager.runCompleteCleanup();
-    });
+  // Ne s'active qu'en environnement sécurisé
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
 
-    // Nettoyage périodique en développement
-    if (process.env.NODE_ENV === 'development') {
-      setInterval(() => {
-        codeCleanupManager.cleanupConsoleStatements();
+  try {
+    // Nettoyage différé au chargement de la page
+    const safeCleanup = () => {
+      try {
+        if (process.env.NODE_ENV === 'production') {
+          codeCleanupManager.cleanupConsoleStatements();
+        }
         codeCleanupManager.enforceAccessibility();
-      }, 30000); // Toutes les 30 secondes
+      } catch (error) {
+        // Échec silencieux pour éviter les erreurs en cascade
+        console.error('Cleanup failed:', error);
+      }
+    };
+
+    // Utilise requestIdleCallback si disponible, sinon setTimeout
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(safeCleanup);
+    } else {
+      setTimeout(safeCleanup, 1000);
     }
+
+    // Nettoyage périodique seulement en développement et avec protection
+    if (process.env.NODE_ENV === 'development') {
+      const intervalId = setInterval(() => {
+        try {
+          codeCleanupManager.enforceAccessibility();
+        } catch (error) {
+          clearInterval(intervalId); // Stop si erreur
+        }
+      }, 60000); // Toutes les minutes au lieu de 30s
+    }
+  } catch (error) {
+    // Échec silencieux de l'initialisation
+    console.error('AutoCleanup initialization failed:', error);
   }
 };
