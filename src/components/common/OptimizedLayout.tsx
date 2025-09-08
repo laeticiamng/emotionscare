@@ -1,5 +1,5 @@
 import React, { memo, Suspense, lazy } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContextEnhanced';
 import { CoachProvider } from '@/contexts/coach/CoachContextUnified';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -15,7 +15,7 @@ interface OptimizedLayoutProps {
   enableAccessibility?: boolean;
 }
 
-const ErrorFallback = ({ error, resetErrorBoundary }: any) => {
+const ErrorFallback = ({ error, resetError }: { error?: Error; resetError: () => void }) => {
   logProductionEvent('Layout Error', error, 'error');
   
   return (
@@ -28,7 +28,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }: any) => {
           L'application a rencontré une erreur inattendue. Veuillez réessayer.
         </p>
         <button
-          onClick={resetErrorBoundary}
+          onClick={resetError}
           className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           aria-label="Réessayer l'application"
         >
@@ -56,7 +56,7 @@ const OptimizedLayout: React.FC<OptimizedLayoutProps> = memo(({
   enableAccessibility = true 
 }) => {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <EnhancedErrorBoundary fallback={ErrorFallback}>
       <AccessibilityProvider>
         <CoachProvider>
           <div className="min-h-screen bg-background text-foreground">
@@ -100,7 +100,7 @@ const OptimizedLayout: React.FC<OptimizedLayoutProps> = memo(({
           </div>
         </CoachProvider>
       </AccessibilityProvider>
-    </ErrorBoundary>
+    </EnhancedErrorBoundary>
   );
 });
 
