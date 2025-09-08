@@ -19,7 +19,7 @@ import {
   Frown,
   Meh,
   Angry,
-  Surprised,
+  AlertCircle,
   Zap,
   TrendingUp,
   Calendar
@@ -30,7 +30,7 @@ const emotionData = [
   { name: 'Calme', value: 78, color: 'bg-blue-500', icon: Meh, trend: '+12%' },
   { name: 'Stress', value: 23, color: 'bg-red-500', icon: Frown, trend: '-8%' },
   { name: 'Énergie', value: 82, color: 'bg-green-500', icon: Zap, trend: '+15%' },
-  { name: 'Surprise', value: 45, color: 'bg-purple-500', icon: Surprised, trend: '+2%' },
+  { name: 'Surprise', value: 45, color: 'bg-purple-500', icon: AlertCircle, trend: '+2%' },
   { name: 'Colère', value: 12, color: 'bg-orange-500', icon: Angry, trend: '-18%' }
 ];
 
