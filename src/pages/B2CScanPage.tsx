@@ -242,7 +242,6 @@ const B2CScanPage: React.FC = () => {
       </div>
     </PageRoot>
   );
-  );
 };
 
 export default B2CScanPage;
