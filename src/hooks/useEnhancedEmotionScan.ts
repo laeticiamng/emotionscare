@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { EmotionResult, ScanMode, EmotionAnalysisConfig, BiometricData, EmotionConfidence, EmotionVector } from '@/types/emotion';
 import { emotionsCareApi } from '@/services/emotionsCareApi';
-import { useLogger } from '@/lib/logger';
+import { logger } from '@/lib/logger';
 
 interface UseEnhancedEmotionScanReturn {
   isScanning: boolean;
@@ -20,7 +20,6 @@ interface UseEnhancedEmotionScanReturn {
 }
 
 export const useEnhancedEmotionScan = (initialConfig: EmotionAnalysisConfig): UseEnhancedEmotionScanReturn => {
-  const logger = useLogger();
   
   // États principaux
   const [isScanning, setIsScanning] = useState(false);
