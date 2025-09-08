@@ -48,7 +48,7 @@ interface CoachState {
 // Notifications State
 interface NotificationState {
   notifications: any[];
-  preferences: {
+  notificationPreferences: {
     push: boolean;
     email: boolean;
     sound: boolean;
@@ -98,7 +98,7 @@ interface AppStore extends AuthState, ThemeState, MusicState, CoachState, Notifi
   addNotification: (notification: any) => void;
   removeNotification: (id: string) => void;
   markAsRead: (id: string) => void;
-  setNotificationPreferences: (prefs: Partial<NotificationState['preferences']>) => void;
+  setNotificationPreferences: (prefs: Partial<NotificationState['notificationPreferences']>) => void;
 
   // Dashboard Actions
   addWidget: (widget: any) => void;
@@ -142,7 +142,7 @@ export const useAppStore = create<AppStore>()(
 
       // Initial Notifications State
       notifications: [],
-      preferences: {
+      notificationPreferences: {
         push: true,
         email: true,
         sound: true,
@@ -312,8 +312,8 @@ export const useAppStore = create<AppStore>()(
       },
 
       setNotificationPreferences: (prefs) => {
-        const { preferences } = get();
-        set({ preferences: { ...preferences, ...prefs } });
+        const { notificationPreferences } = get();
+        set({ notificationPreferences: { ...notificationPreferences, ...prefs } });
       },
 
       // Dashboard Actions
@@ -416,7 +416,7 @@ export const useCoach = () => useAppStore((state) => ({
 
 export const useNotifications = () => useAppStore((state) => ({
   notifications: state.notifications,
-  preferences: state.preferences,
+  preferences: state.notificationPreferences,
   addNotification: state.addNotification,
   removeNotification: state.removeNotification,
   markAsRead: state.markAsRead,

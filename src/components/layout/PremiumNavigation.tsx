@@ -585,3 +585,4 @@ const PremiumNavigation: React.FC = () => {
 };
 
 export default PremiumNavigation;
+export { PremiumNavigation };
