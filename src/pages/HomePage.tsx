@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { 
   Brain, 
   Heart, 
@@ -22,9 +22,11 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 interface FeatureCard {
   icon: React.ComponentType<any>;
@@ -183,18 +185,14 @@ export const HomePage: React.FC = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" asChild className="flex items-center space-x-2">
-                  <Link to="/b2c">
-                    <Users className="h-5 w-5" />
-                    <span>Découvrir B2C</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                <Button size="lg" className="flex items-center space-x-2" onClick={() => navigate('/login')}>
+                  <Heart className="h-5 w-5" />
+                  <span>Commencer Gratuitement</span>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button size="lg" variant="outline" asChild className="flex items-center space-x-2">
-                  <Link to="/entreprise">
-                    <Shield className="h-5 w-5" />
-                    <span>Solutions Entreprise</span>
-                  </Link>
+                <Button size="lg" variant="outline" className="flex items-center space-x-2" onClick={() => navigate('/help')}>
+                  <Shield className="h-5 w-5" />
+                  <span>En savoir plus</span>
                 </Button>
               </div>
             </motion.div>
@@ -227,7 +225,7 @@ export const HomePage: React.FC = () => {
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((feature, index) => (
+              {FEATURES.map((feature, index) => (
                 <motion.div
                   key={feature.title}
                   initial={{ opacity: 0, y: 20 }}
@@ -237,11 +235,21 @@ export const HomePage: React.FC = () => {
                 >
                   <Card className="h-full hover:shadow-lg transition-shadow duration-300">
                     <CardHeader>
-                      <feature.icon className={`h-8 w-8 ${feature.color} mb-2`} />
+                      <div className={`p-2 rounded-lg bg-gradient-to-r ${feature.color} w-fit mb-4`}>
+                        <feature.icon className="h-6 w-6 text-white" />
+                      </div>
                       <CardTitle className="text-lg">{feature.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription>{feature.description}</CardDescription>
+                      <CardDescription className="mb-4">{feature.description}</CardDescription>
+                      <ul className="space-y-1">
+                        {feature.benefits.map((benefit, i) => (
+                          <li key={i} className="flex items-center text-sm text-muted-foreground">
+                            <CheckCircle className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
+                            {benefit}
+                          </li>
+                        ))}
+                      </ul>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -263,7 +271,7 @@ export const HomePage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
+              {STATS.map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -306,17 +314,13 @@ export const HomePage: React.FC = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" asChild className="flex items-center space-x-2">
-                  <Link to="/login">
-                    <Heart className="h-5 w-5" />
-                    <span>Commencer Gratuitement</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                <Button size="lg" className="flex items-center space-x-2" onClick={() => navigate('/login')}>
+                  <Heart className="h-5 w-5" />
+                  <span>Commencer Gratuitement</span>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link to="/help">
-                    En savoir plus
-                  </Link>
+                <Button size="lg" variant="outline" onClick={() => navigate('/help')}>
+                  En savoir plus
                 </Button>
               </div>
 
