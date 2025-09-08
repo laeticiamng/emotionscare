@@ -7,7 +7,7 @@ import { Heart, Play, Pause, Square, Waves, Zap, Target, Trophy, Music } from 'l
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import Breadcrumbs from '@/components/navigation/Breadcrumbs';
+import PageRoot from '@/components/common/PageRoot';
 
 interface Bubble {
   id: string;
@@ -19,7 +19,7 @@ interface Bubble {
   emotion: string;
 }
 
-const B2CBubbleBeatEnhanced: React.FC = () => {
+const B2CBubbleBeatPage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [heartRate, setHeartRate] = useState(72);
   const [targetHeartRate, setTargetHeartRate] = useState([75]);
@@ -247,8 +247,9 @@ const B2CBubbleBeatEnhanced: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs />
+    <PageRoot>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+        <div className="container mx-auto px-4 py-8 space-y-6">
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -525,8 +526,10 @@ const B2CBubbleBeatEnhanced: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
+        </div>
+      </div>
+    </PageRoot>
   );
 };
 
-export default B2CBubbleBeatEnhanced;
+export default B2CBubbleBeatPage;
