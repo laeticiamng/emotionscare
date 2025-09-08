@@ -111,11 +111,22 @@ const B2CAICoachPage: React.FC = () => {
 
   const createNewConversation = async () => {
     try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        toast({
+          title: "Erreur",
+          description: "Vous devez être connecté pour créer une conversation",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('coach_conversations')
         .insert({
           title: 'Nouvelle conversation',
-          coach_mode: coachPersonality
+          coach_mode: coachPersonality,
+          user_id: userData.user.id
         })
         .select()
         .single();
