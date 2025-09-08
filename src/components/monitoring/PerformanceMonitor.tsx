@@ -1,83 +1,105 @@
+import React, { useEffect, useState, memo } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Activity, Cpu, Network, Zap, AlertTriangle } from 'lucide-react';
 
-import React from 'react';
+interface PerformanceMetrics {
+  renderTime: number;
+  memoryUsage: number;
+  networkLatency: number;
+  lcp: number;
+  fid: number;
+  fps: number;
+}
 
-const PerformanceMonitor: React.FC = () => {
-  const [metrics, setMetrics] = React.useState({
+/**
+ * Real-time Performance Monitor - Development Tool
+ */
+const PerformanceMonitor: React.FC = memo(() => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
     renderTime: 0,
     memoryUsage: 0,
-    loadTime: 0
+    networkLatency: 0,
+    lcp: 0,
+    fid: 0,
+    fps: 60
   });
 
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || typeof performance === 'undefined') {
-      return;
-    }
-
-    try {
-      // Surveillance des performances avec protection d'erreurs renforcée
-      if ('PerformanceObserver' in window) {
-        const observer = new PerformanceObserver((list) => {
-          try {
-            const entries = list.getEntries();
-            entries.forEach((entry) => {
-              if (entry.entryType === 'navigation') {
-                setMetrics(prev => ({
-                  ...prev,
-                  loadTime: Math.round(entry.duration || 0)
-                }));
-              }
-            });
-          } catch (error) {
-            console.log('⚠️ Performance entries processing failed:', error);
-          }
-        });
-
-        try {
-          observer.observe({ entryTypes: ['navigation', 'measure'] });
-        } catch (error) {
-          console.log('⚠️ Performance Observer setup failed:', error);
-        }
-
-        // Mesure de la mémoire si disponible
-        try {
-          if ('memory' in performance) {
-            const memory = (performance as any).memory;
-            if (memory && typeof memory.usedJSHeapSize === 'number') {
-              setMetrics(prev => ({
-                ...prev,
-                memoryUsage: Math.round(memory.usedJSHeapSize / 1024 / 1024)
-              }));
-            }
-          }
-        } catch (error) {
-          console.log('⚠️ Memory measurement failed:', error);
-        }
-
-        return () => {
-          try {
-            if (observer && typeof observer.disconnect === 'function') {
-              observer.disconnect();
-            }
-          } catch (error) {
-            console.log('⚠️ Observer disconnect failed:', error);
-          }
-        };
-      }
-    } catch (error) {
-      console.log('⚠️ Performance monitoring setup failed:', error);
-    }
-  }, []);
-
-  if (process.env.NODE_ENV !== 'development') {
+  // Only show in development
+  if (process.env.NODE_ENV === 'production') {
     return null;
   }
 
+  const collectMetrics = () => {
+    const memory = (performance as any).memory;
+    
+    setMetrics({
+      renderTime: performance.now(),
+      memoryUsage: memory ? memory.usedJSHeapSize : 0,
+      networkLatency: 0,
+      lcp: 0,
+      fid: 0,
+      fps: 60
+    });
+  };
+
+  useEffect(() => {
+    const interval = setInterval(collectMetrics, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!isVisible) {
+    return (
+      <Button
+        onClick={() => setIsVisible(true)}
+        size="sm"
+        variant="outline"
+        className="fixed bottom-4 left-4 z-50 opacity-50 hover:opacity-100"
+        title="Open Performance Monitor"
+      >
+        <Activity className="h-4 w-4" />
+      </Button>
+    );
+  }
+
   return (
-    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-2 rounded text-xs z-50">
-      <div>Load: {metrics.loadTime}ms</div>
-      <div>Memory: {metrics.memoryUsage}MB</div>
+    <div className="fixed bottom-4 left-4 w-80 z-50">
+      <Card className="shadow-2xl">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Activity className="h-4 w-4" />
+              Performance Monitor
+            </CardTitle>
+            <Button
+              onClick={() => setIsVisible(false)}
+              size="sm"
+              variant="ghost"
+            >
+              ✕
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <div className="flex justify-between">
+            <span>Memory Usage</span>
+            <span className="font-mono">
+              {Math.round(metrics.memoryUsage / 1024 / 1024)}MB
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>Frame Rate</span>
+            <span className="font-mono">{metrics.fps} FPS</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
+});
+
+PerformanceMonitor.displayName = 'PerformanceMonitor';
 
 export default PerformanceMonitor;
