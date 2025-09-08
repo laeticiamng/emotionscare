@@ -4,7 +4,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Toaster } from '@/components/ui/toaster';
 
 // Import direct des pages principales
-import HomePage from '@/pages/index.tsx';
+import HomePage from '@/pages/HomePage';
 
 // Import lazy des pages pour optimiser le chargement
 const B2CPage = lazy(() => import('@/pages/B2CPage'));
