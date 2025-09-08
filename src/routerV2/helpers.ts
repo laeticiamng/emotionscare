@@ -1,165 +1,223 @@
 /**
- * RouterV2 Helpers - Functions typées pour la navigation
- * TICKET: FE/BE-Router-Cleanup-01
- * 
- * USAGE: 
- * - Remplace tous les liens en dur <Link to="/..."> 
- * - Utilise Routes.music() au lieu de "/music"
- * - Permet les paramètres typés
+ * Router Helpers - Fonctions utilitaires pour la génération d'URLs
+ * Centralise la logique de routing pour éviter les erreurs
  */
 
+interface RouteParams {
+  [key: string]: string | number | boolean | undefined;
+}
+
+interface AuthRouteParams {
+  segment?: 'b2c' | 'b2b';
+  redirect?: string;
+}
+
+interface AppRouteParams {
+  feature?: string;
+  id?: string;
+}
+
+/**
+ * Helper pour construire des URLs avec paramètres
+ */
+function buildUrl(path: string, params?: RouteParams): string {
+  if (!params) return path;
+  
+  const searchParams = new URLSearchParams();
+  
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.set(key, String(value));
+    }
+  });
+  
+  const queryString = searchParams.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
+
+/**
+ * Routes principales de l'application
+ */
 export const Routes = {
-  // ═══════════════════════════════════════════════════════════
-  // ROUTES PUBLIQUES
-  // ═══════════════════════════════════════════════════════════
+  // Routes publiques
   home: () => '/',
-  b2cLanding: () => '/b2c',
-  b2bLanding: () => '/entreprise',
-  
-  login: (params?: { segment?: 'b2c' | 'b2b' }) => {
-    const base = '/login';
-    return params?.segment ? `${base}?segment=${params.segment}` : base;
-  },
-  
-  signup: (params?: { segment?: 'b2c' | 'b2b' }) => {
-    const base = '/signup';
-    return params?.segment ? `${base}?segment=${params.segment}` : base;
-  },
-  
   about: () => '/about',
   contact: () => '/contact',
   help: () => '/help',
-  demo: () => '/demo',
-  onboarding: () => '/onboarding',
   privacy: () => '/privacy',
-
-  // ═══════════════════════════════════════════════════════════
-  // APP & DASHBOARDS
-  // ═══════════════════════════════════════════════════════════
-  app: () => '/app',
-  consumerHome: () => '/app/home',
-  employeeHome: () => '/app/collab',
-  managerHome: () => '/app/rh',
-
-  // ═══════════════════════════════════════════════════════════
-  // MODULES FONCTIONNELS
-  // ═══════════════════════════════════════════════════════════
-  scan: () => '/app/scan',
-  music: () => '/app/music',
-  coach: () => '/app/coach',
-  journal: () => '/app/journal',
-  vr: () => '/app/vr',
-
-  // ═══════════════════════════════════════════════════════════
-  // MODULES FUN-FIRST
-  // ═══════════════════════════════════════════════════════════
-  flashGlow: () => '/app/flash-glow',
-  breath: () => '/app/breath',
-  vrBreath: () => '/app/vr-breath',
-  faceAR: () => '/app/face-ar',
-  emotionScan: () => '/app/emotion-scan',
-  voiceJournal: () => '/app/voice-journal',
-  bubbleBeat: () => '/app/bubble-beat',
-  screenSilk: () => '/app/screen-silk',
-  vrGalaxy: () => '/app/vr-galaxy',
-  bossGrit: () => '/app/boss-grit',
-  moodMixer: () => '/app/mood-mixer',
-  ambitionArcade: () => '/app/ambition-arcade',
-  bounceBack: () => '/app/bounce-back',
-  storySynth: () => '/app/story-synth',
-  emotions: () => '/app/emotions',
-  community: () => '/app/community',
-  socialCoconB2C: () => '/app/social-cocon',
-
-  // ═══════════════════════════════════════════════════════════
-  // ANALYTICS & DATA
-  // ═══════════════════════════════════════════════════════════
-  leaderboard: () => '/app/leaderboard',
-  activity: () => '/app/activity',
-  heatmap: () => '/app/heatmap',
-
-  // ═══════════════════════════════════════════════════════════
-  // PARAMÈTRES
-  // ═══════════════════════════════════════════════════════════
-  settingsGeneral: () => '/settings/general',
-  settingsProfile: () => '/settings/profile',
-  settingsPrivacy: () => '/settings/privacy',
-  settingsNotifications: () => '/settings/notifications',
-  settingsDataPrivacy: () => '/settings/data-privacy',
-
-  // ═══════════════════════════════════════════════════════════
-  // B2B FEATURES
-  // ═══════════════════════════════════════════════════════════
-  teams: () => '/app/teams',
-  socialCoconB2B: () => '/app/social',
-  b2bSelection: () => '/b2b/selection',
-  b2bLandingDetailed: () => '/b2b/landing',
-
-  // ═══════════════════════════════════════════════════════════
-  // B2B ADMIN
-  // ═══════════════════════════════════════════════════════════
-  adminReports: () => '/app/reports',
-  adminEvents: () => '/app/events',
-  adminOptimization: () => '/app/optimization',
-  adminSecurity: () => '/app/security',
-  adminAudit: () => '/app/audit',
-  adminAccessibility: () => '/app/accessibility',
-  apiMonitoring: () => '/system/api-monitoring',
-
-  // ═══════════════════════════════════════════════════════════
-  // NAVIGATION & SYSTEM
-  // ═══════════════════════════════════════════════════════════
-  navigation: () => '/navigation',
-  featureMatrix: () => '/feature-matrix',
-
-  // ═══════════════════════════════════════════════════════════
-  // PAGES SYSTÈME
-  // ═══════════════════════════════════════════════════════════
-  unauthorized: () => '/401',
-  forbidden: () => '/403',
-  notFound: () => '/404',
-  serverError: () => '/503',
-} as const;
-
-// ═══════════════════════════════════════════════════════════
-// HELPERS DYNAMIQUES
-// ═══════════════════════════════════════════════════════════
-
-/**
- * Retourne le dashboard approprié selon le rôle utilisateur
- */
-export function getDashboardRoute(role?: string): string {
-  switch (role) {
-    case 'consumer':
-    case 'b2c':
-      return Routes.consumerHome();
-    case 'employee':
-    case 'b2b_user':
-      return Routes.employeeHome();
-    case 'manager':
-    case 'b2b_admin':
-      return Routes.managerHome();
-    default:
-      return Routes.app();
+  terms: () => '/terms',
+  
+  // Routes commerciales
+  b2c: () => '/b2c',
+  enterprise: () => '/entreprise',
+  pricing: () => '/pricing',
+  
+  // Routes d'authentification
+  login: (params?: AuthRouteParams) => buildUrl('/login', params),
+  signup: (params?: AuthRouteParams) => buildUrl('/signup', params),
+  resetPassword: () => '/reset-password',
+  logout: () => '/logout',
+  
+  // Routes App B2C
+  app: {
+    home: () => '/app/home',
+    scan: () => '/app/scan',
+    coach: () => '/app/coach',
+    journal: () => '/app/journal',
+    music: () => '/app/music',
+    breath: () => '/app/breath',
+    activity: () => '/app/activity',
+    gamification: () => '/app/gamification',
+    vrBreath: () => '/app/vr-breath',
+    flashGlow: () => '/app/flash-glow',
+    settings: () => '/app/settings',
+    profile: () => '/app/profile',
+  },
+  
+  // Routes B2B
+  business: {
+    dashboard: () => '/enterprise/dashboard',
+    admin: () => '/enterprise/admin',
+    teams: () => '/enterprise/teams',
+    reports: () => '/enterprise/reports',
+    settings: () => '/enterprise/settings',
+  },
+  
+  // Routes d'erreur
+  error: {
+    unauthorized: () => '/401',
+    forbidden: () => '/403',
+    notFound: () => '/404',
+    serverError: () => '/500',
+  },
+  
+  // Routes système
+  api: {
+    docs: () => '/api-docs',
+    status: () => '/status',
   }
-}
+};
 
 /**
- * Retourne la route de login appropriée selon le segment
+ * Helpers pour la navigation conditionnelle
  */
-export function getLoginRoute(segment?: 'b2c' | 'b2b'): string {
-  return Routes.login({ segment });
-}
+export const NavigationHelpers = {
+  /**
+   * Retourne l'URL du dashboard approprié selon le segment
+   */
+  getDashboardUrl: (segment?: 'b2c' | 'b2b') => {
+    return segment === 'b2b' ? Routes.business.dashboard() : Routes.app.home();
+  },
+  
+  /**
+   * Retourne l'URL de connexion avec redirection
+   */
+  getLoginUrl: (currentPath?: string, segment?: 'b2c' | 'b2b') => {
+    const params: AuthRouteParams = {};
+    
+    if (segment) params.segment = segment;
+    if (currentPath && currentPath !== '/' && !currentPath.startsWith('/auth')) {
+      params.redirect = currentPath;
+    }
+    
+    return Routes.login(params);
+  },
+  
+  /**
+   * Retourne l'URL d'inscription avec redirection
+   */
+  getSignupUrl: (currentPath?: string, segment?: 'b2c' | 'b2b') => {
+    const params: AuthRouteParams = {};
+    
+    if (segment) params.segment = segment;
+    if (currentPath && currentPath !== '/' && !currentPath.startsWith('/auth')) {
+      params.redirect = currentPath;
+    }
+    
+    return Routes.signup(params);
+  },
+  
+  /**
+   * Vérifie si un chemin est une route protégée
+   */
+  isProtectedRoute: (path: string): boolean => {
+    const protectedPrefixes = ['/app', '/enterprise'];
+    return protectedPrefixes.some(prefix => path.startsWith(prefix));
+  },
+  
+  /**
+   * Vérifie si un chemin est une route d'authentification
+   */
+  isAuthRoute: (path: string): boolean => {
+    const authRoutes = ['/login', '/signup', '/reset-password', '/logout'];
+    return authRoutes.includes(path) || authRoutes.some(route => path.startsWith(route));
+  },
+  
+  /**
+   * Vérifie si un chemin est une route publique
+   */
+  isPublicRoute: (path: string): boolean => {
+    const publicPrefixes = ['/', '/about', '/contact', '/help', '/b2c', '/entreprise', '/privacy', '/terms'];
+    return publicPrefixes.includes(path) || path.startsWith('/api-docs') || path.startsWith('/status');
+  }
+};
 
 /**
- * Retourne la route de signup appropriée selon le segment
+ * Utilitaires pour les breadcrumbs
  */
-export function getSignupRoute(segment?: 'b2c' | 'b2b'): string {
-  return Routes.signup({ segment });
-}
+export const BreadcrumbHelpers = {
+  /**
+   * Génère les breadcrumbs pour un chemin donné
+   */
+  generateBreadcrumbs: (path: string) => {
+    const segments = path.split('/').filter(Boolean);
+    const breadcrumbs = [{ label: 'Accueil', path: '/' }];
+    
+    let currentPath = '';
+    
+    segments.forEach((segment, index) => {
+      currentPath += `/${segment}`;
+      
+      // Mapping des segments vers des labels lisibles
+      const labels: Record<string, string> = {
+        'app': 'Application',
+        'enterprise': 'Entreprise',
+        'home': 'Tableau de bord',
+        'scan': 'Scanner émotionnel',
+        'coach': 'Coach IA',
+        'journal': 'Journal',
+        'music': 'Thérapie musicale',
+        'breath': 'Respiration',
+        'activity': 'Activités',
+        'gamification': 'Jeux',
+        'vr-breath': 'VR Respiration',
+        'flash-glow': 'Flash Glow',
+        'settings': 'Paramètres',
+        'profile': 'Profil',
+        'dashboard': 'Tableau de bord',
+        'admin': 'Administration',
+        'teams': 'Équipes',
+        'reports': 'Rapports',
+        'about': 'À propos',
+        'contact': 'Contact',
+        'help': 'Aide',
+        'privacy': 'Confidentialité',
+        'terms': 'Conditions',
+        'b2c': 'Particuliers',
+        'entreprise': 'Entreprises',
+      };
+      
+      const label = labels[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      
+      breadcrumbs.push({
+        label,
+        path: currentPath,
+        isLast: index === segments.length - 1
+      });
+    });
+    
+    return breadcrumbs;
+  }
+};
 
-/**
- * Type helper pour garantir que toutes les routes sont des strings
- */
-export type RouteFunction = () => string;
-export type ParameterizedRouteFunction<T = any> = (params?: T) => string;
+export default Routes;
