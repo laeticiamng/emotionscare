@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { 
-  VrHeadset, 
+  Glasses, 
   Wind, 
   Play,
   Pause,
@@ -444,7 +444,7 @@ export default function B2CVRBreathPageEnhanced() {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm">
-              <VrHeadset className="h-8 w-8 text-blue-600" />
+              <Glasses className="h-8 w-8 text-blue-600" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
               VR Breath Guide
@@ -465,7 +465,7 @@ export default function B2CVRBreathPageEnhanced() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className={`p-3 rounded-xl ${isVRConnected ? 'bg-green-500/10' : 'bg-gray-500/10'}`}>
-                <VrHeadset className={`h-6 w-6 ${isVRConnected ? 'text-green-600' : 'text-gray-600'}`} />
+                <Glasses className={`h-6 w-6 ${isVRConnected ? 'text-green-600' : 'text-gray-600'}`} />
               </div>
               <div>
                 <h3 className="font-semibold">
@@ -487,14 +487,14 @@ export default function B2CVRBreathPageEnhanced() {
                     </>
                   ) : (
                     <>
-                      <VrHeadset className="h-4 w-4 mr-2" />
+                      <Glasses className="h-4 w-4 mr-2" />
                       Connecter VR
                     </>
                   )}
                 </Button>
               ) : (
                 <Button variant="outline" onClick={disconnectVR}>
-                  <VrHeadset className="h-4 w-4 mr-2" />
+                  <Glasses className="h-4 w-4 mr-2" />
                   Déconnecter
                 </Button>
               )}

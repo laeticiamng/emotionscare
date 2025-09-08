@@ -20,9 +20,9 @@ import {
   Zap, ZapOff,
   
   // Icônes spécialisées
-  Sparkles, Headphones, Waves, Gamepad2, Timer, Contrast, Gauge, Laptop,
+  Sparkles, Headphones, Waves, Gamepad2, Timer, Contrast, Gauge, Laptop, Glasses,
   PlayCircle, PlaySquare, Repeat, Shuffle, SkipBack, SkipForward, Upload,
-  UploadCloud, VrHeadset, Maximize, Minimize, RotateCw, RotateCcw, Volume,
+  UploadCloud, Maximize, Minimize, RotateCw, RotateCcw, Volume,
   Volume1, Headset, MonitorSpeaker, MousePointer, MousePointer2, TreePine,
   Mountain, Fish, Flower2, Compass,
   
@@ -82,7 +82,7 @@ export const VerifiedLucideIcons = {
   Speaker, Star, Stars, Sun, Tablet, Target, Terminal, Trash, Trash2, Trophy,
   TrendingUp, User, Users, Video, Volume2, VolumeX, Wifi, Wind, X, XCircle,
   Zap, ZapOff, Sparkles, Headphones, Waves, Gamepad2, Timer, Contrast, Gauge, 
-  Laptop, PlayCircle, PlaySquare, Repeat, Shuffle, SkipBack, SkipForward, 
+  Laptop, Glasses, PlayCircle, PlaySquare, Repeat, Shuffle, SkipBack, SkipForward, 
   Upload, UploadCloud, Maximize, Minimize, RotateCw, RotateCcw, Volume, Volume1,
   Headset, MonitorSpeaker, MousePointer, MousePointer2, TreePine, Mountain, 
   Fish, Flower2, Compass, Loader, Loader2, MoreHorizontal, MoreVertical, 
