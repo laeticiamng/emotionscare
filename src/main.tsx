@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { unifiedRouter } from './core/UnifiedRouter';
+import { premiumRouter } from './core/PremiumRouter';
 import AppProviders from './AppProviders';
 import './index.css';
 import './styles/accessibility.css';
@@ -141,11 +141,11 @@ if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', handleUnhandledRejection);
 }
 
-// Render App with Unified Router
+// Render App with Premium Router
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppProviders>
-      <RouterProvider router={unifiedRouter} />
+      <RouterProvider router={premiumRouter} />
     </AppProviders>
   </React.StrictMode>
 );
