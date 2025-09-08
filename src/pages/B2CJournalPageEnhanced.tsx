@@ -1,255 +1,254 @@
-import React, { useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Heart, Sparkles, BookOpen, TrendingUp } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, Heart, Brain, Sparkles, TrendingUp, Calendar, Mic, Play, Pause } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
-interface JournalEntry {
-  id: string;
-  date: string;
-  content: string;
-  emotion?: string;
-  mood: number;
-  tags: string[];
-  emotionAnalysis?: EmotionResult;
-  insights?: string[];
-}
-
-const B2CJournalPageEnhanced: React.FC = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [currentEntry, setCurrentEntry] = useState('');
+const B2CJournalPageEnhanced = () => {
+  const [journalEntry, setJournalEntry] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [analysis, setAnalysis] = useState(null);
+  const [journalHistory, setJournalHistory] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const analyzeEntry = useCallback(async (content: string) => {
-    if (!content.trim()) return null;
-    
-    setIsAnalyzing(true);
-    try {
-      // Simuler l'analyse émotionnelle du texte
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const emotions = ['happy', 'sad', 'anxious', 'calm', 'excited', 'thoughtful'];
-      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const mood = Math.floor(Math.random() * 10) + 1;
-      
-      const insights = [
-        'Vous semblez avoir une perspective positive aujourd\'hui',
-        'Il pourrait être bénéfique de pratiquer la méditation',
-        'Votre niveau d\'énergie paraît équilibré',
-        'Considérez partager vos sentiments avec un proche'
-      ];
-      
-      return {
-        emotion,
-        mood,
-        insights: insights.slice(0, Math.floor(Math.random() * 3) + 1)
-      };
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }, []);
+  const emotions = [
+    { name: 'Joie', color: 'bg-yellow-500', icon: '😊' },
+    { name: 'Sérénité', color: 'bg-blue-500', icon: '😌' },
+    { name: 'Énergie', color: 'bg-orange-500', icon: '⚡' },
+    { name: 'Confiance', color: 'bg-green-500', icon: '💪' },
+    { name: 'Gratitude', color: 'bg-purple-500', icon: '🙏' },
+    { name: 'Créativité', color: 'bg-pink-500', icon: '🎨' }
+  ];
 
-  const saveEntry = useCallback(async () => {
-    if (!currentEntry.trim()) {
-      toast.error('Veuillez écrire quelque chose avant de sauvegarder');
+  const analyzeJournal = async () => {
+    if (!journalEntry.trim()) {
+      toast({
+        title: "Texte requis",
+        description: "Veuillez écrire quelque chose avant d'analyser.",
+        variant: "destructive"
+      });
       return;
     }
 
-    const analysis = await analyzeEntry(currentEntry);
-    
-    const entry: JournalEntry = {
-      id: Date.now().toString(),
-      date: new Date().toISOString(),
-      content: currentEntry,
-      emotion: analysis?.emotion,
-      mood: analysis?.mood || 5,
-      tags: extractTags(currentEntry),
-      insights: analysis?.insights
-    };
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('enhanced-emotion-analyze', {
+        body: {
+          text: journalEntry,
+          emotion_context: 'journal_entry'
+        }
+      });
 
-    setEntries(prev => [entry, ...prev]);
-    setCurrentEntry('');
-    toast.success('Entrée sauvegardée avec succès');
-  }, [currentEntry, analyzeEntry]);
+      if (error) throw error;
 
-  const extractTags = (content: string): string[] => {
-    const words = content.toLowerCase().split(/\s+/);
-    const emotionWords = words.filter(word => 
-      ['heureux', 'triste', 'anxieux', 'calme', 'excité', 'fatigué', 'motivé'].includes(word)
-    );
-    return [...new Set(emotionWords)];
+      setAnalysis(data.analysis);
+      
+      toast({
+        title: "Journal analysé",
+        description: "Votre entrée a été analysée avec succès.",
+      });
+    } catch (error) {
+      console.error('Erreur analyse journal:', error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Impossible d'analyser votre journal.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  const getEmotionColor = (emotion?: string) => {
-    const colors: Record<string, string> = {
-      happy: 'bg-yellow-100 text-yellow-800',
-      sad: 'bg-blue-100 text-blue-800',
-      anxious: 'bg-purple-100 text-purple-800',
-      calm: 'bg-green-100 text-green-800',
-      excited: 'bg-orange-100 text-orange-800',
-      thoughtful: 'bg-gray-100 text-gray-800'
-    };
-    return colors[emotion || 'thoughtful'] || 'bg-gray-100 text-gray-800';
+  const startVoiceRecording = () => {
+    setIsRecording(!isRecording);
+    toast({
+      title: "Enregistrement vocal",
+      description: isRecording ? "Enregistrement arrêté" : "Enregistrement démarré",
+    });
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl" data-testid="page-root">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <BookOpen className="w-8 h-8" />
-          Journal Émotionnel
-        </h1>
-        <p className="text-muted-foreground">
-          Explorez vos pensées et émotions avec notre journal intelligent
-        </p>
-      </div>
-
-      {/* Nouvelle entrée */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            Nouvelle entrée
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Textarea
-            placeholder="Comment vous sentez-vous aujourd'hui ? Que s'est-il passé dans votre journée ?"
-            value={currentEntry}
-            onChange={(e) => setCurrentEntry(e.target.value)}
-            className="min-h-32"
-          />
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              {currentEntry.length} caractères
-            </p>
-            <Button 
-              onClick={saveEntry}
-              disabled={!currentEntry.trim() || isAnalyzing}
-              className="flex items-center gap-2"
-            >
-              {isAnalyzing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  Analyse en cours...
-                </>
-              ) : (
-                <>
-                  <Heart className="w-4 h-4" />
-                  Sauvegarder
-                </>
-              )}
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <BookOpen className="h-10 w-10 text-indigo-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Journal Émotionnel Intelligent
+            </h1>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Explorez vos émotions avec l'intelligence artificielle pour un bien-être optimal au travail
+          </p>
+        </motion.div>
 
-      {/* Statistiques rapides */}
-      {entries.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">{entries.length}</div>
-              <div className="text-sm text-muted-foreground">Entrées totales</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">
-                {Math.round(entries.reduce((sum, entry) => sum + entry.mood, 0) / entries.length) || 0}
-              </div>
-              <div className="text-sm text-muted-foreground">Humeur moyenne</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">
-                {Math.max(...entries.map(e => e.mood), 0)}
-              </div>
-              <div className="text-sm text-muted-foreground">Meilleure humeur</div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Liste des entrées */}
-      <div className="space-y-4">
-        {entries.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Aucune entrée pour le moment</h3>
-              <p className="text-muted-foreground">
-                Commencez à écrire pour suivre votre parcours émotionnel
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          entries.map((entry) => (
-            <Card key={entry.id}>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Zone d'écriture principale */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2"
+          >
+            <Card className="h-full shadow-xl border-0 bg-white/70 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(entry.date).toLocaleDateString('fr-FR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {entry.emotion && (
-                      <Badge className={getEmotionColor(entry.emotion)}>
-                        {entry.emotion}
-                      </Badge>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4" />
-                      <span className="text-sm font-medium">{entry.mood}/10</span>
-                    </div>
-                  </div>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-red-500" />
+                  Votre Journal du {new Date(selectedDate).toLocaleDateString('fr-FR')}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-foreground leading-relaxed mb-4">
-                  {entry.content}
-                </p>
-                
-                {entry.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {entry.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+              <CardContent className="space-y-6">
+                <div className="flex gap-2 mb-4">
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={startVoiceRecording}
+                    className="flex items-center gap-2"
+                  >
+                    <Mic className="h-4 w-4" />
+                    {isRecording ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                    Vocal
+                  </Button>
+                </div>
 
-                {entry.insights && entry.insights.length > 0 && (
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-1">
-                      <Sparkles className="w-4 h-4" />
-                      Insights IA
-                    </h4>
-                    <ul className="text-sm space-y-1">
-                      {entry.insights.map((insight, index) => (
-                        <li key={index} className="text-muted-foreground">
-                          • {insight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <Textarea
+                  placeholder="Comment vous sentez-vous aujourd'hui ? Décrivez vos émotions, vos pensées, vos réflexions sur votre journée de travail..."
+                  value={journalEntry}
+                  onChange={(e) => setJournalEntry(e.target.value)}
+                  className="min-h-[300px] text-base leading-relaxed border-2 focus:border-indigo-500 transition-colors"
+                />
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {emotions.map((emotion) => (
+                    <motion.button
+                      key={emotion.name}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setJournalEntry(prev => prev + ` ${emotion.icon} ${emotion.name.toLowerCase()}`)}
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${emotion.color} hover:opacity-90 transition-opacity`}
+                    >
+                      {emotion.icon} {emotion.name}
+                    </motion.button>
+                  ))}
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={analyzeJournal}
+                    disabled={isAnalyzing || !journalEntry.trim()}
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3"
+                  >
+                    {isAnalyzing ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="flex items-center gap-2"
+                      >
+                        <Brain className="h-5 w-5" />
+                        Analyse en cours...
+                      </motion.div>
+                    ) : (
+                      <>
+                        <Sparkles className="h-5 w-5 mr-2" />
+                        Analyser avec l'IA
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-          ))
-        )}
+          </motion.div>
+
+          {/* Analyse et historique */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
+            {/* Résultats d'analyse */}
+            <AnimatePresence>
+              {analysis && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                >
+                  <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Brain className="h-5 w-5 text-purple-500" />
+                        Analyse IA
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold mb-2">Émotion principale</h4>
+                        <Badge variant="secondary" className="text-base px-3 py-1">
+                          {analysis.primary_emotion}
+                        </Badge>
+                      </div>
+
+                      {analysis.secondary_emotions && analysis.secondary_emotions.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-2">Émotions secondaires</h4>
+                          <div className="flex flex-wrap gap-1">
+                            {analysis.secondary_emotions.map((emotion, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {emotion}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <h4 className="font-semibold mb-2">Intensité</h4>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(analysis.intensity / 10) * 100}%` }}
+                            className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full"
+                          />
+                        </div>
+                        <span className="text-sm text-gray-600">{analysis.intensity}/10</span>
+                      </div>
+
+                      {analysis.recommendations && (
+                        <div>
+                          <h4 className="font-semibold mb-2">Recommandations</h4>
+                          <ul className="text-sm space-y-1">
+                            {analysis.recommendations.map((rec, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <TrendingUp className="h-3 w-3 text-green-500 mt-1 flex-shrink-0" />
+                                {rec}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

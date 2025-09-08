@@ -40,6 +40,15 @@ const B2CMusicEnhancedComplete = lazy(() => import('@/pages/B2CMusicEnhancedComp
 const B2CActivityPageEnhanced = lazy(() => import('@/pages/B2CActivityPageEnhanced'));
 const B2CMoodMixerPageEnhanced = lazy(() => import('@/pages/B2CMoodMixerPageEnhanced'));
 const B2CVRBreathPageEnhanced = lazy(() => import('@/pages/B2CVRBreathPageEnhanced'));
+const B2CVRGalaxyPageEnhanced = lazy(() => import('@/pages/B2CVRGalaxyPageEnhanced'));
+const B2CScreenSilkPageEnhanced = lazy(() => import('@/pages/B2CScreenSilkPageEnhanced'));
+
+// Missing enhanced pages - Additional implementations
+const B2CFaceARPageEnhanced = lazy(() => import('@/pages/B2CFaceARPageEnhanced'));
+const B2CBossGritPageEnhanced = lazy(() => import('@/pages/B2CBossGritPageEnhanced'));
+const B2CAmbitionArcadePageEnhanced = lazy(() => import('@/pages/B2CAmbitionArcadePageEnhanced'));
+const B2CBounceBackPageEnhanced = lazy(() => import('@/pages/B2CBounceBackPageEnhanced'));
+const B2CStorySynthPageEnhanced = lazy(() => import('@/pages/B2CStorySynthPageEnhanced'));
 
 // Error pages
 const Page401 = lazy(() => import('@/pages/401Page'));
@@ -116,7 +125,7 @@ function App() {
                   <Route index element={<B2CVRBreathPageEnhanced />} />
                 </Route>
                 <Route path="vr-galaxy" element={<ProtectedRoute role="consumer" neededFlags={["FF_VR"]} />}>
-                  <Route index element={<div data-testid="page-root">VR Galaxy - TODO</div>} />
+                  <Route index element={<B2CVRGalaxyPageEnhanced />} />
                 </Route>
                 
                 {/* Pages avec sensor gates */}
