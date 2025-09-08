@@ -108,7 +108,7 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
         
         {/* Main Content Area */}
         <div className="flex-1 w-full">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
             <motion.div
               key={window.location.pathname}
               initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}

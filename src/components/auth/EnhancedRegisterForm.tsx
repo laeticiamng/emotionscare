@@ -122,7 +122,7 @@ const EnhancedRegisterForm: React.FC = () => {
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
       <motion.div
         key="register-form"
         className="flex min-h-screen items-center justify-center p-4"

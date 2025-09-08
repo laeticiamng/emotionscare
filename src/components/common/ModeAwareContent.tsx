@@ -69,7 +69,7 @@ const ModeAwareContent: React.FC<ModeAwareContentProps> = ({
   const selectedVariant = variants[animationMode];
   
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
       <motion.div
         key={normalizedMode}
         initial={selectedVariant.initial}

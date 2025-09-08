@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AsyncState, QueueFlusher } from '@/components/transverse';
 import ProtectedRoute from '@/app/guards/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
+import { AccessibilityEnhancer } from '@/components/ui/AccessibilityEnhancer';
 import { 
   HelpPage, 
   ApiDocumentationPage, 
@@ -37,7 +38,8 @@ const B2CFlashGlowPageEnhanced = lazy(() => import('@/pages/B2CFlashGlowPageEnha
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
 const B2CMusicEnhancedComplete = lazy(() => import('@/pages/B2CMusicEnhancedComplete'));
 const B2CActivityPageEnhanced = lazy(() => import('@/pages/B2CActivityPageEnhanced'));
-const B2CScreenSilkPageEnhanced = lazy(() => import('@/pages/B2CScreenSilkPageEnhanced'));
+const B2CMoodMixerPageEnhanced = lazy(() => import('@/pages/B2CMoodMixerPageEnhanced'));
+const B2CVRBreathPageEnhanced = lazy(() => import('@/pages/B2CVRBreathPageEnhanced'));
 
 // Error pages
 const Page401 = lazy(() => import('@/pages/401Page'));
@@ -108,10 +110,10 @@ function App() {
                   <Route index element={<B2CMusicEnhancedComplete />} />
                 </Route>
                 <Route path="mood-mixer" element={<ProtectedRoute role="consumer" neededFlags={["FF_PREMIUM_SUNO"]} />}>
-                  <Route index element={<div data-testid="page-root">Mood Mixer - TODO</div>} />
+                  <Route index element={<B2CMoodMixerPageEnhanced />} />
                 </Route>
                 <Route path="vr-breath" element={<ProtectedRoute role="consumer" neededFlags={["FF_VR"]} />}>
-                  <Route index element={<div data-testid="page-root">VR Breath - TODO</div>} />
+                  <Route index element={<B2CVRBreathPageEnhanced />} />
                 </Route>
                 <Route path="vr-galaxy" element={<ProtectedRoute role="consumer" neededFlags={["FF_VR"]} />}>
                   <Route index element={<div data-testid="page-root">VR Galaxy - TODO</div>} />
@@ -183,6 +185,7 @@ function App() {
         {/* Services globaux */}
         <QueueFlusher />
         <Toaster />
+        <AccessibilityEnhancer />
       </BrowserRouter>
   );
 }

@@ -275,7 +275,7 @@ const LivingDashboard: React.FC = () => {
 
         {/* Micro-actions adaptatives */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
             {currentActions.map((action, index) => (
               <motion.div
                 key={action.id}

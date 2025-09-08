@@ -93,7 +93,7 @@ const EnhancedAdminDashboard: React.FC = () => {
             <TabsTrigger value="settings">Paramètres</TabsTrigger>
           </TabsList>
           
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}

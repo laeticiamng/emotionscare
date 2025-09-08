@@ -15,7 +15,7 @@ const AuthFormTransition: React.FC<AuthFormTransitionProps> = ({
   className
 }) => {
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
       {show && (
         <motion.div
           className={cn("w-full", className)}
