@@ -1,4 +1,3 @@
-import { AsyncState } from "@/components/transverse";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -17,17 +16,16 @@ export default function HomePage() {
         Skip to content
       </a>
 
-      <div className="container mx-auto px-4 py-8" id="main-content">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            EmotionsCare
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Votre plateforme de bien-être émotionnel
-          </p>
-        </div>
+        <div className="container mx-auto px-4 py-8" id="main-content">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-foreground mb-4">
+              EmotionsCare
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              Votre plateforme de bien-être émotionnel
+            </p>
+          </div>
 
-        <AsyncState.Content>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             
             {/* B2C Card */}
@@ -82,8 +80,7 @@ export default function HomePage() {
               </Button>
             </div>
           </div>
-        </AsyncState.Content>
-      </div>
+        </div>
     </main>
   );
 }

@@ -89,6 +89,11 @@ const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+
+// Pages manquantes pour routerV2
+const B2CMusicTherapyPremiumPage = lazy(() => import('@/pages/B2CMusicTherapyPremiumPage'));
+const B2CAICoachMicroPage = lazy(() => import('@/pages/B2CAICoachMicroPage'));
+const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
 const B2BEntreprisePage = lazy(() => import('@/pages/B2BEntreprisePage'));
 const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
 const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
@@ -195,6 +200,11 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CEmotionsPage,
   B2CCommunautePage,
   SubscribePage,
+  
+  // Pages manquantes ajoutées au mapping
+  B2CMusicTherapyPremiumPage,
+  B2CAICoachMicroPage,
+  B2CActivitePage,
   
   // Pages nouvelles 
   B2BEntreprisePage,

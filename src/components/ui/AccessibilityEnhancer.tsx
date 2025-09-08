@@ -16,7 +16,7 @@ import {
   Check,
   AlertTriangle
 } from 'lucide-react';
-import { useAccessibility } from '@/hooks/useAccessibility';
+import { useAccessibility } from '@/contexts/AccessibilityContextEnhanced';
 
 interface AccessibilitySettings {
   highContrast: boolean;
@@ -51,7 +51,18 @@ export function AccessibilityEnhancer() {
     announcements: true
   });
   const [issues, setIssues] = useState<AccessibilityIssue[]>([]);
-  const { announce, handleSkipLink, generateId } = useAccessibility();
+  const { announceToScreenReader } = useAccessibility();
+  
+  // Functions pour la compatibilité
+  const announce = announceToScreenReader;
+  const handleSkipLink = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.focus();
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  const generateId = () => `accessibility-${Math.random().toString(36).substr(2, 9)}`;
 
   useEffect(() => {
     // Load settings from localStorage
