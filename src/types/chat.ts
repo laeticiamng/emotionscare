@@ -2,8 +2,10 @@
 export interface ChatMessage {
   id: string;
   text: string;
-  sender: 'user' | 'coach' | 'ai';
-  timestamp: Date;
+  content: string;
+  conversationId: string;
+  sender: 'user' | 'assistant' | 'system';
+  timestamp: string;
   type?: 'text' | 'image' | 'audio';
   metadata?: Record<string, any>;
 }
