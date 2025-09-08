@@ -32,6 +32,8 @@ const B2CJournalPageEnhanced = lazy(() => import('@/pages/B2CJournalPageEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CBreathworkPageEnhanced = lazy(() => import('@/pages/B2CBreathworkPageEnhanced'));
 const B2CLeaderboardPageEnhanced = lazy(() => import('@/pages/B2CLeaderboardPageEnhanced'));
+const B2CGamificationPageEnhanced = lazy(() => import('@/pages/B2CGamificationPageEnhanced'));
+const B2CFlashGlowPageEnhanced = lazy(() => import('@/pages/B2CFlashGlowPageEnhanced'));
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
 
 // Error pages
@@ -87,7 +89,9 @@ function App() {
                 <Route path="journal" element={<B2CJournalPageEnhanced />} />
                 <Route path="coach" element={<B2CAICoachPage />} />
                 <Route path="breath" element={<B2CBreathworkPageEnhanced />} />
-                <Route path="flash-glow" element={<div data-testid="page-root">Flash Glow - TODO</div>} />
+                <Route path="gamification" element={<B2CGamificationPageEnhanced />} />
+                <Route path="flash-glow" element={<B2CFlashGlowPageEnhanced />} />
+                <Route path="face-ar" element={<B2CFaceARPageEnhanced />} />
                 <Route path="face-ar" element={<div data-testid="page-root">Face AR - TODO</div>} />
                 <Route path="boss-grit" element={<div data-testid="page-root">Boss Grit - TODO</div>} />
                 <Route path="ambition-arcade" element={<div data-testid="page-root">Ambition Arcade - TODO</div>} />
