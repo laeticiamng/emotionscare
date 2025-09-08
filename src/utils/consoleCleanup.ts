@@ -26,14 +26,14 @@ export const cleanupConsoleStatements = () => {
     console.timeEnd = noop;
     
     // Enhanced error reporting with proper binding
-    console.error = ((...args: any[]) => {
+    console.error = (...args: any[]) => {
       // In production, send to monitoring service
       if (typeof window !== 'undefined' && (window as any).sentryEnabled) {
         originalError('[PRODUCTION ERROR]', ...args);
       }
-    }).bind(console);
+    };
     
-    console.warn = ((...args: any[]) => {
+    console.warn = (...args: any[]) => {
       // Log warnings only for critical issues
       if (args.some(arg => 
         typeof arg === 'string' && (
@@ -44,7 +44,7 @@ export const cleanupConsoleStatements = () => {
       )) {
         originalWarn('[PRODUCTION WARNING]', ...args);
       }
-    }).bind(console);
+    };
   }
 };
 
