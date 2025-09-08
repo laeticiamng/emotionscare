@@ -16,6 +16,16 @@ import { PerformanceProvider } from '@/components/performance/PerformanceProvide
 import { AccessibilityProvider } from '@/core/AccessibilityManager';
 import { SecurityProvider } from '@/core/SecurityManager';
 
+// Outils d'audit et d'optimisation
+import { PremiumOptimizerPanel } from '@/audit/PremiumOptimizer';
+import { CodeAuditPanel } from '@/audit/CodeAuditManager';
+import { initializeAutoCleanup } from '@/audit/CodeCleanupUtilities';
+
+// Initialisation du nettoyage automatique
+if (typeof window !== 'undefined') {
+  initializeAutoCleanup();
+}
+
 interface AppProvidersProps {
   children: React.ReactNode;
 }
@@ -37,7 +47,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                 <UnifiedProvider>
                   <SecurityProvider>
                     <AccessibilityProvider>
-                      <PerformanceProvider>
+                       <PerformanceProvider>
                     {children}
                     <Toaster 
                       position="top-right" 
@@ -54,7 +64,15 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                         duration: 5000,
                       }}
                     />
-                      </PerformanceProvider>
+                    
+                    {/* Outils d'audit et d'optimisation premium (dev uniquement) */}
+                    {process.env.NODE_ENV === 'development' && (
+                      <>
+                        <PremiumOptimizerPanel />
+                        <CodeAuditPanel />
+                      </>
+                    )}
+                       </PerformanceProvider>
                     </AccessibilityProvider>
                   </SecurityProvider>
                 </UnifiedProvider>
