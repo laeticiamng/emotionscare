@@ -92,11 +92,10 @@ function App() {
                 <Route path="gamification" element={<B2CGamificationPageEnhanced />} />
                 <Route path="flash-glow" element={<B2CFlashGlowPageEnhanced />} />
                 <Route path="face-ar" element={<B2CFaceARPageEnhanced />} />
-                <Route path="face-ar" element={<div data-testid="page-root">Face AR - TODO</div>} />
-                <Route path="boss-grit" element={<div data-testid="page-root">Boss Grit - TODO</div>} />
-                <Route path="ambition-arcade" element={<div data-testid="page-root">Ambition Arcade - TODO</div>} />
-                <Route path="bounce-back" element={<div data-testid="page-root">Bounce Back - TODO</div>} />
-                <Route path="story-synth" element={<div data-testid="page-root">Story Synth - TODO</div>} />
+                <Route path="boss-grit" element={<B2CBossGritPageEnhanced />} />
+                <Route path="ambition-arcade" element={<B2CAmbitionArcadePageEnhanced />} />
+                <Route path="bounce-back" element={<B2CBounceBackPageEnhanced />} />
+                <Route path="story-synth" element={<B2CStorySynthPageEnhanced />} />
                 <Route path="activity" element={<div data-testid="page-root">Activity - TODO</div>} />
                 <Route path="screen-silk" element={<div data-testid="page-root">Screen Silk - TODO</div>} />
                 <Route path="weekly-bars" element={<div data-testid="page-root">Weekly Bars - TODO</div>} />
