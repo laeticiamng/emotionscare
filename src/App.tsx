@@ -47,6 +47,12 @@ const B2CSocialCoconPageEnhanced = lazy(() => import('@/pages/B2CSocialCoconPage
 const B2CTeamsPageEnhanced = lazy(() => import('@/pages/B2CTeamsPageEnhanced'));
 const OnboardingPageEnhanced = lazy(() => import('@/pages/OnboardingPageEnhanced'));
 
+// Manager pages
+const CommunityPageEnhanced = lazy(() => import('@/pages/manager/CommunityPageEnhanced'));
+const ReportsPageEnhanced = lazy(() => import('@/pages/manager/ReportsPageEnhanced'));
+const EventsPageEnhanced = lazy(() => import('@/pages/manager/EventsPageEnhanced'));
+const OptimizationPageEnhanced = lazy(() => import('@/pages/manager/OptimizationPageEnhanced'));
+
 // Missing enhanced pages - Additional implementations
 const B2CFaceARPageEnhanced = lazy(() => import('@/pages/B2CFaceARPageEnhanced'));
 const B2CBossGritPageEnhanced = lazy(() => import('@/pages/B2CBossGritPageEnhanced'));
@@ -145,7 +151,7 @@ function App() {
                 <Route path="teams" element={<B2CTeamsPageEnhanced />} />
                 
                 <Route path="community" element={<ProtectedRoute role="employee" neededFlags={["FF_COMMUNITY"]} />}>
-                  <Route index element={<div data-testid="page-root">Community - TODO</div>} />
+                  <Route index element={<CommunityPageEnhanced />} />
                 </Route>
               </Route>
               
@@ -154,9 +160,9 @@ function App() {
                 <Route path="rh" element={<ProtectedRoute role="manager" neededFlags={["FF_MANAGER_DASH"]} />}>
                   <Route index element={<RhPage />} />
                 </Route>
-                <Route path="reports" element={<div data-testid="page-root">Reports - TODO</div>} />
-                <Route path="events" element={<div data-testid="page-root">Events - TODO</div>} />
-                <Route path="optimization" element={<div data-testid="page-root">Optimization - TODO</div>} />
+                <Route path="reports" element={<ReportsPageEnhanced />} />
+                <Route path="events" element={<EventsPageEnhanced />} />
+                <Route path="optimization" element={<OptimizationPageEnhanced />} />
                 <Route path="security" element={<div data-testid="page-root">Security - TODO</div>} />
                 <Route path="audit" element={<div data-testid="page-root">Audit - TODO</div>} />
                 <Route path="accessibility" element={<div data-testid="page-root">Accessibility - TODO</div>} />
