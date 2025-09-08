@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AsyncState, QueueFlusher } from '@/components/transverse';
 import ProtectedRoute from '@/app/guards/ProtectedRoute';
