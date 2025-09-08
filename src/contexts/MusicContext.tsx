@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { MusicTrack, MusicPlaylist, MusicPlayerState, AdaptiveMusicConfig } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
-import { useMusicGeneration } from '@/hooks/useMusicGeneration';
+import { useEmotionsCarePlatform } from '@/hooks/useEmotionsCarePlatform';
 
 // Export des types pour compatibilité
 export type { MusicTrack as Track, MusicPlaylist };
@@ -91,7 +91,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [state, dispatch] = useReducer(musicReducer, initialState);
   const [adaptiveConfig, setAdaptiveConfigState] = React.useState(initialAdaptiveConfig);
   const { toast } = useToast();
-  const { generateMusic, isGenerating } = useMusicGeneration();
+  const { generateTherapeuticMusic, isLoading: isGenerating } = useEmotionsCarePlatform('anonymous');
 
   const setPlaylist = useCallback((tracks: MusicTrack[]) => {
     dispatch({ type: 'SET_PLAYLIST', payload: tracks });

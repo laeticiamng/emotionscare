@@ -214,13 +214,27 @@ const RouteWrapper: React.FC<RouteWrapperProps> = ({ route, children }) => {
     };
   }, [route, trackAnalytics]);
 
-  const Layout = route.layout || React.Fragment;
+  const Layout = route.layout;
 
   return (
     <PremiumErrorBoundary>
       <SEOHead route={route} />
       <RouteGuard route={route}>
-        <Layout>
+        {Layout ? (
+          <Layout>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={route.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </Layout>
+        ) : (
           <AnimatePresence mode="wait">
             <motion.div
               key={route.id}
@@ -232,7 +246,7 @@ const RouteWrapper: React.FC<RouteWrapperProps> = ({ route, children }) => {
               {children}
             </motion.div>
           </AnimatePresence>
-        </Layout>
+        )}
       </RouteGuard>
     </PremiumErrorBoundary>
   );
