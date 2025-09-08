@@ -1,103 +1,57 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { 
-  Activity, 
-  Clock, 
-  Cpu, 
-  HardDrive,
-  Network,
-  Eye,
-  EyeOff
-} from 'lucide-react';
-
-interface PerformanceMetrics {
-  fcp: number;
-  lcp: number;
-  fid: number;
-  cls: number;
-  memory?: {
-    used: number;
-    total: number;
-  };
-}
+import { Activity } from 'lucide-react';
 
 export const PerformanceMonitor: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+  const [metrics, setMetrics] = useState({
     fcp: 0,
     lcp: 0,
-    fid: 0,
-    cls: 0
+    memoryUsage: 0
   });
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (process.env.NODE_ENV !== 'development') return;
 
-    const updateMetrics = () => {
-      if (typeof window !== 'undefined' && 'performance' in window) {
-        const paint = performance.getEntriesByType('paint');
-        const fcp = paint.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0;
-        
-        setMetrics({
-          fcp: Math.round(fcp),
-          lcp: Math.round(fcp * 1.2),
-          fid: Math.round(Math.random() * 100),
-          cls: Number((Math.random() * 0.1).toFixed(3)),
-          memory: (performance as any).memory ? {
-            used: Math.round((performance as any).memory.usedJSHeapSize / 1024 / 1024),
-            total: Math.round((performance as any).memory.totalJSHeapSize / 1024 / 1024)
-          } : undefined
-        });
-      }
-    };
+    const observer = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      entries.forEach((entry) => {
+        if (entry.name === 'first-contentful-paint') {
+          setMetrics(prev => ({ ...prev, fcp: entry.startTime }));
+        }
+      });
+    });
+    
+    try {
+      observer.observe({ entryTypes: ['paint'] });
+    } catch (error) {
+      console.warn('Performance Observer not supported');
+    }
 
-    updateMetrics();
-    const interval = setInterval(updateMetrics, 5000);
-    return () => clearInterval(interval);
-  }, [isVisible]);
+    return () => observer.disconnect();
+  }, []);
 
-  if (!isVisible) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 z-50"
-      >
-        <Eye className="h-4 w-4 mr-2" />
-        Performance
-      </Button>
-    );
-  }
+  if (process.env.NODE_ENV !== 'development') return null;
 
   return (
-    <Card className="fixed bottom-4 right-4 w-80 z-50 shadow-lg">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Performance Monitor
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => setIsVisible(false)}>
-            <EyeOff className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="flex justify-between">
-            <span>FCP</span>
-            <span>{metrics.fcp}ms</span>
-          </div>
-          <div className="flex justify-between">
-            <span>LCP</span>
-            <span>{metrics.lcp}ms</span>
+    <>
+      <button
+        onClick={() => setIsVisible(!isVisible)}
+        className="fixed bottom-20 right-4 z-40 p-2 bg-card border rounded-full shadow-lg"
+        title="Performance"
+      >
+        <Activity className="h-4 w-4" />
+      </button>
+
+      {isVisible && (
+        <div className="fixed bottom-32 right-4 z-40 w-64 bg-card border rounded-lg shadow-xl p-4">
+          <h3 className="font-semibold mb-2">Performance</h3>
+          <div className="text-xs space-y-1">
+            <div>FCP: {Math.round(metrics.fcp)}ms</div>
+            <div>LCP: {Math.round(metrics.lcp)}ms</div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </>
   );
 };
 

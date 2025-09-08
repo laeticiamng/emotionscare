@@ -1,73 +1,59 @@
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
-import React from 'react';
-import { Button } from './button';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { AlertTriangle } from 'lucide-react';
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error?: Error;
-}
-
-interface EnhancedErrorBoundaryProps {
-  children: React.ReactNode;
+interface Props {
+  children: ReactNode;
   fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>;
 }
 
-export class EnhancedErrorBoundary extends React.Component<
-  EnhancedErrorBoundaryProps,
-  ErrorBoundaryState
-> {
-  constructor(props: EnhancedErrorBoundaryProps) {
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class EnhancedErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
-
-  resetError = () => {
-    this.setState({ hasError: false, error: undefined });
-  };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error} resetError={this.resetError} />;
+        return <FallbackComponent error={this.state.error} resetError={() => this.setState({ hasError: false, error: null })} />;
       }
 
       return (
-        <div className="flex items-center justify-center min-h-[400px] p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <AlertTriangle className="h-12 w-12 text-destructive" />
-              </div>
-              <CardTitle>Une erreur s'est produite</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Nous nous excusons pour la gêne occasionnée.
-              </p>
-              {this.state.error && (
-                <details className="text-xs text-left bg-muted p-2 rounded">
-                  <summary className="cursor-pointer">Détails techniques</summary>
-                  <pre className="mt-2 whitespace-pre-wrap">
-                    {this.state.error.message}
-                  </pre>
-                </details>
-              )}
-              <Button onClick={this.resetError} className="w-full">
-                Réessayer
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-card rounded-lg border shadow-lg p-6 text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-card-foreground mb-2">Une erreur s'est produite</h1>
+            <div className="space-y-3">
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Recharger la page
+              </button>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90"
+              >
+                <Home className="h-4 w-4" />
+                Retour à l'accueil
+              </button>
+            </div>
+          </div>
         </div>
       );
     }
@@ -75,3 +61,5 @@ export class EnhancedErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
+
+export default EnhancedErrorBoundary;
