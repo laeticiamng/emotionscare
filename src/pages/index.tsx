@@ -2,34 +2,39 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Building2, Heart } from "lucide-react";
+import MainNavigation from "@/components/navigation/MainNavigation";
+import Footer from "@/components/layout/Footer";
 
 export default function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <main data-testid="page-root" className="min-h-screen bg-background">
-      {/* Skip link for accessibility */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded"
-      >
-        Skip to content
-      </a>
+    <div className="min-h-screen bg-background flex flex-col">
+      <MainNavigation />
+      
+      <main data-testid="page-root" className="flex-1">
+        {/* Skip link for accessibility */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded z-50"
+        >
+          Skip to content
+        </a>
 
-        <div className="container mx-auto px-4 py-8" id="main-content">
+        <div className="container mx-auto px-4 py-16" id="main-content">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-foreground mb-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               EmotionsCare
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Votre plateforme de bien-être émotionnel
+            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+              Votre plateforme de bien-être émotionnel propulsée par l'IA
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             
             {/* B2C Card */}
-            <Card className="cursor-pointer hover:shadow-lg transition-all"
+            <Card className="cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                   onClick={() => navigate('/b2c')}>
               <CardHeader>
                 <div className="flex items-center space-x-2">
@@ -49,7 +54,7 @@ export default function HomePage() {
             </Card>
 
             {/* B2B Card */}
-            <Card className="cursor-pointer hover:shadow-lg transition-all"
+            <Card className="cursor-pointer hover:shadow-lg transition-all hover:scale-105"
                   onClick={() => navigate('/entreprise')}>
               <CardHeader>
                 <div className="flex items-center space-x-2">
@@ -73,14 +78,20 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <div className="flex flex-wrap justify-center gap-4">
               <Button variant="ghost" onClick={() => navigate('/login')}>
-                Entrer
+                Se connecter
               </Button>
               <Button variant="ghost" onClick={() => navigate('/help')}>
                 Aide
               </Button>
+              <Button variant="ghost" onClick={() => navigate('/about')}>
+                À propos
+              </Button>
             </div>
           </div>
         </div>
-    </main>
+      </main>
+
+      <Footer />
+    </div>
   );
 }
