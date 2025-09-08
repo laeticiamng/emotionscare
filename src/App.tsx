@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 // Import direct des pages principales
 import HomePage from '@/pages/HomePage';
+import AppLayout from '@/layouts/AppLayout';
 
 // Import lazy des pages pour optimiser le chargement
 const B2CPage = lazy(() => import('@/pages/B2CPage'));
@@ -114,8 +115,8 @@ function App() {
             <Route path="/b2c" element={<B2CPage />} />
             <Route path="/entreprise" element={<EntreprisePage />} />
             
-            {/* Routes App B2C */}
-            <Route path="/app">
+            {/* Routes App B2C avec Layout */}
+            <Route path="/app" element={<AppLayout />}>
               <Route path="home" element={<B2CDashboardPage />} />
               <Route path="scan" element={<B2CScanPage />} />
               <Route path="coach" element={<B2CAICoachPage />} />
