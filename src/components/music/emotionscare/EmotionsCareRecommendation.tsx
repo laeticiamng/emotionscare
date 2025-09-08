@@ -1,41 +1,87 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Play } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import EmotionsCareMusicPlayer from './EmotionsCareMusicPlayer';
-import { EmotionsCareMusicProvider, useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Play, Pause, RotateCcw, Heart, Sparkles } from 'lucide-react';
+import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
+import { useMusicGeneration } from '@/hooks/useMusicGeneration';
+import { useToast } from '@/hooks/use-toast';
+import type { EmotionResult } from '@/types';
 
 interface EmotionsCareRecommendationProps {
   emotionResult: EmotionResult;
+  autoGenerate?: boolean;
+  className?: string;
 }
 
-const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProps> = ({ emotionResult }) => {
-  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
-  const { 
-    currentPlaylist, 
-    isLoading: musicLoading, 
-    loadPlaylist, 
-    isPlaying 
-  } = useEmotionsCareMusicContext();
+const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProps> = ({
+  emotionResult,
+  autoGenerate = false,
+  className = ''
+}) => {
+  const [intensity, setIntensity] = useState([0.5]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
   
-  const handleActivateMusic = async () => {
+  const { playTrack, isLoading: musicLoading } = useEmotionsCareMusicContext();
+  const { generateMusic, isGenerating, error } = useMusicGeneration();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (autoGenerate && emotionResult) {
+      handleGenerateMusic();
+    }
+  }, [emotionResult, autoGenerate]);
+
+  const handleGenerateMusic = async () => {
+    if (!emotionResult?.dominantEmotion) return;
+
     try {
-      console.log('🎵 EmotionsCare - Activation de la musique pour:', emotionResult);
-      
-      const playlist = await activateMusicForEmotion({
-        emotion: emotionResult.emotion.toLowerCase(),
-        intensity: emotionResult.confidence
-      });
-      
-      if (playlist) {
-        console.log('✅ EmotionsCare - Playlist reçue:', playlist);
-        loadPlaylist(playlist);
+      const track = await generateMusic(
+        emotionResult.dominantEmotion,
+        undefined, // customPrompt
+        emotionResult.overallMood,
+        intensity[0]
+      );
+
+      if (track) {
+        setCurrentTrack(track);
+        toast({
+          title: "Musique générée !",
+          description: `"${track.title}" est prête à être écoutée`,
+          duration: 4000
+        });
       }
-    } catch (error) {
-      console.error('❌ EmotionsCare - Erreur:', error);
+    } catch (err) {
+      console.error('Error generating music:', err);
+      toast({
+        title: "Erreur de génération",
+        description: "Impossible de générer la musique. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePlayTrack = async () => {
+    if (!currentTrack) return;
+
+    try {
+      if (isPlaying) {
+        // Pause logic would go here
+        setIsPlaying(false);
+      } else {
+        await playTrack(currentTrack);
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error('Error playing track:', err);
+      toast({
+        title: "Erreur de lecture",
+        description: "Impossible de lire la musique",
+        variant: "destructive"
+      });
     }
   };
   
