@@ -1,0 +1,382 @@
+/**
+ * DESIGN SYSTEM COMPLET - TOKENS SÉMANTIQUES
+ * Système de design unifié avec tokens sémantiques HSL
+ */
+
+:root {
+  /* =============================================
+     COULEURS DE BASE - PALETTE PRIMAIRE
+     ============================================= */
+  --primary-h: 260;
+  --primary-s: 84%;
+  --primary-l: 65%;
+  --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+  --primary-foreground: hsl(0, 0%, 98%);
+  
+  /* Variations primaires */
+  --primary-50: hsl(var(--primary-h), var(--primary-s), 96%);
+  --primary-100: hsl(var(--primary-h), var(--primary-s), 90%);
+  --primary-200: hsl(var(--primary-h), var(--primary-s), 80%);
+  --primary-300: hsl(var(--primary-h), var(--primary-s), 70%);
+  --primary-400: hsl(var(--primary-h), var(--primary-s), 65%);
+  --primary-500: hsl(var(--primary-h), var(--primary-s), 60%);
+  --primary-600: hsl(var(--primary-h), var(--primary-s), 50%);
+  --primary-700: hsl(var(--primary-h), var(--primary-s), 40%);
+  --primary-800: hsl(var(--primary-h), var(--primary-s), 30%);
+  --primary-900: hsl(var(--primary-h), var(--primary-s), 20%);
+  --primary-950: hsl(var(--primary-h), var(--primary-s), 10%);
+
+  /* =============================================
+     COULEURS ÉMOTIONNELLES - PALETTE ÉMOTIONSCARE
+     ============================================= */
+  /* Joy - Joie */
+  --emotion-joy: hsl(45, 100%, 70%);
+  --emotion-joy-foreground: hsl(45, 100%, 15%);
+  
+  /* Calm - Calme */
+  --emotion-calm: hsl(200, 60%, 70%);
+  --emotion-calm-foreground: hsl(200, 60%, 15%);
+  
+  /* Energy - Énergie */
+  --emotion-energy: hsl(15, 90%, 65%);
+  --emotion-energy-foreground: hsl(15, 90%, 15%);
+  
+  /* Focus - Concentration */
+  --emotion-focus: hsl(260, 40%, 60%);
+  --emotion-focus-foreground: hsl(260, 40%, 95%);
+  
+  /* Serenity - Sérénité */
+  --emotion-serenity: hsl(160, 50%, 65%);
+  --emotion-serenity-foreground: hsl(160, 50%, 15%);
+
+  /* =============================================
+     COULEURS SYSTÈME
+     ============================================= */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(222, 84%, 4.9%);
+  
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222, 84%, 4.9%);
+  
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222, 84%, 4.9%);
+  
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222, 47%, 11%);
+  
+  --accent: hsl(210, 40%, 94%);
+  --accent-foreground: hsl(222, 47%, 11%);
+  
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  
+  --warning: hsl(38, 92%, 50%);
+  --warning-foreground: hsl(0, 0%, 98%);
+  
+  --success: hsl(142, 76%, 36%);
+  --success-foreground: hsl(0, 0%, 98%);
+  
+  --info: hsl(204, 94%, 44%);
+  --info-foreground: hsl(0, 0%, 98%);
+  
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215, 13%, 37%);
+  
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --ring: var(--primary);
+
+  /* =============================================
+     GRADIENTS ÉMOTIONNELS
+     ============================================= */
+  --gradient-joy: linear-gradient(135deg, var(--emotion-joy), hsl(45, 100%, 80%));
+  --gradient-calm: linear-gradient(135deg, var(--emotion-calm), hsl(200, 60%, 80%));
+  --gradient-energy: linear-gradient(135deg, var(--emotion-energy), hsl(15, 90%, 75%));
+  --gradient-focus: linear-gradient(135deg, var(--emotion-focus), hsl(260, 40%, 70%));
+  --gradient-serenity: linear-gradient(135deg, var(--emotion-serenity), hsl(160, 50%, 75%));
+  
+  /* Gradients système */
+  --gradient-primary: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+  --gradient-hero: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+  --gradient-card: linear-gradient(135deg, var(--card), hsl(0, 0%, 98%));
+
+  /* =============================================
+     OMBRES ÉMOTIONNELLES
+     ============================================= */
+  --shadow-joy: 0 10px 30px -10px hsla(45, 100%, 70%, 0.3);
+  --shadow-calm: 0 10px 30px -10px hsla(200, 60%, 70%, 0.3);
+  --shadow-energy: 0 10px 30px -10px hsla(15, 90%, 65%, 0.3);
+  --shadow-focus: 0 10px 30px -10px hsla(260, 40%, 60%, 0.3);
+  --shadow-serenity: 0 10px 30px -10px hsla(160, 50%, 65%, 0.3);
+  
+  /* Ombres système */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  /* =============================================
+     ANIMATIONS FLUIDES
+     ============================================= */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* Easings spécialisés */
+  --ease-emotional: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* =============================================
+     ESPACEMENTS HARMONIQUES - GOLDEN RATIO
+     ============================================= */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 0.75rem;    /* 12px */
+  --space-lg: 1rem;       /* 16px */
+  --space-xl: 1.25rem;    /* 20px */
+  --space-2xl: 1.618rem;  /* 26px - Golden ratio */
+  --space-3xl: 2rem;      /* 32px */
+  --space-4xl: 2.618rem;  /* 42px - Golden ratio */
+  --space-5xl: 3.236rem;  /* 52px - Golden ratio */
+  --space-6xl: 4rem;      /* 64px */
+
+  /* =============================================
+     BORDURES ET RAYONS
+     ============================================= */
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+  
+  /* Bordures émotionnelles */
+  --border-joy: 2px solid var(--emotion-joy);
+  --border-calm: 2px solid var(--emotion-calm);
+  --border-energy: 2px solid var(--emotion-energy);
+  --border-focus: 2px solid var(--emotion-focus);
+  --border-serenity: 2px solid var(--emotion-serenity);
+}
+
+/* =============================================
+   THÈME SOMBRE
+   ============================================= */
+.dark {
+  --background: hsl(222, 84%, 4.9%);
+  --foreground: hsl(210, 40%, 98%);
+  
+  --card: hsl(222, 84%, 4.9%);
+  --card-foreground: hsl(210, 40%, 98%);
+  
+  --popover: hsl(222, 84%, 4.9%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  
+  --primary: hsl(var(--primary-h), var(--primary-s), 70%);
+  --primary-foreground: hsl(222, 84%, 4.9%);
+  
+  --secondary: hsl(217, 32%, 17%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  
+  --accent: hsl(217, 32%, 17%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  
+  --destructive: hsl(0, 62%, 30%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  
+  --border: hsl(217, 32%, 17%);
+  --input: hsl(217, 32%, 17%);
+  --ring: var(--primary);
+  
+  /* Ajustements émotionnels pour le dark mode */
+  --emotion-joy: hsl(45, 80%, 60%);
+  --emotion-calm: hsl(200, 50%, 60%);
+  --emotion-energy: hsl(15, 80%, 55%);
+  --emotion-focus: hsl(260, 50%, 70%);
+  --emotion-serenity: hsl(160, 40%, 55%);
+}
+
+/* =============================================
+   THÈME PASTEL - MODE DOUX
+   ============================================= */
+.pastel {
+  --primary: hsl(320, 50%, 75%);
+  --primary-foreground: hsl(320, 50%, 20%);
+  
+  --background: hsl(320, 20%, 98%);
+  --foreground: hsl(320, 30%, 15%);
+  
+  --card: hsl(320, 30%, 96%);
+  --card-foreground: hsl(320, 30%, 20%);
+  
+  --secondary: hsl(320, 20%, 92%);
+  --secondary-foreground: hsl(320, 30%, 25%);
+  
+  --accent: hsl(320, 25%, 88%);
+  --accent-foreground: hsl(320, 30%, 25%);
+  
+  --muted: hsl(320, 15%, 90%);
+  --muted-foreground: hsl(320, 20%, 45%);
+  
+  --border: hsl(320, 20%, 85%);
+  --input: hsl(320, 20%, 85%);
+  
+  /* Émotions pastels */
+  --emotion-joy: hsl(45, 60%, 80%);
+  --emotion-calm: hsl(200, 40%, 80%);
+  --emotion-energy: hsl(15, 60%, 75%);
+  --emotion-focus: hsl(260, 30%, 80%);
+  --emotion-serenity: hsl(160, 40%, 80%);
+}
+
+/* =============================================
+   CLASSES UTILITAIRES ÉMOTIONNELLES
+   ============================================= */
+.emotion-joy {
+  --current-emotion: var(--emotion-joy);
+  --current-emotion-fg: var(--emotion-joy-foreground);
+  --current-gradient: var(--gradient-joy);
+  --current-shadow: var(--shadow-joy);
+}
+
+.emotion-calm {
+  --current-emotion: var(--emotion-calm);
+  --current-emotion-fg: var(--emotion-calm-foreground);
+  --current-gradient: var(--gradient-calm);
+  --current-shadow: var(--shadow-calm);
+}
+
+.emotion-energy {
+  --current-emotion: var(--emotion-energy);
+  --current-emotion-fg: var(--emotion-energy-foreground);
+  --current-gradient: var(--gradient-energy);
+  --current-shadow: var(--shadow-energy);
+}
+
+.emotion-focus {
+  --current-emotion: var(--emotion-focus);
+  --current-emotion-fg: var(--emotion-focus-foreground);
+  --current-gradient: var(--gradient-focus);
+  --current-shadow: var(--shadow-focus);
+}
+
+.emotion-serenity {
+  --current-emotion: var(--emotion-serenity);
+  --current-emotion-fg: var(--emotion-serenity-foreground);
+  --current-gradient: var(--gradient-serenity);
+  --current-shadow: var(--shadow-serenity);
+}
+
+/* =============================================
+   COMPOSANTS ÉMOTIONNELS
+   ============================================= */
+.emotional-card {
+  background: var(--current-gradient, var(--gradient-primary));
+  color: var(--current-emotion-fg, var(--primary-foreground));
+  box-shadow: var(--current-shadow, var(--shadow-lg));
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+}
+
+.emotional-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--current-shadow, var(--shadow-xl));
+}
+
+.emotional-button {
+  background: var(--current-emotion, var(--primary));
+  color: var(--current-emotion-fg, var(--primary-foreground));
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-md) var(--space-xl);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.emotional-button:hover {
+  transform: scale(1.02);
+  box-shadow: var(--current-shadow, var(--shadow-md));
+}
+
+.emotional-button:active {
+  transform: scale(0.98);
+}
+
+/* =============================================
+   ANIMATIONS ÉMOTIONNELLES
+   ============================================= */
+@keyframes pulse-emotion {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-pulse-emotion {
+  animation: pulse-emotion 2s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* =============================================
+   RESPONSIVE ET ACCESSIBILITÉ
+   ============================================= */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-emotion,
+  .animate-breathe,
+  .animate-float,
+  .emotional-button,
+  .emotional-card {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --border: hsl(0, 0%, 0%);
+    --ring: hsl(0, 0%, 0%);
+  }
+  
+  .dark {
+    --border: hsl(0, 0%, 100%);
+    --ring: hsl(0, 0%, 100%);
+  }
+}
