@@ -46,6 +46,7 @@ const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
 const B2CVRGalaxyPage = lazy(() => import('@/pages/B2CVRGalaxyPage'));
+const VRBreathPage = lazy(() => import('@/pages/VRBreathPage'));
 
 // Modules Fun-First
 const B2CFlashGlowPage = lazy(() => import('@/pages/B2CFlashGlowPage'));
@@ -158,6 +159,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CJournalPage,
   B2CVRBreathGuidePage,
   B2CVRGalaxyPage,
+  VRBreathPage,
   
   // Fun-First
   B2CFlashGlowPage,

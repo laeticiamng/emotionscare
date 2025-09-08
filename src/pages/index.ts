@@ -96,6 +96,7 @@ export { default as B2CNyveeCoconPage } from './B2CNyveeCoconPage';
 
 // Pages manquantes créées
 export { default as CoachChatPage } from './CoachChatPage';
+export { default as VRBreathPage } from './VRBreathPage';
 export { default as VRSessionsPage } from './VRSessionsPage';
 export { default as JournalNewPage } from './JournalNewPage';
 export { default as ReportingPage } from './ReportingPage';

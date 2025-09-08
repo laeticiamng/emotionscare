@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Send, Mic, MicOff, Bot, User, Heart, Brain, Lightbulb, BookOpen, Music, Dumbbell, Settings, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useMood } from '@/contexts/MoodContext';
 
 interface Message {
   id: string;
@@ -189,7 +190,8 @@ const B2CAICoachPage: React.FC = () => {
             content: msg.content
           })),
           coachPersonality,
-          userEmotion: 'neutral' // TODO: Intégrer l'analyse d'émotion
+          userEmotion: currentMood?.valence > 0.6 ? 'positive' : 
+                       currentMood?.valence < 0.4 ? 'negative' : 'neutral'
         }
       });
 

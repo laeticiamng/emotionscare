@@ -1,5 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, Volume2, Star, Crown, Headphones, Music, Heart, Brain } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Play, Pause, Volume2, Star, Crown, Headphones, Music, 
+  Heart, Brain, Download, Share, Bookmark, Settings,
+  SkipBack, SkipForward, Shuffle, Repeat, Clock,
+  Sparkles, Award, Target
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { useMusic } from '@/contexts/music';
+import { cn } from '@/lib/utils';
 import PageRoot from '@/components/common/PageRoot';
 
 interface PremiumTrack {

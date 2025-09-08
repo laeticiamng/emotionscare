@@ -346,6 +346,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/vr-galactique'],
   },
   {
+    name: 'vr-breath',
+    path: '/app/vr-breath',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'VRBreathPage',
+    guard: true,
+    aliases: ['/vr-respiration'],
+  },
+  {
     name: 'boss-grit',
     path: '/app/boss-grit',
     segment: 'consumer',
