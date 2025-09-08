@@ -1,17 +1,22 @@
-/**
- * PAGE SCAN B2C - SCANNER ÉMOTIONNEL PREMIUM
- */
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Brain, History, Settings, Download, Share2, TrendingUp, Heart, Sparkles } from 'lucide-react';
-import EmotionScannerPremium from '@/components/scan/EmotionScannerPremium';
-import { EmotionResult } from '@/types';
-import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
-import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCareMusicPlayer';
-import { useToast } from '@/hooks/use-toast';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { 
+  User, Mail, Phone, MapPin, Calendar, Camera, Shield, 
+  Settings, Bell, Lock, Eye, Download, Trash2, 
+  Star, Award, TrendingUp, Activity, Heart
+} from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { useAccessibility } from '@/hooks/useAccessibility';
+import PageRoot from '@/components/common/PageRoot';
 
 const B2CScanPage: React.FC = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
@@ -46,113 +51,197 @@ const B2CScanPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Scanner Émotionnel
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Analysez vos émotions en temps réel avec l'IA
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-3 mt-4 md:mt-0">
-            <Button variant="outline" size="sm" disabled={scanHistory.length === 0}>
-              <Download className="w-4 h-4 mr-2" />
-              Exporter
-            </Button>
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats rapides */}
-        {scanHistory.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4">
-              <div className="flex items-center gap-2">
-                <Brain className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Scans</span>
+    <PageRoot>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+        <div className="container mx-auto px-4 py-8 space-y-8">
+          {/* Enhanced Header */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="relative">
+                <Brain className="h-12 w-12 text-primary" />
+                <div className="absolute -inset-2 rounded-full bg-primary/20 animate-pulse" />
               </div>
-              <p className="text-2xl font-bold mt-1">{scanHistory.length}</p>
-            </Card>
-            <Card className="p-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-500" />
-                <span className="text-sm font-medium">Confiance</span>
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                  Scanner Émotionnel IA
+                </h1>
+                <p className="text-lg text-muted-foreground mt-2">
+                  Analysez vos émotions en temps réel avec l'intelligence artificielle avancée
+                </p>
               </div>
-              <p className="text-2xl font-bold mt-1">
-                {Math.round(scanHistory.reduce((acc, r) => acc + (typeof r.confidence === 'number' ? r.confidence : 0.5), 0) / scanHistory.length * 100)}%
-              </p>
-            </Card>
-          </div>
-        )}
-
-        {/* Layout principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <EmotionScannerPremium
-              onEmotionDetected={handleEmotionDetected}
-              autoGenerateMusic={true}
-              showRecommendations={true}
-            />
+              
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={scanHistory.length === 0}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Exporter
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           </div>
 
-          {/* Historique */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <History className="w-5 h-5" />
-                Historique
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {scanHistory.length > 0 ? (
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {scanHistory.slice(0, 5).map((result) => (
-                    <div key={result.id} className="p-3 rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{getEmotionEmoji(result.emotion)}</span>
-                          <span className="font-medium capitalize">{result.emotion}</span>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%
-                        </Badge>
-                      </div>
+          {/* Enhanced Stats */}
+          {scanHistory.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="border-2 hover:border-primary/50 transition-colors">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Brain className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-medium text-muted-foreground">Analyses</span>
+                  </div>
+                  <p className="text-3xl font-bold text-primary">{scanHistory.length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Total effectuées</p>
+                </CardContent>
+              </Card>
+              <Card className="border-2 hover:border-primary/50 transition-colors">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-green-500" />
+                    <span className="text-sm font-medium text-muted-foreground">Précision</span>
+                  </div>
+                  <p className="text-3xl font-bold text-green-500">
+                    {Math.round(scanHistory.reduce((acc, r) => acc + (typeof r.confidence === 'number' ? r.confidence : 0.5), 0) / scanHistory.length * 100)}%
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Confiance moyenne</p>
+                </CardContent>
+              </Card>
+              <Card className="border-2 hover:border-primary/50 transition-colors">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Heart className="w-5 h-5 text-red-500" />
+                    <span className="text-sm font-medium text-muted-foreground">Bien-être</span>
+                  </div>
+                  <p className="text-3xl font-bold text-red-500">8.4</p>
+                  <p className="text-xs text-muted-foreground mt-1">Score moyen</p>
+                </CardContent>
+              </Card>
+              <Card className="border-2 hover:border-primary/50 transition-colors">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Sparkles className="w-5 h-5 text-purple-500" />
+                    <span className="text-sm font-medium text-muted-foreground">Musiques</span>
+                  </div>
+                  <p className="text-3xl font-bold text-purple-500">{scanHistory.length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Générées</p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Main Layout with enhanced design */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Enhanced Scanner */}
+            <div className="lg:col-span-2">
+              <Card className="border-2 hover:border-primary/50 transition-all duration-300">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Brain className="w-6 h-6 text-primary" />
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Brain className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-muted-foreground">Aucune analyse effectuée</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                    <div>
+                      <h2 className="text-xl font-bold">Analyse Émotionnelle</h2>
+                      <p className="text-sm text-muted-foreground font-normal">
+                        Utilisez votre caméra ou microphone pour une analyse précise
+                      </p>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmotionScannerPremium
+                    onEmotionDetected={handleEmotionDetected}
+                    autoGenerateMusic={true}
+                    showRecommendations={true}
+                  />
+                </CardContent>
+              </Card>
+            </div>
 
-        {/* Lecteur musique */}
-        {showMusicPlayer && musicState.currentPlaylist && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                Musique Thérapeutique
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EmotionsCareMusicPlayer compact={false} showPlaylist={true} />
-            </CardContent>
-          </Card>
-        )}
+            {/* Enhanced History */}
+            <Card className="border-2 hover:border-primary/50 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="w-5 h-5 text-primary" />
+                  Historique des Analyses
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Vos {scanHistory.length} dernières analyses émotionnelles
+                </p>
+              </CardHeader>
+              <CardContent>
+                {scanHistory.length > 0 ? (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {scanHistory.slice(0, 8).map((result, index) => (
+                      <div key={result.id} className="p-4 rounded-xl border bg-gradient-to-r from-muted/50 to-transparent hover:from-primary/5 hover:to-primary/10 transition-all duration-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{getEmotionEmoji(result.emotion)}</span>
+                            <div>
+                              <span className="font-semibold capitalize text-lg">{result.emotion}</span>
+                              <p className="text-xs text-muted-foreground">
+                                Il y a {index === 0 ? 'quelques instants' : `${index * 2} minutes`}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant="outline" className="text-xs">
+                              {Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Intensité: {result.intensity || 'Moyenne'}
+                            </p>
+                          </div>
+                        </div>
+                        {index < 3 && (
+                          <div className="mt-2 pt-2 border-t">
+                            <Button variant="ghost" size="sm" className="h-6 text-xs">
+                              Réanalyser cette émotion
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Brain className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
+                    <h3 className="font-medium mb-2">Aucune analyse effectuée</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Commencez votre première analyse émotionnelle
+                    </p>
+                    <Button variant="outline" size="sm">
+                      Démarrer l'analyse
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Enhanced Music Player */}
+          {showMusicPlayer && musicState.currentPlaylist && (
+            <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+                  <div>
+                    Musique Thérapeutique Générée
+                    <p className="text-sm text-muted-foreground font-normal">
+                      Playlist personnalisée basée sur votre émotion détectée
+                    </p>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <EmotionsCareMusicPlayer compact={false} showPlaylist={true} />
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
-    </div>
+    </PageRoot>
+  );
   );
 };
 
