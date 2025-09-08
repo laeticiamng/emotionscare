@@ -42,6 +42,10 @@ const B2CMoodMixerPageEnhanced = lazy(() => import('@/pages/B2CMoodMixerPageEnha
 const B2CVRBreathPageEnhanced = lazy(() => import('@/pages/B2CVRBreathPageEnhanced'));
 const B2CVRGalaxyPageEnhanced = lazy(() => import('@/pages/B2CVRGalaxyPageEnhanced'));
 const B2CScreenSilkPageEnhanced = lazy(() => import('@/pages/B2CScreenSilkPageEnhanced'));
+const B2CBubbleBeatPageEnhanced = lazy(() => import('@/pages/B2CBubbleBeatPageEnhanced'));
+const B2CSocialCoconPageEnhanced = lazy(() => import('@/pages/B2CSocialCoconPageEnhanced'));
+const B2CTeamsPageEnhanced = lazy(() => import('@/pages/B2CTeamsPageEnhanced'));
+const OnboardingPageEnhanced = lazy(() => import('@/pages/OnboardingPageEnhanced'));
 
 // Missing enhanced pages - Additional implementations
 const B2CFaceARPageEnhanced = lazy(() => import('@/pages/B2CFaceARPageEnhanced'));
@@ -130,15 +134,15 @@ function App() {
                 
                 {/* Pages avec sensor gates */}
                 <Route path="bubble-beat" element={<ProtectedRoute role="consumer" sensorGates={["hr"]} />}>
-                  <Route index element={<div data-testid="page-root">Bubble Beat - TODO</div>} />
+                  <Route index element={<B2CBubbleBeatPageEnhanced />} />
                 </Route>
               </Route>
               
               {/* Routes employee */}
               <Route path="" element={<ProtectedRoute role="employee" />}>
                 <Route path="collab" element={<CollabPage />} />
-                <Route path="social-cocon" element={<div data-testid="page-root">Social Cocon - TODO</div>} />
-                <Route path="teams" element={<div data-testid="page-root">Teams - TODO</div>} />
+                <Route path="social-cocon" element={<B2CSocialCoconPageEnhanced />} />
+                <Route path="teams" element={<B2CTeamsPageEnhanced />} />
                 
                 <Route path="community" element={<ProtectedRoute role="employee" neededFlags={["FF_COMMUNITY"]} />}>
                   <Route index element={<div data-testid="page-root">Community - TODO</div>} />
@@ -170,7 +174,7 @@ function App() {
             
             {/* Onboarding */}
             <Route path="/onboarding" element={<ProtectedRoute role="any" />}>
-              <Route index element={<div data-testid="page-root">Onboarding - TODO</div>} />
+              <Route index element={<OnboardingPageEnhanced />} />
             </Route>
             
             {/* System pages */}
