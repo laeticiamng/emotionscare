@@ -7,7 +7,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Routes } from './helpers';
+import { routes } from './routes';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import type { Role } from './schema';
 
@@ -41,7 +41,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
 
   // Authentification requise
   if (requireAuth && !isAuthenticated) {
-    return <Navigate to={Routes.login()} replace />;
+    return <Navigate to={routes.auth.login()} replace />;
   }
 
   // Vérification des rôles
@@ -104,12 +104,12 @@ function normalizeRole(role?: string): Role {
 function getDefaultDashboardForRole(role: Role): string {
   switch (role) {
     case 'consumer':
-      return Routes.consumerHome();
+      return routes.b2c.dashboard();
     case 'employee':
-      return Routes.employeeHome();
+      return routes.b2b.user.dashboard();
     case 'manager':
-      return Routes.managerHome();
+      return routes.b2b.admin.dashboard();
     default:
-      return Routes.consumerHome();
+      return routes.b2c.dashboard();
   }
 }
