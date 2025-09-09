@@ -1,29 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Play, 
   Pause, 
   RotateCcw, 
-  Settings, 
-  Headphones, 
-  Volume2,
   ArrowLeft,
-  Heart,
-  Wind,
-  Sparkles
+  Sparkles,
+  Star
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { cn } from '@/lib/utils';
-import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
+import { UniversePortal } from '@/components/universe/UniversePortal';
+import { CosmicBreathingOrb } from '@/components/breath/CosmicBreathingOrb';
+import { ConstellationReward } from '@/components/breath/ConstellationReward';
+import { CosmicBackground } from '@/components/breath/CosmicBackground';
+import { UNIVERSES } from '@/types/universes';
 
-interface BreathingSession {
+interface CosmicBreathSession {
   id: string;
   name: string;
   duration: number;
@@ -32,66 +30,72 @@ interface BreathingSession {
   exhaleTime: number;
   cycles: number;
   description: string;
-  difficulty: 'facile' | 'moyen' | 'difficile';
-  benefits: string[];
+  constellation: string;
 }
 
-const breathingSessions: BreathingSession[] = [
+const cosmicSessions: CosmicBreathSession[] = [
   {
-    id: '4-7-8',
-    name: 'Respiration 4-7-8',
-    duration: 240,
+    id: 'cosmic-calm',
+    name: 'Souffle Cosmique',
+    duration: 180, // 3 minutes
     inhaleTime: 4,
-    holdTime: 7,
-    exhaleTime: 8,
-    cycles: 8,
-    description: 'Technique de relaxation profonde pour réduire le stress et favoriser le sommeil',
-    difficulty: 'facile',
-    benefits: ['Réduction du stress', 'Amélioration du sommeil', 'Calme mental']
+    holdTime: 2,
+    exhaleTime: 6,
+    cycles: 15,
+    description: 'Laisse ton souffle synchroniser l\'expansion des étoiles',
+    constellation: 'Sérénité Stellaire'
   },
   {
-    id: 'box-breathing',
-    name: 'Respiration Carrée',
-    duration: 480,
-    inhaleTime: 4,
-    holdTime: 4,
+    id: 'galactic-peace',
+    name: 'Paix Galactique', 
+    duration: 120, // 2 minutes
+    inhaleTime: 3,
+    holdTime: 1,
     exhaleTime: 4,
     cycles: 15,
-    description: 'Technique utilisée par les forces spéciales pour maintenir le calme sous pression',
-    difficulty: 'moyen',
-    benefits: ['Concentration', 'Gestion du stress', 'Équilibre émotionnel']
+    description: 'Une vague apaisante à travers les nébuleuses',
+    constellation: 'Harmonie Cosmique'
   },
   {
-    id: 'wim-hof',
-    name: 'Méthode Wim Hof',
-    duration: 600,
-    inhaleTime: 2,
-    holdTime: 0,
-    exhaleTime: 2,
-    cycles: 30,
-    description: 'Respiration énergisante pour stimuler le système immunitaire',
-    difficulty: 'difficile',
-    benefits: ['Énergie', 'Système immunitaire', 'Résistance au froid']
+    id: 'stellar-energy',
+    name: 'Énergie Stellaire',
+    duration: 240, // 4 minutes
+    inhaleTime: 5,
+    holdTime: 3,
+    exhaleTime: 7,
+    cycles: 16,
+    description: 'Puise l\'énergie vitale des constellations anciennes',
+    constellation: 'Force Astrale'
   }
 ];
 
 const VRBreathPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { currentTrack, isPlaying, state, play, pause } = useMusic();
+  const { play, pause } = useMusic();
   
-  const [selectedSession, setSelectedSession] = useState<BreathingSession | null>(null);
+  // Universe state
+  const [isEntering, setIsEntering] = useState(true);
+  const [universeEntered, setUniverseEntered] = useState(false);
+  
+  // Session state
+  const [selectedSession, setSelectedSession] = useState<CosmicBreathSession | null>(null);
   const [isActive, setIsActive] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'idle'>('idle');
   const [currentCycle, setCurrentCycle] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [phaseTimer, setPhaseTimer] = useState(0);
-  const [volume, setVolume] = useState([0.7]);
-  const [showSettings, setShowSettings] = useState(false);
+  const [showReward, setShowReward] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const phaseIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Handle universe entrance
+  const handleUniverseEnterComplete = () => {
+    setUniverseEntered(true);
+  };
+
+  // Session management
   useEffect(() => {
     if (isActive && selectedSession) {
       intervalRef.current = setInterval(() => {
@@ -111,37 +115,39 @@ const VRBreathPage: React.FC = () => {
   }, [isActive, selectedSession]);
 
   useEffect(() => {
-    if (isActive && selectedSession) {
+    if (isActive && selectedSession && currentPhase !== 'idle') {
       runBreathingCycle();
     }
   }, [isActive, selectedSession, currentCycle]);
 
-  const startSession = (session: BreathingSession) => {
+  const startSession = (session: CosmicBreathSession) => {
     setSelectedSession(session);
     setTimeRemaining(session.duration);
     setCurrentCycle(0);
     setCurrentPhase('inhale');
+    setPhaseTimer(session.inhaleTime);
     setIsActive(true);
     
+    // Start ambient music
+    play();
+    
     toast({
-      title: "Session démarrée",
-      description: `Début de la session ${session.name}`,
+      title: "Voyage cosmique commencé",
+      description: "Laisse ton souffle guider les étoiles",
     });
   };
 
   const stopSession = () => {
     setIsActive(false);
     setCurrentCycle(0);
-    setCurrentPhase('inhale');
+    setCurrentPhase('idle');
     setPhaseTimer(0);
     
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (phaseIntervalRef.current) clearInterval(phaseIntervalRef.current);
     
-    toast({
-      title: "Session terminée",
-      description: "Bravo ! Vous avez terminé votre session de respiration",
-    });
+    // Show constellation reward
+    setShowReward(true);
   };
 
   const pauseSession = () => {
@@ -154,6 +160,10 @@ const VRBreathPage: React.FC = () => {
     if (!selectedSession || currentCycle >= selectedSession.cycles) {
       stopSession();
       return;
+    }
+
+    if (phaseIntervalRef.current) {
+      clearInterval(phaseIntervalRef.current);
     }
 
     const phases = [
@@ -172,6 +182,9 @@ const VRBreathPage: React.FC = () => {
           phaseIndex++;
           if (phaseIndex >= phases.length) {
             setCurrentCycle(c => c + 1);
+            if (phaseIntervalRef.current) {
+              clearInterval(phaseIntervalRef.current);
+            }
             return 0;
           } else {
             setCurrentPhase(phases[phaseIndex].name);
@@ -183,68 +196,73 @@ const VRBreathPage: React.FC = () => {
     }, 1000);
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'facile': return 'bg-green-500';
-      case 'moyen': return 'bg-yellow-500';
-      case 'difficile': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getPhaseColor = (phase: string) => {
-    switch (phase) {
-      case 'inhale': return 'from-blue-400 to-cyan-300';
-      case 'hold': return 'from-purple-400 to-pink-300';
-      case 'exhale': return 'from-green-400 to-teal-300';
-      default: return 'from-gray-400 to-gray-300';
-    }
-  };
-
-  const getPhaseText = (phase: string) => {
-    switch (phase) {
-      case 'inhale': return 'Inspirez';
-      case 'hold': return 'Retenez';
-      case 'exhale': return 'Expirez';
-      default: return '';
-    }
+  const handleRewardComplete = () => {
+    setShowReward(false);
+    setSelectedSession(null);
+    
+    toast({
+      title: "Cosmos apaisé ✨",
+      description: "Ta nouvelle constellation brille dans ta galaxie personnelle",
+    });
   };
 
   const progress = selectedSession && timeRemaining > 0 
     ? ((selectedSession.duration - timeRemaining) / selectedSession.duration) * 100 
     : 0;
 
+  const getCurrentPhaseDuration = () => {
+    if (!selectedSession) return 4;
+    switch (currentPhase) {
+      case 'inhale': return selectedSession.inhaleTime;
+      case 'hold': return selectedSession.holdTime;
+      case 'exhale': return selectedSession.exhaleTime;
+      default: return 4;
+    }
+  };
+
+  if (showReward && selectedSession) {
+    return (
+      <ConstellationReward
+        onComplete={handleRewardComplete}
+        sessionType={selectedSession.constellation}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/80 to-primary/5">
+    <UniversePortal
+      universe={UNIVERSES.vrBreath}
+      isEntering={isEntering}
+      onEnterComplete={handleUniverseEnterComplete}
+      className="min-h-screen"
+    >
+      {/* Cosmic background */}
+      <CosmicBackground 
+        phase={currentPhase}
+        isActive={isActive}
+        className="fixed inset-0 z-0"
+      />
+
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/app" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-                <ArrowLeft className="h-5 w-5" />
-                <span className="font-medium">Retour</span>
-              </Link>
-              <div className="h-6 w-px bg-border" />
-              <div className="flex items-center space-x-2">
-                <Wind className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">Respiration VR</h1>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setShowSettings(!showSettings)}
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
+      <header className="relative z-50 p-6">
+        <div className="flex items-center justify-between">
+          <Link 
+            to="/app" 
+            className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-medium">Retour</span>
+          </Link>
+          
+          <div className="flex items-center space-x-2 text-white">
+            <Star className="h-6 w-6" />
+            <h1 className="text-xl font-light tracking-wide">Galaxie du Souffle</h1>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      {/* Main Content */}
+      <main className="relative z-10 container mx-auto px-6 py-12">
         <AnimatePresence mode="wait">
           {!selectedSession ? (
             <motion.div
@@ -252,69 +270,75 @@ const VRBreathPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-8"
+              className="space-y-12"
             >
               {/* Introduction */}
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-                  <Wind className="h-8 w-8 text-primary" />
-                </div>
-                <h2 className="text-3xl font-bold">Exercices de Respiration</h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Découvrez des techniques de respiration guidées pour réduire le stress, 
-                  améliorer votre concentration et favoriser votre bien-être général.
+              <div className="text-center space-y-6">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5, type: "spring" }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+                  style={{ background: 'radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent)' }}
+                >
+                  <Sparkles className="h-10 w-10 text-white" />
+                </motion.div>
+                
+                <h2 className="text-4xl font-light text-white tracking-wide">
+                  Voyages Respiratoires
+                </h2>
+                <p className="text-xl text-white/70 max-w-2xl mx-auto font-light">
+                  Ton souffle fait vibrer les étoiles. Choisis ton voyage cosmique et laisse 
+                  les constellations s'aligner avec ton rythme intérieur.
                 </p>
               </div>
 
               {/* Sessions Grid */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {breathingSessions.map((session) => (
+              <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
+                {cosmicSessions.map((session, index) => (
                   <motion.div
                     key={session.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 + index * 0.2 }}
+                    whileHover={{ scale: 1.05, y: -10 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer"
-                          onClick={() => startSession(session)}>
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <CardTitle className="text-xl">{session.name}</CardTitle>
-                          <Badge className={cn('text-white', getDifficultyColor(session.difficulty))}>
-                            {session.difficulty}
+                    <Card 
+                      className="h-full bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 transition-all duration-300 cursor-pointer group"
+                      onClick={() => startSession(session)}
+                    >
+                      <CardContent className="p-8 space-y-6">
+                        <div className="text-center">
+                          <Star className="w-12 h-12 text-yellow-300 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                          <h3 className="text-2xl font-light text-white mb-2">
+                            {session.name}
+                          </h3>
+                          <Badge 
+                            variant="secondary" 
+                            className="bg-white/20 text-white border-white/30 mb-4"
+                          >
+                            {Math.floor(session.duration / 60)}min
                           </Badge>
                         </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <p className="text-muted-foreground text-sm leading-relaxed">
+                        
+                        <p className="text-white/70 text-center leading-relaxed">
                           {session.description}
                         </p>
                         
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium text-muted-foreground">Durée:</span>
-                            <p className="font-semibold">{Math.floor(session.duration / 60)}min</p>
+                        <div className="text-center space-y-3">
+                          <div className="text-sm text-white/60">
+                            Constellation: <span className="text-yellow-300 font-medium">{session.constellation}</span>
                           </div>
-                          <div>
-                            <span className="font-medium text-muted-foreground">Cycles:</span>
-                            <p className="font-semibold">{session.cycles}</p>
-                          </div>
+                          
+                          <Button 
+                            className="w-full bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm group-hover:bg-gradient-to-r group-hover:from-indigo-500/30 group-hover:to-purple-500/30 transition-all duration-300"
+                            onClick={() => startSession(session)}
+                          >
+                            <Play className="h-4 w-4 mr-2" />
+                            Commencer le voyage
+                          </Button>
                         </div>
-
-                        <div className="space-y-2">
-                          <span className="font-medium text-muted-foreground text-sm">Bénéfices:</span>
-                          <div className="flex flex-wrap gap-1">
-                            {session.benefits.map((benefit, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs">
-                                {benefit}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <Button className="w-full mt-4" onClick={() => startSession(session)}>
-                          <Play className="h-4 w-4 mr-2" />
-                          Commencer
-                        </Button>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -327,151 +351,93 @@ const VRBreathPage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="max-w-4xl mx-auto"
+              className="max-w-6xl mx-auto"
             >
               {/* Session Header */}
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-2">{selectedSession.name}</h2>
-                <p className="text-muted-foreground">{selectedSession.description}</p>
-              </div>
-
-              {/* Breathing Circle */}
-              <div className="flex justify-center mb-8">
-                <div className="relative">
-                  <motion.div
-                    className={cn(
-                      "w-64 h-64 rounded-full bg-gradient-to-br shadow-2xl flex items-center justify-center",
-                      getPhaseColor(currentPhase)
-                    )}
-                    animate={{
-                      scale: currentPhase === 'inhale' ? 1.2 : currentPhase === 'hold' ? 1.1 : 1,
-                    }}
-                    transition={{
-                      duration: currentPhase === 'inhale' ? selectedSession.inhaleTime : 
-                               currentPhase === 'hold' ? selectedSession.holdTime : selectedSession.exhaleTime,
-                      ease: "easeInOut"
-                    }}
+              <div className="text-center mb-12">
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="space-y-4"
+                >
+                  <h2 className="text-3xl font-light text-white tracking-wide">
+                    {selectedSession.name}
+                  </h2>
+                  <p className="text-white/70 text-lg">{selectedSession.description}</p>
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-white/20 text-white border-white/30"
                   >
-                    <div className="text-center text-white">
-                      <div className="text-2xl font-bold mb-2">{getPhaseText(currentPhase)}</div>
-                      <div className="text-4xl font-mono">{phaseTimer}s</div>
-                      <div className="text-sm opacity-80 mt-2">
-                        Cycle {currentCycle + 1}/{selectedSession.cycles}
-                      </div>
-                    </div>
-                  </motion.div>
-                  
-                  {/* Pulse effect */}
-                  {isActive && (
-                    <motion.div
-                      className="absolute inset-0 rounded-full border-4 border-white/30"
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                </div>
+                    Constellation: {selectedSession.constellation}
+                  </Badge>
+                </motion.div>
               </div>
 
-              {/* Progress */}
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Progression</span>
-                  <span>{Math.floor((selectedSession.duration - timeRemaining) / 60)}:{(selectedSession.duration - timeRemaining) % 60 < 10 ? '0' : ''}{(selectedSession.duration - timeRemaining) % 60} / {Math.floor(selectedSession.duration / 60)}:{selectedSession.duration % 60 < 10 ? '0' : ''}{selectedSession.duration % 60}</span>
+              {/* Cosmic Breathing Orb */}
+              <div className="flex justify-center mb-16">
+                <CosmicBreathingOrb
+                  phase={currentPhase}
+                  phaseTimer={phaseTimer}
+                  maxTime={getCurrentPhaseDuration()}
+                  isActive={isActive}
+                />
+              </div>
+
+              {/* Session Info */}
+              <div className="text-center mb-12 space-y-6">
+                <div className="text-white/60 text-sm tracking-widest">
+                  CYCLE {currentCycle + 1} / {selectedSession.cycles}
                 </div>
-                <Progress value={progress} className="h-2" />
+                
+                <div className="w-full max-w-md mx-auto bg-white/10 rounded-full h-2 backdrop-blur-sm">
+                  <motion.div 
+                    className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full"
+                    style={{ width: `${progress}%` }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                  />
+                </div>
+                
+                <div className="text-white/50 text-sm">
+                  {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')} restant
+                </div>
               </div>
 
               {/* Controls */}
-              <div className="flex justify-center space-x-4 mb-8">
+              <div className="flex justify-center space-x-6">
                 <Button
                   onClick={pauseSession}
                   size="lg"
-                  className="min-w-32"
+                  className="min-w-40 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
                 >
-                  {isActive ? <Pause className="h-5 w-5 mr-2" /> : <Play className="h-5 w-5 mr-2" />}
-                  {isActive ? 'Pause' : 'Reprendre'}
+                  {isActive ? (
+                    <>
+                      <Pause className="h-5 w-5 mr-2" />
+                      Pause cosmique
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-5 w-5 mr-2" />
+                      Reprendre le voyage
+                    </>
+                  )}
                 </Button>
+                
                 <Button
                   onClick={stopSession}
                   variant="outline"
                   size="lg"
+                  className="min-w-40 bg-transparent border-white/30 text-white hover:bg-white/10"
                 >
                   <RotateCcw className="h-5 w-5 mr-2" />
-                  Arrêter
+                  Terminer
                 </Button>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-card p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-primary">{currentCycle}</div>
-                  <div className="text-sm text-muted-foreground">Cycles complétés</div>
-                </div>
-                <div className="bg-card p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-primary">{Math.floor(progress)}%</div>
-                  <div className="text-sm text-muted-foreground">Progression</div>
-                </div>
-                <div className="bg-card p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-primary">
-                    {Math.floor(timeRemaining / 60)}:{timeRemaining % 60 < 10 ? '0' : ''}{timeRemaining % 60}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Temps restant</div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Settings Panel */}
-        <AnimatePresence>
-          {showSettings && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-4 right-4 w-80 bg-card border rounded-lg shadow-lg p-4 z-50"
-            >
-              <h3 className="font-semibold mb-4 flex items-center">
-                <Settings className="h-4 w-4 mr-2" />
-                Paramètres Audio
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Volume</span>
-                    <span className="text-sm text-muted-foreground">{Math.round(volume[0] * 100)}%</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Volume2 className="h-4 w-4" />
-                    <Slider
-                      value={volume}
-                      onValueChange={setVolume}
-                      max={1}
-                      step={0.1}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                {currentTrack && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Musique d'ambiance</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => isPlaying ? pause() : play()}
-                    >
-                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
-    </div>
+    </UniversePortal>
   );
 };
 

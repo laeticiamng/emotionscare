@@ -125,5 +125,24 @@ export const UNIVERSES: Record<string, Universe> = {
       name: 'Fleur de mots',
       description: 'Ta pensée transformée en beauté vivante'
     }
+  },
+  vrBreath: {
+    id: 'vr-breath',
+    name: 'La Galaxie du Souffle',
+    description: 'Cosmos infini, constellations respirantes',
+    ambiance: {
+      colors: {
+        primary: 'hsl(240, 80%, 60%)', // Bleu cosmos
+        secondary: 'hsl(280, 70%, 50%)', // Violet nébuleuse
+        accent: 'hsl(50, 90%, 70%)', // Or étoile
+        background: 'linear-gradient(radial-circle, hsl(240, 30%, 5%) 0%, hsl(280, 20%, 10%) 50%, hsl(0, 0%, 2%) 100%)'
+      },
+      metaphor: 'Ton souffle fait vibrer les étoiles de l\'univers'
+    },
+    artifacts: {
+      type: 'constellation',
+      name: 'Constellation Personnelle',
+      description: 'Étoiles alignées selon ton rythme respiratoire'
+    }
   }
 };
