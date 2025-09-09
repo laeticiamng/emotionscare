@@ -2,20 +2,52 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { EmotionResult } from '@/types/emotion';
+import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuid } from 'uuid';
 
-// Mock service function for creating emotion entries
+// Production service function for creating emotion entries
 const createEmotionEntry = async (data: EmotionResult): Promise<EmotionResult> => {
-  // This would normally be an API call
-  console.log('Creating emotion entry:', data);
-  return Promise.resolve(data);
+  try {
+    const { data: result, error } = await supabase
+      .from('emotion_scans')
+      .insert({
+        id: data.id,
+        user_id: data.user_id,
+        emotion: data.emotion,
+        confidence: data.confidence,
+        emotions: data.emotions,
+        emojis: data.emojis,
+        source: data.source || 'text',
+        timestamp: data.timestamp
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return result as EmotionResult;
+  } catch (error) {
+    console.error('Error creating emotion entry:', error);
+    throw error;
+  }
 };
 
-// Mock service function for fetching latest emotion
+// Production service function for fetching latest emotion
 const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
-  // This would normally be an API call
-  console.log('Fetching latest emotion for user:', userId);
-  return Promise.resolve(null);
+  try {
+    const { data, error } = await supabase
+      .from('emotion_scans')
+      .select('*')
+      .eq('user_id', userId)
+      .order('timestamp', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data as EmotionResult | null;
+  } catch (error) {
+    console.error('Error fetching latest emotion:', error);
+    return null;
+  }
 };
 
 export function useEmotionScan() {

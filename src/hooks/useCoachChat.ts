@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { ChatMessage, ChatConversation } from '@/types/chat';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useCoachChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -23,18 +24,50 @@ export const useCoachChat = () => {
       setIsTyping(true);
       setIsProcessing(true);
       
-      setTimeout(() => {
+      try {
+        // Call the production coach AI Edge Function
+        const { data, error } = await supabase.functions.invoke('coach-ai', {
+          body: { 
+            message: content,
+            conversationHistory: messages.slice(-10) // Send last 10 messages for context
+          }
+        });
+
+        if (error) throw error;
+
         const response: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          content: 'Je comprends votre message. Comment puis-je vous aider davantage ?',
+          content: data.response || 'Je suis là pour vous accompagner. Pouvez-vous me dire ce qui vous préoccupe ?',
           sender: 'coach',
           timestamp: new Date().toISOString()
         };
         
         setMessages(prev => [...prev, response]);
+        
+        // Save conversation to database if currentConversation exists
+        if (currentConversation) {
+          await supabase
+            .from('chat_conversations')
+            .update({
+              messages: [...messages, message, response],
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', currentConversation.id);
+        }
+        
+      } catch (error) {
+        console.error('Error sending message to coach:', error);
+        const errorResponse: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          content: 'Je rencontre une difficulté technique. Pouvez-vous reformuler votre question ?',
+          sender: 'coach',
+          timestamp: new Date().toISOString()
+        };
+        setMessages(prev => [...prev, errorResponse]);
+      } finally {
         setIsTyping(false);
         setIsProcessing(false);
-      }, 1500);
+      }
     }
   };
 
