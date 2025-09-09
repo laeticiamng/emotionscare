@@ -7,7 +7,7 @@ import {
   Brain, History, Download, Settings, TrendingUp, 
   Activity, Heart, Sparkles, Music
 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
 import EmotionScannerPremium from '@/components/emotion/EmotionScannerPremium';
 import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCareMusicPlayer';
