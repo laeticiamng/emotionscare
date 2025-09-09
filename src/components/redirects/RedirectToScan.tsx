@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Routes } from '@/routerV2';
 
 /**
- * Composant de redirection : /app/emotion-scan -> /app/scan
+ * Composant de redirection vers /app/scan
+ * Pour les routes obsolètes : /app/emotions, /emotion-scan, etc.
  */
-const RedirectToScan: React.FC = () => {
+const RedirectToScan = () => {
   useEffect(() => {
-    // Log pour analytics des redirections
-    console.log('[Redirect] emotion-scan -> scan');
+    console.log('🔀 Redirection automatique vers /app/scan');
   }, []);
-  
-  return <Navigate to={Routes.scan()} replace />;
+
+  return <Navigate to="/app/scan" replace />;
 };
 
 export default RedirectToScan;

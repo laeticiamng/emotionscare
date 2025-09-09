@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Routes } from '@/routerV2';
 
 /**
- * Composant de redirection : /app/voice-journal -> /app/journal
+ * Composant de redirection vers /app/journal
+ * Pour les routes obsolètes : /voice-journal, etc.
  */
-const RedirectToJournal: React.FC = () => {
+const RedirectToJournal = () => {
   useEffect(() => {
-    // Log pour analytics des redirections
-    console.log('[Redirect] voice-journal -> journal');
+    console.log('🔀 Redirection automatique vers /app/journal');
   }, []);
-  
-  return <Navigate to={Routes.journal()} replace />;
+
+  return <Navigate to="/app/journal" replace />;
 };
 
 export default RedirectToJournal;

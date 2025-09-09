@@ -497,6 +497,117 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'JournalNewPage',
     guard: true,
   },
+  
+  // ═══════════════════════════════════════════════════════════
+  // PAGES EXISTANTES NON MAPPÉES (CONSOLIDATION)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'messages',
+    path: '/messages',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MessagesPage',
+    guard: true,
+    aliases: ['/chat', '/nyvee-chat'],
+  },
+  {
+    name: 'calendar',
+    path: '/calendar',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'CalendarPage',
+    guard: true,
+    aliases: ['/agenda'],
+  },
+  {
+    name: 'point20',
+    path: '/point20',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'Point20Page',
+    guard: true,
+    aliases: ['/recuperation-20'],
+  },
+  {
+    name: 'test-page',
+    path: '/test',
+    segment: 'public',
+    layout: 'simple',
+    component: 'TestPage',
+  },
+  {
+    name: 'dashboard-legacy',
+    path: '/dashboard',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'DashboardPage',
+    guard: true,
+    deprecated: true, // Redirection vers /app/home
+  },
+  {
+    name: 'journal-legacy',
+    path: '/journal',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'JournalPage',
+    guard: true,
+    deprecated: true, // Redirection vers /app/journal
+  },
+  {
+    name: 'music-legacy',
+    path: '/music',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MusicPage',
+    guard: true,
+    deprecated: true, // Redirection vers /app/music
+  },
+  {
+    name: 'emotions-legacy',
+    path: '/emotions',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'EmotionsPage',
+    guard: true,
+    deprecated: true, // Redirection vers /app/scan
+  },
+  {
+    name: 'profile-legacy',
+    path: '/profile',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'ProfilePage',
+    guard: true,
+    deprecated: true, // Redirection vers /settings/profile
+  },
+  {
+    name: 'settings-legacy',
+    path: '/settings',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'GeneralPage',
+    guard: true,
+    deprecated: true, // Redirection vers /settings/general
+  },
+  {
+    name: 'privacy-legacy',
+    path: '/privacy',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'PrivacyPage',
+    guard: true,
+    deprecated: true, // Redirection vers /settings/privacy
+  },
   {
     name: 'reporting',
     path: '/reporting',

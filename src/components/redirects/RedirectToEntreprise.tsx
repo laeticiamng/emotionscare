@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Routes } from '@/routerV2';
 
 /**
- * Composant de redirection : /b2b/landing -> /entreprise
+ * Composant de redirection vers /entreprise
+ * Pour les routes obsolètes : /b2b/landing, etc.
  */
-const RedirectToEntreprise: React.FC = () => {
+const RedirectToEntreprise = () => {
   useEffect(() => {
-    // Log pour analytics des redirections
-    console.log('[Redirect] b2b/landing -> entreprise');
+    console.log('🔀 Redirection automatique vers /entreprise');
   }, []);
-  
-  return <Navigate to={Routes.enterprise()} replace />;
+
+  return <Navigate to="/entreprise" replace />;
 };
 
 export default RedirectToEntreprise;

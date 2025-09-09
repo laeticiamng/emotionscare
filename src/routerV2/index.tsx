@@ -106,17 +106,30 @@ const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
 
-// Pages manquantes nouvellement créées
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
-const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
-const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
-const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
-const ExportPage = lazy(() => import('@/pages/ExportPage'));
-const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
-const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
-const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+  // Pages manquantes nouvellement créées
+  const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+  const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
+  const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
+  const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
+  const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
+  const ExportPage = lazy(() => import('@/pages/ExportPage'));
+  const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
+  const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+  const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+  const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+
+  // Pages existantes à consolider
+  const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
+  const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
+  const Point20Page = lazy(() => import('@/pages/Point20Page'));
+  const TestPage = lazy(() => import('@/pages/TestPage'));
+  const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+  const JournalPage = lazy(() => import('@/pages/JournalPage'));
+  const MusicPage = lazy(() => import('@/pages/MusicPage'));
+  const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
+  const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+  const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
+  const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
 // Pages système
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
@@ -226,6 +239,19 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   LeaderboardPage,
   GamificationPage,
   HeatmapPage,
+  
+  // Pages existantes consolidées
+  MessagesPage,
+  CalendarPage,
+  Point20Page,
+  TestPage,
+  DashboardPage,
+  JournalPage,
+  MusicPage,
+  EmotionsPage,
+  ProfilePage,
+  GeneralPage,
+  PrivacyPage,
   
   // Legal pages
   LegalTermsPage,
