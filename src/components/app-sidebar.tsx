@@ -20,7 +20,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Routes } from "@/routerV2";
+import { routes } from '@/routerV2';
 import { 
   Heart, 
   Scan, 

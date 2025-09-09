@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, CheckCircle, XCircle, Route, Eye, Settings, FileX } from 'lucide-react';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 interface RouteAuditResult {
   path: string;
@@ -97,9 +97,9 @@ export const CompleteRoutesAuditInterface: React.FC = () => {
       
       // Vérifier avec RouterV2 Registry
       const routerV2Routes = [
-        Routes.home(), Routes.scan(), Routes.music(), Routes.coach(),
-        Routes.journal(), Routes.vr(), Routes.consumerHome(),
-        Routes.employeeHome(), Routes.managerHome()
+        routes.public.home(), routes.b2c.scan(), routes.b2c.music(), routes.b2c.coach(),
+        routes.b2c.journal(), routes.b2c.vr(), routes.b2c.dashboard(),
+        routes.b2b.user.dashboard(), routes.b2b.admin.dashboard()
       ];
       const routerV2RouteExists = routerV2Routes.includes(route.path);
       

@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 import { toast } from '@/hooks/use-toast';
 import { useSimpleAuth } from '@/contexts/SimpleAuth';
 

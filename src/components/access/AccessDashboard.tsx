@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, AlertCircle, User, Shield, Users, Settings } from 'lucide-react';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 interface PageAccess {
   path: string;
@@ -32,14 +32,14 @@ const AccessDashboard: React.FC = () => {
     return [
       // Pages principales
       {
-        path: Routes.home(),
+        path: routes.public.home(),
         name: 'Accueil',
         description: 'Page d\'accueil publique',
         accessible: true,
         category: 'core'
       },
       {
-        path: Routes.b2c(),
+        path: routes.b2c.home(),
         name: 'Sélection du mode',
         description: 'Choix du mode utilisateur',
         accessible: isAuthenticated,
@@ -49,130 +49,103 @@ const AccessDashboard: React.FC = () => {
 
       // Dashboards
       {
-        path: Routes.consumerHome(),
-        name: 'Dashboard B2C',
-        description: 'Tableau de bord particulier',
-        requiredMode: 'b2c',
-        accessible: currentMode === 'b2c',
-        reason: currentMode !== 'b2c' ? 'Mode B2C requis' : undefined,
-        category: 'core'
+        path: routes.b2c.dashboard(),
       },
       {
-        path: Routes.employeeHome(),
-        name: 'Dashboard Collaborateur',
-        description: 'Tableau de bord collaborateur',
-        requiredMode: 'b2b_user',
-        accessible: currentMode === 'b2b_user',
-        reason: currentMode !== 'b2b_user' ? 'Mode collaborateur requis' : undefined,
-        category: 'b2b'
+        id: 'employee-dashboard',
+        name: 'Dashboard Employé',
+        description: 'Espace collaborateur B2B',
+        path: routes.b2b.user.dashboard(),
       },
       {
-        path: Routes.managerHome(),
-        name: 'Dashboard Admin RH',
-        description: 'Tableau de bord administrateur RH',
-        requiredMode: 'b2b_admin',
-        accessible: currentMode === 'b2b_admin',
-        reason: currentMode !== 'b2b_admin' ? 'Mode admin RH requis' : undefined,
-        category: 'admin'
-      },
-
-      // Fonctionnalités communes
+        id: 'manager-dashboard', 
+        name: 'Dashboard Manager',
+        description: 'Espace de pilotage RH',
+        path: routes.b2b.admin.dashboard(),
+      }
+    ],
+  },
+  {
+    category: 'Features B2C',
+    description: 'Fonctionnalités pour utilisateurs individuels',
+    routes: [
       {
-        path: Routes.scan(),
-        name: 'Scanner d\'émotions',
-        description: 'Analyse des émotions',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
+        id: 'scan',
+        name: 'Scanner Émotionnel',
+        description: 'Analyse des émotions instantanée',
+        path: routes.b2c.scan(),
       },
       {
-        path: Routes.music(),
+        id: 'music',
         name: 'Musicothérapie',
-        description: 'Thérapie par la musique',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
+        description: 'Sons apaisants personnalisés',
+        path: routes.b2c.music(),
       },
       {
-        path: Routes.coach(),
-        name: 'Coach virtuel',
-        description: 'Assistant bien-être IA',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
+        id: 'coach',
+        name: 'Coach IA',
+        description: 'Accompagnement personnalisé',
+        path: routes.b2c.coach(),
       },
       {
-        path: Routes.journal(),
-        name: 'Journal personnel',
-        description: 'Journal intime numérique',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
+        id: 'journal',
+        name: 'Journal Personnel',
+        description: 'Réflexion et suivi humeurs',
+        path: routes.b2c.journal(),
       },
       {
-        path: Routes.vr(),
-        name: 'Réalité virtuelle',
-        description: 'Expériences immersives VR',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
+        id: 'vr',
+        name: 'Réalité Virtuelle',
+        description: 'Expériences immersives',
+        path: routes.b2c.vr(),
       },
       {
-        path: Routes.leaderboard(),
-        name: 'Gamification',
-        description: 'Défis et récompenses',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
+        id: 'leaderboard',
+        name: 'Gamification Douce',
+        description: 'Progression bienveillante',
+        path: routes.b2c.bossLevel(),
       },
       {
-        path: Routes.socialCocon(),
-        name: 'Cocon social',
-        description: 'Communauté et échanges',
-        accessible: isAuthenticated,
-        reason: !isAuthenticated ? 'Connexion requise' : undefined,
-        category: 'feature'
-      },
-
-      // Pages administrateur
+        id: 'social-cocon',
+        name: 'Social Cocoon',
+        description: 'Communauté sécurisée',
+        path: routes.b2c.community(),
+      }
+    ],
+  },
+  {
+    category: 'Features B2B',
+    description: 'Fonctionnalités organisationnelles',
+    routes: [
       {
-        path: Routes.teams(),
-        name: 'Gestion des équipes',
-        description: 'Administration des équipes',
-        requiredRole: 'b2b_admin',
-        accessible: currentRole === 'b2b_admin',
-        reason: currentRole !== 'b2b_admin' ? 'Rôle admin RH requis' : undefined,
-        category: 'admin'
-      },
-      {
-        path: Routes.adminReports(),
-        name: 'Rapports',
-        description: 'Rapports et analyses',
-        requiredRole: 'b2b_admin',
-        accessible: currentRole === 'b2b_admin',
-        reason: currentRole !== 'b2b_admin' ? 'Rôle admin RH requis' : undefined,
-        category: 'admin'
+        id: 'teams',
+        name: 'Gestion Équipes',
+        description: 'Collaboration et bien-être collectif',
+        path: routes.b2b.teams(),
       },
       {
-        path: Routes.adminEvents(),
-        name: 'Événements',
-        description: 'Gestion des événements',
-        requiredRole: 'b2b_admin',
-        accessible: currentRole === 'b2b_admin',
-        reason: currentRole !== 'b2b_admin' ? 'Rôle admin RH requis' : undefined,
-        category: 'admin'
+        id: 'reports',
+        name: 'Rapports Agrégés',
+        description: 'Analytics anonymisés',
+        path: routes.b2b.reports(),
       },
       {
-        path: Routes.adminOptimization(),
-        name: 'Optimisation',
-        description: 'Outils d\'optimisation',
-        requiredRole: 'b2b_admin',
-        accessible: currentRole === 'b2b_admin',
-        reason: currentRole !== 'b2b_admin' ? 'Rôle admin RH requis' : undefined,
-        category: 'admin'
+        id: 'events',
+        name: 'Événements Bien-être',
+        description: 'Organisation activités',
+        path: routes.b2b.events(),
       },
       {
-        path: Routes.settingsGeneral(),
+        id: 'optimization',
+        name: 'Optimisation RH',
+        description: 'Amélioration continue',
+        path: routes.b2b.admin.analytics(),
+      },
+      {
+        id: 'settings',
+        name: 'Paramètres Entreprise',
+        description: 'Configuration organisationnelle',
+        path: routes.b2c.settings(),
         name: 'Paramètres',
         description: 'Configuration système',
         accessible: isAuthenticated,

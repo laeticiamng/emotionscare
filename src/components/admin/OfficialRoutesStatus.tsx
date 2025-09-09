@@ -2,62 +2,62 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Route, Shield, Zap } from 'lucide-react';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 export const OfficialRoutesStatus: React.FC = () => {
   const routeCategories = [
     {
       name: 'Routes Publiques',
       routes: [
-        { path: Routes.home(), name: 'Accueil' },
-        { path: Routes.b2c(), name: 'Choix Mode' },
-        { path: Routes.login(), name: 'Authentification' },
-        { path: Routes.enterprise(), name: 'Sélection B2B' },
+        { path: routes.public.home(), name: 'Accueil' },
+        { path: routes.b2c.home(), name: 'Choix Mode' },
+        { path: routes.auth.login(), name: 'Authentification' },
+        { path: routes.b2b.home(), name: 'Sélection B2B' },
       ],
       icon: <Route className="h-5 w-5" />
     },
     {
       name: 'Authentification',
       routes: [
-        { path: Routes.login({ segment: 'b2c' }), name: 'Login B2C' },
-        { path: Routes.signup({ segment: 'b2c' }), name: 'Register B2C' },
-        { path: Routes.login({ segment: 'b2b' }), name: 'Login B2B User' },
-        { path: Routes.signup({ segment: 'b2b' }), name: 'Register B2B User' },
-        { path: Routes.login({ segment: 'b2b' }), name: 'Login B2B Admin' },
+        { path: routes.auth.b2cLogin(), name: 'Login B2C' },
+        { path: routes.auth.b2cRegister(), name: 'Register B2C' },
+        { path: routes.auth.b2bUserLogin(), name: 'Login B2B User' },
+        { path: routes.auth.b2bUserLogin(), name: 'Register B2B User' },
+        { path: routes.auth.b2bAdminLogin(), name: 'Login B2B Admin' },
       ],
       icon: <Shield className="h-5 w-5" />
     },
     {
       name: 'Dashboards',
       routes: [
-        { path: Routes.consumerHome(), name: 'Dashboard B2C' },
-        { path: Routes.employeeHome(), name: 'Dashboard B2B User' },
-        { path: Routes.managerHome(), name: 'Dashboard B2B Admin' },
+        { path: routes.b2c.dashboard(), name: 'Dashboard B2C' },
+        { path: routes.b2b.user.dashboard(), name: 'Dashboard B2B User' },
+        { path: routes.b2b.admin.dashboard(), name: 'Dashboard B2B Admin' },
       ],
       icon: <Zap className="h-5 w-5" />
     },
     {
       name: 'Fonctionnalités',
       routes: [
-        { path: Routes.scan(), name: 'Scan Émotionnel' },
-        { path: Routes.music(), name: 'Musicothérapie' },
-        { path: Routes.coach(), name: 'Coach IA' },
-        { path: Routes.journal(), name: 'Journal' },
-        { path: Routes.vr(), name: 'Réalité Virtuelle' },
-        { path: Routes.settingsGeneral(), name: 'Préférences' },
-        { path: Routes.leaderboard(), name: 'Gamification' },
-        { path: Routes.socialCocon(), name: 'Social Cocon' },
+        { path: routes.b2c.scan(), name: 'Scan Émotionnel' },
+        { path: routes.b2c.music(), name: 'Musicothérapie' },
+        { path: routes.b2c.coach(), name: 'Coach IA' },
+        { path: routes.b2c.journal(), name: 'Journal' },
+        { path: routes.b2c.vr(), name: 'Réalité Virtuelle' },
+        { path: routes.b2c.settings(), name: 'Préférences' },
+        { path: routes.b2c.bossLevel(), name: 'Gamification' },
+        { path: routes.b2c.community(), name: 'Social Cocon' },
       ],
       icon: <CheckCircle className="h-5 w-5" />
     },
     {
       name: 'Administration',
       routes: [
-        { path: Routes.teams(), name: 'Équipes' },
-        { path: Routes.adminReports(), name: 'Rapports' },
-        { path: Routes.adminEvents(), name: 'Événements' },
-        { path: Routes.adminOptimization(), name: 'Optimisation' },
-        { path: Routes.settingsGeneral(), name: 'Paramètres' },
+        { path: routes.b2b.teams(), name: 'Équipes' },
+        { path: routes.b2b.reports(), name: 'Rapports' },
+        { path: routes.b2b.events(), name: 'Événements' },
+        { path: routes.b2b.admin.analytics(), name: 'Optimisation' },
+        { path: routes.b2c.settings(), name: 'Paramètres' },
       ],
       icon: <Shield className="h-5 w-5" />
     }

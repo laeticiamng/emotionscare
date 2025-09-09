@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -82,19 +82,19 @@ export const CompleteRouteAudit: React.FC = () => {
 
     // Import depuis RouterV2 registry pour obtenir toutes les routes
     const routesToAudit = [
-      { path: Routes.home(), key: 'HOME' },
-      { path: Routes.scan(), key: 'SCAN' },
-      { path: Routes.music(), key: 'MUSIC' },
-      { path: Routes.coach(), key: 'COACH' },
-      { path: Routes.journal(), key: 'JOURNAL' },
-      { path: Routes.vr(), key: 'VR' },
-      { path: Routes.consumerHome(), key: 'B2C_DASHBOARD' },
-      { path: Routes.employeeHome(), key: 'B2B_USER_DASHBOARD' },
-      { path: Routes.managerHome(), key: 'B2B_ADMIN_DASHBOARD' },
-      { path: Routes.teams(), key: 'TEAMS' },
-      { path: Routes.adminReports(), key: 'REPORTS' },
-      { path: Routes.adminEvents(), key: 'EVENTS' },
-      { path: Routes.settingsGeneral(), key: 'SETTINGS' }
+      { path: routes.public.home(), key: 'HOME' },
+      { path: routes.b2c.scan(), key: 'SCAN' },
+      { path: routes.b2c.music(), key: 'MUSIC' },
+      { path: routes.b2c.coach(), key: 'COACH' },
+      { path: routes.b2c.journal(), key: 'JOURNAL' },
+      { path: routes.b2c.vr(), key: 'VR' },
+      { path: routes.b2c.dashboard(), key: 'B2C_DASHBOARD' },
+      { path: routes.b2b.user.dashboard(), key: 'B2B_USER_DASHBOARD' },
+      { path: routes.b2b.admin.dashboard(), key: 'B2B_ADMIN_DASHBOARD' },
+      { path: routes.b2b.teams(), key: 'TEAMS' },
+      { path: routes.b2b.reports(), key: 'REPORTS' },
+      { path: routes.b2b.events(), key: 'EVENTS' },
+      { path: routes.b2c.settings(), key: 'SETTINGS' }
     ];
 
     for (const { path: route, key } of routesToAudit) {

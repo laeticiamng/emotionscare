@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, ExternalLink } from 'lucide-react';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 const NavigationValidator: React.FC = () => {
   const navigate = useNavigate();
