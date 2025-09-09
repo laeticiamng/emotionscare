@@ -123,7 +123,7 @@ const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
   const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
   const Point20Page = lazy(() => import('@/pages/Point20Page'));
   const TestPage = lazy(() => import('@/pages/TestPage'));
-  const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+  const DashboardSimple = lazy(() => import('@/pages/DashboardSimple'));
   const JournalPage = lazy(() => import('@/pages/JournalPage'));
   const MusicPage = lazy(() => import('@/pages/MusicPage'));
   const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
@@ -245,7 +245,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CalendarPage,
   Point20Page,
   TestPage,
-  DashboardPage,
+  DashboardSimple,
   JournalPage,
   MusicPage,
   EmotionsPage,

@@ -539,14 +539,12 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'TestPage',
   },
   {
-    name: 'dashboard-legacy',
-    path: '/dashboard',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'DashboardPage',
-    guard: true,
-    deprecated: true, // Redirection vers /app/home
+    name: 'dashboard-simple',
+    path: '/dashboard-simple',
+    segment: 'public',
+    layout: 'simple',
+    component: 'DashboardSimple',
+    guard: false,
   },
   {
     name: 'journal-legacy',

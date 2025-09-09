@@ -65,31 +65,27 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       console.log('✅ Connexion réussie, redirection...', mockUser);
 
-      // Navigate based on role - utiliser des routes existantes
+      // Redirection immédiate sans setTimeout
+      console.log('🔄 Redirection immédiate vers dashboard...');
+      
+      // Créer un délai minimum puis rediriger
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Utiliser la navigation programmatique
+      const event = new CustomEvent('authRedirect', { 
+        detail: { 
+          route: '/dashboard-simple', 
+          user: mockUser 
+        } 
+      });
+      window.dispatchEvent(event);
+      
+      // Fallback si l'événement custom ne fonctionne pas
       setTimeout(() => {
-        let dashboardRoute = '/app/home';
-        
-        // Tester différentes routes selon le rôle
-        if (mockUser.role === 'consumer') {
-          dashboardRoute = '/b2c'; // Route landing B2C existante
-        } else if (mockUser.role === 'employee') {
-          dashboardRoute = '/app/collab';
-        } else if (mockUser.role === 'manager') {
-          dashboardRoute = '/app/rh';
-        }
-        
-        console.log('🔄 Redirection vers:', dashboardRoute);
-        
-        // Utiliser React Router au lieu de window.location
-        try {
-          window.history.pushState({}, '', dashboardRoute);
-          window.location.reload();
-        } catch (error) {
-          console.error('Erreur de redirection:', error);
-          // Fallback vers une route connue
-          window.location.replace('/');
-        }
-      }, 800); // Délai plus long
+        console.log('🔄 Fallback: Redirection manuelle');
+        window.location.href = '/dashboard-simple';
+      }, 200);
+      
     } catch (error) {
       console.error('SignIn error:', error);
       setLoading(false);
@@ -118,9 +114,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       // Navigate based on role
       setTimeout(() => {
-        const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
-                              mockUser.role === 'employee' ? '/app/collab' :
-                              mockUser.role === 'manager' ? '/app/rh' : '/app/home';
+        const dashboardRoute = '/dashboard-simple'; // Route simple qui fonctionne toujours
         
         console.log('🔄 Redirection vers:', dashboardRoute);
         
