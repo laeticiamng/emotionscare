@@ -472,7 +472,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Features Section Enhanced */}
         <section className="py-20 bg-background">
