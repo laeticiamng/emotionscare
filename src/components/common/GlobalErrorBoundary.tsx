@@ -1,15 +1,34 @@
-import React from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import React, { Component, ReactNode } from 'react';
 import ErrorFallback from './ErrorFallback';
 
-interface GlobalErrorBoundaryProps {
-  children: React.ReactNode;
+interface Props {
+  children: ReactNode;
 }
 
-const GlobalErrorBoundary: React.FC<GlobalErrorBoundaryProps> = ({ children }) => {
-  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+interface State {
+  hasError: boolean;
+  error?: Error;
+  errorInfo?: React.ErrorInfo;
+}
+
+class GlobalErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to monitoring service
     console.error('Global Error Boundary caught an error:', error, errorInfo);
+    
+    this.setState({
+      error,
+      errorInfo
+    });
     
     // In production, send to error reporting service
     if (import.meta.env.PROD) {
@@ -19,23 +38,25 @@ const GlobalErrorBoundary: React.FC<GlobalErrorBoundaryProps> = ({ children }) =
       //   tags: { component: 'GlobalErrorBoundary' }
       // });
     }
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
-  const handleReset = () => {
-    // Clear any error state
-    window.location.reload();
-  };
+  render() {
+    if (this.state.hasError && this.state.error) {
+      return (
+        <ErrorFallback
+          error={this.state.error}
+          resetErrorBoundary={this.handleReset}
+          errorInfo={this.state.errorInfo}
+        />
+      );
+    }
 
-  return (
-    <ErrorBoundary
-      FallbackComponent={ErrorFallback}
-      onError={handleError}
-      onReset={handleReset}
-      resetKeys={[window.location.pathname]}
-    >
-      {children}
-    </ErrorBoundary>
-  );
-};
+    return this.props.children;
+  }
+}
 
 export default GlobalErrorBoundary;
