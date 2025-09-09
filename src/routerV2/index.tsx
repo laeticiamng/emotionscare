@@ -28,7 +28,6 @@ const FF_ROUTER_V2 = true;
 
 // Pages publiques unifiées 
 const HomePage = lazy(() => import('@/components/HomePage'));
-const UnifiedHomePage = lazy(() => import('@/pages/unified/UnifiedHomePage'));
 const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
 const SimpleB2CPage = lazy(() => import('@/components/SimpleB2CPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
@@ -40,11 +39,9 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 // Auth & Landing unifiées
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 
-// Dashboards unifiés
-const UnifiedDashboardPage = lazy(() => import('@/pages/unified/UnifiedDashboardPage'));
-const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
-const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
-const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
+// Dashboards B2B
+const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
+const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
@@ -63,17 +60,13 @@ const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
 
-// Analytics
-const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
-const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
-const B2CHeatmapVibesPage = lazy(() => import('@/pages/B2CHeatmapVibesPage'));
+// Analytics - nettoyage (pages non utilisées dans registry)
 
 // Paramètres
 const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage'));
 const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
-const B2CDataPrivacyPage = lazy(() => import('@/pages/B2CDataPrivacyPage'));
 
 // B2B Features - use dedicated pages
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
@@ -87,25 +80,23 @@ const B2BSecurityPage = lazy(() => import('@/pages/B2BSecurityPage'));
 const B2BAuditPage = lazy(() => import('@/pages/B2BAuditPage'));
 const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 
-// Pages orphelines à intégrer
-const ApiMonitoringPage = lazy(() => import('@/pages/ApiMonitoringPage'));
+// Pages Fun-First intégrées
 const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage'));
 const B2CBossLevelGritPage = lazy(() => import('@/pages/B2CBossLevelGritPage'));
 const B2CBounceBackBattlePage = lazy(() => import('@/pages/B2CBounceBackBattlePage'));
 const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
-const B2CEmotionsPage = lazy(() => import('@/pages/B2CEmotionsPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 
-// Pages manquantes pour routerV2
+// B2B Enterprise
+const B2BEntreprisePage = lazy(() => import('@/pages/B2BEntreprisePage'));
+
+// Pages fonctionnelles avancées
 const B2CMusicTherapyPremiumPage = lazy(() => import('@/pages/B2CMusicTherapyPremiumPage'));
 const B2CAICoachMicroPage = lazy(() => import('@/pages/B2CAICoachMicroPage'));
 const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
-const B2BEntreprisePage = lazy(() => import('@/pages/B2BEntreprisePage'));
-const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
-const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
@@ -114,27 +105,30 @@ const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
 
-  // Pages manquantes nouvellement créées
-  const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-  const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
-  const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
-  const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
-  const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
-  const ExportPage = lazy(() => import('@/pages/ExportPage'));
-  const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
-  const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
-  const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-  const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+// Pages nouvellement créées
+const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
+const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
+const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
+const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
+const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
+const ExportPage = lazy(() => import('@/pages/ExportPage'));
+const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
+const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
 
-  // Pages existantes à consolider
-  const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
-  const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
-  const Point20Page = lazy(() => import('@/pages/Point20Page'));
-  const TestPage = lazy(() => import('@/pages/TestPage'));
-  const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
-  const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
-  const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
-  const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+// Pages existantes à consolider
+const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
+const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
+const Point20Page = lazy(() => import('@/pages/Point20Page'));
+const TestPage = lazy(() => import('@/pages/TestPage'));
+const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
+const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+
+// Page DEV uniquement
+const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 
 // Pages système unifiées
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
@@ -163,16 +157,16 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   HelpPage,
   DemoPage,
   OnboardingPage,
-  LoginPage: UnifiedLoginPage,
+  UnifiedLoginPage,
   SignupPage,
+  PrivacyPage,
   
-  // App unifiés
+  // App & B2B Enterprise
   AppGatePage,
-  DashboardPage: UnifiedDashboardPage,
-  CompleteDashboardPage: UnifiedDashboardPage,
-  B2CDashboardPage,
-  B2BUserDashboardPage,
-  B2BAdminDashboardPage,
+  B2BEntreprisePage,
+  B2BSelectionPage,
+  B2BCollabDashboard,
+  B2BRHDashboard,
   
   // Modules
   B2CScanPage,
@@ -190,17 +184,16 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CBubbleBeatPage,
   B2CScreenSilkBreakPage,
   
-  // Analytics
-  B2CGamificationPage,
-  B2CWeeklyBarsPage,
-  B2CHeatmapVibesPage,
+  // Analytics & Gamification
+  GamificationPage,
+  LeaderboardPage,
+  HeatmapPage,
   
   // Settings
   B2CSettingsPage,
   B2CProfileSettingsPage,
   B2CPrivacyTogglesPage,
   B2CNotificationsPage,
-  B2CDataPrivacyPage,
   
   // B2B
   B2BTeamsPage,
@@ -211,33 +204,25 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BSecurityPage,
   B2BAuditPage,
   B2BAccessibilityPage,
-  B2BSelectionPage,
   
-  // Pages intégrées
-  ApiMonitoringPage,
+  // Pages Fun-First intégrées
   B2CAmbitionArcadePage,
   B2CBossLevelGritPage,
   B2CBounceBackBattlePage,
   B2CMoodMixerPage,
   B2CSocialCoconPage,
   B2CStorySynthLabPage,
-  B2CEmotionsPage,
   B2CCommunautePage,
   SubscribePage,
   
-  // Pages manquantes ajoutées au mapping
+  // Pages fonctionnelles avancées
   B2CMusicTherapyPremiumPage,
   B2CAICoachMicroPage,
   B2CActivitePage,
-  
-  // Pages nouvelles 
-  B2BEntreprisePage,
-  B2BCollabDashboard,
-  B2BRHDashboard,
   B2CNyveeCoconPage,
   ValidationPage,
   
-  // Pages manquantes ajoutées
+  // Pages nouvellement créées
   ChooseModePage,
   CoachChatPage,
   VRSessionsPage,
@@ -245,9 +230,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ReportingPage,
   ExportPage,
   NavigationPage,
-  LeaderboardPage,
-  GamificationPage,
-  HeatmapPage,
   
   // Pages existantes consolidées
   MessagesPage,
@@ -257,7 +239,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   EmotionsPage,
   ProfilePage,
   GeneralPage,
-  PrivacyPage,
   
   // Legal pages
   LegalTermsPage,
@@ -269,7 +250,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   NotFoundPage: UnifiedErrorPage,
   ServerErrorPage,
   
-  
+  // Dev-only pages
+  ComprehensiveSystemAuditPage,
   
   // Composants de redirection
   RedirectToScan,
