@@ -94,19 +94,13 @@ export default function ComprehensiveSystemAudit() {
       { name: 'B2CVRGalaxyPage', path: 'src/pages/B2CVRGalaxyPage.tsx', routes: ['/app/vr-galaxy'], component: 'B2CVRGalaxyPage' },
       { name: 'B2CAICoachPage', path: 'src/pages/B2CAICoachPage.tsx', routes: ['/app/coach'], component: 'B2CAICoachPage' },
       { name: 'B2CGamificationPage', path: 'src/pages/B2CGamificationPage.tsx', routes: ['/gamification'], component: 'B2CGamificationPage' },
-      
       // Pages d'erreur
       { name: '401Page', path: 'src/pages/401Page.tsx', routes: ['/401'], component: 'Page401' },
       { name: '403Page', path: 'src/pages/403Page.tsx', routes: ['/403'], component: 'Page403' },
       { name: '404Page', path: 'src/pages/404Page.tsx', routes: ['/404'], component: 'Page404' },
       { name: '503Page', path: 'src/pages/503Page.tsx', routes: ['/503'], component: 'ServiceUnavailablePage' },
       
-      // Pages de développement
-      { name: 'RouterDashboardPage', path: 'src/pages/RouterDashboardPage.tsx', routes: ['/dev/router'], component: 'RouterDashboardPage' },
-      { name: 'RouterAuditPage', path: 'src/pages/RouterAuditPage.tsx', routes: ['/dev/router-audit'], component: 'RouterAuditPage' },
-      { name: 'ComponentAuditPage', path: 'src/pages/ComponentAuditPage.tsx', routes: ['/dev/component-audit'], component: 'ComponentAuditPage' },
-      { name: 'CompleteFusionReportPage', path: 'src/pages/CompleteFusionReportPage.tsx', routes: ['/dev/fusion-report'], component: 'CompleteFusionReportPage' },
-      { name: 'DuplicatesAuditPage', path: 'src/pages/DuplicatesAuditPage.tsx', routes: ['/dev/duplicates-audit'], component: 'DuplicatesAuditPage' }
+      // Pages de développement (nettoyées)
     ],
     
     criticalComponents: [
