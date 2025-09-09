@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Music } from 'lucide-react';
-import SimpleMusicPlayer from './SimpleMusicPlayer';
+import PremiumMusicPlayer from './PremiumMusicPlayer';
 
 interface MusicDrawerProps {
   children?: React.ReactNode;
@@ -27,7 +27,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ children }) => {
           <SheetTitle>Lecteur Musical</SheetTitle>
         </SheetHeader>
         <div className="mt-6">
-          {children || <SimpleMusicPlayer />}
+          {children || <PremiumMusicPlayer compact />}
         </div>
       </SheetContent>
     </Sheet>

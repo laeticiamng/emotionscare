@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Music, Play } from 'lucide-react';
 import { EmotionResult } from '@/types/emotion';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import AutoMusicPlayer from '@/components/music/AutoMusicPlayer';
+import PremiumMusicPlayer from '@/components/music/player/PremiumMusicPlayer';
 
 interface MusicEmotionRecommendationProps {
   emotionResult: EmotionResult;
@@ -77,9 +77,8 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
 
       {/* Lecteur automatique */}
       {generatedPlaylist && (
-        <AutoMusicPlayer 
-          playlist={generatedPlaylist}
-          onClose={handleClosePlayer}
+        <PremiumMusicPlayer 
+          className="mt-4"
         />
       )}
     </>
