@@ -47,6 +47,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
     try {
       // Simple mock authentication
       const mockUser = {
@@ -62,21 +63,28 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setRole(mockUser.role);
       localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
 
-      // Navigate based on role using window.location
+      console.log('✅ Connexion réussie, redirection...', mockUser);
+
+      // Navigate based on role - correction des routes
       setTimeout(() => {
         const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
                               mockUser.role === 'employee' ? '/app/collab' :
                               mockUser.role === 'manager' ? '/app/rh' : '/app/home';
         
-        window.location.href = dashboardRoute;
-      }, 100);
+        console.log('🔄 Redirection vers:', dashboardRoute);
+        
+        // Forcer la redirection
+        window.location.replace(dashboardRoute);
+      }, 500); // Délai plus long pour s'assurer que l'état est bien mis à jour
     } catch (error) {
       console.error('SignIn error:', error);
+      setLoading(false);
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string, metadata?: any) => {
+    setLoading(true);
     try {
       // Simple mock registration - in real app, this would call your API
       const mockUser = {
@@ -92,16 +100,22 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setRole(mockUser.role);
       localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
 
+      console.log('✅ Inscription réussie, redirection...', mockUser);
+
       // Navigate based on role
       setTimeout(() => {
         const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
                               mockUser.role === 'employee' ? '/app/collab' :
                               mockUser.role === 'manager' ? '/app/rh' : '/app/home';
         
-        window.location.href = dashboardRoute;
-      }, 100);
+        console.log('🔄 Redirection vers:', dashboardRoute);
+        
+        // Forcer la redirection
+        window.location.replace(dashboardRoute);
+      }, 500);
     } catch (error) {
       console.error('SignUp error:', error);
+      setLoading(false);
       throw error;
     }
   };
