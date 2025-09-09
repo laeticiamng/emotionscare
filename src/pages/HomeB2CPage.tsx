@@ -21,10 +21,10 @@ const HomeB2CPage: React.FC = () => {
             <span className="text-2xl font-bold text-gray-900">EmotionsCare</span>
           </div>
           <div className="flex space-x-4">
-            <Link to={routes.auth.login({ segment: 'b2c' })}>
+            <Link to={routes.auth.login()}>
               <Button variant="ghost">Se connecter</Button>
             </Link>
-            <Link to={routes.auth.signup({ segment: 'b2c' })}>
+            <Link to={routes.auth.signup()}>
               <Button>S'inscrire</Button>
             </Link>
           </div>
@@ -42,12 +42,12 @@ const HomeB2CPage: React.FC = () => {
             d'analyse émotionnelle, de méditation guidée et de coaching personnalisé.
           </p>
           <div className="flex justify-center space-x-4">
-            <Link to={routes.auth.signup({ segment: 'b2c' })}>
+            <Link to={routes.auth.signup()}>
               <Button size="lg" className="px-8">
                 Commencer gratuitement
               </Button>
             </Link>
-            <Link to={routes.public.enterprise()}>
+            <Link to={routes.b2b.home()}>
               <Button size="lg" variant="outline" className="px-8">
                 Solutions entreprise
               </Button>
@@ -106,7 +106,7 @@ const HomeB2CPage: React.FC = () => {
           <p className="text-xl mb-8 opacity-90">
             Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie
           </p>
-          <Link to={routes.auth.signup({ segment: 'b2c' })}>
+          <Link to={routes.auth.signup()}>
             <Button size="lg" variant="secondary" className="px-8">
               Créer mon compte gratuit
             </Button>
