@@ -1,278 +1,64 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BarChart3, 
   Heart, 
-  TrendingUp, 
   Calendar,
-  Music,
-  MessageSquare,
-  Target,
-  Award,
-  Activity,
-  Clock,
+  Navigation,
   Zap,
-  Brain,
-  Sparkles,
-  Users
+  Layout
 } from 'lucide-react';
-import EmotionMeter from '@/components/features/EmotionMeter';
-import MoodChart from '@/components/features/MoodChart';
-import StatsOverview from '@/components/features/StatsOverview';
-import EmotionAnalyzer from '@/components/features/EmotionAnalyzer';
-import NotificationSystem from '@/components/features/NotificationSystem';
+import UnifiedDashboard from '@/components/features/UnifiedDashboard';
+import NavigationHub from '@/components/features/NavigationHub';
 
 const DashboardPage: React.FC = () => {
-  const [emotionalData] = React.useState({
-    currentMood: 7.5,
-    weeklyAverage: 6.8,
-    improvement: '+12%',
-    streak: 14
-  });
-
-  const recentActivities = [
-    { type: 'journal', title: 'Séance de réflexion matinale', time: '8:30', mood: 'positive' },
-    { type: 'music', title: 'Session de relaxation', time: '14:15', mood: 'calm' },
-    { type: 'chat', title: 'Discussion avec Nyvée', time: '16:45', mood: 'neutral' },
-    { type: 'meditation', title: 'Méditation guidée', time: '19:00', mood: 'peaceful' }
-  ];
-
-  const weeklyGoals = [
-    { name: 'Sessions de méditation', current: 5, target: 7, progress: 71 },
-    { name: 'Entrées journal', current: 12, target: 14, progress: 86 },
-    { name: 'Temps d\'écoute musicale', current: 3.2, target: 4, progress: 80, unit: 'h' }
-  ];
+  const [activeView, setActiveView] = React.useState<'unified' | 'navigation'>('unified');
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8" data-testid="page-root">
-      {/* En-tête avec salutation personnalisée */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+    <div className="container mx-auto py-8 px-4" data-testid="page-root">
+      {/* Header avec sélecteur de vue */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Bonjour, Marie! 👋
+            Dashboard Principal
           </h1>
           <p className="text-lg text-muted-foreground">
-            Continuez votre parcours vers le bien-être émotionnel
+            Centre de contrôle de votre bien-être émotionnel
           </p>
         </div>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-lg">
-          <Calendar className="h-4 w-4" />
-          {new Date().toLocaleDateString('fr-FR', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
-        </div>
-      </div>
-
-      {/* Vue d'ensemble des statistiques */}
-      <StatsOverview />
-
-      {/* Système de notifications */}
-      <NotificationSystem />
-
-      {/* Analyseur d'émotions */}
-      <EmotionAnalyzer />
-
-      {/* Métriques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Heart className="h-4 w-4 text-red-500" />
-              Humeur Actuelle
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary">
-                {emotionalData.currentMood}/10
-              </div>
-              <Progress value={emotionalData.currentMood * 10} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                Excellent niveau aujourd'hui
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              Progression
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-green-600">
-                {emotionalData.improvement}
-              </div>
-              <Progress value={75} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                vs semaine dernière
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Target className="h-4 w-4 text-blue-500" />
-              Série Active
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-blue-600">
-                {emotionalData.streak}
-              </div>
-              <Progress value={90} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                jours consécutifs
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Award className="h-4 w-4 text-yellow-500" />
-              Score Moyen
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-yellow-600">
-                {emotionalData.weeklyAverage}
-              </div>
-              <Progress value={emotionalData.weeklyAverage * 10} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                moyenne hebdomadaire
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {/* Émotion meter interactif */}
-        <div className="lg:col-span-1">
-          <EmotionMeter 
-            initialValue={8}
-            onValueChange={(value) => console.log('Nouvelle valeur:', value)}
-            showTrend={true}
-          />
-        </div>
-
-        {/* Graphique des tendances */}
-        <div className="lg:col-span-2">
-          <MoodChart />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Activités récentes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Activités Récentes
-            </CardTitle>
-            <CardDescription>
-              Vos dernières interactions avec EmotionsCare
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    {activity.type === 'journal' && <MessageSquare className="h-4 w-4 text-blue-500" />}
-                    {activity.type === 'music' && <Music className="h-4 w-4 text-purple-500" />}
-                    {activity.type === 'chat' && <MessageSquare className="h-4 w-4 text-green-500" />}
-                    {activity.type === 'meditation' && <Heart className="h-4 w-4 text-pink-500" />}
-                    <div>
-                      <div className="font-medium">{activity.title}</div>
-                      <div className="text-sm text-muted-foreground">{activity.time}</div>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="capitalize">
-                    {activity.mood}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Objectifs hebdomadaires */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Objectifs Hebdomadaires
-            </CardTitle>
-            <CardDescription>
-              Votre progression vers vos objectifs de bien-être
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {weeklyGoals.map((goal, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{goal.name}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {goal.current}{goal.unit || ''} / {goal.target}{goal.unit || ''}
-                    </span>
-                  </div>
-                  <Progress value={goal.progress} className="h-2" />
-                  <div className="text-xs text-muted-foreground">
-                    {goal.progress}% completé
-                  </div>
-                </div>
-              ))}
-              
-              <div className="pt-4 border-t">
-                <Button variant="outline" className="w-full">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Personnaliser les objectifs
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Actions rapides */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-4">Actions Rapides</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Button variant="outline" className="h-20 flex flex-col gap-2">
-            <MessageSquare className="h-6 w-6" />
-            <span className="text-sm">Nouveau Journal</span>
+        
+        {/* Sélecteur de vue */}
+        <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+          <Button
+            variant={activeView === 'unified' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveView('unified')}
+            className="flex items-center gap-2"
+          >
+            <Layout className="h-4 w-4" />
+            Vue Unifiée
           </Button>
-          <Button variant="outline" className="h-20 flex flex-col gap-2">
-            <Music className="h-6 w-6" />
-            <span className="text-sm">Musique Adaptée</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex flex-col gap-2">
-            <Heart className="h-6 w-6" />
-            <span className="text-sm">Check Émotionnel</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex flex-col gap-2">
-            <Calendar className="h-6 w-6" />
-            <span className="text-sm">Planifier Session</span>
+          <Button
+            variant={activeView === 'navigation' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveView('navigation')}
+            className="flex items-center gap-2"
+          >
+            <Navigation className="h-4 w-4" />
+            Navigation
           </Button>
         </div>
       </div>
+
+      {/* Contenu conditionnel */}
+      {activeView === 'unified' ? (
+        <UnifiedDashboard />
+      ) : (
+        <NavigationHub />
+      )}
     </div>
   );
 };
