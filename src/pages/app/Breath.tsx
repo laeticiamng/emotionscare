@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ModuleLayout } from '@/components/modules/ModuleLayout';
 import { SessionResultComponent } from '@/components/modules/SessionResult';
+import { ArtifactReward } from '@/components/universe/ArtifactReward';
+import { UniverseAmbiance } from '@/components/universe/UniverseAmbiance';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useModuleSession } from '@/hooks/useModuleSession';
 import { useRewards } from '@/hooks/useRewards';
-import { Wind } from 'lucide-react';
+import { UNIVERSES } from '@/types/universes';
+import { Wind, Sparkles } from 'lucide-react';
 
 const Breath: React.FC = () => {
   const { state, isActive, startSession, endSession } = useModuleSession();
@@ -15,6 +18,9 @@ const Breath: React.FC = () => {
   const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
   const [preset, setPreset] = useState<'normal' | 'sleep'>('normal');
   const [timeLeft, setTimeLeft] = useState(60);
+  const [showArtifact, setShowArtifact] = useState(false);
+
+  const breathUniverse = UNIVERSES.breath;
 
   const totalCycles = preset === 'sleep' ? 8 : 6;
   const phaseSeconds = preset === 'sleep' ? { inhale: 4, hold: 2, exhale: 6 } : { inhale: 4, hold: 1, exhale: 4 };
@@ -78,17 +84,16 @@ const Breath: React.FC = () => {
       preset
     }, responses);
 
-    // Unlock aura for sleep preset
-    const reward = preset === 'sleep' ? unlockReward({
-      type: 'aura',
-      name: 'Brise du soir',
-      description: 'Aura apaisante pour les moments calmes'
-    }) : undefined;
-
-    setSessionResult({
-      ...result,
-      reward
-    });
+    // Show artifact for sleep preset
+    if (preset === 'sleep') {
+      setShowArtifact(true);
+      setTimeout(() => {
+        setSessionResult(result);
+        setShowArtifact(false);
+      }, 3000);
+    } else {
+      setSessionResult(result);
+    }
   };
 
   const getPhaseText = () => {
@@ -99,43 +104,71 @@ const Breath: React.FC = () => {
     }
   };
 
-  const getOrbScale = () => {
+  const getPhaseColor = () => {
     switch (phase) {
-      case 'inhale': return 'scale-125';
-      case 'hold': return 'scale-125';
-      case 'exhale': return 'scale-75';
+      case 'inhale': return breathUniverse.ambiance.colors.primary;
+      case 'hold': return breathUniverse.ambiance.colors.accent;
+      case 'exhale': return breathUniverse.ambiance.colors.secondary;
     }
   };
+
+  if (showArtifact) {
+    return (
+      <div className="min-h-screen relative" style={{ background: breathUniverse.ambiance.background }}>
+        <UniverseAmbiance universe={breathUniverse} intensity={0.9} />
+        <ArtifactReward 
+          universe={breathUniverse}
+          onComplete={() => {
+            setShowArtifact(false);
+            setSessionResult({ badge: "Souffle apaisé ✨" });
+          }}
+        />
+      </div>
+    );
+  }
 
   if (state === 'verbal-feedback' && sessionResult) {
     return (
       <ModuleLayout 
-        title="Respiration guidée"
+        title={breathUniverse.name}
         state={state}
         showBack={false}
       >
-        <SessionResultComponent result={sessionResult} />
+        <div className="relative">
+          <UniverseAmbiance universe={breathUniverse} intensity={0.6} />
+          <SessionResultComponent result={sessionResult} />
+        </div>
       </ModuleLayout>
     );
   }
 
   return (
-    <ModuleLayout 
-      title="Respiration guidée"
-      subtitle="On suit l'orbe"
-      state={state}
-    >
+    <div className="min-h-screen relative" style={{ background: breathUniverse.ambiance.background }}>
+      <UniverseAmbiance universe={breathUniverse} intensity={0.8} interactive />
+      
+      <ModuleLayout 
+        title={breathUniverse.name}
+        subtitle="La Salle des Souffles"
+        state={state}
+        className="bg-transparent"
+      >
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         {!isActive && (
-          <div className="text-center max-w-sm">
-            <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="text-center max-w-sm relative z-10">
+            <div 
+              className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-elegant"
+              style={{
+                background: `linear-gradient(135deg, ${breathUniverse.ambiance.colors.primary}, ${breathUniverse.ambiance.colors.secondary})`,
+                boxShadow: `0 8px 32px ${breathUniverse.ambiance.colors.primary}40`
+              }}
+            >
               <Wind className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-xl font-medium text-foreground mb-4">
               Respirer ensemble
             </h2>
             <p className="text-muted-foreground mb-8">
-              Quelques cycles pour se poser
+              {breathUniverse.ambiance.metaphor}
             </p>
             
             <div className="space-y-4">
@@ -143,6 +176,9 @@ const Breath: React.FC = () => {
                 onClick={() => handleStart('normal')}
                 size="lg"
                 className="w-full"
+                style={{
+                  background: `linear-gradient(135deg, ${breathUniverse.ambiance.colors.primary}, ${breathUniverse.ambiance.colors.accent})`
+                }}
               >
                 Respiration douce
                 <Badge variant="secondary" className="ml-2">1 min</Badge>
@@ -161,16 +197,44 @@ const Breath: React.FC = () => {
         )}
 
         {isActive && (
-          <div className="text-center">
-            {/* Breathing Orb */}
+          <div className="text-center relative z-10">
+            {/* Breathing Orbs */}
             <div className="relative mb-12">
+              {/* Main breathing orb */}
               <div 
-                className={`w-32 h-32 bg-gradient-primary rounded-full transition-transform duration-1000 ease-in-out ${getOrbScale()}`}
+                className={`w-40 h-40 rounded-full transition-all duration-4000 ease-in-out ${
+                  phase === 'inhale' ? 'scale-125' : phase === 'hold' ? 'scale-125' : 'scale-75'
+                }`}
                 style={{
-                  boxShadow: '0 0 40px rgba(var(--primary-hsl), 0.4)'
+                  background: `radial-gradient(circle, ${getPhaseColor()}80, ${getPhaseColor()}40)`,
+                  boxShadow: `0 0 60px ${getPhaseColor()}50`
                 }}
               />
-              <div className="absolute inset-0 w-32 h-32 border-2 border-primary/30 rounded-full animate-pulse" />
+              
+              {/* Secondary orbs */}
+              {Array.from({ length: 3 }, (_, i) => (
+                <div
+                  key={i}
+                  className={`absolute w-16 h-16 rounded-full transition-all duration-3000 ease-in-out ${
+                    phase === 'exhale' ? 'scale-110 opacity-70' : 'scale-90 opacity-40'
+                  }`}
+                  style={{
+                    background: `radial-gradient(circle, ${breathUniverse.ambiance.colors.accent}60, transparent)`,
+                    left: `${30 + i * 20}%`,
+                    top: `${20 + i * 30}%`,
+                    animationDelay: `${i * 0.5}s`
+                  }}
+                />
+              ))}
+              
+              {/* Sparkle effects */}
+              <Sparkles 
+                className="absolute inset-0 m-auto w-8 h-8 text-white animate-pulse"
+                style={{ 
+                  color: getPhaseColor(),
+                  filter: 'drop-shadow(0 0 8px currentColor)'
+                }}
+              />
             </div>
 
             {/* Phase & Progress */}
@@ -184,25 +248,28 @@ const Breath: React.FC = () => {
               </div>
               
               {preset === 'sleep' && cycles === 0 && (
-                <p className="text-sm text-primary italic">
-                  Épaules relâchées, on prend son temps
+                <p className="text-sm italic" style={{ color: breathUniverse.ambiance.colors.accent }}>
+                  Ton souffle fait vibrer l'espace ✨
                 </p>
               )}
             </div>
 
             {/* Progress bar */}
             <div className="mt-8 w-full max-w-xs mx-auto">
-              <div className="w-full bg-card rounded-full h-2">
+              <div className="w-full bg-card/50 rounded-full h-2">
                 <div 
-                  className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${(cycles / totalCycles) * 100}%` }}
+                  className="h-2 rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${(cycles / totalCycles) * 100}%`,
+                    background: `linear-gradient(90deg, ${breathUniverse.ambiance.colors.primary}, ${breathUniverse.ambiance.colors.accent})`
+                  }}
                 />
               </div>
             </div>
           </div>
         )}
       </div>
-    </ModuleLayout>
+    </div>
   );
 };
 

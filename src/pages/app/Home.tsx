@@ -14,16 +14,25 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { clinicalScoringService } from '@/services/clinicalScoring';
 import { useRewards } from '@/hooks/useRewards';
+import { UniversePortal } from '@/components/universe/UniversePortal';
+import { UniverseAmbiance } from '@/components/universe/UniverseAmbiance';
+import { UNIVERSES } from '@/types/universes';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [cards, setCards] = useState<DayPlanCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEntering, setIsEntering] = useState(true);
+  const [universeReady, setUniverseReady] = useState(false);
   const { dailyCard, generateDailyCard, getActiveAura } = useRewards();
+  
+  const homeUniverse = UNIVERSES.home;
 
   useEffect(() => {
     loadDayPlan();
     generateDailyCard();
+    // Start universe entrance
+    setTimeout(() => setIsEntering(true), 100);
   }, [generateDailyCard]);
 
   const loadDayPlan = async () => {
@@ -96,26 +105,34 @@ const Home: React.FC = () => {
 
   const activeAura = getActiveAura();
 
-  if (loading) {
+  if (loading || !universeReady) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Préparation du jour...</p>
+      <UniversePortal
+        universe={homeUniverse}
+        isEntering={isEntering}
+        onEnterComplete={() => {
+          setUniverseReady(true);
+        }}
+      >
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Préparation du jour...</p>
+          </div>
         </div>
-      </div>
+      </UniversePortal>
     );
   }
 
   return (
-    <div 
-      className="min-h-screen p-6"
-      style={{
-        background: activeAura 
-          ? `linear-gradient(135deg, ${activeAura.colors.join(', ')})`
-          : undefined
-      }}
-    >
+    <div className="min-h-screen relative">
+      <UniverseAmbiance 
+        universe={homeUniverse} 
+        intensity={0.7}
+        interactive
+      />
+      
+      <div className="relative z-10 p-6">
       <div className="max-w-md mx-auto space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -145,12 +162,22 @@ const Home: React.FC = () => {
           {cards.map((card, index) => (
             <Card 
               key={card.id}
-              className="hover:shadow-elegant transition-all duration-300 cursor-pointer group bg-card/90 backdrop-blur-sm"
+              className="hover:shadow-elegant transition-all duration-500 cursor-pointer group bg-card/95 backdrop-blur-md border border-white/20 hover-scale"
               onClick={() => navigate(card.route)}
+              style={{
+                background: `linear-gradient(135deg, ${homeUniverse.ambiance.colors.secondary}90, ${homeUniverse.ambiance.colors.accent}20)`,
+                animationDelay: `${index * 0.1}s`
+              }}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300 text-white"
+                    style={{
+                      background: `linear-gradient(135deg, ${homeUniverse.ambiance.colors.primary}, ${homeUniverse.ambiance.colors.accent})`,
+                      boxShadow: `0 4px 20px ${homeUniverse.ambiance.colors.primary}40`
+                    }}
+                  >
                     {getIcon(card.icon || 'Wind')}
                   </div>
                   
@@ -189,6 +216,7 @@ const Home: React.FC = () => {
             Musique douce
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );
