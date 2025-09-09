@@ -1,111 +1,277 @@
+import { useState, useCallback, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { coachService, CoachingSession, CoachMessage, CoachingRecommendation } from '@/services/coach';
+import { v4 as uuidv4 } from 'uuid';
 
-import { useState } from 'react';
-import { ChatMessage, ChatConversation } from '@/types/chat';
-import { supabase } from '@/integrations/supabase/client';
+export interface CoachChatState {
+  currentSession: CoachingSession | null;
+  messages: CoachMessage[];
+  isProcessing: boolean;
+  recommendations: CoachingRecommendation[];
+  error: string | null;
+}
 
 export const useCoachChat = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
-  const [isTyping, setIsTyping] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useAuth() || { user: null };
+  const [state, setState] = useState<CoachChatState>({
+    currentSession: null,
+    messages: [],
+    isProcessing: false,
+    recommendations: [],
+    error: null
+  });
+  
+  const sessionRef = useRef<CoachingSession | null>(null);
 
-  const sendMessage = async (content: string, sender: ChatMessage['sender'] = 'user') => {
-    const message: ChatMessage = {
-      id: Date.now().toString(),
+  // Démarrage d'une nouvelle session de coaching
+  const startSession = useCallback(async (
+    emotionalContext: {
+      current_emotion: string;
+      intensity: number;
+      triggers?: string[];
+      goals?: string[];
+    },
+    preferredPersonality?: string
+  ) => {
+    if (!user?.id) {
+      setState(prev => ({ ...prev, error: 'Vous devez être connecté pour commencer une session' }));
+      return;
+    }
+
+    try {
+      setState(prev => ({ ...prev, isProcessing: true, error: null }));
+      
+      const session = await coachService.startCoachingSession(
+        user.id,
+        emotionalContext,
+        preferredPersonality
+      );
+      
+      sessionRef.current = session;
+      setState(prev => ({
+        ...prev,
+        currentSession: session,
+        messages: [],
+        isProcessing: false
+      }));
+
+      // Message d'accueil automatique
+      const welcomeMessage = `Bonjour ! Je suis ${session.coach_personality.name}. Je suis là pour vous accompagner dans votre bien-être émotionnel. Comment vous sentez-vous aujourd'hui ?`;
+      
+      const welcomeMsg: CoachMessage = {
+        id: uuidv4(),
+        role: 'coach',
+        content: welcomeMessage,
+        timestamp: new Date().toISOString()
+      };
+
+      setState(prev => ({
+        ...prev,
+        messages: [welcomeMsg]
+      }));
+
+    } catch (error) {
+      console.error('Error starting coaching session:', error);
+      setState(prev => ({ 
+        ...prev, 
+        error: 'Impossible de démarrer la session de coaching',
+        isProcessing: false 
+      }));
+    }
+  }, [user?.id]);
+
+  // Envoi d'un message au coach
+  const sendMessage = useCallback(async (messageContent: string): Promise<string> => {
+    if (!user?.id || !sessionRef.current) {
+      setState(prev => ({ ...prev, error: 'Session de coaching non initialisée' }));
+      return '';
+    }
+
+    try {
+      setState(prev => ({ ...prev, isProcessing: true, error: null }));
+
+      // Ajouter le message utilisateur
+      const userMessage: CoachMessage = {
+        id: uuidv4(),
+        role: 'user',
+        content: messageContent,
+        timestamp: new Date().toISOString()
+      };
+
+      setState(prev => ({
+        ...prev,
+        messages: [...prev.messages, userMessage]
+      }));
+
+      // Envoyer au service de coaching
+      const response = await coachService.sendMessage(
+        sessionRef.current.id,
+        messageContent,
+        user.id
+      );
+
+      // Ajouter la réponse du coach
+      const coachMessage: CoachMessage = {
+        id: uuidv4(),
+        role: 'coach',
+        content: response.coachResponse,
+        timestamp: new Date().toISOString(),
+        emotion_analysis: response.emotionAnalysis
+      };
+
+      setState(prev => ({
+        ...prev,
+        messages: [...prev.messages, coachMessage],
+        recommendations: response.recommendations || prev.recommendations,
+        isProcessing: false
+      }));
+
+      return response.coachResponse;
+    } catch (error) {
+      console.error('Error sending message to coach:', error);
+      setState(prev => ({ 
+        ...prev, 
+        error: 'Impossible d\'envoyer le message',
+        isProcessing: false 
+      }));
+      return '';
+    }
+  }, [user?.id]);
+
+  // Récupération des recommandations personnalisées
+  const getRecommendations = useCallback(async (
+    emotion: string,
+    intensity: number,
+    preferences?: {
+      preferred_activities?: string[];
+      time_available?: number;
+      difficulty_preference?: 'easy' | 'medium' | 'hard';
+    }
+  ) => {
+    try {
+      const recommendations = await coachService.getPersonalizedRecommendations(
+        emotion,
+        intensity,
+        preferences
+      );
+      
+      setState(prev => ({ ...prev, recommendations }));
+      return recommendations;
+    } catch (error) {
+      console.error('Error getting recommendations:', error);
+      return [];
+    }
+  }, []);
+
+  // Chargement de l'historique des sessions
+  const loadSessionHistory = useCallback(async (limit: number = 10) => {
+    if (!user?.id) return [];
+    
+    try {
+      return await coachService.getUserCoachingSessions(user.id, limit);
+    } catch (error) {
+      console.error('Error loading session history:', error);
+      return [];
+    }
+  }, [user?.id]);
+
+  // Analyse des progrès
+  const getProgress = useCallback(async (days: number = 30) => {
+    if (!user?.id) return null;
+    
+    try {
+      return await coachService.getCoachingProgress(user.id, days);
+    } catch (error) {
+      console.error('Error getting coaching progress:', error);
+      return null;
+    }
+  }, [user?.id]);
+
+  // Reprise d'une session existante
+  const resumeSession = useCallback(async (sessionId: string) => {
+    if (!user?.id) return;
+
+    try {
+      setState(prev => ({ ...prev, isProcessing: true }));
+      
+      const sessions = await coachService.getUserCoachingSessions(user.id, 50);
+      const session = sessions.find(s => s.id === sessionId);
+      
+      if (session) {
+        sessionRef.current = session;
+        setState(prev => ({
+          ...prev,
+          currentSession: session,
+          messages: session.messages,
+          isProcessing: false
+        }));
+      }
+    } catch (error) {
+      console.error('Error resuming session:', error);
+      setState(prev => ({ 
+        ...prev, 
+        error: 'Impossible de reprendre la session',
+        isProcessing: false 
+      }));
+    }
+  }, [user?.id]);
+
+  // Nettoyage de la session
+  const clearSession = useCallback(() => {
+    sessionRef.current = null;
+    setState({
+      currentSession: null,
+      messages: [],
+      isProcessing: false,
+      recommendations: [],
+      error: null
+    });
+  }, []);
+
+  // Méthodes de compatibilité avec l'ancien hook
+  const clearMessages = useCallback(() => {
+    setState(prev => ({ ...prev, messages: [] }));
+  }, []);
+
+  const addMessage = useCallback((content: string, role: 'user' | 'coach' | 'system') => {
+    const message: CoachMessage = {
+      id: uuidv4(),
+      role,
       content,
-      sender,
       timestamp: new Date().toISOString()
     };
-
-    setMessages(prev => [...prev, message]);
-
-    if (sender === 'user') {
-      setIsTyping(true);
-      setIsProcessing(true);
-      
-      try {
-        // Call the production coach AI Edge Function
-        const { data, error } = await supabase.functions.invoke('coach-ai', {
-          body: { 
-            message: content,
-            conversationHistory: messages.slice(-10) // Send last 10 messages for context
-          }
-        });
-
-        if (error) throw error;
-
-        const response: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          content: data.response || 'Je suis là pour vous accompagner. Pouvez-vous me dire ce qui vous préoccupe ?',
-          sender: 'coach',
-          timestamp: new Date().toISOString()
-        };
-        
-        setMessages(prev => [...prev, response]);
-        
-        // Save conversation to database if currentConversation exists
-        if (currentConversation) {
-          await supabase
-            .from('chat_conversations')
-            .update({
-              messages: [...messages, message, response],
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', currentConversation.id);
-        }
-        
-      } catch (error) {
-        console.error('Error sending message to coach:', error);
-        const errorResponse: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          content: 'Je rencontre une difficulté technique. Pouvez-vous reformuler votre question ?',
-          sender: 'coach',
-          timestamp: new Date().toISOString()
-        };
-        setMessages(prev => [...prev, errorResponse]);
-      } finally {
-        setIsTyping(false);
-        setIsProcessing(false);
-      }
-    }
-  };
-
-  const clearMessages = () => {
-    setMessages([]);
-  };
-
-  const startNewConversation = (title = 'Nouvelle conversation') => {
-    const conversation: ChatConversation = {
-      id: Date.now().toString(),
-      title,
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
     
-    setConversations(prev => [...prev, conversation]);
-    setCurrentConversation(conversation);
-    return conversation.id;
-  };
-
-  const setActiveConversation = (id: string) => {
-    const conversation = conversations.find(c => c.id === id);
-    if (conversation) {
-      setCurrentConversation(conversation);
-      setMessages(conversation.messages);
-    }
-  };
+    setState(prev => ({
+      ...prev,
+      messages: [...prev.messages, message]
+    }));
+  }, []);
 
   return {
-    messages,
-    conversations,
-    currentConversation,
-    isTyping,
-    isProcessing,
+    // État
+    currentSession: state.currentSession,
+    messages: state.messages,
+    isProcessing: state.isProcessing,
+    recommendations: state.recommendations,
+    error: state.error,
+    
+    // Actions principales
+    startSession,
     sendMessage,
+    getRecommendations,
+    resumeSession,
+    clearSession,
+    
+    // Compatibilité
     clearMessages,
-    startNewConversation,
-    setActiveConversation
+    addMessage,
+    
+    // Historique et analyse
+    loadSessionHistory,
+    getProgress,
+    
+    // Alias pour compatibilité
+    loading: state.isProcessing,
+    isTyping: state.isProcessing
   };
 };
