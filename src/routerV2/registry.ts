@@ -840,6 +840,22 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'FinalComponentReportPage',
       guard: false,
     },
+    {
+      name: 'fusion-report',
+      path: '/dev/fusion-report',
+      segment: 'public',
+      layout: 'app',
+      component: 'CompleteFusionReportPage',
+      guard: false,
+    },
+    {
+      name: 'duplicates-audit',
+      path: '/dev/duplicates-audit',
+      segment: 'public',
+      layout: 'app',
+      component: 'DuplicatesAuditPage',
+      guard: false,
+    },
   // Routes de debug supprimées (pages orphelines nettoyées)
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
