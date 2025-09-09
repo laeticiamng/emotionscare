@@ -11,7 +11,6 @@ import AuthContextProvider, { useAuth } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SecurityProvider } from './components/security/SecurityProvider';
-import EmotionsCareMusicProvider from './contexts/EmotionsCareMusicContext';
 
 // Import RouterV2 - ACTIVATION DU SYSTÈME UNIFIÉ
 import { routerV2 } from './routerV2';
@@ -33,12 +32,10 @@ function App() {
           <AuthContextProvider>
             <UserModeProvider>
               <SecurityProvider>
-                <EmotionsCareMusicProvider>
-                  {/* 🚀 ACTIVATION RouterV2 - Système unifié avec 80+ routes */}
-                  <RouterProvider router={routerV2} />
-                  <Toaster />
-                  <Sonner />
-                </EmotionsCareMusicProvider>
+                {/* 🚀 ACTIVATION RouterV2 - Système unifié avec 80+ routes */}
+                <RouterProvider router={routerV2} />
+                <Toaster />
+                <Sonner />
               </SecurityProvider>
             </UserModeProvider>
           </AuthContextProvider>

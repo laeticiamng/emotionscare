@@ -23,7 +23,7 @@ import {
   Fingerprint,
   Globe
 } from 'lucide-react';
-import { useEnhancedAuth } from '@/contexts/EnhancedAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 // Types pour la sécurité
@@ -255,7 +255,7 @@ const AdvancedSecurityGuard: React.FC<AdvancedSecurityGuardProps> = ({
   securityLevel = 'medium',
   config: userConfig
 }) => {
-  const { user, isAuthenticated, checkPermission } = useEnhancedAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   

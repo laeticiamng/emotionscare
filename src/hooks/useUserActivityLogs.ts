@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { AnonymousActivity, ActivityStats } from '@/components/dashboard/admin/tabs/activity-logs/types';
+import { AnonymousActivity, ActivityStats } from '@/types/activity';
 
 // Mock data functions since the imports were missing
 const getActivityData = async (): Promise<AnonymousActivity[]> => {

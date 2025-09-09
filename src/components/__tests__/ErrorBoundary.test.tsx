@@ -1,7 +1,7 @@
 
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import OptimizedErrorBoundary from '../ErrorBoundary/OptimizedErrorBoundary';
+import { UniversalErrorBoundary } from '../ErrorBoundary/UniversalErrorBoundary';
 
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   if (shouldThrow) {
@@ -10,12 +10,12 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>No error</div>;
 };
 
-describe('OptimizedErrorBoundary', () => {
+describe('UniversalErrorBoundary', () => {
   it('renders children when there is no error', () => {
     render(
-      <OptimizedErrorBoundary>
+      <UniversalErrorBoundary>
         <ThrowError shouldThrow={false} />
-      </OptimizedErrorBoundary>
+      </UniversalErrorBoundary>
     );
 
     expect(screen.getByText('No error')).toBeInTheDocument();
@@ -26,9 +26,9 @@ describe('OptimizedErrorBoundary', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
-      <OptimizedErrorBoundary>
+      <UniversalErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </OptimizedErrorBoundary>
+      </UniversalErrorBoundary>
     );
 
     expect(screen.getByText("Oops! Quelque chose s'est mal passé")).toBeInTheDocument();
@@ -42,9 +42,9 @@ describe('OptimizedErrorBoundary', () => {
     const fallback = <div>Custom error message</div>;
 
     render(
-      <OptimizedErrorBoundary fallback={fallback}>
+      <UniversalErrorBoundary fallback={fallback}>
         <ThrowError shouldThrow={true} />
-      </OptimizedErrorBoundary>
+      </UniversalErrorBoundary>
     );
 
     expect(screen.getByText('Custom error message')).toBeInTheDocument();

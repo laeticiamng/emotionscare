@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, RotateCcw, Heart, Sparkles } from 'lucide-react';
-import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/types';
@@ -25,7 +25,7 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(null);
   
-  const { playTrack, isLoading: musicLoading } = useEmotionsCareMusicContext();
+  const { playTrack, isLoading: musicLoading } = useMusic();
   const { generateMusic, isGenerating, error } = useMusicGeneration();
   const { toast } = useToast();
 
@@ -86,57 +86,88 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
   };
   
   return (
-    <>
-      <Card className="border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-5 w-5 text-primary" />
-            EmotionsCare Music
-          </CardTitle>
-          <CardDescription>
-            Musique thérapeutique adaptée à votre état émotionnel
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4">
-            {getEmotionMusicDescription(emotionResult.emotion.toLowerCase())}
-          </p>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Émotion détectée : 
-            <span className="font-semibold text-primary ml-1 capitalize">
-              {emotionResult.emotion}
-            </span>
-            {emotionResult.confidence && (
-              <span className="ml-2">
-                ({Math.round(emotionResult.confidence * 100)}% de confiance)
-              </span>
-            )}
-          </p>
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-primary" />
+          Recommandation Musicale
+        </CardTitle>
+        <CardDescription>
+          Musique adaptée à votre état émotionnel: {emotionResult.dominantEmotion}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">Intensité</label>
+            <Slider
+              value={intensity}
+              onValueChange={setIntensity}
+              max={1}
+              min={0}
+              step={0.1}
+              className="mt-2"
+            />
+          </div>
+          
           <Button 
-            onClick={handleActivateMusic} 
-            className="w-full bg-primary hover:bg-primary/90"
-            disabled={musicLoading}
+            onClick={handleGenerateMusic} 
+            className="w-full"
+            disabled={isGenerating || musicLoading}
           >
-            <Play className="mr-2 h-4 w-4" /> 
-            {musicLoading ? 'Génération EmotionsCare...' : 'Activer la thérapie musicale'}
+            {isGenerating ? (
+              <>
+                <RotateCcw className="mr-2 h-4 w-4 animate-spin" /> 
+                Génération...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" /> 
+                Générer la musique
+              </>
+            )}
           </Button>
-        </CardContent>
-      </Card>
 
-      {/* Lecteur EmotionsCare */}
-      {currentPlaylist && (
-        <EmotionsCareMusicPlayer />
-      )}
-    </>
+          {currentTrack && (
+            <div className="border rounded-lg p-4 space-y-3">
+              <div>
+                <h4 className="font-medium">{currentTrack.title}</h4>
+                <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
+              </div>
+              
+              <Button
+                onClick={handlePlayTrack}
+                variant="outline"
+                className="w-full"
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="mr-2 h-4 w-4" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" />
+                    Écouter
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded">
+              {error}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
 const EmotionsCareRecommendation: React.FC<EmotionsCareRecommendationProps> = (props) => {
-  return (
-    <EmotionsCareMusicProvider>
-      <EmotionsCareRecommendationContent {...props} />
-    </EmotionsCareMusicProvider>
-  );
+  return <EmotionsCareRecommendationContent {...props} />;
 };
 
 export default EmotionsCareRecommendation;

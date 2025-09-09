@@ -7,7 +7,7 @@ import {
   Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
   Repeat, Shuffle, Heart, Download, Share2, Music
 } from 'lucide-react';
-import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 
 interface EmotionsCareMusicPlayerProps {

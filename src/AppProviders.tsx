@@ -7,7 +7,7 @@ import { UserModeProvider } from '@/contexts/UserModeContext';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import { EmotionsCareMusicProvider } from '@/contexts/EmotionsCareMusicContext';
+import { MusicProvider } from '@/contexts/MusicContext';
 import { MoodProvider } from '@/contexts/MoodContext';
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { NotificationProvider } from '@/components/ui/notification-system';
@@ -32,7 +32,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                 <UserModeProvider>
                   <MoodProvider>
                     <UnifiedProvider>
-                      <EmotionsCareMusicProvider>
+                      <MusicProvider>
                         {children}
                         <Toaster 
                           position="top-right" 
@@ -47,7 +47,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                             },
                           }}
                         />
-                      </EmotionsCareMusicProvider>
+                      </MusicProvider>
                     </UnifiedProvider>
                   </MoodProvider>
                 </UserModeProvider>

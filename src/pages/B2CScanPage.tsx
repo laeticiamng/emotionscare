@@ -11,13 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
 import EmotionScannerPremium from '@/components/emotion/EmotionScannerPremium';
 import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCareMusicPlayer';
-import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
+import { useMusic } from '@/contexts/MusicContext';
 import type { EmotionResult } from '@/types/emotion';
 
 const B2CScanPage: React.FC = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
-  const { state: musicState, generateEmotionPlaylist } = useEmotionsCareMusicContext();
+  const { state: musicState, generateEmotionPlaylist } = useMusic();
   const { toast } = useToast();
 
   const handleEmotionDetected = async (result: EmotionResult) => {
