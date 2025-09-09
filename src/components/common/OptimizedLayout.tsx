@@ -1,6 +1,6 @@
 import React, { memo, Suspense, lazy } from 'react';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
-import { AccessibilityProvider } from '@/contexts/AccessibilityContextEnhanced';
+import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { CoachProvider } from '@/contexts/coach/CoachContextUnified';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { logProductionEvent } from '@/utils/consoleCleanup';

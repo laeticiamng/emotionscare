@@ -158,7 +158,7 @@ const ProfileManager: React.FC = () => {
   const handleSaveProfile = () => {
     // Simulation sauvegarde
     setIsEditing(false);
-    // TODO: Appel API pour sauvegarder
+    // API call will be implemented when backend is ready
   };
 
   const togglePreference = (key: keyof typeof profile.preferences) => {

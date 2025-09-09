@@ -373,7 +373,7 @@ if (typeof window !== 'undefined') {
     const batch = logger.flush();
     
     if (CONFIG.enableRemoteLogging && (batch.logs.length > 0 || batch.errors.length > 0)) {
-      // TODO: Envoyer vers un service de logging externe (Sentry, LogRocket, etc.)
+      // Remote logging service integration (Sentry, LogRocket, etc.) will be added later
       console.debug('Batch flush:', batch);
     }
   }, CONFIG.flushInterval);

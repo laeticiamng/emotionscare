@@ -16,7 +16,7 @@ import {
   Check,
   AlertTriangle
 } from 'lucide-react';
-import { useAccessibility } from '@/contexts/AccessibilityContextEnhanced';
+import { useAccessibility } from '@/components/common/AccessibilityProvider';
 
 interface AccessibilitySettings {
   highContrast: boolean;

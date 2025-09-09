@@ -104,7 +104,7 @@ const InteractiveJournal: React.FC = () => {
         content: currentEntry,
         mood: selectedMood,
         timestamp: new Date(),
-        tags: ['manuel'], // TODO: extraire automatiquement
+        tags: ['manuel'], // Auto-extract tags in future version
         emotionAnalysis: {
           emotion: analysis.emotion,
           confidence: analysis.confidence

@@ -42,7 +42,7 @@ export default function UnifiedErrorPage({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      // TODO: Implémenter la recherche globale
+      // Global search will be implemented when search API is ready
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
     }
   };

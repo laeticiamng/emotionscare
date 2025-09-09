@@ -48,7 +48,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useAccessibility } from '@/contexts/AccessibilityContextEnhanced';
+import { useAccessibility } from '@/components/common/AccessibilityProvider';
 import { logProductionEvent } from '@/utils/consoleCleanup';
 
 interface NavigationItem {

@@ -163,8 +163,8 @@ export const validateFormData = <T>(
  * Valide un email de manière asynchrone (uniqueness)
  */
 export const validateEmailUniqueness = async (email: string): Promise<boolean> => {
-  // TODO: Implémenter la vérification côté API
-  // Pour l'instant, simulation
+  // Implementation will be added when user registration API is available
+  // For now, simulation
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(!email.includes('test@test.com')); // Fake validation

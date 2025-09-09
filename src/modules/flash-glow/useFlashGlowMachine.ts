@@ -157,7 +157,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
 
       const response = await flashGlowService.endSession(sessionData);
       
-      const recommendation = flashGlowService.getRecommendation(label, 3); // TODO: streak réel
+      const recommendation = flashGlowService.getRecommendation(label, 3); // Real streak will be calculated later
       
       toast({
         title: "Session terminée ! ✨",

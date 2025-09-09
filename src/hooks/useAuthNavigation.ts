@@ -57,8 +57,8 @@ export function useAuthNavigation() {
       } else if (segment === 'b2c') {
         destination = '/app/home';
       } else {
-        // Déterminer automatiquement basé sur le profil utilisateur
-        // TODO: Implémenter la logique basée sur les métadonnées utilisateur
+        // Automatically determine based on user profile
+        // Will be implemented based on user metadata when available
         destination = fallback;
       }
     }
