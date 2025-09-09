@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
@@ -78,7 +78,7 @@ const breathingSessions: BreathingSession[] = [
 const VRBreathPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { currentTrack, isPlaying, togglePlay } = useMusic();
+  const { currentTrack, isPlaying, state, play, pause } = useMusic();
   
   const [selectedSession, setSelectedSession] = useState<BreathingSession | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -460,7 +460,7 @@ const VRBreathPage: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={togglePlay}
+                      onClick={() => isPlaying ? pause() : play()}
                     >
                       {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                     </Button>

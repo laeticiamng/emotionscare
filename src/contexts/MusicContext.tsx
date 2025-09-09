@@ -1,7 +1,7 @@
 /**
  * MUSIC CONTEXT UNIFIÉ - EmotionsCare Premium
  * Gestion centralisée de la musique thérapeutique et génération Suno
- * Version: 2.0 - Exports corrigés
+ * Version: 2.1 - Cache refresh
  */
 
 import React, { createContext, useContext, useReducer, useRef, useCallback, useEffect } from 'react';

@@ -1,5 +1,9 @@
+// Export unifié du contexte musique
+import { useMusic as useMusicHook, MusicProvider, MusicContext } from '../MusicContext';
 
-// Réexporter depuis le contexte principal pour maintenir la compatibilité
-export { MusicProvider, MusicContext } from '../MusicContext';
-export { useMusic } from '../MusicContext';
-export default useMusic;
+// Réexport avec noms cohérents
+export const useMusic = useMusicHook;
+export { MusicProvider, MusicContext };
+
+// Export par défaut
+export default useMusicHook;
