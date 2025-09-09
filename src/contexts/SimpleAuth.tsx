@@ -68,23 +68,9 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       // Redirection immédiate sans setTimeout
       console.log('🔄 Redirection immédiate vers dashboard...');
       
-      // Créer un délai minimum puis rediriger
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Utiliser la navigation programmatique
-      const event = new CustomEvent('authRedirect', { 
-        detail: { 
-          route: '/dashboard-simple', 
-          user: mockUser 
-        } 
-      });
-      window.dispatchEvent(event);
-      
-      // Fallback si l'événement custom ne fonctionne pas
-      setTimeout(() => {
-        console.log('🔄 Fallback: Redirection manuelle');
-        window.location.href = '/dashboard-simple';
-      }, 200);
+      // Redirection immédiate avec window.location
+      console.log('🔄 Redirection vers /dashboard-simple...');
+      window.location.href = '/dashboard-simple';
       
     } catch (error) {
       console.error('SignIn error:', error);
