@@ -43,13 +43,12 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-5-2025-08-07',
         messages: [
           { role: 'system', content: getCoachingSystemPrompt() },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.8,
-        max_tokens: 600,
+        max_completion_tokens: 600,
       }),
     });
 
@@ -64,11 +63,6 @@ serve(async (req) => {
     return new Response(JSON.stringify({ response: coaching }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
-
-    return new Response(
-      JSON.stringify(structuredCoaching),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
 
   } catch (error) {
     console.error('Error in coach-ai:', error);
