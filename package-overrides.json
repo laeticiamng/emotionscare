@@ -1,0 +1,21 @@
+{
+  "name": "imagemin-packages-override",
+  "description": "Override file to exclude problematic imagemin packages",
+  "overrides": {
+    "imagemin": false,
+    "imagemin-avif": false,
+    "imagemin-webp": false,
+    "vite-plugin-imagemin": false,
+    "jpegtran-bin": false,
+    "imagemin-jpegtran": false,
+    "imagemin-mozjpeg": false,
+    "imagemin-pngquant": false
+  },
+  "resolutions": {
+    "imagemin": false,
+    "imagemin-avif": false,
+    "imagemin-webp": false,
+    "vite-plugin-imagemin": false,
+    "jpegtran-bin": false
+  }
+}
