@@ -12,7 +12,7 @@ import {
   Heart, Home, Settings, User, ArrowRight, Brain, Music, BookOpen, 
   Headphones, Target, TrendingUp, Calendar, Scan, Eye, Star, Zap, 
   Wind, Camera, Palette, Trophy, RefreshCw, Medal, Activity, Monitor,
-  MessageCircle, PenTool, Sparkles, Plus, ChevronRight
+  MessageCircle, PenTool, Sparkles, Plus, ChevronRight, LogIn
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSimpleAuth } from '@/contexts/SimpleAuth';
