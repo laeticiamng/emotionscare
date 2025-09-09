@@ -88,15 +88,6 @@ export default function B2CJournalEnhanced() {
         `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`,
         `Je remarque des patterns de croissance personnelle dans vos mots`
       ];
-      setAiInsights(insights);
-    } catch (error) {
-      console.error('Erreur analyse:', error);
-    
-      const insights = result.insights || [
-        `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
-        `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`,
-        `Je remarque des patterns de croissance personnelle dans vos mots`
-      ];
       setAiInsights(insights.slice(0, 3));
     } catch (error) {
       console.error('Erreur analyse:', error);
@@ -105,6 +96,8 @@ export default function B2CJournalEnhanced() {
         `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
         `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`
       ]);
+    }
+    
     setIsAnalyzing(false);
   };
 
