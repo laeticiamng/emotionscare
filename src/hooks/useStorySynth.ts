@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useOpenAI } from './useOpenAI';
+import { useOpenAI } from './api/useOpenAI';
 
 interface StoryChapter {
   id: string;
