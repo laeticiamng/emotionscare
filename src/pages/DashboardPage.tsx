@@ -16,6 +16,8 @@ import {
   Clock,
   Zap
 } from 'lucide-react';
+import EmotionMeter from '@/components/features/EmotionMeter';
+import MoodChart from '@/components/features/MoodChart';
 
 const DashboardPage: React.FC = () => {
   const [emotionalData] = React.useState({
@@ -135,6 +137,22 @@ const DashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Émotion meter interactif */}
+        <div className="lg:col-span-1">
+          <EmotionMeter 
+            initialValue={8}
+            onValueChange={(value) => console.log('Nouvelle valeur:', value)}
+            showTrend={true}
+          />
+        </div>
+
+        {/* Graphique des tendances */}
+        <div className="lg:col-span-2">
+          <MoodChart />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

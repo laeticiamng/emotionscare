@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 const mainItems = [
   { title: "Accueil", url: "/", icon: Home },
@@ -67,11 +68,12 @@ export function AppSidebar() {
             <Heart className="h-4 w-4" />
           </div>
           {state === "expanded" && (
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
               <span className="text-sm font-semibold">EmotionsCare</span>
               <span className="text-xs text-muted-foreground">Bien-être digital</span>
             </div>
           )}
+          <ThemeToggle />
         </div>
       </SidebarHeader>
 
