@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { routes } from './routes';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -27,7 +27,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
   allowedRoles = [],
   requireAuth = true,
 }) => {
-  const { isAuthenticated, user, loading: authLoading } = useSimpleAuth();
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: modeLoading } = useUserMode();
 
   // Chargement en cours
@@ -44,20 +44,20 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
     return <Navigate to={routes.auth.login()} replace />;
   }
 
-  // Vérification des rôles
-  if (isAuthenticated && (requiredRole || allowedRoles.length > 0)) {
-    const currentRole = normalizeRole(user?.role || userMode);
-    
-    // Rôle spécifique requis (accès exclusif)
-    if (requiredRole && currentRole !== requiredRole) {
-      return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
+    // Vérification des rôles
+    if (isAuthenticated && (requiredRole || allowedRoles.length > 0)) {
+      const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
+      
+      // Rôle spécifique requis (accès exclusif)
+      if (requiredRole && currentRole !== requiredRole) {
+        return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
+      }
+      
+      // Liste de rôles autorisés (accès multiple)
+      if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
+        return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
+      }
     }
-    
-    // Liste de rôles autorisés (accès multiple)
-    if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
-      return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
-    }
-  }
 
   return <>{children}</>;
 };

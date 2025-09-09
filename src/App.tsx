@@ -7,7 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import './App.css';
 
 // Import des contexts
-import AuthContextProvider from './contexts/AuthContext';
+import AuthContextProvider, { useAuth } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SecurityProvider } from './components/security/SecurityProvider';

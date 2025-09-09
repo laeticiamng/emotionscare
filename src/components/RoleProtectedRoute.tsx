@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { routes } from '@/routerV2';
-import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
@@ -20,7 +20,7 @@ export const RoleProtectedRoute: React.FC<RoleProtectedRouteProps> = ({
   allowedRoles,
   redirectTo = '/auth'
 }) => {
-  const { isAuthenticated, user, loading: authLoading } = useSimpleAuth();
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: modeLoading } = useUserMode();
   const location = useLocation();
 

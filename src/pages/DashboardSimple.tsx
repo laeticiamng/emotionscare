@@ -15,7 +15,7 @@ import {
   MessageCircle, PenTool, Sparkles, Plus, ChevronRight, LogIn
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import EmotionScanButton from '@/components/features/EmotionScanButton';
 import GritChallengeButton from '@/components/features/GritChallengeButton';
 import AmbitionButton from '@/components/features/AmbitionButton';
@@ -25,16 +25,16 @@ import RoutesDiagnostic from '@/components/debug/RoutesDiagnostic';
 
 const DashboardSimple: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, signOut } = useSimpleAuth();
+  const { user, isAuthenticated, signOut, isLoading } = useAuth();
 
   // Rediriger si pas authentifié
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       navigate('/login', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
-  if (!isAuthenticated) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
