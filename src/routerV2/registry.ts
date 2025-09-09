@@ -856,6 +856,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'DuplicatesAuditPage',
       guard: false,
     },
+    {
+      name: 'comprehensive-system-audit',
+      path: '/dev/system-audit',
+      segment: 'public',
+      layout: 'app',
+      component: 'ComprehensiveSystemAuditPage',
+      guard: false,
+    },
   // Routes de debug supprimées (pages orphelines nettoyées)
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
