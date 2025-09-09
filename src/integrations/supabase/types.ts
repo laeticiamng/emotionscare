@@ -2154,6 +2154,50 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_analysis_logs: {
+        Row: {
+          analysis_metadata: Json | null
+          arousal: number | null
+          confidence_score: number | null
+          created_at: string | null
+          detected_emotion: string
+          id: string
+          input_text: string | null
+          user_id: string | null
+          valence: number | null
+        }
+        Insert: {
+          analysis_metadata?: Json | null
+          arousal?: number | null
+          confidence_score?: number | null
+          created_at?: string | null
+          detected_emotion: string
+          id?: string
+          input_text?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Update: {
+          analysis_metadata?: Json | null
+          arousal?: number | null
+          confidence_score?: number | null
+          created_at?: string | null
+          detected_emotion?: string
+          id?: string
+          input_text?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotion_analysis_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emotion_metrics: {
         Row: {
           confidence_score: number | null
@@ -5023,6 +5067,47 @@ export type Database = {
           },
         ]
       }
+      medical_learning_analytics: {
+        Row: {
+          action_type: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          item_code: string
+          metadata: Json | null
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          item_code: string
+          metadata?: Json | null
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          item_code?: string
+          metadata?: Json | null
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_learning_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medilinko_consultations: {
         Row: {
           consultation_result: string | null
@@ -5287,6 +5372,79 @@ export type Database = {
         }
         Relationships: []
       }
+      music_completion_logs: {
+        Row: {
+          completion_percentage: number | null
+          completion_timestamp: string | null
+          id: string
+          listen_duration: number | null
+          track_id: string
+          user_id: string | null
+        }
+        Insert: {
+          completion_percentage?: number | null
+          completion_timestamp?: string | null
+          id?: string
+          listen_duration?: number | null
+          track_id: string
+          user_id?: string | null
+        }
+        Update: {
+          completion_percentage?: number | null
+          completion_timestamp?: string | null
+          id?: string
+          listen_duration?: number | null
+          track_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_completion_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_generation_logs: {
+        Row: {
+          created_at: string | null
+          emotion: string
+          generation_metadata: Json | null
+          id: string
+          intensity: number | null
+          tracks_generated: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          emotion: string
+          generation_metadata?: Json | null
+          id?: string
+          intensity?: number | null
+          tracks_generated?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          emotion?: string
+          generation_metadata?: Json | null
+          id?: string
+          intensity?: number | null
+          tracks_generated?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_generation_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_generation_usage: {
         Row: {
           created_at: string
@@ -5328,6 +5486,41 @@ export type Database = {
           },
           {
             foreignKeyName: "music_generation_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_play_logs: {
+        Row: {
+          emotion_context: string | null
+          id: string
+          play_timestamp: string | null
+          session_metadata: Json | null
+          track_id: string
+          user_id: string | null
+        }
+        Insert: {
+          emotion_context?: string | null
+          id?: string
+          play_timestamp?: string | null
+          session_metadata?: Json | null
+          track_id: string
+          user_id?: string | null
+        }
+        Update: {
+          emotion_context?: string | null
+          id?: string
+          play_timestamp?: string | null
+          session_metadata?: Json | null
+          track_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_play_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_activity_summary"
@@ -5413,6 +5606,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "music_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_skip_logs: {
+        Row: {
+          id: string
+          skip_position: number | null
+          skip_reason: string | null
+          skip_timestamp: string | null
+          track_id: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          skip_position?: number | null
+          skip_reason?: string | null
+          skip_timestamp?: string | null
+          track_id: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          skip_position?: number | null
+          skip_reason?: string | null
+          skip_timestamp?: string | null
+          track_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_skip_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_activity_summary"
@@ -7162,6 +7390,65 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_music_generation: {
+        Row: {
+          audio_url: string | null
+          completed_at: string | null
+          created_at: string
+          duration: number | null
+          id: string
+          item_code: string
+          metadata: Json | null
+          paroles: string[]
+          status: string
+          style: string
+          suno_task_id: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          item_code: string
+          metadata?: Json | null
+          paroles: string[]
+          status?: string
+          style?: string
+          suno_task_id?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          item_code?: string
+          metadata?: Json | null
+          paroles?: string[]
+          status?: string
+          style?: string
+          suno_task_id?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unified_music_generation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       urge_gpt_queries: {
         Row: {
           created_at: string
@@ -7458,6 +7745,35 @@ export type Database = {
           },
         ]
       }
+      user_favorite_tracks: {
+        Row: {
+          favorited_at: string | null
+          id: string
+          track_id: string
+          user_id: string | null
+        }
+        Insert: {
+          favorited_at?: string | null
+          id?: string
+          track_id: string
+          user_id?: string | null
+        }
+        Update: {
+          favorited_at?: string | null
+          id?: string
+          track_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorite_tracks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_generated_music: {
         Row: {
           audio_url: string
@@ -7555,6 +7871,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_music_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_played_emotion: string | null
+          preferred_emotions: string[] | null
+          total_plays: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_played_emotion?: string | null
+          preferred_emotions?: string[] | null
+          total_plays?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_played_emotion?: string | null
+          preferred_emotions?: string[] | null
+          total_plays?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_music_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_notifications: {
         Row: {
@@ -8399,6 +8753,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      cleanup_failed_generations: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cleanup_old_chat_logs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -8742,6 +9100,10 @@ export type Database = {
           total_items: number
         }[]
       }
+      get_medical_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_oic_competences_rapport: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -8821,6 +9183,14 @@ export type Database = {
         Args: { p_period_days?: number }
         Returns: Json
       }
+      get_user_medical_stats: {
+        Args: { p_user_id?: string }
+        Returns: Json
+      }
+      get_user_organization_role: {
+        Args: { org_id: string }
+        Returns: string
+      }
       get_user_subscription: {
         Args: { user_uuid: string }
         Returns: {
@@ -8861,6 +9231,10 @@ export type Database = {
           success_count: number
           updated_items: number
         }[]
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       log_admin_change: {
         Args: {
@@ -9161,6 +9535,15 @@ export type Database = {
           suspicious_data_count: number
           table_name: string
         }[]
+      }
+      secure_generate_music: {
+        Args: {
+          p_item_code: string
+          p_paroles: string[]
+          p_style?: string
+          p_type: string
+        }
+        Returns: string
       }
       security_audit_check: {
         Args: Record<PropertyKey, never>
