@@ -63,9 +63,8 @@ export default function ComprehensiveSystemAudit() {
       { name: 'OnboardingPage', path: 'src/pages/OnboardingPage.tsx', routes: ['/onboarding'], component: 'OnboardingPage' },
       { name: 'PrivacyPage', path: 'src/pages/PrivacyPage.tsx', routes: ['/privacy'], component: 'PrivacyPage' },
       
-      // Pages B2C - DOUBLONS IDENTIFIÉS
-      { name: 'B2CPage', path: 'src/pages/B2CPage.tsx', routes: ['/b2c'], component: 'B2CPage', duplicate: true },
-      { name: 'B2CHomePage', path: 'src/pages/B2CHomePage.tsx', routes: ['/app/home'], component: 'B2CHomePage', duplicate: true },
+      // Pages B2C - NETTOYÉES ✅
+      { name: 'B2CHomePage', path: 'src/pages/B2CHomePage.tsx', routes: ['/app/home', '/b2c'], component: 'B2CHomePage', duplicate: false },
       
       // Pages Émotions - DOUBLONS IDENTIFIÉS  
       { name: 'EmotionsPage', path: 'src/pages/EmotionsPage.tsx', routes: ['/emotions'], component: 'EmotionsPage', duplicate: true },

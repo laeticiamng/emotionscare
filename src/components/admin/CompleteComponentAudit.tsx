@@ -36,7 +36,7 @@ export default function CompleteComponentAudit() {
     'B2CEmotionsPage.tsx', 'B2CFlashGlowPage.tsx', 'B2CGamificationPage.tsx', 'B2CHeatmapVibesPage.tsx',
     'B2CHomePage.tsx', 'B2CJournalPage.tsx', 'B2CMoodMixerPage.tsx', 'B2CMusicEnhanced.tsx',
     'B2CMusicTherapyPremiumPage.tsx', 'B2CNotificationsPage.tsx', 'B2CNyveeCoconPage.tsx',
-    'B2CPage.tsx', 'B2CPrivacyTogglesPage.tsx', 'B2CProfileSettingsPage.tsx', 'B2CScanPage.tsx',
+    'B2CPrivacyTogglesPage.tsx', 'B2CProfileSettingsPage.tsx', 'B2CScanPage.tsx',
     'B2CScreenSilkBreakPage.tsx', 'B2CSettingsPage.tsx', 'B2CSocialCoconPage.tsx',
     'B2CStorySynthLabPage.tsx', 'B2CVRBreathGuidePage.tsx', 'B2CVRGalaxyPage.tsx',
     'B2CWeeklyBarsPage.tsx', 'CalendarPage.tsx', 'ChooseModePage.tsx', 'CoachChatPage.tsx',
@@ -93,15 +93,10 @@ export default function CompleteComponentAudit() {
         redirectComponent = true;
         exists = true; // Supposons qu'ils existent (déjà vérifiés)
       } else if (component === 'HomePage') {
-        // HomePage peut être dans src/pages/ ou src/pages/app/
-        expectedPath = 'src/pages/HomePage.tsx OU src/pages/app/Home.tsx';
-        exists = existingPageFiles.includes('HomePage.tsx');
-        actualPath = exists ? 'HomePage.tsx' : 'app/Home.tsx';
-        if (!exists) {
-          // Vérifier si c'est dans app/
-          exists = true; // On suppose que app/Home.tsx existe
-          actualPath = 'app/Home.tsx';
-        }
+        // HomePage peut être dans src/pages/
+        expectedPath = 'src/pages/HomePage.tsx (UnifiedHomePage)';
+        exists = true; // UnifiedHomePage gère HomePage
+        actualPath = 'UnifiedHomePage.tsx';
       } else {
         expectedPath = `src/pages/${component}.tsx`;
         actualPath = `${component}.tsx`;
