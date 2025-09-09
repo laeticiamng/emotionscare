@@ -154,9 +154,6 @@ const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectT
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
 
-// Import du composant Home pour /app/home
-const AppHomePage = lazy(() => import('@/pages/B2CHomePage'));
-
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
   HomePage,
