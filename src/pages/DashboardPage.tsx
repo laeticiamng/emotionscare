@@ -9,13 +9,31 @@ import {
   Calendar,
   Navigation,
   Zap,
-  Layout
+  Layout,
+  Brain,
+  Music,
+  MessageSquare,
+  Eye
 } from 'lucide-react';
 import UnifiedDashboard from '@/components/features/UnifiedDashboard';
 import NavigationHub from '@/components/features/NavigationHub';
+import EmotionAnalysisEngine from '@/components/core/emotion/EmotionAnalysisEngine';
+import MusicTherapyEngine from '@/components/core/music/MusicTherapyEngine';
+import VirtualCoachEngine from '@/components/core/coaching/VirtualCoachEngine';
 
 const DashboardPage: React.FC = () => {
-  const [activeView, setActiveView] = React.useState<'unified' | 'navigation'>('unified');
+  const [activeView, setActiveView] = React.useState<'unified' | 'navigation' | 'emotion' | 'music' | 'coach'>('unified');
+
+  const views = [
+    { key: 'unified', label: 'Vue Unifiée', icon: Layout, component: UnifiedDashboard },
+    { key: 'navigation', label: 'Navigation', icon: Navigation, component: NavigationHub },
+    { key: 'emotion', label: 'Analyse IA', icon: Brain, component: EmotionAnalysisEngine },
+    { key: 'music', label: 'Musicothérapie', icon: Music, component: MusicTherapyEngine },
+    { key: 'coach', label: 'Coach IA', icon: MessageSquare, component: VirtualCoachEngine }
+  ];
+
+  const currentView = views.find(v => v.key === activeView);
+  const ViewComponent = currentView?.component || UnifiedDashboard;
 
   return (
     <div className="container mx-auto py-8 px-4" data-testid="page-root">
@@ -30,35 +48,34 @@ const DashboardPage: React.FC = () => {
           </p>
         </div>
         
-        {/* Sélecteur de vue */}
-        <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
-          <Button
-            variant={activeView === 'unified' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveView('unified')}
-            className="flex items-center gap-2"
-          >
-            <Layout className="h-4 w-4" />
-            Vue Unifiée
-          </Button>
-          <Button
-            variant={activeView === 'navigation' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveView('navigation')}
-            className="flex items-center gap-2"
-          >
-            <Navigation className="h-4 w-4" />
-            Navigation
-          </Button>
+        {/* Sélecteur de vue étendu */}
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          {views.map((view) => (
+            <Button
+              key={view.key}
+              variant={activeView === view.key ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveView(view.key as any)}
+              className="flex items-center gap-2 text-sm"
+            >
+              <view.icon className="h-4 w-4" />
+              {view.label}
+            </Button>
+          ))}
         </div>
       </div>
 
-      {/* Contenu conditionnel */}
-      {activeView === 'unified' ? (
-        <UnifiedDashboard />
-      ) : (
-        <NavigationHub />
-      )}
+      {/* Badge du module actuel */}
+      <div className="mb-6">
+        <Badge variant="outline" className="flex items-center gap-2 w-fit">
+          {currentView && <currentView.icon className="h-4 w-4" />}
+          {currentView?.label}
+          <Zap className="h-3 w-3" />
+        </Badge>
+      </div>
+
+      {/* Contenu dynamique */}
+      <ViewComponent />
     </div>
   );
 };
