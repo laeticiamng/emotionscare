@@ -16,7 +16,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import { useEmotionAnalysisEngine } from '@/hooks/useEmotionAnalysisEngine';
-import { EmotionScannerPremium } from './EmotionScannerPremium';
+import EmotionScannerPremium from './EmotionScannerPremium';
 import { EmotionsCareRecommendation } from '@/components/music/emotionscare';
 import type { EmotionResult } from '@/types';
 
