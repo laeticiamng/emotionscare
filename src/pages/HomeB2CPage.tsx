@@ -47,7 +47,7 @@ const HomeB2CPage: React.FC = () => {
                 Commencer gratuitement
               </Button>
             </Link>
-            <Link to={Routes.b2bLanding()}>
+            <Link to={Routes.enterprise()}>
               <Button size="lg" variant="outline" className="px-8">
                 Solutions entreprise
               </Button>
@@ -140,8 +140,8 @@ const HomeB2CPage: React.FC = () => {
             <div>
               <h4 className="font-semibold mb-4">Solutions</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to={Routes.b2cLanding()} className="hover:text-white">Particuliers</Link></li>
-                <li><Link to={Routes.b2bLanding()} className="hover:text-white">Entreprises</Link></li>
+                <li><Link to={Routes.b2c()} className="hover:text-white">Particuliers</Link></li>
+                <li><Link to={Routes.enterprise()} className="hover:text-white">Entreprises</Link></li>
               </ul>
             </div>
             
