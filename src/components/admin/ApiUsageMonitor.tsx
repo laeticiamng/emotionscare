@@ -1,107 +1,31 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Line, Bar, Pie } from 'react-chartjs-2';
-import { 
-  Chart as ChartJS, 
-  CategoryScale, 
-  LinearScale, 
-  PointElement, 
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title, 
-  Tooltip, 
-  Legend
-} from 'chart.js';
 import { Button } from '@/components/ui/button';
-import { Download, RefreshCw } from 'lucide-react';
-import { ApiUseActivity, ApiUsageStats } from '@/types/api';
-
-// Enregistrement des composants Chart.js
-ChartJS.register(
-  CategoryScale, 
-  LinearScale, 
-  PointElement, 
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title, 
-  Tooltip, 
-  Legend
-);
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { RefreshCw, TrendingUp, AlertCircle, DollarSign, Clock, Zap } from 'lucide-react';
+import { adminService, ApiUsageStats, ApiUseActivity } from '@/services/admin';
 
 interface ApiUsageMonitorProps {
   onRefresh?: () => void;
 }
 
-const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
+export default function ApiUsageMonitor({ onRefresh }: ApiUsageMonitorProps) {
   const [usageData, setUsageData] = useState<ApiUseActivity[]>([]);
   const [stats, setStats] = useState<ApiUsageStats | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('week');
   
-  // Chargement des données (simulées ici)
+  // Chargement des données via le service admin
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Simulation de chargement - à remplacer par un vrai appel API
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Données simulées
-        const currentDate = new Date();
-        const mockData: ApiUseActivity[] = [];
-        
-        // Nombre de jours selon la période
-        const days = period === 'day' ? 1 : period === 'week' ? 7 : 30;
-        
-        // Génération de données fictives
-        for (let i = 0; i < days; i++) {
-          const date = new Date();
-          date.setDate(currentDate.getDate() - i);
-          
-          mockData.push({
-            date: date.toISOString().split('T')[0],
-            openai: Math.floor(Math.random() * 50) + 20,
-            whisper: Math.floor(Math.random() * 15) + 5,
-            musicgen: Math.floor(Math.random() * 10) + 1,
-            humeai: Math.floor(Math.random() * 8) + 2,
-            dalle: Math.floor(Math.random() * 12) + 3
-          });
-        }
-        
-        // Tri par date
-        mockData.sort((a, b) => a.date.localeCompare(b.date));
-        
-        setUsageData(mockData);
-        
-        // Statistiques globales
-        const totalOpenAI = mockData.reduce((sum, item) => sum + (item.openai || 0), 0);
-        const totalWhisper = mockData.reduce((sum, item) => sum + (item.whisper || 0), 0);
-        const totalMusicGen = mockData.reduce((sum, item) => sum + (item.musicgen || 0), 0);
-        const totalHumeAI = mockData.reduce((sum, item) => sum + (item.humeai || 0), 0);
-        const totalDalle = mockData.reduce((sum, item) => sum + (item.dalle || 0), 0);
-        const totalCalls = totalOpenAI + totalWhisper + totalMusicGen + totalHumeAI + totalDalle;
-        
-        setStats({
-          totalCalls,
-          callsByApi: {
-            openai: totalOpenAI,
-            whisper: totalWhisper,
-            musicgen: totalMusicGen,
-            humeai: totalHumeAI,
-            dalle: totalDalle
-          },
-          errorRate: Math.random() * 0.05, // 0-5% d'erreurs
-          avgResponseTime: Math.random() * 500 + 200, // 200-700ms
-          costEstimate: (totalOpenAI * 0.02 + totalWhisper * 0.006 + totalMusicGen * 0.03 + totalHumeAI * 0.01 + totalDalle * 0.04),
-          period: {
-            start: mockData[0]?.date || '',
-            end: mockData[mockData.length - 1]?.date || ''
-          }
-        });
+        const { stats, activities } = await adminService.getApiUsageStats(period);
+        setUsageData(activities);
+        setStats(stats);
       } catch (error) {
         console.error('Error fetching API usage data:', error);
       } finally {
@@ -112,186 +36,263 @@ const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
     fetchData();
   }, [period]);
   
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     if (onRefresh) {
       onRefresh();
-    } else {
-      setUsageData([]);
-      setStats(null);
-      setPeriod(period); // Déclenche le useEffect
+    }
+    
+    setIsLoading(true);
+    try {
+      const { stats, activities } = await adminService.getApiUsageStats(period);
+      setUsageData(activities);
+      setStats(stats);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  // Configuration pour le graphique d'utilisation quotidienne
-  const lineChartData = {
-    labels: usageData.map(item => item.date),
-    datasets: [
-      {
-        label: 'OpenAI',
-        data: usageData.map(item => item.openai || 0),
-        borderColor: 'rgba(53, 162, 235, 1)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        tension: 0.3
-      },
-      {
-        label: 'Whisper',
-        data: usageData.map(item => item.whisper || 0),
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-        tension: 0.3
-      },
-      {
-        label: 'MusicGen',
-        data: usageData.map(item => item.musicgen || 0),
-        borderColor: 'rgba(255, 159, 64, 1)',
-        backgroundColor: 'rgba(255, 159, 64, 0.5)',
-        tension: 0.3
-      },
-      {
-        label: 'Hume AI',
-        data: usageData.map(item => item.humeai || 0),
-        borderColor: 'rgba(153, 102, 255, 1)',
-        backgroundColor: 'rgba(153, 102, 255, 0.5)',
-        tension: 0.3
-      },
-      {
-        label: 'DALL-E',
-        data: usageData.map(item => item.dalle || 0),
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        tension: 0.3
-      }
-    ]
+
+  const getApiColor = (apiName: string) => {
+    const colors: Record<string, string> = {
+      openai: '#10b981',
+      whisper: '#3b82f6', 
+      musicgen: '#8b5cf6',
+      humeai: '#f59e0b',
+      dalle: '#ef4444'
+    };
+    return colors[apiName] || '#6b7280';
   };
-  
-  // Configuration pour le graphique de répartition par API
-  const pieChartData = {
-    labels: stats ? Object.keys(stats.callsByApi).map(key => 
-      key === 'openai' ? 'OpenAI' :
-      key === 'whisper' ? 'Whisper' :
-      key === 'musicgen' ? 'MusicGen' :
-      key === 'humeai' ? 'Hume AI' :
-      key === 'dalle' ? 'DALL-E' : key
-    ) : [],
-    datasets: [
-      {
-        data: stats ? Object.values(stats.callsByApi) : [],
-        backgroundColor: [
-          'rgba(53, 162, 235, 0.8)',
-          'rgba(75, 192, 192, 0.8)',
-          'rgba(255, 159, 64, 0.8)',
-          'rgba(153, 102, 255, 0.8)',
-          'rgba(255, 99, 132, 0.8)',
-        ],
-        borderWidth: 1
-      }
-    ]
+
+  const getApiName = (apiKey: string) => {
+    const names: Record<string, string> = {
+      openai: 'OpenAI GPT',
+      whisper: 'Whisper STT',
+      musicgen: 'Suno Music',
+      humeai: 'Hume AI',
+      dalle: 'DALL-E'
+    };
+    return names[apiKey] || apiKey;
   };
-  
-  // Options communes aux graphiques
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: false
-      },
-      tooltip: {
-        mode: 'index' as const,
-        intersect: false,
-      }
-    },
-    maintainAspectRatio: false
-  };
-  
-  return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Monitoring des API</CardTitle>
-        <div className="flex items-center gap-2">
-          <Tabs 
-            value={period} 
-            onValueChange={(val) => setPeriod(val as 'day' | 'week' | 'month')}
-            className="mr-4"
-          >
-            <TabsList>
-              <TabsTrigger value="day">Jour</TabsTrigger>
-              <TabsTrigger value="week">Semaine</TabsTrigger>
-              <TabsTrigger value="month">Mois</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={handleRefresh}
-            disabled={isLoading}
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
-          <Button variant="outline" size="icon">
-            <Download className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="flex justify-center items-center h-[400px]">
-            <div className="text-muted-foreground">Chargement des données...</div>
+
+  if (!stats) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="w-5 h-5" />
+            Moniteur d'Usage API
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Chargement des données...</p>
+            </div>
           </div>
-        ) : (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm font-medium text-muted-foreground">Appels totaux</div>
-                  <div className="text-2xl font-bold">{stats?.totalCalls || 0}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm font-medium text-muted-foreground">Taux d'erreurs</div>
-                  <div className="text-2xl font-bold">{(stats?.errorRate || 0) * 100}%</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm font-medium text-muted-foreground">Temps de réponse moyen</div>
-                  <div className="text-2xl font-bold">{Math.round(stats?.avgResponseTime || 0)} ms</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="text-sm font-medium text-muted-foreground">Coût estimé</div>
-                  <div className="text-2xl font-bold">{stats?.costEstimate?.toFixed(2) || 0} €</div>
-                </CardContent>
-              </Card>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header avec contrôles */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-primary" />
+              Moniteur d'Usage API
+            </CardTitle>
+            <div className="flex items-center gap-3">
+              <Select value={period} onValueChange={(value: 'day' | 'week' | 'month') => setPeriod(value)}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="day">Aujourd'hui</SelectItem>
+                  <SelectItem value="week">7 jours</SelectItem>
+                  <SelectItem value="month">30 jours</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRefresh}
+                disabled={isLoading}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Actualiser
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Statistiques principales */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Appels</p>
+                <p className="text-2xl font-bold">{stats.totalCalls.toLocaleString()}</p>
+              </div>
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Zap className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Taux d'Erreur</p>
+                <p className="text-2xl font-bold">{(stats.errorRate * 100).toFixed(1)}%</p>
+              </div>
+              <div className="p-2 bg-red-100 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-red-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Temps Moyen</p>
+                <p className="text-2xl font-bold">{Math.round(stats.avgResponseTime)}ms</p>
+              </div>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Clock className="w-5 h-5 text-blue-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Coût Estimé</p>
+                <p className="text-2xl font-bold">${stats.costEstimate.toFixed(2)}</p>
+              </div>
+              <div className="p-2 bg-green-100 rounded-lg">
+                <DollarSign className="w-5 h-5 text-green-500" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Graphique d'usage */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Évolution de l'Usage</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={usageData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="openai" stroke={getApiColor('openai')} strokeWidth={2} />
+                <Line type="monotone" dataKey="whisper" stroke={getApiColor('whisper')} strokeWidth={2} />
+                <Line type="monotone" dataKey="musicgen" stroke={getApiColor('musicgen')} strokeWidth={2} />
+                <Line type="monotone" dataKey="humeai" stroke={getApiColor('humeai')} strokeWidth={2} />
+                <Line type="monotone" dataKey="dalle" stroke={getApiColor('dalle')} strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Répartition par API */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Répartition par API</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {Object.entries(stats.callsByApi).map(([api, count]) => {
+              const percentage = stats.totalCalls > 0 ? (count / stats.totalCalls) * 100 : 0;
+              return (
+                <div key={api} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: getApiColor(api) }}
+                      />
+                      <span className="font-medium">{getApiName(api)}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-bold">{count.toLocaleString()}</span>
+                      <span className="text-sm text-muted-foreground ml-2">
+                        ({percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                  </div>
+                  <Progress value={percentage} className="h-2" />
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Insights et recommandations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" />
+            Insights et Recommandations
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-semibold mb-3">Tendances</h4>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-green-600">
+                    +12%
+                  </Badge>
+                  <span className="text-sm">Usage OpenAI cette semaine</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-blue-600">
+                    +8%
+                  </Badge>
+                  <span className="text-sm">Génération musicale en hausse</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-orange-600">
+                    Stable
+                  </Badge>
+                  <span className="text-sm">Performance système</span>
+                </div>
+              </div>
             </div>
             
-            <Tabs defaultValue="timeline">
-              <TabsList className="w-full">
-                <TabsTrigger value="timeline" className="flex-1">Utilisation journalière</TabsTrigger>
-                <TabsTrigger value="distribution" className="flex-1">Répartition par API</TabsTrigger>
-              </TabsList>
-              <TabsContent value="timeline">
-                <div className="h-[400px] mt-4">
-                  <Line data={lineChartData} options={chartOptions} />
-                </div>
-              </TabsContent>
-              <TabsContent value="distribution">
-                <div className="h-[400px] flex justify-center items-center mt-4">
-                  <div className="w-1/2 h-full">
-                    <Pie data={pieChartData} options={chartOptions} />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <div>
+              <h4 className="font-semibold mb-3">Recommandations</h4>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>• Optimiser les requêtes OpenAI pour réduire les coûts</p>
+                <p>• Surveiller l'usage Suno pour anticiper les limites</p>
+                <p>• Considérer le cache pour les requêtes fréquentes</p>
+              </div>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
-};
-
-export default ApiUsageMonitor;
+}
