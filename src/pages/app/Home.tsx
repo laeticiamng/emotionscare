@@ -166,7 +166,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative overflow-y-auto">
       <UniverseAmbiance 
         universe={homeUniverse} 
         intensity={0.7}
@@ -174,7 +174,7 @@ const Home: React.FC = () => {
       />
       
       <div className="relative z-10 p-6">
-      <div className="max-w-md mx-auto space-y-6">
+      <div className="max-w-md mx-auto space-y-6 pb-24">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-medium text-foreground mb-2">
@@ -246,14 +246,17 @@ const Home: React.FC = () => {
             Tous les univers
           </h2>
           
-          <div className="grid grid-cols-2 gap-3">
-            {allModules.map((module) => (
+          <div className="grid grid-cols-2 gap-3 min-h-fit">
+            {allModules.map((module, index) => (
               <Card 
                 key={module.id}
-                className="hover:shadow-elegant transition-all duration-300 cursor-pointer group bg-card/90 backdrop-blur-sm border border-white/10 hover-scale"
+                className="hover:shadow-elegant transition-all duration-300 cursor-pointer group bg-card/90 backdrop-blur-sm border border-white/10 hover-scale min-h-[120px] flex"
                 onClick={() => navigate(module.route)}
+                style={{
+                  animationDelay: `${index * 0.05}s`
+                }}
               >
-                <CardContent className="p-3">
+                <CardContent className="p-3 flex-1 flex flex-col justify-center">
                   <div className="text-center">
                     <div 
                       className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-all duration-300 text-white"
@@ -265,20 +268,27 @@ const Home: React.FC = () => {
                       {getIcon(module.icon)}
                     </div>
                     
-                    <h3 className="text-sm font-medium text-foreground mb-1">
+                    <h3 className="text-sm font-medium text-foreground mb-1 line-clamp-1">
                       {module.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground leading-tight">
+                    <p className="text-xs text-muted-foreground leading-tight line-clamp-2 mb-2">
                       {module.subtitle}
                     </p>
                     
-                    <Badge variant="outline" className="text-xs mt-2 opacity-70">
+                    <Badge variant="outline" className="text-xs opacity-70">
                       {module.category}
                     </Badge>
                   </div>
                 </CardContent>
               </Card>
             ))}
+          </div>
+          
+          {/* Indicateur du nombre total */}
+          <div className="text-center mt-4">
+            <p className="text-xs text-muted-foreground">
+              {allModules.length} univers disponibles
+            </p>
           </div>
         </div>
       </div>
