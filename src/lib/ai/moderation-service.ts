@@ -1,8 +1,8 @@
 
 import { toast } from "@/hooks/use-toast";
-import { env } from "@/env.mjs";
+import { NODE_ENV } from "@/lib/env";
 
-const OPENAI_API_KEY = env.NEXT_PUBLIC_OPENAI_API_KEY;
+const OPENAI_API_KEY = ''; // Clé gérée côté serveur via Supabase Edge Functions
 
 export async function moderateText(input: string): Promise<boolean> {
   if (!OPENAI_API_KEY) {

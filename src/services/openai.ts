@@ -5,7 +5,7 @@
  * Ce service centralise toutes les interactions avec l'API OpenAI (GPT, DALL-E, etc.)
  * pour assurer une mise en œuvre cohérente, sécurisée et maintenable.
  */
-import { env } from '@/env.mjs';
+import { API_URL } from '@/lib/env';
 import { ChatMessage } from '@/types/chat';
 
 // Types
@@ -34,12 +34,15 @@ const DEFAULT_IMAGE_MODEL = 'dall-e-3';
 
 /**
  * Récupère la clé API OpenAI depuis les variables d'environnement
+ * NOTE: En production, les clés API sont gérées côté serveur via Supabase Edge Functions
  * @returns La clé API ou lance une erreur
  */
 function getApiKey(): string {
-  const key = env.NEXT_PUBLIC_OPENAI_API_KEY;
+  // En développement local, lire depuis les variables d'env
+  // En production, cette fonction ne sera pas utilisée (appels via Edge Functions)
+  const key = import.meta.env.VITE_OPENAI_API_KEY;
   if (!key) {
-    throw new Error('OpenAI API key is not set in environment variables');
+    throw new Error('OpenAI API key is not set. Use Supabase Edge Functions in production.');
   }
   return key;
 }

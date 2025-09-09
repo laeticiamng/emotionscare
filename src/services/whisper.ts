@@ -5,7 +5,7 @@
  * Ce service gère l'intégration avec l'API Whisper d'OpenAI pour la reconnaissance vocale.
  * Il permet de transcrire de l'audio en texte.
  */
-import { env } from '@/env.mjs';
+import { API_URL } from '@/lib/env';
 
 // Types pour les options de transcription
 export interface WhisperOptions {
@@ -48,9 +48,10 @@ export async function transcribeAudio(
   
   try {
     // Vérification de la clé API
-    const apiKey = env.NEXT_PUBLIC_OPENAI_API_KEY;
+    // NOTE: En production, utiliser Supabase Edge Functions
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error('OpenAI API key is not set in environment variables');
+      throw new Error('OpenAI API key is not set. Use Supabase Edge Functions in production.');
     }
 
     // Préparation du FormData pour l'upload

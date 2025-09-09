@@ -5,7 +5,7 @@
  * Ce service gère l'intégration avec les APIs de génération de musique.
  * Il utilise l'API MusicGen via un proxy sécurisé côté serveur.
  */
-import { env } from '@/env.mjs';
+import { API_URL } from '@/lib/env';
 import { AudioTrack } from '@/types/audio';
 
 // Types pour les options de génération
@@ -37,7 +37,7 @@ export interface MusicGenResult {
 }
 
 // URL de base pour l'API (à remplacer par le réel endpoint)
-const API_BASE_URL = env.NEXT_PUBLIC_API_URL + '/api/music-generation';
+const API_BASE_URL = API_URL + '/api/music-generation';
 
 /**
  * Vérifie la connectivité avec l'API MusicGen

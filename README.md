@@ -1,76 +1,111 @@
 # 🧠 EmotionsCare Platform
 
-Une plateforme de bien-être émotionnel alimentée par l'IA, construite avec React, TypeScript, et Supabase.
+Plateforme de bien-être émotionnel alimentée par l'IA, construite avec React, TypeScript et Supabase.
 
 ## 🚀 Démarrage rapide
 
 ### Prérequis
-- **Node.js** 20+ et **npm** 10+
-- Compte **Supabase** configuré
-- Clés API **OpenAI** et **Hume AI**
+- **Node.js** 20+ et **npm** 
+- Compte **Supabase** (pré-configuré)
+- Clés API optionnelles (**OpenAI**, **Hume AI** pour fonctionnalités avancées)
 
-### Installation
+### Installation en 3 étapes
 ```bash
-# Clone et install
+# 1. Clone et install
 git clone <repo-url>
 cd emotionscare-platform
 npm install
 
-# Configuration environnement
+# 2. Configuration (optionnel - fonctionne sans)
 cp .env.example .env.local
-# Éditer .env.local avec vos clés API
+# Éditer .env.local si vous voulez personnaliser
 
-# Lancement développement
+# 3. Lancement
 npm run dev
 ```
 
-## 📁 Structure du projet
+**Ça fonctionne immédiatement !** Le projet est pré-configuré avec Supabase.
+
+## 📁 Structure claire
 
 ```
 src/
-├── components/          # Composants UI réutilisables
-├── pages/              # Pages de l'application
-├── hooks/              # Custom React hooks
-├── contexts/           # React Context providers
-├── lib/                # Fonctions utilitaires
-├── services/           # Appels API et logique métier
-├── types/              # Définitions TypeScript
-├── core/               # État global et logique centrale
-├── data/               # Données statiques et mocks
-├── assets/             # Images, sons, fichiers statiques
-└── styles/             # Styles CSS globaux
+├── components/      # Composants UI réutilisables  
+├── pages/          # Pages de l'application
+├── hooks/          # Custom React hooks
+├── lib/            # Utilitaires & configuration
+├── services/       # Logique métier & API
+├── integrations/   # Supabase & services externes
+└── assets/         # Images, sons, fichiers
 ```
 
-## 🛠️ Scripts disponibles
+## 🛠️ Commandes essentielles
 
 ```bash
 # Développement
-npm run dev              # Serveur de développement
-npm run build           # Build de production
-npm run preview         # Prévisualisation du build
+npm run dev         # Serveur local (http://localhost:3000)
+npm run build       # Build production
+npm run preview     # Préview du build
 
-# Tests
-npm run test            # Tests unitaires
-npm run test:e2e        # Tests end-to-end
-npm run lint            # Vérification ESLint
-
-# Base de données
-npm run db:migrate      # Migrations Supabase
-npm run db:refresh:*    # Refresh des métriques
+# Qualité
+npm run lint        # Vérification code
+npm run format      # Formatage automatique  
+npm run test        # Tests unitaires
 ```
 
-## 📚 Documentation complète
+## 📚 Guides & Documentation
 
-- **[Guide de développement](./docs/DEVELOPMENT_SETUP.md)** - Configuration et outils
-- **[Guide de contribution](./CONTRIBUTING.md)** - Standards et processus
-- **Storybook** : `npm run storybook` - Interface des composants
+- **[Configuration développement](./docs/DEVELOPMENT_SETUP.md)** - Guide détaillé
+- **[Contribution](./CONTRIBUTING.md)** - Standards de code
+- **[Build de production](./docs/BUILD_CHECKLIST.md)** - Checklist déploiement
 
-## 🆘 Support
+## 🎯 Fonctionnalités principales
 
-- 🐛 **Issues GitHub** pour bugs  
-- 💬 **Discussions** pour questions
-- 📧 **Contact** : support@emotionscare.dev
+- **Interface moderne** - React 18 + TypeScript
+- **Backend intégré** - Supabase (auth, base de données, stockage)
+- **IA émotionnelle** - Analyse et recommandations personnalisées
+- **Design system** - Composants cohérents avec Tailwind CSS
+- **Performance** - Code splitting, lazy loading, optimisations
+
+## 🔧 Configuration avancée
+
+### Variables d'environnement (optionnelles)
+```bash
+# .env.local - Personnalisation optionnelle
+VITE_API_URL=https://votre-api.com           # URL API custom
+VITE_FIREBASE_API_KEY=votre_cle              # Intégration Firebase
+VITE_UPLOAD_MAX_SIZE=10485760               # Limite upload (10MB)
+```
+
+### Ajout de composants
+```bash
+# Nouveau composant UI
+src/components/MonComposant.tsx
+
+# Nouvelle page
+src/pages/MaPage.tsx  
+
+# Nouveau hook
+src/hooks/useMonHook.ts
+```
+
+## 🚀 Déploiement
+
+Le projet est prêt pour déploiement sur :
+- **Vercel** / **Netlify** (frontend)
+- **Supabase** (backend automatique)
+
+```bash
+npm run build       # Génère le dossier dist/
+npm run preview     # Test local du build
+```
+
+## 📞 Support
+
+- 🐛 **Issues GitHub** pour les bugs
+- 💬 **Discussions** pour les questions  
+- 📧 **Email** : support@emotionscare.dev
 
 ---
 
-**EmotionsCare** - L'intelligence artificielle au service de votre bien-être émotionnel 🧠💙
+**EmotionsCare** - L'IA au service de votre bien-être émotionnel 🧠💙

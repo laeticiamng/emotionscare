@@ -1,9 +1,9 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { env } from '@/lib/env-validation';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, IS_DEV } from '@/lib/env';
 
 // Client Supabase configuré avec validation d'environnement
-export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     storage: localStorage,
     persistSession: true,
@@ -23,7 +23,7 @@ export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
 });
 
 // Log de connexion en développement
-if (env.isDevelopment) {
+if (IS_DEV) {
   console.log('🔌 Supabase client initialized');
 }
 
