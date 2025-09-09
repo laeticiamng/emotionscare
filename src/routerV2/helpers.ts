@@ -58,7 +58,26 @@ export const Routes = {
   resetPassword: () => '/reset-password',
   logout: () => '/logout',
   
-  // Routes App B2C
+  // Routes App B2C - Interface Flat pour compatibilité
+  consumerHome: () => '/app/home',
+  scan: () => '/app/scan',
+  emotions: () => '/app/scan', // Redirige vers scan pour analyse émotions
+  coach: () => '/app/coach',
+  journal: () => '/app/journal',
+  music: () => '/app/music',
+  breath: () => '/app/breath',
+  activity: () => '/app/activity',
+  gamification: () => '/app/gamification',
+  vrBreath: () => '/app/vr-breath',
+  flashGlow: () => '/app/flash-glow',
+  community: () => '/app/social-cocon',
+  socialCoconB2C: () => '/app/social-cocon',
+  navigation: () => '/app/home', // Navigation vers dashboard
+  settings: () => '/app/settings',
+  settingsGeneral: () => '/app/settings',
+  profile: () => '/app/profile',
+  
+  // Routes App B2C - Interface Nested (rétrocompatibilité)
   app: {
     home: () => '/app/home',
     scan: () => '/app/scan',
@@ -70,6 +89,7 @@ export const Routes = {
     gamification: () => '/app/gamification',
     vrBreath: () => '/app/vr-breath',
     flashGlow: () => '/app/flash-glow',
+    socialCocon: () => '/app/social-cocon',
     settings: () => '/app/settings',
     profile: () => '/app/profile',
   },
