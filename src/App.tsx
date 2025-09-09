@@ -19,6 +19,14 @@ import NotFoundPage from './pages/NotFoundPage';
 import Point20Page from './pages/Point20Page';
 import GeneralPage from './pages/GeneralPage';
 import PrivacyPage from './pages/PrivacyPage';
+import DashboardPage from './pages/DashboardPage';
+import JournalPage from './pages/JournalPage';
+import MusicPage from './pages/MusicPage';
+import EmotionsPage from './pages/EmotionsPage';
+import MessagesPage from './pages/MessagesPage';
+import ProfilePage from './pages/ProfilePage';
+import CalendarPage from './pages/CalendarPage';
+import HelpPage from './pages/HelpPage';
 
 // Import des composants layout
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -55,8 +63,16 @@ function App() {
                             <Route path="/" element={<HomePage />} />
                             <Route path="/test" element={<TestPage />} />
                             <Route path="/point20" element={<Point20Page />} />
+                            <Route path="/dashboard" element={<DashboardPage />} />
+                            <Route path="/journal" element={<JournalPage />} />
+                            <Route path="/emotions" element={<EmotionsPage />} />
+                            <Route path="/music" element={<MusicPage />} />
+                            <Route path="/messages" element={<MessagesPage />} />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/calendar" element={<CalendarPage />} />
                             <Route path="/settings" element={<GeneralPage />} />
                             <Route path="/privacy" element={<PrivacyPage />} />
+                            <Route path="/help" element={<HelpPage />} />
                             <Route path="*" element={<NotFoundPage />} />
                           </Routes>
                         </main>

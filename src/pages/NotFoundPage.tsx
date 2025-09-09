@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
  */
 const NotFoundPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4" data-testid="page-root">
       <div className="max-w-md w-full text-center">
         {/* Illustration 404 */}
         <div className="mb-8">
           <div className="text-9xl font-bold text-primary/20 mb-4">404</div>
           <div className="text-muted-foreground text-lg">
-            Oups ! Cette page n'existe pas.
+            404 - Page introuvable
           </div>
         </div>
 
@@ -30,7 +30,7 @@ const NotFoundPage: React.FC = () => {
 
         {/* Actions de navigation */}
         <div className="space-y-4">
-          <Link to="/app/home" aria-label="Retour à l'accueil">
+          <Link to="/" aria-label="Retour à l'accueil">
             <Button size="lg" className="w-full">
               <Home className="w-4 h-4 mr-2" />
               Retour à l'accueil
@@ -56,14 +56,14 @@ const NotFoundPage: React.FC = () => {
           </p>
           <div className="space-y-2 text-sm">
             <Link 
-              to="/app/journal" 
+              to="/journal" 
               className="block text-primary hover:underline"
               aria-label="Aller au journal"
             >
               📝 Mon Journal
             </Link>
             <Link 
-              to="/app/music" 
+              to="/music" 
               className="block text-primary hover:underline"
               aria-label="Aller à la musique thérapeutique"
             >
