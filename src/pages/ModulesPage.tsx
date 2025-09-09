@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Music, MessageCircle, Brain, Zap, VolumeX, 
-  BookOpen, Puzzle, Settings, Play, Eye 
+  BookOpen, Puzzle, Settings, Play, Eye, 
+  TrendingUp, Target, Heart, Circle, Monitor
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -15,6 +16,12 @@ import { MusicModule } from '@/components/modules/MusicModule';
 import { SupportModule } from '@/components/modules/SupportModule';
 import { PredictiveAnalyticsModule } from '@/components/modules/PredictiveAnalyticsModule';
 import { OptimizationModule } from '@/components/modules/OptimizationModule';
+import { ScanModule } from '@/components/modules/ScanModule';
+import { JournalModule } from '@/components/modules/JournalModule';
+import { MoodMixerModule } from '@/components/modules/MoodMixerModule';
+import { RespirationModule } from '@/components/modules/RespirationModule';
+import { FlashGlowModule } from '@/components/modules/FlashGlowModule';
+import { BossGritModule } from '@/components/modules/BossGritModule';
 
 interface Module {
   id: string;
@@ -27,6 +34,25 @@ interface Module {
 }
 
 const modules: Module[] = [
+  // Core modules
+  {
+    id: 'scan',
+    name: 'Scan Émotionnel',
+    description: 'Analyse multi-modale de vos émotions en temps réel (texte, voix, facial)',
+    icon: Eye,
+    status: 'active',
+    category: 'core',
+    component: ScanModule
+  },
+  {
+    id: 'journal',
+    name: 'Journal Émotionnel',
+    description: 'Documentez vos émotions et suivez votre évolution personnelle',
+    icon: BookOpen,
+    status: 'active',
+    category: 'core',
+    component: JournalModule
+  },
   {
     id: 'music',
     name: 'Module Musical',
@@ -37,14 +63,16 @@ const modules: Module[] = [
     component: MusicModule
   },
   {
-    id: 'support',
-    name: 'Support & Assistance',
-    description: 'Assistant IA pour le support utilisateur et les questions fréquentes',
-    icon: MessageCircle,
+    id: 'respiration',
+    name: 'Respiration Guidée',
+    description: 'Exercices de respiration pour gérer le stress et améliorer votre bien-être',
+    icon: Play,
     status: 'active',
     category: 'core',
-    component: SupportModule
+    component: RespirationModule
   },
+
+  // AI-powered modules
   {
     id: 'analytics',
     name: 'Analytics Prédictives',
@@ -55,37 +83,122 @@ const modules: Module[] = [
     component: PredictiveAnalyticsModule
   },
   {
+    id: 'support',
+    name: 'Support & Assistance',
+    description: 'Assistant IA pour le support utilisateur et les questions fréquentes',
+    icon: MessageCircle,
+    status: 'active',
+    category: 'ai',
+    component: SupportModule
+  },
+
+  // Enhancement modules
+  {
+    id: 'mood-mixer',
+    name: 'Mood Mixer',
+    description: 'Mélangez et ajustez vos émotions pour créer l\'état d\'esprit parfait',
+    icon: Puzzle,
+    status: 'active',
+    category: 'enhancement',
+    component: MoodMixerModule
+  },
+  {
+    id: 'flash-glow',
+    name: 'Flash Glow',
+    description: 'Thérapie par la lumière pour stimuler votre bien-être émotionnel',
+    icon: Zap,
+    status: 'active',
+    category: 'enhancement',
+    component: FlashGlowModule
+  },
+  {
+    id: 'boss-grit',
+    name: 'Boss Grit',
+    description: 'Développez votre mental de leader avec des défis progressifs',
+    icon: Settings,
+    status: 'beta',
+    category: 'enhancement',
+    component: BossGritModule
+  },
+  {
     id: 'optimization',
     name: 'Optimisation Performance',
     description: 'Surveillance et optimisation en temps réel de l\'application',
-    icon: Zap,
+    icon: TrendingUp,
     status: 'active',
     category: 'enhancement',
     component: OptimizationModule
   },
+
+  // In development
   {
-    id: 'soundscape',
-    name: 'Paysages Sonores',
-    description: 'Ambiances sonores adaptatives pour améliorer l\'expérience utilisateur',
+    id: 'nyvee',
+    name: 'Nyvée',
+    description: 'Module de visualisation avancée et d\'immersion sensorielle',
+    icon: Eye,
+    status: 'inactive',
+    category: 'enhancement',
+    component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
+  },
+  {
+    id: 'ar',
+    name: 'Réalité Augmentée',
+    description: 'Expériences immersives en réalité augmentée pour le bien-être',
     icon: VolumeX,
     status: 'inactive',
     category: 'enhancement',
     component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
   },
   {
-    id: 'storytelling',
-    name: 'Storytelling',
-    description: 'Narration interactive et personnalisée basée sur les émotions',
+    id: 'ambition',
+    name: 'Ambition Tracker',
+    description: 'Suivi et optimisation de vos objectifs à long terme',
+    icon: Target,
+    status: 'inactive',
+    category: 'ai',
+    component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
+  },
+  {
+    id: 'bounce-back',
+    name: 'Bounce Back',
+    description: 'Techniques de résilience et de récupération émotionnelle',
+    icon: Heart,
+    status: 'inactive',
+    category: 'core',
+    component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
+  },
+  {
+    id: 'story-synth',
+    name: 'Story Synth',
+    description: 'Génération d\'histoires personnalisées basées sur vos émotions',
     icon: BookOpen,
     status: 'inactive',
     category: 'ai',
     component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
   },
   {
-    id: 'extensions',
-    name: 'Extensions',
-    description: 'Gestion des modules complémentaires et des intégrations tierces',
-    icon: Puzzle,
+    id: 'activity',
+    name: 'Activité Adaptative',
+    description: 'Recommandations d\'activités basées sur votre état émotionnel',
+    icon: Target,
+    status: 'inactive',
+    category: 'ai',
+    component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
+  },
+  {
+    id: 'auras',
+    name: 'Auras',
+    description: 'Visualisation et harmonisation de votre énergie personnelle',
+    icon: Circle,
+    status: 'inactive',
+    category: 'enhancement',
+    component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
+  },
+  {
+    id: 'screen-silk',
+    name: 'Screen Silk',
+    description: 'Interface adaptive qui s\'ajuste à votre état émotionnel',
+    icon: Monitor,
     status: 'inactive',
     category: 'enhancement',
     component: () => <div className="p-8 text-center text-muted-foreground">Module en développement</div>
