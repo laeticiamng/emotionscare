@@ -35,13 +35,33 @@ const SimpleLogin: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [status, setStatus] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { signIn, signUp, loading } = useSimpleAuth();
+  const { signIn, signUp, loading, isAuthenticated, user } = useSimpleAuth();
   const { logPageView, logUserAction, logError } = useObservability();
+
+  // Rediriger si déjà connecté
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('✅ Utilisateur déjà connecté, redirection...');
+      window.location.href = '/dashboard-simple';
+    }
+  }, [isAuthenticated, user]);
 
   // Log page view
   React.useEffect(() => {
     logPageView('login_page');
   }, [logPageView]);
+
+  // Ne pas afficher la page de login si l'utilisateur est connecté
+  if (isAuthenticated && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Redirection vers votre dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Fonction de connexion avec validation
   const handleLogin = async (e: React.FormEvent) => {
