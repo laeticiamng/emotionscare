@@ -9,7 +9,18 @@ import {
   Music, 
   Sparkles, 
   PenTool,
-  Zap
+  Zap,
+  MessageCircle,
+  Palette,
+  Volume2,
+  Eye,
+  Gamepad2,
+  Target,
+  Users,
+  Waves,
+  BookOpen,
+  BarChart3,
+  Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { clinicalScoringService } from '@/services/clinicalScoring';
@@ -97,11 +108,41 @@ const Home: React.FC = () => {
       Music,
       Sparkles,
       PenTool,
-      Zap
+      Zap,
+      MessageCircle,
+      Palette,
+      Volume2,
+      Eye,
+      Gamepad2,
+      Target,
+      Users,
+      Waves,
+      BookOpen,
+      BarChart3,
+      Settings
     };
     const IconComponent = icons[iconName as keyof typeof icons] || Wind;
     return <IconComponent className="w-6 h-6" />;
   };
+
+  // Tous les modules disponibles
+  const allModules = [
+    { id: 'breath', title: 'Respiration', subtitle: 'La Salle des Souffles', route: '/app/breath', icon: 'Wind', category: 'Bien-être' },
+    { id: 'scan', title: 'Scan émotionnel', subtitle: 'L\'Atelier des Reflets', route: '/app/scan', icon: 'Scan', category: 'Bien-être' },
+    { id: 'flash-glow', title: 'Flash Glow', subtitle: 'Le Dôme d\'Étincelles', route: '/app/flash-glow', icon: 'Zap', category: 'Bien-être' },
+    { id: 'music', title: 'Musique', subtitle: 'Le Studio des Ondes', route: '/app/music', icon: 'Music', category: 'Bien-être' },
+    { id: 'journal', title: 'Journal', subtitle: 'Le Jardin des Mots', route: '/app/journal', icon: 'PenTool', category: 'Expression' },
+    { id: 'mood-mixer', title: 'Mood Mixer', subtitle: 'Console des Humeurs', route: '/app/mood-mixer', icon: 'Palette', category: 'Expression' },
+    { id: 'coach', title: 'Coach IA', subtitle: 'Le Salon du Mentor', route: '/app/coach', icon: 'MessageCircle', category: 'Guidance' },
+    { id: 'boss-grit', title: 'Boss Grit', subtitle: 'La Forge Intérieure', route: '/app/boss-grit', icon: 'Target', category: 'Guidance' },
+    { id: 'ambition-arcade', title: 'Ambition Arcade', subtitle: 'Salle des Quêtes', route: '/app/ambition-arcade', icon: 'Gamepad2', category: 'Guidance' },
+    { id: 'bubble-beat', title: 'Bubble Beat', subtitle: 'L\'Océan des Bulles', route: '/app/bubble-beat', icon: 'Waves', category: 'Mouvement' },
+    { id: 'screen-silk', title: 'Screen Silk', subtitle: 'Le Voile de Soie', route: '/app/screen-silk', icon: 'Eye', category: 'Repos' },
+    { id: 'story-synth', title: 'Story Synth', subtitle: 'Bibliothèque Vivante', route: '/app/story-synth', icon: 'BookOpen', category: 'Repos' },
+    { id: 'vr-galaxy', title: 'VR Galaxy', subtitle: 'La Voûte Cosmique', route: '/app/vr-galaxy', icon: 'Sparkles', category: 'Immersion' },
+    { id: 'social-cocon', title: 'Social B2C', subtitle: 'La Place des Âmes', route: '/app/social-cocon', icon: 'Users', category: 'Partage' },
+    { id: 'activity', title: 'Mon Jardin', subtitle: 'Activité & Weekly', route: '/app/activity', icon: 'BarChart3', category: 'Suivi' },
+  ];
 
   const activeAura = getActiveAura();
 
@@ -199,22 +240,46 @@ const Home: React.FC = () => {
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex gap-3 justify-center pt-6">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/app/journal')}
-          >
-            Écrire 1 ligne
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/app/music')}
-          >
-            Musique douce
-          </Button>
+        {/* Tous les modules - Grille */}
+        <div className="pt-8">
+          <h2 className="text-lg font-medium text-foreground mb-4 text-center">
+            Tous les univers
+          </h2>
+          
+          <div className="grid grid-cols-2 gap-3">
+            {allModules.map((module) => (
+              <Card 
+                key={module.id}
+                className="hover:shadow-elegant transition-all duration-300 cursor-pointer group bg-card/90 backdrop-blur-sm border border-white/10 hover-scale"
+                onClick={() => navigate(module.route)}
+              >
+                <CardContent className="p-3">
+                  <div className="text-center">
+                    <div 
+                      className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-all duration-300 text-white"
+                      style={{
+                        background: `linear-gradient(135deg, ${homeUniverse.ambiance.colors.primary}90, ${homeUniverse.ambiance.colors.accent}60)`,
+                        boxShadow: `0 2px 12px ${homeUniverse.ambiance.colors.primary}30`
+                      }}
+                    >
+                      {getIcon(module.icon)}
+                    </div>
+                    
+                    <h3 className="text-sm font-medium text-foreground mb-1">
+                      {module.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-tight">
+                      {module.subtitle}
+                    </p>
+                    
+                    <Badge variant="outline" className="text-xs mt-2 opacity-70">
+                      {module.category}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
       </div>
