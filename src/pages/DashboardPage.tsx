@@ -23,6 +23,7 @@ import EmotionMeter from '@/components/features/EmotionMeter';
 import MoodChart from '@/components/features/MoodChart';
 import StatsOverview from '@/components/features/StatsOverview';
 import EmotionAnalyzer from '@/components/features/EmotionAnalyzer';
+import NotificationSystem from '@/components/features/NotificationSystem';
 
 const DashboardPage: React.FC = () => {
   const [emotionalData] = React.useState({
@@ -70,6 +71,9 @@ const DashboardPage: React.FC = () => {
 
       {/* Vue d'ensemble des statistiques */}
       <StatsOverview />
+
+      {/* Système de notifications */}
+      <NotificationSystem />
 
       {/* Analyseur d'émotions */}
       <EmotionAnalyzer />
