@@ -69,8 +69,8 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       console.log('🔄 Redirection immédiate vers dashboard...');
       
       // Redirection immédiate avec window.location
-      console.log('🔄 Redirection vers /dashboard-simple...');
-      window.location.href = '/dashboard-simple';
+      console.log('🔄 Redirection vers /app/home...');
+      window.location.href = '/app/home';
       
     } catch (error) {
       console.error('SignIn error:', error);
@@ -100,7 +100,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       // Navigate based on role
       setTimeout(() => {
-        const dashboardRoute = '/dashboard-simple'; // Route simple qui fonctionne toujours
+        const dashboardRoute = '/app/home'; // Dashboard principal
         
         console.log('🔄 Redirection vers:', dashboardRoute);
         

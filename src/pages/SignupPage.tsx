@@ -32,7 +32,7 @@ const SignupPage: React.FC = () => {
   // Redirection automatique si déjà connecté
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate('/dashboard-simple', { replace: true });
+      navigate('/app/home', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 

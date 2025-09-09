@@ -113,14 +113,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // APP DISPATCHER & DASHBOARDS
   // ═══════════════════════════════════════════════════════════
   {
-    name: 'dashboard-simple',
-    path: '/dashboard-simple',
-    segment: 'consumer',
-    layout: 'app',
-    component: 'DashboardSimple',
-    guard: false, // Accessible après connexion basique
-  },
-  {
     name: 'app-gate',
     path: '/app',
     segment: 'consumer',
@@ -545,14 +537,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'simple',
     component: 'TestPage',
-  },
-  {
-    name: 'dashboard-simple',
-    path: '/dashboard-simple',
-    segment: 'public',
-    layout: 'simple',
-    component: 'DashboardSimple',
-    guard: false,
   },
   {
     name: 'journal-legacy',

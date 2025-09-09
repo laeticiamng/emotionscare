@@ -29,7 +29,7 @@ const SimpleLogin: React.FC = () => {
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       console.log('✅ Utilisateur déjà connecté, redirection...');
-      navigate('/dashboard-simple', { replace: true });
+      navigate('/app/home', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
