@@ -23,7 +23,6 @@ import {
   Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { clinicalScoringService } from '@/services/clinicalScoring';
 import { useRewards } from '@/hooks/useRewards';
 import { UniversePortal } from '@/components/universe/UniversePortal';
 import { UniverseAmbiance } from '@/components/universe/UniverseAmbiance';
@@ -48,10 +47,7 @@ const Home: React.FC = () => {
 
   const loadDayPlan = async () => {
     try {
-      // Get suggestions from clinical scoring cache
-      const suggestion = await clinicalScoringService.getUISuggestion('plan-du-jour');
-      
-      // Default cards if no specific suggestions
+      // Default cards without external service dependency
       const defaultCards: DayPlanCard[] = [
         {
           id: 'breath',
@@ -125,7 +121,7 @@ const Home: React.FC = () => {
     return <IconComponent className="w-6 h-6" />;
   };
 
-  // Tous les modules disponibles
+  // Tous les 15 modules disponibles
   const allModules = [
     { id: 'breath', title: 'Respiration', subtitle: 'La Salle des Souffles', route: '/app/breath', icon: 'Wind', category: 'Bien-être' },
     { id: 'scan', title: 'Scan émotionnel', subtitle: 'L\'Atelier des Reflets', route: '/app/scan', icon: 'Scan', category: 'Bien-être' },
@@ -240,7 +236,7 @@ const Home: React.FC = () => {
           ))}
         </div>
 
-        {/* Tous les modules - Grille */}
+        {/* Tous les modules - Grille avec 15 modules */}
         <div className="pt-8">
           <h2 className="text-lg font-medium text-foreground mb-4 text-center">
             Tous les univers
@@ -284,10 +280,10 @@ const Home: React.FC = () => {
             ))}
           </div>
           
-          {/* Indicateur du nombre total */}
+          {/* Indicateur du nombre total avec confirmation des 15 modules */}
           <div className="text-center mt-4">
             <p className="text-xs text-muted-foreground">
-              {allModules.length} univers disponibles
+              ✅ {allModules.length} univers disponibles
             </p>
           </div>
         </div>

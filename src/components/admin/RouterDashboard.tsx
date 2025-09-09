@@ -179,17 +179,37 @@ export default function RouterDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild className="w-full">
-                  <Link to="/dev/component-audit">
-                    Vérifier les composants
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                  </Link>
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">
-                  • Existence des fichiers<br/>
-                  • Mapping des composants<br/>
-                  • Détection des manquants
-                </p>
+              <Button asChild className="w-full">
+                <Link to="/dev/complete-audit">
+                  Audit Complet des 90 Composants
+                  <ExternalLink className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                • Vérification exhaustive<br/>
+                • Détection des manquants<br/>
+                • Rapport détaillé avec export
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 hover:border-primary/50 transition-colors">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Rapport Final
+              </CardTitle>
+              <CardDescription>
+                Résumé complet de la vérification des composants
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full" variant="outline">
+                <Link to="/dev/final-report">
+                  Voir le Rapport Final
+                  <ExternalLink className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
               </CardContent>
             </Card>
           </div>

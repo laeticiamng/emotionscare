@@ -138,6 +138,8 @@ const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 const RouterAuditPage = lazy(() => import('@/pages/RouterAuditPage'));
 const ComponentAuditPage = lazy(() => import('@/pages/ComponentAuditPage'));
 const RouterDashboardPage = lazy(() => import('@/pages/RouterDashboardPage'));
+const CompleteComponentAuditPage = lazy(() => import('@/pages/CompleteComponentAuditPage'));
+const FinalComponentReportPage = lazy(() => import('@/pages/FinalComponentReportPage'));
 
 // Composants de redirection  
 const RedirectToScan = lazy(() => import('@/components/redirects/RedirectToScan'));
@@ -269,6 +271,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RouterAuditPage,
   ComponentAuditPage,
   RouterDashboardPage,
+  CompleteComponentAuditPage,
+  FinalComponentReportPage,
   
   // Composants de redirection
   RedirectToScan,
