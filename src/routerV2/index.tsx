@@ -143,6 +143,7 @@ const RedirectToScan = lazy(() => import('@/components/redirects/RedirectToScan'
 const RedirectToJournal = lazy(() => import('@/components/redirects/RedirectToJournal'));
 const RedirectToSocialCocon = lazy(() => import('@/components/redirects/RedirectToSocialCocon'));
 const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectToEntreprise'));
+const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusic'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -258,6 +259,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToJournal, 
   RedirectToSocialCocon,
   RedirectToEntreprise,
+  RedirectToMusic,
 };
 
 // ═══════════════════════════════════════════════════════════

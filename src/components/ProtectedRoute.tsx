@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { routes } from '@/routerV2';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -40,11 +40,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (!rolesToCheck.includes(userRole)) {
       // Rediriger vers le dashboard approprié selon le rôle
       const dashboardMap: Record<string, string> = {
-        'b2c': '/b2c/dashboard',
-        'b2b_user': '/b2b/user/dashboard', 
-        'b2b_admin': '/b2b/admin/dashboard'
+        'b2c': routes.b2c.dashboard(),
+        'b2b_user': routes.b2b.user.dashboard(), 
+        'b2b_admin': routes.b2b.admin.dashboard()
       };
-      return <Navigate to={dashboardMap[userRole] || '/choose-mode'} replace />;
+      return <Navigate to={dashboardMap[userRole] || routes.special.chooseMode()} replace />;
     }
   }
 

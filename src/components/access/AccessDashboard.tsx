@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,101 +49,121 @@ const AccessDashboard: React.FC = () => {
       // Dashboards
       {
         path: routes.b2c.dashboard(),
+        name: 'Dashboard B2C',
+        description: 'Espace personnel utilisateur',
+        accessible: isAuthenticated && (currentMode === 'b2c' || currentRole === 'b2c'),
+        reason: !isAuthenticated ? 'Connexion requise' : currentMode !== 'b2c' ? 'Rôle B2C requis' : undefined,
+        category: 'core'
       },
       {
-        id: 'employee-dashboard',
+        path: routes.b2b.user.dashboard(),
         name: 'Dashboard Employé',
         description: 'Espace collaborateur B2B',
-        path: routes.b2b.user.dashboard(),
+        accessible: isAuthenticated && (currentMode === 'b2b_user' || currentRole === 'b2b_user'),
+        reason: !isAuthenticated ? 'Connexion requise' : currentMode !== 'b2b_user' ? 'Rôle employé requis' : undefined,
+        category: 'b2b'
       },
       {
-        id: 'manager-dashboard', 
+        path: routes.b2b.admin.dashboard(),
         name: 'Dashboard Manager',
         description: 'Espace de pilotage RH',
-        path: routes.b2b.admin.dashboard(),
-      }
-    ],
-  },
-  {
-    category: 'Features B2C',
-    description: 'Fonctionnalités pour utilisateurs individuels',
-    routes: [
+        accessible: isAuthenticated && (currentMode === 'b2b_admin' || currentRole === 'b2b_admin'),
+        reason: !isAuthenticated ? 'Connexion requise' : currentMode !== 'b2b_admin' ? 'Rôle administrateur requis' : undefined,
+        category: 'admin'
+      },
+
+      // Features B2C
       {
-        id: 'scan',
+        path: routes.b2c.scan(),
         name: 'Scanner Émotionnel',
         description: 'Analyse des émotions instantanée',
-        path: routes.b2c.scan(),
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
       },
       {
-        id: 'music',
+        path: routes.b2c.music(),
         name: 'Musicothérapie',
         description: 'Sons apaisants personnalisés',
-        path: routes.b2c.music(),
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
       },
       {
-        id: 'coach',
+        path: routes.b2c.coach(),
         name: 'Coach IA',
         description: 'Accompagnement personnalisé',
-        path: routes.b2c.coach(),
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
       },
       {
-        id: 'journal',
+        path: routes.b2c.journal(),
         name: 'Journal Personnel',
         description: 'Réflexion et suivi humeurs',
-        path: routes.b2c.journal(),
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
       },
       {
-        id: 'vr',
+        path: routes.b2c.vr(),
         name: 'Réalité Virtuelle',
         description: 'Expériences immersives',
-        path: routes.b2c.vr(),
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
       },
       {
-        id: 'leaderboard',
+        path: routes.b2c.bossLevel(),
         name: 'Gamification Douce',
         description: 'Progression bienveillante',
-        path: routes.b2c.bossLevel(),
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
       },
       {
-        id: 'social-cocon',
+        path: routes.b2c.community(),
         name: 'Social Cocoon',
         description: 'Communauté sécurisée',
-        path: routes.b2c.community(),
-      }
-    ],
-  },
-  {
-    category: 'Features B2B',
-    description: 'Fonctionnalités organisationnelles',
-    routes: [
+        accessible: isAuthenticated,
+        reason: !isAuthenticated ? 'Connexion requise' : undefined,
+        category: 'feature'
+      },
+
+      // Features B2B
       {
-        id: 'teams',
+        path: routes.b2b.teams(),
         name: 'Gestion Équipes',
         description: 'Collaboration et bien-être collectif',
-        path: routes.b2b.teams(),
+        accessible: isAuthenticated && (currentRole === 'b2b_admin' || currentRole === 'b2b_user'),
+        reason: !isAuthenticated ? 'Connexion requise' : 'Rôle B2B requis',
+        category: 'b2b'
       },
       {
-        id: 'reports',
+        path: routes.b2b.reports(),
         name: 'Rapports Agrégés',
         description: 'Analytics anonymisés',
-        path: routes.b2b.reports(),
+        accessible: isAuthenticated && (currentRole === 'b2b_admin' || currentRole === 'b2b_user'),
+        reason: !isAuthenticated ? 'Connexion requise' : 'Rôle B2B requis',
+        category: 'b2b'
       },
       {
-        id: 'events',
+        path: routes.b2b.events(),
         name: 'Événements Bien-être',
         description: 'Organisation activités',
-        path: routes.b2b.events(),
+        accessible: isAuthenticated && (currentRole === 'b2b_admin' || currentRole === 'b2b_user'),
+        reason: !isAuthenticated ? 'Connexion requise' : 'Rôle B2B requis',
+        category: 'b2b'
       },
       {
-        id: 'optimization',
+        path: routes.b2b.admin.analytics(),
         name: 'Optimisation RH',
         description: 'Amélioration continue',
-        path: routes.b2b.admin.analytics(),
+        accessible: isAuthenticated && currentRole === 'b2b_admin',
+        reason: !isAuthenticated ? 'Connexion requise' : currentRole !== 'b2b_admin' ? 'Rôle administrateur requis' : undefined,
+        category: 'admin'
       },
       {
-        id: 'settings',
-        name: 'Paramètres Entreprise',
-        description: 'Configuration organisationnelle',
         path: routes.b2c.settings(),
         name: 'Paramètres',
         description: 'Configuration système',
