@@ -801,11 +801,27 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: true,
     },
     {
+      name: 'router-dashboard',
+      path: '/dev/router',
+      segment: 'public',
+      layout: 'app',
+      component: 'RouterDashboardPage',
+      guard: false,
+    },
+    {
       name: 'router-audit',
       path: '/dev/router-audit',
       segment: 'public',
       layout: 'app',
       component: 'RouterAuditPage',
+      guard: false,
+    },
+    {
+      name: 'component-audit',
+      path: '/dev/component-audit',
+      segment: 'public',
+      layout: 'app',
+      component: 'ComponentAuditPage',
       guard: false,
     },
   // Routes de debug supprimées (pages orphelines nettoyées)
