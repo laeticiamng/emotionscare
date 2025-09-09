@@ -6,7 +6,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -30,7 +29,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     let mounted = true;
@@ -78,7 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           case 'SIGNED_OUT':
             console.log('Utilisateur déconnecté');
             // Rediriger vers la page de connexion
-            navigate('/login');
+            window.location.href = '/login';
             break;
           case 'TOKEN_REFRESHED':
             console.log('Token rafraîchi');
@@ -94,7 +92,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       mounted = false;
       subscription?.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const signUp = async (email: string, password: string, metadata = {}) => {
     setIsLoading(true);
