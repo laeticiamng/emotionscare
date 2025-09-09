@@ -626,7 +626,5 @@ const B2CProfileSettingsPage: React.FC = () => {
     </PageRoot>
   );
 };
-  );
-};
 
 export default B2CProfileSettingsPage;
