@@ -1,5 +1,10 @@
 
-import React from 'react';
+/**
+ * ABOUT PAGE - EMOTIONSCARE
+ * Page À propos accessible WCAG 2.1 AA
+ */
+
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +30,18 @@ import { useNavigate } from 'react-router-dom';
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
+
+  // Focus management pour l'accessibilité
+  useEffect(() => {
+    document.title = "À Propos | EmotionsCare - Intelligence émotionnelle";
+  }, []);
+
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action();
+    }
+  };
 
   const values = [
     {
@@ -108,61 +125,97 @@ const AboutPage: React.FC = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="page-root">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+    <>
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
+        tabIndex={0}
       >
-        {/* Hero Section */}
-        <div className="text-center mb-16">
+        Aller au contenu principal
+      </a>
+
+      <div className="container mx-auto px-4 py-8 max-w-7xl" data-testid="page-root">
+        <main id="main-content" role="main">
           <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              À Propos d'EmotionsCare
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Nous révolutionnons le bien-être émotionnel grâce à l'intelligence artificielle, 
-              en créant un monde où chacun peut comprendre, gérer et améliorer sa santé mentale.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                size="lg" 
-                onClick={() => navigate('/auth')}
-                className="bg-gradient-to-r from-primary to-purple-600"
+            {/* Hero Section */}
+            <section className="text-center mb-16" aria-labelledby="hero-title">
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5 }}
               >
-                Commencer Gratuitement
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => navigate('/contact')}
-              >
-                Nous Contacter
-              </Button>
-            </div>
-          </motion.div>
-        </div>
+                <h1 
+                  id="hero-title"
+                  className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent"
+                >
+                  À Propos d'EmotionsCare
+                </h1>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                  Nous révolutionnons le bien-être émotionnel grâce à l'intelligence artificielle, 
+                  en créant un monde où chacun peut comprendre, gérer et améliorer sa santé mentale.
+                </p>
+                <nav aria-label="Actions principales" className="flex flex-wrap justify-center gap-4">
+                  <Button 
+                    size="lg" 
+                    onClick={() => navigate('/auth')}
+                    onKeyDown={(e) => handleKeyDown(e, () => navigate('/auth'))}
+                    className="bg-gradient-to-r from-primary to-purple-600 focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    aria-label="Commencer gratuitement avec EmotionsCare"
+                    tabIndex={0}
+                  >
+                    Commencer Gratuitement
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => navigate('/contact')}
+                    onKeyDown={(e) => handleKeyDown(e, () => navigate('/contact'))}
+                    className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    aria-label="Contacter l'équipe EmotionsCare"
+                    tabIndex={0}
+                  >
+                    Nous Contacter
+                  </Button>
+                </nav>
+              </motion.div>
+            </section>
 
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
-        >
-          {stats.map((stat, index) => (
-            <Card key={index} className="text-center">
-              <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </motion.div>
+            {/* Stats Section */}
+            <section 
+              className="mb-16"
+              aria-labelledby="stats-title"
+            >
+              <h2 id="stats-title" className="sr-only">Statistiques de performance</h2>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="grid grid-cols-2 md:grid-cols-4 gap-6"
+                role="group"
+                aria-label="Statistiques d'utilisation EmotionsCare"
+              >
+                {stats.map((stat, index) => (
+                  <article key={index}>
+                    <Card className="text-center">
+                      <CardContent className="pt-6">
+                        <div 
+                          className="text-3xl font-bold text-primary mb-2"
+                          aria-label={`${stat.number} ${stat.label}`}
+                        >
+                          {stat.number}
+                        </div>
+                        <div className="text-sm text-muted-foreground">{stat.label}</div>
+                      </CardContent>
+                    </Card>
+                  </article>
+                ))}
+              </motion.div>
+            </section>
 
         {/* Mission Section */}
         <motion.div
@@ -213,41 +266,49 @@ const AboutPage: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* Values Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mb-16"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Nos Valeurs</h2>
-            <p className="text-lg text-muted-foreground">
-              Les principes qui guident chacune de nos décisions et innovations
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => (
+            {/* Values Section */}
+            <section 
+              className="mb-16"
+              aria-labelledby="values-title"
+            >
               <motion.div
-                key={index}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
               >
-                <Card className="h-full text-center hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="mx-auto p-3 bg-primary/10 rounded-full w-fit mb-4">
-                      <value.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{value.description}</p>
-                  </CardContent>
-                </Card>
+                <header className="text-center mb-12">
+                  <h2 id="values-title" className="text-3xl font-bold mb-4">Nos Valeurs</h2>
+                  <p className="text-lg text-muted-foreground">
+                    Les principes qui guident chacune de nos décisions et innovations
+                  </p>
+                </header>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {values.map((value, index) => (
+                    <motion.article
+                      key={index}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card className="h-full text-center hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                          <div 
+                            className="mx-auto p-3 bg-primary/10 rounded-full w-fit mb-4"
+                            role="img"
+                            aria-label={`Icône ${value.title}`}
+                          >
+                            <value.icon className="h-6 w-6 text-primary" aria-hidden="true" />
+                          </div>
+                          <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">{value.description}</p>
+                        </CardContent>
+                      </Card>
+                    </motion.article>
+                  ))}
+                </div>
               </motion.div>
-            ))}
-          </div>
-        </motion.div>
+            </section>
 
         {/* Features Section */}
         <motion.div
@@ -348,45 +409,56 @@ const AboutPage: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4 }}
-          className="text-center"
-        >
-          <Card className="bg-gradient-to-r from-primary/10 to-purple-500/10 border-primary/20">
-            <CardContent className="py-12">
-              <h2 className="text-3xl font-bold mb-4">
-                Prêt à Transformer Votre Bien-être ?
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Rejoignez des milliers d'utilisateurs qui ont déjà commencé leur parcours 
-                vers un meilleur équilibre émotionnel avec EmotionsCare.
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button 
-                  size="lg"
-                  onClick={() => navigate('/auth')}
-                  className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Commencer Maintenant
-                </Button>
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate('/help')}
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Poser une Question
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
-    </div>
+            {/* CTA Section */}
+            <section aria-labelledby="cta-title">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+                className="text-center"
+              >
+                <Card className="bg-gradient-to-r from-primary/10 to-purple-500/10 border-primary/20">
+                  <CardContent className="py-12">
+                    <h2 id="cta-title" className="text-3xl font-bold mb-4">
+                      Prêt à Transformer Votre Bien-être ?
+                    </h2>
+                    <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                      Rejoignez des milliers d'utilisateurs qui ont déjà commencé leur parcours 
+                      vers un meilleur équilibre émotionnel avec EmotionsCare.
+                    </p>
+                    <nav aria-label="Actions finales" className="flex flex-wrap justify-center gap-4">
+                      <Button 
+                        size="lg"
+                        onClick={() => navigate('/auth')}
+                        onKeyDown={(e) => handleKeyDown(e, () => navigate('/auth'))}
+                        className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        aria-label="Commencer maintenant avec EmotionsCare"
+                        tabIndex={0}
+                      >
+                        <Zap className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Commencer Maintenant
+                      </Button>
+                      <Button 
+                        size="lg"
+                        variant="outline"
+                        onClick={() => navigate('/help')}
+                        onKeyDown={(e) => handleKeyDown(e, () => navigate('/help'))}
+                        className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        aria-label="Poser une question à l'équipe EmotionsCare"
+                        tabIndex={0}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Poser une Question
+                      </Button>
+                    </nav>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </section>
+          </motion.div>
+        </main>
+      </div>
+    </>
   );
 };
 

@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+/**
+ * ONBOARDING PAGE - EMOTIONSCARE
+ * Page d'onboarding accessible WCAG 2.1 AA
+ */
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +22,18 @@ const OnboardingPage: React.FC = () => {
     preferences: [] as string[],
     notifications: true
   });
+
+  // Focus management pour l'accessibilité
+  useEffect(() => {
+    document.title = `Onboarding - Étape ${currentStep + 1} sur ${steps.length} | EmotionsCare`;
+  }, [currentStep]);
+
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action();
+    }
+  };
 
   const steps = [
     {
@@ -118,34 +135,61 @@ const OnboardingPage: React.FC = () => {
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl">
-        {/* En-tête avec progression */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Heart className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold text-gray-900">EmotionsCare</h1>
-          </div>
-          <Progress value={progress} className="w-full mb-4" />
-          <p className="text-gray-600">Étape {currentStep + 1} sur {steps.length}</p>
-        </div>
+    <>
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
+        tabIndex={0}
+      >
+        Aller au contenu principal
+      </a>
 
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Card className="shadow-xl">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                {React.createElement(steps[currentStep].icon, { className: "w-8 h-8 text-purple-600" })}
-              </div>
-              <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
-              <p className="text-gray-600">{steps[currentStep].description}</p>
-            </CardHeader>
-            <CardContent className="space-y-6">
+      <div 
+        className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center p-6" 
+        data-testid="page-root"
+      >
+        <main id="main-content" role="main" className="w-full max-w-2xl">
+          {/* En-tête avec progression */}
+          <header className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Heart className="w-8 h-8 text-purple-600" aria-hidden="true" />
+              <h1 className="text-3xl font-bold text-gray-900">EmotionsCare</h1>
+            </div>
+            <div 
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Progression de l'onboarding: ${Math.round(progress)}%`}
+            >
+              <Progress value={progress} className="w-full mb-4" />
+            </div>
+            <p className="text-gray-600">
+              Étape {currentStep + 1} sur {steps.length}
+            </p>
+          </header>
+
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="shadow-xl">
+              <CardHeader className="text-center">
+                <div 
+                  className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  role="img"
+                  aria-label={`Icône étape ${steps[currentStep].title}`}
+                >
+                  {React.createElement(steps[currentStep].icon, { className: "w-8 h-8 text-purple-600", "aria-hidden": "true" })}
+                </div>
+                <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
+                <p className="text-gray-600">{steps[currentStep].description}</p>
+              </CardHeader>
+              <CardContent className="space-y-6">
               
               {/* Étape Bienvenue */}
               {steps[currentStep].id === 'welcome' && (
@@ -183,65 +227,87 @@ const OnboardingPage: React.FC = () => {
 
               {/* Étape Objectifs */}
               {steps[currentStep].id === 'goals' && (
-                <div className="space-y-4">
-                  <p className="text-center text-gray-600 mb-6">
-                    Sélectionnez les domaines que vous souhaitez améliorer (plusieurs choix possibles)
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {goals.map((goal) => (
-                      <div
-                        key={goal.id}
-                        onClick={() => handleGoalToggle(goal.id)}
-                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          userProfile.goals.includes(goal.id)
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-200 hover:border-purple-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-2xl">{goal.icon}</span>
-                          <h3 className="font-semibold">{goal.label}</h3>
-                          {userProfile.goals.includes(goal.id) && (
-                            <Check className="w-5 h-5 text-purple-600 ml-auto" />
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">{goal.description}</p>
+                <section aria-labelledby="goals-title">
+                  <h2 id="goals-title" className="sr-only">Sélection des objectifs de bien-être</h2>
+                  <div className="space-y-4">
+                    <p className="text-center text-gray-600 mb-6">
+                      Sélectionnez les domaines que vous souhaitez améliorer (plusieurs choix possibles)
+                    </p>
+                    <fieldset>
+                      <legend className="sr-only">Objectifs de bien-être disponibles</legend>
+                      <div className="grid md:grid-cols-2 gap-4" role="group" aria-labelledby="goals-title">
+                        {goals.map((goal) => (
+                          <div
+                            key={goal.id}
+                            onClick={() => handleGoalToggle(goal.id)}
+                            onKeyDown={(e) => handleKeyDown(e, () => handleGoalToggle(goal.id))}
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                              userProfile.goals.includes(goal.id)
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-purple-300'
+                            }`}
+                            role="checkbox"
+                            aria-checked={userProfile.goals.includes(goal.id)}
+                            tabIndex={0}
+                            aria-describedby={`goal-${goal.id}-desc`}
+                          >
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-2xl" role="img" aria-label={`Icône ${goal.label}`}>{goal.icon}</span>
+                              <h3 className="font-semibold">{goal.label}</h3>
+                              {userProfile.goals.includes(goal.id) && (
+                                <Check className="w-5 h-5 text-purple-600 ml-auto" aria-label="Sélectionné" />
+                              )}
+                            </div>
+                            <p id={`goal-${goal.id}-desc`} className="text-sm text-gray-600">{goal.description}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </fieldset>
                   </div>
-                </div>
+                </section>
               )}
 
               {/* Étape Expérience */}
               {steps[currentStep].id === 'experience' && (
-                <div className="space-y-4">
-                  <p className="text-center text-gray-600 mb-6">
-                    Quel est votre niveau d'expérience avec les pratiques de bien-être mental ?
-                  </p>
-                  <div className="space-y-3">
-                    {experienceLevels.map((level) => (
-                      <div
-                        key={level.id}
-                        onClick={() => setUserProfile(prev => ({ ...prev, experience: level.id }))}
-                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          userProfile.experience === level.id
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-200 hover:border-purple-300'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold">{level.label}</h3>
-                            <p className="text-sm text-gray-600">{level.description}</p>
+                <section aria-labelledby="experience-title">
+                  <h2 id="experience-title" className="sr-only">Sélection du niveau d'expérience</h2>
+                  <div className="space-y-4">
+                    <p className="text-center text-gray-600 mb-6">
+                      Quel est votre niveau d'expérience avec les pratiques de bien-être mental ?
+                    </p>
+                    <fieldset>
+                      <legend className="sr-only">Niveaux d'expérience disponibles</legend>
+                      <div className="space-y-3" role="radiogroup" aria-labelledby="experience-title">
+                        {experienceLevels.map((level) => (
+                          <div
+                            key={level.id}
+                            onClick={() => setUserProfile(prev => ({ ...prev, experience: level.id }))}
+                            onKeyDown={(e) => handleKeyDown(e, () => setUserProfile(prev => ({ ...prev, experience: level.id })))}
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                              userProfile.experience === level.id
+                                ? 'border-purple-500 bg-purple-50'
+                                : 'border-gray-200 hover:border-purple-300'
+                            }`}
+                            role="radio"
+                            aria-checked={userProfile.experience === level.id}
+                            tabIndex={userProfile.experience === level.id ? 0 : -1}
+                            aria-describedby={`level-${level.id}-desc`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="font-semibold">{level.label}</h3>
+                                <p id={`level-${level.id}-desc`} className="text-sm text-gray-600">{level.description}</p>
+                              </div>
+                              {userProfile.experience === level.id && (
+                                <Check className="w-5 h-5 text-purple-600" aria-label="Sélectionné" />
+                              )}
+                            </div>
                           </div>
-                          {userProfile.experience === level.id && (
-                            <Check className="w-5 h-5 text-purple-600" />
-                          )}
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    </fieldset>
                   </div>
-                </div>
+                </section>
               )}
 
               {/* Étape Préférences */}
@@ -277,16 +343,20 @@ const OnboardingPage: React.FC = () => {
               )}
 
               {/* Boutons de navigation */}
-              <div className="flex justify-between pt-6">
+              <nav aria-label="Navigation de l'onboarding" className="flex justify-between pt-6">
                 <Button
                   variant="outline"
                   onClick={prevStep}
+                  onKeyDown={(e) => handleKeyDown(e, prevStep)}
                   disabled={currentStep === 0}
+                  className="focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  aria-label="Étape précédente"
+                  tabIndex={0}
                 >
                   Précédent
                 </Button>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2" role="status" aria-label="Résumé des sélections">
                   {userProfile.goals.length > 0 && (
                     <Badge variant="secondary">
                       {userProfile.goals.length} objectif{userProfile.goals.length > 1 ? 's' : ''}
@@ -301,19 +371,26 @@ const OnboardingPage: React.FC = () => {
 
                 <Button
                   onClick={nextStep}
+                  onKeyDown={(e) => handleKeyDown(e, nextStep)}
                   disabled={!isStepValid()}
-                  className="bg-purple-600 hover:bg-purple-700"
+                  className="bg-purple-600 hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  aria-label={currentStep === steps.length - 1 ? 'Terminer l\'onboarding' : 'Étape suivante'}
+                  tabIndex={0}
                 >
                   {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
                 </Button>
-              </div>
+              </nav>
             </CardContent>
           </Card>
         </motion.div>
 
         {/* Indicateurs d'étapes */}
-        <div className="flex justify-center gap-2 mt-8">
+        <nav 
+          className="flex justify-center gap-2 mt-8"
+          aria-label="Indicateur de progression des étapes"
+          role="tablist"
+        >
           {steps.map((_, index) => (
             <div
               key={index}
@@ -324,11 +401,15 @@ const OnboardingPage: React.FC = () => {
                   ? 'bg-purple-400'
                   : 'bg-gray-300'
               }`}
+              role="tab"
+              aria-selected={index === currentStep}
+              aria-label={`Étape ${index + 1}${index === currentStep ? ' (actuelle)' : index < currentStep ? ' (terminée)' : ' (à venir)'}`}
             />
           ))}
-        </div>
-      </div>
+        </nav>
+      </main>
     </div>
+  </>
   );
 };
 

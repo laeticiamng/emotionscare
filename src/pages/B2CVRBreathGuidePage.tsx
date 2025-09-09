@@ -1,7 +1,6 @@
 /**
- * B2C VR Breath - Le fil d'Ariane respiratoire
- * Pitch : Tu suis une lueur qui te met au bon rythme sans t'épuiser.
- * Boucle cœur : Mise en place → 6–8 min de pacing → étiquette "élevée / ok / à retravailler".
+ * B2C VR BREATH GUIDE PAGE - EMOTIONSCARE
+ * Page VR respiration accessible WCAG 2.1 AA
  */
 
 import React, { useState, useEffect } from 'react';
@@ -35,6 +34,18 @@ export default function B2CVRBreathGuidePage() {
   const [phaseTime, setPhaseTime] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [rating, setRating] = useState<'élevée' | 'ok' | 'à retravailler' | null>(null);
+
+  // Focus management pour l'accessibilité
+  useEffect(() => {
+    document.title = "VR Breath - Respiration guidée | EmotionsCare";
+  }, []);
+
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action();
+    }
+  };
 
   // Gestion des phases de respiration
   useEffect(() => {
@@ -156,71 +167,100 @@ export default function B2CVRBreathGuidePage() {
   const phaseProgress = (phaseTime / getCurrentPhaseDuration()) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-blue/5 to-background p-4">
-      <div className="max-w-md mx-auto pt-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-2xl font-semibold text-foreground mb-2">
-            VR Breath
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Le fil d'Ariane respiratoire
-          </p>
-          
-          {/* VR Toggle */}
-          <div className="flex items-center justify-center mt-4 space-x-2">
-            <Button
-              onClick={() => setIsVRMode(!isVRMode)}
-              variant="outline"
-              size="sm"
-              className={isVRMode ? 'bg-primary/20 border-primary' : ''}
-            >
-              {isVRMode ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
-              {isVRMode ? 'VR Activé' : 'Mode 2D'}
-            </Button>
-          </div>
-        </motion.div>
+    <>
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
+        tabIndex={0}
+      >
+        Aller au contenu principal
+      </a>
 
-        {/* Session Setup */}
-        {!isActive && !sessionComplete && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="space-y-6"
+      <div className="min-h-screen bg-gradient-to-br from-background via-blue/5 to-background p-4" data-testid="page-root">
+        <main id="main-content" role="main" className="max-w-md mx-auto pt-8">
+          {/* Header */}
+          <motion.header
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
           >
-            <Card className="p-6">
-              <div className="text-center space-y-4">
-                <h3 className="text-lg font-semibold text-foreground">
-                  Session {Math.floor(session.duration / 60)} minutes
-                </h3>
-                
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div className="text-center">
-                    <div className="text-blue-500 font-medium">{session.inhaleTime}s</div>
-                    <div className="text-muted-foreground">Inspire</div>
+            <h1 className="text-2xl font-semibold text-foreground mb-2">
+              VR Breath
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Le fil d'Ariane respiratoire
+            </p>
+            
+            {/* VR Toggle */}
+            <div className="flex items-center justify-center mt-4 space-x-2">
+              <Button
+                onClick={() => setIsVRMode(!isVRMode)}
+                onKeyDown={(e) => handleKeyDown(e, () => setIsVRMode(!isVRMode))}
+                variant="outline"
+                size="sm"
+                className={`focus:ring-2 focus:ring-primary focus:ring-offset-2 ${isVRMode ? 'bg-primary/20 border-primary' : ''}`}
+                aria-pressed={isVRMode}
+                aria-label={isVRMode ? 'Désactiver le mode VR' : 'Activer le mode VR'}
+                tabIndex={0}
+              >
+                {isVRMode ? <Eye className="w-4 h-4 mr-2" aria-hidden="true" /> : <EyeOff className="w-4 h-4 mr-2" aria-hidden="true" />}
+                {isVRMode ? 'VR Activé' : 'Mode 2D'}
+              </Button>
+            </div>
+          </motion.header>
+
+          {/* Session Setup */}
+          {!isActive && !sessionComplete && (
+            <section aria-labelledby="session-setup-title">
+              <h2 id="session-setup-title" className="sr-only">Configuration de la session de respiration</h2>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-6"
+              >
+                <Card className="p-6">
+                  <div className="text-center space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Session {Math.floor(session.duration / 60)} minutes
+                    </h3>
+                    
+                    <div className="grid grid-cols-3 gap-4 text-sm" role="group" aria-label="Rythme de respiration">
+                      <div className="text-center">
+                        <div className="text-blue-500 font-medium" aria-label={`${session.inhaleTime} secondes`}>
+                          {session.inhaleTime}s
+                        </div>
+                        <div className="text-muted-foreground">Inspire</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-yellow-500 font-medium" aria-label={`${session.holdTime} secondes`}>
+                          {session.holdTime}s
+                        </div>
+                        <div className="text-muted-foreground">Retiens</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-green-500 font-medium" aria-label={`${session.exhaleTime} secondes`}>
+                          {session.exhaleTime}s
+                        </div>
+                        <div className="text-muted-foreground">Expire</div>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleStart} 
+                      onKeyDown={(e) => handleKeyDown(e, handleStart)}
+                      className="w-full h-12 mt-6 focus:ring-2 focus:ring-primary focus:ring-offset-2" 
+                      aria-label="Commencer la session de respiration guidée"
+                      tabIndex={0}
+                    >
+                      <Play className="w-5 h-5 mr-2" aria-hidden="true" />
+                      Commencer la session
+                    </Button>
                   </div>
-                  <div className="text-center">
-                    <div className="text-yellow-500 font-medium">{session.holdTime}s</div>
-                    <div className="text-muted-foreground">Retiens</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-green-500 font-medium">{session.exhaleTime}s</div>
-                    <div className="text-muted-foreground">Expire</div>
-                  </div>
-                </div>
-                
-                <Button onClick={handleStart} className="w-full h-12 mt-6">
-                  <Play className="w-5 h-5 mr-2" />
-                  Commencer la session
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
-        )}
+                </Card>
+              </motion.div>
+            </section>
+          )}
 
         {/* Active Session */}
         <AnimatePresence>
@@ -311,24 +351,30 @@ export default function B2CVRBreathGuidePage() {
               </div>
 
               {/* Controls */}
-              <div className="flex justify-center space-x-4">
+              <nav aria-label="Contrôles de la session" className="flex justify-center space-x-4">
                 <Button
                   onClick={isActive ? handlePause : handleStart}
+                  onKeyDown={(e) => handleKeyDown(e, isActive ? handlePause : handleStart)}
                   size="lg"
-                  className="w-16 h-16 rounded-full"
+                  className="w-16 h-16 rounded-full focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  aria-label={isActive ? 'Mettre en pause la session' : 'Reprendre la session'}
+                  tabIndex={0}
                 >
-                  {isActive ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                  {isActive ? <Pause className="w-6 h-6" aria-hidden="true" /> : <Play className="w-6 h-6" aria-hidden="true" />}
                 </Button>
                 
                 <Button
                   onClick={handleReset}
+                  onKeyDown={(e) => handleKeyDown(e, handleReset)}
                   variant="outline"
                   size="lg"
-                  className="w-16 h-16 rounded-full"
+                  className="w-16 h-16 rounded-full focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  aria-label="Réinitialiser la session"
+                  tabIndex={0}
                 >
-                  <RotateCcw className="w-6 h-6" />
+                  <RotateCcw className="w-6 h-6" aria-hidden="true" />
                 </Button>
-              </div>
+              </nav>
             </motion.div>
           )}
         </AnimatePresence>
@@ -336,67 +382,92 @@ export default function B2CVRBreathGuidePage() {
         {/* Session Complete */}
         <AnimatePresence>
           {sessionComplete && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <Card className="p-6 text-center">
-                <h3 className="text-xl font-semibold text-foreground mb-4">
-                  Session terminée !
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {session.cycleCount} cycles • {Math.floor(sessionTime / 60)} minutes
-                </p>
-                
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Comment te sens-tu ?</p>
-                  <div className="flex justify-center space-x-2">
-                    {(['élevée', 'ok', 'à retravailler'] as const).map((level) => (
-                      <Button
-                        key={level}
-                        onClick={() => handleRating(level)}
-                        variant={rating === level ? 'default' : 'outline'}
-                        size="sm"
-                        className={`capitalize ${
-                          level === 'élevée' ? 'hover:bg-green-500/20' :
-                          level === 'ok' ? 'hover:bg-yellow-500/20' :
-                          'hover:bg-red-500/20'
-                        }`}
-                      >
-                        {level}
-                      </Button>
-                    ))}
+            <section aria-labelledby="session-complete-title">
+              <h2 id="session-complete-title" className="sr-only">Session terminée - Évaluation</h2>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <Card className="p-6 text-center">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    Session terminée !
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    {session.cycleCount} cycles • {Math.floor(sessionTime / 60)} minutes
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Comment te sens-tu ?</p>
+                    <fieldset>
+                      <legend className="sr-only">Évaluation de la session</legend>
+                      <div className="flex justify-center space-x-2" role="radiogroup" aria-label="Évaluation de votre ressenti">
+                        {(['élevée', 'ok', 'à retravailler'] as const).map((level) => (
+                          <Button
+                            key={level}
+                            onClick={() => handleRating(level)}
+                            onKeyDown={(e) => handleKeyDown(e, () => handleRating(level))}
+                            variant={rating === level ? 'default' : 'outline'}
+                            size="sm"
+                            className={`capitalize focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                              level === 'élevée' ? 'hover:bg-green-500/20' :
+                              level === 'ok' ? 'hover:bg-yellow-500/20' :
+                              'hover:bg-red-500/20'
+                            }`}
+                            role="radio"
+                            aria-checked={rating === level}
+                            tabIndex={rating === level ? 0 : -1}
+                            aria-label={`Évaluer la session comme ${level}`}
+                          >
+                            {level}
+                          </Button>
+                        ))}
+                      </div>
+                    </fieldset>
                   </div>
-                </div>
-                
-                {rating && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-6"
-                  >
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {rating === 'élevée' && "Excellent ! Tu débloques de nouvelles ambiances."}
-                      {rating === 'ok' && "Bien joué ! La pratique fait la différence."}
-                      {rating === 'à retravailler' && "Pas de souci, chaque respiration compte."}
-                    </p>
-                    
-                    <div className="space-y-2">
-                      <Button onClick={handleReset} className="w-full">
-                        Nouvelle session
-                      </Button>
-                      <Button variant="outline" className="w-full">
-                        Flash Glow (2 min)
-                      </Button>
-                    </div>
-                  </motion.div>
-                )}
-              </Card>
-            </motion.div>
+                  
+                  {rating && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-6"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {rating === 'élevée' && "Excellent ! Tu débloques de nouvelles ambiances."}
+                        {rating === 'ok' && "Bien joué ! La pratique fait la différence."}
+                        {rating === 'à retravailler' && "Pas de souci, chaque respiration compte."}
+                      </p>
+                      
+                      <nav aria-label="Actions après la session" className="space-y-2">
+                        <Button 
+                          onClick={handleReset} 
+                          onKeyDown={(e) => handleKeyDown(e, handleReset)}
+                          className="w-full focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          aria-label="Commencer une nouvelle session de respiration"
+                          tabIndex={0}
+                        >
+                          Nouvelle session
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          aria-label="Accéder à Flash Glow - session courte de 2 minutes"
+                          tabIndex={0}
+                        >
+                          Flash Glow (2 min)
+                        </Button>
+                      </nav>
+                    </motion.div>
+                  )}
+                </Card>
+              </motion.div>
+            </section>
           )}
         </AnimatePresence>
-      </div>
+      </main>
     </div>
+  </>
   );
 }
