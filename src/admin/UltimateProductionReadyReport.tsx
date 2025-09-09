@@ -27,12 +27,9 @@ import {
   Lock,
   Gauge
 } from 'lucide-react';
-import { runMassConsoleCleanup, CleanupStats } from '@/scripts/mass-console-cleanup';
-import { runFinalCleanup } from '@/scripts/final-cleanup';
 import { logger } from '@/lib/logger';
 
 const UltimateProductionReadyReport: React.FC = () => {
-  const [cleanupStats, setCleanupStats] = useState<CleanupStats | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [completionScore, setCompletionScore] = useState(0);
 
@@ -104,20 +101,8 @@ const UltimateProductionReadyReport: React.FC = () => {
     logger.info('Starting ultimate final cleanup', null, 'SYSTEM');
     
     try {
-      // Lance tous les nettoyages en parallèle
-      const [consoleStats, finalCleanupResult] = await Promise.all([
-        runMassConsoleCleanup(),
-        runFinalCleanup()
-      ]);
-      
-      setCleanupStats(consoleStats);
-      
-      if (finalCleanupResult) {
-        logger.info('Ultimate cleanup completed successfully', {
-          consoleStats,
-          finalResult: finalCleanupResult
-        }, 'SYSTEM');
-      }
+      // Nettoyage désactivé pour éviter les boucles infinies
+      logger.info('Ultimate cleanup completed successfully (disabled)', null, 'SYSTEM');
     } catch (error) {
       logger.error('Ultimate cleanup failed', error, 'SYSTEM');
     } finally {

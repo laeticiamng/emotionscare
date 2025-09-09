@@ -227,16 +227,15 @@ export const runFinalCleanup = async (): Promise<boolean> => {
   }
 };
 
-// Auto-exécution en production
-if (import.meta.env.PROD) {
-  // Délai pour permettre l'initialisation complète
-  setTimeout(() => {
-    runFinalCleanup().then(success => {
-      if (success) {
-        logger.info('🎉 EmotionsCare production environment is fully optimized and secure', null, 'SYSTEM');
-      }
-    });
-  }, 1000);
-}
+// Auto-exécution désactivée pour éviter les boucles infinies
+// if (import.meta.env.PROD) {
+//   setTimeout(() => {
+//     runFinalCleanup().then(success => {
+//       if (success) {
+//         logger.info('🎉 EmotionsCare production environment is fully optimized and secure', null, 'SYSTEM');
+//       }
+//     });
+//   }, 1000);
+// }
 
 export default runFinalCleanup;
