@@ -14,10 +14,15 @@ import {
   Award,
   Activity,
   Clock,
-  Zap
+  Zap,
+  Brain,
+  Sparkles,
+  Users
 } from 'lucide-react';
 import EmotionMeter from '@/components/features/EmotionMeter';
 import MoodChart from '@/components/features/MoodChart';
+import StatsOverview from '@/components/features/StatsOverview';
+import EmotionAnalyzer from '@/components/features/EmotionAnalyzer';
 
 const DashboardPage: React.FC = () => {
   const [emotionalData] = React.useState({
@@ -41,20 +46,33 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <div className="container mx-auto py-8 px-4" data-testid="page-root">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <BarChart3 className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700">
-            <Activity className="h-3 w-3 mr-1" />
-            En temps réel
-          </Badge>
+    <div className="container mx-auto py-8 px-4 space-y-8" data-testid="page-root">
+      {/* En-tête avec salutation personnalisée */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Bonjour, Marie! 👋
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Continuez votre parcours vers le bien-être émotionnel
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          Vue d'ensemble de votre progression émotionnelle et bien-être
-        </p>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/50 px-4 py-2 rounded-lg">
+          <Calendar className="h-4 w-4" />
+          {new Date().toLocaleDateString('fr-FR', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </div>
       </div>
+
+      {/* Vue d'ensemble des statistiques */}
+      <StatsOverview />
+
+      {/* Analyseur d'émotions */}
+      <EmotionAnalyzer />
 
       {/* Métriques principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
