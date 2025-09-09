@@ -66,7 +66,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'HomeB2CPage',
-    guard: false,
     aliases: ['/choose-mode'],
   },
   {

@@ -29,7 +29,6 @@ const FF_ROUTER_V2 = true;
 // Pages publiques unifiées 
 const HomePage = lazy(() => import('@/components/HomePage'));
 const UnifiedHomePage = lazy(() => import('@/pages/unified/UnifiedHomePage'));
-const TestB2C = lazy(() => import('@/components/TestB2C'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
@@ -160,7 +159,7 @@ const AppHomePage = lazy(() => import('@/pages/B2CHomePage'));
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
   HomePage,
-  HomeB2CPage: TestB2C, // Test temporaire
+  HomeB2CPage: UnifiedHomePage,
   AboutPage,
   ContactPage,
   HelpPage,
