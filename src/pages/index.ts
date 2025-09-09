@@ -9,7 +9,6 @@ export { default as PrivacyPage } from './PrivacyPage';
 
 // App & Dashboards
 export { default as AppGatePage } from './AppGatePage';
-export { default as HomeB2CPage } from './HomeB2CPage';
 export { default as B2CDashboardPage } from './B2CDashboardPage';
 export { default as B2BUserDashboardPage } from './B2BUserDashboardPage';
 export { default as B2BAdminDashboardPage } from './B2BAdminDashboardPage';
