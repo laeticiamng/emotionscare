@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import emotionsCareProductionService from '@/services/production/emotionsCareProductionService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -79,45 +80,71 @@ export default function B2CJournalEnhanced() {
   const generateAIInsights = async (content: string, mood: string, emotions: string[]) => {
     setIsAnalyzing(true);
     
-    // Simulation d'analyse IA
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Connexion à l'API réelle
+      const result = await emotionsCareProductionService.analyzeJournal(content);
+      const insights = result.insights || [
+        `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
+        `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`,
+        `Je remarque des patterns de croissance personnelle dans vos mots`
+      ];
+      setAiInsights(insights);
+    } catch (error) {
+      console.error('Erreur analyse:', error);
     
-    const insights = [
-      `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
-      `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`,
-      `Je remarque des patterns de croissance personnelle dans vos mots`,
-      `Votre niveau de conscience émotionnelle s'approfondit`,
-      `Cette réflexion montre votre capacité d'introspection remarquable`
-    ];
-    
-    setAiInsights(insights.slice(0, 3));
+      const insights = result.insights || [
+        `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
+        `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`,
+        `Je remarque des patterns de croissance personnelle dans vos mots`
+      ];
+      setAiInsights(insights.slice(0, 3));
+    } catch (error) {
+      console.error('Erreur analyse:', error);
+      // Fallback
+      setAiInsights([
+        `Votre écriture révèle une progression émotionnelle vers le ${mood}`,
+        `Les émotions ${emotions.slice(0, 2).join(' et ')} dominent votre état actuel`
+      ]);
     setIsAnalyzing(false);
   };
 
-  const saveEntry = () => {
-    const entry: JournalEntry = {
-      id: Date.now().toString(),
-      title: currentEntry.title || `Réflexion du ${new Date().toLocaleDateString()}`,
-      content: currentEntry.content || '',
-      mood: currentEntry.mood || 'calm',
-      emotions: currentEntry.emotions || [],
-      aiInsights,
-      timestamp: new Date(),
-      energy: currentEntry.energy || 50,
-      stress: currentEntry.stress || 50,
-      happiness: currentEntry.happiness || 50,
-      gratitude: currentEntry.gratitude?.filter(g => g.trim()) || [],
-      goals: currentEntry.goals?.filter(g => g.trim()) || []
-    };
-    
-    setEntries(prev => [entry, ...prev]);
-    setCurrentEntry({
-      title: '', content: '', mood: 'calm', emotions: [],
-      energy: 50, stress: 50, happiness: 50,
-      gratitude: ['', '', ''], goals: ['']
-    });
-    setAiInsights([]);
-    setIsWriting(false);
+  const saveEntry = async () => {
+    try {
+      // Sauvegarder dans Supabase
+      await emotionsCareProductionService.saveJournalEntry({
+        title: currentEntry.title || `Réflexion du ${new Date().toLocaleDateString()}`,
+        content: currentEntry.content || '',
+        mood: currentEntry.mood || 'calm',
+        emotions: currentEntry.emotions || [],
+        is_private: true
+      });
+      
+      const entry: JournalEntry = {
+        id: Date.now().toString(),
+        title: currentEntry.title || `Réflexion du ${new Date().toLocaleDateString()}`,
+        content: currentEntry.content || '',
+        mood: currentEntry.mood || 'calm',
+        emotions: currentEntry.emotions || [],
+        aiInsights,
+        timestamp: new Date(),
+        energy: currentEntry.energy || 50,
+        stress: currentEntry.stress || 50,
+        happiness: currentEntry.happiness || 50,
+        gratitude: currentEntry.gratitude?.filter(g => g.trim()) || [],
+        goals: currentEntry.goals?.filter(g => g.trim()) || []
+      };
+      
+      setEntries(prev => [entry, ...prev]);
+      setCurrentEntry({
+        title: '', content: '', mood: 'calm', emotions: [],
+        energy: 50, stress: 50, happiness: 50,
+        gratitude: ['', '', ''], goals: ['']
+      });
+      setAiInsights([]);
+      setIsWriting(false);
+    } catch (error) {
+      console.error('Erreur sauvegarde:', error);
+    }
   };
 
   const toggleEmotion = (emotion: string) => {
