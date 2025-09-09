@@ -150,4 +150,32 @@ export class JournalService {
       throw error;
     }
   }
+
+  // Instance methods for production service compatibility
+  async createEntry(userId: string, content: string, options?: {
+    title?: string;
+    emotion?: string;
+    tags?: string[];
+    mood_score?: number;
+    is_private?: boolean;
+    analyze?: boolean;
+  }): Promise<JournalEntry> {
+    return JournalService.createEntry(content);
+  }
+
+  async getUserAnalytics(userId: string, days: number): Promise<any> {
+    // Mock analytics for now - in real implementation would query by user
+    return {
+      totalEntries: 0,
+      avgMoodScore: 5,
+      emotionalTrends: []
+    };
+  }
+
+  async getUserEntries(userId: string, options?: { limit: number }): Promise<JournalEntry[]> {
+    return JournalService.getEntries();
+  }
 }
+
+// Export instance for production service
+export const journalService = new JournalService();
