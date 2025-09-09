@@ -65,17 +65,31 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       console.log('✅ Connexion réussie, redirection...', mockUser);
 
-      // Navigate based on role - correction des routes
+      // Navigate based on role - utiliser des routes existantes
       setTimeout(() => {
-        const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
-                              mockUser.role === 'employee' ? '/app/collab' :
-                              mockUser.role === 'manager' ? '/app/rh' : '/app/home';
+        let dashboardRoute = '/app/home';
+        
+        // Tester différentes routes selon le rôle
+        if (mockUser.role === 'consumer') {
+          dashboardRoute = '/b2c'; // Route landing B2C existante
+        } else if (mockUser.role === 'employee') {
+          dashboardRoute = '/app/collab';
+        } else if (mockUser.role === 'manager') {
+          dashboardRoute = '/app/rh';
+        }
         
         console.log('🔄 Redirection vers:', dashboardRoute);
         
-        // Forcer la redirection
-        window.location.replace(dashboardRoute);
-      }, 500); // Délai plus long pour s'assurer que l'état est bien mis à jour
+        // Utiliser React Router au lieu de window.location
+        try {
+          window.history.pushState({}, '', dashboardRoute);
+          window.location.reload();
+        } catch (error) {
+          console.error('Erreur de redirection:', error);
+          // Fallback vers une route connue
+          window.location.replace('/');
+        }
+      }, 800); // Délai plus long
     } catch (error) {
       console.error('SignIn error:', error);
       setLoading(false);
