@@ -3,6 +3,13 @@
  * TICKET: FE/BE-Router-Cleanup-01
  */
 
+// Type pour éviter les logs répétés
+declare global {
+  interface Window {
+    __routerV2Logged?: boolean;
+  }
+}
+
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
@@ -14,7 +21,6 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 
 // RouterV2 est maintenant activé par défaut - plus de feature flag
 const FF_ROUTER_V2 = true;
-console.log('🚀 RouterV2: FF_ROUTER_V2 activé, aliases disponibles:', FF_ROUTER_V2);
 
 // ═══════════════════════════════════════════════════════════
 // LAZY IMPORTS DES PAGES
@@ -314,7 +320,6 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
   const Component = componentMap[routeMeta.component];
   
   if (!Component) {
-    console.warn(`⚠️ Composant manquant: ${routeMeta.component} pour route ${routeMeta.name}`);
     return <Navigate to="/404" replace />;
   }
 
@@ -356,7 +361,6 @@ export const routerV2 = createBrowserRouter([
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
   ...(FF_ROUTER_V2 ? ROUTE_ALIASES.map(alias => {
-    console.log(`🔀 Alias configuré: ${alias.from} -> ${alias.to}`);
     return {
       path: alias.from,
       element: <Navigate to={alias.to} replace />,
@@ -381,14 +385,18 @@ export const routerV2 = createBrowserRouter([
 // ═══════════════════════════════════════════════════════════
 
 if (import.meta.env.DEV) {
-  // Vérifier que tous les composants sont mappés
+  // Validation silencieuse pour éviter les boucles de logs
   const missingComponents = ROUTES_REGISTRY
     .filter(route => !componentMap[route.component])
     .map(route => `${route.name}: ${route.component}`);
 
-  if (missingComponents.length > 0) {
+  // Log unique au démarrage
+  if (missingComponents.length > 0 && !window.__routerV2Logged) {
     console.warn('⚠️ RouterV2: Composants manquants:', missingComponents);
   }
 
-  console.log(`✅ RouterV2 initialisé: ${ROUTES_REGISTRY.length} routes, FF_ROUTER_V2=${FF_ROUTER_V2}`);
+  if (!window.__routerV2Logged) {
+    console.log(`✅ RouterV2 initialisé: ${ROUTES_REGISTRY.length} routes`);
+    window.__routerV2Logged = true;
+  }
 }
