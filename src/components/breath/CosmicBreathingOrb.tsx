@@ -47,24 +47,18 @@ export const CosmicBreathingOrb: React.FC<CosmicBreathingOrbProps> = ({
 
   return (
     <div className={cn("relative flex items-center justify-center", className)}>
-      {/* Constellation particles */}
+      {/* Constellation particles - Reduced */}
       <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: 20 }, (_, i) => (
-          <motion.div
+        {Array.from({ length: 8 }, (_, i) => (
+          <div
             key={i}
-            className="absolute w-1 h-1 bg-white rounded-full"
+            className="absolute w-1 h-1 bg-white rounded-full animate-ping"
             style={{
-              left: `${20 + Math.random() * 60}%`,
-              top: `${20 + Math.random() * 60}%`,
-            }}
-            animate={{
-              opacity: isActive ? [0.3, 1, 0.3] : 0.3,
-              scale: isActive ? [1, 1.5, 1] : 1,
-            }}
-            transition={{
-              duration: phase === 'inhale' ? maxTime : phase === 'hold' ? maxTime : maxTime,
-              repeat: Infinity,
-              delay: i * 0.1,
+              left: `${25 + (i * 8) % 50}%`,
+              top: `${25 + (i * 12) % 50}%`,
+              opacity: isActive ? 0.6 : 0.3,
+              animationDelay: `${i * 0.3}s`,
+              animationDuration: '2s',
             }}
           />
         ))}
@@ -85,78 +79,37 @@ export const CosmicBreathingOrb: React.FC<CosmicBreathingOrbProps> = ({
           ease: "easeInOut"
         }}
       >
-        {/* Inner glow */}
-        <motion.div
-          className="absolute inset-4 rounded-full bg-white/20 backdrop-blur-sm"
-          animate={{
-            opacity: isActive ? [0.5, 1, 0.5] : 0.3,
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-          }}
-        />
+        {/* Inner glow - Static */}
+        <div className="absolute inset-4 rounded-full bg-white/20 backdrop-blur-sm opacity-60" />
 
         {/* Content */}
         <div className="relative z-10 text-center text-white">
-          <motion.div 
-            className="text-xl font-light mb-4 tracking-wide"
-            animate={{
-              opacity: [0.7, 1, 0.7]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-            }}
-          >
+          <div className="text-xl font-light mb-4 tracking-wide opacity-90">
             {getPhaseText()}
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="text-6xl font-mono font-bold mb-2"
-            animate={{
-              scale: [1, 1.1, 1]
-            }}
-            transition={{
-              duration: 1,
-              repeat: Infinity,
-            }}
-          >
+          <div className="text-6xl font-mono font-bold mb-2">
             {phaseTimer}
-          </motion.div>
+          </div>
           
           <div className="text-sm opacity-80 tracking-widest uppercase">
             {phase === 'idle' ? 'Cosmos' : 'Étoiles'}
           </div>
         </div>
 
-        {/* Cosmic rings */}
+        {/* Cosmic ring - Single simplified */}
         {isActive && (
-          <>
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-white/40"
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.8, 0, 0.8]
-              }}
-              transition={{
-                duration: maxTime,
-                repeat: Infinity,
-              }}
-            />
-            <motion.div
-              className="absolute inset-0 rounded-full border border-white/20"
-              animate={{
-                scale: [1, 2, 1],
-                opacity: [0.6, 0, 0.6]
-              }}
-              transition={{
-                duration: maxTime * 1.5,
-                repeat: Infinity,
-                delay: 0.5
-              }}
-            />
-          </>
+          <motion.div
+            className="absolute inset-0 rounded-full border border-white/30"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.6, 0.2, 0.6]
+            }}
+            transition={{
+              duration: maxTime,
+              repeat: Infinity,
+            }}
+          />
         )}
       </motion.div>
     </div>

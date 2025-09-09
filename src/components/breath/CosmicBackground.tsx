@@ -35,83 +35,64 @@ export const CosmicBackground: React.FC<CosmicBackgroundProps> = ({
         transition={{ duration: 1 }}
       />
 
-      {/* Floating stars */}
+      {/* Floating stars - Optimized */}
       <div className="absolute inset-0">
-        {Array.from({ length: 50 }, (_, i) => (
-          <motion.div
+        {Array.from({ length: 15 }, (_, i) => (
+          <div
             key={i}
-            className="absolute rounded-full bg-white"
+            className="absolute rounded-full bg-white animate-pulse"
             style={{
-              width: `${1 + Math.random() * 2}px`,
-              height: `${1 + Math.random() * 2}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: isActive ? [0.3, 1, 0.3] : [0.2, 0.6, 0.2],
-              scale: isActive ? [1, 1.2, 1] : 1,
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
+              width: `${1 + (i % 3)}px`,
+              height: `${1 + (i % 3)}px`,
+              left: `${(i * 7) % 100}%`,
+              top: `${(i * 11) % 100}%`,
+              opacity: isActive ? 0.8 : 0.4,
+              animationDelay: `${i * 0.2}s`,
+              animationDuration: `${2 + (i % 3)}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Nebula clouds */}
-      <div className="absolute inset-0 opacity-30">
-        {Array.from({ length: 5 }, (_, i) => (
-          <motion.div
+      {/* Nebula clouds - Static with CSS animation */}
+      <div className="absolute inset-0 opacity-20">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div
             key={i}
-            className="absolute rounded-full blur-3xl"
+            className="absolute rounded-full blur-3xl animate-pulse"
             style={{
-              width: `${200 + Math.random() * 300}px`,
-              height: `${200 + Math.random() * 300}px`,
-              left: `${Math.random() * 80}%`,
-              top: `${Math.random() * 80}%`,
-              background: `radial-gradient(circle, ${getNebulaColor()}40, transparent)`
-            }}
-            animate={{
-              opacity: isActive ? [0.1, 0.4, 0.1] : 0.2,
-              scale: isActive ? [1, 1.1, 1] : 1,
-              x: [0, 10, 0],
-              y: [0, -5, 0],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              delay: i * 0.5,
+              width: `${300 + i * 100}px`,
+              height: `${300 + i * 100}px`,
+              left: `${i * 30}%`,
+              top: `${i * 25}%`,
+              background: `radial-gradient(circle, ${getNebulaColor()}30, transparent)`,
+              animationDuration: `${6 + i * 2}s`,
+              animationDelay: `${i}s`,
             }}
           />
         ))}
       </div>
 
-      {/* Shooting stars */}
+      {/* Shooting star - Single optimized */}
       {isActive && (
-        <div className="absolute inset-0">
-          {Array.from({ length: 3 }, (_, i) => (
-            <motion.div
-              key={i}
-              className="absolute h-0.5 bg-gradient-to-r from-transparent via-white to-transparent"
-              style={{
-                width: '100px',
-                top: `${20 + Math.random() * 60}%`,
-                left: '-100px',
-              }}
-              animate={{
-                x: ['0vw', '120vw'],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: 2,
-                delay: i * 3 + Math.random() * 2,
-                repeat: Infinity,
-                repeatDelay: 10,
-              }}
-            />
-          ))}
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div
+            className="absolute h-0.5 bg-gradient-to-r from-transparent via-white to-transparent opacity-70"
+            style={{
+              width: '120px',
+              top: '40%',
+              left: '-120px',
+            }}
+            animate={{
+              x: ['0vw', '120vw'],
+              opacity: [0, 0.8, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatDelay: 8,
+            }}
+          />
         </div>
       )}
 
