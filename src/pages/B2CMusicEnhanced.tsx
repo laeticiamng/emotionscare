@@ -1,297 +1,503 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Pause, Volume2, SkipBack, SkipForward, Heart, Music, Zap, Brain, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import PageRoot from '@/components/common/PageRoot';
+import { Slider } from '@/components/ui/slider';
+import { 
+  Play, 
+  Pause, 
+  ArrowLeft,
+  Music,
+  Volume2,
+  Disc3,
+  Heart,
+  Brain,
+  Zap,
+  Sparkles
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { UniverseEngine } from '@/components/universe/UniverseEngine';
+import { RewardSystem } from '@/components/rewards/RewardSystem';
+import { getOptimizedUniverse } from '@/data/universes/config';
+import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 
-interface MusicTrack {
+interface VinylTrack {
   id: string;
   title: string;
   artist: string;
-  duration: string;
-  category: 'focus' | 'relaxation' | 'energy' | 'healing' | 'meditation';
+  duration: number; // en secondes
+  category: 'doux' | 'énergique' | 'créatif' | 'guérison';
   mood: string;
   color: string;
-  preview?: string;
+  vinylColor: string;
+  description: string;
 }
 
-const MUSIC_TRACKS: MusicTrack[] = [
+const vinylTracks: VinylTrack[] = [
   {
-    id: '1',
-    title: 'Sérénité Océanique',
-    artist: 'EmotionsCare',
-    duration: '8:32',
-    category: 'relaxation',
-    mood: 'Calme',
-    color: 'bg-blue-500'
+    id: 'vinyl-1',
+    title: 'Sérénité Fluide',
+    artist: 'Studio EmotionsCare',
+    duration: 180, // 3 minutes
+    category: 'doux',
+    mood: 'Calme océanique',
+    color: 'hsl(200, 70%, 60%)',
+    vinylColor: 'linear-gradient(135deg, hsl(200, 70%, 60%), hsl(180, 60%, 70%))',
+    description: 'Ondes douces qui bercent ton esprit'
   },
   {
-    id: '2',
-    title: 'Focus Flow',
-    artist: 'AI Composer',
-    duration: '12:45',
-    category: 'focus',
-    mood: 'Concentration',
-    color: 'bg-purple-500'
+    id: 'vinyl-2',
+    title: 'Éveil Créatif',
+    artist: 'Harmonies Génératives',
+    duration: 240, // 4 minutes
+    category: 'créatif',
+    mood: 'Inspiration pure',
+    color: 'hsl(280, 70%, 60%)',
+    vinylColor: 'linear-gradient(135deg, hsl(280, 70%, 60%), hsl(320, 60%, 70%))',
+    description: 'Stimule ta créativité naturelle'
   },
   {
-    id: '3',
-    title: 'Energy Boost',
-    artist: 'Digital Waves',
-    duration: '6:18',
-    category: 'energy',
-    mood: 'Dynamisme',
-    color: 'bg-orange-500'
+    id: 'vinyl-3',
+    title: 'Boost Vital',
+    artist: 'Rythmes Organiques',
+    duration: 150, // 2.5 minutes
+    category: 'énergique',
+    mood: 'Dynamisme zen',
+    color: 'hsl(30, 80%, 60%)',
+    vinylColor: 'linear-gradient(135deg, hsl(30, 80%, 60%), hsl(60, 70%, 70%))',
+    description: 'Énergie sans stress'
   },
   {
-    id: '4',
-    title: 'Guérison Intérieure',
-    artist: 'Healing Frequencies',
-    duration: '15:27',
-    category: 'healing',
-    mood: 'Réparation',
-    color: 'bg-green-500'
-  },
-  {
-    id: '5',
-    title: 'Méditation Profonde',
-    artist: 'Zen Masters',
-    duration: '20:00',
-    category: 'meditation',
-    mood: 'Paix',
-    color: 'bg-indigo-500'
+    id: 'vinyl-4',
+    title: 'Résonance Curative',
+    artist: 'Fréquences Sacrées',
+    duration: 300, // 5 minutes
+    category: 'guérison',
+    mood: 'Régénération',
+    color: 'hsl(140, 60%, 60%)',
+    vinylColor: 'linear-gradient(135deg, hsl(140, 60%, 60%), hsl(120, 70%, 70%))',
+    description: 'Harmonise ton être intérieur'
   }
 ];
 
-const CATEGORY_ICONS = {
-  focus: Brain,
-  relaxation: Heart,
-  energy: Zap,
-  healing: Sparkles,
-  meditation: Music
+const categoryIcons = {
+  doux: Heart,
+  créatif: Sparkles,
+  énergique: Zap,
+  guérison: Brain,
 };
 
 const B2CMusicEnhanced: React.FC = () => {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const { toast } = useToast();
+  
+  // Get optimized universe config
+  const universe = getOptimizedUniverse('music');
+  
+  // Universe state
+  const [isEntering, setIsEntering] = useState(true);
+  const [universeEntered, setUniverseEntered] = useState(false);
+  
+  // Music state
+  const [selectedTrack, setSelectedTrack] = useState<VinylTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState([0]);
-  const [volume, setVolume] = useState([75]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState([70]);
+  const [showReward, setShowReward] = useState(false);
+  const [vinylRotation, setVinylRotation] = useState(0);
+  
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const rotationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const filteredTracks = selectedCategory 
-    ? MUSIC_TRACKS.filter(track => track.category === selectedCategory)
-    : MUSIC_TRACKS;
+  // Optimized animations
+  const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
+    enableComplexAnimations: true,
+    useCSSAnimations: true,
+  });
 
-  const handlePlayPause = (track?: MusicTrack) => {
-    if (track) {
-      setCurrentTrack(track);
-      setIsPlaying(true);
-    } else {
-      setIsPlaying(!isPlaying);
-    }
+  // Handle universe entrance
+  const handleUniverseEnterComplete = () => {
+    setUniverseEntered(true);
   };
 
-  const handleNext = () => {
-    if (currentTrack) {
-      const currentIndex = filteredTracks.findIndex(t => t.id === currentTrack.id);
-      const nextIndex = (currentIndex + 1) % filteredTracks.length;
-      setCurrentTrack(filteredTracks[nextIndex]);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentTrack) {
-      const currentIndex = filteredTracks.findIndex(t => t.id === currentTrack.id);
-      const prevIndex = currentIndex === 0 ? filteredTracks.length - 1 : currentIndex - 1;
-      setCurrentTrack(filteredTracks[prevIndex]);
-    }
-  };
-
-  // Simulation du progrès de la musique
+  // Cleanup on unmount
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && currentTrack) {
-      interval = setInterval(() => {
-        setProgress(prev => {
-          const newProgress = prev[0] + 0.5;
-          return newProgress >= 100 ? [0] : [newProgress];
-        });
-      }, 100);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, currentTrack]);
+    return () => {
+      cleanupAnimation();
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (rotationIntervalRef.current) clearInterval(rotationIntervalRef.current);
+    };
+  }, [cleanupAnimation]);
 
-  const categories = Array.from(new Set(MUSIC_TRACKS.map(track => track.category)));
+  // Track progress and vinyl rotation
+  useEffect(() => {
+    if (isPlaying && selectedTrack) {
+      // Progress timer
+      intervalRef.current = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            stopTrack();
+            return 0;
+          }
+          return prev + (100 / selectedTrack.duration); // Increment based on track duration
+        });
+      }, 1000);
+
+      // Vinyl rotation
+      rotationIntervalRef.current = setInterval(() => {
+        setVinylRotation(prev => (prev + 6) % 360); // 6 degrees per 100ms = smooth rotation
+      }, 100);
+
+      return () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (rotationIntervalRef.current) clearInterval(rotationIntervalRef.current);
+      };
+    }
+  }, [isPlaying, selectedTrack]);
+
+  const startTrack = (track: VinylTrack) => {
+    setSelectedTrack(track);
+    setProgress(0);
+    setIsPlaying(true);
+    
+    toast({
+      title: "Vinyle en rotation ♪",
+      description: `${track.title} compose ton aura sonore`,
+    });
+  };
+
+  const togglePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const stopTrack = () => {
+    setIsPlaying(false);
+    setProgress(0);
+    
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (rotationIntervalRef.current) clearInterval(rotationIntervalRef.current);
+    
+    // Show reward after completion
+    if (selectedTrack) {
+      setShowReward(true);
+    }
+  };
+
+  const handleRewardComplete = () => {
+    setShowReward(false);
+    setSelectedTrack(null);
+    
+    toast({
+      title: "Harmonie du moment ✨",
+      description: "Ton cristal sonore résonne maintenant dans ta collection",
+    });
+  };
+
+  if (showReward && selectedTrack) {
+    return (
+      <RewardSystem
+        reward={{
+          type: 'crystal',
+          name: 'Cristal Sonore',
+          description: universe.artifacts.description,
+          moduleId: 'music'
+        }}
+        badgeText="Harmonie créée ♪"
+        onComplete={handleRewardComplete}
+      />
+    );
+  }
 
   return (
-    <PageRoot>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
-              Thérapie Musicale
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Découvrez notre collection de musiques thérapeutiques adaptées à votre état émotionnel
-            </p>
-          </div>
-
-          {/* Category Filters */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <Button
-              variant={selectedCategory === null ? "default" : "outline"}
-              onClick={() => setSelectedCategory(null)}
-              className="transition-all"
-            >
-              Toutes
-            </Button>
-            {categories.map(category => {
-              const Icon = CATEGORY_ICONS[category as keyof typeof CATEGORY_ICONS];
-              return (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  onClick={() => setSelectedCategory(category)}
-                  className="transition-all"
-                >
-                  <Icon className="h-4 w-4 mr-2" />
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </Button>
-              );
-            })}
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Track List */}
-            <div className="lg:col-span-2 space-y-4">
-              <h2 className="text-2xl font-semibold mb-4">
-                {selectedCategory ? 
-                  `Musiques ${selectedCategory}` : 
-                  'Toutes les musiques'
-                } ({filteredTracks.length})
-              </h2>
-              
-              {filteredTracks.map((track) => {
-                const Icon = CATEGORY_ICONS[track.category as keyof typeof CATEGORY_ICONS];
-                const isCurrentTrack = currentTrack?.id === track.id;
-                
-                return (
-                  <Card key={track.id} className={`transition-all hover:shadow-lg cursor-pointer ${
-                    isCurrentTrack ? 'ring-2 ring-primary shadow-lg' : ''
-                  }`}>
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <Button
-                        size="sm"
-                        variant={isCurrentTrack && isPlaying ? "default" : "outline"}
-                        onClick={() => handlePlayPause(track)}
-                        className="shrink-0"
-                      >
-                        {isCurrentTrack && isPlaying ? (
-                          <Pause className="h-4 w-4" />
-                        ) : (
-                          <Play className="h-4 w-4" />
-                        )}
-                      </Button>
-
-                      <div className={`w-12 h-12 rounded-lg ${track.color} flex items-center justify-center shrink-0`}>
-                        <Icon className="h-6 w-6 text-white" />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate">{track.title}</h3>
-                        <p className="text-sm text-muted-foreground">{track.artist}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-xs">
-                            {track.mood}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{track.duration}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-
-            {/* Player */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-8">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Lecteur</h3>
-                  
-                  {currentTrack ? (
-                    <div className="space-y-6">
-                      {/* Current Track Info */}
-                      <div className="text-center">
-                        <div className={`w-20 h-20 mx-auto rounded-xl ${currentTrack.color} flex items-center justify-center mb-4`}>
-                          {React.createElement(CATEGORY_ICONS[currentTrack.category as keyof typeof CATEGORY_ICONS], 
-                            { className: "h-10 w-10 text-white" }
-                          )}
-                        </div>
-                        <h4 className="font-semibold">{currentTrack.title}</h4>
-                        <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-                        <Badge variant="outline" className="mt-2">
-                          {currentTrack.mood}
-                        </Badge>
-                      </div>
-
-                      {/* Progress */}
-                      <div className="space-y-2">
-                        <Slider
-                          value={progress}
-                          onValueChange={setProgress}
-                          max={100}
-                          step={0.1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{Math.floor((progress[0] / 100) * parseInt(currentTrack.duration.split(':')[0]) * 60 + (progress[0] / 100) * parseInt(currentTrack.duration.split(':')[1]))}:00</span>
-                          <span>{currentTrack.duration}</span>
-                        </div>
-                      </div>
-
-                      {/* Controls */}
-                      <div className="flex items-center justify-center gap-4">
-                        <Button variant="outline" size="sm" onClick={handlePrevious}>
-                          <SkipBack className="h-4 w-4" />
-                        </Button>
-                        <Button onClick={() => handlePlayPause()} className="w-12 h-12 rounded-full">
-                          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={handleNext}>
-                          <SkipForward className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      {/* Volume */}
-                      <div className="flex items-center gap-2">
-                        <Volume2 className="h-4 w-4 shrink-0" />
-                        <Slider
-                          value={volume}
-                          onValueChange={setVolume}
-                          max={100}
-                          step={1}
-                          className="flex-1"
-                        />
-                        <span className="text-xs text-muted-foreground w-8">{volume[0]}%</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center text-muted-foreground py-8">
-                      <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>Sélectionnez une musique pour commencer</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+    <UniverseEngine
+      universe={universe}
+      isEntering={isEntering}
+      onEnterComplete={handleUniverseEnterComplete}
+      enableParticles={true}
+      enableAmbianceSound={false}
+      className="min-h-screen"
+    >
+      {/* Header */}
+      <header className="relative z-50 p-6">
+        <div className="flex items-center justify-between">
+          <Link 
+            to="/app" 
+            className="flex items-center space-x-2 text-foreground/80 hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-medium">Retour</span>
+          </Link>
+          
+          <div className="flex items-center space-x-2 text-foreground">
+            <Music className="h-6 w-6 text-amber-500" />
+            <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
           </div>
         </div>
-      </div>
-    </PageRoot>
+      </header>
+
+      {/* Main Content */}
+      <main className="relative z-10 container mx-auto px-6 py-12">
+        <AnimatePresence mode="wait">
+          {!selectedTrack ? (
+            <motion.div
+              key="selection"
+              variants={entranceVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="space-y-12"
+            >
+              {/* Introduction */}
+              <div className="text-center space-y-6">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.5, type: "spring" }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${universe.ambiance.colors.primary}, ${universe.ambiance.colors.accent})` 
+                  }}
+                >
+                  <Disc3 className="h-10 w-10 text-white" />
+                </motion.div>
+                
+                <h2 className="text-4xl font-light text-foreground tracking-wide">
+                  Vinyles en Apesanteur
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
+                  Choisis ton vinyle et laisse-le composer ton aura sonore. 
+                  Chaque mélodie s'adapte à ton état pour créer l'harmonie parfaite.
+                </p>
+              </div>
+
+              {/* Vinyl Collection */}
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+                {vinylTracks.map((track, index) => {
+                  const Icon = categoryIcons[track.category];
+                  
+                  return (
+                    <motion.div
+                      key={track.id}
+                      initial={{ opacity: 0, y: 30, rotateY: -30 }}
+                      animate={{ opacity: 1, y: 0, rotateY: 0 }}
+                      transition={{ delay: 0.7 + index * 0.2 }}
+                      whileHover={{ scale: 1.05, rotateY: 15 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="perspective-1000"
+                    >
+                      <Card 
+                        className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+                        onClick={() => startTrack(track)}
+                      >
+                        <CardContent className="p-6 space-y-4">
+                          {/* Vinyl Disc */}
+                          <div className="relative">
+                            <motion.div
+                              className="w-24 h-24 mx-auto rounded-full relative overflow-hidden group-hover:scale-110 transition-transform duration-300"
+                              style={{ background: track.vinylColor }}
+                              whileHover={{ rotateZ: 180 }}
+                              transition={{ duration: 1 }}
+                            >
+                              {/* Vinyl grooves */}
+                              <div className="absolute inset-2 rounded-full border-2 border-black/20" />
+                              <div className="absolute inset-4 rounded-full border border-black/20" />
+                              <div className="absolute inset-6 rounded-full border border-black/20" />
+                              
+                              {/* Center hole */}
+                              <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-black/30 flex items-center justify-center">
+                                <Icon className="w-3 h-3" style={{ color: track.color }} />
+                              </div>
+                            </motion.div>
+                            
+                            {/* Floating effect */}
+                            <div 
+                              className="absolute -inset-2 rounded-full opacity-30 blur-md"
+                              style={{ background: track.vinylColor }}
+                            />
+                          </div>
+                          
+                          <div className="text-center space-y-2">
+                            <h3 className="text-lg font-medium text-foreground">
+                              {track.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {track.artist}
+                            </p>
+                            
+                            <Badge 
+                              variant="secondary"
+                              className="text-xs"
+                              style={{ 
+                                backgroundColor: `${track.color}20`,
+                                color: track.color 
+                              }}
+                            >
+                              {track.mood}
+                            </Badge>
+                            
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {track.description}
+                            </p>
+                            
+                            <div className="pt-2">
+                              <Button 
+                                size="sm"
+                                className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                                style={{ 
+                                  backgroundColor: `${track.color}15`,
+                                  color: track.color,
+                                  borderColor: `${track.color}30`
+                                }}
+                                onClick={() => startTrack(track)}
+                              >
+                                <Play className="h-3 w-3 mr-2" />
+                                Lancer le vinyle
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="player"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="max-w-4xl mx-auto text-center space-y-12"
+            >
+              {/* Track Info */}
+              <div className="space-y-4">
+                <h2 className="text-3xl font-light text-foreground tracking-wide">
+                  {selectedTrack.title}
+                </h2>
+                <p className="text-muted-foreground text-lg">{selectedTrack.description}</p>
+                <Badge 
+                  variant="secondary"
+                  className="text-sm"
+                  style={{ 
+                    backgroundColor: `${selectedTrack.color}20`,
+                    color: selectedTrack.color 
+                  }}
+                >
+                  {selectedTrack.mood}
+                </Badge>
+              </div>
+
+              {/* Floating Vinyl Player */}
+              <div className="relative">
+                <motion.div
+                  className="w-64 h-64 mx-auto rounded-full relative"
+                  style={{ background: selectedTrack.vinylColor }}
+                  animate={{ 
+                    rotateZ: isPlaying ? vinylRotation : 0,
+                    y: isPlaying ? [-5, 5, -5] : 0 
+                  }}
+                  transition={{ 
+                    y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                    rotateZ: { duration: 0.1 }
+                  }}
+                >
+                  {/* Vinyl grooves */}
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <div 
+                      key={i}
+                      className={`absolute rounded-full border border-black/20`}
+                      style={{
+                        inset: `${8 + i * 4}px`,
+                      }}
+                    />
+                  ))}
+                  
+                  {/* Center */}
+                  <div className="absolute top-1/2 left-1/2 w-16 h-16 -mt-8 -ml-8 rounded-full bg-card border-4 border-black/30 flex items-center justify-center shadow-lg">
+                    <div className="w-8 h-8 rounded-full" style={{ backgroundColor: selectedTrack.color }} />
+                  </div>
+
+                  {/* Floating glow */}
+                  <div 
+                    className="absolute -inset-8 rounded-full opacity-40 blur-xl"
+                    style={{ background: selectedTrack.vinylColor }}
+                  />
+                </motion.div>
+
+                {/* Progress ring */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg className="w-72 h-72 -rotate-90">
+                    <circle
+                      cx="144"
+                      cy="144"
+                      r="140"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      className="opacity-20"
+                    />
+                    <circle
+                      cx="144"
+                      cy="144"
+                      r="140"
+                      stroke={selectedTrack.color}
+                      strokeWidth="3"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 140}`}
+                      strokeDashoffset={`${2 * Math.PI * 140 * (1 - progress / 100)}`}
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="space-y-6">
+                <div className="flex justify-center items-center space-x-6">
+                  <Button
+                    onClick={togglePlayPause}
+                    size="lg"
+                    className="w-16 h-16 rounded-full"
+                    style={{ backgroundColor: selectedTrack.color }}
+                  >
+                    {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                  </Button>
+                  
+                  <Button
+                    onClick={stopTrack}
+                    variant="outline"
+                    size="lg"
+                    className="min-w-32"
+                  >
+                    Terminer la session
+                  </Button>
+                </div>
+
+                {/* Volume Control */}
+                <div className="max-w-md mx-auto">
+                  <div className="flex items-center gap-4">
+                    <Volume2 className="w-5 h-5 text-muted-foreground" />
+                    <Slider
+                      value={volume}
+                      onValueChange={setVolume}
+                      max={100}
+                      step={1}
+                      className="flex-1"
+                    />
+                    <span className="text-sm text-muted-foreground w-12">
+                      {volume[0]}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+    </UniverseEngine>
   );
 };
 
