@@ -29,6 +29,7 @@ const FF_ROUTER_V2 = true;
 // Pages publiques unifiées 
 const HomePage = lazy(() => import('@/components/HomePage'));
 const UnifiedHomePage = lazy(() => import('@/pages/unified/UnifiedHomePage'));
+const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
 const SimpleB2CPage = lazy(() => import('@/components/SimpleB2CPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
