@@ -1,6 +1,9 @@
+import React, { useState } from 'react';
 
-import React, { useState, useCallback } from 'react';
-import { cn } from '@/lib/utils';
+/**
+ * Composant d'image optimisée avec support formats modernes
+ * Phase 2 - Alternative légère à l'optimisation par plugin
+ */
 
 interface OptimizedImageProps {
   src: string;
@@ -8,98 +11,120 @@ interface OptimizedImageProps {
   className?: string;
   width?: number;
   height?: number;
-  quality?: number;
   priority?: boolean;
-  placeholder?: 'blur' | 'empty';
-  onLoad?: () => void;
-  onError?: () => void;
+  sizes?: string;
 }
 
-const OptimizedImage: React.FC<OptimizedImageProps> = ({
+export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
-  className,
+  className = '',
   width,
   height,
-  quality = 75,
   priority = false,
-  placeholder = 'empty',
-  onLoad,
-  onError,
+  sizes = '100vw'
 }) => {
+  const [imageError, setImageError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
 
-  const handleLoad = useCallback(() => {
+  // Générer les sources pour différents formats
+  const generateSources = (baseSrc: string) => {
+    const ext = baseSrc.split('.').pop()?.toLowerCase();
+    const pathWithoutExt = baseSrc.replace(/\.[^/.]+$/, '');
+    
+    return {
+      avif: `${pathWithoutExt}.avif`,
+      webp: `${pathWithoutExt}.webp`,
+      fallback: ext === 'svg' ? baseSrc : `${pathWithoutExt}.${ext === 'jpg' ? 'jpg' : 'png'}`
+    };
+  };
+
+  const sources = generateSources(src);
+
+  const handleImageLoad = () => {
     setIsLoaded(true);
-    onLoad?.();
-  }, [onLoad]);
+  };
 
-  const handleError = useCallback(() => {
-    setHasError(true);
-    onError?.();
-  }, [onError]);
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
-  // Génère une URL optimisée (simulé - en production, utiliser un service comme Cloudinary)
-  const getOptimizedSrc = useCallback((originalSrc: string) => {
-    // En développement, retourne l'URL originale
-    if (import.meta.env.DEV) {
-      return originalSrc;
-    }
-    
-    // En production, ajouter les paramètres d'optimisation
-    const url = new URL(originalSrc, window.location.origin);
-    if (width) url.searchParams.set('w', width.toString());
-    if (height) url.searchParams.set('h', height.toString());
-    url.searchParams.set('q', quality.toString());
-    url.searchParams.set('f', 'webp');
-    
-    return url.toString();
-  }, [width, height, quality]);
-
-  if (hasError) {
-    return (
-      <div 
-        className={cn(
-          "flex items-center justify-center bg-muted text-muted-foreground",
-          className
-        )}
-        style={{ width, height }}
-      >
-        <span className="text-sm">Image non disponible</span>
-      </div>
-    );
-  }
+  // Classes pour les transitions de chargement
+  const imageClasses = `
+    ${className}
+    transition-opacity duration-300
+    ${isLoaded ? 'opacity-100' : 'opacity-0'}
+  `.trim();
 
   return (
-    <div className={cn("relative overflow-hidden", className)}>
-      {/* Placeholder */}
-      {!isLoaded && placeholder === 'blur' && (
+    <div className="relative overflow-hidden">
+      {/* Skeleton de chargement */}
+      {!isLoaded && !imageError && (
         <div 
-          className="absolute inset-0 bg-muted animate-pulse"
-          style={{ width, height }}
+          className="absolute inset-0 bg-muted animate-pulse rounded"
+          style={{ width: width || 'auto', height: height || 'auto' }}
         />
       )}
-      
-      {/* Image principale */}
-      <img
-        src={getOptimizedSrc(src)}
-        alt={alt}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding={priority ? 'sync' : 'async'}
-        onLoad={handleLoad}
-        onError={handleError}
-        className={cn(
-          "transition-opacity duration-300",
-          isLoaded ? "opacity-100" : "opacity-0",
-          className
-        )}
-        style={{ width, height }}
-      />
+
+      <picture>
+        {/* Format AVIF (le plus moderne) */}
+        <source srcSet={sources.avif} type="image/avif" sizes={sizes} />
+        
+        {/* Format WebP (largement supporté) */}
+        <source srcSet={sources.webp} type="image/webp" sizes={sizes} />
+        
+        {/* Fallback image */}
+        <img
+          src={imageError ? '/placeholder.svg' : sources.fallback}
+          alt={alt}
+          className={imageClasses}
+          width={width}
+          height={height}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+        />
+      </picture>
+
+      {/* Indicateur d'erreur */}
+      {imageError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">
+          Image non disponible
+        </div>
+      )}
     </div>
   );
 };
 
-export default OptimizedImage;
+/**
+ * Hook pour précharger les images critiques
+ */
+export const usePreloadImages = (images: string[]) => {
+  React.useEffect(() => {
+    images.forEach(src => {
+      const sources = generateSources(src);
+      
+      // Précharger WebP en priorité
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = sources.webp;
+      document.head.appendChild(link);
+    });
+  }, [images]);
+};
+
+// Fonction utilitaire pour générer les sources (disponible en export)
+const generateSources = (baseSrc: string) => {
+  const ext = baseSrc.split('.').pop()?.toLowerCase();
+  const pathWithoutExt = baseSrc.replace(/\.[^/.]+$/, '');
+  
+  return {
+    avif: `${pathWithoutExt}.avif`,
+    webp: `${pathWithoutExt}.webp`,
+    fallback: ext === 'svg' ? baseSrc : `${pathWithoutExt}.${ext === 'jpg' ? 'jpg' : 'png'}`
+  };
+};
+
+export { generateSources };
