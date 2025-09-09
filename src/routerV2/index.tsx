@@ -133,7 +133,7 @@ const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
 const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
-const RouterAuditPage = lazy(() => import('@/pages/RouterAuditPage'));
+
 const ComponentAuditPage = lazy(() => import('@/pages/ComponentAuditPage'));
 const RouterDashboardPage = lazy(() => import('@/pages/RouterDashboardPage'));
 const CompleteComponentAuditPage = lazy(() => import('@/pages/CompleteComponentAuditPage'));
@@ -267,7 +267,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ForbiddenPage,
   NotFoundPage: UnifiedErrorPage,
   ServerErrorPage,
-  RouterAuditPage,
+  
   ComponentAuditPage,
   RouterDashboardPage,
   CompleteComponentAuditPage,

@@ -809,14 +809,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       guard: false,
     },
     {
-      name: 'router-audit',
-      path: '/dev/router-audit',
-      segment: 'public',
-      layout: 'app',
-      component: 'RouterAuditPage',
-      guard: false,
-    },
-    {
       name: 'component-audit',
       path: '/dev/component-audit',
       segment: 'public',
