@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSimpleAuth } from '@/contexts/SimpleAuth';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { routes } from './routes';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -27,7 +27,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
   allowedRoles = [],
   requireAuth = true,
 }) => {
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useSimpleAuth();
   const { userMode, isLoading: modeLoading } = useUserMode();
 
   // Chargement en cours

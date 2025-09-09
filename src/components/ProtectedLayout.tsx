@@ -2,12 +2,12 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { routes } from '@/routerV2';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSimpleAuth } from '@/contexts/SimpleAuth';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 const ProtectedLayout: React.FC = () => {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useSimpleAuth();
   const { userMode, isLoading: modeLoading } = useUserMode();
 
   if (authLoading || modeLoading) {
