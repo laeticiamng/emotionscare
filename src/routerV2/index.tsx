@@ -135,6 +135,7 @@ const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
+const RouterAuditPage = lazy(() => import('@/pages/RouterAuditPage'));
 
 // Composants de redirection  
 const RedirectToScan = lazy(() => import('@/components/redirects/RedirectToScan'));
@@ -263,6 +264,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ForbiddenPage,
   NotFoundPage,
   ServerErrorPage,
+  RouterAuditPage,
   
   // Composants de redirection
   RedirectToScan,

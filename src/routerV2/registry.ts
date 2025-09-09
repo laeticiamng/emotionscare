@@ -800,6 +800,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'B2CNyveeCoconPage',
       guard: true,
     },
+    {
+      name: 'router-audit',
+      path: '/dev/router-audit',
+      segment: 'public',
+      layout: 'app',
+      component: 'RouterAuditPage',
+      guard: false,
+    },
   // Routes de debug supprimées (pages orphelines nettoyées)
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
