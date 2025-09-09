@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -18,6 +17,7 @@ interface AppProvidersProps {
 /**
  * PROVIDERS UNIFIÉS - Architecture Premium
  * Single provider tree optimisé pour les performances et l'accessibilité
+ * Note: BrowserRouter supprimé car RouterProvider gère déjà le routing
  */
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
@@ -25,30 +25,28 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <AccessibilityProvider>
         <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
           <NotificationProvider>
-            <BrowserRouter>
-              <AuthProvider>
-                <MoodProvider>
-                  <UnifiedProvider>
-                    <EmotionsCareMusicProvider>
-                      {children}
-                      <Toaster 
-                        position="top-right" 
-                        className="toaster group"
-                        closeButton
-                        toastOptions={{
-                          classNames: {
-                            toast: "group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium",
-                            description: "group-[.toast]:text-muted-foreground",
-                            actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-                            cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-                          },
-                        }}
-                      />
-                    </EmotionsCareMusicProvider>
-                  </UnifiedProvider>
-                </MoodProvider>
-              </AuthProvider>
-            </BrowserRouter>
+            <AuthProvider>
+              <MoodProvider>
+                <UnifiedProvider>
+                  <EmotionsCareMusicProvider>
+                    {children}
+                    <Toaster 
+                      position="top-right" 
+                      className="toaster group"
+                      closeButton
+                      toastOptions={{
+                        classNames: {
+                          toast: "group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium",
+                          description: "group-[.toast]:text-muted-foreground",
+                          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+                          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+                        },
+                      }}
+                    />
+                  </EmotionsCareMusicProvider>
+                </UnifiedProvider>
+              </MoodProvider>
+            </AuthProvider>
           </NotificationProvider>
         </ThemeProvider>
       </AccessibilityProvider>
