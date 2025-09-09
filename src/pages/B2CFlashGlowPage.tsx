@@ -11,6 +11,10 @@ import { useFlashGlowMachine } from '@/modules/flash-glow/useFlashGlowMachine';
 import VelvetPulse from '@/modules/flash-glow/ui/VelvetPulse';
 import EndChoice from '@/modules/flash-glow/ui/EndChoice';
 
+/**
+ * B2C FLASH GLOW PAGE - EMOTIONSCARE
+ * Page Flash Glow accessible WCAG 2.1 AA avec thérapie lumière
+ */
 const B2CFlashGlowPage: React.FC = () => {
   const machine = useFlashGlowMachine();
   
@@ -99,11 +103,25 @@ const B2CFlashGlowPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 min-h-screen">
+    <div className="space-y-6 min-h-screen" data-testid="page-root">
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+      >
+        Aller au contenu principal
+      </a>
+      <a 
+        href="#flash-controls" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-40 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+      >
+        Aller aux contrôles Flash Glow
+      </a>
+
       <Breadcrumbs />
       
       {/* Header avec animation dynamique */}
-      <motion.div 
+      <motion.header 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-3"
@@ -114,6 +132,7 @@ const B2CFlashGlowPage: React.FC = () => {
             rotate: [0, 360]
           } : { scale: 1, rotate: 0 }}
           transition={{ duration: 2, repeat: machine.isActive ? Infinity : 0 }}
+          aria-hidden="true"
         >
           <IconComponent className="h-8 w-8 text-yellow-500" />
         </motion.div>
@@ -123,13 +142,14 @@ const B2CFlashGlowPage: React.FC = () => {
             {machine.state === 'active' ? 'Session en cours...' : 'Transformation énergétique instantanée'}
           </p>
         </div>
-      </motion.div>
+      </motion.header>
 
       {/* Stats utilisateur */}
-      <div className="grid grid-cols-3 gap-4">
+      <section aria-labelledby="stats-title" className="grid grid-cols-3 gap-4">
+        <h2 id="stats-title" className="sr-only">Statistiques de vos sessions Flash Glow</h2>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-orange-500">
+            <div className="text-2xl font-bold text-orange-500" aria-label={`${machine.stats?.totalSessions || 0} sessions totales`}>
               {machine.stats?.totalSessions || 0}
             </div>
             <div className="text-sm text-muted-foreground">Sessions</div>
@@ -137,7 +157,7 @@ const B2CFlashGlowPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-500">
+            <div className="text-2xl font-bold text-purple-500" aria-label={`Durée moyenne ${machine.stats?.avgDuration || 0} secondes`}>
               {machine.stats?.avgDuration || 0}s
             </div>
             <div className="text-sm text-muted-foreground">Durée Moy.</div>
@@ -145,13 +165,16 @@ const B2CFlashGlowPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-500">
+            <div className="text-2xl font-bold text-blue-500" aria-label={`État actuel: ${
+              machine.state === 'success' ? 'Terminée avec succès' : 
+              machine.state === 'active' ? 'Session active' : 'En attente'
+            }`}>
               {machine.state === 'success' ? '✨' : machine.state === 'active' ? '🔥' : '💤'}
             </div>
             <div className="text-sm text-muted-foreground">État</div>
           </CardContent>
         </Card>
-      </div>
+      </section>
 
       {/* Si session terminée, afficher les choix de fin */}
       {machine.state === 'ending' && (
@@ -169,19 +192,19 @@ const B2CFlashGlowPage: React.FC = () => {
 
       {/* Configuration et contrôles principaux */}
       {machine.state !== 'ending' && (
-        <Card className="relative overflow-hidden">
+        <Card className="relative overflow-hidden" id="flash-controls">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <IconComponent className="h-5 w-5" />
+              <IconComponent className="h-5 w-5" aria-hidden="true" />
               Zone d'Activation Flash Glow
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             
             {/* Sélection du type d'énergie */}
-            <div>
-              <label className="block text-sm font-medium mb-3">Type d'Énergie</label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <fieldset>
+              <legend className="block text-sm font-medium mb-3">Type d'Énergie</legend>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3" role="radiogroup" aria-label="Choisir le type d'énergie Flash Glow">
                 {Object.entries(glowTypes).map(([key, type]) => {
                   const Icon = type.icon;
                   const isSelected = machine.config.glowType === key;
@@ -199,25 +222,32 @@ const B2CFlashGlowPage: React.FC = () => {
                           isSelected ? `bg-gradient-to-r ${type.color} text-white` : ''
                         }`}
                         onClick={() => handleGlowTypeChange(key)}
+                        role="radio"
+                        aria-checked={isSelected}
+                        aria-describedby={`${key}-desc`}
                       >
-                        <Icon className="h-6 w-6" />
+                        <Icon className="h-6 w-6" aria-hidden="true" />
                         <div className="text-sm font-medium capitalize">{key}</div>
-                        <div className="text-xs opacity-80">{type.description}</div>
+                        <div id={`${key}-desc`} className="text-xs opacity-80">{type.description}</div>
                       </Button>
                     </motion.div>
                   );
                 })}
               </div>
-            </div>
+            </fieldset>
 
             {/* Contrôles d'intensité et durée */}
-            <div className="space-y-4">
+            <section className="space-y-4" aria-labelledby="controls-title">
+              <h3 id="controls-title" className="sr-only">Contrôles de personnalisation</h3>
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm font-medium">Intensité Glow</label>
-                  <Badge variant="outline">{machine.config.intensity}%</Badge>
+                  <label htmlFor="intensity-slider" className="text-sm font-medium">Intensité Glow</label>
+                  <Badge variant="outline" aria-label={`Intensité actuelle ${machine.config.intensity} pourcent`}>
+                    {machine.config.intensity}%
+                  </Badge>
                 </div>
                 <Slider
+                  id="intensity-slider"
                   value={[machine.config.intensity]}
                   onValueChange={([value]) => machine.setConfig({ intensity: value })}
                   max={100}
@@ -225,15 +255,19 @@ const B2CFlashGlowPage: React.FC = () => {
                   step={5}
                   disabled={machine.isActive || machine.isLoading}
                   className="w-full"
+                  aria-label="Régler l'intensité du Flash Glow"
                 />
               </div>
               
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-sm font-medium">Durée (secondes)</label>
-                  <Badge variant="outline">{machine.config.duration}s</Badge>
+                  <label htmlFor="duration-slider" className="text-sm font-medium">Durée (secondes)</label>
+                  <Badge variant="outline" aria-label={`Durée actuelle ${machine.config.duration} secondes`}>
+                    {machine.config.duration}s
+                  </Badge>
                 </div>
                 <Slider
+                  id="duration-slider"
                   value={[machine.config.duration]}
                   onValueChange={([value]) => machine.setConfig({ duration: value })}
                   max={180}
@@ -241,9 +275,10 @@ const B2CFlashGlowPage: React.FC = () => {
                   step={15}
                   disabled={machine.isActive || machine.isLoading}
                   className="w-full"
+                  aria-label="Régler la durée de la session Flash Glow"
                 />
               </div>
-            </div>
+            </section>
 
             {/* Zone de visualisation VelvetPulse */}
             <div className="relative h-64 bg-muted rounded-lg overflow-hidden">

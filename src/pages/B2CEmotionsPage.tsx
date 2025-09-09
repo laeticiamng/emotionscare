@@ -28,6 +28,10 @@ interface EmotionStats {
   dailyAverage: number;
 }
 
+/**
+ * B2C EMOTIONS PAGE - EMOTIONSCARE
+ * Centre émotionnel IA accessible WCAG 2.1 AA
+ */
 const B2CEmotionsPage: React.FC = () => {
   const [currentEmotion, setCurrentEmotion] = useState<string>('');
   const [emotionHistory, setEmotionHistory] = useState<Emotion[]>([]);
@@ -112,16 +116,30 @@ const B2CEmotionsPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 p-6" data-testid="page-root">
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+      >
+        Aller au contenu principal
+      </a>
+      <a 
+        href="#emotion-selector" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-40 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+      >
+        Aller au sélecteur d'émotions
+      </a>
+      
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div
+        <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-blue-500">
+            <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-blue-500" aria-hidden="true">
               <Heart className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -131,44 +149,55 @@ const B2CEmotionsPage: React.FC = () => {
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
             Explorez et comprenez vos émotions avec l'intelligence artificielle avancée
           </p>
-        </motion.div>
+        </motion.header>
 
-        <div className="grid gap-8">
+        <main id="main-content" role="main" className="grid gap-8">
           {/* Interface de sélection d'émotion */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl">
+          <Card className="bg-white/80 backdrop-blur-sm shadow-xl" id="emotion-selector">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-500" />
+                <Heart className="w-5 h-5 text-pink-500" aria-hidden="true" />
                 Comment vous sentez-vous maintenant ?
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-                {emotions.map(emotion => (
-                  <motion.div
-                    key={emotion.id}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={cn(
-                      "p-4 rounded-xl border-2 cursor-pointer transition-all duration-300",
-                      currentEmotion === emotion.id
-                        ? `${emotion.color} text-white border-white shadow-lg`
-                        : "bg-slate-50 hover:bg-slate-100 border-slate-200 hover:border-blue-300"
-                    )}
-                    onClick={() => handleEmotionSelect(emotion.id)}
-                  >
-                    <div className="flex flex-col items-center gap-2">
-                      <motion.div
-                        animate={currentEmotion === emotion.id ? { rotate: [0, 10, -10, 0] } : {}}
-                        transition={{ duration: 0.5 }}
-                      >
-                        {emotion.icon}
-                      </motion.div>
-                      <span className="text-sm font-medium">{emotion.name}</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              <fieldset className="mb-6">
+                <legend className="sr-only">Sélectionnez votre émotion actuelle</legend>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" role="radiogroup" aria-label="Choisir votre émotion actuelle">
+                  {emotions.map(emotion => (
+                    <motion.button
+                      key={emotion.id}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={cn(
+                        "p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary",
+                        currentEmotion === emotion.id
+                          ? `${emotion.color} text-white border-white shadow-lg`
+                          : "bg-slate-50 hover:bg-slate-100 border-slate-200 hover:border-blue-300"
+                      )}
+                      onClick={() => handleEmotionSelect(emotion.id)}
+                      role="radio"
+                      aria-checked={currentEmotion === emotion.id}
+                      aria-describedby={`${emotion.id}-desc`}
+                      tabIndex={0}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <motion.div
+                          animate={currentEmotion === emotion.id ? { rotate: [0, 10, -10, 0] } : {}}
+                          transition={{ duration: 0.5 }}
+                          aria-hidden="true"
+                        >
+                          {emotion.icon}
+                        </motion.div>
+                        <span className="text-sm font-medium">{emotion.name}</span>
+                      </div>
+                      <span id={`${emotion.id}-desc`} className="sr-only">
+                        {`Sélectionner l'émotion ${emotion.name}`}
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+              </fieldset>
 
               {/* Scan IA en cours */}
               <AnimatePresence>
@@ -178,14 +207,18 @@ const B2CEmotionsPage: React.FC = () => {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     className="mb-6 p-6 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl border border-blue-200"
+                    role="status"
+                    aria-live="polite"
+                    aria-label="Analyse IA en cours"
                   >
                     <div className="flex items-center justify-center mb-4">
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                         className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
+                        aria-hidden="true"
                       />
-                      <Brain className="w-8 h-8 text-blue-500 ml-4" />
+                      <Brain className="w-8 h-8 text-blue-500 ml-4" aria-hidden="true" />
                     </div>
                     <div className="text-center">
                       <h3 className="font-semibold text-blue-700 mb-2">Analyse IA en cours...</h3>
@@ -196,7 +229,7 @@ const B2CEmotionsPage: React.FC = () => {
               </AnimatePresence>
 
               {/* Actions rapides */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" role="group" aria-label="Actions rapides pour l'analyse émotionnelle">
                 {quickActions.map((action, index) => (
                   <motion.div
                     key={action.title}
@@ -439,7 +472,7 @@ const B2CEmotionsPage: React.FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </main>
       </div>
     </div>
   );

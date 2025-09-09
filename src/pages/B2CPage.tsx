@@ -126,13 +126,30 @@ const B2CPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background">
-      {/* === HERO SECTION === */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
-        
-        <div className="relative max-w-7xl mx-auto text-center">
+    <div className="min-h-screen bg-background" data-testid="page-root">
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        tabIndex={1}
+      >
+        Aller au contenu principal
+      </a>
+      <a 
+        href="#features" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-40 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        tabIndex={2}
+      >
+        Aller aux fonctionnalités
+      </a>
+
+      <main id="main-content" role="main" className="min-h-screen bg-background">
+        {/* === HERO SECTION === */}
+        <section className="relative py-20 px-4 overflow-hidden" aria-labelledby="hero-title">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
+          
+          <div className="relative max-w-7xl mx-auto text-center">
           <div className={cn(
             'transition-all duration-1000 transform',
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
@@ -142,7 +159,7 @@ const B2CPage: React.FC = () => {
               Plateforme de Bien-être Émotionnel Premium
             </Badge>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
+            <h1 id="hero-title" className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
               EmotionsCare
             </h1>
             
@@ -153,14 +170,14 @@ const B2CPage: React.FC = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button size="lg" className="px-8 py-3" asChild>
-                <Link to="/app">
-                  <Play className="w-5 h-5 mr-2" />
+                <Link to="/app" aria-label="Commencer gratuitement - Accédez à votre plateforme de bien-être">
+                  <Play className="w-5 h-5 mr-2" aria-hidden="true" />
                   Commencer gratuitement
                 </Link>
               </Button>
               
-              <Button variant="outline" size="lg" className="px-8 py-3">
-                <Camera className="w-5 h-5 mr-2" />
+              <Button variant="outline" size="lg" className="px-8 py-3" aria-label="Voir la démo vidéo de la plateforme">
+                <Camera className="w-5 h-5 mr-2" aria-hidden="true" />
                 Voir la démo
               </Button>
             </div>
@@ -225,17 +242,17 @@ const B2CPage: React.FC = () => {
         </div>
       </section>
 
-      {/* === FONCTIONNALITÉS PRINCIPALES === */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Technologie de Pointe
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Découvrez comment nous révolutionnons le bien-être émotionnel avec l'IA
-            </p>
-          </div>
+        {/* === FONCTIONNALITÉS PRINCIPALES === */}
+        <section id="features" className="py-20 px-4 bg-muted/30" aria-labelledby="features-title">
+          <div className="max-w-7xl mx-auto">
+            <header className="text-center mb-16">
+              <h2 id="features-title" className="text-3xl md:text-4xl font-bold mb-4">
+                Technologie de Pointe
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Découvrez comment nous révolutionnons le bien-être émotionnel avec l'IA
+              </p>
+            </header>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -277,20 +294,19 @@ const B2CPage: React.FC = () => {
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* === TÉMOIGNAGES === */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ils nous font confiance
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Découvrez comment EmotionsCare transforme des vies
-            </p>
-          </div>
+        {/* === TÉMOIGNAGES === */}
+        <section className="py-20 px-4" aria-labelledby="testimonials-title">
+          <div className="max-w-7xl mx-auto">
+            <header className="text-center mb-16">
+              <h2 id="testimonials-title" className="text-3xl md:text-4xl font-bold mb-4">
+                Ils nous font confiance
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Découvrez comment EmotionsCare transforme des vies
+              </p>
+            </header>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
@@ -321,41 +337,63 @@ const B2CPage: React.FC = () => {
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* === CTA FINAL === */}
-      <section className="py-20 px-4 bg-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Commencez votre parcours de bien-être aujourd'hui
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Rejoignez des milliers d'utilisateurs qui transforment leur vie émotionnelle avec EmotionsCare
-          </p>
+        {/* === CTA FINAL === */}
+        <section className="py-20 px-4 bg-primary text-primary-foreground" aria-labelledby="cta-title">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 id="cta-title" className="text-3xl md:text-4xl font-bold mb-6">
+              Commencez votre parcours de bien-être aujourd'hui
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Rejoignez des milliers d'utilisateurs qui transforment leur vie émotionnelle avec EmotionsCare
+            </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="px-8 py-3" asChild>
-              <Link to="/signup">
-                <Zap className="w-5 h-5 mr-2" />
-                Inscription gratuite
-              </Link>
-            </Button>
-            
-            <Button size="lg" variant="outline" className="px-8 py-3 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
-              <Link to="/entreprise">
-                <Users className="w-5 h-5 mr-2" />
-                Version Entreprise
-              </Link>
-            </Button>
-          </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="secondary" className="px-8 py-3" asChild>
+                <Link to="/signup" aria-label="Inscription gratuite - Créer votre compte EmotionsCare">
+                  <Zap className="w-5 h-5 mr-2" aria-hidden="true" />
+                  Inscription gratuite
+                </Link>
+              </Button>
+              
+              <Button size="lg" variant="outline" className="px-8 py-3 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+                <Link to="/entreprise" aria-label="Version Entreprise - Solutions pour les organisations">
+                  <Users className="w-5 h-5 mr-2" aria-hidden="true" />
+                  Version Entreprise
+                </Link>
+              </Button>
+            </div>
           
           <p className="text-sm mt-6 opacity-75">
             Aucun engagement • 30 jours d'essai • Support 24/7
           </p>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer role="contentinfo" className="bg-card border-t">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <p>© 2025 EmotionsCare - L'IA au service de votre bien-être</p>
+            <nav aria-label="Liens footer">
+              <div className="flex space-x-4">
+                <Link to="/privacy" className="hover:text-foreground">
+                  Confidentialité
+                </Link>
+                <Link to="/terms" className="hover:text-foreground">
+                  Conditions
+                </Link>
+                <Link to="/contact" className="hover:text-foreground">
+                  Contact
+                </Link>
+              </div>
+            </nav>
+          </div>
         </div>
-      </section>
-    </main>
+      </footer>
+    </div>
   );
 };
 

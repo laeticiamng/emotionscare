@@ -28,6 +28,10 @@ import {
 } from "lucide-react";
 import { CopyBadge } from "@/components/transverse";
 
+/**
+ * B2C HOME PAGE - EMOTIONSCARE  
+ * Page d'accueil B2C accessible WCAG 2.1 AA
+ */
 export default function B2CHomePage() {
   const navigate = useNavigate();
 
@@ -222,9 +226,25 @@ export default function B2CHomePage() {
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        tabIndex={1}
+      >
+        Aller au contenu principal
+      </a>
+      <a 
+        href="#quick-access" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-40 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        tabIndex={2}
+      >
+        Aller à l'accès rapide
+      </a>
+
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main id="main-content" role="main" className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -232,7 +252,7 @@ export default function B2CHomePage() {
           className="space-y-8"
         >
           {/* Welcome Section */}
-          <div className="text-center space-y-4">
+          <header className="text-center space-y-4">
             <h1 className="text-3xl lg:text-4xl font-bold">
               Bienvenue dans votre espace de bien-être
             </h1>
@@ -240,21 +260,22 @@ export default function B2CHomePage() {
               Explorez nos modules innovants pour améliorer votre santé émotionnelle. 
               Chaque outil est conçu pour s'adapter à vos besoins uniques.
             </p>
-          </div>
+          </header>
 
           {/* Module Categories */}
           {moduleCategories.map((category, categoryIndex) => (
-            <motion.div
+            <motion.section
               key={category.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
               className="space-y-4"
+              aria-labelledby={`category-${categoryIndex}`}
             >
-              <div className="text-left">
-                <h2 className="text-2xl font-semibold">{category.title}</h2>
+              <header className="text-left">
+                <h2 id={`category-${categoryIndex}`} className="text-2xl font-semibold">{category.title}</h2>
                 <p className="text-muted-foreground">{category.description}</p>
-              </div>
+              </header>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {category.modules.map((module, moduleIndex) => (
@@ -270,48 +291,60 @@ export default function B2CHomePage() {
                     className="cursor-pointer"
                     onClick={() => navigate(module.path)}
                   >
-                    <Card className="h-full hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className={`p-2 rounded-lg bg-background border`}>
-                              <module.icon className={`h-6 w-6 ${module.color}`} />
-                            </div>
-                            <div>
-                              <CardTitle className="text-lg">{module.name}</CardTitle>
-                            </div>
-                          </div>
-                          <CopyBadge 
-                            kind={module.badge.kind as any} 
-                            value={module.badge.value}
-                            className="text-xs"
-                          />
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription className="text-sm leading-relaxed">
-                          {module.description}
-                        </CardDescription>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mt-3 w-full justify-center hover:bg-primary/10"
-                        >
-                          Commencer
-                        </Button>
-                      </CardContent>
-                    </Card>
+                     <Card 
+                       className="h-full hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary"
+                       tabIndex={0}
+                       role="button"
+                       aria-describedby={`module-desc-${moduleIndex}`}
+                     >
+                       <CardHeader className="pb-3">
+                         <div className="flex items-start justify-between">
+                           <div className="flex items-center space-x-3">
+                             <div className={`p-2 rounded-lg bg-background border`} aria-hidden="true">
+                               <module.icon className={`h-6 w-6 ${module.color}`} />
+                             </div>
+                             <div>
+                               <CardTitle className="text-lg">{module.name}</CardTitle>
+                             </div>
+                           </div>
+                           <CopyBadge 
+                             kind={module.badge.kind as any} 
+                             value={module.badge.value}
+                             className="text-xs"
+                           />
+                         </div>
+                       </CardHeader>
+                       <CardContent>
+                         <CardDescription 
+                           id={`module-desc-${moduleIndex}`}
+                           className="text-sm leading-relaxed"
+                         >
+                           {module.description}
+                         </CardDescription>
+                         <Button
+                           variant="ghost"
+                           size="sm"
+                           className="mt-3 w-full justify-center hover:bg-primary/10"
+                           aria-label={`Commencer ${module.name}: ${module.description}`}
+                         >
+                           Commencer
+                         </Button>
+                       </CardContent>
+                     </Card>
                   </motion.div>
                 ))}
               </div>
-            </motion.div>
+            </motion.section>
           ))}
 
           {/* Quick Access */}
-          <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <Card 
+            id="quick-access" 
+            className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20"
+          >
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Zap className="h-6 w-6 text-primary" />
+                <Zap className="h-6 w-6 text-primary" aria-hidden="true" />
                 <span>Accès Rapide</span>
               </CardTitle>
               <CardDescription>
@@ -324,32 +357,36 @@ export default function B2CHomePage() {
                   variant="outline"
                   onClick={() => navigate('/app/scan')}
                   className="flex flex-col h-20 space-y-2"
+                  aria-label="Scanner mes émotions - Analyse faciale en temps réel"
                 >
-                  <Scan className="h-5 w-5" />
+                  <Scan className="h-5 w-5" aria-hidden="true" />
                   <span className="text-xs">Scanner</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/app/flash-glow')}
                   className="flex flex-col h-20 space-y-2"
+                  aria-label="Flash Glow - Session de thérapie lumière de 2 minutes"
                 >
-                  <Zap className="h-5 w-5" />
+                  <Zap className="h-5 w-5" aria-hidden="true" />
                   <span className="text-xs">Flash 2min</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/app/music')}
                   className="flex flex-col h-20 space-y-2"
+                  aria-label="Musique thérapeutique - Sons adaptatifs personnalisés"
                 >
-                  <Music className="h-5 w-5" />
+                  <Music className="h-5 w-5" aria-hidden="true" />
                   <span className="text-xs">Musique</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/app/journal')}
                   className="flex flex-col h-20 space-y-2"
+                  aria-label="Journal émotionnel - Consignez vos ressentis"
                 >
-                  <PenTool className="h-5 w-5" />
+                  <PenTool className="h-5 w-5" aria-hidden="true" />
                   <span className="text-xs">Journal</span>
                 </Button>
               </div>
