@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { ModuleState, SessionResult, ModuleContext } from '@/types/modules';
 import { clinicalScoringService } from '@/services/clinicalScoring';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 
 export const useModuleSession = () => {
   const [state, setState] = useState<ModuleState>('content');
