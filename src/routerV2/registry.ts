@@ -14,7 +14,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/',
     segment: 'public',
     layout: 'marketing',
-    component: 'HomePage',
+    component: 'UnifiedHomePage',
   },
   // /home redirect supprimé - confus et inutile
   {
@@ -97,7 +97,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/login',
     segment: 'public',
     layout: 'marketing',
-    component: 'LoginPage',
+    component: 'UnifiedLoginPage',
     aliases: ['/auth', '/b2c/login', '/b2b/user/login', '/b2b/admin/login'],
   },
   {

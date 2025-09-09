@@ -1,3 +1,8 @@
+/**
+ * UNIFIED HOME PAGE - Fusion de HomePage + HomeB2CPage
+ * Préserve EXACTEMENT la même fonctionnalité des deux composants
+ */
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,13 +34,21 @@ import {
   Smile,
   Activity
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export default function HomePage() {
+interface UnifiedHomePageProps {
+  variant?: 'full' | 'b2c-simple';
+}
+
+export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
+  const [searchParams] = useSearchParams();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
+  
+  // Détection automatique du variant depuis les params
+  const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
 
   // Auto-rotate testimonials
   useEffect(() => {
@@ -166,6 +179,161 @@ export default function HomePage() {
     }
   ];
 
+  // Version B2C Simple (comme HomeB2CPage)
+  if (detectedVariant === 'b2c-simple') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50" data-testid="page-root">
+        {/* Header */}
+        <header className="bg-white shadow-sm">
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <Heart className="h-8 w-8 text-primary" />
+              <span className="text-2xl font-bold text-gray-900">EmotionsCare</span>
+            </div>
+            <div className="flex space-x-4">
+              <Link to="/login">
+                <Button variant="ghost">Se connecter</Button>
+              </Link>
+              <Link to="/signup">
+                <Button>S'inscrire</Button>
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <section className="py-20">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              Prenez soin de votre bien-être émotionnel
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Découvrez une approche innovante du bien-être mental avec nos outils 
+              d'analyse émotionnelle, de méditation guidée et de coaching personnalisé.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Link to="/signup">
+                <Button size="lg" className="px-8">
+                  Commencer gratuitement
+                </Button>
+              </Link>
+              <Link to="/entreprise">
+                <Button size="lg" variant="outline" className="px-8">
+                  Solutions entreprise
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+              Nos fonctionnalités phares
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6 text-center">
+                  <Brain className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">Scan émotionnel IA</h3>
+                  <p className="text-gray-600">
+                    Analysez vos émotions en temps réel grâce à notre intelligence artificielle
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6 text-center">
+                  <Smile className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">Modules Fun-First</h3>
+                  <p className="text-gray-600">
+                    Des expériences ludiques et immersives pour améliorer votre humeur
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6 text-center">
+                  <Zap className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-3">Coach personnel IA</h3>
+                  <p className="text-gray-600">
+                    Un accompagnement personnalisé pour votre développement personnel
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-16 bg-primary text-primary-foreground">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-6">
+              Prêt à transformer votre bien-être ?
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie
+            </p>
+            <Link to="/signup">
+              <Button size="lg" variant="secondary" className="px-8">
+                Créer mon compte gratuit
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-12">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <Heart className="h-6 w-6" />
+                  <span className="text-xl font-bold">EmotionsCare</span>
+                </div>
+                <p className="text-gray-400">
+                  La plateforme de référence pour le bien-être émotionnel
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-4">Produit</h4>
+                <ul className="space-y-2 text-gray-400">
+                  <li><Link to="/about" className="hover:text-white">À propos</Link></li>
+                  <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+                  <li><Link to="/help" className="hover:text-white">Aide</Link></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-4">Solutions</h4>
+                <ul className="space-y-2 text-gray-400">
+                  <li><Link to="/b2c" className="hover:text-white">Particuliers</Link></li>
+                  <li><Link to="/entreprise" className="hover:text-white">Entreprises</Link></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-4">Compte</h4>
+                <ul className="space-y-2 text-gray-400">
+                  <li><Link to="/login" className="hover:text-white">Connexion</Link></li>
+                  <li><Link to="/signup" className="hover:text-white">Inscription</Link></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+              <p>&copy; 2024 EmotionsCare. Tous droits réservés.</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // Version Full Marketing (comme HomePage original)
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
       <Header />
@@ -409,37 +577,35 @@ export default function HomePage() {
                   viewport={{ once: true }}
                   className="group"
                 >
-                  <Card className="h-full p-8 hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background to-background/50 group-hover:from-primary/5 group-hover:to-primary/10">
-                    <CardContent className="p-0 space-y-6 text-center">
-                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                        <useCase.icon className="h-10 w-10 text-white" />
+                  <Card className="h-full hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background to-muted/50 group-hover:from-primary/5">
+                    <CardHeader className="text-center pb-4">
+                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mb-4">
+                        <useCase.icon className="h-10 w-10 text-primary" />
                       </div>
+                      <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors">
+                        {useCase.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6 text-center">
+                      <CardDescription className="text-base leading-relaxed">
+                        {useCase.description}
+                      </CardDescription>
                       
                       <div className="space-y-3">
-                        <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">
-                          {useCase.title}
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {useCase.description}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
                         {useCase.features.map((feature, i) => (
-                          <div key={i} className="flex items-center justify-center space-x-2 text-sm">
-                            <Sparkles className="h-4 w-4 text-primary" />
-                            <span>{feature}</span>
+                          <div key={i} className="flex items-center space-x-3 text-sm">
+                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            <span className="text-muted-foreground text-left">{feature}</span>
                           </div>
                         ))}
                       </div>
 
-                      <Button 
-                        className="w-full mt-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all" 
-                        asChild
-                      >
+                      <Separator className="my-6" />
+
+                      <Button className="w-full group-hover:shadow-lg transition-all" asChild>
                         <Link to={useCase.link}>
-                          {useCase.cta}
-                          <ArrowRight className="h-4 w-4 ml-2" />
+                          <span>{useCase.cta}</span>
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                         </Link>
                       </Button>
                     </CardContent>
@@ -462,72 +628,61 @@ export default function HomePage() {
             >
               <Badge variant="secondary" className="mb-2">Témoignages</Badge>
               <h2 className="text-4xl lg:text-5xl font-bold">
-                Ils nous font confiance
+                Ce que disent nos utilisateurs
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Découvrez comment EmotionsCare transforme la vie de nos utilisateurs
+                Des milliers de personnes nous font confiance pour leur bien-être émotionnel
               </p>
             </motion.div>
 
             <div className="max-w-4xl mx-auto">
-              <Card className="p-8 border-0 bg-gradient-to-br from-primary/5 via-background to-primary/5 shadow-xl">
-                <CardContent className="p-0">
-                  <motion.div
-                    key={currentTestimonial}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="text-center space-y-6"
-                  >
-                    <div className="flex justify-center">
-                      {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                        <Star key={i} className="h-6 w-6 text-yellow-500 fill-current" />
-                      ))}
-                    </div>
-                    
-                    <blockquote className="text-xl lg:text-2xl font-medium leading-relaxed text-foreground">
-                      "{testimonials[currentTestimonial].text}"
-                    </blockquote>
-                    
-                    <div className="flex items-center justify-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold">
-                          {testimonials[currentTestimonial].name.charAt(0)}
-                        </span>
-                      </div>
-                      <div className="text-left">
-                        <div className="font-semibold">{testimonials[currentTestimonial].name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {testimonials[currentTestimonial].role} • {testimonials[currentTestimonial].company}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                  
-                  <div className="flex justify-center space-x-2 mt-8">
-                    {testimonials.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentTestimonial(index)}
-                        className={cn(
-                          "w-3 h-3 rounded-full transition-all duration-300",
-                          index === currentTestimonial 
-                            ? "bg-primary scale-125" 
-                            : "bg-muted hover:bg-muted-foreground/30"
-                        )}
-                        aria-label={`Témoignage ${index + 1}`}
-                      />
+              <motion.div
+                key={currentTestimonial}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 lg:p-12"
+              >
+                <div className="text-center space-y-6">
+                  <div className="flex justify-center space-x-1 mb-6">
+                    {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
+                      <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                  
+                  <blockquote className="text-xl lg:text-2xl font-medium leading-relaxed text-foreground">
+                    "{testimonials[currentTestimonial].text}"
+                  </blockquote>
+                  
+                  <div className="space-y-2">
+                    <div className="font-semibold text-lg">{testimonials[currentTestimonial].name}</div>
+                    <div className="text-muted-foreground">{testimonials[currentTestimonial].role}</div>
+                    <Badge variant="outline" className="mt-2">
+                      {testimonials[currentTestimonial].company}
+                    </Badge>
+                  </div>
+                </div>
+              </motion.div>
+
+              <div className="flex justify-center space-x-2 mt-8">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentTestimonial(index)}
+                    className={cn(
+                      "w-3 h-3 rounded-full transition-all duration-300",
+                      index === currentTestimonial ? "bg-primary" : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section Enhanced */}
-        <section className="py-24 bg-gradient-to-br from-primary via-primary to-primary/80 text-white relative overflow-hidden">
-          <div className="container relative z-10">
+        {/* Final CTA Section */}
+        <section className="py-20 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+          <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -535,59 +690,44 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="text-center space-y-8 max-w-4xl mx-auto"
             >
-              <div className="space-y-6">
-                <Badge variant="secondary" className="bg-white/20 text-white border-white/30 mb-4">
-                  Offre limitée
-                </Badge>
-                <h2 className="text-4xl lg:text-6xl font-bold leading-tight">
-                  Transformez votre vie émotionnelle
-                  <span className="block text-3xl lg:text-4xl font-normal mt-2 text-white/90">
-                    dès aujourd'hui
-                  </span>
-                </h2>
-                <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-                  Rejoignez plus de <strong>25,000 utilisateurs</strong> qui ont déjà transformé leur bien-être émotionnel avec EmotionsCare.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300 px-8 py-4 text-lg font-semibold" asChild>
-                  <Link to="/login">
-                    <Heart className="h-5 w-5 mr-2" />
-                    <span>Commencer gratuitement</span>
-                    <ArrowRight className="h-5 w-5 ml-2" />
+              <h2 className="text-4xl lg:text-5xl font-bold">
+                Prêt à transformer votre vie émotionnelle ?
+              </h2>
+              <p className="text-xl opacity-90 leading-relaxed">
+                Rejoignez plus de 25 000 utilisateurs qui ont déjà découvert le pouvoir de l'intelligence émotionnelle. 
+                Commencez votre parcours dès aujourd'hui avec notre essai gratuit de 30 jours.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button size="lg" variant="secondary" className="px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all" asChild>
+                  <Link to="/signup">
+                    <Play className="h-5 w-5 mr-2" />
+                    <span>Commencer maintenant</span>
                   </Link>
                 </Button>
-                <Button size="lg" variant="ghost" className="text-white border-2 border-white/30 hover:bg-white/10 px-8 py-4 text-lg" asChild>
-                  <Link to="/help">
-                    <BookOpen className="h-5 w-5 mr-2" />
-                    Découvrir les fonctionnalités
+                <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg" asChild>
+                  <Link to="/demo">
+                    <Globe className="h-5 w-5 mr-2" />
+                    <span>Voir la démo</span>
                   </Link>
                 </Button>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                <div className="flex items-center justify-center space-x-3 text-white/90">
-                  <Shield className="h-5 w-5" />
-                  <span className="font-medium">Sécurité garantie</span>
+              
+              <div className="flex items-center justify-center space-x-8 text-sm opacity-80">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Essai gratuit 30 jours</span>
                 </div>
-                <div className="flex items-center justify-center space-x-3 text-white/90">
-                  <Clock className="h-5 w-5" />
-                  <span className="font-medium">Support 24/7</span>
+                <div className="flex items-center space-x-2">
+                  <Shield className="h-4 w-4" />
+                  <span>Sécurisé & Confidentiel</span>
                 </div>
-                <div className="flex items-center justify-center space-x-3 text-white/90">
-                  <Globe className="h-5 w-5" />
-                  <span className="font-medium">RGPD conforme</span>
+                <div className="flex items-center space-x-2">
+                  <Heart className="h-4 w-4" />
+                  <span>Support premium</span>
                 </div>
               </div>
             </motion.div>
-          </div>
-
-          {/* Background decoration */}
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-            <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
           </div>
         </section>
       </main>
