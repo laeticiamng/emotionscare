@@ -1,74 +1,189 @@
-
-import { useState } from 'react';
+import { useCallback } from 'react';
+import { useMusic } from '@/hooks/useMusic';
+import { useSoundscape } from '@/providers/SoundscapeProvider';
+import { EmotionMusicParams, MusicPlaylist, MusicTrack } from '@/types/music';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { MusicPlaylist } from '@/types/music';
+import { toast } from 'sonner';
 
 export const useMusicEmotionIntegration = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { state, generateMusicForEmotion, setPlaylist, play } = useMusic();
+  const { updateSoundscapeForEmotion } = useSoundscape();
 
-  const activateMusicForEmotion = async (params: { emotion: string; intensity?: number }) => {
-    setIsLoading(true);
-    
+  // Activation de la musique basée sur l'émotion
+  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
     try {
-      console.log('🎵 Appel de la fonction emotionscare-music-generator avec:', params);
+      const { emotion, intensity = 0.5, duration = 120, instrumental = true, style } = params;
+
+      // Rechercher d'abord dans la bibliothèque existante
+      const existingTracks = await searchExistingTracks(emotion);
       
-      const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
-        body: {
-          emotion: params.emotion,
-          intensity: params.intensity || 0.7
+      if (existingTracks.length > 0) {
+        const playlist: MusicPlaylist = {
+          id: `emotion-${emotion}-${Date.now()}`,
+          name: `Playlist ${emotion}`,
+          tracks: existingTracks,
+          description: `Musique adaptée à votre état émotionnel: ${emotion}`,
+          tags: [emotion, 'therapeutic'],
+          isTherapeutic: true,
+          targetEmotion: emotion,
+          duration: existingTracks.reduce((total, track) => total + track.duration, 0)
+        };
+
+        setPlaylist(existingTracks);
+        
+        // Mettre à jour le paysage sonore
+        if (updateSoundscapeForEmotion) {
+          updateSoundscapeForEmotion(emotion);
         }
-      });
-
-      if (error) {
-        console.error('❌ Erreur Supabase:', error);
-        throw error;
+        
+        toast.success(`Playlist ${emotion} activée`);
+        return playlist;
       }
 
-      if (!data) {
-        throw new Error('Aucune donnée reçue de la fonction');
-      }
-
-      console.log('✅ Playlist générée:', data);
+      // Si pas de tracks existants, générer avec Suno
+      const generatedTrack = await generateMusicForEmotion(emotion, style);
       
-      toast({
-        title: "Playlist générée",
-        description: `Playlist pour l'émotion "${params.emotion}" créée avec succès`,
-      });
+      if (generatedTrack) {
+        const playlist: MusicPlaylist = {
+          id: `generated-${emotion}-${Date.now()}`,
+          name: `Musique générée - ${emotion}`,
+          tracks: [generatedTrack],
+          description: `Musique thérapeutique générée pour votre état: ${emotion}`,
+          tags: [emotion, 'generated', 'therapeutic'],
+          isTherapeutic: true,
+          targetEmotion: emotion,
+          duration: generatedTrack.duration
+        };
 
-      return data as MusicPlaylist;
+        setPlaylist([generatedTrack]);
+        
+        // Mettre à jour le paysage sonore
+        if (updateSoundscapeForEmotion) {
+          updateSoundscapeForEmotion(emotion);
+        }
+        
+        return playlist;
+      }
+
+      return null;
     } catch (error) {
-      console.error('❌ Erreur lors de la génération:', error);
-      
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer la playlist. Vérifiez votre connexion.",
-        variant: "destructive",
-      });
-      
-      throw error;
-    } finally {
-      setIsLoading(false);
+      console.error('Erreur activation musique émotion:', error);
+      toast.error('Impossible d\'activer la musique pour cette émotion');
+      return null;
     }
-  };
+  }, [generateMusicForEmotion, setPlaylist, updateSoundscapeForEmotion]);
 
-  const getEmotionMusicDescription = (emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      calm: "Une musique apaisante pour vous détendre et retrouver votre sérénité.",
-      energetic: "Des rythmes dynamiques pour vous donner de l'énergie et de la motivation.",
-      happy: "Des mélodies joyeuses pour amplifier votre bonne humeur.",
-      sad: "Des sons réconfortants pour vous accompagner dans vos moments difficiles.",
-      focused: "Une ambiance sonore parfaite pour la concentration et la productivité.",
-      relaxed: "Des sonorités douces pour un moment de détente absolu.",
-    };
-    
-    return descriptions[emotion.toLowerCase()] || "Une playlist personnalisée selon votre état émotionnel.";
-  };
+  // Recherche de tracks existants par émotion
+  const searchExistingTracks = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('music_tracks')
+        .select('*')
+        .or(`emotion.eq.${emotion},tags.ilike.%${emotion}%`)
+        .limit(10);
+
+      if (error) throw error;
+
+      return data.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        url: track.audio_url,
+        audioUrl: track.audio_url,
+        duration: track.duration || 120,
+        emotion: track.emotion,
+        mood: track.mood,
+        coverUrl: track.cover_url,
+        tags: track.tags,
+        bpm: track.bpm,
+        key: track.key,
+        energy: track.energy
+      }));
+    } catch (error) {
+      console.error('Erreur recherche tracks:', error);
+      return [];
+    }
+  }, []);
+
+  // Suggestions de musique basées sur l'émotion
+  const getMusicRecommendations = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
+    try {
+      // Mapping émotions vers styles musicaux
+      const emotionStyleMap: Record<string, string[]> = {
+        'calm': ['ambient', 'classical', 'meditation'],
+        'energetic': ['upbeat', 'electronic', 'pop'],
+        'sad': ['melancholic', 'acoustic', 'slow'],
+        'happy': ['uplifting', 'major key', 'bright'],
+        'focused': ['instrumental', 'minimal', 'concentration'],
+        'stressed': ['relaxing', 'nature sounds', 'breathing'],
+        'creative': ['inspiring', 'artistic', 'experimental'],
+        'tired': ['gentle', 'soft', 'recovery']
+      };
+
+      const styles = emotionStyleMap[emotion.toLowerCase()] || ['ambient'];
+      
+      const { data, error } = await supabase
+        .from('music_tracks')
+        .select('*')
+        .or(styles.map(style => `tags.ilike.%${style}%`).join(','))
+        .limit(15)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        url: track.audio_url,
+        audioUrl: track.audio_url,
+        duration: track.duration || 120,
+        emotion: track.emotion,
+        mood: track.mood,
+        coverUrl: track.cover_url,
+        tags: track.tags,
+        bpm: track.bpm,
+        key: track.key,
+        energy: track.energy
+      }));
+    } catch (error) {
+      console.error('Erreur recommandations musique:', error);
+      return [];
+    }
+  }, []);
+
+  // Analyse de l'impact émotionnel de la musique
+  const analyzeMusicImpact = useCallback(async (trackId: string, userFeedback: 'positive' | 'negative' | 'neutral') => {
+    try {
+      const { error } = await supabase
+        .from('music_feedback')
+        .insert({
+          track_id: trackId,
+          user_feedback: userFeedback,
+          timestamp: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      // Mettre à jour les statistiques du track
+      await supabase.rpc('update_track_stats', {
+        track_id: trackId,
+        feedback: userFeedback
+      });
+
+    } catch (error) {
+      console.error('Erreur analyse impact:', error);
+    }
+  }, []);
 
   return {
     activateMusicForEmotion,
-    getEmotionMusicDescription,
-    isLoading
+    searchExistingTracks,
+    getMusicRecommendations,
+    analyzeMusicImpact,
+    isGenerating: state.isGenerating,
+    generationProgress: state.generationProgress,
+    currentEmotion: state.emotionTarget,
+    therapeuticMode: state.therapeuticMode
   };
 };

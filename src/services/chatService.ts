@@ -1,14 +1,87 @@
+import { supabase } from '@/integrations/supabase/client';
+import { ChatResponse, Message } from '@/types/support';
 
-import { ChatResponse } from "@/types/support";
+export class ChatService {
+  static async getSupportResponse(content: string, conversationHistory?: Message[]): Promise<ChatResponse> {
+    try {
+      const { data, error } = await supabase.functions.invoke('support-chat', {
+        body: {
+          message: content,
+          history: conversationHistory || [],
+          context: 'support'
+        }
+      });
 
-export async function getSupportResponse(message: string): Promise<ChatResponse> {
-  // Simulation d'une réponse d'API
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  return {
-    id: `resp-${Date.now()}`,
-    content: `Merci pour votre message: "${message.substring(0, 30)}${message.length > 30 ? '...' : ''}". 
-    Comment puis-je vous aider davantage?`,
-    emotion: ["neutral", "curious", "helpful"][Math.floor(Math.random() * 3)]
-  };
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        content: data.response,
+        emotion: data.detectedEmotion,
+        timestamp: new Date().toISOString(),
+        suggestions: data.suggestions,
+        confidence: data.confidence
+      };
+    } catch (error) {
+      console.error('Error getting support response:', error);
+      
+      // Fallback response
+      return {
+        id: crypto.randomUUID(),
+        content: "Je suis désolé, je rencontre actuellement des difficultés techniques. Un membre de notre équipe vous contactera bientôt.",
+        timestamp: new Date().toISOString(),
+        suggestions: [
+          "Essayer de reformuler votre question",
+          "Consulter notre FAQ",
+          "Contacter le support technique"
+        ]
+      };
+    }
+  }
+
+  static async createSupportTicket(subject: string, message: string, priority: 'low' | 'medium' | 'high' | 'urgent' = 'medium') {
+    try {
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .insert({
+          subject,
+          priority,
+          status: 'open',
+          category: 'general',
+          first_message: message
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error creating support ticket:', error);
+      throw error;
+    }
+  }
+
+  static async getFAQ(category?: string) {
+    try {
+      let query = supabase.from('faq').select('*');
+      
+      if (category) {
+        query = query.eq('category', category);
+      }
+      
+      const { data, error } = await query.order('helpful', { ascending: false });
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching FAQ:', error);
+      return [];
+    }
+  }
 }
+
+export const getSupportResponse = ChatService.getSupportResponse;
+export const createSupportTicket = ChatService.createSupportTicket;
+export const getFAQ = ChatService.getFAQ;
