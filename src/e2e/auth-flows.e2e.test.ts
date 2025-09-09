@@ -1,6 +1,6 @@
 
 import { test, expect } from '@playwright/test';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 test.describe('Authentication Flows E2E', () => {
   test.beforeEach(async ({ page }) => {
@@ -10,11 +10,11 @@ test.describe('Authentication Flows E2E', () => {
   test('B2C authentication complete flow', async ({ page }) => {
     // Navigate to B2C login
     await page.click('text=Espace Personnel');
-    await expect(page).toHaveURL(Routes.login({ segment: 'b2c' }));
+    await expect(page).toHaveURL(routes.auth.b2cLogin());
 
     // Test registration flow
     await page.click('text=Créer un compte');
-    await expect(page).toHaveURL(Routes.signup({ segment: 'b2c' }));
+    await expect(page).toHaveURL(routes.auth.b2cRegister());
 
     await page.fill('input[name="email"]', 'test-b2c@example.com');
     await page.fill('input[name="password"]', 'password123');
@@ -23,7 +23,7 @@ test.describe('Authentication Flows E2E', () => {
     await page.click('button[type="submit"]');
     
     // Should redirect to dashboard after successful registration
-    await expect(page).toHaveURL(Routes.consumerHome());
+    await expect(page).toHaveURL(routes.b2c.dashboard());
     
     // Verify dashboard elements
     await expect(page.locator('h1')).toContainText('Tableau de bord');
@@ -34,18 +34,18 @@ test.describe('Authentication Flows E2E', () => {
   test('B2B user authentication flow', async ({ page }) => {
     // Navigate to B2B selection
     await page.click('text=Espace Entreprise');
-    await expect(page).toHaveURL(Routes.enterprise());
+    await expect(page).toHaveURL(routes.b2b.home());
 
     // Select user option
     await page.click('text=Collaborateur');
-    await expect(page).toHaveURL(Routes.login({ segment: 'b2b' }));
+    await expect(page).toHaveURL(routes.auth.b2bUserLogin());
 
     // Login flow
     await page.fill('input[name="email"]', 'user@company.com');
     await page.fill('input[name="password"]', 'password123');
     await page.click('button[type="submit"]');
 
-    await expect(page).toHaveURL(Routes.employeeHome());
+    await expect(page).toHaveURL(routes.b2b.user.dashboard());
     
     // Verify B2B user specific features
     await expect(page.locator('[data-testid="team-activity"]')).toBeVisible();
@@ -55,13 +55,13 @@ test.describe('Authentication Flows E2E', () => {
   test('B2B admin authentication flow', async ({ page }) => {
     await page.click('text=Espace Entreprise');
     await page.click('text=Administrateur RH');
-    await expect(page).toHaveURL(Routes.login({ segment: 'b2b' }));
+    await expect(page).toHaveURL(routes.auth.b2bAdminLogin());
 
     await page.fill('input[name="email"]', 'admin@company.com');
     await page.fill('input[name="password"]', 'admin123');
     await page.click('button[type="submit"]');
 
-    await expect(page).toHaveURL(Routes.managerHome());
+    await expect(page).toHaveURL(routes.b2b.admin.dashboard());
     
     // Verify admin specific features
     await expect(page.locator('[data-testid="admin-panel"]')).toBeVisible();
@@ -71,24 +71,24 @@ test.describe('Authentication Flows E2E', () => {
 
   test('session persistence across page refreshes', async ({ page }) => {
     // Login as B2C user
-    await page.goto(Routes.login({ segment: 'b2c' }));
+    await page.goto(routes.auth.b2cLogin());
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
     await page.click('button[type="submit"]');
 
-    await expect(page).toHaveURL(Routes.consumerHome());
+    await expect(page).toHaveURL(routes.b2c.dashboard());
 
     // Refresh page
     await page.reload();
     
     // Should still be logged in
-    await expect(page).toHaveURL(Routes.consumerHome());
+    await expect(page).toHaveURL(routes.b2c.dashboard());
     await expect(page.locator('[data-testid="user-menu"]')).toBeVisible();
   });
 
   test('logout flow', async ({ page }) => {
     // Login first
-    await page.goto(Routes.login({ segment: 'b2c' }));
+    await page.goto(routes.auth.b2cLogin());
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
     await page.click('button[type="submit"]');
@@ -98,7 +98,7 @@ test.describe('Authentication Flows E2E', () => {
     await page.click('text=Déconnexion');
 
     // Should redirect to home
-    await expect(page).toHaveURL(Routes.home());
+    await expect(page).toHaveURL(routes.public.home());
     await expect(page.locator('text=Espace Personnel')).toBeVisible();
   });
 });

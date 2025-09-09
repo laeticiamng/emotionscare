@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useApiMonitoring } from '@/hooks/useApiMonitoring';
 import { useNavigate } from 'react-router-dom';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 interface ApiStatusIndicatorProps {
   compact?: boolean;
@@ -103,7 +103,7 @@ const ApiStatusIndicator: React.FC<ApiStatusIndicatorProps> = ({
   const IconComponent = config.icon;
 
   const handleDetailsClick = () => {
-    navigate(Routes.apiMonitoring());
+    navigate(routes.b2c.settings());
   };
 
   if (compact) {

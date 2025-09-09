@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LucideIconType } from '@/types/common';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,55 +41,55 @@ const GlobalNavigation: React.FC = () => {
   const location = useLocation();
 
   const featureRoutes: NavigationItem[] = [
-    { title: 'Scanner Émotionnel', route: Routes.scan(), icon: Camera, description: 'Analyse IA temps réel' },
-    { title: 'Musique Thérapie', route: Routes.music(), icon: Music, description: 'Musique adaptée' },
-    { title: 'Flash Glow', route: Routes.flashGlow(), icon: Sparkles, description: 'Boost instantané' },
-    { title: 'Boss Level Grit', route: Routes.bossGrit(), icon: Gamepad2, description: 'Défis progressifs' },
-    { title: 'Mood Mixer', route: Routes.moodMixer(), icon: Heart, description: 'Mélange d\'humeurs' },
-    { title: 'Bounce Back Battle', route: Routes.bounceBack(), icon: Gamepad2, description: 'Résilience gaming' },
-    { title: 'Breathwork', route: Routes.breath(), icon: Brain, description: 'Respiration guidée' },
-    { title: 'Coach IA', route: Routes.coach(), icon: Brain, description: 'Assistant personnel' },
+    { title: 'Scanner Émotionnel', route: routes.b2c.scan(), icon: Camera, description: 'Analyse IA temps réel' },
+    { title: 'Musique Thérapie', route: routes.b2c.music(), icon: Music, description: 'Musique adaptée' },
+    { title: 'Flash Glow', route: routes.b2c.flashGlow(), icon: Sparkles, description: 'Boost instantané' },
+    { title: 'Boss Level Grit', route: routes.b2c.bossLevel(), icon: Gamepad2, description: 'Défis progressifs' },
+    { title: 'Mood Mixer', route: routes.b2c.moodMixer(), icon: Heart, description: 'Mélange d\'humeurs' },
+    { title: 'Bounce Back Battle', route: routes.b2c.bounceBackBattle(), icon: Gamepad2, description: 'Résilience gaming' },
+    { title: 'Breathwork', route: routes.b2c.breathwork(), icon: Brain, description: 'Respiration guidée' },
+    { title: 'Coach IA', route: routes.b2c.coach(), icon: Brain, description: 'Assistant personnel' },
   ];
 
   const immersiveRoutes: NavigationItem[] = [
-    { title: 'VR Standard', route: Routes.vr(), icon: Glasses, description: 'Réalité virtuelle' },
-    { title: 'VR Galactique', route: Routes.vrGalaxy(), icon: Glasses, description: 'Expérience spatiale' },
-    { title: 'Screen Silk Break', route: Routes.screenSilk(), icon: Eye, description: 'Pause écran' },
-    { title: 'Story Synth Lab', route: Routes.storySynth(), icon: Brain, description: 'Histoires génératives' },
-    { title: 'AR Filters', route: Routes.faceAR(), icon: Camera, description: 'Réalité augmentée' },
-    { title: 'Bubble Beat', route: Routes.bubbleBeat(), icon: Music, description: 'Jeu musical' },
+    { title: 'VR Standard', route: routes.b2c.vr(), icon: Glasses, description: 'Réalité virtuelle' },
+    { title: 'VR Galactique', route: routes.b2c.vr(), icon: Glasses, description: 'Expérience spatiale' },
+    { title: 'Screen Silk Break', route: routes.b2c.arFilters(), icon: Eye, description: 'Pause écran' },
+    { title: 'Story Synth Lab', route: routes.b2c.arFilters(), icon: Brain, description: 'Histoires génératives' },
+    { title: 'AR Filters', route: routes.b2c.arFilters(), icon: Camera, description: 'Réalité augmentée' },
+    { title: 'Bubble Beat', route: routes.b2c.bubbleBeat(), icon: Music, description: 'Jeu musical' },
   ];
 
   const progressionRoutes: NavigationItem[] = [
-    { title: 'Ambition Arcade', route: Routes.ambitionArcade(), icon: Gamepad2, description: 'Objectifs gamifiés' },
-    { title: 'Gamification', route: Routes.leaderboard(), icon: Gamepad2, description: 'Système de points' },
-    { title: 'Weekly Bars', route: Routes.activity(), icon: Heart, description: 'Progression hebdo' },
-    { title: 'Heatmap Vibes', route: Routes.heatmap(), icon: Brain, description: 'Visualisation données' },
+    { title: 'Ambition Arcade', route: routes.b2c.bossLevel(), icon: Gamepad2, description: 'Objectifs gamifiés' },
+    { title: 'Gamification', route: routes.b2c.bossLevel(), icon: Gamepad2, description: 'Système de points' },
+    { title: 'Weekly Bars', route: routes.b2c.activity(), icon: Heart, description: 'Progression hebdo' },
+    { title: 'Heatmap Vibes', route: routes.b2c.activity(), icon: Brain, description: 'Visualisation données' },
   ];
 
   const userRoutes: NavigationItem[] = [
-    { title: 'Accueil', route: Routes.home(), icon: Home, description: 'Page d\'accueil' },
-    { title: 'Choisir Mode', route: Routes.b2c(), icon: User, description: 'Sélection espace' },
-    { title: 'Dashboard B2C', route: Routes.consumerHome(), icon: Heart, description: 'Espace personnel' },
-    { title: 'Préférences', route: Routes.settingsGeneral(), icon: Settings, description: 'Paramètres utilisateur' },
-    { title: 'Cocon Social', route: Routes.socialCocon(), icon: Users, description: 'Communauté' },
-    { title: 'Profil', route: Routes.settingsProfile(), icon: User, description: 'Gestion profil' },
-    { title: 'Journal', route: Routes.journal(), icon: Brain, description: 'Journal personnel' },
-    { title: 'Notifications', route: Routes.settingsNotifications(), icon: Heart, description: 'Alertes système' },
+    { title: 'Accueil', route: routes.public.home(), icon: Home, description: 'Page d\'accueil' },
+    { title: 'Choisir Mode', route: routes.b2c.home(), icon: User, description: 'Sélection espace' },
+    { title: 'Dashboard B2C', route: routes.b2c.dashboard(), icon: Heart, description: 'Espace personnel' },
+    { title: 'Préférences', route: routes.b2c.settings(), icon: Settings, description: 'Paramètres utilisateur' },
+    { title: 'Cocon Social', route: routes.b2c.community(), icon: Users, description: 'Communauté' },
+    { title: 'Profil', route: routes.b2c.profile(), icon: User, description: 'Gestion profil' },
+    { title: 'Journal', route: routes.b2c.journal(), icon: Brain, description: 'Journal personnel' },
+    { title: 'Notifications', route: routes.b2c.notifications(), icon: Heart, description: 'Alertes système' },
   ];
 
   const b2bRoutes: NavigationItem[] = [
-    { title: 'B2B Accueil', route: Routes.enterprise(), icon: Building2, description: 'Espace entreprise' },
-    { title: 'Dashboard User', route: Routes.employeeHome(), icon: Users, description: 'Collaborateur' },
-    { title: 'Dashboard Admin', route: Routes.managerHome(), icon: Shield, description: 'Administration' },
-    { title: 'Équipes', route: Routes.teams(), icon: Users, description: 'Gestion équipes' },
-    { title: 'Rapports', route: Routes.adminReports(), icon: Brain, description: 'Analytics' },
-    { title: 'Événements', route: Routes.adminEvents(), icon: Heart, description: 'Planning RH' },
-    { title: 'Optimisation', route: Routes.adminOptimization(), icon: Brain, description: 'IA prédictive' },
-    { title: 'Paramètres', route: Routes.settingsGeneral(), icon: Settings, description: 'Configuration' },
-    { title: 'Sécurité', route: Routes.adminSecurity(), icon: Shield, description: 'Protection données' },
-    { title: 'Audit', route: Routes.adminAudit(), icon: Shield, description: 'Traçabilité' },
-    { title: 'Accessibilité', route: Routes.adminAccessibility(), icon: Heart, description: 'Conformité a11y' },
+    { title: 'B2B Accueil', route: routes.b2b.home(), icon: Building2, description: 'Espace entreprise' },
+    { title: 'Dashboard User', route: routes.b2b.user.dashboard(), icon: Users, description: 'Collaborateur' },
+    { title: 'Dashboard Admin', route: routes.b2b.admin.dashboard(), icon: Shield, description: 'Administration' },
+    { title: 'Équipes', route: routes.b2b.teams(), icon: Users, description: 'Gestion équipes' },
+    { title: 'Rapports', route: routes.b2b.reports(), icon: Brain, description: 'Analytics' },
+    { title: 'Événements', route: routes.b2b.events(), icon: Heart, description: 'Planning RH' },
+    { title: 'Optimisation', route: routes.b2b.admin.analytics(), icon: Brain, description: 'IA prédictive' },
+    { title: 'Paramètres', route: routes.b2c.settings(), icon: Settings, description: 'Configuration' },
+    { title: 'Sécurité', route: routes.b2b.admin.settings(), icon: Shield, description: 'Protection données' },
+    { title: 'Audit', route: routes.b2b.admin.analytics(), icon: Shield, description: 'Traçabilité' },
+    { title: 'Accessibilité', route: routes.b2b.admin.settings(), icon: Heart, description: 'Conformité a11y' },
   ];
 
   const renderMenuItem = (item: NavigationItem) => (

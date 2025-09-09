@@ -1,21 +1,21 @@
 
 import { test, expect } from '@playwright/test';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 test.describe('Feature Navigation E2E', () => {
   test.beforeEach(async ({ page }) => {
     // Login as B2C user for most tests
-    await page.goto(Routes.login({ segment: 'b2c' }));
+    await page.goto(routes.auth.b2cLogin());
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
     await page.click('button[type="submit"]');
-    await expect(page).toHaveURL(Routes.consumerHome());
+    await expect(page).toHaveURL(routes.b2c.dashboard());
   });
 
   test('emotion scan feature complete flow', async ({ page }) => {
     // Navigate to scan
     await page.click('[data-testid="scan-card"]');
-    await expect(page).toHaveURL(Routes.scan());
+    await expect(page).toHaveURL(routes.b2c.scan());
 
     // Test camera permission
     await page.click('[data-testid="start-scan-button"]');
@@ -37,7 +37,7 @@ test.describe('Feature Navigation E2E', () => {
 
   test('music therapy feature flow', async ({ page }) => {
     await page.click('[data-testid="music-card"]');
-    await expect(page).toHaveURL(Routes.music());
+    await expect(page).toHaveURL(routes.b2c.music());
 
     // Test music player controls
     await expect(page.locator('[data-testid="music-player"]')).toBeVisible();
@@ -56,7 +56,7 @@ test.describe('Feature Navigation E2E', () => {
 
   test('AI coach interaction flow', async ({ page }) => {
     await page.click('[data-testid="coach-card"]');
-    await expect(page).toHaveURL(Routes.coach());
+    await expect(page).toHaveURL(routes.b2c.coach());
 
     // Test chat interface
     await expect(page.locator('[data-testid="coach-chat"]')).toBeVisible();
@@ -75,7 +75,7 @@ test.describe('Feature Navigation E2E', () => {
 
   test('journal feature flow', async ({ page }) => {
     await page.click('[data-testid="journal-card"]');
-    await expect(page).toHaveURL(Routes.journal());
+    await expect(page).toHaveURL(routes.b2c.journal());
 
     // Create new entry
     await page.click('[data-testid="new-entry-button"]');
@@ -96,7 +96,7 @@ test.describe('Feature Navigation E2E', () => {
 
   test('VR experience navigation', async ({ page }) => {
     await page.click('[data-testid="vr-card"]');
-    await expect(page).toHaveURL(Routes.vr());
+    await expect(page).toHaveURL(routes.b2c.vr());
 
     // Test VR scene selection
     await expect(page.locator('[data-testid="vr-scenes"]')).toBeVisible();
@@ -115,7 +115,7 @@ test.describe('Feature Navigation E2E', () => {
   test('preferences and settings flow', async ({ page }) => {
     await page.click('[data-testid="user-menu"]');
     await page.click('text=Préférences');
-    await expect(page).toHaveURL(Routes.settingsGeneral());
+    await expect(page).toHaveURL(routes.b2c.settings());
 
     // Test theme toggle
     await page.click('[data-testid="theme-toggle"]');

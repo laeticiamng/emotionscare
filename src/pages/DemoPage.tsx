@@ -9,7 +9,7 @@ import {
   Volume2, Users, Shield, Headphones
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 interface DemoStep {
   id: string;
@@ -365,7 +365,7 @@ const DemoPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button asChild size="lg" className="text-lg px-8 py-4 bg-white text-blue-600 hover:bg-gray-100 rounded-2xl shadow-xl">
-                      <Link to={Routes.signup()}>
+                      <Link to={routes.auth.signup()}>
                         <Sparkles className="w-5 h-5 mr-2" />
                         Commencer Gratuitement
                         <ArrowRight className="w-5 h-5 ml-2" />
@@ -375,7 +375,7 @@ const DemoPage: React.FC = () => {
                   
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button asChild variant="outline" size="lg" className="text-lg px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-blue-600 rounded-2xl">
-                      <Link to={Routes.enterprise()}>
+                      <Link to={routes.b2b.home()}>
                         <Users className="w-5 h-5 mr-2" />
                         Solutions Entreprise
                       </Link>

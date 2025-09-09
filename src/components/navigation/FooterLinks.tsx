@@ -9,7 +9,7 @@ import React from 'react';
 import { Cog, HelpCircle } from 'lucide-react';
 import NavItem from './NavItem';
 import { useLocation } from 'react-router-dom';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 
 const FooterLinks: React.FC = () => {
   const { pathname } = useLocation();
@@ -19,14 +19,14 @@ const FooterLinks: React.FC = () => {
       <NavItem
         icon={<Cog className="h-6 w-6" />}
         label="Paramètres"
-        to={Routes.settingsGeneral()}
-        active={pathname === Routes.settingsGeneral()}
+        to={routes.b2c.settings()}
+        active={pathname === routes.b2c.settings()}
       />
       <NavItem
         icon={<HelpCircle className="h-6 w-6" />}
         label="Aide"
-        to={Routes.help()}
-        active={pathname === Routes.help()}
+        to={routes.public.help()}
+        active={pathname === routes.public.help()}
       />
     </>
   );

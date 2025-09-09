@@ -6,7 +6,7 @@
 
 import React, { Suspense, memo, lazy, ComponentType } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Routes } from '@/routerV2';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePerformance } from '@/contexts/PerformanceContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -73,12 +73,12 @@ const OptimizedRoute = memo<OptimizedRouteProps>(({
     return <LoadingFallback />;
   }
   
-  if (requireAuth && !isAuthenticated) {
-    return <Navigate to={Routes.login()} replace />;
-  }
+    if (requireAuth && !isAuthenticated) {
+      return <Navigate to={routes.auth.login()} replace />;
+    }
   
   if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to={Routes.unauthorized()} replace />;
+    return <Navigate to={routes.special.unauthorized()} replace />;
   }
   
   return (
