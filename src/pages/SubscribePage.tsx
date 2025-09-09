@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +24,7 @@ interface Plan {
 
 const SubscribePage: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const navigate = useNavigate();
 
   const plans: Plan[] = [
     {
@@ -85,14 +87,14 @@ const SubscribePage: React.FC = () => {
 
   const handleSubscribe = (planId: string) => {
     if (planId === 'free') {
-      // Redirect to signup
-      window.location.href = '/signup';
+      // Navigate to signup
+      navigate('/signup');
       return;
     }
     
     if (planId === 'enterprise') {
-      // Contact sales
-      window.location.href = '/contact';
+      // Navigate to contact
+      navigate('/contact');
       return;
     }
 

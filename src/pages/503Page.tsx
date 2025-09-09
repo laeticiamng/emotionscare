@@ -1,12 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw, Home, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useObservability } from '@/lib/observability';
 
 export default function ServiceUnavailablePage() {
+  const { logPageView, logUserAction } = useObservability();
+  
+  React.useEffect(() => {
+    logPageView('503_error');
+  }, [logPageView]);
+
   const handleRefresh = () => {
-    window.location.reload();
+    logUserAction('503_refresh');
+    window.location.reload(); // Keep this one as it's intentional page reload
   };
 
   return (

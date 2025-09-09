@@ -26,7 +26,7 @@ export default function ForceLogout() {
         console.error('Erreur lors du nettoyage:', error);
         setStatus('Erreur, redirection forcée...');
         setTimeout(() => {
-          window.location.href = '/login?segment=b2c';
+          navigate('/login?segment=b2c', { replace: true });
         }, 2000);
       }
     };

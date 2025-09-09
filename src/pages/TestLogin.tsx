@@ -1,14 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function TestLogin() {
+  const navigate = useNavigate();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     console.log('Form submitted');
     
-    // Simple redirect without any auth
+    // Navigation SPA au lieu de window.location
     setTimeout(() => {
-      window.location.href = '/app/home';
+      navigate('/app/home', { replace: true });
     }, 1000);
   };
 
