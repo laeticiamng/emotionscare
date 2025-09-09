@@ -554,7 +554,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'MusicPage',
+    component: 'B2CMusicEnhanced',
     guard: true,
     deprecated: true, // Redirection vers /app/music
   },
