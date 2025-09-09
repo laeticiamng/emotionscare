@@ -48,7 +48,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({
     
     setUserMode('b2c');
     localStorage.setItem('userMode', 'b2c');
-    navigate(ROUTES.b2c.login);
+    navigate(ROUTES.LOGIN);
   };
   
   const handleB2BClick = () => {
@@ -57,7 +57,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({
       description: "Vous accédez à l'espace entreprise EmotionsCare"
     });
     
-    navigate(ROUTES.common.b2bSelection);
+    navigate(ROUTES.B2B_HOME);
   };
   
   // Animation variants

@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Search, Grid, List, Star, Clock, 
-  Heart, Brain, Activity, Target, Users, Settings
+  Heart, Brain, Activity, Target, Users, Settings, AlertTriangle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { routes } from '@/routerV2';
+import AccessDiagnostic from '@/components/debug/AccessDiagnostic';
 
 interface NavItem {
   id: string;
@@ -195,8 +197,8 @@ const NavigationPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-xl font-semibold">Navigation</h1>
-              <p className="text-sm text-muted-foreground">Explorez toutes les fonctionnalités</p>
+              <h1 className="text-xl font-semibold">Navigation & Diagnostic</h1>
+              <p className="text-sm text-muted-foreground">Explorez les fonctionnalités et vérifiez l'accès</p>
             </div>
           </div>
           
@@ -221,16 +223,26 @@ const NavigationPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         
-        {/* Recherche */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Rechercher une fonctionnalité..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        <Tabs defaultValue="navigation" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="navigation">Navigation</TabsTrigger>
+            <TabsTrigger value="diagnostic" className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              Diagnostic
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="navigation" className="space-y-6">
+            {/* Recherche */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Rechercher une fonctionnalité..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
         {/* Sections Rapides */}
         {!searchQuery && (
@@ -364,15 +376,21 @@ const NavigationPage: React.FC = () => {
           })}
         </div>
 
-        {filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Aucun résultat</h3>
-            <p className="text-muted-foreground">
-              Essayez de modifier votre recherche ou vos filtres
-            </p>
-          </div>
-        )}
+            {filteredItems.length === 0 && (
+              <div className="text-center py-12">
+                <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Aucun résultat</h3>
+                <p className="text-muted-foreground">
+                  Essayez de modifier votre recherche ou vos filtres
+                </p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="diagnostic">
+            <AccessDiagnostic />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
