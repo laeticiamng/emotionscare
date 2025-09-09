@@ -15,11 +15,11 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { UniversePortal } from '@/components/universe/UniversePortal';
+import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { CosmicBreathingOrb } from '@/components/breath/CosmicBreathingOrb';
-import { ConstellationReward } from '@/components/breath/ConstellationReward';
-import { CosmicBackground } from '@/components/breath/CosmicBackground';
-import { UNIVERSES } from '@/types/universes';
+import { RewardSystem } from '@/components/rewards/RewardSystem';
+import { getOptimizedUniverse } from '@/data/universes/config';
+import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 
 interface CosmicBreathSession {
   id: string;
@@ -74,6 +74,9 @@ const VRBreathPage: React.FC = () => {
   const { toast } = useToast();
   const { play, pause } = useMusic();
   
+  // Get optimized universe config
+  const universe = getOptimizedUniverse('vrBreath');
+  
   // Universe state
   const [isEntering, setIsEntering] = useState(true);
   const [universeEntered, setUniverseEntered] = useState(false);
@@ -90,10 +93,25 @@ const VRBreathPage: React.FC = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const phaseIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Optimized animations
+  const { entranceVariants, breathingVariants, cleanupAnimation } = useOptimizedAnimation({
+    enableComplexAnimations: true,
+    useCSSAnimations: true,
+  });
+
   // Handle universe entrance
   const handleUniverseEnterComplete = () => {
     setUniverseEntered(true);
   };
+
+  // Cleanup animations on unmount
+  useEffect(() => {
+    return () => {
+      cleanupAnimation();
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (phaseIntervalRef.current) clearInterval(phaseIntervalRef.current);
+    };
+  }, [cleanupAnimation]);
 
   // Session management
   useEffect(() => {
@@ -222,28 +240,29 @@ const VRBreathPage: React.FC = () => {
 
   if (showReward && selectedSession) {
     return (
-      <ConstellationReward
+      <RewardSystem
+        reward={{
+          type: 'constellation',
+          name: selectedSession.constellation,
+          description: universe.artifacts.description,
+          moduleId: 'vr-breath'
+        }}
+        badgeText="Cosmos apaisé ✨"
         onComplete={handleRewardComplete}
-        sessionType={selectedSession.constellation}
       />
     );
   }
 
   return (
-    <UniversePortal
-      universe={UNIVERSES.vrBreath}
+    <UniverseEngine
+      universe={universe}
       isEntering={isEntering}
       onEnterComplete={handleUniverseEnterComplete}
+      enableParticles={true}
+      enableAmbianceSound={false}
       className="min-h-screen"
     >
-      {/* Cosmic background */}
-      <CosmicBackground 
-        phase={currentPhase}
-        isActive={isActive}
-        className="fixed inset-0 z-0"
-      />
-
-      {/* Header */}
+      {/* Header - Optimized */}
       <header className="relative z-50 p-6">
         <div className="flex items-center justify-between">
           <Link 
@@ -256,20 +275,21 @@ const VRBreathPage: React.FC = () => {
           
           <div className="flex items-center space-x-2 text-white">
             <Star className="h-6 w-6" />
-            <h1 className="text-xl font-light tracking-wide">Galaxie du Souffle</h1>
+            <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - Optimized */}
       <main className="relative z-10 container mx-auto px-6 py-12">
         <AnimatePresence mode="wait">
           {!selectedSession ? (
             <motion.div
               key="selection"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              variants={entranceVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
               className="space-y-12"
             >
               {/* Introduction */}
@@ -437,7 +457,7 @@ const VRBreathPage: React.FC = () => {
           )}
         </AnimatePresence>
       </main>
-    </UniversePortal>
+    </UniverseEngine>
   );
 };
 
