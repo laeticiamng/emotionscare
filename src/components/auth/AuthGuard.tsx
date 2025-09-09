@@ -4,6 +4,7 @@ import { useLocation, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/useAuthStore';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import { logger } from '@/lib/logger';
 
 // Routes publiques autorisées selon les spécifications
 const PUBLIC_ROUTES = [
@@ -47,7 +48,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
           async (event, session) => {
             if (!mounted) return;
 
-            console.log('🔐 Auth state change:', event, !!session);
+            logger.debug('Auth state change', { event, hasSession: !!session }, 'AUTH');
             
             switch (event) {
               case 'SIGNED_IN':
@@ -73,7 +74,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
           subscription.unsubscribe();
         };
       } catch (error) {
-        console.error('❌ Auth initialization failed:', error);
+        logger.error('Auth initialization failed', error, 'AUTH');
         if (mounted) {
           setLoading(false);
           setIsInitialized(true);
@@ -105,13 +106,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   // Si route publique, autoriser l'accès
   if (isPublicRoute) {
-    console.log('✅ Public route access granted:', location.pathname);
+    logger.debug('Public route access granted', { pathname: location.pathname }, 'AUTH');
     return <>{children}</>;
   }
 
   // Si route protégée et utilisateur non authentifié
   if (!isAuthenticated) {
-    console.log('🚫 Access denied - not authenticated, redirecting...');
+    logger.warn('Access denied - not authenticated, redirecting', { pathname: location.pathname }, 'AUTH');
     
     // Déterminer la page de connexion appropriée selon la route
     let loginPath = '/choose-mode';
@@ -130,7 +131,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   }
 
   // Utilisateur authentifié, autoriser l'accès
-  console.log('✅ Authenticated access granted:', location.pathname);
+  logger.debug('Authenticated access granted', { pathname: location.pathname }, 'AUTH');
   return <>{children}</>;
 };
 

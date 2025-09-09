@@ -8,6 +8,7 @@ import { useTheme } from '@/components/theme-provider';
 import '@/styles/immersive-home.css';
 import { VoiceCommandButton } from './voice/VoiceCommandButton';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 const ImmersiveHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const ImmersiveHomePage: React.FC = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    console.log('🏠 ImmersiveHomePage: Composant monté');
+    logger.info('ImmersiveHomePage component mounted', null, 'UI');
     
     // Audio background
     const audio = new Audio('/sounds/ambient-calm.mp3');
@@ -104,7 +105,7 @@ const ImmersiveHomePage: React.FC = () => {
         });
       } else {
         audioElement.play().catch(error => {
-          console.error('Erreur de lecture audio:', error);
+          logger.error('Audio playback failed', error, 'UI');
           toast({
             title: "Erreur audio",
             description: "Impossible de lire la musique d'ambiance",
@@ -232,7 +233,7 @@ const ImmersiveHomePage: React.FC = () => {
         >
           <VoiceCommandButton 
             commands={voiceCommands}
-            onTranscript={(text) => console.log('Transcription:', text)} 
+            onTranscript={(text) => logger.debug('Voice transcript received', { text }, 'UI')} 
           />
         </motion.div>
         

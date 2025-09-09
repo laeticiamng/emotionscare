@@ -3,32 +3,33 @@ import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import BreadcrumbNav from './BreadcrumbNav';
+import { logger } from '@/lib/logger';
 
 const OptimizedLayout: React.FC = () => {
   React.useEffect(() => {
-    console.log('✅ OptimizedLayout mounted');
+    logger.debug('OptimizedLayout mounted', null, 'UI');
     
     // Optimisation des polices avec protection renforcée
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       try {
         if ('fonts' in document && document.fonts) {
           document.fonts.ready.then(() => {
-            console.log('✅ Fonts loaded successfully');
+            logger.debug('Fonts loaded successfully', null, 'UI');
           }).catch((error) => {
-            console.log('⚠️ Fonts loading failed:', error);
+            logger.warn('Fonts loading failed', error, 'UI');
           });
         }
       } catch (error) {
-        console.log('⚠️ Font loading setup failed:', error);
+        logger.warn('Font loading setup failed', error, 'UI');
       }
     }
 
     // Nettoyage sécurisé des ressources
     return () => {
       try {
-        console.log('🧹 OptimizedLayout unmounting');
+        logger.debug('OptimizedLayout unmounting', null, 'UI');
       } catch (error) {
-        console.log('⚠️ Cleanup failed:', error);
+        logger.warn('Cleanup failed', error, 'UI');
       }
     };
   }, []);

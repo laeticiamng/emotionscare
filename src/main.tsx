@@ -7,6 +7,9 @@ import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
 import AccessibilityToolbar from './components/layout/AccessibilityToolbar';
 import './index.css';
 import './styles/accessibility.css';
+import { runProductionCleanup } from './lib/production-cleanup';
+import { runFinalCleanup } from './scripts/final-cleanup';
+import { logger } from './lib/logger';
 
 // Configuration de l'attribut lang pour l'accessibilité
 document.documentElement.lang = 'fr';
@@ -30,6 +33,21 @@ const addAccessibilityMeta = () => {
 };
 
 addAccessibilityMeta();
+
+// Initialisation automatique de la sécurité de production
+if (import.meta.env.PROD) {
+  Promise.all([
+    runProductionCleanup(),
+    runFinalCleanup()
+  ]).then(() => {
+    logger.info('Production environment fully secured and optimized', null, 'SYSTEM');
+  }).catch((error) => {
+    logger.error('Production initialization failed', error, 'SYSTEM');
+  });
+} else {
+  // En développement, nettoyer quand même
+  runFinalCleanup();
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
