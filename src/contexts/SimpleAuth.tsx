@@ -6,6 +6,7 @@ interface SimpleAuthContextType {
   role: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signOut: () => void;
 }
 
@@ -15,6 +16,7 @@ const SimpleAuthContext = createContext<SimpleAuthContextType>({
   role: null,
   loading: true,
   signIn: async () => {},
+  signUp: async () => {},
   signOut: () => {},
 });
 
@@ -24,9 +26,10 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<any | null>(null);
   const [role, setRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false); // Commencer avec false pour éviter de bloquer les champs
 
   useEffect(() => {
+    setLoading(true); // Activer le loading pendant la vérification
     // Check localStorage for existing session
     const storedUser = localStorage.getItem('simple_auth_user');
     if (storedUser) {
@@ -40,7 +43,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         localStorage.removeItem('simple_auth_user');
       }
     }
-    setLoading(false);
+    setLoading(false); // Désactiver le loading à la fin
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -73,6 +76,36 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const signUp = async (email: string, password: string, metadata?: any) => {
+    try {
+      // Simple mock registration - in real app, this would call your API
+      const mockUser = {
+        id: 'user-' + Date.now(),
+        email,
+        role: metadata?.segment === 'b2b' ? 'employee' : 'consumer',
+        name: metadata?.full_name || 'Nouvel utilisateur',
+        ...metadata
+      };
+
+      setUser(mockUser);
+      setIsAuthenticated(true);
+      setRole(mockUser.role);
+      localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
+
+      // Navigate based on role
+      setTimeout(() => {
+        const dashboardRoute = mockUser.role === 'consumer' ? '/app/home' :
+                              mockUser.role === 'employee' ? '/app/collab' :
+                              mockUser.role === 'manager' ? '/app/rh' : '/app/home';
+        
+        window.location.href = dashboardRoute;
+      }, 100);
+    } catch (error) {
+      console.error('SignUp error:', error);
+      throw error;
+    }
+  };
+
   const signOut = () => {
     try {
       setUser(null);
@@ -94,6 +127,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     role,
     loading,
     signIn,
+    signUp,
     signOut,
   };
 
