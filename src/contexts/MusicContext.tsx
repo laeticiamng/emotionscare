@@ -1,6 +1,7 @@
 /**
  * MUSIC CONTEXT UNIFIÉ - EmotionsCare Premium
  * Gestion centralisée de la musique thérapeutique et génération Suno
+ * Version: 2.0 - Exports corrigés
  */
 
 import React, { createContext, useContext, useReducer, useRef, useCallback, useEffect } from 'react';
@@ -194,6 +195,9 @@ interface MusicContextType {
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
+
+// Export du context pour compatibilité
+export { MusicContext };
 
 // ==================== PROVIDER ====================
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -565,7 +569,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
-// ==================== HOOK ====================
+// ==================== HOOK & FINAL EXPORTS ====================
 export const useMusic = () => {
   const context = useContext(MusicContext);
   if (!context) {
@@ -573,3 +577,6 @@ export const useMusic = () => {
   }
   return context;
 };
+
+// Assurer que tous les exports sont disponibles
+export type { MusicContextType, MusicState, MusicTrack, MusicPlaylist };
