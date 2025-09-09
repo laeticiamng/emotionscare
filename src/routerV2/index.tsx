@@ -38,7 +38,6 @@ const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
 // Auth & Landing unifiées
-const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 
 // Dashboards unifiés
