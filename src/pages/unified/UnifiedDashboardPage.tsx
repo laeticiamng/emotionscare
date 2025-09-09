@@ -32,7 +32,7 @@ import NavigationHub from '@/components/features/NavigationHub';
 import EmotionAnalysisEngine from '@/components/core/emotion/EmotionAnalysisEngine';
 import MusicTherapyEngine from '@/components/core/music/MusicTherapyEngine';
 import VirtualCoachEngine from '@/components/core/coaching/VirtualCoachEngine';
-import { EmotionAnalysisDashboard } from '@/components/scan/EmotionAnalysisDashboard';
+import EmotionAnalysisDashboard from '@/components/scan/EmotionAnalysisDashboard';
 import { EmotionsCareMusicPlayer } from '@/components/music/emotionscare';
 import { useOptimizedEmotionsCare } from '@/hooks/useOptimizedEmotionsCare';
 import { useToast } from '@/hooks/use-toast';
