@@ -20,20 +20,20 @@ console.log('🚀 RouterV2: FF_ROUTER_V2 activé, aliases disponibles:', FF_ROUT
 // LAZY IMPORTS DES PAGES
 // ═══════════════════════════════════════════════════════════
 
-// Pages publiques
-const HomePage = lazy(() => import('@/pages/HomePage'));
+// Pages publiques unifiées
+const UnifiedHomePage = lazy(() => import('@/pages/unified/UnifiedHomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
-// Auth & Landing  
-const SimpleLogin = lazy(() => import('@/pages/SimpleLogin'));
+// Auth & Landing unifiées
+const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
-const HomeB2CPage = lazy(() => import('@/pages/HomeB2CPage'));
 
-// Dashboards
+// Dashboards unifiés
+const UnifiedDashboardPage = lazy(() => import('@/pages/unified/UnifiedDashboardPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 const B2BUserDashboardPage = lazy(() => import('@/pages/B2BUserDashboardPage'));
 const B2BAdminDashboardPage = lazy(() => import('@/pages/B2BAdminDashboardPage'));
@@ -130,16 +130,17 @@ const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
   const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
   const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
-// Pages système
+// Pages système unifiées
 const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
 const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 const RouterAuditPage = lazy(() => import('@/pages/RouterAuditPage'));
 const ComponentAuditPage = lazy(() => import('@/pages/ComponentAuditPage'));
 const RouterDashboardPage = lazy(() => import('@/pages/RouterDashboardPage'));
 const CompleteComponentAuditPage = lazy(() => import('@/pages/CompleteComponentAuditPage'));
 const FinalComponentReportPage = lazy(() => import('@/pages/FinalComponentReportPage'));
+const CompleteFusionReportPage = lazy(() => import('@/pages/CompleteFusionReportPage'));
 
 // Composants de redirection  
 const RedirectToScan = lazy(() => import('@/components/redirects/RedirectToScan'));
@@ -155,19 +156,21 @@ const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectT
 const AppHomePage = lazy(() => import('@/pages/app/Home'));
 
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
-  // Public
-  HomePage: AppHomePage,
-  HomeB2CPage,
+  // Public unifiées
+  HomePage: UnifiedHomePage,
+  HomeB2CPage: UnifiedHomePage,
   AboutPage,
   ContactPage,
   HelpPage,
   DemoPage,
   OnboardingPage,
-  LoginPage: SimpleLogin,
+  LoginPage: UnifiedLoginPage,
   SignupPage,
   
-  // App
+  // App unifiés
   AppGatePage,
+  DashboardPage: UnifiedDashboardPage,
+  CompleteDashboardPage: UnifiedDashboardPage,
   B2CDashboardPage,
   B2BUserDashboardPage,
   B2BAdminDashboardPage,
@@ -263,16 +266,17 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   LegalTermsPage,
   LegalPrivacyPage,
   
-  // System
+  // System unifiées
   UnauthorizedPage,
   ForbiddenPage,
-  NotFoundPage,
+  NotFoundPage: UnifiedErrorPage,
   ServerErrorPage,
   RouterAuditPage,
   ComponentAuditPage,
   RouterDashboardPage,
   CompleteComponentAuditPage,
   FinalComponentReportPage,
+  CompleteFusionReportPage,
   
   // Composants de redirection
   RedirectToScan,
@@ -375,7 +379,7 @@ export const routerV2 = createBrowserRouter([
     path: '*',
     element: (
       <SuspenseWrapper>
-        <NotFoundPage />
+        <UnifiedErrorPage />
       </SuspenseWrapper>
     ),
   },
