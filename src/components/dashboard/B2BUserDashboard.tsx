@@ -11,12 +11,8 @@ import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { UserModeSelector } from '@/components/ui/user-mode-selector';
 import { toast } from 'sonner';
 
-// Type pour simuler les données des défis
-interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
+// Import types from unified auth types
+import type { Challenge } from '@/types/badge';
   dueDate: string;
   type: 'daily' | 'weekly' | 'special';
 }

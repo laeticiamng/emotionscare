@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/components/theme/ThemeProvider';
+import { useTheme } from '@/components/theme-provider';
 import EnhancedHeader from './EnhancedHeader';
 import EnhancedFooter from './EnhancedFooter';
 import CommandMenu from './CommandMenu';
