@@ -75,8 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             break;
           case 'SIGNED_OUT':
             console.log('Utilisateur déconnecté');
-            // Rediriger vers la page de connexion
-            window.location.href = '/login';
+            // Ne pas rediriger automatiquement, laisser le routeur gérer
             break;
           case 'TOKEN_REFRESHED':
             console.log('Token rafraîchi');
