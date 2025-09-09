@@ -11,7 +11,7 @@ const RedirectToEntreprise: React.FC = () => {
     console.log('[Redirect] b2b/landing -> entreprise');
   }, []);
   
-  return <Navigate to={Routes.b2bLanding()} replace />;
+  return <Navigate to={Routes.enterprise()} replace />;
 };
 
 export default RedirectToEntreprise;

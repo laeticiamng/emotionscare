@@ -34,7 +34,7 @@ test.describe('Authentication Flows E2E', () => {
   test('B2B user authentication flow', async ({ page }) => {
     // Navigate to B2B selection
     await page.click('text=Espace Entreprise');
-    await expect(page).toHaveURL(Routes.b2bLanding());
+    await expect(page).toHaveURL(Routes.enterprise());
 
     // Select user option
     await page.click('text=Collaborateur');

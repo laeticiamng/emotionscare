@@ -188,7 +188,7 @@ const GlobalNavigationWidget: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button asChild variant="ghost" size="lg">
-                  <Link to={Routes.b2bLanding()}>
+                  <Link to={Routes.enterprise()}>
                     <Shield className="w-5 h-5 mr-2" />
                     Solutions Entreprise
                   </Link>

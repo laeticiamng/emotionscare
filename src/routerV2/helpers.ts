@@ -77,6 +77,10 @@ export const Routes = {
   settingsGeneral: () => '/app/settings',
   profile: () => '/app/profile',
   
+  // Routes B2B - Interface Flat pour compatibilité
+  employeeHome: () => '/enterprise/dashboard', // Dashboard collaborateur
+  managerHome: () => '/enterprise/admin', // Dashboard manager
+  
   // Routes App B2C - Interface Nested (rétrocompatibilité)
   app: {
     home: () => '/app/home',

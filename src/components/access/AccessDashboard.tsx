@@ -39,7 +39,7 @@ const AccessDashboard: React.FC = () => {
         category: 'core'
       },
       {
-        path: Routes.b2cLanding(),
+        path: Routes.b2c(),
         name: 'Sélection du mode',
         description: 'Choix du mode utilisateur',
         accessible: isAuthenticated,

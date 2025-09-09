@@ -10,9 +10,9 @@ export const OfficialRoutesStatus: React.FC = () => {
       name: 'Routes Publiques',
       routes: [
         { path: Routes.home(), name: 'Accueil' },
-        { path: Routes.b2cLanding(), name: 'Choix Mode' },
+        { path: Routes.b2c(), name: 'Choix Mode' },
         { path: Routes.login(), name: 'Authentification' },
-        { path: Routes.b2bLanding(), name: 'Sélection B2B' },
+        { path: Routes.enterprise(), name: 'Sélection B2B' },
       ],
       icon: <Route className="h-5 w-5" />
     },

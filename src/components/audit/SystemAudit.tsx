@@ -90,7 +90,7 @@ const SystemAudit: React.FC = () => {
         // Vérifications spécifiques par route
         switch (route) {
           case Routes.home():
-          case Routes.b2cLanding(): 
+          case Routes.b2c(): 
             // Routes toujours accessibles
             break;
           case Routes.consumerHome():

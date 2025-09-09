@@ -25,7 +25,7 @@ const InteractivePathSelector: React.FC = () => {
         'Un accompagnement sur-mesure qui évolue avec vous'
       ],
       cta: 'Découvrir l\'espace Entreprise',
-      route: Routes.b2bLanding()
+      route: Routes.enterprise()
     },
     {
       id: 'personal' as const,

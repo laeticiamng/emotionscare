@@ -14,7 +14,7 @@ const NavigationValidator: React.FC = () => {
       name: 'Routes Principales',
       routes: [
         { name: 'Accueil', path: Routes.home() },
-        { name: 'Choix Mode', path: Routes.b2cLanding() },
+        { name: 'Choix Mode', path: Routes.b2c() },
         { name: 'App Gate', path: Routes.app() },
       ]
     },
@@ -51,7 +51,7 @@ const NavigationValidator: React.FC = () => {
     {
       name: 'Espaces B2B',
       routes: [
-        { name: 'B2B Landing', path: Routes.b2bLanding() },
+        { name: 'B2B Landing', path: Routes.enterprise() },
         { name: 'Login B2B', path: Routes.login({ segment: 'b2b' }) },
         { name: 'Dashboard User', path: Routes.employeeHome() },
         { name: 'Dashboard Admin', path: Routes.managerHome() },

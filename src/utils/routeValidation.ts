@@ -17,8 +17,8 @@ export function validateRouteAccess(
   // Routes publiques
   const publicRoutes = [
     Routes.home(),
-    Routes.b2cLanding(),
-    Routes.b2bLanding(),
+    Routes.b2c(),
+    Routes.enterprise(),
     Routes.login({ segment: 'b2c' }),
     Routes.signup({ segment: 'b2c' }),
     Routes.login({ segment: 'b2b' }),
@@ -114,7 +114,7 @@ function getLoginRouteForPath(pathname: string): string {
     // Routes app nécessitent l'authentification principale
     return Routes.login();
   }
-  return Routes.b2cLanding();
+  return Routes.b2c();
 }
 
 function getDashboardForRole(role?: string): string {
@@ -158,8 +158,8 @@ export function getAllValidRoutes(): string[] {
 export function isRoutePublic(pathname: string): boolean {
   const publicRoutes = [
     Routes.home(),
-    Routes.b2cLanding(),
-    Routes.b2bLanding(),
+    Routes.b2c(),
+    Routes.enterprise(),
     Routes.login({ segment: 'b2c' }),
     Routes.signup({ segment: 'b2c' }),
     Routes.login({ segment: 'b2b' }),

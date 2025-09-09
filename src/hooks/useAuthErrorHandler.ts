@@ -29,7 +29,7 @@ export const useAuthErrorHandler = () => {
       });
 
       // Rediriger vers la page de choix de mode
-      navigate(Routes.b2cLanding());
+      navigate(Routes.b2c());
     }
   }, [navigate, signOut]);
 

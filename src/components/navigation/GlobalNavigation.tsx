@@ -69,7 +69,7 @@ const GlobalNavigation: React.FC = () => {
 
   const userRoutes: NavigationItem[] = [
     { title: 'Accueil', route: Routes.home(), icon: Home, description: 'Page d\'accueil' },
-    { title: 'Choisir Mode', route: Routes.b2cLanding(), icon: User, description: 'Sélection espace' },
+    { title: 'Choisir Mode', route: Routes.b2c(), icon: User, description: 'Sélection espace' },
     { title: 'Dashboard B2C', route: Routes.consumerHome(), icon: Heart, description: 'Espace personnel' },
     { title: 'Préférences', route: Routes.settingsGeneral(), icon: Settings, description: 'Paramètres utilisateur' },
     { title: 'Cocon Social', route: Routes.socialCocon(), icon: Users, description: 'Communauté' },
@@ -79,7 +79,7 @@ const GlobalNavigation: React.FC = () => {
   ];
 
   const b2bRoutes: NavigationItem[] = [
-    { title: 'B2B Accueil', route: Routes.b2bLanding(), icon: Building2, description: 'Espace entreprise' },
+    { title: 'B2B Accueil', route: Routes.enterprise(), icon: Building2, description: 'Espace entreprise' },
     { title: 'Dashboard User', route: Routes.employeeHome(), icon: Users, description: 'Collaborateur' },
     { title: 'Dashboard Admin', route: Routes.managerHome(), icon: Shield, description: 'Administration' },
     { title: 'Équipes', route: Routes.teams(), icon: Users, description: 'Gestion équipes' },

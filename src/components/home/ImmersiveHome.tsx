@@ -177,7 +177,7 @@ export const ImmersiveHome: React.FC = () => {
               </div>
               
               <Button
-                onClick={() => navigate(Routes.b2bLanding())}
+                onClick={() => navigate(Routes.enterprise())}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3"
               >
                 Découvrir l'espace Entreprise
