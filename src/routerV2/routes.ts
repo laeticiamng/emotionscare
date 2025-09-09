@@ -63,6 +63,8 @@ export const b2cRoutes = {
   bubbleBeat: () => '/app/bubble-beat',
   moodMixer: () => '/app/mood-mixer',
   bossLevel: () => '/app/boss-level-grit',
+  storySynth: () => '/app/story-synth',
+  bounceBack: () => '/app/bounce-back',
   
   // Autres pages B2C
   notifications: () => '/notifications',

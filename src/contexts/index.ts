@@ -20,9 +20,35 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
 export const SupportProvider = ({ children }: { children: React.ReactNode }) => children;
 export const OnboardingProvider = ({ children }: { children: React.ReactNode }) => children;
 
-// Hooks placeholders pour compatibilité
-export const useMusic = () => ({});
-export const useUserPreferences = () => ({});
-export const useSidebar = () => ({ collapsed: false, toggleCollapsed: () => {}, setCollapsed: () => {} });
-export const useSupport = () => ({});
-export const useOnboarding = () => ({});
+// Hooks simplifiés pour compatibilité avec interfaces minimales
+export const useMusic = () => ({ 
+  currentTrack: null,
+  isPlaying: false,
+  play: () => {},
+  pause: () => {},
+  stop: () => {}
+});
+
+export const useUserPreferences = () => ({ 
+  theme: 'light',
+  language: 'fr',
+  accessibility: {}
+});
+
+export const useSidebar = () => ({ 
+  collapsed: false, 
+  toggleCollapsed: () => {}, 
+  setCollapsed: () => {} 
+});
+
+export const useSupport = () => ({ 
+  contactSupport: () => {},
+  getFAQ: () => []
+});
+
+export const useOnboarding = () => ({ 
+  isCompleted: true,
+  currentStep: 0,
+  nextStep: () => {},
+  complete: () => {}
+});

@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import useOpenAI from './api/useOpenAI';
+import { logger } from '@/lib/logger';
 
 interface StoryChapter {
   id: string;
@@ -68,7 +69,7 @@ Histoire positive, interactive, sans violence.
       setCurrentStory(story);
       return story;
     } catch (error) {
-      console.error('Erreur création histoire:', error);
+      logger.error('Story creation failed', error, 'SYSTEM');
       return null;
     } finally {
       setIsGenerating(false);
