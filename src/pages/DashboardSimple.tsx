@@ -24,7 +24,7 @@ import InstantGlowButton from '@/components/features/InstantGlowButton';
 
 const DashboardSimple: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSimpleAuth();
+  const { user, isAuthenticated, signOut } = useSimpleAuth();
 
   // Rediriger si pas authentifié
   useEffect(() => {
@@ -89,6 +89,20 @@ const DashboardSimple: React.FC = () => {
               >
                 <Settings className="h-4 w-4" aria-hidden="true" />
                 <span className="sr-only">Paramètres</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                    signOut();
+                  }
+                }}
+                className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                aria-label="Se déconnecter"
+              >
+                <LogIn className="h-4 w-4 mr-1" aria-hidden="true" />
+                <span className="hidden sm:inline">Déconnexion</span>
               </Button>
             </div>
           </div>
