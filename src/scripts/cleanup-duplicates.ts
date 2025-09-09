@@ -57,25 +57,25 @@ export const CLEANUP_PLAN: DuplicateGroup[] = [
     reason: 'Version dans /settings/ est mieux organisée et cohérente avec l\'architecture.'
   },
   
-  // COMPOSANTS - DOUBLONS POTENTIELS
+  // COMPOSANTS - NETTOYÉS
   {
-    category: 'Composants Musique',
+    category: 'Composants Musique - NETTOYÉ ✅',
     keep: 'src/components/music/emotionscare/EmotionsCareMusicPlayer.tsx',
-    remove: ['src/components/features/SmartMusicPlayer.tsx'],
+    remove: [], // Déjà supprimé: SmartMusicPlayer.tsx
     reason: 'EmotionsCareMusicPlayer est plus spécialisé et intégré au système EmotionsCare.'
   },
   
   {
-    category: 'Composants Journal',
+    category: 'Composants Journal - NETTOYÉ ✅',
     keep: 'src/components/features/InteractiveJournal.tsx',
-    remove: ['src/components/journal/JournalEntryCard.tsx'],
+    remove: [], // Déjà supprimé: JournalEntryCard.tsx  
     reason: 'InteractiveJournal est plus complet. JournalEntryCard peut être remplacé par des composants UI.'
   },
   
   {
-    category: 'Composants Émotions',
+    category: 'Composants Émotions - NETTOYÉ ✅',
     keep: 'src/components/scan/EmotionAnalysisDashboard.tsx',
-    remove: ['src/components/features/EmotionTracking.tsx'],
+    remove: [], // Déjà supprimé: EmotionTracking.tsx
     reason: 'EmotionAnalysisDashboard est plus récent et complet avec analyse temps réel.'
   }
 ];

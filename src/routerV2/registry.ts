@@ -544,7 +544,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'JournalPage',
+    component: 'B2CJournalPage',
     guard: true,
     deprecated: true, // Redirection vers /app/journal
   },

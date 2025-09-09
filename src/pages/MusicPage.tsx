@@ -1,5 +1,5 @@
 import React from 'react';
-import SmartMusicPlayer from '@/components/features/SmartMusicPlayer';
+import MusicTherapyEngine from '@/components/core/music/MusicTherapyEngine';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

@@ -1,5 +1,5 @@
 import React from 'react';
-import EmotionTracking from '@/components/features/EmotionTracking';
+import EmotionAnalysisDashboard from '@/components/scan/EmotionAnalysisDashboard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

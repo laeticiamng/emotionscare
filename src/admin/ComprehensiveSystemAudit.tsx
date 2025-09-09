@@ -118,14 +118,12 @@ export default function ComprehensiveSystemAudit() {
       { name: 'ProtectedRoute', path: 'src/components/ProtectedRoute.tsx', critical: true },
       { name: 'RoleProtectedRoute', path: 'src/components/RoleProtectedRoute.tsx', critical: true },
       
-      // Scan et Émotions - DOUBLONS POSSIBLES
+      // Scan et Émotions
       { name: 'EmotionAnalysisDashboard', path: 'src/components/scan/EmotionAnalysisDashboard.tsx', critical: true },
       { name: 'EmotionScannerPremium', path: 'src/components/scan/EmotionScannerPremium.tsx', critical: true },
-      { name: 'EmotionTracking', path: 'src/components/features/EmotionTracking.tsx', duplicate: true },
       
-      // Musique - DOUBLONS POSSIBLES
-      { name: 'SmartMusicPlayer', path: 'src/components/features/SmartMusicPlayer.tsx', duplicate: true },
-      { name: 'EmotionsCareMusicPlayer', path: 'src/components/music/emotionscare/EmotionsCareMusicPlayer.tsx', duplicate: true },
+      // Musique 
+      { name: 'EmotionsCareMusicPlayer', path: 'src/components/music/emotionscare/EmotionsCareMusicPlayer.tsx', critical: true },
       { name: 'MusicTherapyEngine', path: 'src/components/core/music/MusicTherapyEngine.tsx', critical: true },
       
       // Journal - DOUBLONS POSSIBLES
