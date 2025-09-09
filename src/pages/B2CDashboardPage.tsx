@@ -1,445 +1,308 @@
-/**
- * DASHBOARD B2C PREMIUM - EMOTIONSCARE
- * Dashboard principal avec widgets interactifs pour le bien-être émotionnel
- */
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { 
-  Heart, 
-  Music, 
   Brain, 
+  Music, 
+  BookOpen, 
+  Headphones, 
+  Target, 
   TrendingUp, 
   Calendar,
-  Zap,
-  Mic,
-  Camera,
-  BookOpen,
-  Activity,
-  Target,
-  Bell,
   Settings,
-  Plus,
-  BarChart3,
-  Sparkles,
-  Timer,
-  Users
+  HelpCircle,
+  ChevronRight
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
-import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCareMusicPlayer';
-import { EmotionResult, MoodData } from '@/types';
+import { useAccessibilityAudit } from '@/lib/accessibility-checker';
+import { useEffect } from 'react';
 
-// === DONNÉES MOCK ===
-const mockEmotionData: EmotionResult[] = [
-  {
-    id: '1',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    emotion: 'calm',
-    confidence: 0.85,
-    intensity: 0.6,
-    source: 'facial_analysis',
-  },
-  {
-    id: '2',
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
-    emotion: 'happy',
-    confidence: 0.92,
-    intensity: 0.8,
-    source: 'voice_analysis',
-  },
-  {
-    id: '3',
-    timestamp: new Date(Date.now() - 10800000).toISOString(),
-    emotion: 'focused',
-    confidence: 0.78,
-    intensity: 0.7,
-    source: 'text_analysis',
-  }
-];
-
-const mockMoodData: MoodData[] = [
-  { id: '1', userId: 'user1', date: new Date(), mood: 7.5, energy: 6.2, anxiety: 3.1 },
-  { id: '2', userId: 'user1', date: new Date(Date.now() - 86400000), mood: 6.8, energy: 5.9, anxiety: 4.2 },
-  { id: '3', userId: 'user1', date: new Date(Date.now() - 172800000), mood: 8.1, energy: 7.3, anxiety: 2.8 }
-];
-
-const wellbeingScore = 78;
-const weeklyGoal = 85;
-
-const B2CDashboardPage: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentEmotion, setCurrentEmotion] = useState<EmotionResult | null>(null);
-  const [recentMood, setRecentMood] = useState<MoodData | null>(null);
-  const { state: musicState, generateEmotionPlaylist } = useEmotionsCareMusicContext();
+export default function B2CDashboardPage() {
+  const { runAudit } = useAccessibilityAudit();
 
   useEffect(() => {
-    // Simuler le chargement des données
-    const loadData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setCurrentEmotion(mockEmotionData[0]);
-      setRecentMood(mockMoodData[0]);
-      setIsLoading(false);
-    };
-
-    loadData();
-  }, []);
-
-  const handleQuickScan = async (type: 'facial' | 'voice' | 'text') => {
-    setIsLoading(true);
-    
-    try {
-      // Simuler une analyse rapide
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newEmotion: EmotionResult = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        emotion: ['calm', 'happy', 'focused', 'energetic'][Math.floor(Math.random() * 4)],
-        confidence: 0.8 + Math.random() * 0.2,
-        intensity: 0.5 + Math.random() * 0.5,
-        source: `${type}_analysis` as any,
-      };
-      
-      setCurrentEmotion(newEmotion);
-    } finally {
-      setIsLoading(false);
+    // Audit d'accessibilité en développement
+    if (import.meta.env.DEV) {
+      setTimeout(runAudit, 1000);
     }
-  };
-
-  const handleGenerateMusic = async () => {
-    if (!currentEmotion) return;
-    
-    await generateEmotionPlaylist({
-      emotion: currentEmotion.emotion,
-      intensity: currentEmotion.intensity
-    });
-  };
-
-  const getEmotionColor = (emotion: string) => {
-    const colors: Record<string, string> = {
-      happy: 'text-yellow-500 bg-yellow-50 dark:bg-yellow-950',
-      calm: 'text-blue-500 bg-blue-50 dark:bg-blue-950',
-      focused: 'text-purple-500 bg-purple-50 dark:bg-purple-950',
-      energetic: 'text-orange-500 bg-orange-50 dark:bg-orange-950',
-      sad: 'text-gray-500 bg-gray-50 dark:bg-gray-950',
-      anxious: 'text-red-500 bg-red-50 dark:bg-red-950'
-    };
-    return colors[emotion] || 'text-gray-500 bg-gray-50 dark:bg-gray-950';
-  };
-
-  const getEmotionEmoji = (emotion: string) => {
-    const emojis: Record<string, string> = {
-      happy: '😊',
-      calm: '😌',
-      focused: '🎯',
-      energetic: '⚡',
-      sad: '😔',
-      anxious: '😰'
-    };
-    return emojis[emotion] || '😐';
-  };
-
-  if (isLoading && !currentEmotion) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="xl" text="Chargement de votre dashboard..." />
-      </div>
-    );
-  }
+  }, [runAudit]);
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* === HEADER === */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Bonjour ! 👋
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Voici votre tableau de bord bien-être du {new Date().toLocaleDateString('fr-FR')}
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-3 mt-4 md:mt-0">
-            <Button variant="outline" size="sm">
-              <Bell className="w-4 h-4 mr-2" />
-              Notifications
-            </Button>
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4" />
-            </Button>
+    <div data-testid="page-root" className="min-h-screen bg-background">
+      {/* Skip Links pour l'accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        tabIndex={1}
+      >
+        Aller au contenu principal
+      </a>
+      <a 
+        href="#quick-actions" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-40 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        tabIndex={2}
+      >
+        Aller aux actions rapides
+      </a>
+
+      {/* Navigation principale */}
+      <nav role="navigation" aria-label="Navigation du tableau de bord" className="bg-card border-b">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h2 className="text-lg font-semibold">EmotionsCare</h2>
+              <Badge variant="secondary" aria-label="Mode utilisateur particulier">
+                Particulier
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                aria-label="Accéder aux paramètres"
+              >
+                <Link to="/settings">
+                  <Settings className="h-4 w-4" aria-hidden="true" />
+                  <span className="sr-only">Paramètres</span>
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                aria-label="Accéder à l'aide"
+              >
+                <Link to="/help">
+                  <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                  <span className="sr-only">Aide</span>
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
+      </nav>
 
-        {/* === WIDGETS PRINCIPAUX === */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Score de bien-être */}
-          <Card className="col-span-1">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Heart className="w-4 h-4 text-red-500" />
-                Score Bien-être
+      {/* Contenu principal */}
+      <main id="main-content" role="main" className="container mx-auto px-4 py-8">
+        {/* En-tête de bienvenue */}
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">
+            Bienvenue sur votre espace bien-être
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Découvrez vos outils d'intelligence émotionnelle personnalisés
+          </p>
+        </header>
+
+        {/* Statistiques rapides */}
+        <section aria-labelledby="stats-title" className="mb-8">
+          <h2 id="stats-title" className="text-xl font-semibold mb-4">
+            Votre progression aujourd'hui
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="relative">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Sessions d'analyse
+                </CardTitle>
+                <CardDescription className="sr-only">
+                  Nombre de sessions d'analyse émotionnelle effectuées
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold">3</div>
+                  <TrendingUp className="h-4 w-4 text-green-500" aria-hidden="true" />
+                </div>
+                <Progress value={60} className="mt-2" aria-label="Progression 60%" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  +20% par rapport à hier
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Temps de méditation
+                </CardTitle>
+                <CardDescription className="sr-only">
+                  Durée totale de méditation aujourd'hui
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold">25min</div>
+                  <Calendar className="h-4 w-4 text-blue-500" aria-hidden="true" />
+                </div>
+                <Progress value={83} className="mt-2" aria-label="Progression 83%" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Objectif: 30min
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Humeur générale
+                </CardTitle>
+                <CardDescription className="sr-only">
+                  Évaluation de votre humeur générale
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold">😊</div>
+                  <Target className="h-4 w-4 text-yellow-500" aria-hidden="true" />
+                </div>
+                <div className="mt-2">
+                  <Badge variant="outline" className="text-xs">
+                    Positive
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Tendance stable
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Actions rapides */}
+        <section id="quick-actions" aria-labelledby="actions-title" className="mb-8">
+          <h2 id="actions-title" className="text-xl font-semibold mb-4">
+            Actions rapides
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
+              <Link to="/app/scan" className="block p-6" aria-describedby="scan-desc">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Scanner mes émotions</h3>
+                    <p id="scan-desc" className="text-sm text-muted-foreground">
+                      Analyse faciale temps réel
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                </div>
+              </Link>
+            </Card>
+
+            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
+              <Link to="/app/music" className="block p-6" aria-describedby="music-desc">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <Music className="h-5 w-5 text-blue-500" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Musique thérapeutique</h3>
+                    <p id="music-desc" className="text-sm text-muted-foreground">
+                      Sons adaptatifs personnalisés
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                </div>
+              </Link>
+            </Card>
+
+            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
+              <Link to="/app/journal" className="block p-6" aria-describedby="journal-desc">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-green-500/10 rounded-lg">
+                    <BookOpen className="h-5 w-5 text-green-500" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Journal émotionnel</h3>
+                    <p id="journal-desc" className="text-sm text-muted-foreground">
+                      Consignez vos ressentis
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                </div>
+              </Link>
+            </Card>
+
+            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
+              <Link to="/app/coach" className="block p-6" aria-describedby="coach-desc">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-purple-500/10 rounded-lg">
+                    <Headphones className="h-5 w-5 text-purple-500" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Coach IA</h3>
+                    <p id="coach-desc" className="text-sm text-muted-foreground">
+                      Conseils personnalisés
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                </div>
+              </Link>
+            </Card>
+          </div>
+        </section>
+
+        {/* Recommandations personnalisées */}
+        <section aria-labelledby="recommendations-title">
+          <h2 id="recommendations-title" className="text-xl font-semibold mb-4">
+            Recommandé pour vous
+          </h2>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <div className="p-2 bg-orange-500/10 rounded">
+                  <Target className="h-4 w-4 text-orange-500" aria-hidden="true" />
+                </div>
+                <span>Session de respiration guidée</span>
               </CardTitle>
+              <CardDescription>
+                Basé sur votre niveau de stress détecté ce matin
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary mb-2">
-                {wellbeingScore}%
-              </div>
-              <Progress value={wellbeingScore} className="mb-2" />
-              <p className="text-sm text-muted-foreground">
-                Objectif: {weeklyGoal}% cette semaine
+              <p className="text-sm text-muted-foreground mb-4">
+                Une session de 10 minutes pour réduire le stress et améliorer votre concentration.
+              </p>
+              <Button asChild aria-describedby="breath-session-desc">
+                <Link to="/app/breath">
+                  Commencer la session
+                </Link>
+              </Button>
+              <p id="breath-session-desc" className="sr-only">
+                Démarre une session de respiration guidée de 10 minutes
               </p>
             </CardContent>
           </Card>
+        </section>
+      </main>
 
-          {/* Émotion actuelle */}
-          <Card className="col-span-1">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Brain className="w-4 h-4 text-blue-500" />
-                État Actuel
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentEmotion ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">
-                      {getEmotionEmoji(currentEmotion.emotion)}
-                    </span>
-                    <div>
-                      <p className="font-semibold capitalize">
-                        {currentEmotion.emotion}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {Math.round((typeof currentEmotion.confidence === 'number' ? currentEmotion.confidence : 0.5) * 100)}% confiance
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="text-xs">
-                    Analysé il y a 1h
-                  </Badge>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Aucune analyse récente
-                  </p>
-                  <Button size="sm" variant="outline">
-                    <Plus className="w-4 h-4 mr-1" />
-                    Analyser maintenant
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Musique active */}
-          <Card className="col-span-1">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Music className="w-4 h-4 text-purple-500" />
-                Musique
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {musicState.currentTrack ? (
-                <div className="space-y-2">
-                  <p className="font-medium truncate">
-                    {musicState.currentTrack.title}
-                  </p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {musicState.currentTrack.artist}
-                  </p>
-                  <Badge variant="secondary" className="text-xs">
-                    {musicState.isPlaying ? 'En lecture' : 'En pause'}
-                  </Badge>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Aucune musique active
-                  </p>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={handleGenerateMusic}
-                    disabled={!currentEmotion}
-                  >
-                    <Sparkles className="w-4 h-4 mr-1" />
-                    Générer
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Statistiques rapides */}
-          <Card className="col-span-1">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-500" />
-                Cette Semaine
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm">Sessions</span>
-                <span className="font-semibold">12</span>
+      {/* Footer */}
+      <footer role="contentinfo" className="bg-card border-t mt-12">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <p>© 2025 EmotionsCare - Votre bien-être, notre priorité</p>
+            <nav aria-label="Liens footer">
+              <div className="flex space-x-4">
+                <Link to="/privacy" className="hover:text-foreground">
+                  Confidentialité
+                </Link>
+                <Link to="/terms" className="hover:text-foreground">
+                  Conditions
+                </Link>
+                <Link to="/help" className="hover:text-foreground">
+                  Support
+                </Link>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Temps total</span>
-                <span className="font-semibold">2h 45m</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Amélioration</span>
-                <span className="font-semibold text-green-600">+15%</span>
-              </div>
-            </CardContent>
-          </Card>
+            </nav>
+          </div>
         </div>
-
-        {/* === ACTIONS RAPIDES === */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              Actions Rapides
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button
-                variant="outline"
-                className="h-20 flex-col gap-2"
-                onClick={() => handleQuickScan('facial')}
-                disabled={isLoading}
-              >
-                <Camera className="w-6 h-6" />
-                <span className="text-sm">Scan Facial</span>
-                {isLoading && <LoadingSpinner size="sm" />}
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="h-20 flex-col gap-2"
-                onClick={() => handleQuickScan('voice')}
-                disabled={isLoading}
-              >
-                <Mic className="w-6 h-6" />
-                <span className="text-sm">Analyse Vocale</span>
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="h-20 flex-col gap-2"
-              >
-                <BookOpen className="w-6 h-6" />
-                <span className="text-sm">Journal</span>
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="h-20 flex-col gap-2"
-              >
-                <Activity className="w-6 h-6" />
-                <span className="text-sm">Respiration</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* === LECTEUR MUSIQUE === */}
-        {musicState.currentPlaylist && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Lecteur EmotionsCare</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EmotionsCareMusicPlayer compact={false} showPlaylist={true} />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* === GRAPHIQUES ET TENDANCES === */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Tendances Émotionnelles
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {['Joie', 'Calme', 'Focus', 'Énergie'].map((emotion, index) => (
-                  <div key={emotion} className="flex items-center justify-between">
-                    <span className="text-sm">{emotion}</span>
-                    <div className="flex items-center gap-2">
-                      <Progress 
-                        value={[75, 60, 85, 45][index]} 
-                        className="w-20 h-2" 
-                      />
-                      <span className="text-sm font-medium w-8">
-                        {[75, 60, 85, 45][index]}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Objectifs Bien-être
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Méditation quotidienne</p>
-                    <p className="text-sm text-muted-foreground">10 min/jour</p>
-                  </div>
-                  <Badge variant="outline">7/7</Badge>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Sessions de musique</p>
-                    <p className="text-sm text-muted-foreground">3/semaine</p>
-                  </div>
-                  <Badge variant="secondary">2/3</Badge>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Journal émotionnel</p>
-                    <p className="text-sm text-muted-foreground">Quotidien</p>
-                  </div>
-                  <Badge variant="outline">En cours</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      </footer>
     </div>
   );
-};
-
-export default B2CDashboardPage;
+}
