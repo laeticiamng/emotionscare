@@ -1,22 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { 
-  User, Mail, Phone, MapPin, Calendar, Camera, Shield, 
-  Settings, Bell, Lock, Eye, Download, Trash2, 
-  Star, Award, TrendingUp, Activity, Heart
+  Brain, History, Download, Settings, TrendingUp, 
+  Activity, Heart, Sparkles, Music
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useAccessibility } from '@/hooks/useAccessibility';
 import PageRoot from '@/components/common/PageRoot';
+import EmotionScannerPremium from '@/components/emotion/EmotionScannerPremium';
+import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCareMusicPlayer';
+import { useEmotionsCareMusicContext } from '@/contexts/EmotionsCareMusicContext';
+import type { EmotionResult } from '@/types/emotion';
 
 const B2CScanPage: React.FC = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);

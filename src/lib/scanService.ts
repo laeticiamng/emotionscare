@@ -83,22 +83,32 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
   }
 };
 
-export const analyzeEmotion = async (text: string): Promise<EmotionResult | null> => {
+export const analyzeEmotion = async (text: string, userId?: string): Promise<EmotionResult | null> => {
   try {
-    // This would typically call an AI service or API endpoint
-    // For now, we'll create a mock implementation
-    const mockResult: EmotionResult = {
-      id: uuid(),
-      timestamp: new Date().toISOString(),
-      emotion: text.toLowerCase().includes('happy') ? 'joy' : 
-               text.toLowerCase().includes('sad') ? 'sadness' : 
-               text.toLowerCase().includes('angry') ? 'anger' : 'neutral',
-      intensity: 0.7,
-      confidence: 0.8,
+    const { data, error } = await supabase.functions.invoke('emotion-analysis', {
+      body: { 
+        text,
+        userId,
+        analysisType: 'text'
+      }
+    });
+
+    if (error) throw error;
+
+    const result: EmotionResult = {
+      id: data.id || uuid(),
+      timestamp: data.timestamp || new Date().toISOString(),
+      emotion: data.emotion || 'neutral',
+      intensity: data.intensity || 0.5,
+      confidence: data.confidence || 0.5,
       source: 'text',
+      valence: data.valence,
+      arousal: data.arousal,
+      insight: data.insight,
+      recommendations: data.recommendations || [],
     };
     
-    return mockResult;
+    return result;
   } catch (error) {
     console.error('Error analyzing emotion:', error);
     return null;
