@@ -4,7 +4,7 @@ import { Plus, Zap, Brain, Music, Heart, Eye, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 
 interface FloatingAction {
   id: string;
@@ -24,7 +24,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'scan',
       icon: <Eye className="w-5 h-5" />,
       label: 'Scan Rapide',
-      path: Routes.scan(),
+      path: routes.b2c.scan(),
       color: 'bg-blue-500',
       gradient: 'from-blue-400 to-blue-600'
     },
@@ -32,7 +32,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'emotions',
       icon: <Brain className="w-5 h-5" />,
       label: 'Analyse Émotions',
-      path: Routes.scan(), // Utilise scan au lieu d'emotions
+      path: routes.b2c.scan(), // Utilise scan au lieu d'emotions
       color: 'bg-purple-500',
       gradient: 'from-purple-400 to-purple-600'
     },
@@ -40,7 +40,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'music',
       icon: <Music className="w-5 h-5" />,
       label: 'Musicothérapie',
-      path: Routes.music(),
+      path: routes.b2c.music(),
       color: 'bg-green-500',
       gradient: 'from-green-400 to-green-600'
     },
@@ -48,7 +48,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'flash',
       icon: <Zap className="w-5 h-5" />,
       label: 'Flash Boost',
-      path: Routes.flashGlow(),
+      path: routes.b2c.flashGlow(),
       color: 'bg-yellow-500',
       gradient: 'from-yellow-400 to-orange-500'
     },
@@ -56,7 +56,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'community',
       icon: <Heart className="w-5 h-5" />,
       label: 'Communauté',
-      path: Routes.socialCoconB2C(), // Utilise socialCoconB2C au lieu de community
+      path: routes.b2c.community(),
       color: 'bg-pink-500',
       gradient: 'from-pink-400 to-rose-600'
     }

@@ -13,7 +13,7 @@ import {
   Settings, Zap, Shield, Grid3X3, ArrowRight, Sparkles
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 
 interface QuickAction {
   title: string;
@@ -30,7 +30,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Dashboard',
       description: 'Centre de contrôle principal',
       icon: Grid3X3,
-      path: Routes.consumerHome(),
+      path: routes.b2c.dashboard(),
       color: 'from-blue-500 to-purple-500',
       badge: 'Principal'
     },
@@ -38,7 +38,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Scan Émotionnel',
       description: 'Analyse IA instantanée',
       icon: Brain,
-      path: Routes.scan(),
+      path: routes.b2c.scan(),
       color: 'from-purple-500 to-pink-500',
       badge: 'IA'
     },
@@ -46,7 +46,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Coach Personnel',
       description: 'Assistant empathique 24/7',
       icon: Sparkles,
-      path: Routes.coach(),
+      path: routes.b2c.coach(),
       color: 'from-pink-500 to-red-500',
       badge: 'Premium'
     },
@@ -54,7 +54,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Thérapie Musicale',
       description: 'Playlists adaptatives',
       icon: Music,
-      path: Routes.music(),
+      path: routes.b2c.music(),
       color: 'from-green-500 to-teal-500',
       badge: 'Audio'
     },
@@ -62,7 +62,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Jeux Thérapeutiques',
       description: 'Fun-First experiences',
       icon: Gamepad2,
-      path: Routes.bubbleBeat(),
+      path: routes.b2c.bubbleBeat(),
       color: 'from-orange-500 to-amber-500',
       badge: 'Fun'
     },
@@ -70,7 +70,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Communauté',
       description: 'Partage et entraide',
       icon: Users,
-      path: Routes.community(),
+      path: routes.b2c.community(),
       color: 'from-cyan-500 to-blue-500',
       badge: 'Social'
     },
@@ -78,7 +78,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Analytics',
       description: 'Suivi de progression',
       icon: BarChart3,
-      path: Routes.activity(),
+      path: routes.b2c.activity(),
       color: 'from-indigo-500 to-purple-500',
       badge: 'Data'
     },
@@ -86,7 +86,7 @@ const GlobalNavigationWidget: React.FC = () => {
       title: 'Navigation Complète',
       description: 'Toutes les fonctionnalités',
       icon: Grid3X3,
-      path: Routes.navigation(),
+      path: '/navigation',
       color: 'from-gray-600 to-gray-800',
       badge: 'Complet'
     }
@@ -163,7 +163,7 @@ const GlobalNavigationWidget: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                  <Link to={Routes.login()}>
+                  <Link to={routes.auth.login()}>
                     <Heart className="w-5 h-5 mr-2" />
                     Commencer Votre Parcours
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -188,7 +188,7 @@ const GlobalNavigationWidget: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button asChild variant="ghost" size="lg">
-                  <Link to={Routes.enterprise()}>
+                  <Link to={routes.b2b.home()}>
                     <Shield className="w-5 h-5 mr-2" />
                     Solutions Entreprise
                   </Link>

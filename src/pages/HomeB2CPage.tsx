@@ -7,7 +7,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 import { Heart, Brain, Smile, Zap, Users, Star } from 'lucide-react';
 
 const HomeB2CPage: React.FC = () => {
@@ -21,10 +21,10 @@ const HomeB2CPage: React.FC = () => {
             <span className="text-2xl font-bold text-gray-900">EmotionsCare</span>
           </div>
           <div className="flex space-x-4">
-            <Link to={Routes.login({ segment: 'b2c' })}>
+            <Link to={routes.auth.login({ segment: 'b2c' })}>
               <Button variant="ghost">Se connecter</Button>
             </Link>
-            <Link to={Routes.signup({ segment: 'b2c' })}>
+            <Link to={routes.auth.signup({ segment: 'b2c' })}>
               <Button>S'inscrire</Button>
             </Link>
           </div>
@@ -42,12 +42,12 @@ const HomeB2CPage: React.FC = () => {
             d'analyse émotionnelle, de méditation guidée et de coaching personnalisé.
           </p>
           <div className="flex justify-center space-x-4">
-            <Link to={Routes.signup({ segment: 'b2c' })}>
+            <Link to={routes.auth.signup({ segment: 'b2c' })}>
               <Button size="lg" className="px-8">
                 Commencer gratuitement
               </Button>
             </Link>
-            <Link to={Routes.enterprise()}>
+            <Link to={routes.public.enterprise()}>
               <Button size="lg" variant="outline" className="px-8">
                 Solutions entreprise
               </Button>
@@ -106,7 +106,7 @@ const HomeB2CPage: React.FC = () => {
           <p className="text-xl mb-8 opacity-90">
             Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie
           </p>
-          <Link to={Routes.signup({ segment: 'b2c' })}>
+          <Link to={routes.auth.signup({ segment: 'b2c' })}>
             <Button size="lg" variant="secondary" className="px-8">
               Créer mon compte gratuit
             </Button>
@@ -131,25 +131,25 @@ const HomeB2CPage: React.FC = () => {
             <div>
               <h4 className="font-semibold mb-4">Produit</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to={Routes.about()} className="hover:text-white">À propos</Link></li>
-                <li><Link to={Routes.contact()} className="hover:text-white">Contact</Link></li>
-                <li><Link to={Routes.help()} className="hover:text-white">Aide</Link></li>
+                <li><Link to={routes.public.about()} className="hover:text-white">À propos</Link></li>
+                <li><Link to={routes.public.contact()} className="hover:text-white">Contact</Link></li>
+                <li><Link to={routes.public.help()} className="hover:text-white">Aide</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Solutions</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to={Routes.b2c()} className="hover:text-white">Particuliers</Link></li>
-                <li><Link to={Routes.enterprise()} className="hover:text-white">Entreprises</Link></li>
+                <li><Link to={routes.b2c.home()} className="hover:text-white">Particuliers</Link></li>
+                <li><Link to={routes.b2b.home()} className="hover:text-white">Entreprises</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Compte</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to={Routes.login()} className="hover:text-white">Connexion</Link></li>
-                <li><Link to={Routes.signup()} className="hover:text-white">Inscription</Link></li>
+                <li><Link to={routes.auth.login()} className="hover:text-white">Connexion</Link></li>
+                <li><Link to={routes.auth.signup()} className="hover:text-white">Inscription</Link></li>
               </ul>
             </div>
           </div>

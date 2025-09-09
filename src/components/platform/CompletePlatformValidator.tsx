@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, Eye, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 
 interface RouteTest {
   name: string;

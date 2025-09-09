@@ -7,7 +7,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 import { AlertTriangle, RefreshCw, ArrowLeft, MessageCircle } from 'lucide-react';
 
 const ServerErrorPage: React.FC = () => {
@@ -51,7 +51,7 @@ const ServerErrorPage: React.FC = () => {
               {isRetrying ? 'Nouvelle tentative...' : 'Réessayer'}
             </Button>
             
-            <Link to={Routes.home()}>
+            <Link to={routes.public.home()}>
               <Button variant="outline" className="w-full">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Retour à l'accueil
@@ -78,7 +78,7 @@ const ServerErrorPage: React.FC = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-2">
-              <Link to={Routes.contact()} className="flex-1">
+              <Link to={routes.public.contact()} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full">
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Signaler le problème

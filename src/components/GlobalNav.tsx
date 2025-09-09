@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
@@ -30,7 +30,7 @@ const GlobalNav: React.FC = () => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
           <Link 
-            to={Routes.home()} 
+            to={routes.public.home()} 
             className="font-bold text-xl flex items-center gap-2 focus-enhanced"
             aria-label="EmotionsCare - Retour à l'accueil"
           >
@@ -71,10 +71,10 @@ const GlobalNav: React.FC = () => {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to={Routes.settingsProfile()}>Profile</Link>
+                    <Link to={routes.b2c.profile()}>Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to={Routes.managerHome()}>Admin Dashboard</Link>
+                    <Link to={routes.b2b.admin.dashboard()}>Admin Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
@@ -85,12 +85,12 @@ const GlobalNav: React.FC = () => {
             </>
           ) : (
             <>
-              <Link to={Routes.login()} aria-label="Page de connexion">
+              <Link to={routes.auth.login()} aria-label="Page de connexion">
                 <Button variant="ghost" size="sm" className="focus-enhanced">
                   Se connecter
                 </Button>
               </Link>
-              <Link to={Routes.signup()} aria-label="Page d'inscription">
+              <Link to={routes.auth.signup()} aria-label="Page d'inscription">
                 <Button size="sm" className="focus-enhanced">
                   S'inscrire
                 </Button>

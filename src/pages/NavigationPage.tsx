@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 
 interface NavItem {
   id: string;

@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 const AppGatePage: React.FC = () => {
@@ -25,7 +25,7 @@ const AppGatePage: React.FC = () => {
 
   // Pas authentifié -> Login
   if (!isAuthenticated) {
-    return <Navigate to={Routes.login()} replace />;
+    return <Navigate to={routes.auth.login()} replace />;
   }
 
   // Déterminer le rôle et rediriger vers le bon dashboard
@@ -34,20 +34,20 @@ const AppGatePage: React.FC = () => {
   switch (role) {
     case 'b2c':
     case 'consumer':
-      return <Navigate to={Routes.consumerHome()} replace />;
+      return <Navigate to={routes.b2c.dashboard()} replace />;
     
     case 'b2b_user':
     case 'employee':
-      return <Navigate to={Routes.employeeHome()} replace />;
+      return <Navigate to={routes.b2b.user.dashboard()} replace />;
     
     case 'b2b_admin':
     case 'manager':
-      return <Navigate to={Routes.managerHome()} replace />;
+      return <Navigate to={routes.b2b.admin.dashboard()} replace />;
     
     default:
       // Par défaut, rediriger vers B2C
       console.warn(`[AppGatePage] Rôle inconnu: ${role}, redirection vers B2C`);
-      return <Navigate to={Routes.consumerHome()} replace />;
+      return <Navigate to={routes.b2c.dashboard()} replace />;
   }
 };
 

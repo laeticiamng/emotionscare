@@ -25,7 +25,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 

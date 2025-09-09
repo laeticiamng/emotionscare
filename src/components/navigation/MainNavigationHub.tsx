@@ -12,7 +12,7 @@ import {
   Grid3X3, ArrowRight, Play, Filter, Menu, X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Routes } from '@/routerV2/helpers';
+import { routes } from '@/routerV2';
 import { cn } from '@/lib/utils';
 
 interface NavigationItem {
