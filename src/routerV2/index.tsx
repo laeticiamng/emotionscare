@@ -152,7 +152,7 @@ const AppHomePage = lazy(() => import('@/pages/B2CHomePage'));
 
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
-  HomePage: () => import('@/components/HomePage'),
+  HomePage,
   HomeB2CPage: UnifiedHomePage,
   AboutPage,
   ContactPage,
