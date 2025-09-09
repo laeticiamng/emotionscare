@@ -21,6 +21,7 @@ import GritChallengeButton from '@/components/features/GritChallengeButton';
 import AmbitionButton from '@/components/features/AmbitionButton';
 import StorySynthButton from '@/components/features/StorySynthButton';
 import InstantGlowButton from '@/components/features/InstantGlowButton';
+import RoutesDiagnostic from '@/components/debug/RoutesDiagnostic';
 
 const DashboardSimple: React.FC = () => {
   const navigate = useNavigate();
@@ -202,7 +203,10 @@ const DashboardSimple: React.FC = () => {
             </div>
           </section>
 
-          {/* Fonctionnalités principales avec composants intégrés */}
+          {/* Diagnostic des routes temporaire */}
+          <div className="mb-8">
+            <RoutesDiagnostic />
+          </div>
           <section aria-labelledby="features-title" className="mb-8">
             <h2 id="features-title" className="text-xl font-semibold mb-4">
               Outils disponibles
