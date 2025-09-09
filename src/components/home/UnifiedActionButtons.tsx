@@ -35,25 +35,25 @@ const UnifiedActionButtons: React.FC = () => {
       {
         label: 'Scan Émotionnel',
         icon: <Scan className="h-5 w-5" />,
-        path: '/scan',
+        path: '/app/scan',
         variant: 'primary'
       },
       {
         label: 'Musique Thérapeutique',
         icon: <Music className="h-5 w-5" />,
-        path: '/music',
+        path: '/app/music',
         variant: 'secondary'
       },
       {
         label: 'Coach IA',
         icon: <MessageSquare className="h-5 w-5" />,
-        path: '/coach',
+        path: '/app/coach',
         variant: 'accent'
       },
       {
         label: 'Expérience VR',
         icon: <Video className="h-5 w-5" />,
-        path: '/vr',
+        path: '/app/vr',
         variant: 'ghost'
       }
     ];
@@ -64,13 +64,13 @@ const UnifiedActionButtons: React.FC = () => {
         {
           label: 'Gamification',
           icon: <Gamepad2 className="h-5 w-5" />,
-          path: '/gamification',
+          path: '/app/gamification',
           variant: 'primary'
         },
         {
           label: 'Social Cocon',
           icon: <HeartHandshake className="h-5 w-5" />,
-          path: '/social-cocon',
+          path: '/app/social-cocon',
           variant: 'secondary'
         }
       ];
@@ -82,13 +82,13 @@ const UnifiedActionButtons: React.FC = () => {
         {
           label: 'Social Cocon',
           icon: <HeartHandshake className="h-5 w-5" />,
-          path: '/social-cocon',
+          path: '/app/social-cocon',
           variant: 'secondary'
         },
         {
           label: 'Gamification',
           icon: <Gamepad2 className="h-5 w-5" />,
-          path: '/gamification',
+          path: '/app/gamification',
           variant: 'accent'
         }
       ];
@@ -100,19 +100,19 @@ const UnifiedActionButtons: React.FC = () => {
         {
           label: 'Gestion Équipes',
           icon: <Users className="h-5 w-5" />,
-          path: '/teams',
+          path: '/app/teams',
           variant: 'primary'
         },
         {
           label: 'Rapports',
           icon: <BarChart3 className="h-5 w-5" />,
-          path: '/reports',
+          path: '/app/reports',
           variant: 'secondary'
         },
         {
           label: 'Optimisation',
           icon: <Zap className="h-5 w-5" />,
-          path: '/optimisation',
+          path: '/app/optimisation',
           variant: 'accent'
         }
       ];

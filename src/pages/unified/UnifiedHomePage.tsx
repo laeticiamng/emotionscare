@@ -417,7 +417,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
         </section>
 
         {/* Stats Section Enhanced */}
-        <section 
+        <motion.section 
           className="py-16 bg-muted/20"
           onViewportEnter={() => setStatsVisible(true)}
         >
