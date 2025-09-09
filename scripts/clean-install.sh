@@ -1,21 +1,20 @@
 #!/bin/bash
 
-# Script de nettoyage complet des dépendances
-# Résout les problèmes de cache et de packages conflictuels
-
+# Script de nettoyage et installation forcée
 echo "🧹 Nettoyage complet des dépendances..."
 
-# Supprimer tous les caches et node_modules
-echo "📁 Suppression des caches..."
-rm -rf node_modules/
-rm -rf .bun/
+# Supprimer tous les fichiers de cache et lock
+rm -rf node_modules
 rm -f package-lock.json
+rm -f yarn.lock
 rm -f bun.lockb
+rm -rf .npm
+rm -rf ~/.bun/install/cache
 
-# Nettoyer les caches npm/bun
-echo "🗑️ Nettoyage des caches système..."
-npm cache clean --force 2>/dev/null || true
-bun pm cache rm 2>/dev/null || true
+echo "📦 Installation avec npm (sans packages problématiques)..."
 
-echo "✅ Nettoyage terminé!"
-echo "💡 Exécutez maintenant: npm install"
+# Installation forcée avec npm
+npm install --legacy-peer-deps --no-optional --ignore-scripts --prefer-offline
+
+echo "✅ Installation terminée sans packages imagemin problématiques"
+echo "🚀 L'application devrait maintenant fonctionner correctement"

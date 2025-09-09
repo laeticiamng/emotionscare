@@ -4,7 +4,7 @@ import path from 'path';
 import { componentTagger } from "lovable-tagger";
 import { visualizer } from 'rollup-plugin-visualizer';
 
-// Configuration Vite nettoyée - Phase 2 sans packages problématiques
+// Configuration Vite nettoyée - Phase 3 sans packages imagemin
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
