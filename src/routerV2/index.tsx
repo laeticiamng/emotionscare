@@ -20,7 +20,8 @@ console.log('🚀 RouterV2: FF_ROUTER_V2 activé, aliases disponibles:', FF_ROUT
 // LAZY IMPORTS DES PAGES
 // ═══════════════════════════════════════════════════════════
 
-// Pages publiques unifiées
+// Pages publiques unifiées 
+const HomePage = lazy(() => import('@/components/HomePage'));
 const UnifiedHomePage = lazy(() => import('@/pages/unified/UnifiedHomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
@@ -151,7 +152,7 @@ const AppHomePage = lazy(() => import('@/pages/B2CHomePage'));
 
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
-  HomePage: UnifiedHomePage,
+  HomePage: () => import('@/components/HomePage'),
   HomeB2CPage: UnifiedHomePage,
   AboutPage,
   ContactPage,

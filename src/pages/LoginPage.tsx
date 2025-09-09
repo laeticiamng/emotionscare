@@ -36,6 +36,7 @@ interface LoginFormData {
 }
 
 const LoginPage: React.FC = () => {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const segment = searchParams.get('segment') as 'b2c' | 'b2b' | null;
   
@@ -50,8 +51,8 @@ const LoginPage: React.FC = () => {
   
   const { signIn, isLoading, isAuthenticated, user } = useAuth();
 
-  // Rediriger si déjà connecté
-  if (isAuthenticated && user) {
+  // Rediriger si déjà connecté - mais permettre l'accès à la homepage
+  if (isAuthenticated && user && location.pathname === '/login') {
     return <Navigate to="/app/home" replace />;
   }
 
