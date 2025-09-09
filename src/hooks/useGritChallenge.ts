@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useOpenAI } from './api/useOpenAI';
+import useOpenAI from './api/useOpenAI';
 import { useMood } from './useMood';
 
 interface GritChallenge {
