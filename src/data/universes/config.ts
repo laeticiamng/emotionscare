@@ -175,6 +175,106 @@ export const UNIVERSE_CONFIGS: Record<string, Universe> = {
       name: 'Fleur de mots',
       description: 'Ta pensée transformée en beauté vivante'
     }
+  },
+
+  moodMixer: {
+    id: 'mood-mixer',
+    name: 'La Console des Humeurs',
+    description: 'Sliders lumineux, couleurs qui dansent',
+    ambiance: {
+      colors: {
+        primary: 'hsl(320, 70%, 60%)',
+        secondary: 'hsl(280, 60%, 70%)',
+        accent: 'hsl(200, 80%, 75%)',
+        background: 'linear-gradient(135deg, hsl(280, 20%, 8%), hsl(320, 30%, 15%))'
+      },
+      sounds: {
+        ambient: '/audio/synth-ambient.mp3',
+        interaction: '/audio/slider-move.mp3',
+        completion: '/audio/palette-complete.mp3'
+      },
+      metaphor: 'Peins l\'ambiance parfaite avec tes nuances'
+    },
+    artifacts: {
+      type: 'aura',
+      name: 'Palette unique',
+      description: 'Ton ambiance personnalisée créée'
+    }
+  },
+
+  bossGrit: {
+    id: 'boss-grit',
+    name: 'La Forge Intérieure',
+    description: 'Atelier métallique, étincelles créatives',
+    ambiance: {
+      colors: {
+        primary: 'hsl(25, 80%, 55%)',
+        secondary: 'hsl(15, 70%, 45%)',
+        accent: 'hsl(45, 90%, 70%)',
+        background: 'linear-gradient(135deg, hsl(15, 30%, 8%), hsl(25, 40%, 15%))'
+      },
+      sounds: {
+        ambient: '/audio/forge-ambient.mp3',
+        interaction: '/audio/hammer-strike.mp3',
+        completion: '/audio/metal-complete.mp3'
+      },
+      metaphor: 'Forge ta détermination dans les flammes'
+    },
+    artifacts: {
+      type: 'sticker',
+      name: 'Artefact forgé',
+      description: 'Objet de persévérance matérialisé'
+    }
+  },
+
+  bubbleBeat: {
+    id: 'bubble-beat',
+    name: 'L\'Océan des Bulles',
+    description: 'Bulles translucides, rythme apaisant',
+    ambiance: {
+      colors: {
+        primary: 'hsl(200, 70%, 60%)',
+        secondary: 'hsl(180, 60%, 70%)',
+        accent: 'hsl(220, 80%, 75%)',
+        background: 'linear-gradient(135deg, hsl(200, 40%, 8%), hsl(180, 30%, 15%))'
+      },
+      sounds: {
+        ambient: '/audio/ocean-ambient.mp3',
+        interaction: '/audio/bubble-pop.mp3',
+        completion: '/audio/wave-complete.mp3'
+      },
+      metaphor: 'Libère tes tensions dans la danse des bulles'
+    },
+    artifacts: {
+      type: 'sticker',
+      name: 'Bulle précieuse',
+      description: 'Tension libérée dans l\'océan'
+    }
+  },
+
+  storySynth: {
+    id: 'story-synth',
+    name: 'La Bibliothèque Vivante',
+    description: 'Livres flottants, pages lumineuses',
+    ambiance: {
+      colors: {
+        primary: 'hsl(260, 70%, 65%)',
+        secondary: 'hsl(280, 60%, 70%)',
+        accent: 'hsl(50, 80%, 75%)',
+        background: 'linear-gradient(135deg, hsl(260, 30%, 8%), hsl(280, 20%, 15%))'
+      },
+      sounds: {
+        ambient: '/audio/library-ambient.mp3',
+        interaction: '/audio/page-turn.mp3',
+        completion: '/audio/story-complete.mp3'
+      },
+      metaphor: 'Chaque histoire est un chemin vers toi'
+    },
+    artifacts: {
+      type: 'sticker',
+      name: 'Phrase-poème',
+      description: 'Souvenir narratif personnalisé'
+    }
   }
 };
 
