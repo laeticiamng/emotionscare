@@ -1,10 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
-import { routerV2 } from './routerV2';
-import AppProviders from './AppProviders';
-import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
-import AccessibilityToolbar from './components/layout/AccessibilityToolbar';
+import App from './App';
 import './index.css';
 import './styles/accessibility.css';
 
@@ -33,11 +29,6 @@ addAccessibilityMeta();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <GlobalErrorBoundary>
-      <AppProviders>
-        <RouterProvider router={routerV2} />
-        <AccessibilityToolbar />
-      </AppProviders>
-    </GlobalErrorBoundary>
+    <App />
   </React.StrictMode>
 );

@@ -127,7 +127,18 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
-// Page DEV uniquement
+// Import des nouveaux modules optimisés
+const FlashGlowPage = lazy(() => import('@/pages/modules/FlashGlowPage'));
+const JournalPage = lazy(() => import('@/pages/modules/JournalPage'));
+const ScanPage = lazy(() => import('@/pages/modules/ScanPage'));
+const CoachPage = lazy(() => import('@/pages/modules/CoachPage'));
+const MoodMixerPage = lazy(() => import('@/pages/modules/MoodMixerPage'));
+const BossGritPage = lazy(() => import('@/pages/modules/BossGritPage'));
+const BubbleBeatPage = lazy(() => import('@/pages/modules/BubbleBeatPage'));
+const StorySynthPage = lazy(() => import('@/pages/modules/StorySynthPage'));
+const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
+
+// Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 
 // Pages système unifiées
@@ -251,6 +262,17 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   NotFoundPage: UnifiedErrorPage,
   ServerErrorPage,
   
+  // Import des nouveaux modules optimisés
+  FlashGlowPage,
+  JournalPage: JournalPage,
+  ScanPage,
+  CoachPage,
+  MoodMixerPage,
+  BossGritPage,
+  BubbleBeatPage,
+  StorySynthPage,
+  ModulesShowcasePage,
+
   // Dev-only pages
   ComprehensiveSystemAuditPage,
   

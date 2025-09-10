@@ -46,33 +46,35 @@ interface NavigationItem {
 const navigationItems: NavigationItem[] = [
   // Accueil & Dashboards
   { id: 'home', label: 'Accueil', icon: Home, href: '/', category: 'Principal', description: 'Page d\'accueil' },
-  { id: 'dashboard-b2c', label: 'Mon Espace', icon: User, href: '/b2c/dashboard', category: 'Principal', description: 'Tableau de bord personnel' },
+  { id: 'dashboard-b2c', label: 'Mon Espace', icon: User, href: '/app/home', category: 'Principal', description: 'Tableau de bord personnel' },
   
   // Fonctionnalités principales
-  { id: 'scan', label: 'Scanner Émotionnel', icon: Brain, href: '/scan', category: 'Analyse', description: 'Analyse IA temps réel', badge: 'IA' },
-  { id: 'music', label: 'Musicothérapie', icon: Music, href: '/music', category: 'Thérapie', description: 'Musique adaptative' },
-  { id: 'journal', label: 'Journal', icon: BookOpen, href: '/journal', category: 'Réflexion', description: 'Journal émotionnel' },
-  { id: 'breathwork', label: 'Respiration', icon: Wind, href: '/breathwork', category: 'Bien-être', description: 'Exercices guidés' },
-  { id: 'coach', label: 'Coach IA', icon: Sparkles, href: '/coach', category: 'Accompagnement', description: 'Assistant personnel', isNew: true },
+  { id: 'scan', label: 'Scanner Émotionnel', icon: Brain, href: '/app/scan', category: 'Analyse', description: 'Analyse IA temps réel', badge: 'IA' },
+  { id: 'music', label: 'Musicothérapie', icon: Music, href: '/app/music', category: 'Thérapie', description: 'Musique adaptative' },
+  { id: 'journal', label: 'Journal', icon: BookOpen, href: '/app/journal', category: 'Réflexion', description: 'Journal émotionnel' },
+  { id: 'breathwork', label: 'Respiration', icon: Wind, href: '/app/breath', category: 'Bien-être', description: 'Exercices guidés' },
+  { id: 'coach', label: 'Coach IA', icon: Sparkles, href: '/app/coach', category: 'Accompagnement', description: 'Assistant personnel', isNew: true },
   
   // Modules innovants
-  { id: 'vr', label: 'Réalité Virtuelle', icon: Eye, href: '/vr', category: 'Immersif', description: 'Expériences VR', isPremium: true },
-  { id: 'mood-mixer', label: 'Mood Mixer', icon: Palette, href: '/mood-mixer', category: 'Créatif', description: 'Mix personnalisé' },
-  { id: 'story-synth', label: 'Story Synth Lab', icon: Wand2, href: '/story-synth-lab', category: 'Créatif', description: 'Histoires IA' },
-  { id: 'boss-level', label: 'Boss Level Grit', icon: Target, href: '/boss-level-grit', category: 'Développement', description: 'Défis gamifiés' },
+  { id: 'vr', label: 'Réalité Virtuelle', icon: Eye, href: '/app/vr', category: 'Immersif', description: 'Expériences VR', isPremium: true },
+  { id: 'mood-mixer', label: 'Mood Mixer', icon: Palette, href: '/app/mood-mixer', category: 'Créatif', description: 'Mix personnalisé' },
+  { id: 'story-synth', label: 'Story Synth Lab', icon: Wand2, href: '/app/story-synth', category: 'Créatif', description: 'Histoires IA' },
+  { id: 'boss-level', label: 'Boss Level Grit', icon: Target, href: '/app/boss-grit', category: 'Développement', description: 'Défis gamifiés' },
   
   // Modules fun
-  { id: 'ambition-arcade', label: 'Ambition Arcade', icon: Zap, href: '/ambition-arcade', category: 'Gamification', description: 'Jeux motivationnels' },
-  { id: 'bounce-back', label: 'Bounce Back Battle', icon: Shield, href: '/bounce-back-battle', category: 'Résilience', description: 'Récupération émotionnelle' },
-  { id: 'flash-glow', label: 'Flash Glow', icon: Sparkles, href: '/flash-glow', category: 'Instantané', description: 'Boost rapide' },
-  { id: 'ar-filters', label: 'AR Filters', icon: Eye, href: '/ar-filters', category: 'Immersif', description: 'Réalité augmentée' },
+  { id: 'ambition-arcade', label: 'Ambition Arcade', icon: Zap, href: '/app/ambition-arcade', category: 'Gamification', description: 'Jeux motivationnels' },
+  { id: 'bounce-back', label: 'Bounce Back Battle', icon: Shield, href: '/app/bounce-back', category: 'Résilience', description: 'Récupération émotionnelle' },
+  { id: 'flash-glow', label: 'Flash Glow', icon: Sparkles, href: '/app/flash-glow', category: 'Instantané', description: 'Boost rapide', isNew: true },
+  { id: 'ar-filters', label: 'AR Filters', icon: Eye, href: '/app/face-ar', category: 'Immersif', description: 'Réalité augmentée' },
+  { id: 'bubble-beat', label: 'Bubble Beat', icon: Heart, href: '/app/bubble-beat', category: 'Instantané', description: 'Défouloir ludique', isNew: true },
   
   // Analytics
-  { id: 'weekly-bars', label: 'Weekly Bars', icon: BarChart3, href: '/weekly-bars', category: 'Analytics', description: 'Graphiques hebdo' },
-  { id: 'heatmap-vibes', label: 'Heatmap Vibes', icon: Heart, href: '/heatmap-vibes', category: 'Analytics', description: 'Carte émotionnelle' },
+  { id: 'weekly-bars', label: 'Weekly Bars', icon: BarChart3, href: '/app/activity', category: 'Analytics', description: 'Graphiques hebdo' },
+  { id: 'heatmap-vibes', label: 'Heatmap Vibes', icon: Heart, href: '/app/heatmap', category: 'Analytics', description: 'Carte émotionnelle' },
+  { id: 'leaderboard', label: 'Classements', icon: Target, href: '/app/leaderboard', category: 'Analytics', description: 'Compétition amicale' },
   
   // Social & Communauté
-  { id: 'social-cocon', label: 'Social Cocon', icon: Users, href: '/social-cocon', category: 'Social', description: 'Communauté bienveillante' },
+  { id: 'social-cocon', label: 'Social Cocon', icon: Users, href: '/app/social-cocon', category: 'Social', description: 'Communauté bienveillante' },
   { id: 'gamification', label: 'Gamification', icon: Target, href: '/gamification', category: 'Social', description: 'Défis et récompenses' },
   
   // Paramètres & Outils
