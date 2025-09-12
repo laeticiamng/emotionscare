@@ -5,7 +5,7 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { useRewardsStore } from '@/store/rewards.store';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
@@ -19,7 +19,7 @@ const MoodMixerPage: React.FC = () => {
   const { addReward } = useRewardsStore();
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
-  const universe = universes.moodMixer;
+  const universe = UNIVERSE_CONFIGS.moodMixer;
 
   const handleEnterComplete = useCallback(() => {
     setIsEntering(false);
