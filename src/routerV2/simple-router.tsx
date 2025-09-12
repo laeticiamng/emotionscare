@@ -10,7 +10,7 @@ import { SecurityProvider } from '@/components/security/SecurityProvider';
 // Pages simples 
 const HomePage = lazy(() => import('@/components/HomePage'));
 const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
-const UserDashboard = lazy(() => import('@/components/UserDashboard'));
+const B2CHomePage = lazy(() => import('@/pages/B2CHomePage'));
 
 const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <Suspense
@@ -54,7 +54,7 @@ export const simpleRouter = createBrowserRouter([
     path: '/app/home',
     element: (
       <SecureWrapper>
-        <UserDashboard />
+        <B2CHomePage />
       </SecureWrapper>
     ),
   },
