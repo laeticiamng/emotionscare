@@ -12,7 +12,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { SecurityProvider } from './components/security/SecurityProvider';
 
 // Import RouterV2 - ACTIVATION DU SYSTÈME UNIFIÉ
-import { routerV2 } from './routerV2';
+import { routerV2 } from './routerV2/index.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {

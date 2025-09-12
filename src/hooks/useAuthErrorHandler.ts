@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { routes } from '@/routerV2';
+import { routes } from '@/routerV2/routes';
 
 /**
  * Hook pour gérer les erreurs d'authentification
