@@ -9,7 +9,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';
 import { ThemeProvider } from '@/components/theme-provider';
-import { SecurityProvider } from './components/security/SecurityProvider';
 
 // Import RouterV2 - ACTIVATION DU SYSTÈME UNIFIÉ
 import { simpleRouter as routerV2 } from './routerV2/simple-router';
@@ -30,12 +29,10 @@ function App() {
         <TooltipProvider>
           <AuthProvider>
             <UserModeProvider>
-              <SecurityProvider>
-                {/* 🚀 ACTIVATION RouterV2 - Système unifié avec 80+ routes */}
-                <RouterProvider router={routerV2} />
-                <Toaster />
-                <Sonner />
-              </SecurityProvider>
+              {/* 🚀 ACTIVATION RouterV2 - Système unifié avec 80+ routes */}
+              <RouterProvider router={routerV2} />
+              <Toaster />
+              <Sonner />
             </UserModeProvider>
           </AuthProvider>
         </TooltipProvider>

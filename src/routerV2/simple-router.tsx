@@ -5,6 +5,7 @@
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import { SecurityProvider } from '@/components/security/SecurityProvider';
 
 // Pages simples 
 const HomePage = lazy(() => import('@/components/HomePage'));
@@ -21,6 +22,15 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
   >
     {children}
   </Suspense>
+);
+
+// Wrapper avec SecurityProvider pour les routes qui en ont besoin
+const SecureWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <SecurityProvider>
+    <SuspenseWrapper>
+      {children}
+    </SuspenseWrapper>
+  </SecurityProvider>
 );
 
 export const simpleRouter = createBrowserRouter([
@@ -43,9 +53,9 @@ export const simpleRouter = createBrowserRouter([
   {
     path: '/app/home',
     element: (
-      <SuspenseWrapper>
+      <SecureWrapper>
         <SimpleB2CPage />
-      </SuspenseWrapper>
+      </SecureWrapper>
     ),
   },
   {

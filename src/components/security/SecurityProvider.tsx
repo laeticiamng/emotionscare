@@ -29,8 +29,16 @@ const SecurityContext = createContext<SecurityContextType | undefined>(undefined
 
 export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
-  const location = useLocation();
   const security = useSecurity();
+  
+  // Safe useLocation hook
+  let location;
+  try {
+    location = useLocation();
+  } catch (error) {
+    // Si useLocation échoue, on utilise window.location
+    location = { pathname: window.location.pathname };
+  }
 
   // Enregistrer automatiquement les accès aux pages
   useEffect(() => {
