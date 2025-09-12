@@ -208,4 +208,6 @@ export function useAuth() {
   return context;
 }
 
-export default AuthContext;
+// Alias pour compatibilité
+export { AuthProvider as default };
+export const AuthContextProvider = AuthProvider;

@@ -6,13 +6,13 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 // Import des contexts
-import AuthContextProvider, { useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SecurityProvider } from './components/security/SecurityProvider';
 
 // Import RouterV2 - ACTIVATION DU SYSTÈME UNIFIÉ
-import { routerV2 } from './routerV2/index.tsx';
+import { simpleRouter as routerV2 } from './routerV2/simple-router';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +28,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <TooltipProvider>
-          <AuthContextProvider>
+          <AuthProvider>
             <UserModeProvider>
               <SecurityProvider>
                 {/* 🚀 ACTIVATION RouterV2 - Système unifié avec 80+ routes */}
@@ -37,7 +37,7 @@ function App() {
                 <Sonner />
               </SecurityProvider>
             </UserModeProvider>
-          </AuthContextProvider>
+          </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
