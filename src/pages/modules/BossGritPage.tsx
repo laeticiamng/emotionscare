@@ -5,7 +5,7 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { useRewardsStore } from '@/store/rewards.store';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 
 interface ForgedItem {
@@ -26,14 +26,7 @@ const BossGritPage: React.FC = () => {
   const { addReward } = useRewardsStore();
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
-  const universe = universes.bossGrit || {
-    name: "La Forge Intérieure",
-    ambiance: {
-      colors: { 
-        background: "linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2d1b2e 100%)",
-        primary: "#ff6b35",
-        secondary: "#ffa726" 
-      },
+  const universe = UNIVERSE_CONFIGS.bossGrit;
       metaphor: "Forge ta détermination dans les flammes de la persévérance"
     }
   };

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardAnimation } from '@/components/rewards/RewardAnimation';
 import { useCollectionStore } from '@/store/collection.store';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, Music, Volume2, Save } from 'lucide-react';
@@ -33,7 +33,7 @@ const AdaptiveMusicPage = () => {
   const [sessionDuration, setSessionDuration] = useState(0);
 
   const { addReward } = useCollectionStore();
-  const universe = universes.find(u => u.id === 'adaptive-music');
+  const universe = UNIVERSE_CONFIGS.music;
 
   // Update layers based on mood sliders
   useEffect(() => {

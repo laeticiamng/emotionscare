@@ -5,7 +5,7 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { useRewardsStore } from '@/store/rewards.store';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 
 interface Story {
@@ -29,14 +29,7 @@ const StorySynthPage: React.FC = () => {
   const { addReward } = useRewardsStore();
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
-  const universe = universes.storySynth || {
-    name: "La Bibliothèque Vivante",
-    ambiance: {
-      colors: { 
-        background: "linear-gradient(135deg, #1a1625 0%, #2d1b3d 50%, #4a2c5a 100%)",
-        primary: "#9c88ff",
-        secondary: "#b794f6" 
-      },
+  const universe = UNIVERSE_CONFIGS.storySynth;
       metaphor: "Chaque histoire est un chemin vers ton mieux-être"
     }
   };

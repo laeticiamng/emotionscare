@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardAnimation } from '@/components/rewards/RewardAnimation';
 import { useCollectionStore } from '@/store/collection.store';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Circle, Star } from 'lucide-react';
 
@@ -21,7 +21,7 @@ const BreathConstellationPage = () => {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
 
   const { addReward } = useCollectionStore();
-  const universe = universes.find(u => u.id === 'breath-constellation');
+  const universe = UNIVERSE_CONFIGS.vrBreath;
 
   // Breath timing configuration (in seconds)
   const breathTiming = {

@@ -5,7 +5,7 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { useRewardsStore } from '@/store/rewards.store';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 
 interface Bubble {
@@ -29,14 +29,7 @@ const BubbleBeatPage: React.FC = () => {
   const { addReward } = useRewardsStore();
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
-  const universe = universes.bubbleBeat || {
-    name: "L'Océan des Bulles",
-    ambiance: {
-      colors: { 
-        background: "linear-gradient(135deg, #0f1419 0%, #1e3a5f 50%, #2d5a87 100%)",
-        primary: "#4fc3f7",
-        secondary: "#81d4fa" 
-      },
+  const universe = UNIVERSE_CONFIGS.bubbleBeat;
       metaphor: "Libère tes tensions dans la danse des bulles"
     }
   };

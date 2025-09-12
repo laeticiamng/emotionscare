@@ -15,12 +15,12 @@ import {
   Sun,
   ArrowRight
 } from 'lucide-react';
-import { Reward, RewardType, useRewardsStore } from '@/store/rewards.store';
+import { RewardType, useRewardsStore } from '@/store/rewards.store';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 
 interface RewardSystemProps {
-  reward: Omit<Reward, 'id' | 'unlockedAt' | 'isNew'>;
-  badgeText: string;
+  type: RewardType;
+  message: string;
   onComplete: () => void;
   className?: string;
 }
@@ -50,13 +50,13 @@ const rewardColors: Record<RewardType, string> = {
 };
 
 export const RewardSystem: React.FC<RewardSystemProps> = ({
-  reward,
-  badgeText,
+  type,
+  message,
   onComplete,
   className = ""
 }) => {
   const [phase, setPhase] = useState<'materializing' | 'revealing' | 'complete'>('materializing');
-  const { addReward, addBadge } = useRewardsStore();
+  const { addReward } = useRewardsStore();
   
   const { entranceVariants, generateParticles } = useOptimizedAnimation({
     particleCount: 8,
@@ -64,23 +64,27 @@ export const RewardSystem: React.FC<RewardSystemProps> = ({
   });
 
   const particles = generateParticles(8);
-  const RewardIcon = rewardIcons[reward.type];
-  const iconColor = rewardColors[reward.type];
+  const RewardIcon = rewardIcons[type];
+  const iconColor = rewardColors[type];
 
   useEffect(() => {
     const timer1 = setTimeout(() => setPhase('revealing'), 1500);
     const timer2 = setTimeout(() => {
       setPhase('complete');
       // Add to store
-      addReward(reward);
-      addBadge({ text: badgeText, moduleId: reward.moduleId });
+      addReward({
+        type,
+        name: `Récompense ${type}`,
+        description: message,
+        moduleId: 'module'
+      });
     }, 2500);
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
-  }, [reward, badgeText, addReward, addBadge]);
+  }, [type, message, addReward]);
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen p-8 ${className}`}>
@@ -176,15 +180,15 @@ export const RewardSystem: React.FC<RewardSystemProps> = ({
                   variant="secondary"
                   className="mb-4 bg-primary/10 text-primary border-primary/20"
                 >
-                  {badgeText}
+                  Nouveau
                 </Badge>
                 
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {reward.name}
+                  Récompense débloquée
                 </h3>
                 
                 <p className="text-sm text-muted-foreground mb-6">
-                  {reward.description}
+                  {message}
                 </p>
 
                 {phase === 'complete' && (

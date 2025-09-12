@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardAnimation } from '@/components/rewards/RewardAnimation';
 import { useCollectionStore } from '@/store/collection.store';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Droplets, Flame, Wind, Mountain } from 'lucide-react';
@@ -26,7 +26,7 @@ const EmotionScanPage = () => {
   const [isUniverseReady, setIsUniverseReady] = useState(false);
 
   const { addReward } = useCollectionStore();
-  const universe = universes.find(u => u.id === 'emotion-scan');
+  const universe = UNIVERSE_CONFIGS.scan;
 
   // Emotion avatar types based on valence/arousal model
   const avatars: EmotionAvatar[] = [

@@ -8,7 +8,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 // Import des contexts
 import AuthContextProvider, { useAuth } from './contexts/AuthContext';
 import { UserModeProvider } from './contexts/UserModeContext';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from '@/components/theme-provider';
 import { SecurityProvider } from './components/security/SecurityProvider';
 
 // Import RouterV2 - ACTIVATION DU SYSTÈME UNIFIÉ

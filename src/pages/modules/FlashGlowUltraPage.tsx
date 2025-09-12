@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardAnimation } from '@/components/rewards/RewardAnimation';
 import { useCollectionStore } from '@/store/collection.store';
-import { universes } from '@/data/universes/config';
+import { UNIVERSE_CONFIGS } from '@/data/universes/config';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Zap, Circle, Sparkles } from 'lucide-react';
@@ -21,7 +21,7 @@ const FlashGlowUltraPage = () => {
   const [isUniverseReady, setIsUniverseReady] = useState(false);
 
   const { addReward } = useCollectionStore();
-  const universe = universes.find(u => u.id === 'flash-glow');
+  const universe = UNIVERSE_CONFIGS.flashGlow;
 
   // Glow type colors and properties
   const glowConfigs = {
