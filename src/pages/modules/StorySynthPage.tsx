@@ -30,9 +30,6 @@ const StorySynthPage: React.FC = () => {
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
   const universe = UNIVERSE_CONFIGS.storySynth;
-      metaphor: "Chaque histoire est un chemin vers ton mieux-être"
-    }
-  };
 
   const stories: Story[] = [
     {

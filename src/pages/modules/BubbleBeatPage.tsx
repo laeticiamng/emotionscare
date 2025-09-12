@@ -30,9 +30,6 @@ const BubbleBeatPage: React.FC = () => {
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
   const universe = UNIVERSE_CONFIGS.bubbleBeat;
-      metaphor: "Libère tes tensions dans la danse des bulles"
-    }
-  };
 
   const handleEnterComplete = useCallback(() => {
     setIsEntering(false);

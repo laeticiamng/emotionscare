@@ -27,9 +27,6 @@ const BossGritPage: React.FC = () => {
   const { entranceVariants, cssAnimationClasses } = useOptimizedAnimation();
 
   const universe = UNIVERSE_CONFIGS.bossGrit;
-      metaphor: "Forge ta détermination dans les flammes de la persévérance"
-    }
-  };
 
   const challenges = [
     { id: 'daily-breath', name: 'Respirer 3 fois par jour', icon: Flame, days: 7 },
