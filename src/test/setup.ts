@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import React from 'react';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -47,6 +48,6 @@ vi.mock('@/integrations/supabase/client', () => ({
 vi.mock('react-router-dom', () => ({
   useNavigate: vi.fn(() => vi.fn()),
   useLocation: vi.fn(() => ({ pathname: '/' })),
-  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
-  BrowserRouter: ({ children }: any) => <div>{children}</div>
+  Link: ({ children, to }: any) => React.createElement('a', { href: to }, children),
+  BrowserRouter: ({ children }: any) => React.createElement('div', null, children)
 }));

@@ -7,3 +7,8 @@ export { FadeIn } from "@/ui/motion/FadeIn";
 export { SlideIn } from "@/ui/motion/SlideIn";
 export { I18nProvider, useI18n, t } from "@/lib/i18n/i18n";
 export { SeoHead } from "@/lib/seo/SeoHead";
+export { NavBar } from "@/ui/NavBar";
+export { Footer } from "@/ui/Footer";
+export { CommandPalette, useCommandPalette } from "@/ui/CommandPalette";
+export { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
+export { Card } from "./components/ui/card.tsx";
