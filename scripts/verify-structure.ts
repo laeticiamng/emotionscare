@@ -1,65 +1,66 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-import { getRoutes } from "../src/ROUTES.reg.ts";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const snapshotPath = path.join(__dirname, ".structure-snapshot.json");
+const SNAP_FILE = "scripts/.structure-snapshot.json";
+const ROUTES_REG = "src/ROUTES.reg.ts";
+const COMPONENTS_REG = "src/COMPONENTS.reg.ts";
+const APP_DIR = "src/app";
 
-function listFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const files: string[] = [];
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...listFiles(full));
-    } else {
-      files.push(path.relative(path.join(process.cwd(), "src"), full));
+function fail(msg: string): never {
+  console.error("❌", msg);
+  process.exit(1);
+}
+
+function fileExists(p: string) { return fs.existsSync(p) && fs.statSync(p).isFile(); }
+function dirExists(p: string) { return fs.existsSync(p) && fs.statSync(p).isDirectory(); }
+
+function readFileOrEmpty(p: string) { return fileExists(p) ? fs.readFileSync(p, "utf8") : ""; }
+
+function listAppFiles(root: string) {
+  const out: string[] = [];
+  if (!dirExists(root)) return out;
+  (function walk(d: string) {
+    for (const name of fs.readdirSync(d)) {
+      const p = path.join(d, name);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) walk(p);
+      else out.push(p.replace(/\\/g, "/"));
     }
-  }
-  return files.sort();
+  })(root);
+  return out.sort();
 }
 
-if (!fs.existsSync(snapshotPath)) {
-  console.error("Snapshot file not found. Run struct:snapshot first.");
-  process.exit(1);
+function extractRouteIds(code: string) {
+  const ids = new Set<string>();
+  for (const m of code.matchAll(/\bid\s*:\s*["'`](.+?)["'`]/g)) ids.add(m[1]);
+  return [...ids].sort();
 }
 
-const compSource = fs.readFileSync(path.join(process.cwd(), "src/COMPONENTS.reg.ts"), "utf8");
-const componentExports = compSource
-  .split("\n")
-  .filter((l) => l.startsWith("export {"))
-  .map((l) => l.match(/export\s+{\s*(?:default\s+as\s+)?(\w+)/)?.[1])
-  .filter(Boolean) as string[];
-
-const snapshot = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
-const current = {
-  routes: getRoutes(),
-  components: componentExports.sort(),
-  appFiles: listFiles(path.join(process.cwd(), "src/app")),
-};
-
-function diff<T extends { id?: string }>(prev: T[], now: T[], key: keyof T) {
-  const prevSet = new Set(prev.map((i) => i[key] as string));
-  const nowSet = new Set(now.map((i) => i[key] as string));
-  const missing: string[] = [];
-  for (const item of prevSet) {
-    if (!nowSet.has(item)) missing.push(item);
-  }
-  return missing;
+function extractComponentExports(code: string) {
+  const ex = new Set<string>();
+  for (const m of code.matchAll(/export\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"']+["']/g)) ex.add(m[1]);
+  return [...ex].sort();
 }
 
-const missingRoutes = diff(snapshot.routes, current.routes, "id");
-const missingComponents = snapshot.components.filter((c: string) => !current.components.includes(c));
-const missingFiles = snapshot.appFiles.filter((f: string) => !current.appFiles.includes(f));
+// 1) Charger le snapshot de référence
+if (!fileExists(SNAP_FILE)) fail("Aucun snapshot trouvé. Lance d'abord : npm run struct:snapshot");
+const snap = JSON.parse(fs.readFileSync(SNAP_FILE, "utf8"));
 
-if (missingRoutes.length || missingComponents.length || missingFiles.length) {
-  console.error("Structure verification failed:");
-  if (missingRoutes.length) console.error("Missing routes:", missingRoutes);
-  if (missingComponents.length) console.error("Missing components:", missingComponents);
-  if (missingFiles.length) console.error("Missing app files:", missingFiles);
-  process.exit(1);
+// 2) Recalculer l'état courant
+const routesNow = extractRouteIds(readFileOrEmpty(ROUTES_REG));
+const compsNow  = extractComponentExports(readFileOrEmpty(COMPONENTS_REG));
+const appFilesNow = listAppFiles(APP_DIR);
+
+// 3) Vérifier la présence de tout ce qui existait
+for (const r of snap.routes ?? []) {
+  if (!routesNow.includes(r)) fail(`Route existante manquante/renommée : ${r}`);
+}
+for (const e of snap.componentExports ?? []) {
+  if (!compsNow.includes(e)) fail(`Export DS manquant/renommé : ${e}`);
+}
+for (const f of snap.appFiles ?? []) {
+  if (!appFilesNow.includes(f)) fail(`Fichier sous src/app supprimé/déplacé : ${f}`);
 }
 
-console.log("Structure verified");
+console.log("✅ Invariants structurels OK (append-only respecté)");
+

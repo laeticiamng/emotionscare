@@ -1,40 +1,61 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-import { getRoutes } from "../src/ROUTES.reg.ts";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SNAP_FILE = "scripts/.structure-snapshot.json";
+const ROUTES_REG = "src/ROUTES.reg.ts";
+const COMPONENTS_REG = "src/COMPONENTS.reg.ts";
+const APP_DIR = "src/app";
 
-function listFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const files: string[] = [];
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...listFiles(full));
-    } else {
-      files.push(path.relative(path.join(process.cwd(), "src"), full));
+function fileExists(p: string) { return fs.existsSync(p) && fs.statSync(p).isFile(); }
+function dirExists(p: string) { return fs.existsSync(p) && fs.statSync(p).isDirectory(); }
+
+function listAppFiles(root: string) {
+  const out: string[] = [];
+  if (!dirExists(root)) return out;
+  (function walk(d: string) {
+    for (const name of fs.readdirSync(d)) {
+      const p = path.join(d, name);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) walk(p);
+      else out.push(p.replace(/\\/g, "/")); // normalize
     }
-  }
-  return files.sort();
+  })(root);
+  // On stocke des chemins relatifs au repo pour éviter les surprises
+  return out.sort();
 }
 
-const compSource = fs.readFileSync(path.join(process.cwd(), "src/COMPONENTS.reg.ts"), "utf8");
-const componentExports = compSource
-  .split("\n")
-  .filter((l) => l.startsWith("export {"))
-  .map((l) => l.match(/export\s+{\s*(?:default\s+as\s+)?(\w+)/)?.[1])
-  .filter(Boolean) as string[];
+function readFileOrEmpty(p: string) { return fileExists(p) ? fs.readFileSync(p, "utf8") : ""; }
+
+// Heuristiques robustes et tolérantes (on cherche l'append-only, pas l'AST parfait)
+function extractRouteIds(code: string) {
+  // ex: id: "home"  OU  addRoute({ id: "mood-mixer", ... })
+  const ids = new Set<string>();
+  for (const m of code.matchAll(/\bid\s*:\s*["'`](.+?)["'`]/g)) ids.add(m[1]);
+  return [...ids].sort();
+}
+
+function extractComponentExports(code: string) {
+  // ex: export { Button } from "@/ui/Button"
+  const ex = new Set<string>();
+  for (const m of code.matchAll(/export\s*\{\s*([A-Za-z0-9_]+)\s*\}\s*from\s*["'][^"]+["']/g)) ex.add(m[1]);
+  return [...ex].sort();
+}
+
+const routesCode = readFileOrEmpty(ROUTES_REG);
+const compsCode  = readFileOrEmpty(COMPONENTS_REG);
 
 const snapshot = {
-  routes: getRoutes(),
-  components: componentExports.sort(),
-  appFiles: listFiles(path.join(process.cwd(), "src/app")),
+  createdAt: new Date().toISOString(),
+  files: {
+    routesReg: fileExists(ROUTES_REG) ? ROUTES_REG : null,
+    componentsReg: fileExists(COMPONENTS_REG) ? COMPONENTS_REG : null,
+    appDir: dirExists(APP_DIR) ? APP_DIR : null
+  },
+  routes: extractRouteIds(routesCode),
+  componentExports: extractComponentExports(compsCode),
+  appFiles: listAppFiles(APP_DIR)
 };
 
-fs.writeFileSync(
-  path.join(__dirname, ".structure-snapshot.json"),
-  JSON.stringify(snapshot, null, 2)
-);
-console.log("Structure snapshot saved");
+fs.writeFileSync(SNAP_FILE, JSON.stringify(snapshot, null, 2));
+console.log("✅ Structure snapshot enregistrée :", SNAP_FILE);
+
