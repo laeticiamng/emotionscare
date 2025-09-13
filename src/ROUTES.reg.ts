@@ -27,3 +27,4 @@ addRoute({ id: "journal", path: "/modules/journal", component: "JournalPage" });
 addRoute({ id: "mood-mixer", path: "/modules/mood-mixer", component: "MoodMixerPage" });
 addRoute({ id: "scan", path: "/modules/scan", component: "ScanPage" });
 addRoute({ id: "story-synth", path: "/modules/story-synth", component: "StorySynthPage" });
+addRoute({ id: "onboarding", path: "/onboarding", component: "OnboardingPage" });

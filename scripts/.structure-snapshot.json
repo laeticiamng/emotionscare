@@ -1,87 +1,42 @@
 {
-  "createdAt": "2025-09-13T13:22:01.595Z",
+  "createdAt": "2025-09-13T13:36:30.578Z",
   "files": {
     "routesReg": "src/ROUTES.reg.ts",
     "componentsReg": "src/COMPONENTS.reg.ts",
     "appDir": "src/app"
   },
   "routes": [
-    {
-      "id": "flash-glow",
-      "path": "/modules/flash-glow",
-      "component": "FlashGlowPage"
-    },
-    {
-      "id": "adaptive-music",
-      "path": "/modules/adaptive-music",
-      "component": "AdaptiveMusicPage"
-    },
-    {
-      "id": "boss-grit",
-      "path": "/modules/boss-grit",
-      "component": "BossGritPage"
-    },
-    {
-      "id": "breath-constellation",
-      "path": "/modules/breath-constellation",
-      "component": "BreathConstellationPage"
-    },
-    {
-      "id": "bubble-beat",
-      "path": "/modules/bubble-beat",
-      "component": "BubbleBeatPage"
-    },
-    {
-      "id": "coach",
-      "path": "/modules/coach",
-      "component": "CoachPage"
-    },
-    {
-      "id": "emotion-scan",
-      "path": "/modules/emotion-scan",
-      "component": "EmotionScanPage"
-    },
-    {
-      "id": "flash-glow-ultra",
-      "path": "/modules/flash-glow-ultra",
-      "component": "FlashGlowUltraPage"
-    },
-    {
-      "id": "journal",
-      "path": "/modules/journal",
-      "component": "JournalPage"
-    },
-    {
-      "id": "mood-mixer",
-      "path": "/modules/mood-mixer",
-      "component": "MoodMixerPage"
-    },
-    {
-      "id": "scan",
-      "path": "/modules/scan",
-      "component": "ScanPage"
-    },
-    {
-      "id": "story-synth",
-      "path": "/modules/story-synth",
-      "component": "StorySynthPage"
-    }
+    "adaptive-music",
+    "boss-grit",
+    "breath-constellation",
+    "bubble-beat",
+    "coach",
+    "emotion-scan",
+    "flash-glow",
+    "flash-glow-ultra",
+    "journal",
+    "mood-mixer",
+    "onboarding",
+    "scan",
+    "story-synth"
   ],
   "componentExports": [
+    "Card",
     "LoadingSpinner"
   ],
   "appFiles": [
-    "app/modules/adaptive-music/page.tsx",
-    "app/modules/boss-grit/page.tsx",
-    "app/modules/breath-constellation/page.tsx",
-    "app/modules/bubble-beat/page.tsx",
-    "app/modules/coach/page.tsx",
-    "app/modules/emotion-scan/page.tsx",
-    "app/modules/flash-glow-ultra/page.tsx",
-    "app/modules/flash-glow/page.tsx",
-    "app/modules/journal/page.tsx",
-    "app/modules/mood-mixer/page.tsx",
-    "app/modules/scan/page.tsx",
-    "app/modules/story-synth/page.tsx"
+    "src/app/modules/adaptive-music/page.tsx",
+    "src/app/modules/boss-grit/page.tsx",
+    "src/app/modules/breath-constellation/page.tsx",
+    "src/app/modules/bubble-beat/page.tsx",
+    "src/app/modules/coach/page.tsx",
+    "src/app/modules/emotion-scan/page.tsx",
+    "src/app/modules/flash-glow-ultra/page.tsx",
+    "src/app/modules/flash-glow/page.tsx",
+    "src/app/modules/journal/page.tsx",
+    "src/app/modules/mood-mixer/page.tsx",
+    "src/app/modules/scan/page.tsx",
+    "src/app/modules/story-synth/page.tsx",
+    "src/app/onboarding/page.tsx"
   ]
 }
