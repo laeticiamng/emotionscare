@@ -31,6 +31,9 @@ const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
+const PrivacyPage = lazy(() => import('@/app/legal/privacy/page'));
+const TermsPage = lazy(() => import('@/app/legal/terms/page'));
+const AccountDataPage = lazy(() => import('@/app/account/data/page'));
 
 const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <Suspense
@@ -220,6 +223,30 @@ export const simpleRouter = createBrowserRouter([
     element: (
       <SecureWrapper>
         <B2CActivitePage />
+      </SecureWrapper>
+    ),
+  },
+  {
+    path: '/legal/privacy',
+    element: (
+      <SuspenseWrapper>
+        <PrivacyPage />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: '/legal/terms',
+    element: (
+      <SuspenseWrapper>
+        <TermsPage />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: '/account/data',
+    element: (
+      <SecureWrapper>
+        <AccountDataPage />
       </SecureWrapper>
     ),
   },

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 import './styles/accessibility.css';
+import './theme/theme.css';
+import { ThemeProvider, I18nProvider } from '@/COMPONENTS.reg';
 
 // Configuration de l'attribut lang pour l'accessibilité
 document.documentElement.lang = 'fr';
@@ -29,6 +31,10 @@ addAccessibilityMeta();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider>
+      <I18nProvider>
+        <App />
+      </I18nProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );
