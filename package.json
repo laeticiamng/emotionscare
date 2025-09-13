@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=20",
-    "npm": ">=10"
+    "node": ">=18 <=22",
+    "npm": ">=9"
   },
   "packageManager": "npm@10.0.0",
   "scripts": {
@@ -43,9 +43,10 @@
     "struct:snapshot": "ts-node scripts/lock-structure.ts",
     "struct:verify": "ts-node scripts/verify-structure.ts",
     "test:quick": "npm run typecheck && npm run lint && npm run test",
-    "ci:guard": "npm run test:quick && npm run struct:verify",
+    "ci:guard": "npm run lock:check && npm run test:quick && npm run struct:verify",
     "lovable:push": "npm run ci:guard && lovable sync",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lock:check": "node scripts/validate-lockfile.mjs"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",
