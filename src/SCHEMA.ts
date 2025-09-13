@@ -27,3 +27,9 @@ export const ScanPrefs = z.object({}).optional();
 export type ScanPrefs = z.infer<typeof ScanPrefs>;
 export const StorySynthPrefs = z.object({}).optional();
 export type StorySynthPrefs = z.infer<typeof StorySynthPrefs>;
+export const OnboardingPrefs = z.object({
+  musicRelax: z.boolean().optional(),
+  defaultDurationMin: z.number().int().min(5).max(60).optional(),
+  favoriteModule: z.string().optional(), // optionnel si redirection vers un module favori
+});
+export type OnboardingPrefs = z.infer<typeof OnboardingPrefs>;

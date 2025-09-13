@@ -28,3 +28,4 @@ addRoute({ id: "mood-mixer", path: "/modules/mood-mixer", component: "MoodMixerP
 addRoute({ id: "scan", path: "/modules/scan", component: "ScanPage" });
 addRoute({ id: "story-synth", path: "/modules/story-synth", component: "StorySynthPage" });
 addRoute({ id: "modules", path: "/modules", component: "ModulesIndexPage" });
+addRoute({ id: "onboarding", path: "/onboarding", component: "OnboardingPage" });

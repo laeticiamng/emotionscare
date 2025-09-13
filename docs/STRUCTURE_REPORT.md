@@ -41,6 +41,19 @@
 - `docs/STRUCTURE_REPORT.md` : ce rapport.
 
 ## TODO restants
+- Aucun.
+
+## Onboarding
+- Route ajoutée `/onboarding` → composant `OnboardingPage`.
+- Champs Zod optionnels : `musicRelax`, `defaultDurationMin`, `favoriteModule`.
+- Tests ajoutés : `src/__tests__/onboarding.snapshot.spec.tsx` et `e2e/onboarding.smoke.spec.ts`.
+- Aucun élément existant modifié/supprimé.
+
+## P2 — Données & Sécurité
+- connect-src autorisés : https://api.openai.com, https://*.supabase.co, https://*.sentry.io
+- Flags `data-export` / `data-delete` pour activer les endpoints d'export et de suppression via `ff`.
+- Page dédiée : [/account/data](/account/data)
+
 - Ajouter et compléter d'autres modules.
 
 ## P1 — Finition
