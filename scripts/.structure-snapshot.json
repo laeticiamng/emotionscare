@@ -1,0 +1,17 @@
+{
+  "routes": [
+    {
+      "id": "flash-glow",
+      "path": "/modules/flash-glow",
+      "component": "FlashGlowPage"
+    }
+  ],
+  "components": [
+    "Button",
+    "LoadingSpinner",
+    "PageHeader"
+  ],
+  "appFiles": [
+    "app/modules/flash-glow/page.tsx"
+  ]
+}
