@@ -70,3 +70,9 @@
 - Calculs : streak, niveaux, badges, agrégation par jour.
 - UI DS : ProgressBar, Sparkline, BadgeLevel.
 - Intégration module : exemple d’appel à recordEvent sur le CTA principal.
+
+## P4 — Navigation & Discoverability
+- `/modules` comme hub ; source : `ROUTES.reg.ts`.
+- Présence de NavBar, Footer, error.tsx, not-found.tsx.
+- Raccourci Cmd/Ctrl + K pour la Command Palette.
+- Règles a11y appliquées ; comportements de prefetch.

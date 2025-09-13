@@ -27,6 +27,14 @@ export const ScanPrefs = z.object({}).optional();
 export type ScanPrefs = z.infer<typeof ScanPrefs>;
 export const StorySynthPrefs = z.object({}).optional();
 export type StorySynthPrefs = z.infer<typeof StorySynthPrefs>;
+
+export const AudioPrefs = z.object({
+  masterVolume: z.number().min(0).max(1).optional(),
+  crossfadeMs: z.number().int().min(0).max(5000).optional(),
+  haptics: z.boolean().optional(),
+  loopDefault: z.boolean().optional()
+});
+export type AudioPrefs = z.infer<typeof AudioPrefs>;
 export const OnboardingPrefs = z.object({
   musicRelax: z.boolean().optional(),
   defaultDurationMin: z.number().int().min(5).max(60).optional(),
@@ -63,3 +71,9 @@ export const Achievement = z.object({
   earnedAt: z.string().optional()
 });
 export type Achievement = z.infer<typeof Achievement>;
+export const Feedback = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  message: z.string().optional(),
+});
+export type Feedback = z.infer<typeof Feedback>;
