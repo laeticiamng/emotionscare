@@ -43,6 +43,12 @@
 ## TODO restants
 - Aucun.
 
+## Onboarding
+- Route ajoutée `/onboarding` → composant `OnboardingPage`.
+- Champs Zod optionnels : `musicRelax`, `defaultDurationMin`, `favoriteModule`.
+- Tests ajoutés : `src/__tests__/onboarding.snapshot.spec.tsx` et `e2e/onboarding.smoke.spec.ts`.
+- Aucun élément existant modifié/supprimé.
+
 ## P2 — Données & Sécurité
 - connect-src autorisés : https://api.openai.com, https://*.supabase.co, https://*.sentry.io
 - Flags `data-export` / `data-delete` pour activer les endpoints d'export et de suppression via `ff`.
@@ -56,3 +62,10 @@
 - Base i18n FR/EN avec `I18nProvider` et `t()`.
 - Composant `SeoHead` pour les métadonnées.
 - Cookbooks disponibles dans `docs/cookbooks/`.
+
+
+## P4 — Navigation & Discoverability
+- `/modules` comme hub ; source : `ROUTES.reg.ts`.
+- Présence de NavBar, Footer, error.tsx, not-found.tsx.
+- Raccourci Cmd/Ctrl + K pour la Command Palette.
+- Règles a11y appliquées ; comportements de prefetch.

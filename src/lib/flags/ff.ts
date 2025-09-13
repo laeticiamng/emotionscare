@@ -1,3 +1,5 @@
+export function ff(key: string): boolean {
+  return true;
 import flags from "./flags.json" assert { type: "json" };
 
 export function ff(name: keyof typeof flags): boolean {

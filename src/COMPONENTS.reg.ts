@@ -1,6 +1,7 @@
 export { default as PageHeader } from "./components/ui/PageHeader.tsx";
 export { LoadingSpinner } from "./components/ui/LoadingSpinner.tsx";
 export { default as Button } from "./components/ui/button.tsx";
+export { Card } from "./components/ui/card.tsx";
 export { useDebounce } from "@/ui/hooks/useDebounce";
 export { useThrottle } from "@/ui/hooks/useThrottle";
 export { CookieConsent, hasConsent } from "@/ui/CookieConsent";
@@ -14,3 +15,8 @@ export { useSound } from "@/ui/hooks/useSound";
 export { useAudioBus } from "@/ui/hooks/useAudioBus";
 export { useCrossfade } from "@/ui/hooks/useCrossfade";
 export { AudioPlayer } from "@/ui/AudioPlayer";
+export { NavBar } from "@/ui/NavBar";
+export { Footer } from "@/ui/Footer";
+export { CommandPalette, useCommandPalette } from "@/ui/CommandPalette";
+export { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
+export { Card } from "./components/ui/card.tsx";

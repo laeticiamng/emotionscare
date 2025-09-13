@@ -35,3 +35,9 @@ export const AudioPrefs = z.object({
   loopDefault: z.boolean().optional()
 });
 export type AudioPrefs = z.infer<typeof AudioPrefs>;
+export const OnboardingPrefs = z.object({
+  musicRelax: z.boolean().optional(),
+  defaultDurationMin: z.number().int().min(5).max(60).optional(),
+  favoriteModule: z.string().optional(), // optionnel si redirection vers un module favori
+});
+export type OnboardingPrefs = z.infer<typeof OnboardingPrefs>;
