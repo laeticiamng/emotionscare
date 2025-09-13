@@ -1,17 +1,17 @@
 {
+  "createdAt": "2025-09-13T13:22:01.595Z",
+  "files": {
+    "routesReg": "src/ROUTES.reg.ts",
+    "componentsReg": "src/COMPONENTS.reg.ts",
+    "appDir": "src/app"
+  },
   "routes": [
-    {
-      "id": "flash-glow",
-      "path": "/modules/flash-glow",
-      "component": "FlashGlowPage"
-    }
+    "flash-glow"
   ],
-  "components": [
-    "Button",
-    "LoadingSpinner",
-    "PageHeader"
+  "componentExports": [
+    "LoadingSpinner"
   ],
   "appFiles": [
-    "app/modules/flash-glow/page.tsx"
+    "src/app/modules/flash-glow/page.tsx"
   ]
 }

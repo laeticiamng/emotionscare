@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "▶ Running ci:guard before push…"
+npm run ci:guard || { echo "✖ ci:guard failed. Push aborted."; exit 1; }
