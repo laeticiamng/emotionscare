@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+import { FadeIn, SeoHead } from '@/COMPONENTS.reg';
 
 interface MoodVibe {
   id: string;
@@ -112,6 +113,7 @@ const B2CMoodMixerPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4 relative overflow-hidden">
+      <SeoHead title="Mood Mixer" description="Mix tes humeurs en musique" />
       {/* Particules de poussière */}
       {shouldAnimate && dustParticles.map((particle, index) => (
         <div
@@ -128,20 +130,22 @@ const B2CMoodMixerPage: React.FC = () => {
       ))}
 
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8 relative z-10">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate('/dashboard')}
-          className="hover:bg-white/10 transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Mood Mixer</h1>
-          <p className="text-sm text-muted-foreground">Climat sur deux sliders</p>
+      <FadeIn>
+        <div className="flex items-center gap-4 mb-8 relative z-10">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/dashboard')}
+            className="hover:bg-white/10 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Mood Mixer</h1>
+            <p className="text-sm text-muted-foreground">Climat sur deux sliders</p>
+          </div>
         </div>
-      </div>
+      </FadeIn>
 
       <div className="max-w-md mx-auto space-y-6 relative z-10">
         {/* Zone de mix principal */}
