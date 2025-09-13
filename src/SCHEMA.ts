@@ -27,3 +27,11 @@ export const ScanPrefs = z.object({}).optional();
 export type ScanPrefs = z.infer<typeof ScanPrefs>;
 export const StorySynthPrefs = z.object({}).optional();
 export type StorySynthPrefs = z.infer<typeof StorySynthPrefs>;
+
+export const AudioPrefs = z.object({
+  masterVolume: z.number().min(0).max(1).optional(),
+  crossfadeMs: z.number().int().min(0).max(5000).optional(),
+  haptics: z.boolean().optional(),
+  loopDefault: z.boolean().optional()
+});
+export type AudioPrefs = z.infer<typeof AudioPrefs>;
