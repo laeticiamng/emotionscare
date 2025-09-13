@@ -41,6 +41,13 @@
 - `docs/STRUCTURE_REPORT.md` : ce rapport.
 
 ## TODO restants
+- Aucun.
+
+## P2 — Données & Sécurité
+- connect-src autorisés : https://api.openai.com, https://*.supabase.co, https://*.sentry.io
+- Flags `data-export` / `data-delete` pour activer les endpoints d'export et de suppression via `ff`.
+- Page dédiée : [/account/data](/account/data)
+
 - Ajouter et compléter d'autres modules.
 
 ## P1 — Finition
@@ -49,4 +56,3 @@
 - Base i18n FR/EN avec `I18nProvider` et `t()`.
 - Composant `SeoHead` pour les métadonnées.
 - Cookbooks disponibles dans `docs/cookbooks/`.
-
