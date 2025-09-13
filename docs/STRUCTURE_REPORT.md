@@ -42,3 +42,8 @@
 
 ## TODO restants
 - Aucun.
+
+## P2 — Données & Sécurité
+- connect-src autorisés : https://api.openai.com, https://*.supabase.co, https://*.sentry.io
+- Flags `data-export` / `data-delete` pour activer les endpoints d'export et de suppression via `ff`.
+- Page dédiée : [/account/data](/account/data)
