@@ -1,5 +1,12 @@
 
 # Changelog
+
+## [1.1.14] - 2025-06-05
+
+### Ajouté
+- Intégration des modules interactifs restants (Adaptive Music, Boss Grit, Breath Constellation, Bubble Beat, Coach, Emotion Scan, Flash Glow Ultra, Journal, Mood Mixer, Scan, Story Synth) avec routes, pages et tests.
+
+
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
 
