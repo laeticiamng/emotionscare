@@ -41,3 +41,9 @@ export const OnboardingPrefs = z.object({
   favoriteModule: z.string().optional(), // optionnel si redirection vers un module favori
 });
 export type OnboardingPrefs = z.infer<typeof OnboardingPrefs>;
+export const Feedback = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  message: z.string().optional(),
+});
+export type Feedback = z.infer<typeof Feedback>;
