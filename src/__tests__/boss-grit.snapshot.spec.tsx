@@ -4,18 +4,11 @@ vi.mock("@/COMPONENTS.reg", () => ({
   PageHeader: ({ title }: any) => <div>{title}</div>,
   Button: ({ children }: any) => <button>{children}</button>,
 }));
-import Page from "@/app/modules/flash-glow/page";
-import { ThemeProvider, I18nProvider } from "@/COMPONENTS.reg";
+import Page from "@/app/modules/boss-grit/page";
 
-describe("FlashGlowPage", () => {
+describe("BossGrit Page", () => {
   it("rend la page", () => {
-    const { container } = render(
-      <ThemeProvider>
-        <I18nProvider>
-          <Page />
-        </I18nProvider>
-      </ThemeProvider>
-    );
+    const { container } = render(<Page />);
     expect(container).toMatchSnapshot();
   });
 });

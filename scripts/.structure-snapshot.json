@@ -1,17 +1,87 @@
 {
+  "createdAt": "2025-09-13T13:22:01.595Z",
+  "files": {
+    "routesReg": "src/ROUTES.reg.ts",
+    "componentsReg": "src/COMPONENTS.reg.ts",
+    "appDir": "src/app"
+  },
   "routes": [
     {
       "id": "flash-glow",
       "path": "/modules/flash-glow",
       "component": "FlashGlowPage"
+    },
+    {
+      "id": "adaptive-music",
+      "path": "/modules/adaptive-music",
+      "component": "AdaptiveMusicPage"
+    },
+    {
+      "id": "boss-grit",
+      "path": "/modules/boss-grit",
+      "component": "BossGritPage"
+    },
+    {
+      "id": "breath-constellation",
+      "path": "/modules/breath-constellation",
+      "component": "BreathConstellationPage"
+    },
+    {
+      "id": "bubble-beat",
+      "path": "/modules/bubble-beat",
+      "component": "BubbleBeatPage"
+    },
+    {
+      "id": "coach",
+      "path": "/modules/coach",
+      "component": "CoachPage"
+    },
+    {
+      "id": "emotion-scan",
+      "path": "/modules/emotion-scan",
+      "component": "EmotionScanPage"
+    },
+    {
+      "id": "flash-glow-ultra",
+      "path": "/modules/flash-glow-ultra",
+      "component": "FlashGlowUltraPage"
+    },
+    {
+      "id": "journal",
+      "path": "/modules/journal",
+      "component": "JournalPage"
+    },
+    {
+      "id": "mood-mixer",
+      "path": "/modules/mood-mixer",
+      "component": "MoodMixerPage"
+    },
+    {
+      "id": "scan",
+      "path": "/modules/scan",
+      "component": "ScanPage"
+    },
+    {
+      "id": "story-synth",
+      "path": "/modules/story-synth",
+      "component": "StorySynthPage"
     }
   ],
-  "components": [
-    "Button",
-    "LoadingSpinner",
-    "PageHeader"
+  "componentExports": [
+    "LoadingSpinner"
   ],
   "appFiles": [
-    "app/modules/flash-glow/page.tsx"
+    "app/modules/adaptive-music/page.tsx",
+    "app/modules/boss-grit/page.tsx",
+    "app/modules/breath-constellation/page.tsx",
+    "app/modules/bubble-beat/page.tsx",
+    "app/modules/coach/page.tsx",
+    "app/modules/emotion-scan/page.tsx",
+    "app/modules/flash-glow-ultra/page.tsx",
+    "app/modules/flash-glow/page.tsx",
+    "app/modules/journal/page.tsx",
+    "app/modules/mood-mixer/page.tsx",
+    "app/modules/scan/page.tsx",
+    "app/modules/story-synth/page.tsx"
   ]
 }
