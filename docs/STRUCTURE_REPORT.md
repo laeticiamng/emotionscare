@@ -62,3 +62,11 @@
 - Base i18n FR/EN avec `I18nProvider` et `t()`.
 - Composant `SeoHead` pour les métadonnées.
 - Cookbooks disponibles dans `docs/cookbooks/`.
+
+## P6 — Scores V2
+- Flags : scores-v2 (UI), telemetry-opt-in (sync).
+- API : /api/scores/sync (stub).
+- Service : recordEvent(), format SessionEvent.
+- Calculs : streak, niveaux, badges, agrégation par jour.
+- UI DS : ProgressBar, Sparkline, BadgeLevel.
+- Intégration module : exemple d’appel à recordEvent sur le CTA principal.

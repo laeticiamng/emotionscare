@@ -1,0 +1,27 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ScoresV2Panel > rend un panneau scores 1`] = `
+<div>
+  <section aria-label="Scores V2">
+    <div>
+      <h1>Scores</h1>
+      <p>Progression, streaks et badges</p>
+    </div>
+    <div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span aria-label="Niveau 1" style="padding: 2px 8px; border-radius: 999px; background: var(--card);">Niveau 1</span>
+        <span>Streak: 0 j</span>
+        <span>Total: 0</span>
+      </div>
+      <div aria-label="Progression" style="background: var(--card); border-radius: 8px; overflow: hidden;">
+        <div style="width: 0%; height: 8px; background: var(--accent);"></div>
+      </div>
+      <svg width="200" height="48" role="img" aria-label="Sparkline vide"></svg>
+      <div>
+        <strong>Badges :</strong> —
+      </div>
+      <button data-ui="refresh">Actualiser</button>
+    </div>
+  </section>
+</div>
+`;

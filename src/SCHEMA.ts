@@ -33,3 +33,33 @@ export const OnboardingPrefs = z.object({
   favoriteModule: z.string().optional(), // optionnel si redirection vers un module favori
 });
 export type OnboardingPrefs = z.infer<typeof OnboardingPrefs>;
+
+export const SessionEvent = z.object({
+  id: z.string().optional(),
+  module: z.string().optional(),           // ex: "mood-mixer"
+  startedAt: z.string().optional(),        // ISO
+  endedAt: z.string().optional(),          // ISO
+  durationSec: z.number().int().optional(),// durée estimée
+  mood: z.string().optional(),             // info libre
+  score: z.number().optional(),            // score brut si dispo
+  meta: z.record(z.any()).optional()
+});
+export type SessionEvent = z.infer<typeof SessionEvent>;
+
+export const ScoreSnapshot = z.object({
+  total: z.number().optional(),
+  streakDays: z.number().optional(),
+  level: z.number().optional(),
+  badges: z.array(z.string()).optional(),
+  byDay: z.array(z.object({
+    date: z.string(), value: z.number()
+  })).optional()
+});
+export type ScoreSnapshot = z.infer<typeof ScoreSnapshot>;
+
+export const Achievement = z.object({
+  key: z.string().optional(),
+  label: z.string().optional(),
+  earnedAt: z.string().optional()
+});
+export type Achievement = z.infer<typeof Achievement>;

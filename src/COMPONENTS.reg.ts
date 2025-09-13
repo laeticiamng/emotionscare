@@ -11,3 +11,6 @@ export { FadeIn } from "@/ui/motion/FadeIn";
 export { SlideIn } from "@/ui/motion/SlideIn";
 export { I18nProvider, useI18n, t } from "@/lib/i18n/i18n";
 export { SeoHead } from "@/lib/seo/SeoHead";
+export { ProgressBar } from "@/ui/ProgressBar";
+export { Sparkline } from "@/ui/Sparkline";
+export { BadgeLevel } from "@/ui/BadgeLevel";
