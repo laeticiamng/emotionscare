@@ -42,3 +42,9 @@
 
 ## TODO restants
 - Aucun.
+
+## Onboarding
+- Route ajoutée `/onboarding` → composant `OnboardingPage`.
+- Champs Zod optionnels : `musicRelax`, `defaultDurationMin`, `favoriteModule`.
+- Tests ajoutés : `src/__tests__/onboarding.snapshot.spec.tsx` et `e2e/onboarding.smoke.spec.ts`.
+- Aucun élément existant modifié/supprimé.
