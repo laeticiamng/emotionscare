@@ -1,3 +1,3 @@
 
-// Re-export unified coach functionality
-export { useCoach, CoachProvider } from './CoachContextUnified';
+// Re-export du coach unifié optimisé
+export { useCoach, CoachProvider, useCoachQueries } from './UnifiedCoachContext';
