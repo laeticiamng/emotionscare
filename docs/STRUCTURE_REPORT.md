@@ -31,3 +31,10 @@
 
 ## TODO restants
 - Ajouter et compléter d'autres modules.
+
+## P1 — Finition
+- Thème et mode sombre via `ThemeProvider` et `ThemeToggle`.
+- Composants de micro-animations `FadeIn` et `SlideIn`.
+- Base i18n FR/EN avec `I18nProvider` et `t()`.
+- Composant `SeoHead` pour les métadonnées.
+- Cookbooks disponibles dans `docs/cookbooks/`.
