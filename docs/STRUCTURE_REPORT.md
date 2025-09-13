@@ -62,3 +62,10 @@
 - Base i18n FR/EN avec `I18nProvider` et `t()`.
 - Composant `SeoHead` pour les métadonnées.
 - Cookbooks disponibles dans `docs/cookbooks/`.
+
+
+## P4 — Navigation & Discoverability
+- `/modules` comme hub ; source : `ROUTES.reg.ts`.
+- Présence de NavBar, Footer, error.tsx, not-found.tsx.
+- Raccourci Cmd/Ctrl + K pour la Command Palette.
+- Règles a11y appliquées ; comportements de prefetch.
