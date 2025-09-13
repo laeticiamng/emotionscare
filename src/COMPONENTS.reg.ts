@@ -20,3 +20,6 @@ export { Footer } from "@/ui/Footer";
 export { CommandPalette, useCommandPalette } from "@/ui/CommandPalette";
 export { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 export { Card } from "./components/ui/card.tsx";
+export { Input } from "./components/ui/input.tsx";
+export { Textarea } from "./components/ui/textarea.tsx";
+export { FeedbackForm } from "@/ui/FeedbackForm";
