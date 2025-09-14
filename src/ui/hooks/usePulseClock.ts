@@ -19,8 +19,7 @@ export function usePulseClock(bpm: number, running: boolean) {
       last.current = t;
       const dt = (t - prev) / 1000; // s
       const period = 60 / CAP_BPM;
-      const next = (phase01 + dt / period) % 1;
-      setPhase01(next);
+      setPhase01((prevPhase) => (prevPhase + dt / period) % 1);
       raf.current = requestAnimationFrame(loop);
     };
     raf.current = requestAnimationFrame(loop);
