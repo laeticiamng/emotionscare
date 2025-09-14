@@ -7,7 +7,11 @@ export const FlashGlowPrefs = z.object({
 export type FlashGlowPrefs = z.infer<typeof FlashGlowPrefs>;
 export const AdaptiveMusicPrefs = z.object({}).optional();
 export type AdaptiveMusicPrefs = z.infer<typeof AdaptiveMusicPrefs>;
-export const BossGritPrefs = z.object({}).optional();
+export const BossGritPrefs = z.object({
+  defaultMs: z.number().int().min(30000).max(3600000).optional(), // 30s..60min
+  cues: z.boolean().optional(),   // bip + haptics
+  tasks: z.array(z.object({ id: z.string(), label: z.string(), done: z.boolean().optional() })).optional()
+});
 export type BossGritPrefs = z.infer<typeof BossGritPrefs>;
 export const BreathConstellationPrefs = z.object({}).optional();
 export type BreathConstellationPrefs = z.infer<typeof BreathConstellationPrefs>;
