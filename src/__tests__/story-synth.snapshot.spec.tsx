@@ -1,14 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
-  Button: ({ children }: any) => <button>{children}</button>,
-}));
-import Page from "@/app/modules/story-synth/page";
+import StorySynthPage from "@/modules/story-synth/StorySynthPage";
 
-describe("StorySynth Page", () => {
-  it("rend la page", () => {
-    const { container } = render(<Page />);
+describe("StorySynthPage", () => {
+  it("rend la page et le CTA Générer", () => {
+    const { container, getByText } = render(<StorySynthPage />);
+    expect(getByText(/Story Synth/i)).toBeTruthy();
+    expect(getByText(/Générer/i)).toBeTruthy();
     expect(container).toMatchSnapshot();
   });
 });
