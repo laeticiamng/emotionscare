@@ -1,19 +1,56 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FlashGlowUltra Page > rend la page 1`] = `
+exports[`FlashGlowUltraPage > rend la page et le CTA Démarrer 1`] = `
 <div>
-  <main
-    class="p-4 space-y-4"
-  >
+  <main aria-label="Flash Glow Ultra">
+    <div>Flash Glow Ultra</div>
     <div>
-      FlashGlowUltra
+      <section style="display: grid; gap: 12px;">
+        <div style="display: grid; gap: 8px;">
+          <label>
+            Preset
+            <select>
+              <option value="calme">Calme (6 bpm, emerald)</option>
+              <option value="focus">Focus (8 bpm, cyan)</option>
+              <option value="recovery">Recovery (4 bpm, violet)</option>
+            </select>
+          </label>
+          <label>
+            BPM visuel : 6
+            <input type="range" min="2" max="12" step="1" value="6">
+          </label>
+          <label>
+            Intensité : 60%
+            <input type="range" min="0.2" max="1" step="0.05" value="0.6">
+          </label>
+          <label>
+            Thème
+            <select>
+              <option value="emerald">Émeraude</option>
+              <option value="cyan">Cyan</option>
+              <option value="violet">Violet</option>
+              <option value="amber">Ambre</option>
+            </select>
+          </label>
+          <label>
+            Forme
+            <select>
+              <option value="ring">Anneau</option>
+              <option value="full">Plein</option>
+            </select>
+          </label>
+          <label>
+            Durée (min) : 2
+            <input type="range" min="1" max="10" step="1" value="2">
+          </label>
+        </div>
+        <div>glow</div>
+        <div style="display: flex; gap: 8px;">
+          <button data-ui="primary-cta">Démarrer</button>
+        </div>
+        <small style="opacity: 0.75;">Sécurité anti-flash activée (≤3 Hz). Si tu utilises “Réduction des animations” sur ton appareil, l’animation devient très douce.</small>
+      </section>
     </div>
-    <p>
-      Bienvenue dans le module FlashGlowUltra.
-    </p>
-    <button>
-      Commencer
-    </button>
   </main>
 </div>
 `;

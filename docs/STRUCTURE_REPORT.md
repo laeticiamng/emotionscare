@@ -110,6 +110,13 @@
 - Event `recordEvent` à la soumission (si P6 présent).
 - Historique : clé `emotion_scan_history_v1` (localStorage, 12 points).
 
+## Module — Flash Glow Ultra
+- Route /modules/flash-glow-ultra, composant FlashGlowUltraPage.
+- DS : GlowSurface, hook usePulseClock.
+- Schéma FlashGlowUltraPrefs (tous optionnels).
+- Sécurité : anti-flash (≤ 3 Hz) + respect de prefers-reduced-motion.
+- Events : recordEvent à start/stop (si P6).
+
 ## Module — Breath Constellation
 - Route `/modules/breath-constellation`, composant `BreathConstellationPage`.
 - DS : ConstellationCanvas, hooks useRaf, useBreathPattern.

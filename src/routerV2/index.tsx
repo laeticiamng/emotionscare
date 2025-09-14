@@ -138,6 +138,7 @@ const BubbleBeatPage = lazy(() => import('@/pages/modules/BubbleBeatPage'));
 const StorySynthPage = lazy(() => import('@/pages/modules/StorySynthPage'));
 const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
 const EmotionScanPage = lazy(() => import('@/modules/emotion-scan/EmotionScanPage'));
+const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGlowUltraPage'));
 
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
@@ -274,6 +275,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   StorySynthPage,
   ModulesShowcasePage,
   EmotionScanPage,
+  FlashGlowUltraPage,
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
