@@ -30,7 +30,6 @@
 - La structure est désormais verrouillable via les scripts de snapshot et vérification.
 
 ## Fichiers créés
-- `src/ROUTES.reg.ts` : registre central des routes.
 - `src/COMPONENTS.reg.ts` : registre des composants UI.
 - `src/SCHEMA.ts` : schéma Zod pour les préférences.
 - Pages Next.js pour chaque module dans `src/app/modules/*/page.tsx`.
@@ -72,10 +71,10 @@
 - Intégration module : exemple d’appel à recordEvent sur le CTA principal.
 
 ## P4 — Navigation & Discoverability
-- `/modules` comme hub ; source : `ROUTES.reg.ts`.
-- Présence de NavBar, Footer, error.tsx, not-found.tsx.
-- Raccourci Cmd/Ctrl + K pour la Command Palette.
-- Règles a11y appliquées ; comportements de prefetch.
+- `/modules` comme hub.
+    - Présence de NavBar, Footer, error.tsx, not-found.tsx.
+    - Raccourci Cmd/Ctrl + K pour la Command Palette.
+    - Règles a11y appliquées ; comportements de prefetch.
 
 ### Module — Boss Grit
 - Route `/modules/boss-grit`, composant `BossGritPage`.

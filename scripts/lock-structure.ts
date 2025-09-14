@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 
 const SNAP_FILE = "scripts/.structure-snapshot.json";
-const ROUTES_REG = "src/ROUTES.reg.ts";
 const COMPONENTS_REG = "src/COMPONENTS.reg.ts";
 const APP_DIR = "src/app";
 
@@ -27,12 +26,6 @@ function listAppFiles(root: string) {
 function readFileOrEmpty(p: string) { return fileExists(p) ? fs.readFileSync(p, "utf8") : ""; }
 
 // Heuristiques robustes et tolérantes (on cherche l'append-only, pas l'AST parfait)
-function extractRouteIds(code: string) {
-  // ex: id: "home"  OU  addRoute({ id: "mood-mixer", ... })
-  const ids = new Set<string>();
-  for (const m of code.matchAll(/\bid\s*:\s*["'`](.+?)["'`]/g)) ids.add(m[1]);
-  return [...ids].sort();
-}
 
 function extractComponentExports(code: string) {
   // ex: export { Button } from "@/ui/Button"
@@ -41,17 +34,14 @@ function extractComponentExports(code: string) {
   return [...ex].sort();
 }
 
-const routesCode = readFileOrEmpty(ROUTES_REG);
 const compsCode  = readFileOrEmpty(COMPONENTS_REG);
 
 const snapshot = {
   createdAt: new Date().toISOString(),
   files: {
-    routesReg: fileExists(ROUTES_REG) ? ROUTES_REG : null,
     componentsReg: fileExists(COMPONENTS_REG) ? COMPONENTS_REG : null,
     appDir: dirExists(APP_DIR) ? APP_DIR : null
   },
-  routes: extractRouteIds(routesCode),
   componentExports: extractComponentExports(compsCode),
   appFiles: listAppFiles(APP_DIR)
 };

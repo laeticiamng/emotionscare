@@ -1,42 +1,37 @@
 {
-  "createdAt": "2025-09-13T13:36:30.578Z",
+  "createdAt": "2025-09-14T13:32:19.978Z",
   "files": {
-    "routesReg": "src/ROUTES.reg.ts",
     "componentsReg": "src/COMPONENTS.reg.ts",
-    "appDir": "src/app"
+    "appDir": null
   },
-  "routes": [
-    "adaptive-music",
-    "boss-grit",
-    "breath-constellation",
-    "bubble-beat",
-    "coach",
-    "emotion-scan",
-    "flash-glow",
-    "flash-glow-ultra",
-    "journal",
-    "mood-mixer",
-    "onboarding",
-    "scan",
-    "story-synth"
-  ],
   "componentExports": [
+    "AudioPlayer",
+    "BadgeLevel",
+    "Button",
     "Card",
-    "LoadingSpinner"
+    "ConstellationCanvas",
+    "FadeIn",
+    "FeedbackForm",
+    "Footer",
+    "GlowSurface",
+    "Input",
+    "LoadingSpinner",
+    "NavBar",
+    "ProgressBar",
+    "SeoHead",
+    "SlideIn",
+    "Sparkline",
+    "Textarea",
+    "ThemeToggle",
+    "useAudioBus",
+    "useCrossfade",
+    "useDebounce",
+    "usePrefetchOnHover",
+    "usePulseClock",
+    "useRaf",
+    "useSound",
+    "useThrottle",
+    "useTimer"
   ],
-  "appFiles": [
-    "src/app/modules/adaptive-music/page.tsx",
-    "src/app/modules/boss-grit/page.tsx",
-    "src/app/modules/breath-constellation/page.tsx",
-    "src/app/modules/bubble-beat/page.tsx",
-    "src/app/modules/coach/page.tsx",
-    "src/app/modules/emotion-scan/page.tsx",
-    "src/app/modules/flash-glow-ultra/page.tsx",
-    "src/app/modules/flash-glow/page.tsx",
-    "src/app/modules/journal/page.tsx",
-    "src/app/modules/mood-mixer/page.tsx",
-    "src/app/modules/scan/page.tsx",
-    "src/app/modules/story-synth/page.tsx",
-    "src/app/onboarding/page.tsx"
-  ]
+  "appFiles": []
 }
