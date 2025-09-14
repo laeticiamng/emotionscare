@@ -13,7 +13,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
-    "test": "vitest run --silent",
+    "test": "node scripts/run-tests.mjs",
     "test:ui": "vitest run src/pages/settings/SilkPage.test.tsx",
     "test:edge": "vitest --environment edge-runtime --no-browser-env-check",
     "test:db": "echo 'DB tests exécutés dans le pipeline back-end'",
