@@ -215,7 +215,7 @@ const PremiumDashboardContainer: React.FC<PremiumDashboardContainerProps> = ({
 
   // Gestion du rafraîchissement
   const handleRefreshWidget = useCallback(async (widgetId: string) => {
-    setRefreshingWidgets(prev => new Set(prev).add(widgetId));
+    setRefreshingWidgets(prev => safeAdd(prev, widgetId));
     
     // Simuler le rechargement
     await new Promise(resolve => setTimeout(resolve, 1000));
