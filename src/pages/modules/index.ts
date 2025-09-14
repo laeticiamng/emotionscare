@@ -6,7 +6,7 @@ export { default as JournalPage } from './JournalPage';
 export { default as ScanPage } from './ScanPage';
 export { default as CoachPage } from '@/modules/coach/CoachPage';
 export { default as MoodMixerPage } from './MoodMixerPage';
-export { default as BossGritPage } from './BossGritPage';
+export { default as BossGritPage } from '@/modules/boss-grit/BossGritPage';
 export { default as BubbleBeatPage } from './BubbleBeatPage';
 export { default as StorySynthPage } from './StorySynthPage';
 

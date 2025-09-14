@@ -12,7 +12,11 @@ export const AdaptiveMusicPrefs = z.object({
   defaultVolume: z.number().min(0).max(1).optional()
 });
 export type AdaptiveMusicPrefs = z.infer<typeof AdaptiveMusicPrefs>;
-export const BossGritPrefs = z.object({}).optional();
+export const BossGritPrefs = z.object({
+  defaultMs: z.number().int().min(30000).max(3600000).optional(), // 30s..60min
+  cues: z.boolean().optional(),   // bip + haptics
+  tasks: z.array(z.object({ id: z.string(), label: z.string(), done: z.boolean().optional() })).optional()
+});
 export type BossGritPrefs = z.infer<typeof BossGritPrefs>;
 export const BreathConstellationPrefs = z.object({
   pattern: z

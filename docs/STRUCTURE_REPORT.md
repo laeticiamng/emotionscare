@@ -77,6 +77,13 @@
 - Raccourci Cmd/Ctrl + K pour la Command Palette.
 - Règles a11y appliquées ; comportements de prefetch.
 
+### Module — Boss Grit
+- Route `/modules/boss-grit`, composant `BossGritPage`.
+- Hook `useTimer`, persistance `boss_grit_tasks_v1`.
+- Zod `BossGritPrefs` (champs optionnels).
+- Event `recordEvent` en fin de session (si P6).
+- Cues audio/haptics optionnels.
+
 ## Module — Coach
 - Route `/modules/coach`, composant `CoachPage`.
 - Contexte : `getCoachContext()` (streak, scan, récents).

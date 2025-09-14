@@ -133,7 +133,7 @@ const JournalPage = lazy(() => import('@/pages/modules/JournalPage'));
 const ScanPage = lazy(() => import('@/pages/modules/ScanPage'));
 const CoachPage = lazy(() => import('@/pages/modules/CoachPage'));
 const MoodMixerPage = lazy(() => import('@/pages/modules/MoodMixerPage'));
-const BossGritPage = lazy(() => import('@/pages/modules/BossGritPage'));
+const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
 const BubbleBeatPage = lazy(() => import('@/pages/modules/BubbleBeatPage'));
 const StorySynthPage = lazy(() => import('@/pages/modules/StorySynthPage'));
 const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
