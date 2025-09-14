@@ -1,6 +1,6 @@
-import { Response } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { listWeekly } from '../lib/db';
-import { RequestWithUser } from '../server';
+import { hash } from '../../journal/lib/hash';
 
 function parseSince(url: string | undefined): Date {
   const sinceParam = new URL('http://localhost' + (url || '')).searchParams.get('since');
@@ -10,9 +10,10 @@ function parseSince(url: string | undefined): Date {
   return d;
 }
 
-export async function getWeeklyUser(req: RequestWithUser, res: Response) {
+export async function getWeeklyUser(req: FastifyRequest, reply: FastifyReply) {
   const since = parseSince(req.url);
-  const rows = listWeekly(req.user.hash, since).map(r => ({
+  const userHash = hash((req as any).user.sub);
+  const rows = listWeekly(userHash, since).map(r => ({
     week_start: r.week_start,
     glowScore: r.hrv_stress_idx,
     coherence: r.coherence_avg,
@@ -21,5 +22,5 @@ export async function getWeeklyUser(req: RequestWithUser, res: Response) {
     mindfulScore: r.mindfulness_avg,
     moodScore: r.mood_score
   }));
-  res.status(200).json(rows);
+  reply.code(200).send(rows);
 }

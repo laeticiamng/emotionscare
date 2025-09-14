@@ -1,3 +1,7 @@
+-- Date: 20250609
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: privacy prefs
+
 /* 1-A  TABLE ------------------------------------------------------- */
 CREATE TABLE IF NOT EXISTS public.privacy_prefs (
   user_id_hash text PRIMARY KEY,

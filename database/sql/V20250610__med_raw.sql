@@ -1,3 +1,7 @@
+-- Date: 20250610
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: med raw
+
 -- MED raw tables and triggers
 
 -- 1-A  FLOW_WALK

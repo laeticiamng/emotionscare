@@ -1,0 +1,1 @@
+-- Undo: drop objects for V20250609__gam_weekly.sql

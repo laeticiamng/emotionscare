@@ -1,0 +1,1 @@
+-- Undo: drop objects for V20250608__scan_weekly.sql

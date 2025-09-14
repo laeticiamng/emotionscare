@@ -1,3 +1,7 @@
+-- Date: 20250606
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: breath weekly
+
 /*--------------------------------------------------------------------------
   Breathwork weekly metrics materialized views and refresh job
 --------------------------------------------------------------------------*/

@@ -1,3 +1,7 @@
+-- Date: 20250603
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: journal etl
+
 /*---------------------------------------------------------------------------
   1.1  VUE MATÉRIALISÉE  metrics_weekly_journal
 ---------------------------------------------------------------------------*/

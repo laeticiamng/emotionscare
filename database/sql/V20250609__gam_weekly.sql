@@ -1,3 +1,7 @@
+-- Date: 20250609
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: gam weekly
+
 /*---------------------------------------------------------------------------
   GAM weekly metrics materialized views and refresh job
 ---------------------------------------------------------------------------*/

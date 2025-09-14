@@ -1,3 +1,7 @@
+-- Date: 20250611
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: med weekly
+
 /*--------------------------------------------------------------------------
   Breathwork weekly metrics materialized views and refresh job
 --------------------------------------------------------------------------*/

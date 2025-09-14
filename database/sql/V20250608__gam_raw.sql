@@ -1,3 +1,7 @@
+-- Date: 20250608
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: gam raw
+
 -- GAM raw tables and triggers
 
 -- 1-A  TABLE echo_crystal  (rire → cristal)

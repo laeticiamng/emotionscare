@@ -1,3 +1,7 @@
+-- Date: 20250605
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: music metrics org
+
 CREATE MATERIALIZED VIEW IF NOT EXISTS public.metrics_weekly_music_org AS
 SELECT
   uom.org_id,

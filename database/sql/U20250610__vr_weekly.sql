@@ -1,0 +1,1 @@
+-- Undo: drop objects for V20250610__vr_weekly.sql

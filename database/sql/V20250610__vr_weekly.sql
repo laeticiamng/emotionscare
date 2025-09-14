@@ -1,3 +1,7 @@
+-- Date: 20250610
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: vr weekly
+
 /*---------------------------------------------------------------------------
   VR weekly metrics materialized views and refresh job
 ---------------------------------------------------------------------------*/

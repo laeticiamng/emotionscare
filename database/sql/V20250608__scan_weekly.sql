@@ -1,3 +1,7 @@
+-- Date: 20250608
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: scan weekly
+
 /*---------------------------------------------------------------------------
   SCAN weekly metrics materialized views and refresh job
 ---------------------------------------------------------------------------*/

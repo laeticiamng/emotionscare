@@ -1,16 +1,19 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createApp } from '../server';
+import { signJwt } from '../../lib/jwt';
 
 let app: any;
 let url: string;
 
-beforeEach(async () => {
-  app = createApp();
-  await app.listen({ port: 0 });
-  const address = app.server.address();
-  const port = typeof address === 'object' && address ? address.port : 0;
-  url = `http://127.0.0.1:${port}`;
-});
+  beforeEach(async () => {
+    process.env.JWT_SECRETS = 'test-secret';
+    process.env.HASH_PEPPER = 'pepper';
+    app = createApp();
+    await app.listen({ port: 0 });
+    const address = app.server.address();
+    const port = typeof address === 'object' && address ? address.port : 0;
+    url = `http://127.0.0.1:${port}`;
+  });
 
 afterEach(async () => {
   await app.close();
@@ -36,11 +39,12 @@ const textBody = {
 
 describe('deprecated journal endpoints', () => {
   it('POST /journal_voice', async () => {
-    const res = await fetch(url + '/journal_voice', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer user42', 'Content-Type': 'application/json' },
-      body: JSON.stringify(voiceBody)
-    });
+      const token = await signJwt({ sub: 'user42', role: 'b2c', aud: 'test' });
+      const res = await fetch(url + '/journal_voice', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(voiceBody)
+      });
     expect(res.status).toBe(201);
     expect(res.headers.get('X-Deprecated-Endpoint')).toBe('true');
     const data = await res.json();
@@ -49,11 +53,12 @@ describe('deprecated journal endpoints', () => {
   });
 
   it('POST /journal_text', async () => {
-    const res = await fetch(url + '/journal_text', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer user42', 'Content-Type': 'application/json' },
-      body: JSON.stringify(textBody)
-    });
+      const token = await signJwt({ sub: 'user42', role: 'b2c', aud: 'test' });
+      const res = await fetch(url + '/journal_text', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(textBody)
+      });
     expect(res.status).toBe(201);
     expect(res.headers.get('X-Deprecated-Endpoint')).toBe('true');
     const data = await res.json();

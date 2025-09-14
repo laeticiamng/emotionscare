@@ -1,0 +1,1 @@
+-- Undo: drop objects for V20250611__med_weekly.sql
