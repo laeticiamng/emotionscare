@@ -1,0 +1,1 @@
+-- Undo: drop objects for V20250603__journal_etl.sql

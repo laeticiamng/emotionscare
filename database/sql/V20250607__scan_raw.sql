@@ -1,3 +1,7 @@
+-- Date: 20250607
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: scan raw
+
 -- SCAN raw tables and triggers
 
 -- 1-A TABLE scan_face

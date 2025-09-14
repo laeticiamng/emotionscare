@@ -1,3 +1,7 @@
+-- Date: 20250609
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: rgpd exports
+
 /* Table des jobs d'export */
 CREATE TABLE IF NOT EXISTS public.export_jobs (
   id            uuid        PRIMARY KEY DEFAULT gen_random_uuid(),

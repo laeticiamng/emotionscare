@@ -1,0 +1,1 @@
+-- Undo: drop objects for V20250605__music_metrics_org.sql

@@ -1,3 +1,7 @@
+-- Date: 20250610
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: vr raw
+
 -- VR raw tables and triggers
 
 /* --- 1-A BIO-NEBULA ----------------------------------------------------- */

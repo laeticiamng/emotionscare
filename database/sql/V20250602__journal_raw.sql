@@ -1,3 +1,7 @@
+-- Date: 20250602
+-- Ticket: Harmonisation backend & securisation API
+-- Migration: journal raw
+
 /*---------------------------------------------------------------------------
   3-1  CAPSULE VOCALE – TABLE + TRIGGER
 ---------------------------------------------------------------------------*/
