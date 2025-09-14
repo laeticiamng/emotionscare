@@ -1,10 +1,11 @@
 /**
- * SERVICE API EMOTIONSCARE - INTÉGRATION PREMIUM
- * Service unifié pour toutes les intégrations AI (Suno, Hume, OpenAI)
+ * EmotionsCare API service
+ * Unified service for AI integrations (Suno, Hume, OpenAI) and backend endpoints
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult, MusicPlaylist, EmotionMusicParams } from '@/types';
+import { apiService } from '@/services/api/endpoints';
 
 // === INTERFACES D'API ===
 export interface SunoGenerationParams {
@@ -32,14 +33,14 @@ export interface OpenAIAnalysisParams {
 }
 
 // === SERVICE PRINCIPAL ===
-export class EmotionsCareAPI {
-  private static instance: EmotionsCareAPI;
+export class EmotionsCareApi {
+  private static instance: EmotionsCareApi;
 
-  static getInstance(): EmotionsCareAPI {
-    if (!EmotionsCareAPI.instance) {
-      EmotionsCareAPI.instance = new EmotionsCareAPI();
+  static getInstance(): EmotionsCareApi {
+    if (!EmotionsCareApi.instance) {
+      EmotionsCareApi.instance = new EmotionsCareApi();
     }
-    return EmotionsCareAPI.instance;
+    return EmotionsCareApi.instance;
   }
 
   // === SUNO MUSIC GENERATION ===
@@ -189,6 +190,52 @@ export class EmotionsCareAPI {
     }
   }
 
+  // === BACKEND API METHODS ===
+  async analyzeEmotionText(text: string) {
+    try {
+      return await apiService.analyzeEmotion(text);
+    } catch (error) {
+      console.error('Error analyzing emotion:', error);
+      throw error;
+    }
+  }
+
+  async analyzeVoiceEmotion(audioBlob: Blob) {
+    try {
+      return await apiService.analyzeVoice(audioBlob);
+    } catch (error) {
+      console.error('Error analyzing voice:', error);
+      throw error;
+    }
+  }
+
+  async chatWithCoach(message: string, conversationHistory?: any[]) {
+    try {
+      return await apiService.chatWithAI(message, conversationHistory);
+    } catch (error) {
+      console.error('Error during coach chat:', error);
+      throw error;
+    }
+  }
+
+  async getDashboardData() {
+    try {
+      return await apiService.getDashboardStats();
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      throw error;
+    }
+  }
+
+  async saveJournalEntry(content: string) {
+    try {
+      return await apiService.saveJournalEntry(content);
+    } catch (error) {
+      console.error('Error saving journal entry:', error);
+      throw error;
+    }
+  }
+
   // === INTÉGRATION COMPLÈTE ===
   async generateEmotionMusicSession(params: EmotionMusicParams): Promise<{
     emotion: EmotionResult;
@@ -320,5 +367,5 @@ export class EmotionsCareAPI {
   }
 }
 
-// === INSTANCE SINGLETON ===
-export const emotionsCareAPI = EmotionsCareAPI.getInstance();
+// === Singleton instance ===
+export const emotionsCareApi = EmotionsCareApi.getInstance();

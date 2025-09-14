@@ -19,7 +19,7 @@ import {
   Play,
   Square
 } from 'lucide-react';
-import { emotionsCareApi } from '@/services/emotionsCareApi';
+import { emotionsCareApi } from '@/services/emotions-care-api';
 
 interface EmotionResult {
   emotion: string;
@@ -40,7 +40,7 @@ const EmotionAnalyzer: React.FC = () => {
     
     setIsAnalyzing(true);
     try {
-      const result = await emotionsCareApi.analyzeEmotion(textInput);
+      const result = await emotionsCareApi.analyzeEmotionText(textInput);
       setEmotionResult({
         emotion: result.emotion || 'Neutre',
         confidence: result.confidence || 0.85,

@@ -2,7 +2,7 @@
 import { Notification, NotificationType, NotificationPriority } from '@/types/notifications';
 import { pushNotificationService } from '@/lib/notifications/pushNotifications';
 
-class NotificationService {
+class NotificationUiService {
   private notifications: Notification[] = [];
   private listeners: Array<(notifications: Notification[]) => void> = [];
   private storageKey = 'emotionscare-notifications';
@@ -18,7 +18,7 @@ class NotificationService {
         this.notifications = JSON.parse(stored);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des notifications:', error);
+      console.error('Error loading notifications:', error);
     }
   }
 
@@ -26,7 +26,7 @@ class NotificationService {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.notifications));
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des notifications:', error);
+      console.error('Error saving notifications:', error);
     }
   }
 
@@ -55,12 +55,12 @@ class NotificationService {
     this.saveNotifications();
     this.notifyListeners();
 
-    // Envoyer notification push si autorisée
+    // Send push notification if allowed
     if (notification.priority === 'high' || notification.priority === 'critical') {
       await this.sendPushNotification(newNotification);
     }
 
-    // Jouer le son de notification
+    // Play notification sound
     this.playNotificationSound();
 
     return newNotification.id;
@@ -75,7 +75,7 @@ class NotificationService {
         requireInteraction: notification.priority === 'critical',
       });
     } catch (error) {
-      console.error('Erreur lors de l\'envoi de la notification push:', error);
+      console.error('Error sending push notification:', error);
     }
   }
 
@@ -84,10 +84,10 @@ class NotificationService {
       const audio = new Audio('/sounds/notification.mp3');
       audio.volume = 0.3;
       audio.play().catch(error => {
-        console.log('Impossible de jouer le son de notification:', error);
+        console.log('Unable to play notification sound:', error);
       });
     } catch (error) {
-      console.log('Son de notification non disponible:', error);
+      console.log('Notification sound not available:', error);
     }
   }
 
@@ -178,4 +178,4 @@ class NotificationService {
   }
 }
 
-export const notificationService = new NotificationService();
+export const notificationUiService = new NotificationUiService();

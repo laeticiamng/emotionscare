@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { EmotionResult, ScanMode, EmotionAnalysisConfig, BiometricData, EmotionConfidence, EmotionVector } from '@/types/emotion';
-import { emotionsCareApi } from '@/services/emotionsCareApi';
+import { emotionsCareApi } from '@/services/emotions-care-api';
 import { useLogger } from '@/lib/logger';
 
 interface UseEnhancedEmotionScanReturn {
@@ -146,7 +146,7 @@ export const useEnhancedEmotionScan = (initialConfig: EmotionAnalysisConfig): Us
       
       switch (mode) {
         case 'text':
-          analysisResult = await emotionsCareApi.analyzeEmotion(inputData.text);
+          analysisResult = await emotionsCareApi.analyzeEmotionText(inputData.text);
           break;
         case 'voice':
           analysisResult = await emotionsCareApi.analyzeVoiceEmotion(inputData.audioBlob);

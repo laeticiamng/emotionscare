@@ -19,7 +19,7 @@ import {
   Clock,
   Loader2
 } from 'lucide-react';
-import { emotionsCareApi } from '@/services/emotionsCareApi';
+import { emotionsCareApi } from '@/services/emotions-care-api';
 
 interface JournalEntry {
   id: string;
@@ -92,7 +92,7 @@ const InteractiveJournal: React.FC = () => {
     setIsAnalyzing(true);
     try {
       // Analyse de l'émotion du texte
-      const analysis = await emotionsCareApi.analyzeEmotion(currentEntry);
+      const analysis = await emotionsCareApi.analyzeEmotionText(currentEntry);
       
       setIsSaving(true);
       
