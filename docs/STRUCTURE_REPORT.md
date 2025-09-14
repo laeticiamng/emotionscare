@@ -76,3 +76,10 @@
 - Présence de NavBar, Footer, error.tsx, not-found.tsx.
 - Raccourci Cmd/Ctrl + K pour la Command Palette.
 - Règles a11y appliquées ; comportements de prefetch.
+
+## Module — Journal
+- Route `/modules/journal`, composant `JournalPage`.
+- Schéma `JournalEntry` (tous champs optionnels).
+- Stockage local : clé `ec_journal_entries_v1`.
+- Events : `recordEvent` à la création (si P6).
+- Filtres : texte + tag, soft delete.
