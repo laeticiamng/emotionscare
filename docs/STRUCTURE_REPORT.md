@@ -76,3 +76,10 @@
 - Présence de NavBar, Footer, error.tsx, not-found.tsx.
 - Raccourci Cmd/Ctrl + K pour la Command Palette.
 - Règles a11y appliquées ; comportements de prefetch.
+
+## Module — Coach
+- Route `/modules/coach`, composant `CoachPage`.
+- Contexte : `getCoachContext()` (streak, scan, récents).
+- Règles : `buildAdvice()` (tags respire/écris/musique/scan/routine).
+- Event `recordEvent` à l’ouverture d’un conseil (si P6).
+- Aucune dépendance externe ; append-only.
