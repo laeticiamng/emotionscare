@@ -25,7 +25,27 @@ The resulting cookies and tokens are stored in JSON files under
 npx playwright test --global-setup tests/e2e/_setup/global-setup.ts
 ```
 
+The setup script will reset and seed the database before logging in with the
+different roles (B2C, B2B user and admin).
+
 ## data-testid conventions
 
 Selectors used in the tests rely on `data-testid` attributes. When adding new UI
 interactions, please expose stable identifiers using this attribute.
+
+Common selectors are centralized in `tests/e2e/_selectors.ts` to avoid
+duplication.
+
+## Useful commands
+
+```bash
+# End-to-end tests
+npm run e2e
+
+# Unit and integration tests
+npm test
+
+# Reset and seed the database for tests
+npm run test:db:reset
+npm run test:db:seed
+```

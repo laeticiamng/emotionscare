@@ -16,7 +16,7 @@ export default defineConfig({
   },
   projects: [
     { name: 'b2c-chromium', use: { ...devices['Desktop Chrome'], storageState: 'tests/e2e/_setup/state-b2c.json' } },
-    { name: 'b2b-user-chromium', use: { ...devices['Desktop Chrome'], storageState: 'tests/e2e/_setup/state-b2b_user.json' } },
-    { name: 'b2b-admin-chromium', use: { ...devices['Desktop Chrome'], storageState: 'tests/e2e/_setup/state-b2b_admin.json' } },
+    { name: 'b2b_user-chromium', use: { ...devices['Desktop Chrome'], storageState: 'tests/e2e/_setup/state-b2b_user.json' } },
+    { name: 'b2b_admin-chromium', use: { ...devices['Desktop Chrome'], storageState: 'tests/e2e/_setup/state-b2b_admin.json' } },
   ],
 });
