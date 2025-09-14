@@ -6,7 +6,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult, EmotionAnalysisConfig, ScanMode } from '@/types';
-import { emotionsCareAPI } from '@/services/emotionsCareAPI';
+import { emotionsCareApi } from '@/services/emotions-care-api';
 
 interface EmotionAnalysisState {
   isAnalyzing: boolean;
@@ -68,7 +68,7 @@ export const useEmotionAnalysisEngine = () => {
     try {
       console.log('📸 Analyse faciale en cours...');
 
-      const result = await emotionsCareAPI.analyzeEmotion({
+      const result = await emotionsCareApi.analyzeEmotion({
         data: imageData,
         type: 'facial',
         options: {
@@ -136,7 +136,7 @@ export const useEmotionAnalysisEngine = () => {
     try {
       console.log('🎤 Analyse vocale en cours...');
 
-      const result = await emotionsCareAPI.analyzeEmotion({
+      const result = await emotionsCareApi.analyzeEmotion({
         data: audioData,
         type: 'voice',
         options: {
@@ -198,7 +198,7 @@ export const useEmotionAnalysisEngine = () => {
     try {
       console.log('💭 Analyse textuelle en cours...');
 
-      const result = await emotionsCareAPI.analyzeText({
+      const result = await emotionsCareApi.analyzeText({
         text,
         type: 'emotion',
         context: {
@@ -323,7 +323,7 @@ export const useEmotionAnalysisEngine = () => {
   // === GÉNÉRER RECOMMANDATIONS ===
   const generateRecommendations = useCallback(async (result: EmotionResult) => {
     try {
-      const recommendations = await emotionsCareAPI.analyzeText({
+      const recommendations = await emotionsCareApi.analyzeText({
         text: `Génère 3 recommendations de bien-être pour une personne qui ressent: ${result.emotion} avec une intensité de ${result.intensity}`,
         type: 'recommendation'
       });

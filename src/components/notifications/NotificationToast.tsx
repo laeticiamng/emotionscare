@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
-import { Notification } from '@/services/notificationService';
+import { Notification } from '@/types/notifications';
 
 interface NotificationToastProps {
   notification: Notification;

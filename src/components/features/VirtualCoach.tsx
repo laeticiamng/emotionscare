@@ -22,7 +22,7 @@ import {
   Compass,
   Loader2
 } from 'lucide-react';
-import { emotionsCareApi } from '@/services/emotionsCareApi';
+import { emotionsCareApi } from '@/services/emotions-care-api';
 
 interface ChatMessage {
   id: string;

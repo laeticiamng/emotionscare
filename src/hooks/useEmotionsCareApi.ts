@@ -1,6 +1,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { emotionsCareApi } from '@/services/emotionsCareApi';
+import { emotionsCareApi } from '@/services/emotions-care-api';
 import { toast } from 'sonner';
 
 /**
@@ -8,7 +8,7 @@ import { toast } from 'sonner';
  */
 export const useEmotionAnalysis = () => {
   return useMutation({
-    mutationFn: (text: string) => emotionsCareApi.analyzeEmotion(text),
+    mutationFn: (text: string) => emotionsCareApi.analyzeEmotionText(text),
     onSuccess: (data) => {
       console.log('Analyse d\'émotion réussie:', data);
     },
