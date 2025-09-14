@@ -77,3 +77,23 @@ export const Feedback = z.object({
   message: z.string().optional(),
 });
 export type Feedback = z.infer<typeof Feedback>;
+
+export const EmotionScanData = z.object({
+  // clés I-PANAS-SF — toutes optionnelles pour compat ascendante
+  active: z.number().int().min(1).max(5).optional(),
+  determined: z.number().int().min(1).max(5).optional(),
+  attentive: z.number().int().min(1).max(5).optional(),
+  inspired: z.number().int().min(1).max(5).optional(),
+  alert: z.number().int().min(1).max(5).optional(),
+  upset: z.number().int().min(1).max(5).optional(),
+  hostile: z.number().int().min(1).max(5).optional(),
+  ashamed: z.number().int().min(1).max(5).optional(),
+  nervous: z.number().int().min(1).max(5).optional(),
+  afraid: z.number().int().min(1).max(5).optional(),
+  // scores dérivés (facultatifs)
+  pa: z.number().optional(),
+  na: z.number().optional(),
+  balance: z.number().optional()
+}).optional();
+
+export type EmotionScanData = z.infer<typeof EmotionScanData>;
