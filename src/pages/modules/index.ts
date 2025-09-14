@@ -14,3 +14,4 @@ export { default as StorySynthPage } from './StorySynthPage';
 export { default as VRBreathPage } from '../VRBreathPage';
 export { default as MusicPage } from '../B2CMusicEnhanced';
 export { default as EmotionScanPage } from '@/modules/emotion-scan/EmotionScanPage';
+export { default as BreathConstellationPage } from "@/modules/breath-constellation/BreathConstellationPage";
