@@ -26,7 +26,10 @@ export const BreathConstellationPrefs = z.object({
 export type BreathConstellationPrefs = z.infer<typeof BreathConstellationPrefs>;
 export const BubbleBeatPrefs = z.object({}).optional();
 export type BubbleBeatPrefs = z.infer<typeof BubbleBeatPrefs>;
-export const CoachPrefs = z.object({}).optional();
+export const CoachPrefs = z.object({
+  mode: z.enum(["soft","boost"]).optional(),   // intensité des suggestions
+  dailyGoalMin: z.number().int().min(1).max(60).optional()
+});
 export type CoachPrefs = z.infer<typeof CoachPrefs>;
 export const EmotionScanPrefs = z.object({}).optional();
 export type EmotionScanPrefs = z.infer<typeof EmotionScanPrefs>;
