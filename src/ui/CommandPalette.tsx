@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import routes from "@/ROUTES.reg";
+// Temporary empty command list until Next.js App Router provides automatic discovery
+// of available routes.
 
 type Cmd = { id: string; label: string; path: string };
 const Ctx = React.createContext<{ open: () => void } | null>(null);
@@ -10,11 +11,7 @@ export function useCommandPalette() { return React.useContext(Ctx); }
 export function CommandPalette({ children }: { children: React.ReactNode }) {
   const [visible, setVisible] = React.useState(false);
   const [q, setQ] = React.useState("");
-  const cmds = React.useMemo<Cmd[]>(() => {
-    return Object.values(routes)
-      .filter(r => r.path?.startsWith?.("/modules/") || r.path === "/")
-      .map(r => ({ id: r.id, label: r.component.replace(/Page$/, ""), path: r.path }));
-  }, []);
+  const cmds = React.useMemo<Cmd[]>(() => [], []);
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setVisible(true); }

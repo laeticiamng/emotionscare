@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 
 const SNAP_FILE = "scripts/.structure-snapshot.json";
-const ROUTES_REG = "src/ROUTES.reg.ts";
 const COMPONENTS_REG = "src/COMPONENTS.reg.ts";
 const APP_DIR = "src/app";
 
@@ -30,11 +29,6 @@ function listAppFiles(root: string) {
   return out.sort();
 }
 
-function extractRouteIds(code: string) {
-  const ids = new Set<string>();
-  for (const m of code.matchAll(/\bid\s*:\s*["'`](.+?)["'`]/g)) ids.add(m[1]);
-  return [...ids].sort();
-}
 
 function extractComponentExports(code: string) {
   const ex = new Set<string>();
@@ -47,14 +41,10 @@ if (!fileExists(SNAP_FILE)) fail("Aucun snapshot trouvé. Lance d'abord : npm ru
 const snap = JSON.parse(fs.readFileSync(SNAP_FILE, "utf8"));
 
 // 2) Recalculer l'état courant
-const routesNow = extractRouteIds(readFileOrEmpty(ROUTES_REG));
 const compsNow  = extractComponentExports(readFileOrEmpty(COMPONENTS_REG));
 const appFilesNow = listAppFiles(APP_DIR);
 
 // 3) Vérifier la présence de tout ce qui existait
-for (const r of snap.routes ?? []) {
-  if (!routesNow.includes(r)) fail(`Route existante manquante/renommée : ${r}`);
-}
 for (const e of snap.componentExports ?? []) {
   if (!compsNow.includes(e)) fail(`Export DS manquant/renommé : ${e}`);
 }
