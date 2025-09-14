@@ -9,7 +9,15 @@ export const AdaptiveMusicPrefs = z.object({}).optional();
 export type AdaptiveMusicPrefs = z.infer<typeof AdaptiveMusicPrefs>;
 export const BossGritPrefs = z.object({}).optional();
 export type BossGritPrefs = z.infer<typeof BossGritPrefs>;
-export const BreathConstellationPrefs = z.object({}).optional();
+export const BreathConstellationPrefs = z.object({
+  pattern: z
+    .enum(["coherence-5-5", "4-7-8", "box-4-4-4-4", "triangle-4-6-8"])
+    .optional(),
+  cycles: z.number().int().min(4).max(16).optional(),
+  density: z.number().min(0.3).max(1).optional(),
+  soundCues: z.boolean().optional(),
+  haptics: z.boolean().optional(),
+});
 export type BreathConstellationPrefs = z.infer<typeof BreathConstellationPrefs>;
 export const BubbleBeatPrefs = z.object({}).optional();
 export type BubbleBeatPrefs = z.infer<typeof BubbleBeatPrefs>;
