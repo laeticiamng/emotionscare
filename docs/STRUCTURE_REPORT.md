@@ -82,3 +82,23 @@
 - Rollout : `flagActive("scores-v2", { percent, ff })` + overrides locaux via `/admin/flags`.
 - Cohorte stable par utilisateur via `ec_uid_v1`.
 - Aucun remplacement de la page legacy ; lien d’essai optionnel.
+## Module — Journal
+- Route `/modules/journal`, composant `JournalPage`.
+- Schéma `JournalEntry` (tous champs optionnels).
+- Stockage local : clé `ec_journal_entries_v1`.
+- Events : `recordEvent` à la création (si P6).
+- Filtres : texte + tag, soft delete.
+
+## Module — Emotion Scan
+- Route ajoutée `/modules/emotion-scan`.
+- Composant `EmotionScanPage`.
+- Schéma `EmotionScanData` (tous champs optionnels).
+- Event `recordEvent` à la soumission (si P6 présent).
+- Historique : clé `emotion_scan_history_v1` (localStorage, 12 points).
+
+## Module — Breath Constellation
+- Route `/modules/breath-constellation`, composant `BreathConstellationPage`.
+- DS : ConstellationCanvas, hooks useRaf, useBreathPattern.
+- Schéma `BreathConstellationPrefs` (tous optionnels).
+- Event `recordEvent` à la fin de session.
+- Notes perf & reduced motion.

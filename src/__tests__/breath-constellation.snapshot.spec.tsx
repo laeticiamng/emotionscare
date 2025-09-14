@@ -1,14 +1,38 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
-  Button: ({ children }: any) => <button>{children}</button>,
-}));
-import Page from "@/app/modules/breath-constellation/page";
+import BreathConstellationPage from "@/modules/breath-constellation/BreathConstellationPage";
 
-describe("BreathConstellation Page", () => {
-  it("rend la page", () => {
-    const { container } = render(<Page />);
+// mock canvas context for jsdom
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+  value: () => ({
+    scale: () => {},
+    clearRect: () => {},
+    beginPath: () => {},
+    arc: () => {},
+    fill: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    stroke: () => {},
+    save: () => {},
+    restore: () => {},
+    fillStyle: "",
+    globalAlpha: 1,
+    lineWidth: 1,
+    strokeStyle: "",
+  }),
+});
+
+class RO {
+  observe() {}
+  disconnect() {}
+}
+(globalThis as any).ResizeObserver = RO;
+
+describe("BreathConstellationPage", () => {
+  it("rend la page et le CTA Démarrer", () => {
+    const { container, getByText } = render(<BreathConstellationPage />);
+    expect(getByText(/Breath Constellation/i)).toBeTruthy();
+    expect(getByText(/Démarrer/i)).toBeTruthy();
     expect(container).toMatchSnapshot();
   });
 });
