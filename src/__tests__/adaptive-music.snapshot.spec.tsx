@@ -1,14 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
-  Button: ({ children }: any) => <button>{children}</button>,
-}));
-import Page from "@/app/modules/adaptive-music/page";
+import AdaptiveMusicPage from "@/modules/adaptive-music/AdaptiveMusicPage";
 
-describe("AdaptiveMusic Page", () => {
-  it("rend la page", () => {
-    const { container } = render(<Page />);
+describe("AdaptiveMusicPage", () => {
+  it("rend la page et le CTA", () => {
+    const { container, getByText } = render(<AdaptiveMusicPage />);
+    expect(getByText(/Adaptive Music/i)).toBeTruthy();
+    expect(getByText(/Lancer/i)).toBeTruthy();
     expect(container).toMatchSnapshot();
   });
 });

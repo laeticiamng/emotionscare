@@ -13,3 +13,4 @@ export { default as StorySynthPage } from './StorySynthPage';
 // Re-export refactored modules
 export { default as VRBreathPage } from '../VRBreathPage';
 export { default as MusicPage } from '../B2CMusicEnhanced';
+export { default as AdaptiveMusicPage } from '@/modules/adaptive-music/AdaptiveMusicPage';
