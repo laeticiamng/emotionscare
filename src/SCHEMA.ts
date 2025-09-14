@@ -14,7 +14,15 @@ export const AdaptiveMusicPrefs = z.object({
 export type AdaptiveMusicPrefs = z.infer<typeof AdaptiveMusicPrefs>;
 export const BossGritPrefs = z.object({}).optional();
 export type BossGritPrefs = z.infer<typeof BossGritPrefs>;
-export const BreathConstellationPrefs = z.object({}).optional();
+export const BreathConstellationPrefs = z.object({
+  pattern: z
+    .enum(["coherence-5-5", "4-7-8", "box-4-4-4-4", "triangle-4-6-8"])
+    .optional(),
+  cycles: z.number().int().min(4).max(16).optional(),
+  density: z.number().min(0.3).max(1).optional(),
+  soundCues: z.boolean().optional(),
+  haptics: z.boolean().optional(),
+});
 export type BreathConstellationPrefs = z.infer<typeof BreathConstellationPrefs>;
 export const BubbleBeatPrefs = z.object({}).optional();
 export type BubbleBeatPrefs = z.infer<typeof BubbleBeatPrefs>;
@@ -82,3 +90,23 @@ export const Feedback = z.object({
   message: z.string().optional(),
 });
 export type Feedback = z.infer<typeof Feedback>;
+
+export const EmotionScanData = z.object({
+  // clés I-PANAS-SF — toutes optionnelles pour compat ascendante
+  active: z.number().int().min(1).max(5).optional(),
+  determined: z.number().int().min(1).max(5).optional(),
+  attentive: z.number().int().min(1).max(5).optional(),
+  inspired: z.number().int().min(1).max(5).optional(),
+  alert: z.number().int().min(1).max(5).optional(),
+  upset: z.number().int().min(1).max(5).optional(),
+  hostile: z.number().int().min(1).max(5).optional(),
+  ashamed: z.number().int().min(1).max(5).optional(),
+  nervous: z.number().int().min(1).max(5).optional(),
+  afraid: z.number().int().min(1).max(5).optional(),
+  // scores dérivés (facultatifs)
+  pa: z.number().optional(),
+  na: z.number().optional(),
+  balance: z.number().optional()
+}).optional();
+
+export type EmotionScanData = z.infer<typeof EmotionScanData>;

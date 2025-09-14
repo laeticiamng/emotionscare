@@ -76,3 +76,17 @@
 - Présence de NavBar, Footer, error.tsx, not-found.tsx.
 - Raccourci Cmd/Ctrl + K pour la Command Palette.
 - Règles a11y appliquées ; comportements de prefetch.
+
+## Module — Emotion Scan
+- Route ajoutée `/modules/emotion-scan`.
+- Composant `EmotionScanPage`.
+- Schéma `EmotionScanData` (tous champs optionnels).
+- Event `recordEvent` à la soumission (si P6 présent).
+- Historique : clé `emotion_scan_history_v1` (localStorage, 12 points).
+
+## Module — Breath Constellation
+- Route `/modules/breath-constellation`, composant `BreathConstellationPage`.
+- DS : ConstellationCanvas, hooks useRaf, useBreathPattern.
+- Schéma `BreathConstellationPrefs` (tous optionnels).
+- Event `recordEvent` à la fin de session.
+- Notes perf & reduced motion.
