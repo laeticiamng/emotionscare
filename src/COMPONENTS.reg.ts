@@ -25,3 +25,5 @@ export { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 export { Input } from "./components/ui/input.tsx";
 export { Textarea } from "./components/ui/textarea.tsx";
 export { FeedbackForm } from "@/ui/FeedbackForm";
+export { GlowSurface } from "@/ui/GlowSurface";
+export { usePulseClock } from "@/ui/hooks/usePulseClock";

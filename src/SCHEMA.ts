@@ -17,7 +17,14 @@ export const CoachPrefs = z.object({}).optional();
 export type CoachPrefs = z.infer<typeof CoachPrefs>;
 export const EmotionScanPrefs = z.object({}).optional();
 export type EmotionScanPrefs = z.infer<typeof EmotionScanPrefs>;
-export const FlashGlowUltraPrefs = z.object({}).optional();
+export const FlashGlowUltraPrefs = z.object({
+  bpm: z.number().int().min(2).max(12).optional(),       // sûr pour le visuel
+  intensity: z.number().min(0.2).max(1).optional(),
+  theme: z.enum(["cyan","violet","amber","emerald"]).optional(),
+  shape: z.enum(["ring","full"]).optional(),
+  durationMin: z.number().int().min(1).max(10).optional(),
+  audioCues: z.boolean().optional()
+});
 export type FlashGlowUltraPrefs = z.infer<typeof FlashGlowUltraPrefs>;
 export const JournalPrefs = z.object({}).optional();
 export type JournalPrefs = z.infer<typeof JournalPrefs>;
