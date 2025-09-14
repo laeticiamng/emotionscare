@@ -83,3 +83,10 @@
 - Schéma `EmotionScanData` (tous champs optionnels).
 - Event `recordEvent` à la soumission (si P6 présent).
 - Historique : clé `emotion_scan_history_v1` (localStorage, 12 points).
+
+## Module — Story Synth
+- Route `/modules/story-synth`, composant `StorySynthPage`.
+- Utilitaires : `rng.ts`, `templates.ts`, `export.ts`, stockage `ec_story_synth_v1`.
+- Schémas : `StorySynthPrefs`, `StoryRecord` (tous optionnels).
+- Events : `recordEvent` sur Générer/Enregistrer (si P6).
+- Ambiance audio optionnelle (requiert `new-audio-engine` activé).

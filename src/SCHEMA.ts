@@ -25,8 +25,23 @@ export const MoodMixerPrefs = z.object({}).optional();
 export type MoodMixerPrefs = z.infer<typeof MoodMixerPrefs>;
 export const ScanPrefs = z.object({}).optional();
 export type ScanPrefs = z.infer<typeof ScanPrefs>;
-export const StorySynthPrefs = z.object({}).optional();
+export const StorySynthPrefs = z.object({
+  defaultGenre: z.enum(["calme","aventure","poetique","mysterieux","romance"]).optional(),
+  defaultLength: z.number().int().min(3).max(7).optional(),
+  defaultStyle: z.enum(["sobre","lyrique","journal","dialogue"]).optional(),
+  ambientAudio: z.boolean().optional()
+}).optional();
 export type StorySynthPrefs = z.infer<typeof StorySynthPrefs>;
+
+export const StoryRecord = z.object({
+  id: z.string().optional(),
+  createdAt: z.string().optional(),
+  title: z.string().optional(),
+  content: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  mood: z.string().optional()
+}).optional();
+export type StoryRecord = z.infer<typeof StoryRecord>;
 
 export const AudioPrefs = z.object({
   masterVolume: z.number().min(0).max(1).optional(),
