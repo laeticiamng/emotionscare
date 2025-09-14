@@ -6,8 +6,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult, MusicPlaylist, EmotionMusicParams } from '@/types';
 import { apiService } from '@/services/api/endpoints';
+import { logger } from '@/lib/logger';
 
-// === INTERFACES D'API ===
+// === API Interfaces ===
 export interface SunoGenerationParams {
   emotion: string;
   intensity: number;
@@ -32,7 +33,7 @@ export interface OpenAIAnalysisParams {
   context?: Record<string, any>;
 }
 
-// === SERVICE PRINCIPAL ===
+// === Main Service ===
 export class EmotionsCareApi {
   private static instance: EmotionsCareApi;
 
@@ -43,10 +44,10 @@ export class EmotionsCareApi {
     return EmotionsCareApi.instance;
   }
 
-  // === SUNO MUSIC GENERATION ===
+  // === Suno Music Generation ===
   async generateMusic(params: SunoGenerationParams): Promise<MusicPlaylist> {
     try {
-      console.log('🎵 Génération Suno avec params:', params);
+      logger.info('Generating Suno music', { params }, 'MUSIC');
 
       const { data, error } = await supabase.functions.invoke('suno-music-generation', {
         body: {
@@ -59,13 +60,13 @@ export class EmotionsCareApi {
       });
 
       if (error) {
-        console.error('❌ Erreur Suno:', error);
-        throw new Error(`Erreur Suno: ${error.message}`);
+        logger.error('Suno generation failed', error, 'MUSIC');
+        throw new Error(`Suno error: ${error.message}`);
       }
 
-      console.log('✅ Réponse Suno:', data);
+      logger.info('Suno response received', { data }, 'MUSIC');
 
-      // Transformer la réponse Suno en MusicPlaylist
+      // Transform Suno response into MusicPlaylist
       const playlist: MusicPlaylist = {
         id: data.session_id || `suno-${Date.now()}`,
         name: `Playlist ${params.emotion}`,
@@ -88,17 +89,17 @@ export class EmotionsCareApi {
 
       return playlist;
     } catch (error) {
-      console.error('❌ Erreur génération musique:', error);
-      
-      // Fallback avec playlist simulée
+      logger.error('Music generation error', error, 'MUSIC');
+
+      // Fallback with mocked playlist
       return this.createFallbackPlaylist(params);
     }
   }
 
-  // === HUME EMOTION ANALYSIS ===
+  // === Hume Emotion Analysis ===
   async analyzeEmotion(params: HumeAnalysisParams): Promise<EmotionResult> {
     try {
-      console.log('🧠 Analyse Hume avec type:', params.type);
+      logger.info('Analyzing emotion with Hume', { type: params.type }, 'API');
 
       let functionName: string;
       let body: any;
@@ -117,7 +118,7 @@ export class EmotionsCareApi {
           body = { text: params.data };
           break;
         default:
-          throw new Error(`Type d'analyse non supporté: ${params.type}`);
+          throw new Error(`Unsupported analysis type: ${params.type}`);
       }
 
       const { data, error } = await supabase.functions.invoke(functionName, {
@@ -125,13 +126,13 @@ export class EmotionsCareApi {
       });
 
       if (error) {
-        console.error('❌ Erreur Hume:', error);
-        throw new Error(`Erreur Hume: ${error.message}`);
+        logger.error('Hume analysis failed', error, 'API');
+        throw new Error(`Hume error: ${error.message}`);
       }
 
-      console.log('✅ Réponse Hume:', data);
+      logger.info('Hume response received', { data }, 'API');
 
-      // Transformer la réponse Hume en EmotionResult
+      // Transform Hume response into EmotionResult
       const emotionResult: EmotionResult = {
         id: `hume-${Date.now()}`,
         timestamp: new Date().toISOString(),
@@ -149,15 +150,15 @@ export class EmotionsCareApi {
 
       return emotionResult;
     } catch (error) {
-      console.error('❌ Erreur analyse émotion:', error);
+      logger.error('Emotion analysis error', error, 'API');
       throw error;
     }
   }
 
-  // === OPENAI TEXT ANALYSIS ===
+  // === OpenAI Text Analysis ===
   async analyzeText(params: OpenAIAnalysisParams): Promise<any> {
     try {
-      console.log('💭 Analyse OpenAI avec type:', params.type);
+      logger.info('Analyzing text with OpenAI', { type: params.type }, 'API');
 
       const { data, error } = await supabase.functions.invoke('openai-chat', {
         body: {
@@ -177,15 +178,15 @@ export class EmotionsCareApi {
       });
 
       if (error) {
-        console.error('❌ Erreur OpenAI:', error);
-        throw new Error(`Erreur OpenAI: ${error.message}`);
+        logger.error('OpenAI analysis failed', error, 'API');
+        throw new Error(`OpenAI error: ${error.message}`);
       }
 
-      console.log('✅ Réponse OpenAI:', data);
+      logger.info('OpenAI response received', { data }, 'API');
 
       return data;
     } catch (error) {
-      console.error('❌ Erreur analyse texte:', error);
+      logger.error('Text analysis error', error, 'API');
       throw error;
     }
   }
@@ -195,7 +196,7 @@ export class EmotionsCareApi {
     try {
       return await apiService.analyzeEmotion(text);
     } catch (error) {
-      console.error('Error analyzing emotion:', error);
+      logger.error('Error analyzing emotion', error, 'API');
       throw error;
     }
   }
@@ -204,7 +205,7 @@ export class EmotionsCareApi {
     try {
       return await apiService.analyzeVoice(audioBlob);
     } catch (error) {
-      console.error('Error analyzing voice:', error);
+      logger.error('Error analyzing voice', error, 'API');
       throw error;
     }
   }
@@ -213,7 +214,7 @@ export class EmotionsCareApi {
     try {
       return await apiService.chatWithAI(message, conversationHistory);
     } catch (error) {
-      console.error('Error during coach chat:', error);
+      logger.error('Error during coach chat', error, 'API');
       throw error;
     }
   }
@@ -222,7 +223,7 @@ export class EmotionsCareApi {
     try {
       return await apiService.getDashboardStats();
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      logger.error('Error fetching dashboard data', error, 'API');
       throw error;
     }
   }
@@ -231,36 +232,36 @@ export class EmotionsCareApi {
     try {
       return await apiService.saveJournalEntry(content);
     } catch (error) {
-      console.error('Error saving journal entry:', error);
+      logger.error('Error saving journal entry', error, 'API');
       throw error;
     }
   }
 
-  // === INTÉGRATION COMPLÈTE ===
+  // === Full Integration ===
   async generateEmotionMusicSession(params: EmotionMusicParams): Promise<{
     emotion: EmotionResult;
     playlist: MusicPlaylist;
     recommendations: string[];
   }> {
     try {
-      console.log('🎭 Session complète EmotionsCare:', params);
+      logger.info('Starting full EmotionsCare session', { params }, 'SYSTEM');
 
-      // 1. Analyser l'émotion avec un prompt enrichi
+      // 1. Analyze emotion with an enriched prompt
       const emotionAnalysis = await this.analyzeText({
-        text: `Analyser cette émotion: ${params.emotion} avec une intensité de ${params.intensity || 0.5}`,
+        text: `Analyze emotion ${params.emotion} with intensity ${params.intensity || 0.5}`,
         type: 'emotion'
       });
 
-      // 2. Générer la playlist musicale
+      // 2. Generate the music playlist
       const playlist = await this.generateMusic({
         emotion: params.emotion,
         intensity: params.intensity || 0.5,
         style: params.preferences?.genre?.[0] || 'ambient'
       });
 
-      // 3. Générer des recommandations
+      // 3. Generate recommendations
       const recommendationsAnalysis = await this.analyzeText({
-        text: `Générer 3 recommandations de bien-être pour une personne qui ressent: ${params.emotion}`,
+        text: `Generate 3 wellness recommendations for a person feeling ${params.emotion}`,
         type: 'recommendation'
       });
 
@@ -284,12 +285,12 @@ export class EmotionsCareApi {
         recommendations: emotionResult.recommendations || []
       };
     } catch (error) {
-      console.error('❌ Erreur session complète:', error);
+      logger.error('Full session error', error, 'SYSTEM');
       throw error;
     }
   }
 
-  // === MÉTHODES UTILITAIRES ===
+  // === Utility Methods ===
   private createFallbackPlaylist(params: SunoGenerationParams): MusicPlaylist {
     return {
       id: `fallback-${Date.now()}`,
@@ -356,13 +357,13 @@ export class EmotionsCareApi {
   private getOpenAISystemPrompt(type: string): string {
     switch (type) {
       case 'sentiment':
-        return 'Tu es un expert en analyse de sentiment. Analyse le texte et retourne un objet JSON avec sentiment (positive/negative/neutral) et confidence (0-1).';
+        return 'You are a sentiment analysis expert. Analyze the text and return a JSON object with sentiment (positive/negative/neutral) and confidence (0-1).';
       case 'emotion':
-        return 'Tu es un expert en analyse émotionnelle. Analyse le texte et retourne un objet JSON avec emotion, intensity (0-1), et recommendations.';
+        return 'You are an emotion analysis expert. Analyze the text and return a JSON object with emotion, intensity (0-1), and recommendations.';
       case 'recommendation':
-        return 'Tu es un coach de bien-être. Génère des recommandations pratiques et bienveillantes sous format JSON array.';
+        return 'You are a wellness coach. Generate practical and kind recommendations as a JSON array.';
       default:
-        return 'Tu es un assistant IA spécialisé en bien-être émotionnel.';
+        return 'You are an AI assistant specialized in emotional well-being.';
     }
   }
 }
