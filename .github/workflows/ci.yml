@@ -33,7 +33,7 @@ jobs:
         run: npm ci --prefer-offline --audit=false
         
       - name: 🧹 Lint check
-        run: npm run lint
+        run: bun run lint
         
       - name: 📝 Type check
         run: npm run type-check

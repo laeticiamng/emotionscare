@@ -1,0 +1,10 @@
+"use strict";
+
+module.exports = {
+  rules: {
+    "no-next-imports": require("./rules/no-next-imports"),
+    "no-legacy-routes-helpers": require("./rules/no-legacy-routes-helpers"),
+    // optionnel, voir plus bas
+    "no-alias-routes": require("./rules/no-alias-routes"),
+  }
+};
