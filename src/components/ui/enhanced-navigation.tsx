@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
+import { routes } from '@/routerV2';
 
 interface NavItem {
   name: string;
@@ -77,7 +78,7 @@ const EnhancedNavigation: React.FC = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo amélioré */}
-            <Link to={Routes.home()} className="flex items-center space-x-3 group">
+            <Link to={routes.public.home()} className="flex items-center space-x-3 group">
               <motion.div 
                 className="relative"
                 whileHover={{ scale: 1.05 }}

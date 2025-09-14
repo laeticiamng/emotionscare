@@ -73,13 +73,13 @@ export function AppSidebar() {
       items: [
         {
           title: "Accueil",
-          url: Routes.home(),
+          url: routes.public.home(),
           icon: Home,
           description: "Votre tableau de bord principal"
         },
         {
           title: "Dashboard B2C",
-          url: Routes.consumerHome(),
+          url: routes.b2c.dashboard(),
           icon: Heart,
           gradient: "from-pink-500 to-rose-500",
           description: "Suivi personnel de votre bien-être"
@@ -92,7 +92,7 @@ export function AppSidebar() {
       items: [
         {
           title: "Scanner Émotions",
-          url: Routes.scan(),
+          url: routes.b2c.scan(),
           icon: Scan,
           badge: "IA",
           gradient: "from-blue-500 to-cyan-500",
@@ -100,7 +100,7 @@ export function AppSidebar() {
         },
         {
           title: "Heatmap Vibes",
-          url: Routes.heatmap(),
+          url: routes.b2c.activity(),
           icon: BarChart3,
           gradient: "from-orange-500 to-red-500",
           description: "Visualisez vos patterns émotionnels"
@@ -113,14 +113,14 @@ export function AppSidebar() {
       items: [
         {
           title: "Musicothérapie",
-          url: Routes.music(),
+          url: routes.b2c.music(),
           icon: Music,
           gradient: "from-purple-500 to-violet-500",
           description: "Playlists thérapeutiques personnalisées"
         },
         {
           title: "Réalité Virtuelle",
-          url: Routes.vr(),
+          url: routes.b2c.vr(),
           icon: Camera,
           badge: "VR",
           gradient: "from-green-500 to-emerald-500",
@@ -128,7 +128,7 @@ export function AppSidebar() {
         },
         {
           title: "Flash Glow",
-          url: Routes.flashGlow(),
+          url: routes.b2c.flashGlow(),
           icon: Zap,
           badge: "Nouveau",
           gradient: "from-yellow-500 to-orange-500",
@@ -142,7 +142,7 @@ export function AppSidebar() {
       items: [
         {
           title: "Coach IA",
-          url: Routes.coach(),
+          url: routes.b2c.coach(),
           icon: MessageCircle,
           badge: "24/7",
           gradient: "from-indigo-500 to-purple-500",
@@ -150,7 +150,7 @@ export function AppSidebar() {
         },
         {
           title: "Journal Privé",
-          url: Routes.journal(),
+          url: routes.b2c.journal(),
           icon: BookOpen,
           gradient: "from-slate-500 to-gray-500",
           description: "Réflexions et suivi personnel"
@@ -163,7 +163,7 @@ export function AppSidebar() {
       items: [
         {
           title: "Espace Gamification",
-          url: Routes.leaderboard(),
+          url: routes.b2c.bossLevel(),
           icon: Star,
           badge: "XP",
           gradient: "from-amber-500 to-yellow-500",
@@ -171,13 +171,13 @@ export function AppSidebar() {
         },
         {
           title: "Boss Grit",
-          url: Routes.bossGrit(),
+          url: routes.b2c.bossLevel(),
           icon: Shield,
           description: "Défiez-vous avec nos boss levels"
         },
         {
           title: "Mood Mixer",
-          url: Routes.moodMixer(),
+          url: routes.b2c.moodMixer(),
           icon: Headphones,
           description: "Créez vos ambiances émotionnelles"
         }
@@ -189,7 +189,7 @@ export function AppSidebar() {
       items: [
         {
           title: "Cocon Social",
-          url: Routes.socialCocon(),
+          url: routes.b2c.community(),
           icon: Users,
           gradient: "from-teal-500 to-cyan-500",
           description: "Connectez-vous avec la communauté"
@@ -202,7 +202,7 @@ export function AppSidebar() {
       items: [
         {
           title: "Préférences",
-          url: Routes.settingsGeneral(),
+          url: routes.b2c.settings(),
           icon: Settings,
           description: "Personnalisez votre expérience"
         }
