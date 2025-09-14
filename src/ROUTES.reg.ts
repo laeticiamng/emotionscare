@@ -30,3 +30,14 @@ addRoute({ id: "story-synth", path: "/modules/story-synth", component: "StorySyn
 addRoute({ id: "modules", path: "/modules", component: "ModulesIndexPage" });
 addRoute({ id: "onboarding", path: "/onboarding", component: "OnboardingPage" });
 addRoute({ id: "feedback", path: "/feedback", component: "FeedbackPage" });
+addRoute({
+  id: "scores-v2",
+  path: "/modules/scores-v2",
+  component: "ScoresV2Page"
+});
+
+addRoute({
+  id: "admin-flags",
+  path: "/admin/flags",
+  component: "AdminFlagsPage"
+});

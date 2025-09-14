@@ -2,13 +2,19 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 vi.mock("@/COMPONENTS.reg", () => ({
   PageHeader: ({ title }: any) => <div>{title}</div>,
-  Button: ({ children }: any) => <button>{children}</button>,
+  Card: ({ children }: any) => <div>{children}</div>,
+  Button: ({ children, ...p }: any) => <button {...p}>{children}</button>,
+  Input: (p: any) => <input {...p} />,
+  Textarea: (p: any) => <textarea {...p} />,
+  useDebounce: (fn: any) => fn,
 }));
-import Page from "@/app/modules/journal/page";
+import JournalPage from "@/modules/journal/JournalPage";
 
-describe("Journal Page", () => {
-  it("rend la page", () => {
-    const { container } = render(<Page />);
+describe("JournalPage", () => {
+  it("rend la page et le CTA Ajouter", () => {
+    const { container, getByText } = render(<JournalPage />);
+    expect(getByText(/Journal/i)).toBeTruthy();
+    expect(getByText(/Ajouter/i)).toBeTruthy();
     expect(container).toMatchSnapshot();
   });
 });
