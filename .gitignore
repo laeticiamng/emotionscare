@@ -31,4 +31,3 @@ env
 # Playwright artifacts
 playwright-report
 test-results
-tests/e2e/_setup/state-*.json
