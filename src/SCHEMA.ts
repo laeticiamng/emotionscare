@@ -5,7 +5,12 @@ export const FlashGlowPrefs = z.object({
   enabled: z.boolean().optional(),
 });
 export type FlashGlowPrefs = z.infer<typeof FlashGlowPrefs>;
-export const AdaptiveMusicPrefs = z.object({}).optional();
+export const AdaptiveMusicPrefs = z.object({
+  style: z.string().optional(),
+  durationMin: z.number().int().min(1).max(60).optional(),
+  autoLoop: z.boolean().optional(),
+  defaultVolume: z.number().min(0).max(1).optional()
+});
 export type AdaptiveMusicPrefs = z.infer<typeof AdaptiveMusicPrefs>;
 export const BossGritPrefs = z.object({}).optional();
 export type BossGritPrefs = z.infer<typeof BossGritPrefs>;
