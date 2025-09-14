@@ -77,6 +77,11 @@
 - Raccourci Cmd/Ctrl + K pour la Command Palette.
 - Règles a11y appliquées ; comportements de prefetch.
 
+## Scores — Activation
+- Route `/modules/scores-v2` ajoutée, composant `ScoresV2Page` (qui rend `ScoresV2Panel`).
+- Rollout : `flagActive("scores-v2", { percent, ff })` + overrides locaux via `/admin/flags`.
+- Cohorte stable par utilisateur via `ec_uid_v1`.
+- Aucun remplacement de la page legacy ; lien d’essai optionnel.
 ## Module — Journal
 - Route `/modules/journal`, composant `JournalPage`.
 - Schéma `JournalEntry` (tous champs optionnels).

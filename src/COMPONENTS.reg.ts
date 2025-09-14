@@ -25,5 +25,6 @@ export { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 export { Input } from "./components/ui/input.tsx";
 export { Textarea } from "./components/ui/textarea.tsx";
 export { FeedbackForm } from "@/ui/FeedbackForm";
+export { flagActive, inCohort, setOverride, clearOverride, getOverrides } from "@/lib/flags/rollout";
 export { useRaf } from "@/ui/hooks/useRaf";
 export { ConstellationCanvas } from "@/ui/ConstellationCanvas";
