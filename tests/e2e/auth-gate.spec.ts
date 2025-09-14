@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginAs } from './_setup/auth';
 
 test.describe('Authentication Gates', () => {
   test('anonymous user on /app/* redirects to login', async ({ page }) => {
@@ -45,8 +46,14 @@ test.describe('Authentication Gates', () => {
     // This test would need proper auth setup
     // For now, just test that 403 page exists
     await page.goto('/403');
-    
+
     await expect(page.locator('[data-testid="page-root"]')).toBeVisible({ timeout: 5000 });
     await expect(page.locator('text=403')).toBeVisible();
+  });
+
+  test('authenticated b2c user reaches dashboard', async ({ page }) => {
+    await loginAs(page, 'b2c');
+    await page.goto('/app/home');
+    await expect(page).not.toHaveURL(/\/login/);
   });
 });
