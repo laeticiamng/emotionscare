@@ -77,6 +77,32 @@
 - Raccourci Cmd/Ctrl + K pour la Command Palette.
 - Règles a11y appliquées ; comportements de prefetch.
 
+### Module — Boss Grit
+- Route `/modules/boss-grit`, composant `BossGritPage`.
+- Hook `useTimer`, persistance `boss_grit_tasks_v1`.
+- Zod `BossGritPrefs` (champs optionnels).
+- Event `recordEvent` en fin de session (si P6).
+- Cues audio/haptics optionnels.
+
+## Module — Coach
+- Route `/modules/coach`, composant `CoachPage`.
+- Contexte : `getCoachContext()` (streak, scan, récents).
+- Règles : `buildAdvice()` (tags respire/écris/musique/scan/routine).
+- Event `recordEvent` à l’ouverture d’un conseil (si P6).
+- Aucune dépendance externe ; append-only.
+
+## Scores — Activation
+- Route `/modules/scores-v2` ajoutée, composant `ScoresV2Page` (qui rend `ScoresV2Panel`).
+- Rollout : `flagActive("scores-v2", { percent, ff })` + overrides locaux via `/admin/flags`.
+- Cohorte stable par utilisateur via `ec_uid_v1`.
+- Aucun remplacement de la page legacy ; lien d’essai optionnel.
+## Module — Journal
+- Route `/modules/journal`, composant `JournalPage`.
+- Schéma `JournalEntry` (tous champs optionnels).
+- Stockage local : clé `ec_journal_entries_v1`.
+- Events : `recordEvent` à la création (si P6).
+- Filtres : texte + tag, soft delete.
+
 ## Module — Emotion Scan
 - Route ajoutée `/modules/emotion-scan`.
 - Composant `EmotionScanPage`.
@@ -90,3 +116,17 @@
 - Schémas : `StorySynthPrefs`, `StoryRecord` (tous optionnels).
 - Events : `recordEvent` sur Générer/Enregistrer (si P6).
 - Ambiance audio optionnelle (requiert `new-audio-engine` activé).
+
+## Module — Flash Glow Ultra
+- Route /modules/flash-glow-ultra, composant FlashGlowUltraPage.
+- DS : GlowSurface, hook usePulseClock.
+- Schéma FlashGlowUltraPrefs (tous optionnels).
+- Sécurité : anti-flash (≤ 3 Hz) + respect de prefers-reduced-motion.
+- Events : recordEvent à start/stop (si P6).
+
+## Module — Breath Constellation
+- Route `/modules/breath-constellation`, composant `BreathConstellationPage`.
+- DS : ConstellationCanvas, hooks useRaf, useBreathPattern.
+- Schéma `BreathConstellationPrefs` (tous optionnels).
+- Event `recordEvent` à la fin de session.
+- Notes perf & reduced motion.

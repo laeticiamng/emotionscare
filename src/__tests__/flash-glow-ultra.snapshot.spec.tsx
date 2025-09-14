@@ -2,13 +2,18 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 vi.mock("@/COMPONENTS.reg", () => ({
   PageHeader: ({ title }: any) => <div>{title}</div>,
-  Button: ({ children }: any) => <button>{children}</button>,
+  Card: ({ children }: any) => <div>{children}</div>,
+  Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  GlowSurface: () => <div>glow</div>,
+  usePulseClock: () => 0
 }));
-import Page from "@/app/modules/flash-glow-ultra/page";
+import FlashGlowUltraPage from "@/modules/flash-glow-ultra/FlashGlowUltraPage";
 
-describe("FlashGlowUltra Page", () => {
-  it("rend la page", () => {
-    const { container } = render(<Page />);
+describe("FlashGlowUltraPage", () => {
+  it("rend la page et le CTA Démarrer", () => {
+    const { container, getByText } = render(<FlashGlowUltraPage />);
+    expect(getByText(/Flash Glow Ultra/i)).toBeTruthy();
+    expect(getByText(/Démarrer/i)).toBeTruthy();
     expect(container).toMatchSnapshot();
   });
 });

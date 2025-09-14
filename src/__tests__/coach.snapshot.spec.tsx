@@ -1,14 +1,11 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
-  Button: ({ children }: any) => <button>{children}</button>,
-}));
-import Page from "@/app/modules/coach/page";
+import CoachPage from "@/modules/coach/CoachPage";
 
-describe("Coach Page", () => {
-  it("rend la page", () => {
-    const { container } = render(<Page />);
+describe("CoachPage", () => {
+  it("rend la page et des conseils", () => {
+    const { container, getByText } = render(<CoachPage />);
+    expect(getByText(/Coach/i)).toBeTruthy();
     expect(container).toMatchSnapshot();
   });
 });
