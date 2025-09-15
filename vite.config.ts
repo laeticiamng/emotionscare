@@ -2,12 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// Configuration Vite simplifiée - Bypass complet TypeScript build
+// Configuration Vite - Bypass complet des conflits TypeScript
 export default defineConfig(({ mode }) => ({
   plugins: [
     react({
-      // CRITIQUE: Complètement désactiver TypeScript dans Vite pour éviter --build
-      typescript: false
+      // Utiliser notre propre config TypeScript sans conflits
+      typescript: {
+        tsconfigPath: './tsconfig.vite.json'
+      }
     })
   ],
   
