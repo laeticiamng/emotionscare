@@ -1,31 +1,30 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { componentTagger } from "lovable-tagger";
 
-// Configuration Vite - Bypass complet des conflits TypeScript
+// Configuration Vite - Dernière version Lovable avec componentTagger
 export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
   plugins: [
     react({
-      // Utiliser notre propre config TypeScript sans conflits
-      typescript: {
-        tsconfigPath: './tsconfig.vite.json'
-      }
-    })
-  ],
-  
-  server: {
-    port: 8080,
-    host: true
-  },
+      // Désactiver TypeScript pour éviter les conflits --noEmit/--build
+      typescript: false
+    }),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   
   preview: {
     port: 4173,
-    host: true
+    host: "::"
   },
   
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   
