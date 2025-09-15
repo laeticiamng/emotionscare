@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      // Désactiver TypeScript pour éviter les conflits --noEmit/--build
+      // Désactiver complètement TypeScript - laisser esbuild tout gérer
       typescript: false
     }),
     mode === 'development' && componentTagger(),
