@@ -123,7 +123,7 @@ a:hover {
 }
 
 a:focus-visible {
-  @apply premium-focus;
+  @apply ring-2 ring-primary ring-offset-2 rounded;
 }
 
 /* Citations */
@@ -188,7 +188,7 @@ button:disabled {
 }
 
 button:focus-visible {
-  @apply premium-focus;
+  @apply ring-2 ring-primary ring-offset-2 rounded;
 }
 
 /* Champs de formulaire */
@@ -306,7 +306,7 @@ th {
 
 /* === FOCUS VISIBLE === */
 :focus-visible {
-  @apply premium-focus;
+  @apply ring-2 ring-primary ring-offset-2 rounded;
 }
 
 /* === UTILITAIRES GLOBAUX === */

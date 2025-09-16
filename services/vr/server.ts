@@ -1,43 +1,72 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { getWeeklyUser } from './handlers/getWeeklyUser';
-import { getWeeklyOrg } from './handlers/getWeeklyOrg';
+import { createServer } from '../lib/server';
+import { hash } from '../journal/lib/hash';
+import { listWeekly, listWeeklyOrg } from './lib/db';
 
-function getUser(req: IncomingMessage) {
-  const auth = req.headers['authorization'];
-  if (auth && auth.startsWith('Bearer ')) {
-    const token = auth.substring(7);
-    return { sub: token, role: token.startsWith('admin:') ? 'admin' : 'user', org: token.split(':')[1] };
+interface WeeklyUserQuery {
+  since?: string;
+}
+
+interface WeeklyOrgQuery {
+  since?: string;
+}
+
+function parseSince(sinceParam: string | undefined): Date {
+  if (!sinceParam) return new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default 30d ago
+  
+  const sinceInt = parseInt(sinceParam, 10);
+  if (!isNaN(sinceInt)) {
+    return new Date(Date.now() - sinceInt * 24 * 60 * 60 * 1000);
   }
-  return null;
+  
+  const sinceDate = new Date(sinceParam);
+  return isNaN(sinceDate.getTime()) 
+    ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    : sinceDate;
 }
 
 export function createApp() {
-  return createServer(async (req: IncomingMessage, res: ServerResponse) => {
-    const user = getUser(req);
-    if (!user) {
-      res.statusCode = 401;
-      res.end('Unauthorized');
-      return;
-    }
+  return createServer({
+    registerRoutes(app) {
+      // GET /me/vr/weekly - VR weekly analytics for user
+      app.get<{
+        Querystring: WeeklyUserQuery;
+      }>('/me/vr/weekly', async (req, reply) => {
+        const userHash = hash(req.user.sub);
+        const since = parseSince(req.query.since);
+        
+        try {
+          const weeklyData = listWeekly(userHash);
+          reply.send({ 
+            ok: true, 
+            data: weeklyData,
+            meta: { user_hash: userHash, since: since.toISOString() }
+          });
+        } catch (error) {
+          app.log.error(error);
+          reply.code(500).send({ ok: false, error: 'Failed to fetch VR data' });
+        }
+      });
 
-    if (req.method === 'GET' && req.url?.startsWith('/me/vr/weekly')) {
-      await getWeeklyUser(req, res, user);
-      return;
-    }
-
-    const match = req.url?.match(/^\/org\/([^/]+)\/vr\/weekly/);
-    if (req.method === 'GET' && match) {
-      const orgId = match[1];
-      if (user.role !== 'admin' || user.org !== orgId) {
-        res.statusCode = 403;
-        res.end('forbidden');
-        return;
-      }
-      await getWeeklyOrg(req, res, orgId);
-      return;
-    }
-
-    res.statusCode = 404;
-    res.end('Not Found');
+      // GET /org/:orgId/vr/weekly - VR weekly analytics for organization
+      app.get<{
+        Params: { orgId: string };
+        Querystring: WeeklyOrgQuery;
+      }>('/org/:orgId/vr/weekly', async (req, reply) => {
+        const { orgId } = req.params;
+        const since = parseSince(req.query.since);
+        
+        try {
+          const orgData = listWeeklyOrg(orgId);
+          reply.send({ 
+            ok: true, 
+            data: orgData,
+            meta: { org_id: orgId, since: since.toISOString() }
+          });
+        } catch (error) {
+          app.log.error(error);
+          reply.code(500).send({ ok: false, error: 'Failed to fetch org VR data' });
+        }
+      });
+    },
   });
 }

@@ -1,86 +1,137 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { createServer } from '../lib/server';
 import { hash } from '../journal/lib/hash';
-import {
-  createExportJob,
-  findRecentJob,
-  getJob,
-  createDeleteRequest,
-  getDeleteRequest
-} from './lib/db';
+import { createExportJob, findRecentJob, getJob, createDeleteRequest, getDeleteRequest } from './lib/db';
+import { z } from 'zod';
 
-function getUser(req: IncomingMessage) {
-  const auth = req.headers['authorization'];
-  if (auth && auth.startsWith('Bearer ')) {
-    const token = auth.substring(7);
-    return { sub: token };
-  }
-  return null;
-}
+const ExportRequestSchema = z.object({
+  format: z.enum(['json', 'csv', 'pdf']).default('json'),
+  data_types: z.array(z.enum(['journal', 'analytics', 'preferences'])).default(['journal']),
+  date_range: z.object({
+    start: z.string().optional(),
+    end: z.string().optional()
+  }).optional()
+});
+
+type ExportRequest = z.infer<typeof ExportRequestSchema>;
 
 export function createApp() {
-  return createServer(async (req: IncomingMessage, res: ServerResponse) => {
-    const user = getUser(req);
-    if (!user) {
-      res.statusCode = 401;
-      res.end('Unauthorized');
-      return;
-    }
+  return createServer({
+    registerRoutes(app) {
+      // POST /user/export - Request data export
+      app.post<{
+        Body: ExportRequest;
+      }>('/user/export', async (req, reply) => {
+        const userHash = hash(req.user.sub);
+        
+        try {
+          const exportRequest = req.body ? ExportRequestSchema.parse(req.body) : ExportRequestSchema.parse({});
+          
+          // Check for existing recent job
+          const existing = findRecentJob(userHash);
+          if (existing) {
+            reply.code(202).send({ 
+              ok: true,
+              data: { jobId: existing.id, status: 'existing' }
+            });
+            return;
+          }
+          
+          // Create new export job
+          const job = createExportJob(userHash);
+          
+          app.log.info({
+            user_hash: userHash,
+            action: 'export_requested',
+            job_id: job.id,
+            request: exportRequest
+          });
 
-    if (req.method === 'POST' && req.url === '/user/export') {
-      const userHash = hash(user.sub);
-      const existing = findRecentJob(userHash);
-      if (existing) {
-        res.statusCode = 202;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ jobId: existing.id }));
-        return;
-      }
-      const job = createExportJob(userHash);
-      res.statusCode = 202;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ jobId: job.id }));
-      return;
-    }
+          reply.code(202).send({ 
+            ok: true,
+            data: { jobId: job.id, status: 'created' }
+          });
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            reply.code(400).send({
+              ok: false,
+              error: {
+                code: 'validation_error',
+                message: 'Invalid export request',
+                details: error.errors
+              }
+            });
+          } else {
+            app.log.error(error);
+            reply.code(500).send({ ok: false, error: 'Failed to create export job' });
+          }
+        }
+      });
 
-    const matchExport = req.url?.match(/^\/user\/export\/([^/]+)$/);
-    if (req.method === 'GET' && matchExport) {
-      const id = matchExport[1];
-      const job = getJob(id);
-      if (!job) {
-        res.statusCode = 404;
-        res.end('not found');
-        return;
-      }
-      const userHash = hash(user.sub);
-      if (job.user_id_hash !== userHash) {
-        res.statusCode = 403;
-        res.end('forbidden');
-        return;
-      }
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(job));
-      return;
-    }
+      // GET /user/export/:id - Get export job status
+      app.get<{
+        Params: { id: string };
+      }>('/user/export/:id', async (req, reply) => {
+        const userHash = hash(req.user.sub);
+        const job = getJob(req.params.id);
+        
+        if (!job) {
+          reply.code(404).send({
+            ok: false,
+            error: { code: 'not_found', message: 'Export job not found' }
+          });
+          return;
+        }
+        
+        if (job.user_id_hash !== userHash) {
+          reply.code(403).send({
+            ok: false,
+            error: { code: 'forbidden', message: 'Access denied' }
+          });
+          return;
+        }
 
-    if (req.method === 'POST' && req.url === '/user/delete') {
-      const userHash = hash(user.sub);
-      createDeleteRequest(userHash);
-      res.statusCode = 204;
-      res.end();
-      return;
-    }
+        reply.send({ 
+          ok: true, 
+          data: job
+        });
+      });
 
-    if (req.method === 'GET' && req.url === '/user/delete/status') {
-      const userHash = hash(user.sub);
-      const dr = getDeleteRequest(userHash);
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify(dr || null));
-      return;
-    }
+      // POST /user/delete - Request account deletion
+      app.post('/user/delete', async (req, reply) => {
+        const userHash = hash(req.user.sub);
+        
+        try {
+          createDeleteRequest(userHash);
+          
+          app.log.info({
+            user_hash: userHash,
+            action: 'delete_requested',
+            timestamp: new Date().toISOString()
+          });
 
-    res.statusCode = 404;
-    res.end('Not Found');
+          reply.code(204).send();
+        } catch (error) {
+          app.log.error(error);
+          reply.code(500).send({ ok: false, error: 'Failed to create delete request' });
+        }
+      });
+
+      // GET /user/delete/status - Get account deletion status
+      app.get('/user/delete/status', async (req, reply) => {
+        const userHash = hash(req.user.sub);
+        
+        try {
+          const deleteRequest = getDeleteRequest(userHash);
+          
+          reply.send({ 
+            ok: true, 
+            data: deleteRequest || null
+          });
+        } catch (error) {
+          app.log.error(error);
+          reply.code(500).send({ ok: false, error: 'Failed to fetch delete status' });
+        }
+      });
+    },
   });
 }
