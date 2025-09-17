@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
+import { supabase } from "../_shared/supa_client.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,6 +28,20 @@ serve(async (req) => {
 
   try {
     const { text, context, previousEmotions }: EmotionAnalysisRequest = await req.json()
+
+    const authHeader = req.headers.get("Authorization") || req.headers.get("authorization")
+    let userId: string | null = null
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "")
+      const { data, error: authError } = await supabase.auth.getUser(token)
+
+      if (authError) {
+        console.error("❌ Erreur authentification:", authError)
+      } else if (data?.user) {
+        userId = data.user.id
+      }
+    }
     
     if (!text?.trim()) {
       throw new Error('Texte requis pour l\'analyse')
@@ -134,6 +149,32 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
       confidence: Math.round(confidence * 100) / 100,
       insights: insights.slice(0, 3),
       recommendations: recommendations.slice(0, 3)
+    }
+
+    if (userId) {
+      const { error: insertError } = await supabase
+        .from("emotion_scans")
+        .insert({
+          user_id: userId,
+          scan_type: "text",
+          mood: dominantEmotion,
+          confidence: result.confidence,
+          recommendations: result.recommendations,
+          emotions: {
+            scores: emotions,
+            insights: result.insights,
+            context: context || null,
+            previousEmotions: previousEmotions || null
+          }
+        })
+
+      if (insertError) {
+        console.error("❌ Erreur enregistrement emotion_scans:", insertError)
+      } else {
+        console.log("🗄️ Emotion scan enregistré", { userId, mood: dominantEmotion })
+      }
+    } else {
+      console.log("ℹ️ Aucun utilisateur authentifié, saut de l'enregistrement")
     }
 
     console.log('✅ Analyse terminée:', { dominantEmotion, confidence: result.confidence })
