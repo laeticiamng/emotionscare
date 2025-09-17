@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useReducedMotion } from "framer-motion";
 import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
 import { ConstellationCanvas } from "@/COMPONENTS.reg";
 import { useBreathPattern, Pattern } from "@/ui/hooks/useBreathPattern";
@@ -34,7 +35,8 @@ export default function BreathConstellationPage() {
   const [patternKey, setPatternKey] = React.useState<keyof typeof PATTERNS>("coherence-5-5");
   const [cycles, setCycles] = React.useState(8);
   const [density, setDensity] = React.useState(0.8); // 0..1
-  const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const prefersReducedMotion = useReducedMotion();
+  const isReducedMotion = Boolean(prefersReducedMotion);
 
   const bp = useBreathPattern(PATTERNS[patternKey], cycles);
   const { current, phaseProgress, running, cycle, start, stop, toggle } = bp;
@@ -48,9 +50,9 @@ export default function BreathConstellationPage() {
     if (p !== lastPhase.current) {
       lastPhase.current = p;
       if (cue?.play) cue.play().catch(() => {});
-      if ("vibrate" in navigator && !reduced) navigator.vibrate?.(6);
+      if ("vibrate" in navigator && !isReducedMotion) navigator.vibrate?.(6);
     }
-  }, [bp.current.phase, cue, reduced]);
+  }, [bp.phaseIndex, cue, isReducedMotion]);
 
   const logSession = React.useCallback(
     (cyclesCompleted: number, completed: boolean) => {
@@ -129,7 +131,13 @@ export default function BreathConstellationPage() {
             </label>
           </div>
 
-          <ConstellationCanvas phase={current.phase} phaseProgress={phaseProgress} reduced={!!reduced} density={density} />
+          <ConstellationCanvas
+            phase={bp.current.phase}
+            phaseProgress={bp.phaseProgress}
+            phaseDuration={bp.phaseDuration}
+            reduced={isReducedMotion}
+            density={density}
+          />
 
           <div style={{ display: "flex", gap: 8 }}>
             <Button onClick={toggle} data-ui="primary-cta">{running ? "Pause" : "Démarrer"}</Button>

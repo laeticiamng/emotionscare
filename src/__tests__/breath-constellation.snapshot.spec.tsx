@@ -6,6 +6,7 @@ import BreathConstellationPage from "@/modules/breath-constellation/BreathConste
 Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
   value: () => ({
     scale: () => {},
+    setTransform: () => {},
     clearRect: () => {},
     beginPath: () => {},
     arc: () => {},
