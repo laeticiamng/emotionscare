@@ -32,7 +32,7 @@ async function fileExists(filePath: string): Promise<boolean> {
 function generatePageStub(route: RouteManifestEntry): string {
   const isProtected = route.auth !== 'public';
   const protectedWrapper = isProtected ? `
-import { ProtectedRoute } from '@/components/ProtectedRoute';` : '';
+import { ProtectedRoute } from '@/guards';` : '';
 
   const componentContent = `import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

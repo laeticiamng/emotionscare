@@ -4,7 +4,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { logger } from '@/lib/logger';
 
-interface B2BModeGuardProps {
+export interface B2BModeGuardProps {
   children: React.ReactNode;
   requiredMode?: 'b2b_user' | 'b2b_admin';
 }
