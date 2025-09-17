@@ -26,6 +26,14 @@ export const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
+export const unifiedRegisterSchema = registerSchema.extend({
+  fullName: z
+    .string()
+    .trim()
+    .min(2, 'Le nom complet doit contenir au moins 2 caractères')
+    .max(100, 'Le nom complet ne peut pas dépasser 100 caractères')
+});
+
 export const resetPasswordSchema = z.object({
   email: z
     .string()
@@ -36,3 +44,4 @@ export const resetPasswordSchema = z.object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type UnifiedRegisterFormData = z.infer<typeof unifiedRegisterSchema>;
