@@ -8649,6 +8649,50 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_presets: {
+        Row: {
+          blend: Json
+          clarity: number
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          softness: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          blend?: Json
+          clarity?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          softness?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          blend?: Json
+          clarity?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          softness?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mood_presets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_progress_view: {
         Row: {
           avg_duration: number | null
