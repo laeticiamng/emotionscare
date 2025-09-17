@@ -37,8 +37,10 @@ export default function BreathConstellationPage() {
   const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   const bp = useBreathPattern(PATTERNS[patternKey], cycles);
+  const { current, phaseProgress, running, cycle, start, stop, toggle } = bp;
   const useNewAudio = ff?.("new-audio-engine") ?? false;
   const cue = useNewAudio ? useSound?.("/audio/tick.mp3") ?? null : null;
+  const sessionStartRef = React.useRef<number | null>(null);
 
   const lastPhase = React.useRef<string>("");
   React.useEffect(() => {
@@ -50,19 +52,55 @@ export default function BreathConstellationPage() {
     }
   }, [bp.current.phase, cue, reduced]);
 
+  const logSession = React.useCallback(
+    (cyclesCompleted: number, completed: boolean) => {
+      const startedAt = sessionStartRef.current;
+      if (!startedAt) return;
+      const endedAt = Date.now();
+      const durationSec = Math.max(1, Math.round((endedAt - startedAt) / 1000));
+      try {
+        recordEvent?.({
+          module: "breath-constellation",
+          startedAt: new Date(startedAt).toISOString(),
+          endedAt: new Date(endedAt).toISOString(),
+          durationSec,
+          score: Math.min(10, Math.round((completed ? cycles : cyclesCompleted) * 1.2)),
+          meta: {
+            pattern: patternKey,
+            density,
+            cyclesPlanned: cycles,
+            cyclesCompleted,
+            completed,
+          },
+        });
+      } finally {
+        sessionStartRef.current = null;
+      }
+    },
+    [cycles, density, patternKey]
+  );
+
   React.useEffect(() => {
-    if (!bp.running && bp.cycle >= cycles && cycles > 0) {
-      const dur = PATTERNS[patternKey].reduce((s, p) => s + p.sec, 0) * cycles;
-      recordEvent?.({
-        module: "breath-constellation",
-        startedAt: new Date(Date.now() - dur * 1000).toISOString(),
-        endedAt: new Date().toISOString(),
-        durationSec: dur,
-        score: Math.min(10, Math.round(cycles * 1.2)),
-        meta: { pattern: patternKey, density },
-      });
+    if (running && sessionStartRef.current === null) {
+      sessionStartRef.current = Date.now();
     }
-  }, [bp.running, bp.cycle, cycles, density, patternKey]);
+  }, [running]);
+
+  React.useEffect(() => {
+    if (running && cycles > 0 && cycle >= cycles && sessionStartRef.current) {
+      logSession(Math.min(cycle, cycles), true);
+      stop();
+    }
+  }, [running, cycle, cycles, logSession, stop]);
+
+  const handleStop = React.useCallback(() => {
+    const completedCycles = Math.min(cycle, cycles);
+    const completed = cycles > 0 && completedCycles >= cycles;
+    if (sessionStartRef.current) {
+      logSession(completedCycles, completed);
+    }
+    stop();
+  }, [cycle, cycles, logSession, stop]);
 
   return (
     <main aria-label="Breath Constellation">
@@ -91,15 +129,26 @@ export default function BreathConstellationPage() {
             </label>
           </div>
 
-          <ConstellationCanvas phase={bp.current.phase} phaseProgress={bp.phaseProgress} reduced={!!reduced} density={density} />
+          <ConstellationCanvas phase={current.phase} phaseProgress={phaseProgress} reduced={!!reduced} density={density} />
 
           <div style={{ display: "flex", gap: 8 }}>
-            <Button onClick={bp.toggle} data-ui="primary-cta">{bp.running ? "Pause" : "Démarrer"}</Button>
-            {!bp.running && bp.cycle > 0 && bp.cycle < cycles && <Button onClick={bp.start}>Reprendre</Button>}
-            <Button onClick={bp.stop}>Arrêter</Button>
+            <Button onClick={toggle} data-ui="primary-cta">{running ? "Pause" : "Démarrer"}</Button>
+            {!running && cycle > 0 && cycle < cycles && (
+              <Button
+                onClick={() => {
+                  if (sessionStartRef.current === null) {
+                    sessionStartRef.current = Date.now();
+                  }
+                  start();
+                }}
+              >
+                Reprendre
+              </Button>
+            )}
+            <Button onClick={handleStop}>Arrêter</Button>
           </div>
 
-          <small>Cycle {Math.min(bp.cycle, cycles)} / {cycles}</small>
+          <small>Cycle {Math.min(cycle, cycles)} / {cycles}</small>
         </section>
       </Card>
     </main>
