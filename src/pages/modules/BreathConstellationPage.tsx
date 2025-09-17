@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardAnimation } from '@/components/rewards/RewardAnimation';
@@ -10,6 +10,32 @@ import { Sparkles, Circle, Star } from 'lucide-react';
 type BreathPhase = 'inhale' | 'hold' | 'exhale' | 'pause';
 type SessionState = 'setup' | 'breathing' | 'complete';
 
+const BREATH_PRESETS = {
+  cosmic: {
+    label: 'Équilibre cosmique (4-4-6-2)',
+    description: 'Rythme progressif utilisé par la constellation pour guider la respiration.',
+    timings: { inhale: 4, hold: 4, exhale: 6, pause: 2 },
+  },
+  coherence: {
+    label: 'Cohérence cardiaque (5-5)',
+    description: 'Respiration cadencée pour activer la cohérence cardiaque.',
+    timings: { inhale: 5, hold: 0, exhale: 5, pause: 0 },
+  },
+  '4-7-8': {
+    label: 'Relaxation 4-7-8',
+    description: 'Technique apaisante pour calmer le système nerveux.',
+    timings: { inhale: 4, hold: 7, exhale: 8, pause: 0 },
+  },
+} as const;
+
+type BreathPresetKey = keyof typeof BREATH_PRESETS;
+type BreathPreset = (typeof BREATH_PRESETS)[BreathPresetKey];
+
+const BREATH_PRESET_ENTRIES = Object.entries(BREATH_PRESETS) as Array<[
+  BreathPresetKey,
+  BreathPreset
+]>;
+
 const BreathConstellationPage = () => {
   const [sessionState, setSessionState] = useState<SessionState>('setup');
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
@@ -19,17 +45,15 @@ const BreathConstellationPage = () => {
   const [showReward, setShowReward] = useState(false);
   const [isUniverseReady, setIsUniverseReady] = useState(false);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState<BreathPresetKey>('cosmic');
 
   const { addReward } = useCollectionStore();
   const universe = UNIVERSE_CONFIGS.vrBreath;
 
   // Breath timing configuration (in seconds)
-  const breathTiming = {
-    inhale: 4,
-    hold: 4,
-    exhale: 6,
-    pause: 2
-  };
+  const breathTiming = useMemo(() => ({
+    ...BREATH_PRESETS[selectedPreset].timings,
+  }), [selectedPreset]);
 
   // Start breathing session
   const startBreathing = useCallback(() => {
@@ -85,10 +109,10 @@ const BreathConstellationPage = () => {
     };
 
     const currentTiming = breathTiming[breathPhase];
-    timer = setTimeout(nextPhase, currentTiming * 1000);
+    timer = setTimeout(nextPhase, Math.max(currentTiming, 0) * 1000);
 
     return () => clearTimeout(timer);
-  }, [breathPhase, sessionState, cycleCount, targetCycles]);
+  }, [breathPhase, sessionState, cycleCount, targetCycles, breathTiming]);
 
   const generateConstellation = useCallback(() => {
     if (!sessionStartTime) return;
@@ -100,7 +124,9 @@ const BreathConstellationPage = () => {
       starPattern: stars,
       cycleCount,
       sessionDuration,
-      timestamp: new Date()
+      timestamp: new Date(),
+      preset: selectedPreset,
+      presetLabel: BREATH_PRESETS[selectedPreset].label,
     };
 
     addReward({
@@ -118,7 +144,7 @@ const BreathConstellationPage = () => {
     });
 
     setShowReward(true);
-  }, [stars, cycleCount, sessionStartTime, addReward]);
+  }, [stars, cycleCount, sessionStartTime, addReward, selectedPreset]);
 
   const getCycleQuality = (cycles: number): string => {
     if (cycles >= 10) return 'Majeure';
@@ -185,6 +211,27 @@ const BreathConstellationPage = () => {
                 </div>
 
                 <div className="space-y-6">
+                  <div className="space-y-3">
+                    <p className="text-white font-medium">Rythme de respiration</p>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {BREATH_PRESET_ENTRIES.map(([key, preset]) => (
+                        <Button
+                          key={key}
+                          type="button"
+                          variant={selectedPreset === key ? 'default' : 'outline'}
+                          onClick={() => setSelectedPreset(key)}
+                          className="h-auto py-3 text-left text-white border-white/30"
+                        >
+                          <span className="block text-sm font-semibold">{preset.label}</span>
+                          <span className="block text-xs text-white/70">{preset.timings.inhale}s / {preset.timings.hold}s / {preset.timings.exhale}s / {preset.timings.pause}s</span>
+                        </Button>
+                      ))}
+                    </div>
+                    <p className="text-sm text-white/60 max-w-2xl mx-auto">
+                      {BREATH_PRESETS[selectedPreset].description}
+                    </p>
+                  </div>
+
                   <div className="space-y-4">
                     <label className="text-white font-medium">
                       Nombre de cycles: {targetCycles}
@@ -205,9 +252,9 @@ const BreathConstellationPage = () => {
 
                   <div className="text-white/60 space-y-2">
                     <p>• Inspirez : {breathTiming.inhale}s</p>
-                    <p>• Retenez : {breathTiming.hold}s</p>
+                    <p>• Retenez : {breathTiming.hold > 0 ? `${breathTiming.hold}s` : '—'}</p>
                     <p>• Expirez : {breathTiming.exhale}s</p>
-                    <p>• Pause : {breathTiming.pause}s</p>
+                    <p>• Pause : {breathTiming.pause > 0 ? `${breathTiming.pause}s` : '—'}</p>
                   </div>
 
                   <Button
@@ -230,9 +277,8 @@ const BreathConstellationPage = () => {
               >
                 <div className="text-white space-y-2">
                   <h3 className="text-xl font-light">{getPhaseInstructions()}</h3>
-                  <p className="text-sm opacity-60">
-                    Cycle {cycleCount + 1} / {targetCycles}
-                  </p>
+                  <p className="text-sm opacity-60">{BREATH_PRESETS[selectedPreset].label}</p>
+                  <p className="text-sm opacity-60">Cycle {cycleCount + 1} / {targetCycles}</p>
                 </div>
 
                 {/* Breathing sphere */}
@@ -242,8 +288,8 @@ const BreathConstellationPage = () => {
                     animate={{ 
                       scale: getSphereScale(),
                     }}
-                    transition={{ 
-                      duration: breathTiming[breathPhase],
+                    transition={{
+                      duration: Math.max(breathTiming[breathPhase], 0.2),
                       ease: "easeInOut"
                     }}
                   >
@@ -293,7 +339,7 @@ const BreathConstellationPage = () => {
                             scale: [1, 0]
                           }}
                           transition={{
-                            duration: breathTiming.exhale,
+                            duration: Math.max(breathTiming.exhale, 0.2),
                             ease: "easeOut"
                           }}
                         />
@@ -332,6 +378,9 @@ const BreathConstellationPage = () => {
                   </h3>
                   <p className="text-lg opacity-80">
                     {cycleCount} étoiles brillent dans votre ciel personnel
+                  </p>
+                  <p className="text-sm text-white/60">
+                    Rythme : {BREATH_PRESETS[selectedPreset].label}
                   </p>
                 </div>
 
@@ -405,7 +454,7 @@ const BreathConstellationPage = () => {
             id: `constellation-${Date.now()}`,
             type: 'constellation',
             name: `Constellation ${getCycleQuality(cycleCount)}`,
-            description: `${cycleCount} étoiles créées par votre respiration`,
+            description: `${cycleCount} étoiles créées • ${BREATH_PRESETS[selectedPreset].label}`,
             moduleId: 'breath-constellation',
             rarity: cycleCount >= 10 ? 'epic' : cycleCount >= 7 ? 'rare' : 'common',
             visualData: {

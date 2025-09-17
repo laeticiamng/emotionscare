@@ -15,6 +15,26 @@ export interface MoodProfile {
   lastUsed?: Date;
 }
 
+export interface MoodPresetBlend {
+  joy: number;
+  calm: number;
+  energy: number;
+  focus: number;
+}
+
+export interface MoodPresetRecord {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  gradient: string | null;
+  tags: string[];
+  blend: MoodPresetBlend;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MoodMix {
   id: string;
   name: string;

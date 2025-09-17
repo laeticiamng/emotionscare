@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, Calendar, Filter, Download, 
+import {
+  ArrowLeft, Calendar, Filter, Download,
   TrendingUp, Brain, Heart, Zap, Sun, Moon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 interface HeatmapData {
   date: string;
@@ -26,11 +27,100 @@ interface EmotionStat {
   icon: string;
 }
 
+const EMOTION_CONFIG = [
+  { key: 'happy', label: 'Heureux', className: 'bg-yellow-300', hex: '#FCD34D' },
+  { key: 'calm', label: 'Calme', className: 'bg-blue-300', hex: '#93C5FD' },
+  { key: 'anxious', label: 'Anxieux', className: 'bg-red-300', hex: '#FCA5A5' },
+  { key: 'excited', label: 'Énergique', className: 'bg-orange-300', hex: '#FDBA74' },
+  { key: 'tired', label: 'Fatigué', className: 'bg-gray-300', hex: '#D1D5DB' },
+  { key: 'focused', label: 'Concentré', className: 'bg-purple-300', hex: '#D8B4FE' },
+  { key: 'stressed', label: 'Stressé', className: 'bg-red-400', hex: '#F87171' },
+] as const;
+
+const INTENSITY_CONFIG = [
+  { threshold: 1, label: 'Très léger', className: 'bg-green-100', hex: '#DCFCE7' },
+  { threshold: 2, label: 'Léger', className: 'bg-green-200', hex: '#BBF7D0' },
+  { threshold: 3, label: 'Modéré', className: 'bg-yellow-200', hex: '#FEF08A' },
+  { threshold: 4, label: 'Élevé', className: 'bg-orange-200', hex: '#FED7AA' },
+  { threshold: Number.POSITIVE_INFINITY, label: 'Intense', className: 'bg-red-200', hex: '#FECACA' },
+] as const;
+
+const DAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] as const;
+
+const VIEW_LABELS: Record<'emotion' | 'intensity' | 'activity', string> = {
+  emotion: 'Par émotion',
+  intensity: 'Par intensité',
+  activity: 'Par activité',
+};
+
+const PERIOD_LABELS: Record<string, string> = {
+  week: 'Cette semaine',
+  month: 'Ce mois',
+  quarter: 'Ce trimestre',
+  year: 'Cette année',
+};
+
+const DEFAULT_CELL_COLOR = '#E2E8F0';
+
+const emotionLegend = EMOTION_CONFIG.map(({ label, hex }) => ({ label, color: hex }));
+const intensityLegend = INTENSITY_CONFIG.map(({ label, hex }) => ({ label, color: hex }));
+
+type EmotionKey = (typeof EMOTION_CONFIG)[number]['key'];
+
+const getEmotionConfig = (emotion: string) =>
+  EMOTION_CONFIG.find((preset) => preset.key === (emotion as EmotionKey));
+
+const getIntensityPreset = (intensity: number) =>
+  INTENSITY_CONFIG.find((preset) => intensity <= preset.threshold);
+
+const drawRoundedRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+  fillStyle: string,
+  strokeStyle?: string
+) => {
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+
+  if (strokeStyle) {
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+};
+
+const formatDateForExport = (dateStr?: string | null) => {
+  if (!dateStr) return null;
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'short',
+  });
+};
+
 const HeatmapPage: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [selectedView, setSelectedView] = useState('emotion');
+  const [selectedView, setSelectedView] = useState<'emotion' | 'intensity' | 'activity'>('emotion');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Générer des données de heatmap pour les 30 derniers jours
   const generateHeatmapData = (): HeatmapData[] => {
@@ -63,26 +153,17 @@ const HeatmapPage: React.FC = () => {
     { emotion: 'Fatigué', percentage: 10, change: -2, color: 'bg-gray-200', icon: '😴' },
   ]);
 
-  const getIntensityColor = (intensity: number): string => {
-    if (intensity <= 1) return 'bg-green-100';
-    if (intensity <= 2) return 'bg-green-200';
-    if (intensity <= 3) return 'bg-yellow-200';
-    if (intensity <= 4) return 'bg-orange-200';
-    return 'bg-red-200';
-  };
+  const getIntensityColor = (intensity: number): string =>
+    getIntensityPreset(intensity)?.className ?? 'bg-gray-200';
 
-  const getEmotionColor = (emotion: string): string => {
-    const colors: { [key: string]: string } = {
-      happy: 'bg-yellow-300',
-      calm: 'bg-blue-300',
-      anxious: 'bg-red-300',
-      excited: 'bg-orange-300',
-      tired: 'bg-gray-300',
-      focused: 'bg-purple-300',
-      stressed: 'bg-red-400',
-    };
-    return colors[emotion] || 'bg-gray-200';
-  };
+  const getEmotionColor = (emotion: string): string =>
+    getEmotionConfig(emotion)?.className ?? 'bg-gray-200';
+
+  const getIntensityHex = (intensity: number): string =>
+    getIntensityPreset(intensity)?.hex ?? DEFAULT_CELL_COLOR;
+
+  const getEmotionHex = (emotion: string): string =>
+    getEmotionConfig(emotion)?.hex ?? DEFAULT_CELL_COLOR;
 
   const getDayName = (dateStr: string): string => {
     const date = new Date(dateStr);
@@ -96,18 +177,236 @@ const HeatmapPage: React.FC = () => {
     return Math.ceil((days + startOfYear.getDay() + 1) / 7);
   };
 
-  // Organiser les données par semaines
-  const organizeDataByWeeks = () => {
-    const weeks: { [key: number]: HeatmapData[] } = {};
-    heatmapData.forEach(data => {
-      const week = getWeekNumber(data.date);
-      if (!weeks[week]) weeks[week] = [];
-      weeks[week].push(data);
-    });
-    return Object.values(weeks);
-  };
+  const weeklyData = useMemo<(HeatmapData | null)[][]>(() => {
+    const weeksMap = new Map<string, (HeatmapData | null)[]>();
 
-  const weeklyData = organizeDataByWeeks();
+    heatmapData.forEach((data) => {
+      const date = new Date(data.date);
+      const weekNumber = getWeekNumber(data.date);
+      const key = `${date.getFullYear()}-${weekNumber}`;
+
+      if (!weeksMap.has(key)) {
+        weeksMap.set(key, Array(7).fill(null));
+      }
+
+      const weekDays = weeksMap.get(key);
+      if (weekDays) {
+        const dayOfWeek = (date.getDay() + 6) % 7; // Transforme dimanche=0 en dimanche=6
+        weekDays[dayOfWeek] = data;
+      }
+    });
+
+    return Array.from(weeksMap.entries())
+      .sort(([aKey], [bKey]) => {
+        const [aYear, aWeek] = aKey.split('-').map(Number);
+        const [bYear, bWeek] = bKey.split('-').map(Number);
+        if (aYear === bYear) {
+          return aWeek - bWeek;
+        }
+        return aYear - bYear;
+      })
+      .map(([, days]) => days);
+  }, [heatmapData]);
+
+  const handleExportHeatmap = useCallback(() => {
+    if (isExporting) return;
+    if (!weeklyData.length) {
+      toast({
+        title: 'Export impossible',
+        description: 'Aucune donnée n’est disponible pour générer une heatmap.',
+        variant: 'warning',
+      });
+      return;
+    }
+
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      const cellSize = 44;
+      const cellGap = 8;
+      const weekLabelWidth = 100;
+      const contentPaddingX = 56;
+      const contentPaddingY = 80;
+      const headerSpacing = 160;
+      const legendSpacing = selectedView === 'emotion' ? 240 : 190;
+      const weeksCount = weeklyData.length;
+
+      const gridWidth = DAY_LABELS.length * cellSize + (DAY_LABELS.length - 1) * cellGap;
+      const gridHeight = weeksCount * cellSize + Math.max(0, weeksCount - 1) * cellGap;
+
+      const cardWidth = weekLabelWidth + gridWidth + contentPaddingX * 2;
+      const cardHeight = headerSpacing + gridHeight + legendSpacing;
+      const canvasWidth = cardWidth + 64;
+      const canvasHeight = cardHeight + 64;
+
+      const canvas = document.createElement('canvas');
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = canvasWidth * scale;
+      canvas.height = canvasHeight * scale;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('CanvasRenderingContext2D indisponible');
+      }
+
+      ctx.scale(scale, scale);
+      ctx.imageSmoothingEnabled = true;
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+      gradient.addColorStop(0, '#EEF2FF');
+      gradient.addColorStop(1, '#F8FAFC');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      const cardX = 32;
+      const cardY = 32;
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.12)';
+      ctx.shadowBlur = 28;
+      ctx.shadowOffsetY = 18;
+      drawRoundedRect(ctx, cardX, cardY, cardWidth, cardHeight, 28, '#ffffff');
+      ctx.restore();
+      drawRoundedRect(ctx, cardX, cardY, cardWidth, cardHeight, 28, '#ffffff', 'rgba(148, 163, 184, 0.22)');
+
+      const contentStartX = cardX + contentPaddingX;
+      const contentStartY = cardY + contentPaddingY;
+      const gridStartX = contentStartX + weekLabelWidth;
+      const gridStartY = contentStartY + headerSpacing;
+
+      const viewLabel = VIEW_LABELS[selectedView] ?? VIEW_LABELS.emotion;
+      const periodLabel = PERIOD_LABELS[selectedPeriod] ?? 'Période personnalisée';
+      const startDate = formatDateForExport(heatmapData[0]?.date);
+      const endDate = formatDateForExport(heatmapData[heatmapData.length - 1]?.date);
+      const rangeLabel = startDate && endDate ? `${startDate} – ${endDate}` : 'Période récente';
+      const exportedAt = new Date().toLocaleString('fr-FR', {
+        dateStyle: 'full',
+        timeStyle: 'short',
+      });
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#312E81';
+      ctx.font = '600 28px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText('Carte émotionnelle', contentStartX, contentStartY);
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '500 18px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText(`Vue actuelle : ${viewLabel}`, contentStartX, contentStartY + 36);
+      ctx.fillText(`Période sélectionnée : ${periodLabel}`, contentStartX, contentStartY + 64);
+      ctx.fillText(`Plage analysée : ${rangeLabel}`, contentStartX, contentStartY + 92);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '400 16px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText(`Exporté le ${exportedAt}`, contentStartX, contentStartY + 122);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#475569';
+      ctx.font = '600 16px "Inter", "Segoe UI", sans-serif';
+      DAY_LABELS.forEach((label, index) => {
+        const labelX = gridStartX + index * (cellSize + cellGap) + cellSize / 2;
+        ctx.fillText(label, labelX, gridStartY - 20);
+      });
+
+      weeklyData.forEach((week, rowIndex) => {
+        const rowY = gridStartY + rowIndex * (cellSize + cellGap);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#64748B';
+        ctx.font = '500 14px "Inter", "Segoe UI", sans-serif';
+        ctx.fillText(`Sem ${rowIndex + 1}`, gridStartX - 16, rowY + cellSize / 2 + 5);
+
+        for (let dayIndex = 0; dayIndex < DAY_LABELS.length; dayIndex++) {
+          const cellX = gridStartX + dayIndex * (cellSize + cellGap);
+          const cellData = week[dayIndex];
+          const fillColor = cellData
+            ? selectedView === 'emotion'
+              ? getEmotionHex(cellData.emotion)
+              : getIntensityHex(cellData.intensity)
+            : DEFAULT_CELL_COLOR;
+
+          drawRoundedRect(ctx, cellX, rowY, cellSize, cellSize, 10, fillColor, 'rgba(148, 163, 184, 0.32)');
+
+          if (cellData) {
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+            ctx.font = '500 12px "Inter", "Segoe UI", sans-serif';
+            ctx.fillText(cellData.value.toFixed(1), cellX + cellSize / 2, rowY + cellSize / 2 + 4);
+          }
+        }
+      });
+
+      const legendTitleY = gridStartY + gridHeight + 52;
+      const legendItems = selectedView === 'emotion' ? emotionLegend : intensityLegend;
+      const legendColumns = 2;
+      const legendColumnWidth = 220;
+      const legendRowSpacing = 36;
+      const legendDescription =
+        selectedView === 'emotion'
+          ? 'Couleurs associées aux émotions principales'
+          : selectedView === 'activity'
+            ? 'Niveau d’activité des routines émotionnelles'
+            : 'Échelle d’intensité émotionnelle (faible à forte)';
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#312E81';
+      ctx.font = '600 20px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText('Légende', contentStartX, legendTitleY);
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '400 15px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText(legendDescription, contentStartX, legendTitleY + 26);
+
+      legendItems.forEach((item, index) => {
+        const column = index % legendColumns;
+        const row = Math.floor(index / legendColumns);
+        const legendX = contentStartX + column * legendColumnWidth;
+        const legendY = legendTitleY + 56 + row * legendRowSpacing;
+
+        drawRoundedRect(ctx, legendX, legendY - 18, 24, 24, 6, item.color, 'rgba(148, 163, 184, 0.28)');
+
+        ctx.fillStyle = '#1F2937';
+        ctx.font = '500 15px "Inter", "Segoe UI", sans-serif';
+        ctx.fillText(item.label, legendX + 34, legendY);
+      });
+
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '400 12px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText('Export généré par EmotionsCare', contentStartX, cardY + cardHeight - 24);
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `heatmap-${selectedView}-${new Date().toISOString().split('T')[0]}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: 'Export réussi',
+        description: 'La heatmap a été sauvegardée au format PNG.',
+        variant: 'success',
+      });
+    } catch (error) {
+      console.error('Heatmap export failed', error);
+      toast({
+        title: "L'export a échoué",
+        description: 'Nous n’avons pas pu générer le PNG. Réessayez dans un instant.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  }, [
+    heatmapData,
+    isExporting,
+    selectedPeriod,
+    selectedView,
+    toast,
+    weeklyData,
+  ]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800">
@@ -129,9 +428,15 @@ const HeatmapPage: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <Download className="w-4 h-4 mr-2" />
-              Exporter
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportHeatmap}
+              disabled={isExporting}
+              aria-busy={isExporting}
+            >
+              <Download className={`w-4 h-4 mr-2 ${isExporting ? 'animate-spin' : ''}`} />
+              {isExporting ? 'Export en cours…' : 'Exporter'}
             </Button>
           </div>
         </div>
@@ -154,7 +459,10 @@ const HeatmapPage: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <Select value={selectedView} onValueChange={setSelectedView}>
+          <Select
+            value={selectedView}
+            onValueChange={(value) => setSelectedView(value as 'emotion' | 'intensity' | 'activity')}
+          >
             <SelectTrigger className="w-48">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue />

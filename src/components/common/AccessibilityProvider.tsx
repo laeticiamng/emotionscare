@@ -1,4 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 interface AccessibilitySettings {
   fontSize: number;
@@ -39,13 +44,13 @@ interface AccessibilityProviderProps {
 export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ children }) => {
   const [settings, setSettings] = useState<AccessibilitySettings>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('accessibility-settings');
-      if (saved) {
-        try {
+      try {
+        const saved = window.localStorage.getItem('accessibility-settings');
+        if (saved) {
           return { ...defaultSettings, ...JSON.parse(saved) };
-        } catch {
-          return defaultSettings;
         }
+      } catch (error) {
+        console.warn('[AccessibilityProvider] Failed to read settings from localStorage', error);
       }
     }
     return defaultSettings;
@@ -67,34 +72,38 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
 
   useEffect(() => {
     // Apply settings to document
-    const root = document.documentElement;
-    
+    const root = safeGetDocumentRoot();
+
     // Font size
     root.style.setProperty('--font-scale', settings.fontSize.toString());
-    
+
     // High contrast
     if (settings.highContrast) {
-      root.classList.add('high-contrast');
+      safeClassAdd(root, 'high-contrast');
     } else {
-      root.classList.remove('high-contrast');
+      safeClassRemove(root, 'high-contrast');
     }
-    
+
     // Reduced motion
     if (settings.reducedMotion) {
-      root.classList.add('reduced-motion');
+      safeClassAdd(root, 'reduced-motion');
     } else {
-      root.classList.remove('reduced-motion');
+      safeClassRemove(root, 'reduced-motion');
     }
-    
+
     // Focus indicators
     if (settings.focusIndicators) {
-      root.classList.add('enhanced-focus');
+      safeClassAdd(root, 'enhanced-focus');
     } else {
-      root.classList.remove('enhanced-focus');
+      safeClassRemove(root, 'enhanced-focus');
     }
-    
+
     // Save to localStorage
-    localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+    try {
+      window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+    } catch (error) {
+      console.warn('[AccessibilityProvider] Failed to persist settings', error);
+    }
   }, [settings]);
 
   const updateSetting = (key: keyof AccessibilitySettings, value: any) => {
@@ -103,7 +112,11 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
 
   const resetSettings = () => {
     setSettings(defaultSettings);
-    localStorage.removeItem('accessibility-settings');
+    try {
+      window.localStorage.removeItem('accessibility-settings');
+    } catch (error) {
+      console.warn('[AccessibilityProvider] Failed to clear settings', error);
+    }
   };
 
   return (

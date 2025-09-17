@@ -3,6 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, Keyboard, Volume2, Type, Contrast } from 'lucide-react';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 interface AccessibilitySettings {
   highContrast: boolean;
@@ -24,28 +29,31 @@ const AccessibilityEnhancer: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     // Détecter les préférences système
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
 
-    setSettings(prev => ({
-      ...prev,
-      reducedMotion: prefersReducedMotion,
-      highContrast: prefersHighContrast,
-    }));
-
-    // Appliquer les styles d'accessibilité
-    applyAccessibilityStyles(settings);
+    setSettings(prev => {
+      const updated = {
+        ...prev,
+        reducedMotion: prefersReducedMotion,
+        highContrast: prefersHighContrast,
+      };
+      applyAccessibilityStyles(updated);
+      return updated;
+    });
   }, []);
 
   const applyAccessibilityStyles = (newSettings: AccessibilitySettings) => {
-    const root = document.documentElement;
+    const root = safeGetDocumentRoot();
 
     // Contraste élevé
     if (newSettings.highContrast) {
-      root.classList.add('high-contrast');
+      safeClassAdd(root, 'high-contrast');
     } else {
-      root.classList.remove('high-contrast');
+      safeClassRemove(root, 'high-contrast');
     }
 
     // Texte agrandi
@@ -57,16 +65,16 @@ const AccessibilityEnhancer: React.FC = () => {
 
     // Mouvement réduit
     if (newSettings.reducedMotion) {
-      root.classList.add('reduce-motion');
+      safeClassAdd(root, 'reduce-motion');
     } else {
-      root.classList.remove('reduce-motion');
+      safeClassRemove(root, 'reduce-motion');
     }
 
     // Navigation clavier
     if (newSettings.keyboardNavigation) {
-      root.classList.add('keyboard-navigation');
+      safeClassAdd(root, 'keyboard-navigation');
     } else {
-      root.classList.remove('keyboard-navigation');
+      safeClassRemove(root, 'keyboard-navigation');
     }
   };
 
@@ -76,7 +84,13 @@ const AccessibilityEnhancer: React.FC = () => {
     applyAccessibilityStyles(newSettings);
     
     // Sauvegarder dans localStorage
-    localStorage.setItem('accessibility-settings', JSON.stringify(newSettings));
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('accessibility-settings', JSON.stringify(newSettings));
+      }
+    } catch (error) {
+      console.warn('[AccessibilityEnhancer] Failed to persist settings', error);
+    }
   };
 
   const togglePanel = () => {

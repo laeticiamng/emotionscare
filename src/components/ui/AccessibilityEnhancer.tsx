@@ -17,6 +17,11 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useAccessibility } from '@/components/common/AccessibilityProvider';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 interface AccessibilitySettings {
   highContrast: boolean;
@@ -56,6 +61,7 @@ export function AccessibilityEnhancer() {
   // Functions pour la compatibilité
   const announce = announceToScreenReader;
   const handleSkipLink = (id: string) => {
+    if (typeof document === 'undefined') return;
     const element = document.getElementById(id);
     if (element) {
       element.focus();
@@ -66,9 +72,15 @@ export function AccessibilityEnhancer() {
 
   useEffect(() => {
     // Load settings from localStorage
-    const savedSettings = localStorage.getItem('accessibility-settings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
+    if (typeof window === 'undefined') return;
+
+    try {
+      const savedSettings = window.localStorage.getItem('accessibility-settings');
+      if (savedSettings) {
+        setSettings(JSON.parse(savedSettings));
+      }
+    } catch (error) {
+      console.warn('[AccessibilityEnhancer UI] Failed to read settings', error);
     }
 
     // Check for accessibility issues
@@ -79,25 +91,31 @@ export function AccessibilityEnhancer() {
     // Apply settings to document
     applyAccessibilitySettings(settings);
     // Save settings to localStorage
-    localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+      }
+    } catch (error) {
+      console.warn('[AccessibilityEnhancer UI] Failed to persist settings', error);
+    }
   }, [settings]);
 
   const applyAccessibilitySettings = (newSettings: AccessibilitySettings) => {
-    const root = document.documentElement;
-    const body = document.body;
+    const root = safeGetDocumentRoot();
+    const body = typeof document !== 'undefined' ? document.body : null;
 
     // High contrast
     if (newSettings.highContrast) {
-      body.classList.add('high-contrast');
+      safeClassAdd(body, 'high-contrast');
     } else {
-      body.classList.remove('high-contrast');
+      safeClassRemove(body, 'high-contrast');
     }
 
     // Reduced motion
     if (newSettings.reducedMotion) {
-      body.classList.add('reduce-motion');
+      safeClassAdd(body, 'reduce-motion');
     } else {
-      body.classList.remove('reduce-motion');
+      safeClassRemove(body, 'reduce-motion');
     }
 
     // Large text
@@ -109,16 +127,16 @@ export function AccessibilityEnhancer() {
 
     // Dyslexic font
     if (newSettings.dyslexicFont) {
-      body.classList.add('dyslexic-font');
+      safeClassAdd(body, 'dyslexic-font');
     } else {
-      body.classList.remove('dyslexic-font');
+      safeClassRemove(body, 'dyslexic-font');
     }
 
     // Color blind friendly
     if (newSettings.colorBlindFriendly) {
-      body.classList.add('color-blind-friendly');
+      safeClassAdd(body, 'color-blind-friendly');
     } else {
-      body.classList.remove('color-blind-friendly');
+      safeClassRemove(body, 'color-blind-friendly');
     }
 
     // Focus indicators
@@ -130,6 +148,10 @@ export function AccessibilityEnhancer() {
   };
 
   const checkAccessibilityIssues = () => {
+    if (typeof document === 'undefined') {
+      setIssues([]);
+      return;
+    }
     const foundIssues: AccessibilityIssue[] = [];
 
     // Check for images without alt text

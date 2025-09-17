@@ -1,81 +1,92 @@
-/**
- * Configuration Sentry pour traquer spécifiquement les erreurs "Cannot read properties of undefined (reading 'add')"
- */
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 
-interface SentryConfig {
-  dsn?: string;
-  environment: string;
-  beforeSend?: (event: any) => any;
-  integrations?: any[];
+interface SentryContextOptions {
+  component?: string;
+  operation?: string;
+  element?: string;
+  attempted?: string;
 }
 
-/**
- * Configuration Sentry optimisée pour détecter les erreurs critiques
- */
+let sentryInitialized = false;
+let domMonitoringAttached = false;
+
+const hasSentryClient = () => Boolean(Sentry.getCurrentHub().getClient());
+
+const parseRate = (value: string | undefined, fallback: number) => {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 export function initializeSentry(): void {
-  // Vérifier si Sentry est disponible
-  if (typeof window === 'undefined' || !(window as any).Sentry) {
-    console.warn('[Sentry] Sentry SDK not loaded, error tracking disabled');
+  if (sentryInitialized || typeof window === 'undefined') {
     return;
   }
 
-  const Sentry = (window as any).Sentry;
+  const dsn = import.meta.env.VITE_SENTRY_DSN;
 
-  const config: SentryConfig = {
-    environment: process.env.NODE_ENV || 'development',
-    
-    beforeSend(event) {
-      // Enrichir les événements liés aux erreurs "reading add"
-      if (event.exception?.values?.[0]?.value?.includes("Cannot read properties of undefined (reading 'add')")) {
-        // Ajouter des tags spécifiques
-        event.tags = {
-          ...event.tags,
-          errorType: 'reading_add',
-          critical: true,
-          component: 'dom_manipulation'
-        };
-
-        // Ajouter du contexte supplémentaire
-        event.contexts = {
-          ...event.contexts,
-          debugging: {
-            suggestion: 'Use safe-helpers.ts functions instead of direct .add() calls',
-            documentation: 'Check src/lib/safe-helpers.ts for safe alternatives',
-            preventable: true
-          }
-        };
-
-        // Augmenter la priorité
-        event.level = 'error';
-      }
-
-      // Filtrer les erreurs en développement si nécessaire
-      if (process.env.NODE_ENV === 'development') {
-        console.group('🚨 Sentry Error Report');
-        console.error('Error:', event.exception?.values?.[0]?.value);
-        console.error('Context:', event.contexts);
-        console.error('Tags:', event.tags);
-        console.groupEnd();
-      }
-
-      return event;
+  if (!dsn) {
+    if (import.meta.env.DEV) {
+      console.info('[Sentry] Aucun DSN détecté, initialisation ignorée');
     }
-  };
+    return;
+  }
 
   try {
-    Sentry.init(config);
-    
-    // Capturer les erreurs DOM spécifiques
-    Sentry.addGlobalEventProcessor((event: any) => {
+    Sentry.init({
+      dsn,
+      environment: import.meta.env.VITE_SENTRY_ENVIRONMENT ?? import.meta.env.MODE ?? 'development',
+      integrations: [new BrowserTracing()],
+      tracesSampleRate: parseRate(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE, 0.1),
+      replaysSessionSampleRate: parseRate(import.meta.env.VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE, 0),
+      replaysOnErrorSampleRate: parseRate(import.meta.env.VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE, 1.0),
+      beforeSend(event) {
+        if (event.exception?.values?.[0]?.value?.includes("Cannot read properties of undefined (reading 'add')")) {
+          event.tags = {
+            ...event.tags,
+            errorType: 'reading_add',
+            critical: true,
+            component: 'dom_manipulation'
+          };
+
+          event.contexts = {
+            ...event.contexts,
+            debugging: {
+              suggestion: 'Use safe-helpers.ts functions instead of direct .add() calls',
+              documentation: 'Check src/lib/safe-helpers.ts for safe alternatives',
+              preventable: true
+            }
+          };
+
+          event.level = 'error';
+        }
+
+        if (import.meta.env.DEV) {
+          console.group('🚨 Sentry Error Report');
+          console.error('Error:', event.exception?.values?.[0]?.value);
+          console.error('Context:', event.contexts);
+          console.error('Tags:', event.tags);
+          console.groupEnd();
+        }
+
+        return event;
+      }
+    });
+
+    Sentry.addGlobalEventProcessor((event) => {
       if (event.exception?.values?.[0]?.stacktrace?.frames) {
         const frames = event.exception.values[0].stacktrace.frames;
-        
-        // Détecter si l'erreur vient d'une manipulation DOM
-        const hasDOMFrame = frames.some((frame: any) => 
-          frame.filename?.includes('AccessibilityEnhancer') ||
-          frame.filename?.includes('theme-provider') ||
-          frame.filename?.includes('MoodMixer') ||
-          frame.function?.includes('classList')
+
+        const hasDOMFrame = frames.some(
+          (frame) =>
+            frame.filename?.includes('AccessibilityEnhancer') ||
+            frame.filename?.includes('theme-provider') ||
+            frame.filename?.includes('MoodMixer') ||
+            frame.function?.includes('classList')
         );
 
         if (hasDOMFrame) {
@@ -90,40 +101,32 @@ export function initializeSentry(): void {
       return event;
     });
 
-    console.log('[Sentry] Error tracking initialized for "reading add" errors');
-    
+    sentryInitialized = true;
+
+    if (import.meta.env.DEV) {
+      console.log('[Sentry] Error tracking initialized for "reading add" errors');
+    }
   } catch (error) {
     console.error('[Sentry] Failed to initialize:', error);
   }
 }
 
-/**
- * Reporter manuellement une erreur "reading add" avec contexte
- */
-export function reportReadingAddError(
-  error: Error,
-  context: {
-    component?: string;
-    operation?: string;
-    element?: string;
-    attempted?: string;
-  }
-): void {
-  if (typeof window === 'undefined' || !(window as any).Sentry) {
-    console.warn('[Sentry] Cannot report error, Sentry not available');
+export function reportReadingAddError(error: Error, context: SentryContextOptions): void {
+  if (!hasSentryClient()) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry] Cannot report error, Sentry not available');
+    }
     return;
   }
 
-  const Sentry = (window as any).Sentry;
-
-  Sentry.withScope((scope: any) => {
+  Sentry.withScope((scope) => {
     scope.setLevel('error');
     scope.setTag('errorType', 'reading_add');
     scope.setTag('critical', true);
-    
+
     if (context.component) scope.setTag('component', context.component);
     if (context.operation) scope.setTag('operation', context.operation);
-    
+
     scope.setContext('errorDetails', {
       element: context.element || 'unknown',
       attempted: context.attempted || 'unknown operation',
@@ -135,51 +138,42 @@ export function reportReadingAddError(
   });
 }
 
-/**
- * Monitorer les erreurs DOM en temps réel
- */
 export function monitorDOMErrors(): void {
-  if (typeof window === 'undefined') return;
+  if (domMonitoringAttached || typeof window === 'undefined') {
+    return;
+  }
 
-  // Surveiller les erreurs globales
   const originalError = window.onerror;
   window.onerror = (message, source, lineno, colno, error) => {
     if (typeof message === 'string' && message.includes("Cannot read properties of undefined (reading 'add')")) {
-      reportReadingAddError(
-        error || new Error(message),
-        {
-          component: source ? source.split('/').pop() : 'unknown',
-          operation: 'dom_manipulation',
-          attempted: 'add_operation'
-        }
-      );
+      reportReadingAddError(error || new Error(message), {
+        component: source ? source.split('/').pop() : 'unknown',
+        operation: 'dom_manipulation',
+        attempted: 'add_operation'
+      });
     }
 
     if (originalError) {
       return originalError(message, source, lineno, colno, error);
     }
+
     return false;
   };
 
-  // Surveiller les promesses rejetées
   window.addEventListener('unhandledrejection', (event) => {
-    const error = event.reason;
-    if (error?.message?.includes("Cannot read properties of undefined (reading 'add')")) {
-      reportReadingAddError(
-        error,
-        {
-          component: 'promise',
-          operation: 'async_dom_manipulation'
-        }
-      );
+    const reason = event.reason as Error | undefined;
+
+    if (reason?.message?.includes("Cannot read properties of undefined (reading 'add')")) {
+      reportReadingAddError(reason, {
+        component: 'promise',
+        operation: 'async_dom_manipulation'
+      });
     }
   });
 
-  console.log('[Sentry] DOM error monitoring active');
-}
+  domMonitoringAttached = true;
 
-// Auto-initialisation si Sentry est disponible
-if (typeof window !== 'undefined' && (window as any).Sentry) {
-  initializeSentry();
-  monitorDOMErrors();
+  if (import.meta.env.DEV) {
+    console.log('[Sentry] DOM error monitoring active');
+  }
 }

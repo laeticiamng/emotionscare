@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Header, Footer } from "@/components/layout";
+import { Header } from "@/components/layout";
 import { 
   ArrowRight, 
   Heart, 
@@ -35,8 +35,11 @@ import {
   Activity
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useLazyRender } from "@/hooks/useLazyRender";
+
+const Footer = lazy(() => import("@/components/layout/Footer"));
 
 interface UnifiedHomePageProps {
   variant?: 'full' | 'b2c-simple';
@@ -46,6 +49,11 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   const [searchParams] = useSearchParams();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
+  const statsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const featuresSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const useCasesSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   
   // Détection automatique du variant depuis les params
   const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
@@ -57,6 +65,12 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (statsSection.isVisible) {
+      setStatsVisible(true);
+    }
+  }, [statsSection.isVisible]);
 
   const features = [
     {
@@ -417,322 +431,419 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
         </section>
 
         {/* Stats Section Enhanced */}
-        <motion.section 
-          className="py-16 bg-muted/20"
-          onViewportEnter={() => setStatsVisible(true)}
-        >
-          <div className="container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center space-y-4 mb-12"
-            >
-              <Badge variant="outline" className="mb-2">Performance en temps réel</Badge>
-              <h2 className="text-3xl lg:text-4xl font-bold">
-                Des résultats qui parlent d'eux-mêmes
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Notre communauté grandit chaque jour et obtient des résultats mesurables
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="text-center space-y-4"
-                >
-                  <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/50">
-                    <CardContent className="p-0 space-y-4">
-                      <div className="w-12 h-12 mx-auto bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center">
-                        <stat.icon className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                          {stat.value}
-                        </div>
-                        <div className="font-semibold">{stat.label}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {stat.description}
-                        </div>
-                        <Progress 
-                          value={statsVisible ? stat.progress : 0} 
-                          className="h-2 bg-muted"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Features Section Enhanced */}
-        <section className="py-20 bg-background">
-          <div className="container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center space-y-4 mb-16"
-            >
-              <Badge variant="secondary" className="mb-2">Intelligence Artificielle</Badge>
-              <h2 className="text-4xl lg:text-5xl font-bold">
-                Fonctionnalités de 
-                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"> Nouvelle Génération</span>
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Découvrez nos outils révolutionnaires conçus par des experts en psychologie et ingénieurs IA pour maximiser votre potentiel émotionnel.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  whileHover={{ scale: 1.02 }}
-                  className="group"
-                >
-                  <Card className="h-full hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background via-background to-muted/30 group-hover:from-primary/5 group-hover:to-primary/10">
-                    <CardHeader className="pb-4">
-                      <div className={cn(
-                        "w-16 h-16 rounded-2xl mb-4 flex items-center justify-center",
-                        `bg-gradient-to-br ${feature.gradient} shadow-lg group-hover:shadow-xl transition-all duration-300`
-                      )}>
-                        <feature.icon className="h-8 w-8 text-white" />
-                      </div>
-                      <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors">
-                        {feature.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <CardDescription className="text-base leading-relaxed">
-                        {feature.description}
-                      </CardDescription>
-                      
-                      <div className="space-y-2">
-                        {feature.benefits.map((benefit, i) => (
-                          <div key={i} className="flex items-center space-x-2 text-sm">
-                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span className="text-muted-foreground">{benefit}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <Separator className="my-4" />
-
-                      <Button variant="ghost" className="w-full group-hover:bg-primary/10 group-hover:text-primary transition-all" asChild>
-                        <Link to={feature.demo}>
-                          <span>Essayer maintenant</span>
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Use Cases Section */}
-        <section className="py-20 bg-gradient-to-br from-muted/30 to-muted/10">
-          <div className="container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center space-y-4 mb-16"
-            >
-              <Badge variant="outline" className="mb-2">Cas d'usage</Badge>
-              <h2 className="text-4xl lg:text-5xl font-bold">
-                Pour tous vos besoins émotionnels
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Que vous soyez un particulier, un professionnel ou une entreprise, 
-                nos solutions s'adaptent parfaitement à votre contexte.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {useCases.map((useCase, index) => (
-                <motion.div
-                  key={useCase.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                  viewport={{ once: true }}
-                  className="group"
-                >
-                  <Card className="h-full hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background to-muted/50 group-hover:from-primary/5">
-                    <CardHeader className="text-center pb-4">
-                      <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mb-4">
-                        <useCase.icon className="h-10 w-10 text-primary" />
-                      </div>
-                      <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors">
-                        {useCase.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6 text-center">
-                      <CardDescription className="text-base leading-relaxed">
-                        {useCase.description}
-                      </CardDescription>
-                      
-                      <div className="space-y-3">
-                        {useCase.features.map((feature, i) => (
-                          <div key={i} className="flex items-center space-x-3 text-sm">
-                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span className="text-muted-foreground text-left">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <Separator className="my-6" />
-
-                      <Button className="w-full group-hover:shadow-lg transition-all" asChild>
-                        <Link to={useCase.link}>
-                          <span>{useCase.cta}</span>
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section className="py-20 bg-background">
-          <div className="container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center space-y-4 mb-16"
-            >
-              <Badge variant="secondary" className="mb-2">Témoignages</Badge>
-              <h2 className="text-4xl lg:text-5xl font-bold">
-                Ce que disent nos utilisateurs
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Des milliers de personnes nous font confiance pour leur bien-être émotionnel
-              </p>
-            </motion.div>
-
-            <div className="max-w-4xl mx-auto">
+        <motion.section ref={statsSection.ref} className="py-16 bg-muted/20">
+          {statsSection.isVisible ? (
+            <div className="container">
               <motion.div
-                key={currentTestimonial}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 lg:p-12"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center space-y-4 mb-12"
               >
-                <div className="text-center space-y-6">
-                  <div className="flex justify-center space-x-1 mb-6">
-                    {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
-                      <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  
-                  <blockquote className="text-xl lg:text-2xl font-medium leading-relaxed text-foreground">
-                    "{testimonials[currentTestimonial].text}"
-                  </blockquote>
-                  
-                  <div className="space-y-2">
-                    <div className="font-semibold text-lg">{testimonials[currentTestimonial].name}</div>
-                    <div className="text-muted-foreground">{testimonials[currentTestimonial].role}</div>
-                    <Badge variant="outline" className="mt-2">
-                      {testimonials[currentTestimonial].company}
-                    </Badge>
-                  </div>
-                </div>
+                <Badge variant="outline" className="mb-2">Performance en temps réel</Badge>
+                <h2 className="text-3xl lg:text-4xl font-bold">
+                  Des résultats qui parlent d'eux-mêmes
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Notre communauté grandit chaque jour et obtient des résultats mesurables
+                </p>
               </motion.div>
 
-              <div className="flex justify-center space-x-2 mt-8">
-                {testimonials.map((_, index) => (
-                  <button
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {stats.map((stat, index) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="text-center space-y-4"
+                  >
+                    <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/50">
+                      <CardContent className="p-0 space-y-4">
+                        <div className="w-12 h-12 mx-auto bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center">
+                          <stat.icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                            {stat.value}
+                          </div>
+                          <div className="font-semibold">{stat.label}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {stat.description}
+                          </div>
+                          <Progress
+                            value={statsVisible ? stat.progress : 0}
+                            className="h-2 bg-muted"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="container space-y-8" aria-hidden="true">
+              <div className="mx-auto flex flex-col items-center space-y-3 text-center">
+                <span className="h-4 w-32 rounded-full bg-muted/40 animate-pulse" />
+                <span className="h-8 w-64 rounded-full bg-muted/40 animate-pulse md:w-80" />
+                <span className="h-4 w-56 rounded-full bg-muted/30 animate-pulse md:w-72" />
+              </div>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div
                     key={index}
-                    onClick={() => setCurrentTestimonial(index)}
-                    className={cn(
-                      "w-3 h-3 rounded-full transition-all duration-300",
-                      index === currentTestimonial ? "bg-primary" : "bg-muted"
-                    )}
+                    className="h-48 rounded-3xl bg-muted/40 animate-pulse"
                   />
                 ))}
               </div>
             </div>
-          </div>
-        </section>
+          )}
+        </motion.section>
 
+        {/* Features Section Enhanced */}
+        <section ref={featuresSection.ref} className="py-20 bg-background">
+          {featuresSection.isVisible ? (
+            <div className="container">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center space-y-4 mb-16"
+              >
+                <Badge variant="secondary" className="mb-2">Intelligence Artificielle</Badge>
+                <h2 className="text-4xl lg:text-5xl font-bold">
+                  Fonctionnalités de
+                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"> Nouvelle Génération</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                  Découvrez nos outils révolutionnaires conçus par des experts en psychologie et ingénieurs IA pour maximiser votre potentiel émotionnel.
+                </p>
+              </motion.div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {features.map((feature, index) => (
+                  <motion.div
+                    key={feature.title}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.02 }}
+                    className="group"
+                  >
+                    <Card className="h-full hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background via-background to-muted/30 group-hover:from-primary/5 group-hover:to-primary/10">
+                      <CardHeader className="pb-4">
+                        <div className={cn(
+                          "w-16 h-16 rounded-2xl mb-4 flex items-center justify-center",
+                          `bg-gradient-to-br ${feature.gradient} shadow-lg group-hover:shadow-xl transition-all duration-300`
+                        )}>
+                          <feature.icon className="h-8 w-8 text-white" />
+                        </div>
+                        <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors">
+                          {feature.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <CardDescription className="text-base leading-relaxed">
+                          {feature.description}
+                        </CardDescription>
+
+                        <div className="space-y-2">
+                          {feature.benefits.map((benefit, i) => (
+                            <div key={i} className="flex items-center space-x-2 text-sm">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              <span className="text-muted-foreground">{benefit}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Separator className="my-4" />
+
+                        <Button variant="ghost" className="w-full group-hover:bg-primary/10 group-hover:text-primary transition-all" asChild>
+                          <Link to={feature.demo}>
+                            <span>Essayer maintenant</span>
+                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          </Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="container space-y-10" aria-hidden="true">
+              <div className="mx-auto flex flex-col items-center space-y-3 text-center">
+                <span className="h-4 w-40 rounded-full bg-muted/40 animate-pulse" />
+                <span className="h-10 w-3/4 rounded-full bg-muted/40 animate-pulse md:w-2/3" />
+                <span className="h-4 w-2/3 rounded-full bg-muted/30 animate-pulse md:w-1/2" />
+              </div>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-64 rounded-3xl bg-muted/40 animate-pulse"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+        {/* Use Cases Section */}
+        <section ref={useCasesSection.ref} className="py-20 bg-gradient-to-br from-muted/30 to-muted/10">
+          {useCasesSection.isVisible ? (
+            <div className="container">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center space-y-4 mb-16"
+              >
+                <Badge variant="outline" className="mb-2">Cas d'usage</Badge>
+                <h2 className="text-4xl lg:text-5xl font-bold">
+                  Pour tous vos besoins émotionnels
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Que vous soyez un particulier, un professionnel ou une entreprise,
+                  nos solutions s'adaptent parfaitement à votre contexte.
+                </p>
+              </motion.div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {useCases.map((useCase, index) => (
+                  <motion.div
+                    key={useCase.title}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.2 }}
+                    viewport={{ once: true }}
+                    className="group"
+                  >
+                    <Card className="h-full hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background to-muted/50 group-hover:from-primary/5">
+                      <CardHeader className="text-center pb-4">
+                        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mb-4">
+                          <useCase.icon className="h-10 w-10 text-primary" />
+                        </div>
+                        <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors">
+                          {useCase.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6 text-center">
+                        <CardDescription className="text-base leading-relaxed">
+                          {useCase.description}
+                        </CardDescription>
+
+                        <div className="space-y-3">
+                          {useCase.features.map((feature, i) => (
+                            <div key={i} className="flex items-center space-x-3 text-sm">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              <span className="text-muted-foreground text-left">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Separator className="my-6" />
+
+                        <Button className="w-full group-hover:shadow-lg transition-all" asChild>
+                          <Link to={useCase.link}>
+                            <span>{useCase.cta}</span>
+                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          </Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="container space-y-10" aria-hidden="true">
+              <div className="mx-auto flex flex-col items-center space-y-3 text-center">
+                <span className="h-4 w-32 rounded-full bg-muted/40 animate-pulse" />
+                <span className="h-10 w-2/3 rounded-full bg-muted/40 animate-pulse md:w-1/2" />
+                <span className="h-4 w-1/2 rounded-full bg-muted/30 animate-pulse md:w-1/3" />
+              </div>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-72 rounded-3xl bg-muted/40 animate-pulse"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+        {/* Testimonials Section */}
+        <section ref={testimonialsSection.ref} className="py-20 bg-background">
+          {testimonialsSection.isVisible ? (
+            <div className="container">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center space-y-4 mb-16"
+              >
+                <Badge variant="secondary" className="mb-2">Témoignages</Badge>
+                <h2 className="text-4xl lg:text-5xl font-bold">
+                  Ce que disent nos utilisateurs
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Des milliers de personnes nous font confiance pour leur bien-être émotionnel
+                </p>
+              </motion.div>
+
+              <div className="max-w-4xl mx-auto">
+                <motion.div
+                  key={currentTestimonial}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 lg:p-12"
+                >
+                  <div className="text-center space-y-6">
+                    <div className="flex justify-center space-x-1 mb-6">
+                      {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
+                        <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+
+                    <blockquote className="text-xl lg:text-2xl font-medium leading-relaxed text-foreground">
+                      "{testimonials[currentTestimonial].text}"
+                    </blockquote>
+
+                    <div className="space-y-2">
+                      <div className="font-semibold text-lg">{testimonials[currentTestimonial].name}</div>
+                      <div className="text-muted-foreground">{testimonials[currentTestimonial].role}</div>
+                      <Badge variant="outline" className="mt-2">
+                        {testimonials[currentTestimonial].company}
+                      </Badge>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <div className="flex justify-center space-x-2 mt-8">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentTestimonial(index)}
+                      className={cn(
+                        "w-3 h-3 rounded-full transition-all duration-300",
+                        index === currentTestimonial ? "bg-primary" : "bg-muted"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="container space-y-10" aria-hidden="true">
+              <div className="mx-auto flex flex-col items-center space-y-3 text-center">
+                <span className="h-4 w-32 rounded-full bg-muted/40 animate-pulse" />
+                <span className="h-10 w-2/3 rounded-full bg-muted/40 animate-pulse md:w-1/2" />
+                <span className="h-4 w-1/2 rounded-full bg-muted/30 animate-pulse md:w-1/3" />
+              </div>
+              <div className="max-w-4xl mx-auto h-72 rounded-3xl bg-muted/40 animate-pulse" />
+              <div className="flex justify-center space-x-2">
+                {Array.from({ length: testimonials.length }).map((_, index) => (
+                  <div key={index} className="h-3 w-3 rounded-full bg-muted/40" />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
         {/* Final CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-          <div className="container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center space-y-8 max-w-4xl mx-auto"
-            >
-              <h2 className="text-4xl lg:text-5xl font-bold">
-                Prêt à transformer votre vie émotionnelle ?
-              </h2>
-              <p className="text-xl opacity-90 leading-relaxed">
-                Rejoignez plus de 25 000 utilisateurs qui ont déjà découvert le pouvoir de l'intelligence émotionnelle. 
-                Commencez votre parcours dès aujourd'hui avec notre essai gratuit de 30 jours.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button size="lg" variant="secondary" className="px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all" asChild>
-                  <Link to="/signup">
-                    <Play className="h-5 w-5 mr-2" />
-                    <span>Commencer maintenant</span>
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg" asChild>
-                  <Link to="/demo">
-                    <Globe className="h-5 w-5 mr-2" />
-                    <span>Voir la démo</span>
-                  </Link>
-                </Button>
+        <section ref={finalCtaSection.ref} className="py-20 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+          {finalCtaSection.isVisible ? (
+            <div className="container">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center space-y-8 max-w-4xl mx-auto"
+              >
+                <h2 className="text-4xl lg:text-5xl font-bold">
+                  Prêt à transformer votre vie émotionnelle ?
+                </h2>
+                <p className="text-xl opacity-90 leading-relaxed">
+                  Rejoignez plus de 25 000 utilisateurs qui ont déjà découvert le pouvoir de l'intelligence émotionnelle.
+                  Commencez votre parcours dès aujourd'hui avec notre essai gratuit de 30 jours.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button size="lg" variant="secondary" className="px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all" asChild>
+                    <Link to="/signup">
+                      <Play className="h-5 w-5 mr-2" />
+                      <span>Commencer maintenant</span>
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg" asChild>
+                    <Link to="/demo">
+                      <Globe className="h-5 w-5 mr-2" />
+                      <span>Voir la démo</span>
+                    </Link>
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-center space-x-8 text-sm opacity-80">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Essai gratuit 30 jours</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Shield className="h-4 w-4" />
+                    <span>Sécurisé & Confidentiel</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Heart className="h-4 w-4" />
+                    <span>Support premium</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          ) : (
+            <div className="container" aria-hidden="true">
+              <div className="max-w-4xl mx-auto space-y-6 text-center">
+                <div className="h-10 w-3/4 mx-auto rounded-full bg-white/40 animate-pulse" />
+                <div className="h-6 w-2/3 mx-auto rounded-full bg-white/30 animate-pulse" />
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  {Array.from({ length: 2 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-12 w-44 rounded-full bg-white/30 animate-pulse"
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center justify-center space-x-6">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-4 w-24 rounded-full bg-white/20 animate-pulse"
+                    />
+                  ))}
+                </div>
               </div>
-              
-              <div className="flex items-center justify-center space-x-8 text-sm opacity-80">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4" />
-                  <span>Essai gratuit 30 jours</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Shield className="h-4 w-4" />
-                  <span>Sécurisé & Confidentiel</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Heart className="h-4 w-4" />
-                  <span>Support premium</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+          )}
         </section>
       </main>
 
-      <Footer />
+      <Suspense
+        fallback={(
+          <div className="py-12 text-center text-sm text-muted-foreground" aria-busy="true">
+            Chargement du pied de page…
+          </div>
+        )}
+      >
+        <Footer />
+      </Suspense>
     </div>
   );
 }

@@ -1,22 +1,34 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createApp } from '../server';
-import { signJwt } from '../../lib/jwt';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import * as jwt from '../../lib/jwt';
 
 let app: any;
 let url: string;
 
-  beforeEach(async () => {
-    process.env.JWT_SECRETS = 'test-secret';
-    process.env.HASH_PEPPER = 'pepper';
-    app = createApp();
-    await app.listen({ port: 0 });
-    const address = app.server.address();
-    const port = typeof address === 'object' && address ? address.port : 0;
-    url = `http://127.0.0.1:${port}`;
+beforeEach(async () => {
+  process.env.HASH_PEPPER = 'pepper';
+  vi.spyOn(jwt, 'verifyJwt').mockImplementation(async token => {
+    if (token === 'valid-token') {
+      return { sub: 'user42', role: 'b2c', aud: 'test' } as jwt.TokenPayload;
+    }
+    throw new Error('invalid token');
   });
+  const serverModule = await import('../server');
+  app = serverModule.createApp();
+  app.addHook('preHandler', (req: any, _reply: any, done: any) => {
+    if (req.headers.authorization === 'Bearer valid-token') {
+      (req as any).user = { sub: 'user42', role: 'b2c', aud: 'test' };
+    }
+    done();
+  });
+  await app.listen({ port: 0 });
+  const address = app.server.address();
+  const port = typeof address === 'object' && address ? address.port : 0;
+  url = `http://127.0.0.1:${port}`;
+});
 
 afterEach(async () => {
   await app.close();
+  vi.restoreAllMocks();
 });
 
 const voiceBody = {
@@ -39,10 +51,9 @@ const textBody = {
 
 describe('deprecated journal endpoints', () => {
   it('POST /journal_voice', async () => {
-      const token = await signJwt({ sub: 'user42', role: 'b2c', aud: 'test' });
       const res = await fetch(url + '/journal_voice', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': 'Bearer valid-token', 'Content-Type': 'application/json' },
         body: JSON.stringify(voiceBody)
       });
     expect(res.status).toBe(201);
@@ -53,10 +64,9 @@ describe('deprecated journal endpoints', () => {
   });
 
   it('POST /journal_text', async () => {
-      const token = await signJwt({ sub: 'user42', role: 'b2c', aud: 'test' });
       const res = await fetch(url + '/journal_text', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': 'Bearer valid-token', 'Content-Type': 'application/json' },
         body: JSON.stringify(textBody)
       });
     expect(res.status).toBe(201);

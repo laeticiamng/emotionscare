@@ -27,6 +27,7 @@
     
     { "path": "/boss-level-grit", "auth": "authenticated", "module": "resilience", "component": "BossLevelGritPage", "status": "created" },
     { "path": "/mood-mixer", "auth": "authenticated", "module": "resilience", "component": "MoodMixerPage", "status": "created" },
+    { "path": "/mood-presets", "auth": "authenticated", "module": "resilience", "component": "MoodPresetsAdminPage", "status": "created" },
     { "path": "/bounce-back-battle", "auth": "authenticated", "module": "resilience", "component": "BounceBackBattlePage", "status": "created" },
     { "path": "/story-synth-lab", "auth": "authenticated", "module": "resilience", "component": "StorySynthLabPage", "status": "created" },
     { "path": "/breathwork", "auth": "authenticated", "module": "resilience", "component": "BreathworkPage", "status": "created" },
@@ -66,9 +67,9 @@
     { "path": "/health-check-badge", "auth": "b2b_admin", "role": "b2b_admin", "module": "platform", "component": "PlatformStatusPage", "status": "created" }
   ],
   "meta": {
-    "totalRoutes": 52,
+    "totalRoutes": 53,
     "activeRoutes": 25,
-    "createdRoutes": 27,
+    "createdRoutes": 28,
     "lastUpdated": "2025-01-23T12:00:00.000Z",
     "version": "2.0.0",
     "backendIntegration": "completed",

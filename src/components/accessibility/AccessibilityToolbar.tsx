@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Accessibility, 
-  Eye, 
-  Type, 
-  MousePointer, 
-  Volume2, 
+import {
+  Accessibility,
+  Eye,
+  Type,
+  MousePointer,
+  Volume2,
   Contrast,
   ZoomIn,
   Settings,
   X
 } from 'lucide-react';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 interface AccessibilitySettings {
   highContrast: boolean;
@@ -37,7 +42,15 @@ export const AccessibilityToolbar: React.FC = () => {
 
   // Charger les paramètres depuis localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('accessibility-settings');
+    if (typeof window === 'undefined') return;
+
+    let saved: string | null = null;
+    try {
+      saved = window.localStorage.getItem('accessibility-settings');
+    } catch (error) {
+      console.warn('[AccessibilityToolbar] Failed to read settings', error);
+    }
+
     if (saved) {
       try {
         const parsedSettings = JSON.parse(saved);
@@ -56,50 +69,56 @@ export const AccessibilityToolbar: React.FC = () => {
   ) => {
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
-    localStorage.setItem('accessibility-settings', JSON.stringify(newSettings));
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('accessibility-settings', JSON.stringify(newSettings));
+      }
+    } catch (error) {
+      console.warn('[AccessibilityToolbar] Failed to persist settings', error);
+    }
     applySettings(newSettings);
   };
 
   // Appliquer les paramètres au DOM
   const applySettings = (newSettings: AccessibilitySettings) => {
-    const root = document.documentElement;
-    const body = document.body;
+    const root = safeGetDocumentRoot();
+    const body = typeof document !== 'undefined' ? document.body : null;
 
     // Contraste élevé
     if (newSettings.highContrast) {
-      body.classList.add('high-contrast');
+      safeClassAdd(body, 'high-contrast');
     } else {
-      body.classList.remove('high-contrast');
+      safeClassRemove(body, 'high-contrast');
     }
 
     // Texte large
     if (newSettings.largeText) {
-      body.classList.add('large-text');
+      safeClassAdd(body, 'large-text');
     } else {
-      body.classList.remove('large-text');
+      safeClassRemove(body, 'large-text');
     }
 
     // Mouvement réduit
     if (newSettings.reducedMotion) {
-      body.classList.add('reduced-motion');
+      safeClassAdd(body, 'reduced-motion');
     } else {
-      body.classList.remove('reduced-motion');
+      safeClassRemove(body, 'reduced-motion');
     }
 
     // Focus amélioré
     if (newSettings.enhancedFocus) {
-      body.classList.add('enhanced-focus');
+      safeClassAdd(body, 'enhanced-focus');
     } else {
-      body.classList.remove('enhanced-focus');
+      safeClassRemove(body, 'enhanced-focus');
     }
 
     // Taille de police
     root.style.fontSize = `${newSettings.fontSize}px`;
 
     // Filtre daltonisme
-    body.classList.remove('protanopia', 'deuteranopia', 'tritanopia');
+    safeClassRemove(body, 'protanopia', 'deuteranopia', 'tritanopia');
     if (newSettings.colorBlind !== 'none') {
-      body.classList.add(newSettings.colorBlind);
+      safeClassAdd(body, newSettings.colorBlind);
     }
   };
 
@@ -110,8 +129,13 @@ export const AccessibilityToolbar: React.FC = () => {
     announcement.setAttribute('aria-atomic', 'true');
     announcement.className = 'sr-only';
     announcement.textContent = message;
+    if (typeof document === 'undefined') return;
     document.body.appendChild(announcement);
-    setTimeout(() => document.body.removeChild(announcement), 1000);
+    setTimeout(() => {
+      if (announcement.parentNode) {
+        announcement.parentNode.removeChild(announcement);
+      }
+    }, 1000);
   };
 
   const resetSettings = () => {
@@ -126,7 +150,13 @@ export const AccessibilityToolbar: React.FC = () => {
       fontSize: 16
     };
     setSettings(defaultSettings);
-    localStorage.removeItem('accessibility-settings');
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('accessibility-settings');
+      }
+    } catch (error) {
+      console.warn('[AccessibilityToolbar] Failed to clear settings', error);
+    }
     applySettings(defaultSettings);
     announceToScreenReader('Paramètres d\'accessibilité réinitialisés');
   };

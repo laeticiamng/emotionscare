@@ -5,6 +5,7 @@ import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
 import { ThemeProvider, I18nProvider } from '@/COMPONENTS.reg';
+import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 
 // Configuration de l'attribut lang pour l'accessibilité
 document.documentElement.lang = 'fr';
@@ -28,6 +29,11 @@ const addAccessibilityMeta = () => {
 };
 
 addAccessibilityMeta();
+
+if (typeof window !== 'undefined') {
+  initializeSentry();
+  monitorDOMErrors();
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
