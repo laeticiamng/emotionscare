@@ -421,63 +421,63 @@
 
 /* Semantic colors utility classes */
 .bg-success {
-  @apply bg-success-500 dark:bg-success-600;
+  @apply bg-green-500 dark:bg-green-600;
 }
 
 .bg-success-subtle {
-  @apply bg-success-50 dark:bg-success-900/30;
+  @apply bg-green-50 dark:bg-green-900/30;
 }
 
 .text-success {
-  @apply text-success-700 dark:text-success-400;
+  @apply text-green-700 dark:text-green-400;
 }
 
 .border-success {
-  @apply border-success-500 dark:border-success-400;
+  @apply border-green-500 dark:border-green-400;
 }
 
 .ring-success {
-  @apply ring-success-400 dark:ring-success-500;
+  @apply ring-green-400 dark:ring-green-500;
 }
 
 .bg-warning {
-  @apply bg-warning-500 dark:bg-warning-600;
+  @apply bg-orange-500 dark:bg-orange-600;
 }
 
 .bg-warning-subtle {
-  @apply bg-warning-50 dark:bg-warning-900/30;
+  @apply bg-orange-50 dark:bg-orange-900/30;
 }
 
 .text-warning {
-  @apply text-warning-700 dark:text-warning-400;
+  @apply text-orange-700 dark:text-orange-400;
 }
 
 .border-warning {
-  @apply border-warning-500 dark:border-warning-400;
+  @apply border-orange-500 dark:border-orange-400;
 }
 
 .ring-warning {
-  @apply ring-warning-400 dark:ring-warning-500;
+  @apply ring-orange-400 dark:ring-orange-500;
 }
 
 .bg-info {
-  @apply bg-info-500 dark:bg-info-600;
+  @apply bg-blue-500 dark:bg-blue-600;
 }
 
 .bg-info-subtle {
-  @apply bg-info-50 dark:bg-info-900/30;
+  @apply bg-blue-50 dark:bg-blue-900/30;
 }
 
 .text-info {
-  @apply text-info-700 dark:text-info-400;
+  @apply text-blue-700 dark:text-blue-400;
 }
 
 .border-info {
-  @apply border-info-500 dark:border-info-400;
+  @apply border-blue-500 dark:border-blue-400;
 }
 
 .ring-info {
-  @apply ring-info-400 dark:ring-info-500;
+  @apply ring-blue-400 dark:ring-blue-500;
 }
 
 .bg-error {
@@ -485,15 +485,15 @@
 }
 
 .bg-error-subtle {
-  @apply bg-destructive-50 dark:bg-destructive-900/30;
+  @apply bg-red-50 dark:bg-red-900/30;
 }
 
 .text-error {
-  @apply text-destructive-700 dark:text-destructive-400;
+  @apply text-destructive dark:text-red-400;
 }
 
 .border-error {
-  @apply border-destructive dark:border-destructive-400;
+  @apply border-destructive dark:border-red-400;
 }
 
 .ring-error {
@@ -512,17 +512,17 @@
 
 /* Alert & notification styles */
 .alert-success {
-  @apply bg-success-50 border-success-200 text-success-800 dark:bg-success-900/20 dark:border-success-800/30 dark:text-success-200;
+  @apply bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800/30 dark:text-green-200;
 }
 
 .alert-warning {
-  @apply bg-warning-50 border-warning-200 text-warning-800 dark:bg-warning-900/20 dark:border-warning-800/30 dark:text-warning-200;
+  @apply bg-orange-50 border-orange-200 text-orange-800 dark:bg-orange-900/20 dark:border-orange-800/30 dark:text-orange-200;
 }
 
 .alert-info {
-  @apply bg-info-50 border-info-200 text-info-800 dark:bg-info-900/20 dark:border-info-800/30 dark:text-info-200;
+  @apply bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800/30 dark:text-blue-200;
 }
 
 .alert-error {
-  @apply bg-destructive-50 border-destructive-200 text-destructive-800 dark:bg-destructive-900/20 dark:border-destructive-800/30 dark:text-destructive-200;
+  @apply bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800/30 dark:text-red-200;
 }

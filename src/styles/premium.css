@@ -1,5 +1,5 @@
 
-@layer components {
+/* Premium components styles */
   /* Premium theme-specific styling */
   .theme-light .premium-card {
     @apply bg-white shadow-md border border-gray-100;
@@ -51,4 +51,3 @@
   .pastel .glass-effect {
     @apply bg-blue-50/80 border-blue-100/30;
   }
-}
