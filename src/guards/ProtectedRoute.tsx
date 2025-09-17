@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { routes } from '@/routerV2';
+import { routes } from '@/routerV2/routes';
 import { Loader2 } from 'lucide-react';
 
-interface ProtectedRouteProps {
+export interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
   allowedRoles?: string[];

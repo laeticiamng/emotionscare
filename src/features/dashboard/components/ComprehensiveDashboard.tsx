@@ -39,6 +39,17 @@ interface QuickAction {
   isPremium?: boolean;
 }
 
+interface ScanResult {
+  id: string;
+  timestamp: Date;
+  dominantEmotion: string;
+  score: number;
+  confidence: number;
+  energyLevel: string;
+  insight?: string;
+  tags?: string[];
+}
+
 /**
  * Dashboard complet - Vue d'ensemble de l'activité utilisateur
  * Intégration avec toutes les fonctionnalités via le système de navigation unifié
@@ -64,6 +75,13 @@ export function ComprehensiveDashboard() {
     queryKey: ['recommendations', user?.id],
     queryFn: () => fetchRecommendations(user?.id),
     enabled: isAuthenticated,
+  });
+
+  const { data: recentScans, isLoading: scansLoading } = useQuery({
+    queryKey: ['recent-scans', user?.id],
+    queryFn: () => fetchRecentScans(user?.id),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
   });
 
   // Actions rapides définies via le schéma de navigation
@@ -250,7 +268,7 @@ export function ComprehensiveDashboard() {
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Activité récente */}
         <Card>
           <CardHeader>
@@ -289,6 +307,79 @@ export function ComprehensiveDashboard() {
               <div className="text-center py-8 text-muted-foreground">
                 <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p>Aucune activité récente</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Derniers scans */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Derniers scans
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {scansLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="animate-pulse space-y-3 rounded-lg border p-4"
+                  >
+                    <div className="h-4 w-1/3 rounded bg-muted"></div>
+                    <div className="h-3 w-1/2 rounded bg-muted"></div>
+                    <div className="h-2 w-full rounded bg-muted"></div>
+                  </div>
+                ))}
+              </div>
+            ) : recentScans?.length ? (
+              <div className="space-y-3">
+                {recentScans.map((scan: ScanResult, index: number) => (
+                  <motion.div
+                    key={scan.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="space-y-3 rounded-lg border p-4"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{scan.dominantEmotion}</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {formatRelativeTime(scan.timestamp)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-semibold">
+                        <Heart className="h-4 w-4 text-rose-500" />
+                        {scan.score}/10
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{scan.energyLevel}</span>
+                      <span>Confiance {scan.confidence}%</span>
+                    </div>
+                    <Progress value={scan.confidence} className="h-1" />
+                    {scan.insight && (
+                      <p className="text-sm text-muted-foreground">{scan.insight}</p>
+                    )}
+                    {scan.tags?.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {scan.tags.map(tag => (
+                          <Badge key={tag} variant="outline" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Heart className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>Aucun scan récent</p>
               </div>
             )}
           </CardContent>
@@ -491,7 +582,7 @@ async function fetchRecentActivity(userId?: string): Promise<RecentActivity[]> {
 
 async function fetchRecommendations(userId?: string) {
   await new Promise(resolve => setTimeout(resolve, 700));
-  
+
   return [
     {
       id: '1',
@@ -508,6 +599,43 @@ async function fetchRecommendations(userId?: string) {
       description: 'Plus que 2 sessions pour atteindre votre objectif.',
       priority: 'medium',
       actionButton: 'Voir mes objectifs',
+    },
+  ];
+}
+
+async function fetchRecentScans(userId?: string): Promise<ScanResult[]> {
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  return [
+    {
+      id: 'scan-1',
+      timestamp: new Date(Date.now() - 30 * 60 * 1000),
+      dominantEmotion: 'Sérénité',
+      score: 8.5,
+      confidence: 92,
+      energyLevel: 'Énergie stable',
+      insight: 'Moments de calme détectés, continuez vos exercices de respiration.',
+      tags: ['Matin', 'Respiration'],
+    },
+    {
+      id: 'scan-2',
+      timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
+      dominantEmotion: 'Concentration',
+      score: 7.2,
+      confidence: 88,
+      energyLevel: 'Légère tension',
+      insight: 'Une pause musicale pourrait vous aider à relâcher la pression.',
+      tags: ['Travail', 'Focus'],
+    },
+    {
+      id: 'scan-3',
+      timestamp: new Date(Date.now() - 26 * 60 * 60 * 1000),
+      dominantEmotion: 'Fatigue',
+      score: 5.9,
+      confidence: 81,
+      energyLevel: 'Énergie basse',
+      insight: 'Pensez à planifier un moment de repos ou une session de relaxation.',
+      tags: ['Soir', 'Repos'],
     },
   ];
 }

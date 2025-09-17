@@ -1,11 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { routes } from '@/routerV2';
+import { routes } from '@/routerV2/routes';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
-interface RoleProtectedRouteProps {
+export interface RoleProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles: string[];
   redirectTo?: string;

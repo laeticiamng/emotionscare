@@ -26,6 +26,7 @@ export default function AdaptiveMusicPage() {
           <div style={{ display: "grid", gap: 12 }}>
             <AudioPlayer
               src="/audio/lofi-120.mp3"
+              trackId="adaptive-lofi-120"
               title="Lofi 120"
               loop
               defaultVolume={0.75}

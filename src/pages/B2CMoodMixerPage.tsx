@@ -9,6 +9,9 @@ import { FadeIn, SeoHead } from '@/COMPONENTS.reg';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
+import { useMusicControls } from '@/hooks/useMusicControls';
+import { adaptiveMusicService } from '@/services/adaptiveMusicService';
+import type { MusicTrack } from '@/types/music';
 
 interface MoodVibe {
   id: string;
@@ -45,13 +48,16 @@ const B2CMoodMixerPage: React.FC = () => {
   const { shouldAnimate } = useMotionPrefs();
   const [softness, setSoftness] = useState([50]);
   const [clarity, setClarity] = useState([50]);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentVibe, setCurrentVibe] = useState<string>('');
   const [savedVibes, setSavedVibes] = useState<MoodVibe[]>([]);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
   const [isLoadingPresets, setIsLoadingPresets] = useState(true);
   const [isSavingPreset, setIsSavingPreset] = useState(false);
   const [dustParticles, setDustParticles] = useState<Array<{ x: number; y: number; opacity: number }>>([]);
+  const [isFetchingPreview, setIsFetchingPreview] = useState(false);
+  const [previewSource, setPreviewSource] = useState<'api' | 'mock'>('mock');
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const { playTrack, pause, isPlaying: isPreviewPlaying, isLoading: isAudioLoading, currentTrack } = useMusicControls();
 
   // Générateur de nom de vibe basé sur les sliders
   const generateVibeName = useCallback((soft: number, clear: number) => {
@@ -141,9 +147,132 @@ const B2CMoodMixerPage: React.FC = () => {
     setCurrentVibe(vibeName);
   }, [softness, clarity, generateVibeName]);
 
-  const handlePlay = () => {
-    setIsPlaying(!isPlaying);
-    // Simulation de lecture audio avec crossfade
+  const determineTargetEmotion = (soft: number, clear: number) => {
+    if (soft >= 65 && clear <= 40) return 'calm';
+    if (clear >= 65 && soft <= 40) return 'happy';
+    if (soft <= 35 && clear <= 35) return 'anxious';
+    if (soft >= 65 && clear >= 65) return 'happy';
+    return 'calm';
+  };
+
+  const normalizeTrack = (trackData: RawTrack | null | undefined, fallbackEmotion: string): MusicTrack | null => {
+    if (!trackData) return null;
+
+    const sourceUrl = trackData.audioUrl || trackData.url;
+    if (!sourceUrl) return null;
+
+    return {
+      id: trackData.id ?? `preview-${fallbackEmotion}-${Date.now()}`,
+      title: trackData.title ?? trackData.name ?? 'Aperçu adaptatif',
+      artist: trackData.artist ?? trackData.author ?? 'Adaptive Music',
+      duration: trackData.duration ?? 180,
+      emotion: trackData.emotion ?? fallbackEmotion,
+      mood: trackData.mood ?? fallbackEmotion,
+      coverUrl: trackData.coverUrl ?? trackData.imageUrl,
+      tags: trackData.tags,
+      isGenerated: trackData.isGenerated,
+      generatedAt: trackData.generatedAt,
+      sunoTaskId: trackData.sunoTaskId,
+      bpm: trackData.bpm,
+      key: trackData.key,
+      energy: trackData.energy,
+      url: sourceUrl,
+      audioUrl: sourceUrl,
+    };
+  };
+
+  const getMockTrack = (emotion: string): MusicTrack => {
+    if (emotion === 'happy') {
+      return {
+        id: 'mock-happy-preview',
+        title: 'Rayon de Soleil',
+        artist: 'EmotionsCare Adaptive',
+        url: '/audio/lofi-120.mp3',
+        audioUrl: '/audio/lofi-120.mp3',
+        duration: 120,
+        emotion: 'happy',
+        mood: 'happy',
+      };
+    }
+
+    return {
+      id: `mock-${emotion}-preview`,
+      title: 'Pluie Relaxante',
+      artist: 'EmotionsCare Adaptive',
+      url: '/audio/rain-soft.mp3',
+      audioUrl: '/audio/rain-soft.mp3',
+      duration: 150,
+      emotion: emotion,
+      mood: emotion,
+    };
+  };
+
+  const handlePreviewToggle = async () => {
+    if (isPreviewPlaying) {
+      pause();
+      return;
+    }
+
+    if (isFetchingPreview || isAudioLoading) return;
+
+    setPreviewError(null);
+    setIsFetchingPreview(true);
+
+    const targetEmotion = determineTargetEmotion(softness[0], clarity[0]);
+    let source: 'api' | 'mock' = 'mock';
+    let previewTrack: MusicTrack | null = null;
+
+    try {
+      const response = await fetch('/api/modules/adaptive-music/preview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          vibe: currentVibe,
+          emotion: targetEmotion,
+          sliders: {
+            softness: softness[0],
+            clarity: clarity[0]
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const normalized = normalizeTrack(data?.track ?? data, targetEmotion);
+        if (normalized) {
+          previewTrack = normalized;
+          source = 'api';
+        }
+      } else {
+        console.warn('Adaptive music preview API returned an error:', response.status);
+      }
+    } catch (error) {
+      console.warn('Adaptive music preview API unavailable, using mock fallback.', error);
+    }
+
+    if (!previewTrack) {
+      const recommended = adaptiveMusicService.getRecommendedTrack(targetEmotion);
+      previewTrack = normalizeTrack(recommended, targetEmotion) ?? getMockTrack(targetEmotion);
+    }
+
+    if (!previewTrack?.url) {
+      setPreviewError('Impossible de charger une pré-écoute pour le moment.');
+      setIsFetchingPreview(false);
+      return;
+    }
+
+    setPreviewSource(source);
+
+    try {
+      await playTrack(previewTrack);
+    } catch (error) {
+      console.error('Erreur pendant la lecture de la pré-écoute.', error);
+      setPreviewError('Lecture impossible. Réessayez plus tard.');
+    } finally {
+      setIsFetchingPreview(false);
+    }
   };
 
   const saveCurrentVibe = useCallback(async () => {
@@ -407,11 +536,17 @@ const B2CMoodMixerPage: React.FC = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={handlePlay}
+              onClick={handlePreviewToggle}
               className="hover:bg-white/10"
               aria-label={isPlaying ? 'Mettre la lecture en pause' : 'Lancer la lecture du mix'}
             >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {isPreviewPlaying ? (
+                <Pause className="h-4 w-4" />
+              ) : (isFetchingPreview || isAudioLoading) ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
             </Button>
             <Button
               variant="ghost"
@@ -441,6 +576,22 @@ const B2CMoodMixerPage: React.FC = () => {
               <Volume2 className="h-4 w-4 text-muted-foreground mx-auto" />
             </div>
           </div>
+
+          {currentTrack && (
+            <div className="mt-4 text-center text-xs text-muted-foreground space-y-1">
+              <p className="text-sm font-medium text-foreground">{currentTrack.title}</p>
+              <p>{currentTrack.artist}</p>
+              <p>
+                {previewSource === 'api'
+                  ? 'Aperçu via Adaptive Music'
+                  : 'Aperçu simulé (mock adaptatif)'}
+              </p>
+            </div>
+          )}
+
+          {previewError && (
+            <p className="mt-3 text-xs text-destructive text-center">{previewError}</p>
+          )}
         </Card>
 
         {/* Bibliothèque de vibes */}

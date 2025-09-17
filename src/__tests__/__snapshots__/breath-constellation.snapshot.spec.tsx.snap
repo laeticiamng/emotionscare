@@ -7,7 +7,7 @@ exports[`BreathConstellationPage > rend la page et le CTA Démarrer 1`] = `
   >
     <div
       class="relative overflow-hidden rounded-2xl p-6 mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background"
-      style="opacity: 0; transform: translateY(-20px);"
+      style="opacity: 0; transform: translateY(-20px) translateZ(0);"
     >
       <div
         class="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/30 to-pink-50/20 dark:from-blue-900/10 dark:via-purple-900/5 dark:to-pink-900/5"

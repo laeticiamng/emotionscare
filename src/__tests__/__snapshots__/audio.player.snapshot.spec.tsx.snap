@@ -7,17 +7,29 @@ exports[`AudioPlayer > renders and exposes volume slider 1`] = `
     style="display: grid; gap: 8px;"
   >
     <div
-      style="display: flex; gap: 8px; align-items: center;"
+      style="display: grid; gap: 6px;"
     >
-      <button
-        aria-pressed="false"
-        data-ui="primary-cta"
-      >
-        Lecture
-      </button>
       <strong>
         Test
       </strong>
+      <div
+        style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;"
+      >
+        <button
+          aria-pressed="false"
+          data-ui="primary-cta"
+          type="button"
+        >
+          Lecture
+        </button>
+        <button
+          aria-pressed="true"
+          data-ui="favorite-toggle"
+          type="button"
+        >
+          Retirer des favoris
+        </button>
+      </div>
     </div>
     <label
       style="display: flex; gap: 8px; align-items: center;"
@@ -32,6 +44,11 @@ exports[`AudioPlayer > renders and exposes volume slider 1`] = `
         value="0.8"
       />
     </label>
+    <small
+      style="opacity: 0.75;"
+    >
+      Sauvegardé dans vos favoris locaux.
+    </small>
   </div>
 </div>
 `;

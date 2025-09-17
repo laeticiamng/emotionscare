@@ -38,8 +38,8 @@ export default function ComprehensiveDuplicatesAnalysis() {
           {
             group: "Route Protection",
             files: [
-              "src/components/ProtectedRoute.tsx",
-              "src/components/RoleProtectedRoute.tsx",
+              "src/guards/ProtectedRoute.tsx",
+              "src/guards/RoleProtectedRoute.tsx",
               "src/components/ProtectedLayout.tsx", 
               "src/components/ProtectedLayoutWrapper.tsx",
               "src/app/guards/ProtectedRoute.tsx"

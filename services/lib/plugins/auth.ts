@@ -20,6 +20,7 @@ export const authPlugin: FastifyPluginAsync = async app => {
       (req as any).user = await verifyJwt(token);
     } catch {
       reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Invalid token' } });
+      return;
     }
   });
 };

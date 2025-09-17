@@ -10,6 +10,7 @@ type Handle = {
   setLoop: (loop: boolean) => void;
   getCurrentTime: () => number;
   getDuration: () => number | null;
+  seek: (time: number) => void;
   onEnded: (cb: () => void) => void;
 };
 
@@ -42,6 +43,10 @@ export async function createAudioHandle(src: Source): Promise<Handle> {
       setLoop: (loop: boolean) => { el.loop = loop; },
       getCurrentTime: () => el.currentTime,
       getDuration: () => el.duration || null,
+      seek: (time: number) => {
+        const clamped = Math.max(0, Math.min(time, el.duration || Infinity));
+        el.currentTime = clamped;
+      },
       onEnded: (cb) => { endedCb = cb; }
     };
   }
@@ -98,6 +103,17 @@ export async function createAudioHandle(src: Source): Promise<Handle> {
       return Math.min(buf.duration, (getCtx()?.currentTime ?? 0) - startedAt);
     },
     getDuration: () => buf?.duration ?? null,
+    seek: (time: number) => {
+      if (!buf) return;
+      const clamped = Math.max(0, Math.min(buf.duration, time));
+      pausedAt = clamped;
+      if (srcNode) {
+        srcNode.stop(0);
+        srcNode.disconnect();
+        startNode(clamped);
+        startedAt = (getCtx()?.currentTime ?? 0) - clamped;
+      }
+    },
     onEnded: (cb) => { endedCb = cb; }
   };
 }
