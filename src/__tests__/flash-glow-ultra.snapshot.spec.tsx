@@ -5,6 +5,7 @@ vi.mock("@/COMPONENTS.reg", () => ({
   Card: ({ children }: any) => <div>{children}</div>,
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
   GlowSurface: () => <div>glow</div>,
+  ProgressBar: ({ value }: any) => <div>progress:{value}</div>,
   usePulseClock: () => 0
 }));
 import FlashGlowUltraPage from "@/modules/flash-glow-ultra/FlashGlowUltraPage";
