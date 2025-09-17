@@ -35,6 +35,8 @@ interface ChatMessage {
     confidence?: number;
     category?: string;
   };
+  suggestions?: string[];
+  disclaimers?: string[];
 }
 
 interface CoachPersonality {
@@ -76,6 +78,11 @@ const VirtualCoach: React.FC = () => {
     { text: 'Exercices de relaxation', icon: Target, color: 'text-green-500' }
   ];
 
+  const DEFAULT_DISCLAIMERS = [
+    "Le coach IA ne remplace pas un professionnel de santé.",
+    "En cas d'urgence ou de détresse, contactez les services d'urgence (112 en Europe).",
+  ];
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -113,7 +120,9 @@ const VirtualCoach: React.FC = () => {
           emotion: response.detectedEmotion,
           confidence: response.confidence,
           category: response.category
-        }
+        },
+        suggestions: response.suggestions,
+        disclaimers: response.disclaimers && response.disclaimers.length > 0 ? response.disclaimers : DEFAULT_DISCLAIMERS
       };
 
       setMessages(prev => [...prev, coachResponse]);
@@ -132,7 +141,8 @@ const VirtualCoach: React.FC = () => {
         content: 'Je rencontre une petite difficulté technique. Pouvez-vous réessayer ? En attendant, prenez quelques respirations profondes.',
         sender: 'coach',
         timestamp: new Date(),
-        type: 'text'
+        type: 'text',
+        disclaimers: DEFAULT_DISCLAIMERS
       };
       setMessages(prev => [...prev, errorResponse]);
     } finally {
@@ -245,15 +255,15 @@ const VirtualCoach: React.FC = () => {
                   </Avatar>
                   
                   <div className={`max-w-[70%] ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
-                    <div 
+                    <div
                       className={`p-3 rounded-lg ${
-                        message.sender === 'user' 
-                          ? 'bg-primary text-primary-foreground ml-auto' 
+                        message.sender === 'user'
+                          ? 'bg-primary text-primary-foreground ml-auto'
                           : 'bg-muted'
                       }`}
                     >
                       <p className="text-sm leading-relaxed">{message.content}</p>
-                      
+
                       {message.metadata && (
                         <div className="mt-2 flex gap-1">
                           {message.metadata.emotion && (
@@ -268,11 +278,37 @@ const VirtualCoach: React.FC = () => {
                           )}
                         </div>
                       )}
+
+                      {message.sender === 'coach' && message.suggestions && message.suggestions.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {message.suggestions.map((suggestion, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {suggestion}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {message.sender === 'coach' && message.disclaimers && message.disclaimers.length > 0 && (
+                        <div className="mt-3 rounded-md border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-900">
+                          <p className="mb-1 flex items-center gap-2 font-medium">
+                            <Sparkles className="h-3 w-3 text-amber-500" />
+                            Avertissement important
+                          </p>
+                          <ul className="list-disc space-y-1 pl-4">
+                            {message.disclaimers.map((disclaimer, index) => (
+                              <li key={index} className="leading-snug">
+                                {disclaimer}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 px-3">
-                      {message.timestamp.toLocaleTimeString('fr-FR', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
+                      {message.timestamp.toLocaleTimeString('fr-FR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
                       })}
                     </p>
                   </div>
