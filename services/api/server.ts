@@ -2,6 +2,7 @@ import { VoiceSchema, TextSchema } from '../journal/lib/validate';
 import { hash } from '../journal/lib/hash';
 import { insertVoice, insertText, listFeed } from '../journal/lib/db';
 import { createServer } from '../lib/server';
+import { moodPlaylistRequestSchema, buildMoodPlaylistResponse } from './music';
 
 export function createApp() {
   return createServer({
@@ -36,6 +37,25 @@ export function createApp() {
         const userHash = hash(req.user.sub);
         const entries = listFeed(userHash);
         reply.send({ ok: true, data: { entries, weekly: [] } });
+      });
+
+      app.post('/api/mood_playlist', async (req, reply) => {
+        const parsed = moodPlaylistRequestSchema.safeParse(req.body);
+
+        if (!parsed.success) {
+          reply.code(422).send({
+            ok: false,
+            error: {
+              code: 'invalid_payload',
+              message: 'Invalid mood playlist payload',
+              details: parsed.error.flatten(),
+            },
+          });
+          return;
+        }
+
+        const playlist = buildMoodPlaylistResponse(parsed.data);
+        reply.send({ ok: true, data: playlist });
       });
     },
   });
