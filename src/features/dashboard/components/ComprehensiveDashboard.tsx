@@ -12,6 +12,12 @@ import { NavButton } from '@/components/navigation/NavButton';
 import { NAV_SCHEMA, findNavNode } from '@/lib/nav-schema';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
+import { Sparkline } from '@/COMPONENTS.reg';
+import {
+  getEmotionScanHistory,
+  deriveScore10,
+  type EmotionScanHistoryEntry,
+} from '@/services/emotionScan.service';
 
 interface DashboardStats {
   totalSessions: number;
@@ -83,6 +89,18 @@ export function ComprehensiveDashboard() {
     enabled: isAuthenticated,
     staleTime: 60 * 1000,
   });
+
+  const scanTimeline = React.useMemo(
+    () => (recentScans ?? []).slice().reverse().map(scan => Math.round(scan.score * 10)),
+    [recentScans]
+  );
+
+  const scanTrend = React.useMemo(() => {
+    if (!recentScans?.length) return null;
+    const oldest = recentScans[recentScans.length - 1];
+    const latest = recentScans[0];
+    return Number((latest.score - oldest.score).toFixed(1));
+  }, [recentScans]);
 
   // Actions rapides définies via le schéma de navigation
   const quickActions: QuickAction[] = [
@@ -335,46 +353,59 @@ export function ComprehensiveDashboard() {
                 ))}
               </div>
             ) : recentScans?.length ? (
-              <div className="space-y-3">
-                {recentScans.map((scan: ScanResult, index: number) => (
-                  <motion.div
-                    key={scan.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="space-y-3 rounded-lg border p-4"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{scan.dominantEmotion}</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {formatRelativeTime(scan.timestamp)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm font-semibold">
-                        <Heart className="h-4 w-4 text-rose-500" />
-                        {scan.score}/10
-                      </div>
+              <div className="space-y-4">
+                {scanTimeline.length > 1 && (
+                  <div className="space-y-1">
+                    <div className="text-primary">
+                      <Sparkline values={scanTimeline} width={360} height={48} />
                     </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{scan.energyLevel}</span>
-                      <span>Confiance {scan.confidence}%</span>
-                    </div>
-                    <Progress value={scan.confidence} className="h-1" />
-                    {scan.insight && (
-                      <p className="text-sm text-muted-foreground">{scan.insight}</p>
-                    )}
-                    {scan.tags?.length ? (
-                      <div className="flex flex-wrap gap-2">
-                        {scan.tags.map(tag => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
+                    <p className="text-xs text-muted-foreground">
+                      Tendance émotionnelle {scanTrend !== null ? `${scanTrend >= 0 ? '+' : ''}${scanTrend.toFixed(1)} pts` : ''} sur {recentScans.length} scans
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  {recentScans.map((scan: ScanResult, index: number) => (
+                    <motion.div
+                      key={scan.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="space-y-3 rounded-lg border p-4"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary">{scan.dominantEmotion}</Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {formatRelativeTime(scan.timestamp)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm font-semibold">
+                          <Heart className="h-4 w-4 text-rose-500" />
+                          {scan.score}/10
+                        </div>
                       </div>
-                    ) : null}
-                  </motion.div>
-                ))}
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{scan.energyLevel}</span>
+                        <span>Confiance {scan.confidence}%</span>
+                      </div>
+                      <Progress value={scan.confidence} className="h-1" />
+                      {scan.insight && (
+                        <p className="text-sm text-muted-foreground">{scan.insight}</p>
+                      )}
+                      {scan.tags?.length ? (
+                        <div className="flex flex-wrap gap-2">
+                          {scan.tags.map(tag => (
+                            <Badge key={tag} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : null}
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
@@ -604,38 +635,70 @@ async function fetchRecommendations(userId?: string) {
 }
 
 async function fetchRecentScans(userId?: string): Promise<ScanResult[]> {
-  await new Promise(resolve => setTimeout(resolve, 500));
+  if (!userId) {
+    return [];
+  }
 
-  return [
-    {
-      id: 'scan-1',
-      timestamp: new Date(Date.now() - 30 * 60 * 1000),
-      dominantEmotion: 'Sérénité',
-      score: 8.5,
-      confidence: 92,
-      energyLevel: 'Énergie stable',
-      insight: 'Moments de calme détectés, continuez vos exercices de respiration.',
-      tags: ['Matin', 'Respiration'],
-    },
-    {
-      id: 'scan-2',
-      timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
-      dominantEmotion: 'Concentration',
-      score: 7.2,
-      confidence: 88,
-      energyLevel: 'Légère tension',
-      insight: 'Une pause musicale pourrait vous aider à relâcher la pression.',
-      tags: ['Travail', 'Focus'],
-    },
-    {
-      id: 'scan-3',
-      timestamp: new Date(Date.now() - 26 * 60 * 60 * 1000),
-      dominantEmotion: 'Fatigue',
-      score: 5.9,
-      confidence: 81,
-      energyLevel: 'Énergie basse',
-      insight: 'Pensez à planifier un moment de repos ou une session de relaxation.',
-      tags: ['Soir', 'Repos'],
-    },
-  ];
+  try {
+    const entries = await getEmotionScanHistory(userId, 12);
+    return entries.map(mapHistoryEntryToScan);
+  } catch (error) {
+    console.error('Unable to fetch emotion scans', error);
+    return [];
+  }
+}
+
+function mapHistoryEntryToScan(entry: EmotionScanHistoryEntry): ScanResult {
+  const score10 = Number(deriveScore10(entry.normalizedBalance).toFixed(1));
+  const energyLevel = score10 >= 7
+    ? 'Énergie élevée'
+    : score10 >= 4
+      ? 'Énergie stable'
+      : 'Énergie basse';
+
+  return {
+    id: entry.id,
+    timestamp: new Date(entry.createdAt),
+    dominantEmotion: entry.mood ?? 'Indéterminé',
+    score: score10,
+    confidence: entry.confidence,
+    energyLevel,
+    insight: entry.insights[0] ?? entry.summary ?? undefined,
+    tags: buildScanTags(entry),
+  };
+}
+
+function buildScanTags(entry: EmotionScanHistoryEntry): string[] {
+  const tags = new Set<string>();
+
+  if (entry.mood) {
+    tags.add(capitalize(entry.mood));
+  }
+
+  if (entry.scanType) {
+    tags.add(scanTypeLabel(entry.scanType));
+  }
+
+  if (entry.recommendations.length) {
+    tags.add('Conseils IA');
+  }
+
+  return Array.from(tags);
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function scanTypeLabel(value: string) {
+  switch (value) {
+    case 'text':
+      return 'Analyse texte';
+    case 'voice':
+      return 'Analyse vocale';
+    case 'facial':
+      return 'Analyse faciale';
+    default:
+      return capitalize(value);
+  }
 }

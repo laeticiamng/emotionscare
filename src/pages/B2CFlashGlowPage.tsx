@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { usePageMetadata } from '@/hooks/usePageMetadata';
 import { useFlashGlowMachine } from '@/modules/flash-glow/useFlashGlowMachine';
 import VelvetPulse from '@/modules/flash-glow/ui/VelvetPulse';
 import EndChoice from '@/modules/flash-glow/ui/EndChoice';
+import { Progress } from '@/components/ui/progress';
 
 /**
  * B2C FLASH GLOW PAGE - EMOTIONSCARE
@@ -17,6 +18,7 @@ import EndChoice from '@/modules/flash-glow/ui/EndChoice';
  */
 const B2CFlashGlowPage: React.FC = () => {
   const machine = useFlashGlowMachine();
+  const [moodBefore, setMoodBefore] = useState(50);
   
   // Charger les stats au montage
   useEffect(() => {
@@ -95,11 +97,31 @@ const B2CFlashGlowPage: React.FC = () => {
   const handleGlowTypeChange = (newType: string) => {
     const typeConfig = glowTypes[newType as keyof typeof glowTypes];
     if (typeConfig) {
-      machine.setConfig({ 
+      machine.setConfig({
         glowType: newType,
         duration: typeConfig.defaultDuration
       });
     }
+  };
+
+  const formattedElapsed = useMemo(() => {
+    const minutes = Math.floor(machine.elapsedSeconds / 60);
+    const seconds = machine.elapsedSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }, [machine.elapsedSeconds]);
+
+  const formattedRemaining = useMemo(() => {
+    const minutes = Math.floor(machine.remainingSeconds / 60);
+    const seconds = machine.remainingSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }, [machine.remainingSeconds]);
+
+  const handleStartSession = async () => {
+    await machine.startSession({ moodBaseline: moodBefore });
+  };
+
+  const handleCompletion = async (payload: { label: 'gain' | 'léger' | 'incertain'; extend?: boolean; moodAfter?: number | null }) => {
+    await machine.onSessionComplete(payload);
   };
 
   return (
@@ -165,13 +187,10 @@ const B2CFlashGlowPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-500" aria-label={`État actuel: ${
-              machine.state === 'success' ? 'Terminée avec succès' : 
-              machine.state === 'active' ? 'Session active' : 'En attente'
-            }`}>
-              {machine.state === 'success' ? '✨' : machine.state === 'active' ? '🔥' : '💤'}
+            <div className="text-2xl font-bold text-blue-500" aria-live="polite">
+              {machine.moodDelta !== null ? `${machine.moodDelta > 0 ? '+' : ''}${machine.moodDelta}` : '—'}
             </div>
-            <div className="text-sm text-muted-foreground">État</div>
+            <div className="text-sm text-muted-foreground">Δ humeur</div>
           </CardContent>
         </Card>
       </section>
@@ -183,9 +202,10 @@ const B2CFlashGlowPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <EndChoice
-            onChoice={machine.onSessionComplete}
+            onChoice={handleCompletion}
             sessionDuration={machine.sessionDuration}
             className="max-w-lg mx-auto"
+            moodBefore={moodBefore}
           />
         </motion.div>
       )}
@@ -241,6 +261,29 @@ const B2CFlashGlowPage: React.FC = () => {
               <h3 id="controls-title" className="sr-only">Contrôles de personnalisation</h3>
               <div>
                 <div className="flex justify-between items-center mb-2">
+                  <label htmlFor="mood-before-slider" className="text-sm font-medium">Ressenti initial</label>
+                  <Badge variant="outline" aria-label={`Humeur initiale ${moodBefore} sur 100`}>
+                    {moodBefore}/100
+                  </Badge>
+                </div>
+                <Slider
+                  id="mood-before-slider"
+                  value={[moodBefore]}
+                  onValueChange={([value]) => {
+                    const clamped = Math.max(0, Math.min(100, Math.round(value)));
+                    setMoodBefore(clamped);
+                    machine.setMoodBaseline(clamped);
+                  }}
+                  max={100}
+                  min={0}
+                  step={1}
+                  disabled={machine.isActive || machine.isLoading}
+                  className="w-full"
+                  aria-label="Régler votre humeur avant la session"
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-2">
                   <label htmlFor="intensity-slider" className="text-sm font-medium">Intensité Glow</label>
                   <Badge variant="outline" aria-label={`Intensité actuelle ${machine.config.intensity} pourcent`}>
                     {machine.config.intensity}%
@@ -294,11 +337,19 @@ const B2CFlashGlowPage: React.FC = () => {
               />
             </div>
 
+            <div className="space-y-2" aria-live="polite">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Écoulé : {formattedElapsed}</span>
+                <span>Restant : {formattedRemaining}</span>
+              </div>
+              <Progress value={Math.min(100, Math.round(machine.sessionProgress * 100))} />
+            </div>
+
             {/* Contrôles principaux */}
             <div className="flex gap-3">
               {machine.state === 'idle' && (
-                <Button 
-                  onClick={machine.startSession}
+                <Button
+                  onClick={handleStartSession}
                   size="lg"
                   className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                 >

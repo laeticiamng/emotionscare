@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { VoiceSchema, TextSchema } from '../journal/lib/validate';
 import { hash } from '../journal/lib/hash';
 import { insertVoice, insertText, listFeed } from '../journal/lib/db';
@@ -28,6 +31,64 @@ const defaultJournalDb: JournalDb = {
   listFeed,
 };
 
+type HealthServiceState = {
+  api: boolean;
+  database: boolean;
+  storage: boolean;
+  ai: boolean;
+};
+
+type HealthPayload = {
+  ok: boolean;
+  version: string;
+  uptime: number;
+  timestamp: string;
+  services: HealthServiceState;
+  metrics: {
+    rss: number;
+    heapUsed: number;
+  };
+};
+
+const appStartedAt = Date.now();
+
+const resolveVersion = (() => {
+  let cached: string | null = null;
+  return () => {
+    if (cached) return cached;
+    try {
+      const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
+      cached = pkg.version ?? '0.0.0';
+    } catch {
+      cached = '0.0.0';
+    }
+    return cached;
+  };
+})();
+
+const buildHealthPayload = (): HealthPayload => {
+  const services: HealthServiceState = {
+    api: true,
+    database: Boolean(process.env.DATABASE_URL || process.env.SUPABASE_URL),
+    storage: Boolean(process.env.SUPABASE_STORAGE_URL || process.env.SUPABASE_URL),
+    ai: Boolean(process.env.OPENAI_API_KEY || process.env.HUME_API_KEY),
+  };
+
+  const memory = process.memoryUsage();
+
+  return {
+    ok: services.api,
+    version: process.env.APP_VERSION ?? resolveVersion(),
+    uptime: Math.round((Date.now() - appStartedAt) / 1000),
+    timestamp: new Date().toISOString(),
+    services,
+    metrics: {
+      rss: memory.rss,
+      heapUsed: memory.heapUsed,
+    },
+  };
+};
+
 export function createApp(options: CreateAppOptions = {}) {
   const journalDb: JournalDb = {
     insertVoice: options.journalDb?.insertVoice ?? defaultJournalDb.insertVoice,
@@ -37,6 +98,15 @@ export function createApp(options: CreateAppOptions = {}) {
 
   return createServer({
     registerRoutes(app) {
+      const sendHealth = async (_req: any, reply: any) => {
+        reply.header('cache-control', 'no-store');
+        reply.send(buildHealthPayload());
+      };
+
+      app.get('/health', sendHealth);
+      app.get('/healthz', sendHealth);
+      app.get('/api/healthz', sendHealth);
+
       const ensureUser = (req: any, reply: any) => {
         if (!req.user) {
           reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Unauthorized' } });

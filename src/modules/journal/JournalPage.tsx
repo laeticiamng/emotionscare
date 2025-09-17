@@ -1,147 +1,206 @@
 "use client";
 import React from "react";
-import { PageHeader, Card, Button, useDebounce, Input, Textarea } from "@/COMPONENTS.reg";
+import { PageHeader, Card, Button, Input, Textarea, LoadingSpinner } from "@/COMPONENTS.reg";
+import { useJournalFeed } from "@/hooks/useJournalFeed";
 import { recordEvent } from "@/lib/scores/events";
-import { loadEntries, upsertEntry, softDelete, searchEntries, JournalEntryRec } from "@/lib/journal/store";
+
+const formatDate = (iso: string) => {
+  try {
+    return new Date(iso).toLocaleString();
+  } catch {
+    return iso;
+  }
+};
+
+const formatTag = (tag: string) => `#${tag}`;
+
+const moodLabel: Record<"positive" | "neutral" | "negative", string> = {
+  positive: "Positif",
+  neutral: "Neutre",
+  negative: "Négatif",
+};
+
+const parseTags = (raw: string): string[] =>
+  raw
+    .split(/[,\s]+/)
+    .map(tag => tag.replace(/^#/, "").trim())
+    .filter(Boolean);
 
 export default function JournalPage() {
   const [content, setContent] = React.useState("");
   const [tagsInput, setTagsInput] = React.useState("");
-  const [mood, setMood] = React.useState("calme");
-  const [query, setQuery] = React.useState("");
-  const [tagFilter, setTagFilter] = React.useState<string|undefined>(undefined);
-  const [list, setList] = React.useState<JournalEntryRec[]>([]);
-  const debouncedSearch = (useDebounce?.((q: string) => {
-    setList(searchEntries(q, tagFilter));
-  }, 150)) ?? ((q: string) => setList(searchEntries(q, tagFilter)));
+  const {
+    entries,
+    tags,
+    search,
+    setSearch,
+    tagFilter,
+    setTagFilter,
+    isLoading,
+    isError,
+    error,
+    createEntry,
+    isCreating,
+    creationError,
+  } = useJournalFeed();
 
-  React.useEffect(() => { setList(searchEntries("", undefined)); }, []);
-  React.useEffect(() => { debouncedSearch(query); /* eslint-disable-next-line */ }, [query, tagFilter]);
-
-  function tagsFromInput(s: string) {
-    return s.split(",").map(t => t.trim()).filter(Boolean);
-  }
-
-  async function onCreate(e: React.FormEvent) {
-    e.preventDefault();
-    const tags = tagsFromInput(tagsInput);
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!content.trim()) return;
-    const rec: JournalEntryRec = {
-      id: crypto.randomUUID?.() || String(Date.now()),
-      createdAt: new Date().toISOString(),
-      content: content.trim(),
-      tags,
-      mood
-    };
-    upsertEntry(rec);
-    setContent(""); setTagsInput("");
-    setList(searchEntries(query, tagFilter));
+    const parsedTags = parseTags(tagsInput);
 
-    // Event Scores V2 (si dispo)
     try {
-      recordEvent?.({
-        module: "journal",
-        startedAt: rec.createdAt,
-        endedAt: new Date().toISOString(),
-        durationSec: Math.min(600, Math.max(30, Math.round(rec.content.length / 10))),
-        score: Math.min(10, Math.round(rec.content.length / 80)), // proxy simple
-        mood,
-        meta: { tags }
-      });
-    } catch {}
-  }
+      await createEntry({ content, tags: parsedTags });
 
-  function onDelete(id: string) {
-    softDelete(id);
-    setList(searchEntries(query, tagFilter));
-  }
+      try {
+        recordEvent?.({
+          module: "journal",
+          startedAt: new Date().toISOString(),
+          endedAt: new Date().toISOString(),
+          durationSec: Math.min(900, Math.max(30, Math.round(content.length / 5))),
+          score: Math.min(10, Math.round(content.length / 80)),
+          mood: parsedTags[0] ?? undefined,
+          meta: { tags: parsedTags },
+        });
+      } catch {
+        // analytics optional
+      }
 
-  const allTags = Array.from(new Set(loadEntries().flatMap(e => e.tags || []))).sort();
+      setContent("");
+      setTagsInput("");
+    } catch (err) {
+      console.error("journal entry creation failed", err);
+    }
+  };
+
+  const creationMessage = creationError ? creationError.message : null;
 
   return (
-    <main aria-label="Journal">
-      <PageHeader title="Journal" subtitle="Note tes pensées, ajoute des tags et retrouve-les" />
+    <main aria-label="Journal" className="space-y-6">
+      <PageHeader title="Journal" subtitle="Consigne tes pensées et retrouve-les grâce aux tags et à la recherche" />
+
       <Card>
-        <form onSubmit={onCreate} style={{ display:"grid", gap: 10 }}>
-          <label>
-            Humeur
-            <select value={mood} onChange={(e)=>setMood(e.target.value)}>
-              <option value="calme">Calme</option>
-              <option value="focus">Focus</option>
-              <option value="joyeux">Joyeux</option>
-              <option value="nostalgique">Nostalgique</option>
-              <option value="tendu">Tendu</option>
-            </select>
-          </label>
-
-          <label>
-            Contenu
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="font-medium" htmlFor="journal-content">
+              Contenu
+            </label>
             <Textarea
-              rows={5}
+              id="journal-content"
+              data-testid="journal-input"
+              rows={6}
               value={content}
-              onChange={(e)=>setContent(e.target.value)}
-              placeholder="Écris librement…"
+              placeholder="Écris librement, les tags seront ajoutés automatiquement (#travail, gratitude…)"
+              onChange={(event) => setContent(event.target.value)}
             />
-          </label>
+          </div>
 
-          <label>
-            Tags (séparés par des virgules)
+          <div className="space-y-2">
+            <label className="font-medium" htmlFor="journal-tags">
+              Tags
+            </label>
             <Input
+              id="journal-tags"
               type="text"
               value={tagsInput}
-              onChange={(e)=>setTagsInput(e.target.value)}
-              placeholder="ex: travail, sommeil, gratitude"
+              placeholder="Exemples : travail, sommeil, gratitude"
+              onChange={(event) => setTagsInput(event.target.value)}
             />
-          </label>
+          </div>
 
-          <div style={{ display:"flex", gap:8 }}>
-            <Button type="submit" data-ui="primary-cta">Ajouter</Button>
-            <Button type="button" onClick={() => { setContent(""); setTagsInput(""); }}>Vider</Button>
+          {creationMessage && (
+            <p role="alert" className="text-sm text-destructive">
+              {creationMessage}
+            </p>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button type="submit" data-ui="primary-cta" disabled={isCreating}>
+              {isCreating ? "Enregistrement…" : "Enregistrer"}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => { setContent(""); setTagsInput(""); }}>
+              Effacer
+            </Button>
           </div>
         </form>
       </Card>
 
-      <Card style={{ marginTop: 12 }}>
-        <section style={{ display:"grid", gap: 8 }}>
-          <label>
-            Recherche
-            <Input type="search" value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Texte ou #tag" />
-          </label>
-
-          <div style={{ display:"flex", flexWrap:"wrap", gap: 6 }}>
-            <button
-              aria-pressed={!tagFilter}
-              onClick={() => setTagFilter(undefined)}
-              style={{ padding:"4px 8px", borderRadius: 999 }}
-            >Tous</button>
-            {allTags.map(t => (
-              <button key={t}
-                aria-pressed={tagFilter === t}
-                onClick={() => setTagFilter(t)}
-                style={{ padding:"4px 8px", borderRadius: 999 }}
-              >#{t}</button>
-            ))}
+      <Card>
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <label className="font-medium" htmlFor="journal-search">
+              Recherche
+            </label>
+            <Input
+              id="journal-search"
+              type="search"
+              value={search}
+              placeholder="Rechercher un mot-clé ou un #tag"
+              onChange={(event) => setSearch(event.target.value)}
+            />
           </div>
 
-          <ul style={{ listStyle:"none", padding:0, display:"grid", gap: 8 }}>
-            {list.map(e => (
-              <li key={e.id} style={{ border:"1px solid var(--card)", borderRadius: 12, padding: 10 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", gap:8 }}>
-                  <small>{new Date(e.createdAt).toLocaleString()}</small>
-                  <div style={{ display:"flex", gap: 6 }}>
-                    {(e.tags || []).map(t => <span key={t} style={{ opacity: .8 }}>#{t}</span>)}
+          {Boolean(tags.length) && (
+            <div className="flex flex-wrap gap-2" aria-label="Filtrer par tag">
+              <Button
+                type="button"
+                variant={tagFilter ? "outline" : "default"}
+                onClick={() => setTagFilter(null)}
+              >
+                Tous
+              </Button>
+              {tags.map(tag => (
+                <Button
+                  key={tag}
+                  type="button"
+                  variant={tagFilter === tag ? "default" : "outline"}
+                  onClick={() => setTagFilter(tag)}
+                >
+                  {formatTag(tag)}
+                </Button>
+              ))}
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <LoadingSpinner />
+              <span>Chargement du journal…</span>
+            </div>
+          ) : (
+            <ul className="space-y-3" role="list">
+              {entries.map(entry => (
+                <li key={entry.id} className="rounded-lg border p-4" role="listitem">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+                    <span>{formatDate(entry.timestamp)}</span>
+                    {entry.mood && <span>{moodLabel[entry.mood]}</span>}
                   </div>
-                </div>
-                <p style={{ whiteSpace:"pre-wrap", marginTop: 6 }}>{e.content}</p>
-                <div style={{ display:"flex", gap:8 }}>
-                  <Button onClick={() => onDelete(e.id)}>Supprimer</Button>
-                </div>
-              </li>
-            ))}
-            {!list.length && <em>Aucune entrée pour l’instant.</em>}
-          </ul>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                    {entry.type === "voice" && entry.summary ? entry.summary : entry.text}
+                  </p>
+                  {entry.tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+                      {entry.tags.map(tag => (
+                        <span key={tag}>{formatTag(tag)}</span>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+              {!entries.length && (
+                <li className="text-sm text-muted-foreground">Aucune entrée pour le moment.</li>
+              )}
+            </ul>
+          )}
+
+          {isError && !isLoading && !entries.length && (
+            <p role="alert" className="text-sm text-destructive">
+              {(error as Error)?.message || "Impossible de charger le journal"}
+            </p>
+          )}
         </section>
       </Card>
     </main>
   );
 }
+

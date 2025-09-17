@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import AuthBackdrop from '@/components/auth/AuthBackdrop';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 
 interface B2CAuthLayoutProps {
@@ -14,7 +15,7 @@ const B2CAuthLayout: React.FC<B2CAuthLayoutProps> = ({
   title,
   subtitle,
   children,
-  backgroundImage = '/lovable-uploads/65eb0fb8-5f75-46e9-8f78-e5e73bbf2c72.png',
+  backgroundImage,
 }) => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-hidden">
@@ -25,12 +26,7 @@ const B2CAuthLayout: React.FC<B2CAuthLayoutProps> = ({
         transition={{ duration: 0.6 }}
         className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-50 to-purple-100 dark:from-blue-950 dark:to-purple-900 relative overflow-hidden"
       >
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent dark:from-black/60"></div>
-        </div>
+        <AuthBackdrop imageUrl={backgroundImage} variant="consumer" />
         
         <div className="relative z-10 flex flex-col justify-end p-12 text-white h-full w-full">
           <motion.h1 

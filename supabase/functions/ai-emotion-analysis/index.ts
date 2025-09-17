@@ -143,12 +143,32 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
       emotions.tristesse > 7 ? "Accordez-vous du temps pour exprimer et accepter vos émotions" : "Utilisez la méditation pour maintenir votre équilibre émotionnel"
     ]
 
+    const normalizedConfidence = Math.round(confidence * 100) / 100
+    const confidencePercent = Math.round(normalizedConfidence * 100)
+
+    const positiveScore = (emotions.joie || 0) + (emotions.confiance || 0) + (emotions.anticipation || 0) + (emotions.surprise || 0)
+    const negativeScore = (emotions.tristesse || 0) + (emotions.colere || 0) + (emotions.peur || 0) + (emotions.degout || 0)
+    const emotionalBalance = Math.round(Math.max(0, Math.min(100, ((positiveScore - negativeScore + 40) / 80) * 100)))
+
+    const summary = [
+      `Émotion dominante: ${dominantEmotion}`,
+      `Confiance: ${confidencePercent}%`,
+      `Équilibre émotionnel estimé: ${emotionalBalance}/100`
+    ].join(' · ')
+
     const result: EmotionAnalysisResponse = {
       emotions,
       dominantEmotion,
-      confidence: Math.round(confidence * 100) / 100,
+      confidence: normalizedConfidence,
       insights: insights.slice(0, 3),
-      recommendations: recommendations.slice(0, 3)
+      recommendations: recommendations.slice(0, 3),
+    }
+
+    const persistedPayload = {
+      scores: emotions,
+      insights: result.insights,
+      context: context || null,
+      previousEmotions: previousEmotions || null
     }
 
     if (userId) {
@@ -158,14 +178,12 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
           user_id: userId,
           scan_type: "text",
           mood: dominantEmotion,
-          confidence: result.confidence,
+          confidence: confidencePercent,
+          summary,
           recommendations: result.recommendations,
-          emotions: {
-            scores: emotions,
-            insights: result.insights,
-            context: context || null,
-            previousEmotions: previousEmotions || null
-          }
+          insights: result.insights,
+          emotions: persistedPayload,
+          emotional_balance: emotionalBalance
         })
 
       if (insertError) {
@@ -177,9 +195,13 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
       console.log("ℹ️ Aucun utilisateur authentifié, saut de l'enregistrement")
     }
 
-    console.log('✅ Analyse terminée:', { dominantEmotion, confidence: result.confidence })
+    console.log('✅ Analyse terminée:', { dominantEmotion, confidence: normalizedConfidence, emotionalBalance })
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify({
+      ...result,
+      emotionalBalance,
+      confidence: normalizedConfidence,
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 

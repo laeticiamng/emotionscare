@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
+import { computeBalanceFromScores } from './emotionScan.service';
 
 export interface EmotionAnalysisRequest {
   type: 'text' | 'voice' | 'image';
@@ -94,24 +95,31 @@ class EmotionService {
    */
   async saveEmotionResult(emotion: EmotionAnalysisResponse, userId: string): Promise<EmotionResult> {
     try {
-      const { data, error } = await supabase
+      const balance = computeBalanceFromScores(emotion.emotions);
+      const { error } = await supabase
         .from('emotion_scans')
         .insert({
           id: emotion.id,
           user_id: userId,
-          emotion: emotion.emotion,
-          confidence: emotion.confidence,
-          emotions: emotion.emotions,
-          emojis: emotion.emojis,
-          source: emotion.source,
-          timestamp: emotion.timestamp
-        })
-        .select()
-        .single();
+          mood: emotion.emotion,
+          confidence: Math.round(emotion.confidence * 100),
+          emotions: { scores: emotion.emotions, source: emotion.source },
+          summary: `Analyse ${emotion.source}`,
+          scan_type: emotion.source,
+          emotional_balance: balance,
+        });
 
       if (error) throw error;
 
-      return data as EmotionResult;
+      return {
+        emotion: emotion.emotion,
+        confidence: emotion.confidence,
+        valence: emotion.emotions.valence ?? 0,
+        arousal: emotion.emotions.arousal ?? 0,
+        timestamp: new Date(emotion.timestamp),
+        insight: undefined,
+        suggestions: [],
+      } as EmotionResult;
     } catch (error) {
       console.error('Error saving emotion:', error);
       throw new Error('Échec de la sauvegarde');
@@ -127,12 +135,20 @@ class EmotionService {
         .from('emotion_scans')
         .select('*')
         .eq('user_id', userId)
-        .order('timestamp', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(limit);
 
       if (error) throw error;
 
-      return data as EmotionResult[];
+      return (data ?? []).map(item => ({
+        emotion: item.mood ?? 'Indéterminé',
+        confidence: (Number(item.confidence) || 0) / 100,
+        valence: 0,
+        arousal: 0,
+        timestamp: new Date(item.created_at ?? Date.now()),
+        insight: item.summary ?? undefined,
+        suggestions: item.recommendations ?? [],
+      }));
     } catch (error) {
       console.error('Error fetching user emotions:', error);
       return [];

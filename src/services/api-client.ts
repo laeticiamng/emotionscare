@@ -247,10 +247,22 @@ export class ApiClient {
   }
 
   static async createEmotionScan(scanData: any) {
-    return this.request(() => 
+    const payload = {
+      user_id: scanData.user_id ?? scanData.userId ?? null,
+      mood: scanData.mood ?? scanData.emotion ?? null,
+      confidence: scanData.confidence ?? null,
+      emotions: scanData.emotions ?? { scores: scanData.scores ?? {} },
+      summary: scanData.summary ?? scanData.description ?? null,
+      scan_type: scanData.scan_type ?? scanData.source ?? 'manual',
+      recommendations: Array.isArray(scanData.recommendations) ? scanData.recommendations : [],
+      insights: Array.isArray(scanData.insights) ? scanData.insights : [],
+      emotional_balance: scanData.emotional_balance ?? null,
+    };
+
+    return this.request(() =>
       supabase
         .from('emotion_scans')
-        .insert(scanData)
+        .insert(payload)
         .select()
         .single()
     );

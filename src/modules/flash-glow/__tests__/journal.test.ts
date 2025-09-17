@@ -35,7 +35,9 @@ describe('createFlashGlowJournalEntry', () => {
       intensity: 82,
       glowType: 'energy',
       recommendation: 'Continuez sur cette lancée ✨',
-      context: 'Flash Glow Ultra'
+      context: 'Flash Glow Ultra',
+      moodBefore: 40,
+      moodAfter: 72
     });
 
     expect(journalService.saveEntry).toHaveBeenCalledTimes(1);
@@ -45,7 +47,12 @@ describe('createFlashGlowJournalEntry', () => {
         summary: expect.stringContaining('Flash Glow Ultra'),
         content: expect.stringContaining('Gain ressenti'),
         duration: 95,
-        ephemeral: false
+        ephemeral: false,
+        metadata: {
+          mood_before: 40,
+          mood_after: 72,
+          mood_delta: 32
+        }
       })
     );
 

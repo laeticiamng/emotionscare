@@ -22,19 +22,24 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
         >
           Progression, streaks et badges
         </p>
+        <p
+          class="text-xs text-muted-foreground"
+        >
+          Synchronisé en temps réel avec vos activités Supabase.
+        </p>
       </div>
       <div
         class="flex flex-wrap items-center gap-3 text-sm"
       >
         <div
-          aria-label="Niveau 3"
+          aria-label="Niveau 4"
           class="inline-flex items-center rounded-md border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 px-3 py-1"
         >
           Niveau 
-          3
+          4
         </div>
         <div
-          aria-label="7 jours de suite"
+          aria-label="6 jours de suite"
           class="flex items-center gap-1 text-muted-foreground"
         >
           <svg
@@ -55,7 +60,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
             />
           </svg>
           <span>
-            7
+            6
              j de suite
           </span>
         </div>
@@ -105,19 +110,21 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
             />
           </svg>
           <span>
-            S13
+            S19
             : 
-            13
+            11
              séances
           </span>
         </div>
         <button
+          aria-label=" (désactivé)"
           class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs ml-auto md:ml-0"
           data-ui="refresh"
+          disabled=""
           type="button"
         >
           <svg
-            class="lucide lucide-refresh-ccw mr-2 h-4 w-4"
+            class="lucide lucide-refresh-ccw mr-2 h-4 w-4 animate-spin"
             fill="none"
             height="24"
             stroke="currentColor"
@@ -154,16 +161,53 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
         <div
           class="flex flex-col space-y-1.5 p-6 pb-0"
         >
-          <h3
-            class="font-semibold leading-none tracking-tight"
+          <div
+            class="flex items-start justify-between gap-4"
           >
-            Évolution de l'humeur
-          </h3>
-          <p
-            class="text-sm text-muted-foreground"
-          >
-            10 derniers jours, corrélation énergie & activités
-          </p>
+            <div>
+              <h3
+                class="font-semibold leading-none tracking-tight"
+              >
+                Évolution de l'humeur
+              </h3>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                30 derniers jours, corrélation énergie & activités
+              </p>
+            </div>
+            <button
+              aria-label="Exporter l'évolution de l'humeur"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-9 w-9"
+              type="button"
+            >
+              <svg
+                class="lucide lucide-download h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                />
+                <polyline
+                  points="7 10 12 15 17 10"
+                />
+                <line
+                  x1="12"
+                  x2="12"
+                  y1="15"
+                  y2="3"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
         <div
           class="p-6 pt-0 space-y-6"
@@ -180,7 +224,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
               <p
                 class="text-2xl font-semibold"
               >
-                7.6
+                7.7
                 /10
               </p>
             </div>
@@ -194,7 +238,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 class="text-2xl font-semibold text-emerald-600"
               >
                 +
-                2.4
+                0.8
               </p>
             </div>
             <div>
@@ -206,7 +250,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
               <p
                 class="text-2xl font-semibold"
               >
-                26 mars
+                3 mai
               </p>
             </div>
           </div>
@@ -250,7 +294,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 Expérience
               </span>
               <span>
-                1860
+                1680
                  / 
                 2200
               </span>
@@ -268,15 +312,17 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 class="h-full w-full flex-1 bg-primary transition-all"
                 data-max="100"
                 data-state="indeterminate"
-                style="transform: translateX(-15%);"
+                style="transform: translateX(-24%);"
               />
             </div>
             <p
               class="text-xs text-muted-foreground"
             >
               Encore 
-              340
-               pts avant le niveau 4.
+              520
+               pts avant le niveau 
+              5
+              .
             </p>
           </div>
           <div
@@ -359,7 +405,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 <p
                   class="text-xs text-muted-foreground"
                 >
-                  13
+                  11
                    séances réalisées cette semaine
                 </p>
               </div>
@@ -377,16 +423,53 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
         <div
           class="flex flex-col space-y-1.5 p-6 pb-0"
         >
-          <h3
-            class="font-semibold leading-none tracking-tight"
+          <div
+            class="flex items-start justify-between gap-4"
           >
-            Séances par semaine
-          </h3>
-          <p
-            class="text-sm text-muted-foreground"
-          >
-            Répartition guidée, respiration, VR et journal
-          </p>
+            <div>
+              <h3
+                class="font-semibold leading-none tracking-tight"
+              >
+                Séances par semaine
+              </h3>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Répartition guidée, respiration, VR et journal
+              </p>
+            </div>
+            <button
+              aria-label="Exporter les sessions hebdomadaires"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-9 w-9"
+              type="button"
+            >
+              <svg
+                class="lucide lucide-download h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                />
+                <polyline
+                  points="7 10 12 15 17 10"
+                />
+                <line
+                  x1="12"
+                  x2="12"
+                  y1="15"
+                  y2="3"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
         <div
           class="p-6 pt-0 space-y-6"
@@ -403,7 +486,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
               <p
                 class="text-2xl font-semibold"
               >
-                8.8
+                9.5
                  séances
               </p>
             </div>
@@ -416,7 +499,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
               <p
                 class="text-2xl font-semibold"
               >
-                S13
+                S19
               </p>
             </div>
             <div>
@@ -428,7 +511,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
               <p
                 class="text-2xl font-semibold"
               >
-                5
+                4
               </p>
             </div>
           </div>
@@ -475,14 +558,16 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
             >
               Jeu
                — 
-              Matin
+              Soir
             </p>
             <p
               class="text-sm text-muted-foreground"
             >
-              3
-               séances, vibe 
-              euphorique
+              2
+               
+              séances
+              , vibe 
+              serein
             </p>
           </div>
           <div
@@ -495,7 +580,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 Pic d'énergie
               </span>
               <span>
-                26 mars
+                3 mai
               </span>
             </div>
             <div
@@ -505,7 +590,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 Sessions VR cumulées
               </span>
               <span>
-                10
+                3
               </span>
             </div>
             <div
@@ -515,7 +600,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
                 Respirations guidées
               </span>
               <span>
-                13
+                5
               </span>
             </div>
           </div>
@@ -528,16 +613,53 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
       <div
         class="flex flex-col space-y-1.5 p-6 pb-0"
       >
-        <h3
-          class="font-semibold leading-none tracking-tight"
+        <div
+          class="flex items-start justify-between gap-4"
         >
-          Heatmap Vibes
-        </h3>
-        <p
-          class="text-sm text-muted-foreground"
-        >
-          Intensité émotionnelle par moment clé de la journée
-        </p>
+          <div>
+            <h3
+              class="font-semibold leading-none tracking-tight"
+            >
+              Heatmap Vibes
+            </h3>
+            <p
+              class="text-sm text-muted-foreground"
+            >
+              Intensité émotionnelle par moment clé de la journée
+            </p>
+          </div>
+          <button
+            aria-label="Exporter la heatmap des vibes"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-9 w-9"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-download h-4 w-4"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              />
+              <polyline
+                points="7 10 12 15 17 10"
+              />
+              <line
+                x1="12"
+                x2="12"
+                y1="15"
+                y2="3"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
       <div
         class="p-6 pt-0 space-y-6"

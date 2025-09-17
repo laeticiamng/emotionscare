@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import AuthBackdrop from '@/components/auth/AuthBackdrop';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { Building, ShieldCheck } from 'lucide-react';
 
@@ -17,7 +18,7 @@ const B2BPremiumAuthLayout: React.FC<B2BPremiumAuthLayoutProps> = ({
   subtitle,
   children,
   isAdmin = false,
-  backgroundPattern = '/lovable-uploads/17a93ade-b9b3-4fb7-8a0d-e6cb1b9e58de.png',
+  backgroundPattern,
 }) => {
   // Colors based on role
   const gradientFrom = isAdmin ? 'from-purple-50' : 'from-green-50';
@@ -82,10 +83,7 @@ const B2BPremiumAuthLayout: React.FC<B2BPremiumAuthLayoutProps> = ({
         transition={{ duration: 0.6 }}
         className={`hidden md:flex md:w-1/2 bg-gradient-to-br ${gradientFrom} ${gradientTo} ${darkGradientFrom} ${darkGradientTo} relative overflow-hidden`}
       >
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${backgroundPattern})` }}
-        />
+        <AuthBackdrop imageUrl={backgroundPattern} variant={isAdmin ? 'admin' : 'business'} />
         
         <div className="relative z-10 flex flex-col justify-center items-center p-12 w-full">
           <motion.div

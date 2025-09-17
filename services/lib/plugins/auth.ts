@@ -7,9 +7,16 @@ declare module 'fastify' {
   }
 }
 
+const PUBLIC_PATHS = new Set(['/health', '/healthz', '/api/healthz']);
+
 export const authPlugin: FastifyPluginAsync = async app => {
   app.decorateRequest('user', null);
   app.addHook('preHandler', async (req, reply) => {
+    const routePath = req.routerPath || req.url.split('?')[0];
+    if (PUBLIC_PATHS.has(routePath)) {
+      return;
+    }
+
     const auth = req.headers['authorization'];
     if (!auth || !auth.startsWith('Bearer ')) {
       reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Unauthorized' } });

@@ -491,6 +491,48 @@ export type Database = {
           },
         ]
       }
+      breathwork_sessions: {
+        Row: {
+          actual_bpm: number | null
+          coherence_score: number | null
+          created_at: string | null
+          duration: number
+          id: string
+          session_data: Json | null
+          stress_level_after: number | null
+          stress_level_before: number | null
+          target_bpm: number | null
+          technique_type: string
+          user_id: string | null
+        }
+        Insert: {
+          actual_bpm?: number | null
+          coherence_score?: number | null
+          created_at?: string | null
+          duration?: number
+          id?: string
+          session_data?: Json | null
+          stress_level_after?: number | null
+          stress_level_before?: number | null
+          target_bpm?: number | null
+          technique_type: string
+          user_id?: string | null
+        }
+        Update: {
+          actual_bpm?: number | null
+          coherence_score?: number | null
+          created_at?: string | null
+          duration?: number
+          id?: string
+          session_data?: Json | null
+          stress_level_after?: number | null
+          stress_level_before?: number | null
+          target_bpm?: number | null
+          technique_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_fixes: {
         Row: {
           applied: boolean | null
@@ -2240,35 +2282,44 @@ export type Database = {
         Row: {
           confidence: number | null
           created_at: string | null
-          emotions: Json
+          emotional_balance: number | null
+          emotions: Json | null
           id: string
+          insights: string[] | null
           mood: string | null
-          recommendations: Json | null
-          scan_type: string
+          recommendations: string[] | null
+          scan_type: string | null
+          summary: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           confidence?: number | null
           created_at?: string | null
-          emotions?: Json
+          emotional_balance?: number | null
+          emotions?: Json | null
           id?: string
+          insights?: string[] | null
           mood?: string | null
-          recommendations?: Json | null
-          scan_type: string
+          recommendations?: string[] | null
+          scan_type?: string | null
+          summary?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           confidence?: number | null
           created_at?: string | null
-          emotions?: Json
+          emotional_balance?: number | null
+          emotions?: Json | null
           id?: string
+          insights?: string[] | null
           mood?: string | null
-          recommendations?: Json | null
-          scan_type?: string
+          recommendations?: string[] | null
+          scan_type?: string | null
+          summary?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -5615,51 +5666,59 @@ export type Database = {
       }
       mood_presets: {
         Row: {
-          calm: number
+          blend: Json
+          clarity: number
           created_at: string
           description: string | null
-          energy: number
-          focus: number
           gradient: string | null
           icon: string | null
           id: string
-          joy: number
           name: string
-          slug: string
+          slug: string | null
+          softness: number
           tags: string[]
           updated_at: string
+          user_id: string | null
         }
         Insert: {
-          calm?: number
+          blend?: Json
+          clarity?: number
           created_at?: string
           description?: string | null
-          energy?: number
-          focus?: number
           gradient?: string | null
           icon?: string | null
           id?: string
-          joy?: number
           name: string
-          slug: string
+          slug?: string | null
+          softness?: number
           tags?: string[]
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
-          calm?: number
+          blend?: Json
+          clarity?: number
           created_at?: string
           description?: string | null
-          energy?: number
-          focus?: number
           gradient?: string | null
           icon?: string | null
           id?: string
-          joy?: number
           name?: string
-          slug?: string
+          slug?: string | null
+          softness?: number
           tags?: string[]
           updated_at?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "mood_presets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       music_skip_logs: {
         Row: {
@@ -8655,33 +8714,45 @@ export type Database = {
           clarity: number
           created_at: string
           description: string | null
+          gradient: string | null
+          icon: string | null
           id: string
           name: string
+          slug: string | null
           softness: number
+          tags: string[]
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           blend?: Json
           clarity?: number
           created_at?: string
           description?: string | null
+          gradient?: string | null
+          icon?: string | null
           id?: string
           name: string
+          slug?: string | null
           softness?: number
+          tags?: string[]
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           blend?: Json
           clarity?: number
           created_at?: string
           description?: string | null
+          gradient?: string | null
+          icon?: string | null
           id?: string
           name?: string
+          slug?: string | null
           softness?: number
+          tags?: string[]
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

@@ -109,6 +109,80 @@ test.describe('B2C Experience - Parcours principaux', () => {
     await expect(stopButton).toBeVisible({ timeout: 10000 });
     await stopButton.click();
 
+    await expect(page.getByLabel(/Ressenti après séance/i)).toBeVisible();
+    await expect(page.getByText(/Delta d'humeur/i)).toBeVisible();
+
     await expect(page.getByRole('button', { name: /Déclencher le Flash Glow/i })).toBeVisible();
+  });
+
+  test('parcours complet du bien-être b2c', async ({ page }) => {
+    await page.goto('/app/home');
+
+    await test.step('Dashboard accessible', async () => {
+      const welcomeHeading = page.getByRole('heading', { name: /Bienvenue sur votre espace bien-être/i });
+      await expect(welcomeHeading).toBeVisible({ timeout: 20000 });
+
+      const scanLink = page.getByRole('link', { name: /Scanner mes émotions/i });
+      await expect(scanLink).toBeVisible();
+
+      await Promise.all([
+        page.waitForURL(/\/app\/scan/),
+        scanLink.click()
+      ]);
+    });
+
+    await test.step('Emotion Scan et historique', async () => {
+      await expect(page).toHaveURL(/\/app\/scan/);
+      await expect(page.getByRole('heading', { name: /Scanner Émotionnel IA/i })).toBeVisible();
+
+      const happyCard = page.getByRole('button', { name: /Heureux|😊/i }).first();
+      await happyCard.click();
+
+      const analyseButton = page.getByRole('button', { name: /Analyser mon humeur/i });
+      await analyseButton.click();
+
+      await expect(page.getByText(/Analyse en cours/i)).toBeVisible();
+
+      const historyCard = page
+        .locator('div')
+        .filter({ has: page.getByRole('heading', { name: /Historique des Analyses/i }) })
+        .first();
+
+      await expect(historyCard.locator('text=/Happy/i').first()).toBeVisible({ timeout: 20000 });
+    });
+
+    await test.step('MoodMixer CRUD', async () => {
+      await page.goto('/app/mood-mixer');
+
+      await expect(page.getByRole('heading', { name: /Mood Mixer/i })).toBeVisible({ timeout: 20000 });
+
+      const mixTitle = await page.locator('div:has(> p:text("Votre climat sonore")) h2').first().innerText();
+      await page.getByRole('button', { name: /Sauvegarder ce mix/i }).click();
+
+      const vibePattern = new RegExp(mixTitle.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      await expect(page.getByRole('heading', { name: vibePattern })).toBeVisible({ timeout: 10000 });
+
+      const existingVibe = page.getByRole('heading', { name: /brise lagon/i }).first();
+      await existingVibe.click();
+
+      await expect(page.locator('div:has(> p:text("Votre climat sonore")) h2').first()).toHaveText(/brise lagon/i);
+    });
+
+    await test.step('Flash Glow complet', async () => {
+      await page.goto('/app/flash-glow');
+
+      await expect(page.getByRole('heading', { name: /Flash Glow Ultra/i })).toBeVisible({ timeout: 20000 });
+
+      const startButton = page.getByRole('button', { name: /Déclencher le Flash Glow/i });
+      await startButton.click();
+
+      const stopButton = page.getByRole('button', { name: /Arrêter/i });
+      await expect(stopButton).toBeVisible({ timeout: 10000 });
+      await stopButton.click();
+
+      await expect(page.getByLabel(/Ressenti après séance/i)).toBeVisible();
+      await page.getByRole('button', { name: /Gain ressenti/i }).click();
+      await expect(page.getByText(/Votre retour nous aide/i)).toBeVisible();
+    });
   });
 });

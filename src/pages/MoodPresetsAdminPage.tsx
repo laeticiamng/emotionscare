@@ -36,7 +36,8 @@ const INITIAL_FORM_STATE: MoodPresetFormState = {
   focus: 50,
 };
 
-const toPercent = (value: number) => Math.round(Math.min(Math.max(value, 0), 1) * 100);
+const clampPercent = (value: number) => Math.min(100, Math.max(0, Math.round(value)));
+const toPercent = (value: number) => clampPercent(value * 100);
 const toRatio = (value: number) => Math.min(Math.max(value / 100, 0), 1);
 
 const MoodPresetsAdminPage: React.FC = () => {
@@ -46,7 +47,12 @@ const MoodPresetsAdminPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const existingSlugs = useMemo(() => new Set(presets.map((preset) => preset.slug)), [presets]);
+  const existingSlugs = useMemo(() => {
+    const values = presets
+      .map((preset) => preset.slug)
+      .filter((slug): slug is string => typeof slug === 'string' && slug.trim().length > 0);
+    return new Set(values);
+  }, [presets]);
 
   const loadPresets = async () => {
     setIsLoading(true);
@@ -73,7 +79,7 @@ const MoodPresetsAdminPage: React.FC = () => {
   const handleEdit = (preset: MoodPresetRecord) => {
     setEditingId(preset.id);
     setFormState({
-      slug: preset.slug,
+      slug: preset.slug ?? '',
       name: preset.name,
       description: preset.description ?? '',
       icon: preset.icon ?? '',
@@ -108,6 +114,13 @@ const MoodPresetsAdminPage: React.FC = () => {
       return null;
     }
 
+    const blend = {
+      joy: toRatio(formState.joy),
+      calm: toRatio(formState.calm),
+      energy: toRatio(formState.energy),
+      focus: toRatio(formState.focus),
+    };
+
     return {
       slug,
       name: formState.name.trim(),
@@ -115,12 +128,9 @@ const MoodPresetsAdminPage: React.FC = () => {
       icon: formState.icon.trim() || null,
       gradient: formState.gradient.trim() || null,
       tags: parseTags(formState.tags),
-      blend: {
-        joy: toRatio(formState.joy),
-        calm: toRatio(formState.calm),
-        energy: toRatio(formState.energy),
-        focus: toRatio(formState.focus),
-      },
+      blend,
+      softness: clampPercent(formState.joy),
+      clarity: clampPercent(formState.energy),
     };
   };
 
