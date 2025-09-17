@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 export type Theme = 'system' | 'light' | 'dark';
 
@@ -48,40 +53,44 @@ const initialState: Profile = {
 
 // Apply theme to document
 const applyThemeToDocument = (theme: Theme) => {
+  if (typeof window === 'undefined') return;
+
+  const root = safeGetDocumentRoot();
+
   if (theme === 'system') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.dataset.theme = prefersDark ? 'dark' : 'light';
+    root.dataset.theme = prefersDark ? 'dark' : 'light';
   } else {
-    document.documentElement.dataset.theme = theme;
+    root.dataset.theme = theme;
   }
 };
 
 // Apply accessibility settings to CSS
 const applyA11yToDocument = (a11y: A11y) => {
-  const root = document.documentElement;
-  
+  const root = safeGetDocumentRoot();
+
   // Reduced motion
   if (a11y.reduced_motion) {
-    root.classList.add('reduced-motion');
+    safeClassAdd(root, 'reduced-motion');
   } else {
-    root.classList.remove('reduced-motion');
+    safeClassRemove(root, 'reduced-motion');
   }
-  
+
   // High contrast
   if (a11y.high_contrast) {
-    root.classList.add('high-contrast');
+    safeClassAdd(root, 'high-contrast');
   } else {
-    root.classList.remove('high-contrast');
+    safeClassRemove(root, 'high-contrast');
   }
-  
+
   // Font scale
   root.style.setProperty('--font-scale', a11y.font_scale.toString());
-  
+
   // Dyslexic font
   if (a11y.dyslexic_font) {
-    root.classList.add('dyslexic-font');
+    safeClassAdd(root, 'dyslexic-font');
   } else {
-    root.classList.remove('dyslexic-font');
+    safeClassRemove(root, 'dyslexic-font');
   }
 };
 

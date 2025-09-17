@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Eye, EyeOff, Volume2, VolumeX, Type, Contrast, 
+import {
+  Eye, EyeOff, Volume2, VolumeX, Type, Contrast,
   MousePointer, Keyboard, Settings, X, Check,
   Zap, Moon, Sun, Palette, Move, RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 // Accessibility Settings Context
 interface AccessibilitySettings {
@@ -70,8 +75,12 @@ export const AccessibilityPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('accessibility-settings');
-      return saved ? JSON.parse(saved) : defaultSettings;
+      try {
+        const saved = window.localStorage.getItem('accessibility-settings');
+        return saved ? JSON.parse(saved) : defaultSettings;
+      } catch (error) {
+        console.warn('[AccessibilityPanel] Failed to read settings', error);
+      }
     }
     return defaultSettings;
   });
@@ -79,20 +88,20 @@ export const AccessibilityPanel: React.FC = () => {
 
   // Apply settings to document
   useEffect(() => {
-    const root = document.documentElement;
-    
+    const root = safeGetDocumentRoot();
+
     // High contrast
     if (settings.highContrast) {
-      root.classList.add('high-contrast');
+      safeClassAdd(root, 'high-contrast');
     } else {
-      root.classList.remove('high-contrast');
+      safeClassRemove(root, 'high-contrast');
     }
 
     // Reduced motion
     if (settings.reducedMotion) {
-      root.classList.add('reduce-motion');
+      safeClassAdd(root, 'reduce-motion');
     } else {
-      root.classList.remove('reduce-motion');
+      safeClassRemove(root, 'reduce-motion');
     }
 
     // Large text
@@ -107,13 +116,19 @@ export const AccessibilityPanel: React.FC = () => {
 
     // Color blind friendly
     if (settings.colorBlindFriendly) {
-      root.classList.add('color-blind-friendly');
+      safeClassAdd(root, 'color-blind-friendly');
     } else {
-      root.classList.remove('color-blind-friendly');
+      safeClassRemove(root, 'color-blind-friendly');
     }
 
     // Save settings
-    localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+      }
+    } catch (error) {
+      console.warn('[AccessibilityPanel] Failed to persist settings', error);
+    }
   }, [settings]);
 
   const updateSetting = <K extends keyof AccessibilitySettings>(
