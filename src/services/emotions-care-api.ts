@@ -212,11 +212,69 @@ export class EmotionsCareApi {
 
   async chatWithCoach(message: string, conversationHistory?: any[]) {
     try {
-      return await apiService.chatWithAI(message, conversationHistory);
+      const detectedEmotion = this.detectEmotionFromHistory(conversationHistory, message);
+
+      logger.info('Calling ai-coach function', {
+        detectedEmotion,
+        historySize: conversationHistory?.length || 0,
+      }, 'COACH');
+
+      const { data, error } = await supabase.functions.invoke('ai-coach', {
+        body: {
+          message,
+          emotion: detectedEmotion,
+        },
+      });
+
+      if (error) {
+        logger.error('ai-coach invocation failed', error, 'COACH');
+        throw new Error(error.message || 'Erreur lors de la communication avec le coach IA');
+      }
+
+      const response = {
+        message: data?.response ?? '',
+        suggestions: data?.suggestions ?? [],
+        disclaimers: data?.disclaimers ?? [],
+        type: 'text',
+        detectedEmotion: data?.meta?.emotion ?? detectedEmotion,
+        confidence: data?.meta?.confidence ?? null,
+        category: data?.meta?.category ?? 'coaching',
+        meta: data?.meta ?? null,
+      };
+
+      logger.info('ai-coach response received', response, 'COACH');
+
+      return response;
     } catch (error) {
       logger.error('Error during coach chat', error, 'API');
       throw error;
     }
+  }
+
+  private detectEmotionFromHistory(history: any[] = [], fallbackMessage?: string): string {
+    const searchSpace = [...history].reverse();
+    const target = searchSpace.find((entry) => {
+      const role = entry?.role || entry?.sender;
+      return role === 'user';
+    }) || { content: fallbackMessage, text: fallbackMessage };
+
+    const text = (target?.content || target?.text || fallbackMessage || '').toLowerCase();
+
+    const emotionKeywords: Record<string, string[]> = {
+      joie: ['heureu', 'content', 'joie', 'ravi', 'positif'],
+      tristesse: ['trist', 'déprim', 'mal', 'chagrin', 'pleur'],
+      colère: ['colère', 'énerv', 'furieux', 'frustr', 'agacé'],
+      peur: ['peur', 'anxi', 'inquiet', 'angoiss', 'stress'],
+      calme: ['calme', 'serein', 'apais', 'tranquill'],
+    };
+
+    for (const [emotion, keywords] of Object.entries(emotionKeywords)) {
+      if (keywords.some(keyword => text.includes(keyword))) {
+        return emotion;
+      }
+    }
+
+    return 'neutre';
   }
 
   async getDashboardData() {

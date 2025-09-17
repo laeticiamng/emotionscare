@@ -5613,6 +5613,54 @@ export type Database = {
           },
         ]
       }
+      mood_presets: {
+        Row: {
+          calm: number
+          created_at: string
+          description: string | null
+          energy: number
+          focus: number
+          gradient: string | null
+          icon: string | null
+          id: string
+          joy: number
+          name: string
+          slug: string
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          calm?: number
+          created_at?: string
+          description?: string | null
+          energy?: number
+          focus?: number
+          gradient?: string | null
+          icon?: string | null
+          id?: string
+          joy?: number
+          name: string
+          slug: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          calm?: number
+          created_at?: string
+          description?: string | null
+          energy?: number
+          focus?: number
+          gradient?: string | null
+          icon?: string | null
+          id?: string
+          joy?: number
+          name?: string
+          slug?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       music_skip_logs: {
         Row: {
           id: string

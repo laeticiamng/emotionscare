@@ -23,3 +23,17 @@ export default defineConfig({
   },
 });
 
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['services/api/tests/**/*.test.ts'],
+    maxThreads: 1,
+    minThreads: 1,
+    sequence: { hooks: 'list', files: 'serial' },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json'],
+      reportsDirectory: 'reports/api-tests-coverage',
+    },
+  },
+});

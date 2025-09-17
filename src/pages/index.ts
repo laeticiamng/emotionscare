@@ -58,6 +58,7 @@ export { default as B2BEntreprisePage } from './B2BEntreprisePage';
 export { default as B2BSocialCoconPage } from './B2BSocialCoconPage';
 export { default as B2BReportsPage } from './B2BReportsPage';
 export { default as B2BEventsPage } from './B2BEventsPage';
+export { default as B2BUserCoachPage } from './b2b/user/CoachPage';
 
 // B2B Admin 
 export { default as B2BOptimisationPage } from './B2BOptimisationPage';
@@ -103,6 +104,7 @@ export { default as ExportPage } from './ExportPage';
 export { default as NavigationPage } from './NavigationPage';
 export { default as LeaderboardPage } from './LeaderboardPage';
 export { default as HeatmapPage } from './HeatmapPage';
+export { default as MoodPresetsAdminPage } from './MoodPresetsAdminPage';
 export { default as GamificationPage } from './GamificationPage';
 export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";

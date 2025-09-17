@@ -13,7 +13,7 @@ declare global {
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
-import { ROUTE_ALIASES, findRedirectFor } from './aliases';
+import { ROUTE_ALIASES } from './aliases';
 import { RouteGuard } from './guards';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import EnhancedShell from '@/components/layout/EnhancedShell';
@@ -85,6 +85,7 @@ const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage')
 const B2CBossLevelGritPage = lazy(() => import('@/pages/B2CBossLevelGritPage'));
 const B2CBounceBackBattlePage = lazy(() => import('@/pages/B2CBounceBackBattlePage'));
 const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
+const MoodPresetsAdminPage = lazy(() => import('@/pages/MoodPresetsAdminPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
@@ -224,6 +225,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CBossLevelGritPage,
   B2CBounceBackBattlePage,
   B2CMoodMixerPage,
+  MoodPresetsAdminPage,
   B2CSocialCoconPage,
   B2CStorySynthLabPage,
   B2CCommunautePage,
@@ -360,6 +362,8 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 
 // Export des routes helpers et du router
 export { routes } from './routes';
+export { ROUTE_ALIASES } from './aliases';
+export type { RouteAlias } from './aliases';
 export const routerV2 = createBrowserRouter([
   // Routes principales du registry
   ...ROUTES_REGISTRY.map(route => ({
