@@ -142,6 +142,7 @@ export default function StorySynthPage() {
             {newAudio && ambient !== "aucun" && (
               <AudioPlayer
                 src={AMBIENTS[ambient]}
+                trackId={`story-ambient-${ambient}`}
                 title={`Ambiance ${ambient}`}
                 loop
                 defaultVolume={0.5}
