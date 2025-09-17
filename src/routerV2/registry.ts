@@ -377,6 +377,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/mood-mixer'],
   },
   {
+    name: 'mood-presets-admin',
+    path: '/app/mood-presets',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MoodPresetsAdminPage',
+    guard: true,
+  },
+  {
     name: 'ambition-arcade',
     path: '/app/ambition-arcade',
     segment: 'consumer',

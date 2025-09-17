@@ -29,6 +29,7 @@ const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage
 const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
+const MoodPresetsAdminPage = lazy(() => import('@/pages/MoodPresetsAdminPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
 const PrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
@@ -151,6 +152,14 @@ export const simpleRouter = createBrowserRouter([
     element: (
       <SecureWrapper>
         <B2CMoodMixerPage />
+      </SecureWrapper>
+    ),
+  },
+  {
+    path: '/app/mood-presets',
+    element: (
+      <SecureWrapper>
+        <MoodPresetsAdminPage />
       </SecureWrapper>
     ),
   },
