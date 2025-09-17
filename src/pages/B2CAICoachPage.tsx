@@ -12,6 +12,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMood } from '@/contexts/MoodContext';
 import { useAppStore } from '@/store/appStore';
 import B2BCoachPage from '@/pages/b2b/user/CoachPage';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { COACH_DISCLAIMERS, CoachAudience, requestCoachResponse } from '@/modules/coach/coachService';
 
 interface Message {
   id: string;
@@ -44,6 +47,12 @@ const B2CCoachExperience: React.FC = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [coachPersonality, setCoachPersonality] = useState('empathetic');
+  const [disclaimers, setDisclaimers] = useState<string[]>(() => [...COACH_DISCLAIMERS]);
+  const [hasConsented, setHasConsented] = useState(false);
+  const [consentToken, setConsentToken] = useState<string | null>(null);
+  const [audience, setAudience] = useState<CoachAudience>('b2c');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [sessionStartedAt, setSessionStartedAt] = useState<number | null>(null);
 
   const personalities = [
     { id: 'empathetic', name: 'Empathique', icon: '❤️', description: 'Écoute bienveillante' },
@@ -61,8 +70,70 @@ const B2CCoachExperience: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const resolveUserAudience = async () => {
+      try {
+        const { data } = await supabase.auth.getUser();
+        const authUser = data?.user;
+        if (authUser) {
+          setUserId(authUser.id);
+          const primaryRole = typeof authUser.app_metadata?.role === 'string'
+            ? authUser.app_metadata.role
+            : Array.isArray(authUser.app_metadata?.roles) && authUser.app_metadata.roles.length
+              ? authUser.app_metadata.roles[0]
+              : null;
+
+          if (primaryRole && primaryRole.toLowerCase().includes('b2b')) {
+            setAudience('b2b');
+          }
+        }
+      } catch (error) {
+        console.error('Erreur récupération utilisateur coach:', error);
+      }
+    };
+
+    resolveUserAudience();
+  }, []);
+
+  useEffect(() => {
+    if (hasConsented && !consentToken) {
+      const token = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+      setConsentToken(token);
+      if (!sessionStartedAt) {
+        setSessionStartedAt(Date.now());
+      }
+    }
+
+    if (!hasConsented) {
+      setConsentToken(null);
+      setSessionStartedAt(null);
+    }
+  }, [hasConsented, consentToken, sessionStartedAt]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const deriveMoodLabel = (): string | null => {
+    if (!currentMood) return null;
+
+    const valence = typeof currentMood.valence === 'number' ? currentMood.valence : null;
+    const arousal = typeof (currentMood as any)?.arousal === 'number' ? (currentMood as any).arousal : null;
+
+    if (valence !== null) {
+      if (valence >= 0.7) return 'joie';
+      if (valence <= 0.3) return 'tristesse';
+    }
+
+    if (arousal !== null) {
+      if (arousal >= 0.7) return 'colere';
+      if (arousal <= 0.3) return 'peur';
+    }
+
+    return 'neutre';
   };
 
   const loadConversations = async () => {
@@ -95,7 +166,7 @@ const B2CCoachExperience: React.FC = () => {
         .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
-      
+
       if (error) throw error;
       if (data) {
         const formattedMessages = data.map(msg => ({
@@ -107,6 +178,8 @@ const B2CCoachExperience: React.FC = () => {
         }));
         setMessages(formattedMessages);
         setCurrentConversationId(conversationId);
+        setSessionStartedAt(Date.now());
+        setDisclaimers([...COACH_DISCLAIMERS]);
       }
     } catch (error) {
       console.error('Erreur chargement messages:', error);
@@ -116,7 +189,8 @@ const B2CCoachExperience: React.FC = () => {
   const createNewConversation = async () => {
     try {
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) {
+      const resolvedUserId = userData.user?.id ?? userId;
+      if (!resolvedUserId) {
         toast({
           title: "Erreur",
           description: "Vous devez être connecté pour créer une conversation",
@@ -125,22 +199,28 @@ const B2CCoachExperience: React.FC = () => {
         return;
       }
 
+      if (!userId) {
+        setUserId(resolvedUserId);
+      }
+
       const { data, error } = await supabase
         .from('coach_conversations')
         .insert({
           title: 'Nouvelle conversation',
           coach_mode: coachPersonality,
-          user_id: userData.user.id
+          user_id: resolvedUserId
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       if (data) {
         setCurrentConversationId(data.id);
         setMessages([]);
         await loadConversations();
-        
+        setSessionStartedAt(Date.now());
+        setDisclaimers([...COACH_DISCLAIMERS]);
+
         // Message de bienvenue
         const welcomeMessage: Message = {
           id: 'welcome',
@@ -163,93 +243,106 @@ const B2CCoachExperience: React.FC = () => {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    if (!currentConversationId) {
+      toast({
+        title: 'Conversation requise',
+        description: 'Sélectionnez ou créez une conversation pour envoyer un message.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!hasConsented || !consentToken) {
+      toast({
+        title: 'Consentement requis',
+        description: 'Merci d’accepter les mentions légales avant de discuter avec le coach IA.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!sessionStartedAt) {
+      setSessionStartedAt(Date.now());
+    }
+
+    const trimmed = input.trim();
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
-      timestamp: new Date()
+      content: trimmed,
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const historyWithUser = [...messages, userMessage];
+    setMessages(historyWithUser);
     setInput('');
     setIsLoading(true);
 
     try {
-      // Sauvegarder le message utilisateur
-      if (currentConversationId) {
-        await supabase.from('coach_messages').insert({
-          conversation_id: currentConversationId,
-          sender: 'user',
-          content: userMessage.content
-        });
-      }
-
-      // Appeler l'IA pour la réponse
-      const { data, error } = await supabase.functions.invoke('ai-coach-response', {
-        body: {
-          message: input,
-          conversationHistory: messages.slice(-6).map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          coachPersonality,
-          userEmotion: currentMood?.valence > 0.6 ? 'positive' : 
-                       currentMood?.valence < 0.4 ? 'negative' : 'neutral'
-        }
+      await supabase.from('coach_messages').insert({
+        conversation_id: currentConversationId,
+        sender: 'user',
+        content: trimmed,
       });
 
-      if (error) throw error;
+      const coachResponse = await requestCoachResponse({
+        message: trimmed,
+        emotion: deriveMoodLabel(),
+        history: historyWithUser.map(msg => ({ role: msg.role, content: msg.content })),
+        audience,
+        consentToken,
+        personality: coachPersonality,
+        conversationId: currentConversationId,
+        userId,
+        startedAt: sessionStartedAt,
+      });
+
+      setDisclaimers(coachResponse.disclaimers);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.response,
+        content: coachResponse.message,
         timestamp: new Date(),
-        emotion: data.emotion,
-        techniques: data.techniques,
-        resources: data.resources
+        techniques: coachResponse.suggestions,
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const updatedMessages = [...historyWithUser, assistantMessage];
+      setMessages(updatedMessages);
 
-      // Sauvegarder la réponse du coach
-      if (currentConversationId) {
-        await supabase.from('coach_messages').insert({
-          conversation_id: currentConversationId,
-          sender: 'assistant',
-          content: assistantMessage.content,
-          message_type: data.emotion
-        });
+      await supabase.from('coach_messages').insert({
+        conversation_id: currentConversationId,
+        sender: 'assistant',
+        content: assistantMessage.content,
+        message_type: coachResponse.meta.emotion,
+      });
 
-        // Mettre à jour la conversation
-        await supabase
-          .from('coach_conversations')
-          .update({
-            last_message_at: new Date().toISOString(),
-            message_count: messages.length + 2
-          })
-          .eq('id', currentConversationId);
-      }
-
+      await supabase
+        .from('coach_conversations')
+        .update({
+          last_message_at: new Date().toISOString(),
+          message_count: updatedMessages.length,
+        })
+        .eq('id', currentConversationId);
     } catch (error) {
       console.error('Erreur envoi message:', error);
       toast({
         title: "Erreur de communication",
         description: "Je n'ai pas pu traiter votre message. Réessayez dans un moment.",
-        variant: "destructive"
+        variant: 'destructive',
       });
 
-      // Message d'erreur empathique
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: "Je rencontre un petit problème technique. Prenez un moment pour respirer, je serai bientôt de retour pour vous accompagner.",
         timestamp: new Date(),
         techniques: [
-          "Inspirez profondément pendant 4 secondes",
-          "Retenez votre souffle 4 secondes", 
-          "Expirez lentement pendant 6 secondes"
-        ]
+          'Inspirez profondément pendant 4 secondes',
+          'Retenez votre souffle 4 secondes',
+          'Expirez lentement pendant 6 secondes',
+        ],
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -263,12 +356,13 @@ const B2CCoachExperience: React.FC = () => {
         .from('coach_conversations')
         .delete()
         .eq('id', conversationId);
-      
+
       if (currentConversationId === conversationId) {
         setCurrentConversationId(null);
         setMessages([]);
+        setSessionStartedAt(null);
       }
-      
+
       await loadConversations();
       toast({
         title: "Conversation supprimée",
@@ -280,6 +374,15 @@ const B2CCoachExperience: React.FC = () => {
   };
 
   const startVoiceRecognition = () => {
+    if (!hasConsented) {
+      toast({
+        title: 'Consentement requis',
+        description: 'Activez la reconnaissance vocale après avoir accepté les mentions légales.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if ('webkitSpeechRecognition' in window) {
       const recognition = new (window as any).webkitSpeechRecognition();
       recognition.continuous = false;
@@ -444,13 +547,41 @@ const B2CCoachExperience: React.FC = () => {
 
               {/* Messages */}
               <CardContent className="flex-1 overflow-hidden">
-                <ScrollArea className="h-full pr-4">
-                  <div className="space-y-4">
-                    {messages.length === 0 ? (
-                      <div className="text-center py-12 text-gray-400">
-                        <Heart className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                        <h3 className="text-lg font-medium mb-2">Commencez une conversation</h3>
-                        <p className="text-sm">Votre coach IA est là pour vous accompagner dans votre parcours de bien-être</p>
+                <div className="flex h-full flex-col">
+                  <div
+                    className={`mb-4 rounded-lg border ${
+                      hasConsented
+                        ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-100'
+                        : 'border-yellow-500/40 bg-yellow-500/10 text-yellow-100'
+                    } p-4 text-xs`}
+                  >
+                    <p className="mb-2 font-semibold">Mentions importantes</p>
+                    <ul className="list-disc space-y-1 pl-4">
+                      {disclaimers.map(item => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mb-4 flex items-start gap-3 text-sm text-gray-200">
+                    <Checkbox
+                      id="coach-consent"
+                      checked={hasConsented}
+                      onCheckedChange={checked => setHasConsented(Boolean(checked))}
+                      className="mt-1"
+                    />
+                    <Label htmlFor="coach-consent" className="leading-tight cursor-pointer">
+                      J’ai lu et compris ces indications et j’accepte de poursuivre la conversation avec le coach IA.
+                    </Label>
+                  </div>
+
+                  <ScrollArea className="flex-1 pr-4">
+                    <div className="space-y-4">
+                      {messages.length === 0 ? (
+                        <div className="text-center py-12 text-gray-400">
+                          <Heart className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                          <h3 className="text-lg font-medium mb-2">Commencez une conversation</h3>
+                          <p className="text-sm">Votre coach IA est là pour vous accompagner dans votre parcours de bien-être</p>
                         <Button onClick={createNewConversation} className="mt-4 bg-gradient-to-r from-cyan-500 to-purple-500">
                           Démarrer une conversation
                         </Button>
@@ -516,7 +647,7 @@ const B2CCoachExperience: React.FC = () => {
                         </div>
                       ))
                     )}
-                    
+
                     {isLoading && (
                       <div className="flex gap-3 justify-start">
                         <div className="bg-gray-800/80 rounded-lg p-4 border border-gray-700">
@@ -532,8 +663,9 @@ const B2CCoachExperience: React.FC = () => {
                       </div>
                     )}
                     <div ref={messagesEndRef} />
-                  </div>
-                </ScrollArea>
+                    </div>
+                  </ScrollArea>
+                </div>
               </CardContent>
 
               {/* Zone de saisie */}
@@ -546,7 +678,9 @@ const B2CCoachExperience: React.FC = () => {
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Partagez vos pensées, vos émotions, vos défis..."
                         className="min-h-[60px] bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 resize-none"
+                        disabled={!hasConsented}
                         onKeyPress={(e) => {
+                          if (!hasConsented) return;
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             sendMessage();
@@ -557,14 +691,14 @@ const B2CCoachExperience: React.FC = () => {
                     <div className="flex flex-col gap-2">
                       <Button
                         onClick={sendMessage}
-                        disabled={!input.trim() || isLoading}
+                        disabled={!input.trim() || isLoading || !hasConsented}
                         className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
                       >
                         <Send className="w-4 h-4" />
                       </Button>
                       <Button
                         onClick={startVoiceRecognition}
-                        disabled={isListening}
+                        disabled={isListening || !hasConsented}
                         variant="outline"
                         className="bg-transparent border-gray-600 text-gray-300"
                       >

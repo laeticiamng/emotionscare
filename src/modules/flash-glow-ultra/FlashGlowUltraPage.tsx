@@ -7,6 +7,9 @@ import { ff } from "@/lib/flags/ff";
 import { useSound } from "@/COMPONENTS.reg";       // si P5 dispo
 import { recordEvent } from "@/lib/scores/events"; // si P6 dispo
 import { supabase } from "@/integrations/supabase/client";
+import { createFlashGlowJournalEntry } from "@/modules/flash-glow/journal";
+import type { JournalEntry } from "@/modules/journal/journalService";
+import { toast } from "@/hooks/use-toast";
 
 type Theme = "cyan" | "violet" | "amber" | "emerald";
 type PresetKey = "calme" | "focus" | "recovery";
@@ -107,6 +110,9 @@ export default function FlashGlowUltraPage() {
   const [autoSaveError, setAutoSaveError] = React.useState<string | null>(null);
   const [sessionRecordId, setSessionRecordId] = React.useState<string | null>(null);
   const [lastSessionReason, setLastSessionReason] = React.useState<"manual_stop" | "auto_complete" | null>(null);
+  const [moodBaseline, setMoodBaseline] = React.useState<number>(50);
+  const [moodAfterSession, setMoodAfterSession] = React.useState<number | null>(null);
+  const [moodDelta, setMoodDelta] = React.useState<number | null>(null);
 
   const reduced =
     typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -157,6 +163,47 @@ export default function FlashGlowUltraPage() {
       const targetSeconds = Math.max(1, Math.round(targetMinutes * 60));
       const safeBpm = Math.min(Math.max(1, bpm), 12);
 
+      const normalizedBaseline = Math.max(0, Math.min(100, Math.round(moodBaseline)));
+      const normalizedAfter = typeof moodAfterSession === "number"
+        ? Math.max(0, Math.min(100, Math.round(moodAfterSession)))
+        : normalizedBaseline;
+      const computedMoodDelta = normalizedAfter !== null ? normalizedAfter - normalizedBaseline : null;
+      setMoodAfterSession(normalizedAfter);
+      setMoodDelta(computedMoodDelta);
+
+      const moodLabel: "gain" | "léger" | "incertain" = computedMoodDelta !== null
+        ? computedMoodDelta >= 10
+          ? "gain"
+          : computedMoodDelta >= 3
+            ? "léger"
+            : "incertain"
+        : "incertain";
+
+      const recommendationMessage = computedMoodDelta !== null
+        ? computedMoodDelta >= 10
+          ? "Progression spectaculaire ! Gardez ce rythme lumineux."
+          : computedMoodDelta >= 3
+            ? "Belle progression, continuez sur cette cadence."
+            : "Les micro-changements nourrissent votre constance, respirez profondément."
+        : "Prenez un instant pour écouter vos ressentis avant de consigner la séance.";
+
+      let journalEntry: JournalEntry | null = null;
+      try {
+        journalEntry = await createFlashGlowJournalEntry({
+          label: moodLabel,
+          duration: actualDurationSec,
+          intensity: Math.round(Math.max(0, Math.min(1, intensity)) * 100),
+          glowType: preset,
+          recommendation: recommendationMessage,
+          context: "Flash Glow Ultra",
+          moodBefore: normalizedBaseline,
+          moodAfter: normalizedAfter,
+          moodDelta: computedMoodDelta
+        });
+      } catch (err) {
+        console.warn("flash-glow-ultra journal", err);
+      }
+
       if (!eventLoggedRef.current) {
         try {
           recordEvent?.({
@@ -201,6 +248,18 @@ export default function FlashGlowUltraPage() {
 
         const summaries = buildStageSummaries(actualDurationSec, targetSeconds);
 
+        const satisfactionScore = computedMoodDelta !== null
+          ? computedMoodDelta >= 10
+            ? 5
+            : computedMoodDelta >= 3
+              ? 4
+              : computedMoodDelta >= 0
+                ? 3
+                : computedMoodDelta >= -3
+                  ? 2
+                  : 1
+          : null;
+
         const { data, error } = await supabase
           .from("user_activity_sessions")
           .insert({
@@ -208,6 +267,9 @@ export default function FlashGlowUltraPage() {
             activity_type: "flash_glow_ultra",
             duration_seconds: actualDurationSec,
             completed_at: new Date().toISOString(),
+            mood_before: normalizedBaseline.toString(),
+            mood_after: normalizedAfter !== null ? normalizedAfter.toString() : null,
+            satisfaction_score: satisfactionScore ?? undefined,
             session_data: {
               preset,
               bpm,
@@ -225,7 +287,13 @@ export default function FlashGlowUltraPage() {
               })),
               safe_bpm: safeBpm,
               reason,
-              started_at: new Date(sessionStartedAt).toISOString()
+              started_at: new Date(sessionStartedAt).toISOString(),
+              mood: {
+                before: normalizedBaseline,
+                after: normalizedAfter,
+                delta: computedMoodDelta
+              },
+              journal_entry_id: journalEntry?.id || null
             }
           })
           .select("id")
@@ -238,6 +306,12 @@ export default function FlashGlowUltraPage() {
         }
 
         setSessionRecordId(data?.id ?? null);
+        if (journalEntry) {
+          toast({
+            title: "Journal mis à jour ✨",
+            description: recommendationMessage
+          });
+        }
         setAutoSaveStatus("saved");
       } catch (err: any) {
         console.error("Auto-save Flash Glow Ultra session failed", err);
@@ -325,6 +399,8 @@ export default function FlashGlowUltraPage() {
       setAutoSaveError(null);
       setSessionRecordId(null);
       setLastSessionReason(null);
+      setMoodAfterSession(moodBaseline);
+      setMoodDelta(null);
       eventLoggedRef.current = false;
       lastZone.current = -1;
       setSessionActive(true);
@@ -431,6 +507,37 @@ export default function FlashGlowUltraPage() {
                 onChange={(e) => setDur(parseInt(e.target.value, 10))}
               />
             </label>
+          </div>
+
+          <div style={{ display: "grid", gap: 8, background: "rgba(255,255,255,0.02)", borderRadius: 16, padding: 16 }}>
+            <label>
+              Humeur avant séance : {moodBaseline}/100
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={moodBaseline}
+                onChange={(e) => setMoodBaseline(parseInt(e.target.value, 10))}
+                disabled={isSessionActive}
+              />
+            </label>
+            <label>
+              Humeur après séance : {moodAfterSession ?? moodBaseline}/100
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={moodAfterSession ?? moodBaseline}
+                onChange={(e) => setMoodAfterSession(parseInt(e.target.value, 10))}
+              />
+            </label>
+            {moodDelta !== null && (
+              <span style={{ fontSize: 12, color: moodDelta >= 0 ? "var(--success, #22c55e)" : "var(--accent, #f97316)" }}>
+                Δ humeur {moodDelta > 0 ? `+${moodDelta}` : moodDelta}
+              </span>
+            )}
           </div>
 
           <div
@@ -586,6 +693,11 @@ export default function FlashGlowUltraPage() {
                 <span style={{ color: "var(--success, #22c55e)" }}>
                   Session enregistrée automatiquement
                   {sessionRecordId ? ` (#${sessionRecordId.slice(0, 8)})` : ""}.
+                  {moodDelta !== null && (
+                    <span style={{ marginLeft: 4 }}>
+                      Δ humeur {moodDelta > 0 ? `+${moodDelta}` : moodDelta}
+                    </span>
+                  )}
                 </span>
               )}
               {autoSaveStatus === "unauthenticated" && (

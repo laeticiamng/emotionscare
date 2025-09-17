@@ -13,6 +13,7 @@ export interface JournalEntry {
   created_at: Date;
   voice_url?: string;
   duration?: number; // en secondes pour les entrées vocales
+  metadata?: Record<string, any>;
 }
 
 export interface JournalVoiceEntry {

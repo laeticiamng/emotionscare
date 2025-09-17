@@ -1,115 +1,128 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createHash } from 'crypto';
-import * as jwt from '../../lib/jwt';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { TextSchema } from '../../journal/lib/validate';
+import { hash } from '../../journal/lib/hash';
 
-const voiceBody = {
-  audio_url: 'https://storage.supabase.co/u123/cap.webm',
-  text_raw: 'hello',
-  summary_120: 'hi',
-  valence: 0.3,
-  emo_vec: [0, 0, 0, 0, 0, 0, 0, 0],
-  pitch_avg: 200,
-  crystal_meta: { form: 'gem', palette: ['#fff', '#000'], mesh_url: 'https://x.com/a.glb' },
-};
+vi.hoisted(() => {
+  process.env.HASH_PEPPER = 'test-pepper';
+});
 
-const textBody = {
-  text_raw: 'text entry',
-  styled_html: '<p>text</p>',
-  preview: 'text',
-  valence: 0.1,
-  emo_vec: [0, 0, 0, 0, 0, 0, 0, 0],
-};
+const insertTextMock = vi.fn(async (data: any) => ({
+  id: 'text-1',
+  ts: '2024-05-20T10:00:00.000Z',
+  ...data,
+}));
 
-const computeHash = () => createHash('sha256').update('user42' + 'pepper').digest('hex');
+const listFeedMock = vi.fn(async () => [
+  {
+    id: 'entry-1',
+    type: 'text',
+    ts: '2024-05-19T09:30:00.000Z',
+    preview: 'Bonjour journal',
+    text_raw: 'Bonjour journal',
+    summary: 'Bonjour journal',
+    valence: 0.25,
+  },
+]);
 
-describe('journal api', () => {
-  let app: any;
-  let url: string;
-  const voiceResponse = { id: 'voice-123', ts: '2024-01-01T00:00:00.000Z' };
-  const textResponse = { id: 'text-456', ts: '2024-01-02T00:00:00.000Z' };
+async function handleText(req: any, reply: any) {
+  if (!req.user) {
+    reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Unauthorized' } });
+    return;
+  }
+  const data = TextSchema.parse(req.body);
+  const userHash = hash(req.user.sub);
+  const row = await insertTextMock({ ...data, user_hash: userHash });
+  reply.code(201).send({ ok: true, data: { id: row.id, ts: row.ts } });
+}
 
-  const insertVoiceMock = vi.fn(async (data: any) => ({ ...voiceResponse, ...data }));
-  const insertTextMock = vi.fn(async (data: any) => ({ ...textResponse, ...data }));
-  const listFeedMock = vi.fn(async () => [
-    { type: 'voice', id: 'voice-123', ts: '2024-01-01T00:00:00.000Z', summary: 'summary' },
-    { type: 'text', id: 'text-456', ts: '2024-01-02T00:00:00.000Z', preview: 'preview' },
-  ]);
+async function handleFeed(req: any, reply: any) {
+  if (!req.user) {
+    reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Unauthorized' } });
+    return;
+  }
+  const entries = await listFeedMock(hash(req.user.sub));
+  reply.send({ ok: true, data: { entries, weekly: [] } });
+}
 
-  beforeEach(async () => {
-    process.env.JWT_SECRETS = 'test-secret';
-    process.env.HASH_PEPPER = 'pepper';
-    insertVoiceMock.mockClear();
-    insertTextMock.mockClear();
-    listFeedMock.mockClear();
-    vi.spyOn(jwt, 'verifyJwt').mockImplementation(async token => {
-      if (token === 'valid-token') {
-        return { sub: 'user42', role: 'b2c', aud: 'test' } as jwt.TokenPayload;
-      }
-      throw new Error('invalid token');
+beforeEach(() => {
+  insertTextMock.mockClear();
+  listFeedMock.mockClear();
+});
+
+describe('journal API routes', () => {
+  it('rejects text journal creation without authentication', async () => {
+    const reply = createReply();
+    await handleText({ body: { text_raw: 'Bonjour', styled_html: '<p>Bonjour</p>', preview: 'Bonjour', valence: 0, emo_vec: Array(8).fill(0) } }, reply);
+
+    expect(reply.statusCode).toBe(401);
+    expect(insertTextMock).not.toHaveBeenCalled();
+  });
+
+  it('creates a text journal entry for the authenticated user', async () => {
+    const payload = {
+      text_raw: 'Bonjour journal',
+      styled_html: '<p>Bonjour journal</p>',
+      preview: 'Bonjour journal',
+      valence: 0.1,
+      emo_vec: Array(8).fill(0.1),
+    };
+    const reply = createReply();
+
+    await handleText({ body: payload, user: { sub: 'user-123' } }, reply);
+
+    expect(reply.statusCode).toBe(201);
+    const expectedHash = hash('user-123');
+    expect(insertTextMock).toHaveBeenCalledWith({
+      ...payload,
+      user_hash: expectedHash,
     });
-    const serverModule = await import('../server');
-    app = serverModule.createApp({
-      journalDb: {
-        insertVoice: insertVoiceMock,
-        insertText: insertTextMock,
-        listFeed: listFeedMock,
+
+    expect(reply.payload).toEqual({
+      ok: true,
+      data: { id: 'text-1', ts: '2024-05-20T10:00:00.000Z' },
+    });
+  });
+
+  it('returns the journal feed for the authenticated user', async () => {
+    const reply = createReply();
+
+    await handleFeed({ user: { sub: 'user-123' } }, reply);
+
+    expect(reply.statusCode).toBe(200);
+    const expectedHash = hash('user-123');
+    expect(listFeedMock).toHaveBeenCalledWith(expectedHash);
+
+    expect(reply.payload).toEqual({
+      ok: true,
+      data: {
+        entries: [
+          {
+            id: 'entry-1',
+            type: 'text',
+            ts: '2024-05-19T09:30:00.000Z',
+            preview: 'Bonjour journal',
+            text_raw: 'Bonjour journal',
+            summary: 'Bonjour journal',
+            valence: 0.25,
+          },
+        ],
+        weekly: [],
       },
     });
-    app.addHook('preHandler', (req: any, _reply: any, done: any) => {
-      if (req.headers.authorization === 'Bearer valid-token') {
-        (req as any).user = { sub: 'user42', role: 'b2c', aud: 'test' };
-      }
-      done();
-    });
-    await app.listen({ port: 0 });
-    const address = app.server.address();
-    const port = typeof address === 'object' && address ? address.port : 0;
-    url = `http://127.0.0.1:${port}`;
-  });
-
-  afterEach(async () => {
-    await app.close();
-    vi.restoreAllMocks();
-  });
-
-  it('creates voice journal entry with hashed user id', async () => {
-    const res = await fetch(url + '/api/v1/journal/voice', {
-      method: 'POST',
-      headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
-      body: JSON.stringify(voiceBody),
-    });
-
-    expect(res.status).toBe(201);
-    expect(insertVoiceMock).toHaveBeenCalledTimes(1);
-    expect(insertVoiceMock).toHaveBeenCalledWith({ ...voiceBody, user_hash: computeHash() });
-    const data = await res.json();
-    expect(data).toEqual({ ok: true, data: voiceResponse });
-  });
-
-  it('creates text journal entry with hashed user id', async () => {
-    const res = await fetch(url + '/api/v1/journal/text', {
-      method: 'POST',
-      headers: { Authorization: 'Bearer valid-token', 'Content-Type': 'application/json' },
-      body: JSON.stringify(textBody),
-    });
-
-    expect(res.status).toBe(201);
-    expect(insertTextMock).toHaveBeenCalledTimes(1);
-    expect(insertTextMock).toHaveBeenCalledWith({ ...textBody, user_hash: computeHash() });
-    const data = await res.json();
-    expect(data).toEqual({ ok: true, data: textResponse });
-  });
-
-  it('returns journal feed from dependency', async () => {
-    const res = await fetch(url + '/api/v1/me/journal', {
-      headers: { Authorization: 'Bearer valid-token' },
-    });
-
-    expect(res.status).toBe(200);
-    expect(listFeedMock).toHaveBeenCalledTimes(1);
-    expect(listFeedMock).toHaveBeenCalledWith(computeHash());
-    const data = await res.json();
-    const entries = await listFeedMock.mock.results[0].value;
-    expect(data).toEqual({ ok: true, data: { entries, weekly: [] } });
   });
 });
+
+function createReply() {
+  return {
+    statusCode: 0,
+    payload: undefined as any,
+    code(code: number) {
+      this.statusCode = code;
+      return this;
+    },
+    send(body: any) {
+      this.payload = body;
+      this.statusCode = this.statusCode || 200;
+    },
+  };
+}

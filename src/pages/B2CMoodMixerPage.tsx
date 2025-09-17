@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Volume2, Save, Play, Pause, RotateCcw, Trash2 } from 'lucide-react';
+import { ArrowLeft, Volume2, Save, Play, Pause, RotateCcw, Trash2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -538,7 +538,7 @@ const B2CMoodMixerPage: React.FC = () => {
               size="icon"
               onClick={handlePreviewToggle}
               className="hover:bg-white/10"
-              aria-label={isPlaying ? 'Mettre la lecture en pause' : 'Lancer la lecture du mix'}
+              aria-label={isPreviewPlaying ? 'Mettre la lecture en pause' : 'Lancer la lecture du mix'}
             >
               {isPreviewPlaying ? (
                 <Pause className="h-4 w-4" />

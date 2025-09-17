@@ -49,24 +49,30 @@ describe('useFlashGlowMachine - auto journalisation', () => {
     });
 
     await act(async () => {
-      const promise = result.current.startSession();
+      const promise = result.current.startSession({ moodBaseline: 40 });
       vi.runAllTimers();
       await promise;
     });
 
     await act(async () => {
-      await result.current.onSessionComplete('gain');
+      await result.current.onSessionComplete({ label: 'gain', moodAfter: 76 });
     });
 
     expect(createFlashGlowJournalEntry).toHaveBeenCalledTimes(1);
     expect(createFlashGlowJournalEntry).toHaveBeenCalledWith(expect.objectContaining({
       label: 'gain',
       context: 'Flash Glow Ultra',
-      recommendation: 'Recommandation test'
+      recommendation: 'Recommandation test',
+      moodBefore: 40,
+      moodAfter: 76,
+      moodDelta: 36
     }));
 
     expect(flashGlowService.endSession).toHaveBeenCalledWith(expect.objectContaining({
       metadata: expect.objectContaining({
+        moodBefore: 40,
+        moodAfter: 76,
+        moodDelta: 36,
         autoJournal: true,
         journalEntryId: 'journal-1',
         journalSummary: 'Flash Glow Ultra - Gain ressenti',

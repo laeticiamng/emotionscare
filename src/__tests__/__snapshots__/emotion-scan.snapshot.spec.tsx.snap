@@ -1,23 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`EmotionScan Page > rend la page 1`] = `
-<div>
-  <main
-    class="p-4 space-y-4"
-  >
-    <div>
-      EmotionScan
-    </div>
-    <p>
-      Bienvenue dans le module EmotionScan.
-    </p>
-    <button>
-      Commencer
-    </button>
-  </main>
-</div>
-`;
-
 exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
 <div>
   <main
@@ -800,6 +782,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
           <button
             aria-disabled="true"
             data-ui="primary-cta"
+            disabled=""
             type="submit"
           >
             Calculer

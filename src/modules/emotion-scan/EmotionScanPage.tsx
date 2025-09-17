@@ -1,8 +1,17 @@
 "use client";
 import React from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageHeader, Card, Button, ProgressBar, Sparkline } from "@/COMPONENTS.reg"; // ProgressBar/Sparkline ajoutés en P6
 import { recordEvent } from "@/lib/scores/events"; // si P6 non intégré, cet import peut être ignoré (no-op)
-import { z } from "zod";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  invokeEmotionScan,
+  getEmotionScanHistory,
+  summarizeLikertAnswers,
+  deriveScore10,
+  EmotionScanHistoryEntry,
+  EmotionAnalysisResult,
+} from "@/services/emotionScan.service";
 
 const POS = [
   { id: "active", label: "Actif(ve)" },
@@ -23,21 +32,92 @@ const NEG = [
 type Likert = 1|2|3|4|5;
 type Resp = Record<(typeof POS[number] | typeof NEG[number])["id"], Likert | undefined>;
 
-const HISTORY_KEY = "emotion_scan_history_v1";
+const LOCAL_HISTORY_KEY = "emotion_scan_history_v2";
 
-function loadHistory(): number[] {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { return []; }
+function loadLocalHistory(): number[] {
+  try {
+    const payload = localStorage.getItem(LOCAL_HISTORY_KEY);
+    if (!payload) return [];
+    const parsed = JSON.parse(payload);
+    return Array.isArray(parsed) ? parsed.filter((value: unknown) => typeof value === "number") : [];
+  } catch {
+    return [];
+  }
 }
-function saveHistory(vals: number[]) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(vals.slice(-12)));
+
+function saveLocalHistory(values: number[]) {
+  try {
+    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(values.slice(-12)));
+  } catch {
+    // ignore storage errors (private mode, quota, etc.)
+  }
 }
 
 export default function EmotionScanPage() {
   const [resp, setResp] = React.useState<Resp>({} as any);
   const [submitted, setSubmitted] = React.useState(false);
-  const [history, setHistory] = React.useState<number[]>([]);
+  const [analysis, setAnalysis] = React.useState<EmotionAnalysisResult | null>(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [localHistory, setLocalHistory] = React.useState<number[]>(() => loadLocalHistory());
 
-  React.useEffect(() => { setHistory(loadHistory()); }, []);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    if (!user?.id) {
+      setLocalHistory(loadLocalHistory());
+    }
+  }, [user?.id]);
+
+  const { data: remoteHistory = [], isLoading: historyLoading } = useQuery({
+    queryKey: ["emotion-scan-history", user?.id],
+    queryFn: () => getEmotionScanHistory(user!.id, 12),
+    enabled: Boolean(user?.id),
+    staleTime: 60 * 1000,
+  });
+
+  const historyEntries: EmotionScanHistoryEntry[] = React.useMemo(
+    () => (user?.id ? remoteHistory : []),
+    [remoteHistory, user?.id]
+  );
+
+  const sparklineValues = React.useMemo(() => {
+    if (user?.id) {
+      return [...historyEntries].reverse().map(entry => entry.normalizedBalance);
+    }
+    return localHistory;
+  }, [historyEntries, localHistory, user?.id]);
+
+  const latestScores = historyEntries[0]?.scores;
+
+  const emotionScanMutation = useMutation({
+    mutationFn: (payload: { text: string; context?: string; previousEmotions?: Record<string, number> }) =>
+      invokeEmotionScan(payload),
+    onMutate: () => {
+      setErrorMessage(null);
+    },
+    onSuccess: async (result) => {
+      setAnalysis(result);
+
+      if (user?.id) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["emotion-scan-history", user.id] }),
+          queryClient.invalidateQueries({ queryKey: ["recent-scans", user.id] }),
+        ]);
+      } else {
+        setLocalHistory(prev => {
+          const next = [...prev, result.emotionalBalance].slice(-12);
+          saveLocalHistory(next);
+          return next;
+        });
+      }
+    },
+    onError: (error: unknown) => {
+      console.error("Emotion scan analysis failed", error);
+      setAnalysis(null);
+      setErrorMessage(error instanceof Error ? error.message : "Analyse impossible pour le moment");
+    },
+  });
 
   const pa = POS.reduce((s, q) => s + ((resp[q.id] ?? 0) as number), 0); // 0..25
   const na = NEG.reduce((s, q) => s + ((resp[q.id] ?? 0) as number), 0); // 0..25
@@ -55,25 +135,34 @@ export default function EmotionScanPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
-    // Historique (balance normalisée 0..100)
-    const toStore = Math.round((balance + 25) * 2); // -25..25 → 0..100
-    const next = [...history, toStore].slice(-12);
-    setHistory(next);
-    saveHistory(next);
+    setErrorMessage(null);
 
-    // Event pour Scores V2 (si dispo)
+    const positiveAnswers = POS.map(question => ({ ...question, value: resp[question.id] as number | undefined }));
+    const negativeAnswers = NEG.map(question => ({ ...question, value: resp[question.id] as number | undefined }));
+
+    const summaryText = summarizeLikertAnswers(positiveAnswers, negativeAnswers, balance);
+
     try {
-      recordEvent?.({
-        module: "emotion-scan",
-        startedAt: new Date().toISOString(),
-        endedAt: new Date().toISOString(),
-        durationSec: 60,
-        score: Math.max(0, toStore), // proxy
-        meta: { pa, na, balance }
+      const result = await emotionScanMutation.mutateAsync({
+        text: summaryText,
+        context: "Auto-évaluation I-PANAS-SF",
+        previousEmotions: latestScores,
       });
-    } catch {}
 
-    // focus résultat
+      try {
+        recordEvent?.({
+          module: "emotion-scan",
+          startedAt: new Date().toISOString(),
+          endedAt: new Date().toISOString(),
+          durationSec: 60,
+          score: result.emotionalBalance,
+          meta: { pa, na, balance, mood: result.dominantEmotion },
+        });
+      } catch {}
+    } catch {
+      // handled in mutation onError
+    }
+
     setTimeout(() => document.getElementById("scan-result")?.scrollIntoView({ behavior: "smooth", block: "start" }), 10);
   }
 
@@ -98,20 +187,104 @@ export default function EmotionScanPage() {
 
           <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
             <ProgressBar value={completion * 100} max={100} />
-            <Button type="submit" data-ui="primary-cta" aria-disabled={completion < 1}>Calculer</Button>
+            <Button
+              type="submit"
+              data-ui="primary-cta"
+              aria-disabled={completion < 1 || emotionScanMutation.isPending}
+              disabled={completion < 1 || emotionScanMutation.isPending}
+            >
+              {emotionScanMutation.isPending ? "Analyse en cours…" : "Calculer"}
+            </Button>
           </div>
         </form>
       </Card>
 
-      {submitted && (
-        <Card id="scan-result" style={{ marginTop: 12 }}>
-          <h2>Résultat</h2>
-          <p><strong>PA</strong> (positif) : {pa} / 25</p>
-          <p><strong>NA</strong> (négatif) : {na} / 25</p>
-          <p><strong>Balance</strong> (PA - NA) : {balance} — <em>{labelForBalance(balance)}</em></p>
-          <div style={{ marginTop: 8 }}>
-            <Sparkline values={history} />
-          </div>
+      {(submitted || emotionScanMutation.isPending || analysis) && (
+        <Card id="scan-result" style={{ marginTop: 12, display: "grid", gap: 12 }}>
+          <header>
+            <h2>Résultat &amp; analyse IA</h2>
+            <p style={{ marginTop: 4, color: "var(--muted-foreground)" }}>
+              Synthèse de votre auto-évaluation et recommandations générées par l'IA.
+            </p>
+          </header>
+
+          <section aria-live="polite" style={{ display: "grid", gap: 4 }}>
+            <p><strong>PA</strong> (positif) : {pa} / 25</p>
+            <p><strong>NA</strong> (négatif) : {na} / 25</p>
+            <p>
+              <strong>Balance</strong> (PA - NA) : {balance} — <em>{labelForBalance(balance)}</em>
+            </p>
+          </section>
+
+          {errorMessage && (
+            <p role="alert" style={{ color: "var(--destructive)" }}>
+              {errorMessage}
+            </p>
+          )}
+
+          {emotionScanMutation.isPending && (
+            <p style={{ color: "var(--muted-foreground)" }}>Analyse de vos réponses…</p>
+          )}
+
+          {analysis && (
+            <section aria-label="Analyse IA" style={{ display: "grid", gap: 8 }}>
+              <div>
+                <p>
+                  <strong>Émotion dominante :</strong> {analysis.dominantEmotion}
+                </p>
+                <p>
+                  <strong>Confiance :</strong> {analysis.confidence}% · <strong>Équilibre émotionnel :</strong> {analysis.emotionalBalance}/100
+                </p>
+              </div>
+
+              <EmotionScoresGrid scores={analysis.emotions} />
+
+              {analysis.insights.length > 0 && (
+                <div>
+                  <h3>Insights clés</h3>
+                  <ul style={{ paddingLeft: 18, marginTop: 4 }}>
+                    {analysis.insights.map((insight) => (
+                      <li key={insight}>{insight}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {analysis.recommendations.length > 0 && (
+                <div>
+                  <h3>Recommandations personnalisées</h3>
+                  <ul style={{ paddingLeft: 18, marginTop: 4 }}>
+                    {analysis.recommendations.map((recommendation) => (
+                      <li key={recommendation}>{recommendation}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          )}
+
+          <section aria-label="Historique des scans" style={{ display: "grid", gap: 8 }}>
+            <h3>Historique des 12 derniers scans</h3>
+            {historyLoading && user?.id ? (
+              <p style={{ color: "var(--muted-foreground)" }}>Chargement de votre historique…</p>
+            ) : sparklineValues.length ? (
+              <div style={{ display: "grid", gap: 8 }}>
+                <Sparkline values={sparklineValues} width={320} height={56} />
+                {user?.id && historyEntries.length > 0 && (
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 6 }}>
+                    {historyEntries.slice(0, 3).map(entry => (
+                      <li key={entry.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
+                        <span>{formatHistoryLabel(entry)}</span>
+                        <span>{deriveScore10(entry.normalizedBalance).toFixed(1)}/10</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <p style={{ color: "var(--muted-foreground)" }}>Aucun historique disponible pour le moment.</p>
+            )}
+          </section>
         </Card>
       )}
     </main>
@@ -137,4 +310,40 @@ function LikertRow({ id, label, value, onChange }: { id: string; label: string; 
       ))}
     </div>
   );
+}
+
+function EmotionScoresGrid({ scores }: { scores: Record<string, number> }) {
+  const sorted = React.useMemo(
+    () => Object.entries(scores).sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0)).slice(0, 6),
+    [scores]
+  );
+
+  if (!sorted.length) return null;
+
+  return (
+    <div style={{ display: "grid", gap: 4 }}>
+      <h3>Scores émotionnels</h3>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
+        {sorted.map(([key, value]) => (
+          <div key={key} style={{ border: "1px solid var(--border)", borderRadius: 8, padding: 8 }}>
+            <p style={{ fontWeight: 600, textTransform: "capitalize" }}>{key}</p>
+            <p style={{ color: "var(--muted-foreground)" }}>{value.toFixed(1)} / 10</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function formatHistoryLabel(entry: EmotionScanHistoryEntry) {
+  const date = new Date(entry.createdAt);
+  const formatter = new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const dateLabel = formatter.format(date);
+  return entry.mood ? `${dateLabel} · ${entry.mood}` : dateLabel;
 }

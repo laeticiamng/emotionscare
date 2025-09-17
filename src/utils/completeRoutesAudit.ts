@@ -1,5 +1,5 @@
 
-import { ROUTES_MANIFEST } from '@/router/buildUnifiedRoutes';
+import { ROUTER_V2_MANIFEST } from '@/routerV2/manifest';
 
 export interface RouteAuditData {
   route: string;
@@ -65,7 +65,7 @@ export const COMPLETE_ROUTES_AUDIT: RouteAuditData[] = [
 ];
 
 export function validateAllRoutes() {
-  const manifestRoutes = Object.values(ROUTES_MANIFEST);
+  const manifestRoutes = ROUTER_V2_MANIFEST;
   const auditRoutes = COMPLETE_ROUTES_AUDIT.map(r => r.route);
   
   const missingInAudit = manifestRoutes.filter(route => !auditRoutes.includes(route));

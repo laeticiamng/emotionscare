@@ -1,40 +1,55 @@
-import { test, expect } from 'vitest';
-import { routes } from '@/router';
-import ProtectedRoute from '@/guards/ProtectedRoute';
+import { expect, test } from 'vitest';
+import { ROUTES_REGISTRY } from '@/routerV2/registry';
+import { ROUTE_ALIASES } from '@/routerV2/aliases';
 
-function findRoute(path: string) {
-  return routes.find(r => r.path === path);
-}
+const findRouteByAlias = (alias: string) =>
+  ROUTES_REGISTRY.find(route => route.aliases?.includes(alias));
 
-test('b2c dashboard routes protected', () => {
-  const b2c = findRoute('b2c');
-  expect(b2c).toBeTruthy();
-  expect(b2c!.element.type).toBe(ProtectedRoute);
-  expect(b2c!.element.props.requiredRole).toBe('b2c');
-  const expected = ['dashboard', 'journal', 'scan', 'music', 'coach', 'coach-chat', 'vr', 'preferences', 'settings', 'cocon', 'social-cocon', 'gamification'];
-  for (const p of expected) {
-    expect(b2c!.children?.some(c => c.path === p)).toBeTruthy();
+const expectProtectedDashboard = (
+  alias: string,
+  {
+    path,
+    role,
+    extraAliases = [],
+  }: {
+    path: string;
+    role: string;
+    extraAliases?: string[];
+  },
+) => {
+  const route = findRouteByAlias(alias);
+  expect(route, `route for alias ${alias}`).toBeTruthy();
+  expect(route?.path).toBe(path);
+  expect(route?.guard).toBe(true);
+  expect(route?.role).toBe(role);
+  expect(route?.aliases).toContain(alias);
+  for (const extraAlias of extraAliases) {
+    expect(route?.aliases).toContain(extraAlias);
   }
+
+  const aliasEntry = ROUTE_ALIASES.find(entry => entry.from === alias);
+  expect(aliasEntry, `alias redirect for ${alias}`).toBeTruthy();
+  expect(aliasEntry?.to).toBe(path);
+};
+
+test('b2c dashboard is served by RouterV2 with consumer guard', () => {
+  expectProtectedDashboard('/b2c/dashboard', {
+    path: '/app/home',
+    role: 'consumer',
+    extraAliases: ['/dashboard'],
+  });
 });
 
-test('b2b user dashboard routes protected', () => {
-  const user = findRoute('b2b/user');
-  expect(user).toBeTruthy();
-  expect(user!.element.type).toBe(ProtectedRoute);
-  expect(user!.element.props.requiredRole).toBe('b2b_user');
-  const expected = ['dashboard', 'journal', 'scan', 'music', 'coach', 'vr', 'preferences', 'settings', 'cocon', 'social-cocon', 'gamification'];
-  for (const p of expected) {
-    expect(user!.children?.some(c => c.path === p)).toBeTruthy();
-  }
+test('b2b user dashboard is routed via RouterV2 employee segment', () => {
+  expectProtectedDashboard('/b2b/user/dashboard', {
+    path: '/app/collab',
+    role: 'employee',
+  });
 });
 
-test('b2b admin dashboard routes protected', () => {
-  const admin = findRoute('b2b/admin');
-  expect(admin).toBeTruthy();
-  expect(admin!.element.type).toBe(ProtectedRoute);
-  expect(admin!.element.props.requiredRole).toBe('b2b_admin');
-  const expected = ['dashboard', 'journal', 'scan', 'music', 'teams', 'reports', 'events', 'social-cocon', 'optimisation', 'settings'];
-  for (const p of expected) {
-    expect(admin!.children?.some(c => c.path === p)).toBeTruthy();
-  }
+test('b2b admin dashboard is routed via RouterV2 manager segment', () => {
+  expectProtectedDashboard('/b2b/admin/dashboard', {
+    path: '/app/rh',
+    role: 'manager',
+  });
 });

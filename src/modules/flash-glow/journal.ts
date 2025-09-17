@@ -11,6 +11,9 @@ interface CreateFlashGlowJournalEntryParams {
   glowType?: string;
   recommendation?: string;
   context?: string;
+  moodBefore?: number | null;
+  moodAfter?: number | null;
+  moodDelta?: number | null;
 }
 
 const LABEL_CONFIG: Record<FlashGlowJournalLabel, { title: string; tone: 'positive' | 'neutral' | 'negative'; reflection: string }> = {
@@ -66,14 +69,25 @@ export async function createFlashGlowJournalEntry({
   intensity,
   glowType,
   recommendation,
-  context
+  context,
+  moodBefore,
+  moodAfter,
+  moodDelta
 }: CreateFlashGlowJournalEntryParams): Promise<JournalEntry | null> {
   if (typeof window === 'undefined') {
     return null;
   }
 
   const safeDuration = Math.max(1, Math.round(duration));
-  const safeIntensity = Math.max(0, Math.min(100, Math.round(intensity)));
+  const parsedIntensity = Number.isFinite(intensity) ? Number(intensity) : 0;
+  const safeIntensity = Math.max(0, Math.min(100, Math.round(parsedIntensity)));
+  const normalizedMoodBefore = typeof moodBefore === 'number' ? Math.round(moodBefore) : null;
+  const normalizedMoodAfter = typeof moodAfter === 'number' ? Math.round(moodAfter) : null;
+  const normalizedMoodDelta = typeof moodDelta === 'number'
+    ? Math.round(moodDelta)
+    : normalizedMoodBefore !== null && normalizedMoodAfter !== null
+      ? Math.round(normalizedMoodAfter - normalizedMoodBefore)
+      : null;
   const labelInfo = label ? LABEL_CONFIG[label] : DEFAULT_LABEL_INFO;
   const friendlyGlowType = formatGlowType(glowType);
   const sectionTitle = context ?? 'Flash Glow';
@@ -95,13 +109,32 @@ export async function createFlashGlowJournalEntry({
     contentLines.push('', labelInfo.reflection);
   }
 
+  if (normalizedMoodBefore !== null || normalizedMoodAfter !== null) {
+    contentLines.push('', 'Suivi d’humeur :');
+    if (normalizedMoodBefore !== null) {
+      contentLines.push(`• Avant séance : ${normalizedMoodBefore}/100`);
+    }
+    if (normalizedMoodAfter !== null) {
+      contentLines.push(`• Après séance : ${normalizedMoodAfter}/100`);
+    }
+    if (normalizedMoodDelta !== null) {
+      const signedDelta = normalizedMoodDelta > 0 ? `+${normalizedMoodDelta}` : `${normalizedMoodDelta}`;
+      contentLines.push(`• Delta : ${signedDelta}`);
+    }
+  }
+
   try {
     const entry = await journalService.saveEntry({
       content: contentLines.join('\n'),
       summary,
       tone: labelInfo.tone,
       ephemeral: false,
-      duration: safeDuration
+      duration: safeDuration,
+      metadata: {
+        mood_before: normalizedMoodBefore,
+        mood_after: normalizedMoodAfter,
+        mood_delta: normalizedMoodDelta
+      }
     });
 
     return entry;

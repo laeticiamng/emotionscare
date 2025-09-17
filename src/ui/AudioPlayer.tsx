@@ -3,6 +3,9 @@ import React from "react";
 import { useSound } from "@/ui/hooks/useSound";
 import { clamp01 } from "@/lib/audio/utils";
 
+export const ADAPTIVE_MUSIC_FAVORITES_EVENT = "adaptive-music:favorites-changed";
+export const ADAPTIVE_MUSIC_PLAYBACK_EVENT = "adaptive-music:playback-changed";
+
 type FavoriteEntry = {
   id: string;
   title?: string;
@@ -10,11 +13,15 @@ type FavoriteEntry = {
   addedAt: string;
 };
 
+export type AudioPlayerFavoriteEntry = FavoriteEntry;
+
 type PlaybackPersistedState = {
   position: number;
   volume: number;
   wasPlaying: boolean;
   updatedAt: number;
+  trackTitle?: string;
+  trackSrc?: string;
 };
 
 const FAVORITES_STORAGE_KEY = "adaptive-music:favorites";
@@ -54,9 +61,11 @@ export function AudioPlayer({
       position: 0,
       volume: safeDefaultVolume,
       wasPlaying: false,
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
+      trackSrc: src,
+      trackTitle: title,
     }),
-    [safeDefaultVolume]
+    [safeDefaultVolume, src, title]
   );
 
   const {
@@ -89,6 +98,36 @@ export function AudioPlayer({
     }
   }, [haptics]);
 
+  const dispatchFavoritesChanged = React.useCallback((entries: FavoriteEntry[]) => {
+    if (typeof window === "undefined") return;
+    try {
+      window.dispatchEvent(new CustomEvent(ADAPTIVE_MUSIC_FAVORITES_EVENT, { detail: entries }));
+    } catch (error) {
+      console.warn("Unable to broadcast favorites", error);
+    }
+  }, []);
+
+  const dispatchPlaybackChanged = React.useCallback(
+    (state: PlaybackPersistedState) => {
+      if (typeof window === "undefined") return;
+      try {
+        window.dispatchEvent(
+          new CustomEvent(ADAPTIVE_MUSIC_PLAYBACK_EVENT, {
+            detail: {
+              trackId: trackKey,
+              title,
+              src,
+              state,
+            },
+          })
+        );
+      } catch (error) {
+        console.warn("Unable to broadcast playback", error);
+      }
+    },
+    [trackKey, title, src]
+  );
+
   const persistPlayback = React.useCallback(
     (update: Partial<PlaybackPersistedState>, options?: { skipState?: boolean }) => {
       const nextPosition =
@@ -108,7 +147,9 @@ export function AudioPlayer({
         position: nextPosition,
         volume: nextVolume,
         wasPlaying: nextWasPlaying,
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        trackSrc: src,
+        trackTitle: title,
       };
 
       playbackRef.current = nextState;
@@ -121,6 +162,8 @@ export function AudioPlayer({
         }
       }
 
+      dispatchPlaybackChanged(nextState);
+
       if (!options?.skipState && typeof update.position === "number") {
         const safePosition = Math.max(0, update.position);
         setResumePosition(prev =>
@@ -128,7 +171,7 @@ export function AudioPlayer({
         );
       }
     },
-    [playbackStorageKey]
+    [playbackStorageKey, dispatchPlaybackChanged, src, title]
   );
 
   const updateFavorites = React.useCallback(
@@ -142,10 +185,11 @@ export function AudioPlayer({
             console.warn("Unable to persist favorites", error);
           }
         }
+        dispatchFavoritesChanged(next);
         return next;
       });
     },
-    []
+    [dispatchFavoritesChanged]
   );
 
   React.useEffect(() => {
@@ -184,7 +228,9 @@ export function AudioPlayer({
             ? clamp01(parsed.volume)
             : defaultPlaybackState.volume,
         wasPlaying: typeof parsed?.wasPlaying === "boolean" ? parsed.wasPlaying : false,
-        updatedAt: typeof parsed?.updatedAt === "number" ? parsed.updatedAt : Date.now()
+        updatedAt: typeof parsed?.updatedAt === "number" ? parsed.updatedAt : Date.now(),
+        trackSrc: typeof parsed?.trackSrc === "string" ? parsed.trackSrc : src,
+        trackTitle: typeof parsed?.trackTitle === "string" ? parsed.trackTitle : title,
       };
 
       playbackRef.current = normalized;
@@ -192,13 +238,14 @@ export function AudioPlayer({
       setVolume(current =>
         Math.abs(current - normalized.volume) < 0.001 ? current : normalized.volume
       );
+      dispatchPlaybackChanged(normalized);
     } catch (error) {
       console.warn("Unable to restore playback state", error);
       playbackRef.current = defaultPlaybackState;
       setResumePosition(defaultPlaybackState.position);
       setVolume(defaultPlaybackState.volume);
     }
-  }, [playbackStorageKey, defaultPlaybackState]);
+  }, [playbackStorageKey, defaultPlaybackState, dispatchPlaybackChanged, src, title]);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;

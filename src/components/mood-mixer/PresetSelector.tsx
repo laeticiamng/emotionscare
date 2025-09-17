@@ -69,7 +69,7 @@ const resolveIcon = (iconName?: string | null): LucideIconType => {
 };
 
 const mapRecordToCard = (record: MoodPresetRecord): MoodPresetCard => ({
-  id: record.id || record.slug,
+  id: record.slug ?? record.id,
   name: record.name,
   description: record.description ?? 'Ambiance personnalisée générée',
   icon: resolveIcon(record.icon),

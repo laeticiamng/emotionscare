@@ -2,7 +2,7 @@
  * Analyseur de similarités et redondances dans les routes
  */
 
-import { ROUTE_MANIFEST } from '@/router/buildUnifiedRoutes';
+import { ROUTER_V2_MANIFEST } from '@/routerV2/manifest';
 
 export interface SimilarityGroup {
   category: string;
@@ -45,7 +45,7 @@ function getRouteContext(route: string): string {
 function groupByFunctionality(): Map<string, string[]> {
   const groups = new Map<string, string[]>();
   
-  ROUTE_MANIFEST.forEach(route => {
+  ROUTER_V2_MANIFEST.forEach(route => {
     const baseName = getRouteBaseName(route);
     if (!groups.has(baseName)) {
       groups.set(baseName, []);
@@ -82,7 +82,7 @@ function findSemanticSimilarities(): SimilarityGroup[] {
   ];
   
   semanticGroups.forEach(group => {
-    const matchingRoutes = ROUTE_MANIFEST.filter(route => 
+    const matchingRoutes = ROUTER_V2_MANIFEST.filter(route =>
       group.names.some(name => route.includes(name))
     );
     
@@ -151,8 +151,8 @@ function findPotentialRedundancies(): SimilarityGroup[] {
   ];
   
   redundantPairs.forEach(pair => {
-    const routes1 = ROUTE_MANIFEST.filter(route => route.includes(pair.pattern1));
-    const routes2 = ROUTE_MANIFEST.filter(route => route.includes(pair.pattern2));
+    const routes1 = ROUTER_V2_MANIFEST.filter(route => route.includes(pair.pattern1));
+    const routes2 = ROUTER_V2_MANIFEST.filter(route => route.includes(pair.pattern2));
     
     if (routes1.length > 0 && routes2.length > 0) {
       redundancies.push({

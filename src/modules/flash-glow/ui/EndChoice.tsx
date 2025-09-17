@@ -2,25 +2,45 @@
  * EndChoice - Composant de choix de fin pour Flash Glow
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, RotateCcw, Sparkles, Clock } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 interface EndChoiceProps {
-  onChoice: (choice: 'gain' | 'léger' | 'incertain', extend?: boolean) => void;
+  onChoice: (choice: { label: 'gain' | 'léger' | 'incertain'; extend?: boolean; moodAfter?: number | null }) => void;
   sessionDuration: number;
   className?: string;
+  moodBefore?: number | null;
 }
 
 const EndChoice: React.FC<EndChoiceProps> = ({
   onChoice,
   sessionDuration,
-  className
+  className,
+  moodBefore
 }) => {
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [showExtend, setShowExtend] = useState(false);
+  const [moodAfter, setMoodAfter] = useState<number>(() => {
+    if (typeof moodBefore === 'number') {
+      return Math.max(0, Math.min(100, Math.round(moodBefore)));
+    }
+    return 50;
+  });
+  useEffect(() => {
+    if (typeof moodBefore === 'number') {
+      setMoodAfter(Math.max(0, Math.min(100, Math.round(moodBefore))));
+    } else {
+      setMoodAfter(50);
+    }
+  }, [sessionDuration, moodBefore]);
+
+  const handleMoodChange = (value: number) => {
+    setMoodAfter(Math.max(0, Math.min(100, Math.round(value))));
+  };
 
   const choices = [
     {
@@ -56,13 +76,13 @@ const EndChoice: React.FC<EndChoiceProps> = ({
     if (sessionDuration < 90 && choice !== 'gain') {
       setShowExtend(true);
     } else {
-      onChoice(choice, false);
+      onChoice({ label: choice, extend: false, moodAfter });
     }
   };
 
   const handleExtend = (extend: boolean) => {
     if (selectedChoice) {
-      onChoice(selectedChoice as 'gain' | 'léger' | 'incertain', extend);
+      onChoice({ label: selectedChoice as 'gain' | 'léger' | 'incertain', extend, moodAfter });
     }
   };
 
@@ -120,10 +140,34 @@ const EndChoice: React.FC<EndChoiceProps> = ({
         </p>
       </div>
 
+      <div className="mb-6 space-y-3" aria-live="polite">
+        <div className="flex items-center justify-between text-sm">
+          <label htmlFor="mood-after-slider" className="font-medium">Ressenti après séance</label>
+          <span className="text-muted-foreground">{moodAfter}/100</span>
+        </div>
+        <Slider
+          id="mood-after-slider"
+          value={[moodAfter]}
+          onValueChange={([value]) => handleMoodChange(value)}
+          min={0}
+          max={100}
+          step={1}
+          aria-valuetext={`${moodAfter} sur 100`}
+        />
+        {typeof moodBefore === 'number' && (
+          <p className="text-xs text-muted-foreground">
+            Delta d'humeur :
+            <span className={`ml-1 font-medium ${moodAfter - moodBefore >= 0 ? 'text-green-500' : 'text-orange-500'}`}>
+              {moodAfter - moodBefore >= 0 ? '+' : ''}{Math.round(moodAfter - moodBefore)}
+            </span>
+          </p>
+        )}
+      </div>
+
       <div className="grid gap-3 max-w-md mx-auto">
         {choices.map((choice) => {
           const Icon = choice.icon;
-          
+
           return (
             <motion.div
               key={choice.id}

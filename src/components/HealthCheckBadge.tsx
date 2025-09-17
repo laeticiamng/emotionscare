@@ -105,6 +105,7 @@ const HealthCheckBadge: React.FC = () => {
 
   const statusInfo = getStatusInfo();
   const Icon = statusInfo.icon;
+  const srStatusMessage = `Statut plateforme ${statusInfo.label}`;
 
   const getTooltipContent = () => {
     const latencyText = health.latency ? `${health.latency}ms` : '';
@@ -130,16 +131,19 @@ const HealthCheckBadge: React.FC = () => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Badge 
+          <Badge
             variant={statusInfo.variant}
             className="gap-1 cursor-help"
             aria-label={`Santé plateforme: ${statusInfo.label}`}
           >
-            <Icon 
-              className={`w-3 h-3 ${statusInfo.color}`} 
+            <Icon
+              className={`w-3 h-3 ${statusInfo.color}`}
               aria-hidden="true"
             />
-            <span className="sr-only">Plateforme</span>
+            <span className="sr-only" role="status" aria-live="polite">
+              {srStatusMessage}
+              {health.latency ? ` (latence ${health.latency} millisecondes)` : ''}
+            </span>
             <span className="hidden sm:inline">{statusInfo.label}</span>
           </Badge>
         </TooltipTrigger>

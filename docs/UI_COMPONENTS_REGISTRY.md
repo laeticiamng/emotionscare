@@ -1,6 +1,6 @@
 # Registre des composants UI
 
-> 📌 Généré automatiquement le 17 septembre 2025 à 12:48 à partir de `src/COMPONENTS.reg.ts`. Utilisez `npm run generate:ui-registry` pour rafraîchir cette liste.
+> 📌 Généré automatiquement le 17 septembre 2025 à 20:41 à partir de `src/COMPONENTS.reg.ts`. Utilisez `npm run generate:ui-registry` pour rafraîchir cette liste.
 
 
 ## Statistiques rapides

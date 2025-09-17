@@ -3,7 +3,7 @@
  * Pattern : idle → loading → active → ending → success|error
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { flashGlowService, FlashGlowSession } from './flash-glowService';
 import { toast } from '@/hooks/use-toast';
@@ -16,32 +16,55 @@ interface FlashGlowConfig {
   duration: number;
 }
 
+interface StartSessionOptions {
+  moodBaseline?: number | null;
+}
+
+interface CompleteSessionOptions {
+  label: 'gain' | 'léger' | 'incertain';
+  extend?: boolean;
+  moodAfter?: number | null;
+}
+
 interface FlashGlowMachineReturn {
   // État de la machine
   state: 'idle' | 'loading' | 'active' | 'ending' | 'success' | 'error';
   isActive: boolean;
-  
+
   // Configuration
   config: FlashGlowConfig;
   setConfig: (config: Partial<FlashGlowConfig>) => void;
-  
+
   // Contrôles
-  startSession: () => Promise<void>;
+  startSession: (options?: StartSessionOptions) => Promise<void>;
   stopSession: () => void;
   extendSession: (additionalSeconds: number) => Promise<void>;
-  
-  // Données de résultat
+
+  // Données de progression
   sessionDuration: number;
+  elapsedSeconds: number;
+  remainingSeconds: number;
+  sessionProgress: number;
+
+  // Humeur
+  moodBaseline: number | null;
+  moodAfter: number | null;
+  moodDelta: number | null;
+  setMoodBaseline: (value: number | null) => void;
+
+  // Résultats
   result: any;
   error: Error | null;
-  
+
   // Callbacks pour les composants UI
-  onSessionComplete: (label: 'gain' | 'léger' | 'incertain', extend?: boolean) => Promise<void>;
-  
+  onSessionComplete: (options: CompleteSessionOptions) => Promise<void>;
+
   // Stats
   stats: { totalSessions: number; avgDuration: number } | null;
   loadStats: () => Promise<void>;
 }
+
+const clampMood = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
 
 export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
   const [config, setConfigState] = useState<FlashGlowConfig>({
@@ -52,37 +75,113 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
 
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
+  const [sessionProgress, setSessionProgress] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [remainingSeconds, setRemainingSeconds] = useState(config.duration);
   const [stats, setStats] = useState<{ totalSessions: number; avgDuration: number } | null>(null);
+  const [moodBaselineState, setMoodBaselineState] = useState<number | null>(null);
+  const [moodAfterState, setMoodAfterState] = useState<number | null>(null);
+  const [lastMoodDelta, setLastMoodDelta] = useState<number | null>(null);
 
-  // Configuration de la machine async
+  const durationRef = useRef(config.duration);
+  const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const moodBaselineRef = useRef<number | null>(null);
+  const moodAfterRef = useRef<number | null>(null);
+  const sessionExtendedRef = useRef(false);
+
+  const clearProgressTimer = useCallback(() => {
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current);
+      progressTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    durationRef.current = config.duration;
+    if (!progressTimerRef.current) {
+      setRemainingSeconds(config.duration);
+    }
+  }, [config.duration]);
+
+  useEffect(() => () => {
+    clearProgressTimer();
+  }, [clearProgressTimer]);
+
+  const setMoodBaseline = useCallback((value: number | null) => {
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      const clamped = clampMood(value);
+      setMoodBaselineState(clamped);
+      moodBaselineRef.current = clamped;
+    } else {
+      setMoodBaselineState(null);
+      moodBaselineRef.current = null;
+    }
+  }, []);
+
+  const setMoodAfter = useCallback((value: number | null) => {
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      const clamped = clampMood(value);
+      setMoodAfterState(clamped);
+      moodAfterRef.current = clamped;
+    } else {
+      setMoodAfterState(null);
+      moodAfterRef.current = null;
+    }
+  }, []);
+
+  const setConfig = useCallback((newConfig: Partial<FlashGlowConfig>) => {
+    setConfigState(prev => ({ ...prev, ...newConfig }));
+  }, []);
+
   const machine = useAsyncMachine<any>({
     run: async (signal: AbortSignal) => {
-      // Phase 1: Démarrer la session
       const sessionStart = await flashGlowService.startSession(config);
-      setSessionStartTime(Date.now());
-      
-      if (signal.aborted) throw new Error('Session aborted');
+      const startedAt = Date.now();
+      setSessionStartTime(startedAt);
+      sessionExtendedRef.current = false;
+      setSessionDuration(0);
+      setSessionProgress(0);
+      setElapsedSeconds(0);
+      setRemainingSeconds(durationRef.current);
+      clearProgressTimer();
 
-      // Phase 2: Attendre la durée configurée
       await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(resolve, config.duration * 1000);
-        
+        const tick = () => {
+          if (signal.aborted) {
+            clearProgressTimer();
+            reject(new Error('Session interrupted'));
+            return;
+          }
+
+          const targetSeconds = Math.max(1, Math.round(durationRef.current));
+          const elapsed = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
+          setElapsedSeconds(elapsed);
+          setRemainingSeconds(Math.max(targetSeconds - elapsed, 0));
+          setSessionProgress(targetSeconds > 0 ? Math.min(1, elapsed / targetSeconds) : 1);
+
+          if (elapsed >= targetSeconds) {
+            clearProgressTimer();
+            resolve();
+          }
+        };
+
+        tick();
+        progressTimerRef.current = setInterval(tick, 1000);
+
         signal.addEventListener('abort', () => {
-          clearTimeout(timeout);
+          clearProgressTimer();
           reject(new Error('Session interrupted'));
         });
       });
 
       if (signal.aborted) throw new Error('Session aborted');
 
-      // Phase 3: Calcul de la durée réelle
-      const actualDuration = sessionStartTime 
-        ? Math.round((Date.now() - sessionStartTime) / 1000)
-        : config.duration;
-      
+      const actualDuration = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
       setSessionDuration(actualDuration);
+      setSessionProgress(1);
+      setElapsedSeconds(actualDuration);
+      setRemainingSeconds(0);
 
-      // Feedback haptique
       flashGlowService.triggerHapticFeedback();
 
       return {
@@ -95,6 +194,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
       console.log('✅ Flash Glow session completed:', result);
     },
     onError: (error) => {
+      clearProgressTimer();
       console.error('❌ Flash Glow session error:', error);
       toast({
         title: "Session interrompue",
@@ -102,38 +202,58 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         variant: "destructive",
       });
     },
-    retryLimit: 0, // Pas de retry automatique pour une session utilisateur
-    timeout: (config.duration + 10) * 1000 // Timeout avec marge
+    retryLimit: 0,
+    timeout: (config.duration + 15) * 1000
   });
 
-  const setConfig = useCallback((newConfig: Partial<FlashGlowConfig>) => {
-    setConfigState(prev => ({ ...prev, ...newConfig }));
-  }, []);
-
-  const startSession = useCallback(async () => {
+  const startSession = useCallback(async (options?: StartSessionOptions) => {
     if (machine.isActive || machine.isLoading) return;
-    
+
+    const providedBaseline = options?.moodBaseline ?? moodBaselineRef.current ?? moodBaselineState ?? null;
+    if (typeof providedBaseline === 'number') {
+      const clamped = clampMood(providedBaseline);
+      setMoodBaselineState(clamped);
+      moodBaselineRef.current = clamped;
+    }
+
+    durationRef.current = config.duration;
+    sessionExtendedRef.current = false;
+    setLastMoodDelta(null);
+    setMoodAfter(null);
+    setSessionDuration(0);
+    setSessionProgress(0);
+    setElapsedSeconds(0);
+    setRemainingSeconds(config.duration);
+
     console.log('🌟 Starting Flash Glow session:', config);
     await machine.start();
-  }, [machine, config]);
+  }, [machine, config, setMoodAfter, moodBaselineState]);
 
   const stopSession = useCallback(() => {
+    clearProgressTimer();
     machine.stop();
     setSessionStartTime(null);
     setSessionDuration(0);
-  }, [machine]);
+    setSessionProgress(0);
+    setElapsedSeconds(0);
+    setRemainingSeconds(config.duration);
+  }, [machine, config.duration, clearProgressTimer]);
 
   const extendSession = useCallback(async (additionalSeconds: number) => {
     if (!machine.isActive) return;
-    
-    const newDuration = config.duration + additionalSeconds;
+
+    const safeAdditional = Math.max(1, Math.round(additionalSeconds));
+    const newDuration = Math.max(1, durationRef.current + safeAdditional);
+    durationRef.current = newDuration;
+    sessionExtendedRef.current = true;
     setConfig({ duration: newDuration });
-    
+    setRemainingSeconds(prev => prev + safeAdditional);
+
     toast({
       title: "Session prolongée",
-      description: `+${additionalSeconds}s ajoutées à votre session`,
+      description: `+${safeAdditional}s ajoutées à votre session`,
     });
-  }, [machine.isActive, config.duration, setConfig]);
+  }, [machine.isActive, setConfig]);
 
   const loadStats = useCallback(async () => {
     try {
@@ -147,18 +267,31 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
     }
   }, []);
 
-  const onSessionComplete = useCallback(async (
-    label: 'gain' | 'léger' | 'incertain',
-    extend: boolean = false
-  ) => {
+  const onSessionComplete = useCallback(async ({
+    label,
+    extend = false,
+    moodAfter: providedMoodAfter
+  }: CompleteSessionOptions) => {
     if (extend) {
       await extendSession(60);
       return;
     }
 
     try {
-      const recordedDuration = sessionDuration || config.duration;
-      const recommendation = flashGlowService.getRecommendation(label, 3); // Real streak will be calculated later
+      const recordedDuration = sessionDuration || elapsedSeconds || config.duration;
+      const recommendation = flashGlowService.getRecommendation(label, 3);
+
+      const baseline = moodBaselineRef.current;
+      const explicitMoodAfter = typeof providedMoodAfter === 'number' ? clampMood(providedMoodAfter) : null;
+      const resolvedMoodAfter = explicitMoodAfter ?? moodAfterRef.current ?? baseline ?? null;
+
+      setMoodAfter(resolvedMoodAfter);
+
+      const moodDelta = baseline !== null && resolvedMoodAfter !== null
+        ? resolvedMoodAfter - baseline
+        : null;
+
+      setLastMoodDelta(moodDelta);
 
       let journalEntry: JournalEntry | null = await createFlashGlowJournalEntry({
         label,
@@ -166,7 +299,10 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         intensity: config.intensity,
         glowType: config.glowType,
         recommendation,
-        context: 'Flash Glow Ultra'
+        context: 'Flash Glow Ultra',
+        moodBefore: baseline,
+        moodAfter: resolvedMoodAfter,
+        moodDelta
       });
 
       const sessionData: FlashGlowSession = {
@@ -177,11 +313,14 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         result: 'completed',
         metadata: {
           timestamp: new Date().toISOString(),
-          extended: false,
+          extended: sessionExtendedRef.current,
           autoJournal: Boolean(journalEntry),
           journalEntryId: journalEntry?.id,
           journalSummary: journalEntry?.summary,
-          journalTone: journalEntry?.tone
+          journalTone: journalEntry?.tone,
+          moodBefore: baseline,
+          moodAfter: resolvedMoodAfter,
+          moodDelta
         }
       };
 
@@ -189,25 +328,35 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
 
       if (!journalEntry) {
         journalEntry = await createFlashGlowJournalEntry({
+          label,
           duration: recordedDuration,
           intensity: config.intensity,
           glowType: config.glowType,
           recommendation,
-          context: 'Flash Glow Ultra'
+          context: 'Flash Glow Ultra',
+          moodBefore: baseline,
+          moodAfter: resolvedMoodAfter,
+          moodDelta
         });
       }
+
+      const deltaDescription = moodDelta === null
+        ? null
+        : `Δ humeur : ${moodDelta > 0 ? '+' : ''}${moodDelta}`;
 
       toast({
         title: "Session terminée ! ✨",
         description: [
           recommendation,
+          deltaDescription,
           journalEntry
             ? '📝 Votre expérience a été ajoutée automatiquement au journal.'
             : '📝 Journalisation automatique indisponible, pensez à noter votre ressenti manuellement.'
-        ].join('\n')
+        ].filter(Boolean).join('\n')
       });
 
-      // Recharger les stats
+      sessionExtendedRef.current = false;
+
       await loadStats();
 
     } catch (error) {
@@ -218,30 +367,46 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         variant: "destructive",
       });
     }
-  }, [sessionDuration, config, extendSession, loadStats]);
+  }, [extendSession, sessionDuration, elapsedSeconds, config, loadStats, setMoodAfter]);
+
+  const computedMoodDelta = useMemo(() => {
+    if (lastMoodDelta === null) return null;
+    return lastMoodDelta;
+  }, [lastMoodDelta]);
 
   return {
     // État
     state: machine.state,
     isActive: machine.isActive,
-    
+
     // Configuration
     config,
     setConfig,
-    
+
     // Contrôles
     startSession,
     stopSession,
     extendSession,
-    
-    // Données
+
+    // Données de progression
     sessionDuration,
+    elapsedSeconds,
+    remainingSeconds,
+    sessionProgress,
+
+    // Humeur
+    moodBaseline: moodBaselineState,
+    moodAfter: moodAfterState,
+    moodDelta: computedMoodDelta,
+    setMoodBaseline,
+
+    // Résultats
     result: machine.result,
     error: machine.error,
-    
+
     // Callbacks
     onSessionComplete,
-    
+
     // Stats
     stats,
     loadStats

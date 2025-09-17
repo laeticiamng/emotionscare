@@ -24,12 +24,15 @@ export interface MoodPresetBlend {
 
 export interface MoodPresetRecord {
   id: string;
-  slug: string;
+  slug: string | null;
+  userId: string | null;
   name: string;
   description: string | null;
   icon: string | null;
   gradient: string | null;
   tags: string[];
+  softness: number;
+  clarity: number;
   blend: MoodPresetBlend;
   createdAt: string;
   updatedAt: string;
