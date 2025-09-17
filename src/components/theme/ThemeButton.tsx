@@ -2,6 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import {
+  safeClassAdd,
+  safeClassRemove,
+  safeGetDocumentRoot
+} from '@/lib/safe-helpers';
 
 const ThemeButton: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
@@ -9,7 +14,15 @@ const ThemeButton: React.FC = () => {
   
   useEffect(() => {
     // Check if theme is set in localStorage
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    let savedTheme: 'light' | 'dark' | 'system' | null = null;
+
+    if (typeof window !== 'undefined') {
+      try {
+        savedTheme = window.localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+      } catch (error) {
+        console.warn('[ThemeButton] Failed to read theme from localStorage', error);
+      }
+    }
     
     if (savedTheme) {
       setTheme(savedTheme);
@@ -34,16 +47,18 @@ const ThemeButton: React.FC = () => {
   }, []);
   
   const applyTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    const root = window.document.documentElement;
-    
+    if (typeof window === 'undefined') return;
+
+    const root = safeGetDocumentRoot();
+
     if (newTheme === 'system') {
       // Check system preference
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.remove('light', 'dark');
-      root.classList.add(systemTheme);
+      safeClassRemove(root, 'light', 'dark');
+      safeClassAdd(root, systemTheme);
     } else {
-      root.classList.remove('light', 'dark');
-      root.classList.add(newTheme);
+      safeClassRemove(root, 'light', 'dark');
+      safeClassAdd(root, newTheme);
     }
   };
   
@@ -59,7 +74,13 @@ const ThemeButton: React.FC = () => {
     }
     
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('theme', newTheme);
+      }
+    } catch (error) {
+      console.warn('[ThemeButton] Failed to persist theme', error);
+    }
     applyTheme(newTheme);
     
     toast({
