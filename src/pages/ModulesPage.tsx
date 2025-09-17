@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageLayout } from '@/components/layout/PageLayout';
+import { UnifiedPageLayout as PageLayout } from '@/components/ui/unified-page-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

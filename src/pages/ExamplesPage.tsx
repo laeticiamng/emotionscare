@@ -11,7 +11,7 @@ import {
   AlertCircle,
   Code2
 } from 'lucide-react';
-import PageLayout from '@/components/layout/PageLayout';
+import { UnifiedPageLayout as PageLayout } from '@/components/ui/unified-page-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

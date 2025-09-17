@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Loader2, Music, Clock, BarChart2, User, HeartPulse } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import useMusicStats from '@/hooks/useMusicStats';
-import EmptyState from '@/components/shared/EmptyState';
+import { UnifiedEmptyState as EmptyState } from '@/components/ui/unified-empty-state';
 
 const MusicStatistics: React.FC = () => {
   const { user } = useAuth();
