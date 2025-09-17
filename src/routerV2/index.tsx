@@ -13,7 +13,7 @@ declare global {
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
-import { ROUTE_ALIASES, findRedirectFor } from './aliases';
+import { ROUTE_ALIASES } from './aliases';
 import { RouteGuard } from './guards';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import EnhancedShell from '@/components/layout/EnhancedShell';
@@ -360,6 +360,8 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 
 // Export des routes helpers et du router
 export { routes } from './routes';
+export { ROUTE_ALIASES } from './aliases';
+export type { RouteAlias } from './aliases';
 export const routerV2 = createBrowserRouter([
   // Routes principales du registry
   ...ROUTES_REGISTRY.map(route => ({
