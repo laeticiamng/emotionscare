@@ -1,5 +1,6 @@
 import httpClient from '@/services/api/httpClient';
 import { DataValidator, sanitizeInput as sanitizePlain, secureTextSchema } from '@/lib/validation/dataValidator';
+import sanitizeHtml from 'sanitize-html';
 
 const EMOTION_VECTOR_LENGTH = 8;
 
@@ -52,7 +53,7 @@ const stripHtml = (html: string): string => {
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || '';
   }
-  return html.replace(/<[^>]*>/g, '');
+  return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} });
 };
 
 const escapeHtml = (value: string): string =>
