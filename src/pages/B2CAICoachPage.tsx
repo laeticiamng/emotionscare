@@ -10,6 +10,8 @@ import { ArrowLeft, Send, Mic, MicOff, Bot, User, Heart, Brain, Lightbulb, BookO
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMood } from '@/contexts/MoodContext';
+import { useAppStore } from '@/store/appStore';
+import B2BCoachPage from '@/pages/b2b/user/CoachPage';
 
 interface Message {
   id: string;
@@ -29,9 +31,10 @@ interface Conversation {
   messageCount: number;
 }
 
-const B2CAICoachPage: React.FC = () => {
+const B2CCoachExperience: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { currentMood } = useMood();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const [messages, setMessages] = useState<Message[]>([]);
@@ -580,6 +583,17 @@ const B2CAICoachPage: React.FC = () => {
       </div>
     </div>
   );
+};
+
+const B2CAICoachPage: React.FC = () => {
+  const userRole = useAppStore((state) => state.user?.role);
+  const isB2B = userRole === 'b2b_user' || userRole === 'b2b_admin';
+
+  if (isB2B) {
+    return <B2BCoachPage />;
+  }
+
+  return <B2CCoachExperience />;
 };
 
 export default B2CAICoachPage;
