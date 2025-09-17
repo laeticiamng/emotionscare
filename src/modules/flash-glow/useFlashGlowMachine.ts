@@ -7,6 +7,8 @@ import { useState, useCallback } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { flashGlowService, FlashGlowSession } from './flash-glowService';
 import { toast } from '@/hooks/use-toast';
+import { createFlashGlowJournalEntry } from './journal';
+import type { JournalEntry } from '@/modules/journal/journalService';
 
 interface FlashGlowConfig {
   glowType: string;
@@ -133,8 +135,20 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
     });
   }, [machine.isActive, config.duration, setConfig]);
 
+  const loadStats = useCallback(async () => {
+    try {
+      const statsData = await flashGlowService.getStats();
+      setStats({
+        totalSessions: statsData.total_sessions,
+        avgDuration: statsData.avg_duration
+      });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }, []);
+
   const onSessionComplete = useCallback(async (
-    label: 'gain' | 'léger' | 'incertain', 
+    label: 'gain' | 'léger' | 'incertain',
     extend: boolean = false
   ) => {
     if (extend) {
@@ -143,25 +157,54 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
     }
 
     try {
+      const recordedDuration = sessionDuration || config.duration;
+      const recommendation = flashGlowService.getRecommendation(label, 3); // Real streak will be calculated later
+
+      let journalEntry: JournalEntry | null = await createFlashGlowJournalEntry({
+        label,
+        duration: recordedDuration,
+        intensity: config.intensity,
+        glowType: config.glowType,
+        recommendation,
+        context: 'Flash Glow Ultra'
+      });
+
       const sessionData: FlashGlowSession = {
-        duration_s: sessionDuration,
+        duration_s: recordedDuration,
         label,
         glow_type: config.glowType,
         intensity: config.intensity,
         result: 'completed',
         metadata: {
           timestamp: new Date().toISOString(),
-          extended: false
+          extended: false,
+          autoJournal: Boolean(journalEntry),
+          journalEntryId: journalEntry?.id,
+          journalSummary: journalEntry?.summary,
+          journalTone: journalEntry?.tone
         }
       };
 
-      const response = await flashGlowService.endSession(sessionData);
-      
-      const recommendation = flashGlowService.getRecommendation(label, 3); // Real streak will be calculated later
-      
+      await flashGlowService.endSession(sessionData);
+
+      if (!journalEntry) {
+        journalEntry = await createFlashGlowJournalEntry({
+          duration: recordedDuration,
+          intensity: config.intensity,
+          glowType: config.glowType,
+          recommendation,
+          context: 'Flash Glow Ultra'
+        });
+      }
+
       toast({
         title: "Session terminée ! ✨",
-        description: recommendation,
+        description: [
+          recommendation,
+          journalEntry
+            ? '📝 Votre expérience a été ajoutée automatiquement au journal.'
+            : '📝 Journalisation automatique indisponible, pensez à noter votre ressenti manuellement.'
+        ].join('\n')
       });
 
       // Recharger les stats
@@ -175,19 +218,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         variant: "destructive",
       });
     }
-  }, [sessionDuration, config, extendSession]);
-
-  const loadStats = useCallback(async () => {
-    try {
-      const statsData = await flashGlowService.getStats();
-      setStats({
-        totalSessions: statsData.total_sessions,
-        avgDuration: statsData.avg_duration
-      });
-    } catch (error) {
-      console.error('Error loading stats:', error);
-    }
-  }, []);
+  }, [sessionDuration, config, extendSession, loadStats]);
 
   return {
     // État
