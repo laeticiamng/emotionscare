@@ -315,6 +315,13 @@
       "layout": "marketing"
     },
     {
+      "name": "modules-journal",
+      "path": "/modules/journal",
+      "component": "JournalPage",
+      "segment": "public",
+      "layout": "app"
+    },
+    {
       "name": "onboarding",
       "path": "/onboarding",
       "component": "OnboardingPage",
