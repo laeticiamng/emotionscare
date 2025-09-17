@@ -85,6 +85,7 @@ const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage')
 const B2CBossLevelGritPage = lazy(() => import('@/pages/B2CBossLevelGritPage'));
 const B2CBounceBackBattlePage = lazy(() => import('@/pages/B2CBounceBackBattlePage'));
 const B2CMoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
+const MoodPresetsAdminPage = lazy(() => import('@/pages/MoodPresetsAdminPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
@@ -224,6 +225,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CBossLevelGritPage,
   B2CBounceBackBattlePage,
   B2CMoodMixerPage,
+  MoodPresetsAdminPage,
   B2CSocialCoconPage,
   B2CStorySynthLabPage,
   B2CCommunautePage,
