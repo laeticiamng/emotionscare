@@ -108,8 +108,8 @@ export default function ComprehensiveSystemAudit() {
       { name: 'GlobalNav', path: 'src/components/GlobalNav.tsx', critical: true },
       { name: 'AppSidebar', path: 'src/components/AppSidebar.tsx', critical: true },
       { name: 'DashboardLayout', path: 'src/components/DashboardLayout.tsx', critical: true },
-      { name: 'ProtectedRoute', path: 'src/components/ProtectedRoute.tsx', critical: true },
-      { name: 'RoleProtectedRoute', path: 'src/components/RoleProtectedRoute.tsx', critical: true },
+      { name: 'ProtectedRoute', path: 'src/guards/ProtectedRoute.tsx', critical: true },
+      { name: 'RoleProtectedRoute', path: 'src/guards/RoleProtectedRoute.tsx', critical: true },
       
       // Scan et Émotions
       { name: 'EmotionAnalysisDashboard', path: 'src/components/scan/EmotionAnalysisDashboard.tsx', critical: true },

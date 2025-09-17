@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { routes } from '@/router';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/guards/ProtectedRoute';
 
 function findRoute(path: string) {
   return routes.find(r => r.path === path);
