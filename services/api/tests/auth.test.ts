@@ -4,7 +4,6 @@ import { signJwt } from '../../lib/jwt';
 
 let app: any;
 let url: string;
-
 beforeAll(async () => {
   process.env.JWT_SECRETS = 'test-secret';
   process.env.HASH_PEPPER = 'pepper';
@@ -28,8 +27,8 @@ describe('auth', () => {
   });
 
   it('rejects expired token', async () => {
-    const token = await signJwt({ sub: 'u1', role: 'b2c', aud: 'test' }, { expiresIn: '1ms' });
-    await new Promise(r => setTimeout(r, 5));
+    const token = await signJwt({ sub: 'u1', role: 'b2c', aud: 'test' }, { expiresIn: '1s' });
+    await new Promise(r => setTimeout(r, 1100));
     const res = await fetch(url + '/api/v1/me/journal', {
       headers: { Authorization: `Bearer ${token}` },
     });
