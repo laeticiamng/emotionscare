@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
+import * as Sentry from '@sentry/react';
 
 interface Props {
   children: ReactNode;
@@ -89,9 +90,8 @@ export class CriticalErrorBoundary extends Component<Props, State> {
 
   private reportError(error: Error, errorInfo: ErrorInfo, context?: string) {
     try {
-      // Si Sentry est configuré
-      if (typeof window !== 'undefined' && (window as any).Sentry) {
-        (window as any).Sentry.captureException(error, {
+      if (Sentry.getCurrentHub().getClient()) {
+        Sentry.captureException(error, {
           contexts: {
             react: {
               componentStack: errorInfo.componentStack
@@ -100,7 +100,7 @@ export class CriticalErrorBoundary extends Component<Props, State> {
           tags: {
             errorBoundary: context || 'CriticalErrorBoundary',
             feature: 'error-boundary',
-            errorType: error.message.includes('reading \'add\'') ? 'reading_add' : 'unknown'
+            errorType: error.message.includes("reading 'add'") ? 'reading_add' : 'unknown'
           },
           extra: {
             errorInfo,

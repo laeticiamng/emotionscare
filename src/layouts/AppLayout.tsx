@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/components/theme-provider';
-import { 
-  Loader2, 
-  Menu, 
-  X, 
+import {
+  Loader2,
+  Menu,
+  X,
   Heart, 
   Bell, 
   Settings, 
@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import HealthCheckBadge from '@/components/HealthCheckBadge';
 
 // Enhanced layout component with premium sidebar and navigation
 const AppLayout: React.FC = () => {
@@ -270,14 +271,14 @@ const AppLayout: React.FC = () => {
         {/* Mobile Header */}
         <header className="lg:hidden sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b">
           <div className="flex items-center justify-between p-4">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu className="w-5 h-5" />
             </Button>
-            
+
             <Link to="/app/home" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center">
                 <Heart className="w-4 h-4 text-white" />
@@ -286,6 +287,7 @@ const AppLayout: React.FC = () => {
             </Link>
 
             <div className="flex items-center space-x-2">
+              <HealthCheckBadge />
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="w-5 h-5" />
                 {notifications > 0 && (
@@ -324,6 +326,9 @@ const AppLayout: React.FC = () => {
 
         {/* Page Content */}
         <main className="min-h-screen" role="main">
+          <div className="hidden lg:flex justify-end px-6 py-4 border-b bg-background/80 backdrop-blur-md">
+            <HealthCheckBadge />
+          </div>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
