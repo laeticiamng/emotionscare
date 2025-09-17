@@ -50,7 +50,8 @@
     "ci:guard": "npm run lock:check && npm run test:quick && npm run struct:verify",
     "lovable:push": "npm run ci:guard && lovable sync",
     "prepare": "husky",
-    "lock:check": "node scripts/validate-lockfile.mjs"
+    "lock:check": "node scripts/validate-lockfile.mjs",
+    "generate:ui-registry": "node scripts/generate-ui-registry.mjs"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",
