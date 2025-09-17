@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createAudioHandle } from "@/lib/audio/engine";
 
 export function useSound(url: string, opts?: { loop?: boolean; volume?: number }) {
@@ -14,17 +14,28 @@ export function useSound(url: string, opts?: { loop?: boolean; volume?: number }
       setReady(true);
     });
     return () => { mounted = false; ref.current?.stop(); };
-  }, [url]);
+  }, [url, opts?.loop, opts?.volume]);
 
-  return {
+  const play = useCallback(() => ref.current?.play() ?? Promise.resolve(), []);
+  const pause = useCallback(() => ref.current?.pause(), []);
+  const stop = useCallback(() => ref.current?.stop(), []);
+  const setVolume = useCallback((v: number) => ref.current?.setVolume(v), []);
+  const setLoop = useCallback((l: boolean) => ref.current?.setLoop(l), []);
+  const seek = useCallback((time: number) => ref.current?.seek(time), []);
+  const getTime = useCallback(() => ref.current?.getCurrentTime() ?? 0, []);
+  const getDuration = useCallback(() => ref.current?.getDuration() ?? null, []);
+  const onEnded = useCallback((cb: () => void) => ref.current?.onEnded(cb), []);
+
+  return useMemo(() => ({
     ready,
-    play: () => ref.current?.play() ?? Promise.resolve(),
-    pause: () => ref.current?.pause(),
-    stop: () => ref.current?.stop(),
-    setVolume: (v: number) => ref.current?.setVolume(v),
-    setLoop: (l: boolean) => ref.current?.setLoop(l),
-    getTime: () => ref.current?.getCurrentTime() ?? 0,
-    getDuration: () => ref.current?.getDuration() ?? null,
-    onEnded: (cb: () => void) => ref.current?.onEnded(cb)
-  };
+    play,
+    pause,
+    stop,
+    setVolume,
+    setLoop,
+    seek,
+    getTime,
+    getDuration,
+    onEnded
+  }), [ready, play, pause, stop, setVolume, setLoop, seek, getTime, getDuration, onEnded]);
 }
