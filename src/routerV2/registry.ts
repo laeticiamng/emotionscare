@@ -633,6 +633,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'ChooseModePage',
   },
+  {
+    name: 'modules-journal',
+    path: '/modules/journal',
+    segment: 'public',
+    layout: 'app',
+    component: 'JournalPage',
+    guard: false,
+  },
 
   // ═══════════════════════════════════════════════════════════
   // PARAMÈTRES & COMPTE
