@@ -1,8 +1,10 @@
 /**
  * Unified Login Page - Page de connexion unifiée B2C/B2B
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Heart, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  loginSchema,
+  type LoginFormData,
+  unifiedRegisterSchema,
+  type UnifiedRegisterFormData
+} from '@/lib/validations/auth';
 
 const UnifiedLoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -20,95 +28,111 @@ const UnifiedLoginPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  
-  // Données des formulaires
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ 
-    email: '', 
-    password: '', 
-    confirmPassword: '',
-    fullName: ''
+
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
+
+  const signupForm = useForm<UnifiedRegisterFormData>({
+    resolver: zodResolver(unifiedRegisterSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+      fullName: ''
+    }
   });
 
   // Détection du segment (B2C/B2B)
   const segment = searchParams.get('segment') || 'b2c';
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onLoginSubmit = async (values: LoginFormData) => {
     setIsLoading(true);
-    setError(null);
+    setFormError(null);
+    setSuccess(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
+      const { email, password } = values;
+      const sanitizedEmail = email.trim();
+
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: sanitizedEmail,
+        password
       });
 
-      if (error) {
-        setError(error.message === 'Invalid login credentials' 
-          ? 'Email ou mot de passe incorrect' 
-          : error.message
+      if (authError) {
+        setFormError(authError.message === 'Invalid login credentials'
+          ? 'Email ou mot de passe incorrect'
+          : authError.message
         );
       } else {
+        loginForm.reset({ email: sanitizedEmail, password: '' });
         setSuccess('Connexion réussie ! Redirection...');
         setTimeout(() => navigate('/app/home'), 1000);
       }
     } catch (err) {
-      setError('Une erreur est survenue lors de la connexion');
+      setFormError('Une erreur est survenue lors de la connexion');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSignupSubmit = async (values: UnifiedRegisterFormData) => {
     setIsLoading(true);
-    setError(null);
-
-    // Validation
-    if (signupData.password !== signupData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
-      setIsLoading(false);
-      return;
-    }
-
-    if (signupData.password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
-      setIsLoading(false);
-      return;
-    }
+    setFormError(null);
+    setSuccess(null);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email: signupData.email,
-        password: signupData.password,
+      const sanitizedEmail = values.email.trim();
+      const sanitizedFullName = values.fullName.trim();
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
+
+      const { error: signupError } = await supabase.auth.signUp({
+        email: sanitizedEmail,
+        password: values.password,
         options: {
-          emailRedirectTo: redirectUrl,
+          ...(redirectUrl ? { emailRedirectTo: redirectUrl } : {}),
           data: {
-            full_name: signupData.fullName,
-            segment: segment
+            full_name: sanitizedFullName,
+            segment
           }
         }
       });
 
-      if (error) {
-        if (error.message === 'User already registered') {
-          setError('Cet email est déjà utilisé. Essayez de vous connecter.');
+      if (signupError) {
+        if (signupError.message === 'User already registered') {
+          setFormError('Cet email est déjà utilisé. Essayez de vous connecter.');
         } else {
-          setError(error.message);
+          setFormError(signupError.message);
         }
       } else {
+        signupForm.reset();
+        loginForm.reset({ email: sanitizedEmail, password: '' });
         setSuccess('Compte créé ! Vérifiez votre email pour confirmer votre inscription.');
         setActiveTab('login');
       }
     } catch (err) {
-      setError('Une erreur est survenue lors de l\'inscription');
+      setFormError('Une erreur est survenue lors de l\'inscription');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleTabChange = (value: 'login' | 'signup') => {
+    setActiveTab(value);
+    setFormError(null);
+    setSuccess(null);
+    setShowPassword(false);
+    if (value === 'login') {
+      signupForm.clearErrors();
+    } else {
+      loginForm.clearErrors();
     }
   };
 
@@ -137,7 +161,7 @@ const UnifiedLoginPage: React.FC = () => {
           </CardHeader>
 
           <CardContent>
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')}>
+            <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as 'login' | 'signup')}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Connexion</TabsTrigger>
                 <TabsTrigger value="signup">Inscription</TabsTrigger>
@@ -145,7 +169,11 @@ const UnifiedLoginPage: React.FC = () => {
 
               {/* Onglet Connexion */}
               <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form
+                  onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                  className="space-y-4"
+                  noValidate
+                >
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <div className="relative">
@@ -155,11 +183,14 @@ const UnifiedLoginPage: React.FC = () => {
                         type="email"
                         placeholder="votre@email.com"
                         className="pl-10"
-                        value={loginData.email}
-                        onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
-                        required
+                        autoComplete="email"
+                        disabled={isLoading}
+                        {...loginForm.register('email')}
                       />
                     </div>
+                    {loginForm.formState.errors.email && (
+                      <p className="text-xs text-red-600">{loginForm.formState.errors.email.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -171,18 +202,22 @@ const UnifiedLoginPage: React.FC = () => {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="••••••••"
                         className="pl-10 pr-10"
-                        value={loginData.password}
-                        onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
-                        required
+                        autoComplete="current-password"
+                        disabled={isLoading}
+                        {...loginForm.register('password')}
                       />
                       <button
                         type="button"
                         className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                    {loginForm.formState.errors.password && (
+                      <p className="text-xs text-red-600">{loginForm.formState.errors.password.message}</p>
+                    )}
                   </div>
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
@@ -200,17 +235,24 @@ const UnifiedLoginPage: React.FC = () => {
 
               {/* Onglet Inscription */}
               <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4">
+                <form
+                  onSubmit={signupForm.handleSubmit(onSignupSubmit)}
+                  className="space-y-4"
+                  noValidate
+                >
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Nom complet</Label>
                     <Input
                       id="signup-name"
                       type="text"
                       placeholder="Jean Dupont"
-                      value={signupData.fullName}
-                      onChange={(e) => setSignupData(prev => ({ ...prev, fullName: e.target.value }))}
-                      required
+                      autoComplete="name"
+                      disabled={isLoading}
+                      {...signupForm.register('fullName')}
                     />
+                    {signupForm.formState.errors.fullName && (
+                      <p className="text-xs text-red-600">{signupForm.formState.errors.fullName.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -222,11 +264,14 @@ const UnifiedLoginPage: React.FC = () => {
                         type="email"
                         placeholder="votre@email.com"
                         className="pl-10"
-                        value={signupData.email}
-                        onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
-                        required
+                        autoComplete="email"
+                        disabled={isLoading}
+                        {...signupForm.register('email')}
                       />
                     </div>
+                    {signupForm.formState.errors.email && (
+                      <p className="text-xs text-red-600">{signupForm.formState.errors.email.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -238,18 +283,22 @@ const UnifiedLoginPage: React.FC = () => {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="••••••••"
                         className="pl-10 pr-10"
-                        value={signupData.password}
-                        onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
-                        required
+                        autoComplete="new-password"
+                        disabled={isLoading}
+                        {...signupForm.register('password')}
                       />
                       <button
                         type="button"
                         className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                    {signupForm.formState.errors.password && (
+                      <p className="text-xs text-red-600">{signupForm.formState.errors.password.message}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -261,11 +310,14 @@ const UnifiedLoginPage: React.FC = () => {
                         type="password"
                         placeholder="••••••••"
                         className="pl-10"
-                        value={signupData.confirmPassword}
-                        onChange={(e) => setSignupData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        required
+                        autoComplete="new-password"
+                        disabled={isLoading}
+                        {...signupForm.register('confirmPassword')}
                       />
                     </div>
+                    {signupForm.formState.errors.confirmPassword && (
+                      <p className="text-xs text-red-600">{signupForm.formState.errors.confirmPassword.message}</p>
+                    )}
                   </div>
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
@@ -283,12 +335,12 @@ const UnifiedLoginPage: React.FC = () => {
             </Tabs>
 
             {/* Messages d'erreur et de succès */}
-            {error && (
+            {formError && (
               <Alert className="mt-4 border-red-200 bg-red-50">
-                <AlertDescription className="text-red-800">{error}</AlertDescription>
+                <AlertDescription className="text-red-800">{formError}</AlertDescription>
               </Alert>
             )}
-            
+
             {success && (
               <Alert className="mt-4 border-green-200 bg-green-50">
                 <AlertDescription className="text-green-800">{success}</AlertDescription>
