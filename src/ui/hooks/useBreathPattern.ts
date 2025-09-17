@@ -9,48 +9,83 @@ export function useBreathPattern(pattern: Pattern, _cycles: number) {
   const [running, setRunning] = React.useState(false);
   const [phaseIndex, setPhaseIndex] = React.useState(0);
   const [cycle, setCycle] = React.useState(0);
-  const [phaseStart, setPhaseStart] = React.useState(0);
+  const [phaseProgress, setPhaseProgress] = React.useState(0);
+  const phaseStartRef = React.useRef(0);
   const tick = React.useRef(0);
 
-  const current = React.useRef({ phase: pattern[0]?.phase || "inhale" });
+  const current = React.useRef({
+    phase: pattern[0]?.phase || "inhale",
+    duration: pattern[0]?.sec ?? 0,
+    index: 0,
+  });
+
+  React.useEffect(() => {
+    setRunning(false);
+    setPhaseIndex(0);
+    setCycle(0);
+    setPhaseProgress(0);
+    phaseStartRef.current = performance.now();
+    current.current = {
+      phase: pattern[0]?.phase ?? "inhale",
+      duration: pattern[0]?.sec ?? 0,
+      index: 0,
+    };
+  }, [pattern]);
 
   useRaf(() => {
     if (!running) return;
     tick.current++;
     const now = performance.now();
-    const elapsed = (now - phaseStart) / 1000;
     const cur = pattern[phaseIndex];
+    if (!cur) return;
+
+    const elapsed = (now - phaseStartRef.current) / 1000;
+    const progress = cur.sec > 0 ? Math.min(1, elapsed / cur.sec) : 1;
+    setPhaseProgress(prev => (Math.abs(prev - progress) < 0.002 ? prev : progress));
+    current.current = { phase: cur.phase, duration: cur.sec, index: phaseIndex };
+
     if (elapsed >= cur.sec) {
       let nextIndex = phaseIndex + 1;
       if (nextIndex >= pattern.length) {
         nextIndex = 0;
-        setCycle(c => c + 1);
+        setCycle(cycleCount => cycleCount + 1);
       }
+      phaseStartRef.current = now;
       setPhaseIndex(nextIndex);
-      setPhaseStart(now);
-      current.current = { phase: pattern[nextIndex].phase };
-    } else {
-      current.current = { phase: cur.phase };
+      current.current = {
+        phase: pattern[nextIndex]?.phase ?? cur.phase,
+        duration: pattern[nextIndex]?.sec ?? cur.sec,
+        index: nextIndex,
+      };
+      setPhaseProgress(0);
     }
   }, running);
-
-  const phaseProgress = running
-    ? Math.min(1, (performance.now() - phaseStart) / (pattern[phaseIndex].sec * 1000))
-    : 0;
 
   const start = React.useCallback(() => {
     setCycle(0);
     setPhaseIndex(0);
-    setPhaseStart(performance.now());
+    phaseStartRef.current = performance.now();
     setRunning(true);
-    current.current = { phase: pattern[0].phase };
+    setPhaseProgress(0);
+    current.current = {
+      phase: pattern[0]?.phase ?? "inhale",
+      duration: pattern[0]?.sec ?? 0,
+      index: 0,
+    };
   }, [pattern]);
 
   const stop = React.useCallback(() => {
     setRunning(false);
     setCycle(0);
     setPhaseIndex(0);
-  }, []);
+    setPhaseProgress(0);
+    phaseStartRef.current = performance.now();
+    current.current = {
+      phase: pattern[0]?.phase ?? "inhale",
+      duration: pattern[0]?.sec ?? 0,
+      index: 0,
+    };
+  }, [pattern]);
 
   const toggle = React.useCallback(() => {
     if (running) setRunning(false);
@@ -62,6 +97,8 @@ export function useBreathPattern(pattern: Pattern, _cycles: number) {
     phaseProgress,
     running,
     cycle,
+    phaseIndex,
+    phaseDuration: pattern[phaseIndex]?.sec ?? 0,
     start,
     stop,
     toggle,

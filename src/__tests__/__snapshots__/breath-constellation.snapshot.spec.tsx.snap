@@ -7,7 +7,7 @@ exports[`BreathConstellationPage > rend la page et le CTA Démarrer 1`] = `
   >
     <div
       class="relative overflow-hidden rounded-2xl p-6 mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background"
-      style="opacity: 0; transform: translateY(-20px);"
+      style="opacity: 0; transform: translateY(-20px) translateZ(0);"
     >
       <div
         class="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/30 to-pink-50/20 dark:from-blue-900/10 dark:via-purple-900/5 dark:to-pink-900/5"
@@ -222,8 +222,12 @@ exports[`BreathConstellationPage > rend la page et le CTA Démarrer 1`] = `
           </label>
         </div>
         <div
-          style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden;"
+          style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; position: relative; box-shadow: 0 0 61.5px rgba(90, 128, 255, 0.21250000000000002);"
         >
+          <div
+            aria-hidden="true"
+            style="position: absolute; inset: -60px; filter: blur(60px); opacity: 0.475; transform: none;"
+          />
           <canvas
             aria-label="Constellation respiratoire"
             height="0"

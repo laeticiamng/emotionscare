@@ -1,37 +1,68 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
 import { useRaf } from "@/COMPONENTS.reg";
 
 type Props = {
   phase: "inhale" | "exhale" | "hold" | "hold2";
   phaseProgress: number; // 0..1
+  phaseDuration?: number;
   reduced?: boolean;
   density?: number; // 0..1
 };
 
 type Star = { x: number; y: number; vx: number; vy: number; r: number };
 
-export function ConstellationCanvas({ phase, phaseProgress, reduced = false, density = 0.8 }: Props) {
-  const ref = useRef<HTMLCanvasElement | null>(null);
-  const starsRef = useRef<Star[]>([]);
-  const tRef = useRef(0);
+const BASE_BACKGROUND = "linear-gradient(180deg, #0c0f1a 0%, #161b2b 100%)";
 
-  // init étoiles
+export function ConstellationCanvas({
+  phase,
+  phaseProgress,
+  phaseDuration = 0,
+  reduced = false,
+  density = 0.8,
+}: Props) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const starsRef = useRef<Star[]>([]);
+
+  const prefersReducedMotion = useReducedMotion();
+  const shouldReduceMotion = reduced || Boolean(prefersReducedMotion);
+
+  const scaleMotion = useMotionValue(1);
+  const glowMotion = useMotionValue(0.45);
+
+  const scaleRef = useRef(scaleMotion.get());
+  const glowRef = useRef(glowMotion.get());
+
   useEffect(() => {
-    const cvs = ref.current;
-    if (!cvs) return;
-    const ctx = cvs.getContext("2d");
+    const unsubscribeScale = scaleMotion.on("change", value => {
+      scaleRef.current = value;
+    });
+    const unsubscribeGlow = glowMotion.on("change", value => {
+      glowRef.current = value;
+    });
+    return () => {
+      unsubscribeScale();
+      unsubscribeGlow();
+    };
+  }, [scaleMotion, glowMotion]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
     const resize = () => {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
-      const rect = cvs.getBoundingClientRect();
-      cvs.width = Math.round(rect.width * dpr);
-      cvs.height = Math.round(rect.height * dpr);
-      ctx.scale(dpr, dpr);
-      // régénérer les étoiles selon la densité et la taille
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       const area = rect.width * rect.height;
       const count = Math.max(12, Math.min(220, Math.round((area / 4500) * density)));
-      starsRef.current = new Array(count).fill(0).map(() => ({
+      starsRef.current = Array.from({ length: count }, () => ({
         x: Math.random() * rect.width,
         y: Math.random() * rect.height,
         vx: (Math.random() - 0.5) * 0.2,
@@ -39,99 +70,156 @@ export function ConstellationCanvas({ phase, phaseProgress, reduced = false, den
         r: 0.8 + Math.random() * 1.8,
       }));
     };
+
     resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(cvs);
-    return () => ro.disconnect();
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+    return () => observer.disconnect();
   }, [density]);
 
-  // rendu
-  useRaf(
-    (t) => {
-      const cvs = ref.current;
-      if (!cvs) return;
-      const ctx = cvs.getContext("2d");
-      if (!ctx) return;
-      const w = cvs.clientWidth,
-        h = cvs.clientHeight;
-      ctx.clearRect(0, 0, w, h);
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      scaleMotion.set(1);
+      glowMotion.set(0.3);
+      return;
+    }
 
-      // facteur respiratoire : zoom / lueur / lien
-      let breathe = 1;
-      if (!reduced) {
-        breathe =
-          phase === "inhale"
-            ? 0.9 + 0.2 * phaseProgress
-            : phase === "exhale"
-            ? 1.1 - 0.2 * phaseProgress
-            : 1.0;
-      }
+    const amplitude = 0.18;
+    const holdOffset = amplitude * 0.4;
+    const duration = Math.max(0.35, phaseDuration || 0.9);
 
-      // déplacement lent
-      const stars = starsRef.current;
-      if (!reduced) {
-        for (const s of stars) {
-          s.x += s.vx * (0.5 + 0.5 * breathe);
-          s.y += s.vy * (0.5 + 0.5 * breathe);
-          if (s.x < 0) s.x += w;
-          else if (s.x > w) s.x -= w;
-          if (s.y < 0) s.y += h;
-          else if (s.y > h) s.y -= h;
-        }
-      }
+    const scaleTarget =
+      phase === "inhale"
+        ? 1 + amplitude
+        : phase === "exhale"
+        ? 1 - amplitude
+        : 1 + holdOffset;
 
-      // dessiner
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      for (const s of stars) {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r * breathe, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.85)";
-        ctx.fill();
-      }
+    const glowTarget =
+      phase === "inhale"
+        ? 0.75
+        : phase === "exhale"
+        ? 0.4
+        : 0.55;
 
-      // relier les proches (distance modulée par la respiration)
-      const linkDist = 60 * breathe;
-      ctx.lineWidth = 0.6;
-      ctx.strokeStyle = "rgba(255,255,255,0.25)";
-      for (let i = 0; i < stars.length; i++) {
-        for (let j = i + 1; j < stars.length; j++) {
-          const a = stars[i],
-            b = stars[j];
-          const dx = a.x - b.x,
-            dy = a.y - b.y;
-          const d2 = dx * dx + dy * dy;
-          if (d2 < linkDist * linkDist) {
-            ctx.globalAlpha = Math.max(0.05, 0.35 - (Math.sqrt(d2) / linkDist) * 0.35);
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-        }
-      }
-      ctx.restore();
-      tRef.current = t;
-    },
-    true
+    const scaleControls = animate(scaleMotion, scaleTarget, {
+      duration,
+      ease: "easeInOut",
+    });
+
+    const glowControls = animate(glowMotion, glowTarget, {
+      duration,
+      ease: "easeInOut",
+    });
+
+    return () => {
+      scaleControls.stop();
+      glowControls.stop();
+    };
+  }, [phase, phaseDuration, scaleMotion, glowMotion, shouldReduceMotion]);
+
+  const overlayScale = useTransform(scaleMotion, value => 1 + (value - 1) * 0.6);
+  const containerShadow = useTransform(
+    glowMotion,
+    value => `0 0 ${30 + value * 70}px rgba(90, 128, 255, ${0.1 + value * 0.25})`
   );
+  const auraOpacity = useTransform(glowMotion, value => 0.25 + value * 0.5);
+
+  useRaf(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    ctx.clearRect(0, 0, width, height);
+
+    const stars = starsRef.current;
+    const breathe = shouldReduceMotion ? 1 : scaleRef.current;
+    const glowLevel = shouldReduceMotion ? 0.3 : glowRef.current;
+    const progress = Math.min(1, Math.max(0, phaseProgress));
+    const progressWave = shouldReduceMotion ? 0 : Math.sin(progress * Math.PI);
+
+    if (!shouldReduceMotion) {
+      const velocityBoost = 0.5 + Math.abs(breathe - 1) * 1.1 + progressWave * 0.4;
+      for (const star of stars) {
+        star.x += star.vx * velocityBoost;
+        star.y += star.vy * velocityBoost;
+        if (star.x < 0) star.x += width;
+        else if (star.x > width) star.x -= width;
+        if (star.y < 0) star.y += height;
+        else if (star.y > height) star.y -= height;
+      }
+    }
+
+    ctx.save();
+    const starAlpha = shouldReduceMotion ? 0.6 : Math.min(0.95, 0.55 + glowLevel * 0.5);
+    ctx.globalAlpha = starAlpha;
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    for (const star of stars) {
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.r * breathe, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    ctx.save();
+    const linkDistance = 60 * breathe;
+    const baseLinkAlpha = shouldReduceMotion ? 0.12 : 0.16 + glowLevel * 0.18 + progressWave * 0.08;
+    ctx.lineWidth = shouldReduceMotion ? 0.4 : 0.6;
+    ctx.strokeStyle = "rgba(200,210,255,0.8)";
+
+    for (let i = 0; i < stars.length; i++) {
+      for (let j = i + 1; j < stars.length; j++) {
+        const a = stars[i];
+        const b = stars[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist2 = dx * dx + dy * dy;
+        if (dist2 < linkDistance * linkDistance) {
+          const intensity = Math.max(0.05, baseLinkAlpha * (1 - Math.sqrt(dist2) / linkDistance));
+          ctx.globalAlpha = intensity;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.restore();
+  }, true);
 
   return (
-    <div
+    <motion.div
       style={{
         width: "100%",
         height: 300,
         borderRadius: 12,
         overflow: "hidden",
-        background: "linear-gradient(180deg, #0c0f1a, #161b2b)",
+        position: "relative",
+        background: BASE_BACKGROUND,
+        boxShadow: shouldReduceMotion ? "0 0 22px rgba(28, 40, 76, 0.45)" : containerShadow,
       }}
     >
+      <motion.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: -60,
+          background:
+            "radial-gradient(circle at 30% 20%, rgba(99,132,255,0.25), transparent 60%)," +
+            "radial-gradient(circle at 70% 70%, rgba(58,88,180,0.2), transparent 65%)",
+          opacity: shouldReduceMotion ? 0.18 : auraOpacity,
+          filter: "blur(60px)",
+          scale: shouldReduceMotion ? 1 : overlayScale,
+        }}
+      />
       <canvas
-        ref={ref}
+        ref={canvasRef}
         style={{ width: "100%", height: "100%", display: "block" }}
         aria-label="Constellation respiratoire"
       />
-    </div>
+    </motion.div>
   );
 }
-
