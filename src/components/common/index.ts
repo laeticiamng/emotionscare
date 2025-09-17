@@ -1,6 +1,7 @@
 export { PageRoot } from './PageRoot';
 export { PageHeader } from './PageHeader';
-export { PageLayout } from './PageLayout';
+export { UnifiedPageLayout as PageLayout } from '../ui/unified-page-layout';
+export type { UnifiedPageLayoutProps as PageLayoutProps } from '../ui/unified-page-layout';
 export { FeatureCard } from './FeatureCard';
 export { ModeSwitcher } from './ModeSwitcher';
 export { ModeAwareContent } from './ModeAwareContent';
