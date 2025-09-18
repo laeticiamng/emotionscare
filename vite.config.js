@@ -1,3 +1,4 @@
+import tsconfigPaths from 'vite-tsconfig-paths';
 // Configuration Vite en JavaScript pur - Évite complètement TypeScript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -13,12 +14,12 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [
+  plugins: [tsconfigPaths(), 
     react({
       // Configuration React sans TypeScript du tout
       typescript: false,
       babel: {
-        plugins: []
+        plugins: [tsconfigPaths(), ]
       }
     }),
     mode === 'development' && componentTagger(),

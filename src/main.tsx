@@ -1,25 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
-import { ThemeProvider, I18nProvider } from '@/COMPONENTS.reg';
+import '@/lib/i18n';
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
+import { RootProvider } from '@/providers';
+import { routerV2 } from '@/routerV2';
 
 // Configuration de l'attribut lang pour l'accessibilité
 document.documentElement.lang = 'fr';
-document.title = 'EmotionsCare - Plateforme d\'intelligence émotionnelle';
+document.title = "EmotionsCare - Plateforme d'intelligence émotionnelle";
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
   if (!document.querySelector('meta[name="description"]')) {
     const metaDesc = document.createElement('meta');
     metaDesc.name = 'description';
-    metaDesc.content = 'Plateforme d\'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.';
+    metaDesc.content =
+      "Plateforme d'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.";
     document.head.appendChild(metaDesc);
   }
-  
+
   if (!document.querySelector('meta[name="viewport"]')) {
     const metaViewport = document.createElement('meta');
     metaViewport.name = 'viewport';
@@ -37,10 +40,8 @@ if (typeof window !== 'undefined') {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <I18nProvider>
-        <App />
-      </I18nProvider>
-    </ThemeProvider>
-  </React.StrictMode>
+    <RootProvider>
+      <RouterProvider router={routerV2} />
+    </RootProvider>
+  </React.StrictMode>,
 );

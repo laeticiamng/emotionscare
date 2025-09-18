@@ -44,6 +44,7 @@ import {
   Music2,
   PlayCircle,
   RefreshCw,
+  RotateCcw,
   Sparkles,
 } from "lucide-react";
 
@@ -54,6 +55,12 @@ type PlaybackSnapshot = {
   title?: string;
   src?: string;
   wasPlaying?: boolean;
+};
+
+type PlayerResumeHint = {
+  key: string;
+  position: number;
+  autoPlay?: boolean;
 };
 
 const PLAYBACK_STORAGE_PREFIX = "adaptive-music:playback:";
@@ -395,6 +402,7 @@ const AdaptiveMusicPage: React.FC = () => {
   });
 
   const [activeTrack, setActiveTrack] = React.useState<MoodPlaylistTrack | null>(null);
+  const [resumeCommand, setResumeCommand] = React.useState<PlayerResumeHint | null>(null);
 
   React.useEffect(() => {
     const tracks = query.data?.tracks ?? [];
@@ -439,22 +447,95 @@ const AdaptiveMusicPage: React.FC = () => {
     setSelectedMood(value);
   };
 
-  const handleSelectTrack = (track: MoodPlaylistTrack) => {
-    setActiveTrack(track);
-    recordEvent?.({
-      module: "adaptive-music",
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      durationSec: track.duration,
-      score: Math.round((query.data?.energyProfile.alignment ?? 0) * 100),
-      meta: {
-        action: "select-track",
-        trackId: track.id,
-        mood: query.data?.mood,
-        energy: track.energy,
-      },
+  const createSyntheticTrack = React.useCallback(
+    (base: { id: string; src: string; title?: string }) => {
+      return {
+        id: base.id,
+        title: base.title ?? "Piste favorite",
+        artist: "Adaptive Music",
+        url: base.src,
+        duration: 0,
+        mood: query.data?.mood ?? selectedMood,
+        energy: query.data?.energyProfile.recommended ?? intensity,
+        focus: "flow" as const,
+        instrumentation: [],
+        tags: [],
+        description: "Lecture d'une piste favorite sauvegardée.",
+      } satisfies MoodPlaylistTrack;
+    },
+    [intensity, query.data, selectedMood]
+  );
+
+  const handleSelectTrack = React.useCallback(
+    (
+      track: MoodPlaylistTrack,
+      options?: { resumePosition?: number; autoPlay?: boolean; resumeKey?: string }
+    ) => {
+      if (typeof options?.resumePosition === "number") {
+        setResumeCommand({
+          key: options.resumeKey ?? `${track.id}:${Date.now()}`,
+          position: Math.max(0, options.resumePosition),
+          autoPlay: options.autoPlay ?? false,
+        });
+      } else {
+        setResumeCommand(null);
+      }
+
+      setActiveTrack(track);
+
+      recordEvent?.({
+        module: "adaptive-music",
+        startedAt: new Date().toISOString(),
+        endedAt: new Date().toISOString(),
+        durationSec: track.duration,
+        score: Math.round((query.data?.energyProfile.alignment ?? 0) * 100),
+        meta: {
+          action: "select-track",
+          trackId: track.id,
+          mood: query.data?.mood,
+          energy: track.energy,
+        },
+      });
+    },
+    [query.data, recordEvent]
+  );
+
+  const handleResumePlayback = React.useCallback(() => {
+    if (!playback?.trackId || !playback.src) return;
+    const existing = query.data?.tracks.find(track => track.id === playback.trackId);
+    const track = existing ?? createSyntheticTrack({
+      id: playback.trackId,
+      src: playback.src,
+      title: playback.title,
     });
-  };
+
+    handleSelectTrack(track, {
+      resumePosition: playback.position,
+      autoPlay: true,
+      resumeKey: `resume-${playback.trackId}-${Date.now()}`,
+    });
+  }, [createSyntheticTrack, handleSelectTrack, playback, query.data]);
+
+  const handlePlayFavorite = React.useCallback(
+    (entry: AudioPlayerFavoriteEntry) => {
+      if (!entry?.id || !entry.src) return;
+      const existing = query.data?.tracks.find(track => track.id === entry.id);
+      const track = existing ?? createSyntheticTrack({
+        id: entry.id,
+        src: entry.src,
+        title: entry.title,
+      });
+
+      handleSelectTrack(track, {
+        resumePosition: 0,
+        autoPlay: true,
+        resumeKey: `favorite-${entry.id}-${Date.now()}`,
+      });
+    },
+    [createSyntheticTrack, handleSelectTrack, query.data]
+  );
+
+  const canResumePlayback = React.useMemo(() => Boolean(playback?.src), [playback]);
 
   const queryError = query.error?.message ?? null;
 
@@ -601,6 +682,8 @@ const AdaptiveMusicPage: React.FC = () => {
                       title={activeTrack.title}
                       loop={false}
                       defaultVolume={0.75}
+                      resumeHint={resumeCommand}
+                      onResumeApplied={() => setResumeCommand(null)}
                     />
                   </div>
                 ) : (
@@ -628,11 +711,23 @@ const AdaptiveMusicPage: React.FC = () => {
                   Dernière lecture
                 </div>
                 {resumeTrackInfo ? (
-                  <div className="mt-2 text-sm">
-                    <p className="font-semibold">{resumeTrackInfo.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Reprise à {formatDuration(resumeTrackInfo.position)}
-                    </p>
+                  <div className="mt-2 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-semibold">{resumeTrackInfo.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Reprise à {formatDuration(resumeTrackInfo.position)}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={handleResumePlayback}
+                      disabled={!canResumePlayback}
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
+                      Reprendre
+                    </Button>
                   </div>
                 ) : (
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -652,7 +747,10 @@ const AdaptiveMusicPage: React.FC = () => {
                       .slice(-3)
                       .reverse()
                       .map(entry => (
-                        <li key={entry.id} className="flex items-center justify-between rounded-md border bg-background px-3 py-2">
+                        <li
+                          key={entry.id}
+                          className="flex flex-col gap-3 rounded-md border bg-background px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                        >
                           <div className="flex flex-col">
                             <span className="font-medium">
                               {entry.title ?? "Piste personnalisée"}
@@ -661,7 +759,18 @@ const AdaptiveMusicPage: React.FC = () => {
                               Ajouté le {new Date(entry.addedAt).toLocaleDateString()}
                             </span>
                           </div>
-                          <Badge variant="secondary">#{entry.id.slice(0, 6)}</Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary">#{entry.id.slice(0, 6)}</Badge>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handlePlayFavorite(entry)}
+                            >
+                              <PlayCircle className="mr-2 h-4 w-4" aria-hidden />
+                              Lire
+                            </Button>
+                          </div>
                         </li>
                       ))}
                   </ul>

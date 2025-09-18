@@ -1,11 +1,13 @@
 
 import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { captureAppError } from '@/lib/sentry-config';
 
 interface ErrorHandlerOptions {
   showToast?: boolean;
   logToConsole?: boolean;
   reportToService?: boolean;
+  tags?: Record<string, string>;
 }
 
 export const useErrorHandler = () => {
@@ -19,7 +21,8 @@ export const useErrorHandler = () => {
     const {
       showToast = true,
       logToConsole = true,
-      reportToService = false
+      reportToService = true,
+      tags,
     } = options;
 
     const errorMessage = error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite';
@@ -29,23 +32,31 @@ export const useErrorHandler = () => {
       console.error(fullContext, error);
     }
 
+    let sentryEventId: string | undefined;
+    if (reportToService) {
+      sentryEventId = captureAppError(error, {
+        tags: { ...tags, context: context ?? 'global' },
+        userMessage: errorMessage,
+      });
+
+      if (sentryEventId && import.meta.env.DEV) {
+        console.info('[Sentry] captured error', sentryEventId);
+      }
+    }
+
     if (showToast) {
       toast({
         title: "Erreur",
-        description: errorMessage,
+        description: sentryEventId ? `${errorMessage} (code ${sentryEventId.slice(0, 8)})` : errorMessage,
         variant: "destructive",
       });
-    }
-
-    if (reportToService && process.env.NODE_ENV === 'production') {
-      // Ici on pourrait intégrer Sentry ou un autre service de monitoring
-      console.warn('Error reporting service not configured');
     }
 
     return {
       message: errorMessage,
       context: fullContext,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      sentryEventId,
     };
   }, [toast]);
 

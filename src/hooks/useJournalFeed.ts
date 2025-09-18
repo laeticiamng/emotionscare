@@ -63,10 +63,8 @@ export const useJournalFeed = () => {
   };
 
   const entriesSource: JournalFeedEntry[] = useMemo(() => {
-    if (user?.id) {
-      return remoteEntries;
-    }
-    return localEntries.map(mapLocalEntry);
+    const base = user?.id ? remoteEntries : localEntries.map(mapLocalEntry);
+    return [...base].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
   }, [localEntries, remoteEntries, user?.id]);
 
   const availableTags = useMemo(() => {

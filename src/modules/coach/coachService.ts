@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { hashString } from "@/lib/hash";
 
 export const COACH_DISCLAIMERS = [
   "Le coach IA ne remplace pas un professionnel de santé ou de santé mentale.",
@@ -116,29 +117,11 @@ function truncateForSummary(text: string, maxLength = HASH_TRUNCATE): string {
 }
 
 async function hashText(value: string): Promise<string> {
-  if (typeof value !== "string" || !value.length) {
+  if (typeof value !== "string" || value.length === 0) {
     return "";
   }
 
-  // Use Web Crypto API (available in modern browsers)
-  if (typeof crypto !== "undefined" && crypto.subtle) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(value);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("");
-  }
-
-  // Fallback for environments without Web Crypto API
-  // Simple hash using string manipulation (less secure but works)
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) {
-    const char = value.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(16);
+  return hashString(value);
 }
 
 async function summarizeConversation(history: CoachHistoryItem[]): Promise<string | null> {
@@ -397,5 +380,6 @@ export const __coachInternals = {
   clampHistory,
   truncateForSummary,
   hashText,
+  SUMMARY_INSTRUCTIONS,
 };
 

@@ -4,7 +4,7 @@ import React from "react";
 import { useReducedMotion } from "framer-motion";
 import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
 import { ConstellationCanvas } from "@/COMPONENTS.reg";
-import { useBreathPattern, type Pattern, type Phase } from "@/ui/hooks/useBreathPattern";
+import { useBreathPattern, type Phase } from "@/ui/hooks/useBreathPattern";
 import { useSound } from "@/COMPONENTS.reg";
 import { ff } from "@/lib/flags/ff";
 import { recordEvent } from "@/lib/scores/events";
@@ -13,133 +13,17 @@ import {
   BreathworkSessionAuthError,
   BreathworkSessionPersistError,
 } from "@/services/breathworkSessions.service";
-
-type BreathProtocolId = "coherence-5-5" | "4-7-8" | "box-4-4-4-4" | "triangle-4-6-8";
-
-type BreathProtocolDefinition = {
-  id: BreathProtocolId;
-  label: string;
-  description: string;
-  focus: string;
-  benefits: string[];
-  recommendedCycles: number;
-  recommendedDensity: number;
-  pattern: Pattern;
-};
-
-type BreathProtocol = BreathProtocolDefinition & {
-  cycleDuration: number;
-  cadence: number;
-};
+import {
+  BREATH_PROTOCOL_SEQUENCE,
+  DEFAULT_PROTOCOL_ID,
+  PHASE_DESCRIPTIONS,
+  PHASE_LABELS,
+  PROTOCOLS_BY_ID,
+  type BreathProtocol,
+  type BreathProtocolId,
+} from "./protocols";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error" | "unauthenticated";
-
-const PHASE_LABELS: Record<Phase, string> = {
-  inhale: "Inspiration",
-  hold: "Rétention pleine",
-  exhale: "Expiration",
-  hold2: "Rétention basse",
-};
-
-const PHASE_DESCRIPTIONS: Record<Phase, string> = {
-  inhale: "Soulevez doucement la cage thoracique et remplissez vos poumons.",
-  hold: "Suspendez la respiration, épaules relâchées.",
-  exhale: "Relâchez l'air sans effort, videz complètement.",
-  hold2: "Gardez les poumons vides dans le calme avant le prochain cycle.",
-};
-
-const PROTOCOL_DEFINITIONS: BreathProtocolDefinition[] = [
-  {
-    id: "coherence-5-5",
-    label: "Cohérence cardiaque 5-5",
-    description: "6 respirations par minute pour réguler le système nerveux.",
-    focus: "Équilibre & clarté",
-    benefits: [
-      "Stabilise la variabilité cardiaque",
-      "Idéal pour une pause active ou avant une réunion",
-    ],
-    recommendedCycles: 10,
-    recommendedDensity: 0.8,
-    pattern: [
-      { phase: "inhale", sec: 5 },
-      { phase: "exhale", sec: 5 },
-    ],
-  },
-  {
-    id: "4-7-8",
-    label: "Sommeil profond 4-7-8",
-    description: "Allonge l'expiration pour apaiser le mental et préparer le repos.",
-    focus: "Apaisement & lâcher-prise",
-    benefits: [
-      "Réduit rapidement la tension accumulée",
-      "Facilite l'endormissement et calme les ruminations",
-    ],
-    recommendedCycles: 6,
-    recommendedDensity: 0.7,
-    pattern: [
-      { phase: "inhale", sec: 4 },
-      { phase: "hold", sec: 7 },
-      { phase: "exhale", sec: 8 },
-    ],
-  },
-  {
-    id: "box-4-4-4-4",
-    label: "Carré 4-4-4-4",
-    description: "Rythme symétrique pour la concentration et la préparation mentale.",
-    focus: "Focus & préparation",
-    benefits: [
-      "Améliore la clarté d'esprit",
-      "Structure la respiration avant un effort cognitif",
-    ],
-    recommendedCycles: 12,
-    recommendedDensity: 0.9,
-    pattern: [
-      { phase: "inhale", sec: 4 },
-      { phase: "hold", sec: 4 },
-      { phase: "exhale", sec: 4 },
-      { phase: "hold2", sec: 4 },
-    ],
-  },
-  {
-    id: "triangle-4-6-8",
-    label: "Triangle 4-6-8",
-    description: "Progression douce vers une expiration allongée pour relâcher les tensions.",
-    focus: "Décompression & ancrage",
-    benefits: [
-      "Déverrouille la respiration abdominale",
-      "Idéal après une journée dense ou avant un soin",
-    ],
-    recommendedCycles: 9,
-    recommendedDensity: 0.75,
-    pattern: [
-      { phase: "inhale", sec: 4 },
-      { phase: "hold", sec: 6 },
-      { phase: "exhale", sec: 8 },
-    ],
-  },
-];
-
-const toProtocol = (definition: BreathProtocolDefinition): BreathProtocol => {
-  const cycleDuration = definition.pattern.reduce((total, step) => total + Math.max(0, step.sec), 0);
-  const cadence = cycleDuration > 0 ? Number.parseFloat((60 / cycleDuration).toFixed(2)) : 0;
-  return {
-    ...definition,
-    cycleDuration,
-    cadence,
-  };
-};
-
-const PROTOCOLS_BY_ID = PROTOCOL_DEFINITIONS.reduce<Record<BreathProtocolId, BreathProtocol>>(
-  (acc, definition) => {
-    acc[definition.id] = toProtocol(definition);
-    return acc;
-  },
-  {} as Record<BreathProtocolId, BreathProtocol>,
-);
-
-const PROTOCOL_SEQUENCE = PROTOCOL_DEFINITIONS.map(definition => PROTOCOLS_BY_ID[definition.id]);
-
-const DEFAULT_PROTOCOL_ID: BreathProtocolId = "coherence-5-5";
 
 const formatDuration = (seconds: number): string => {
   if (!Number.isFinite(seconds) || seconds <= 0) return "0 s";
@@ -410,7 +294,7 @@ export default function BreathConstellationPage() {
                 onChange={event => handlePatternChange(event.target.value as BreathProtocolId)}
                 style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #1f2937" }}
               >
-                {PROTOCOL_SEQUENCE.map(option => (
+                {BREATH_PROTOCOL_SEQUENCE.map(option => (
                   <option key={option.id} value={option.id}>
                     {option.label}
                   </option>

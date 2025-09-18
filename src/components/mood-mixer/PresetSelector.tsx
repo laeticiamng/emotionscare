@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { LucideIconType } from '@/types/common';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
   Headphones,
   Sparkles,
 } from 'lucide-react';
-import { moodPresetsService } from '@/services/moodPresetsService';
+import { useMoodPresetsStore } from '@/store/moodPresets.store';
 import { MoodPresetRecord } from '@/types/mood-mixer';
 
 interface BlendState {
@@ -167,39 +167,34 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
   onPresetSelect,
   currentBlend,
 }) => {
-  const [presets, setPresets] = useState<MoodPresetCard[]>(DEFAULT_PRESET_CARDS);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    presets,
+    isLoading,
+    hasInitialized,
+    loadPresets,
+  } = useMoodPresetsStore((state) => ({
+    presets: state.presets,
+    isLoading: state.isLoading,
+    hasInitialized: state.hasInitialized,
+    loadPresets: state.loadPresets,
+  }));
 
   useEffect(() => {
-    let isMounted = true;
+    if (hasInitialized) {
+      return;
+    }
 
-    const fetchPresets = async () => {
-      try {
-        const data = await moodPresetsService.listPresets();
-        if (!isMounted) return;
-        if (data.length > 0) {
-          setPresets(data.map(mapRecordToCard));
-        } else {
-          setPresets(DEFAULT_PRESET_CARDS);
-        }
-      } catch (error) {
-        console.error('Unable to load mood presets', error);
-        if (isMounted) {
-          setPresets(DEFAULT_PRESET_CARDS);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
+    loadPresets().catch((error) => {
+      console.error('Unable to load mood presets', error);
+    });
+  }, [hasInitialized, loadPresets]);
 
-    fetchPresets();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const presetCards = useMemo(() => {
+    if (presets.length === 0) {
+      return DEFAULT_PRESET_CARDS;
+    }
+    return presets.map(mapRecordToCard);
+  }, [presets]);
 
   const isCurrentPreset = (presetBlend: BlendState) => {
     return (
@@ -220,7 +215,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {presets.map((preset, index) => {
+        {presetCards.map((preset, index) => {
           const IconComponent = preset.icon;
           const isCurrent = isCurrentPreset(preset.blend);
 

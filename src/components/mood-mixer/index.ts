@@ -5,3 +5,4 @@ export { default as PlaybackControls } from './PlaybackControls';
 export { default as MoodVisualization } from './MoodVisualization';
 export { default as MixLibrary } from './MixLibrary';
 export { default as SessionInsights } from './SessionInsights';
+export { default as PresetSelector } from './PresetSelector';

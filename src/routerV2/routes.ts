@@ -52,12 +52,13 @@ export const b2cRoutes = {
   vr: () => '/app/vr',
   meditation: () => '/meditation',
   emotions: () => '/app/emotions',
-  community: () => '/app/community',
+  community: () => '/app/social-cocon',
   settings: () => '/settings',
   profile: () => '/profile',
   
   // Modules Fun-First
   flashGlow: () => '/app/flash-glow',
+  scores: () => '/app/scores',
   breathwork: () => '/app/breathwork',
   arFilters: () => '/app/ar-filters',
   bubbleBeat: () => '/app/bubble-beat',

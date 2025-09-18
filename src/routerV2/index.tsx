@@ -3,15 +3,8 @@
  * TICKET: FE/BE-Router-Cleanup-01
  */
 
-// Type pour éviter les logs répétés
-declare global {
-  interface Window {
-    __routerV2Logged?: boolean;
-  }
-}
-
 import React, { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES } from './aliases';
 import { RouteGuard } from './guards';
@@ -140,6 +133,7 @@ const StorySynthPage = lazy(() => import('@/pages/modules/StorySynthPage'));
 const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
 const EmotionScanPage = lazy(() => import('@/modules/emotion-scan/EmotionScanPage'));
 const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGlowUltraPage'));
+const ScoresV2Page = lazy(() => import('@/modules/scores/ScoresV2Page'));
 
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
@@ -278,6 +272,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ModulesShowcasePage,
   EmotionScanPage,
   FlashGlowUltraPage,
+  ScoresV2Page,
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
@@ -364,6 +359,30 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 export { routes } from './routes';
 export { ROUTE_ALIASES } from './aliases';
 export type { RouteAlias } from './aliases';
+
+const redirectPairs = new Map<string, string>();
+
+if (FF_ROUTER_V2) {
+  ROUTES_REGISTRY.forEach(route => {
+    route.aliases?.forEach(aliasPath => {
+      if (aliasPath && aliasPath !== route.path && !redirectPairs.has(aliasPath)) {
+        redirectPairs.set(aliasPath, route.path);
+      }
+    });
+  });
+
+  ROUTE_ALIASES.forEach(alias => {
+    if (!redirectPairs.has(alias.from)) {
+      redirectPairs.set(alias.from, alias.to);
+    }
+  });
+}
+
+const redirectRoutes = Array.from(redirectPairs.entries()).map(([path, to]) => ({
+  path,
+  element: <Navigate to={to} replace />,
+}));
+
 export const routerV2 = createBrowserRouter([
   // Routes principales du registry
   ...ROUTES_REGISTRY.map(route => ({
@@ -372,12 +391,7 @@ export const routerV2 = createBrowserRouter([
   })),
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
-  ...(FF_ROUTER_V2 ? ROUTE_ALIASES.map(alias => {
-    return {
-      path: alias.from,
-      element: <Navigate to={alias.to} replace />,
-    };
-  }) : []),
+  ...redirectRoutes,
 
   // Fallback 404 pour toutes les autres routes
   {
@@ -391,24 +405,3 @@ export const routerV2 = createBrowserRouter([
 ], {
   basename: import.meta.env.BASE_URL ?? '/',
 });
-
-// ═══════════════════════════════════════════════════════════
-// VALIDATION AU DÉMARRAGE (DEV ONLY)
-// ═══════════════════════════════════════════════════════════
-
-if (import.meta.env.DEV) {
-  // Validation silencieuse pour éviter les boucles de logs
-  const missingComponents = ROUTES_REGISTRY
-    .filter(route => !componentMap[route.component])
-    .map(route => `${route.name}: ${route.component}`);
-
-  // Log unique au démarrage
-  if (missingComponents.length > 0 && !window.__routerV2Logged) {
-    console.warn('⚠️ RouterV2: Composants manquants:', missingComponents);
-  }
-
-  if (!window.__routerV2Logged) {
-    console.log(`✅ RouterV2 initialisé: ${ROUTES_REGISTRY.length} routes`);
-    window.__routerV2Logged = true;
-  }
-}

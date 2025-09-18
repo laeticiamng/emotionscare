@@ -4,18 +4,21 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
 <div>
   <main
     aria-label="Emotion Scan"
+    id="main-content"
   >
     <div>
       Emotion Scan
     </div>
     <div>
       <form>
-        <fieldset>
+        <fieldset
+          aria-invalid="false"
+        >
           <legend>
             Émotions positives
           </legend>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="active-3"
@@ -28,6 +31,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="active-1"
                 name="active"
                 type="radio"
@@ -41,6 +45,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="active-2"
                 name="active"
                 type="radio"
@@ -54,6 +59,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="active-3"
                 name="active"
                 type="radio"
@@ -67,6 +73,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="active-4"
                 name="active"
                 type="radio"
@@ -80,6 +87,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="active-5"
                 name="active"
                 type="radio"
@@ -90,7 +98,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="determined-3"
@@ -103,6 +111,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="determined-1"
                 name="determined"
                 type="radio"
@@ -116,6 +125,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="determined-2"
                 name="determined"
                 type="radio"
@@ -129,6 +139,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="determined-3"
                 name="determined"
                 type="radio"
@@ -142,6 +153,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="determined-4"
                 name="determined"
                 type="radio"
@@ -155,6 +167,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="determined-5"
                 name="determined"
                 type="radio"
@@ -165,7 +178,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="attentive-3"
@@ -178,6 +191,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="attentive-1"
                 name="attentive"
                 type="radio"
@@ -191,6 +205,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="attentive-2"
                 name="attentive"
                 type="radio"
@@ -204,6 +219,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="attentive-3"
                 name="attentive"
                 type="radio"
@@ -217,6 +233,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="attentive-4"
                 name="attentive"
                 type="radio"
@@ -230,6 +247,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="attentive-5"
                 name="attentive"
                 type="radio"
@@ -240,7 +258,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="inspired-3"
@@ -253,6 +271,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="inspired-1"
                 name="inspired"
                 type="radio"
@@ -266,6 +285,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="inspired-2"
                 name="inspired"
                 type="radio"
@@ -279,6 +299,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="inspired-3"
                 name="inspired"
                 type="radio"
@@ -292,6 +313,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="inspired-4"
                 name="inspired"
                 type="radio"
@@ -305,6 +327,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="inspired-5"
                 name="inspired"
                 type="radio"
@@ -315,7 +338,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="alert-3"
@@ -328,6 +351,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="alert-1"
                 name="alert"
                 type="radio"
@@ -341,6 +365,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="alert-2"
                 name="alert"
                 type="radio"
@@ -354,6 +379,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="alert-3"
                 name="alert"
                 type="radio"
@@ -367,6 +393,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="alert-4"
                 name="alert"
                 type="radio"
@@ -380,6 +407,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="alert-5"
                 name="alert"
                 type="radio"
@@ -391,13 +419,14 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
           </div>
         </fieldset>
         <fieldset
+          aria-invalid="false"
           style="margin-top: 12px;"
         >
           <legend>
             Émotions négatives
           </legend>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="upset-3"
@@ -410,6 +439,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="upset-1"
                 name="upset"
                 type="radio"
@@ -423,6 +453,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="upset-2"
                 name="upset"
                 type="radio"
@@ -436,6 +467,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="upset-3"
                 name="upset"
                 type="radio"
@@ -449,6 +481,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="upset-4"
                 name="upset"
                 type="radio"
@@ -462,6 +495,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="upset-5"
                 name="upset"
                 type="radio"
@@ -472,7 +506,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="hostile-3"
@@ -485,6 +519,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="hostile-1"
                 name="hostile"
                 type="radio"
@@ -498,6 +533,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="hostile-2"
                 name="hostile"
                 type="radio"
@@ -511,6 +547,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="hostile-3"
                 name="hostile"
                 type="radio"
@@ -524,6 +561,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="hostile-4"
                 name="hostile"
                 type="radio"
@@ -537,6 +575,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="hostile-5"
                 name="hostile"
                 type="radio"
@@ -547,7 +586,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="ashamed-3"
@@ -560,6 +599,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="ashamed-1"
                 name="ashamed"
                 type="radio"
@@ -573,6 +613,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="ashamed-2"
                 name="ashamed"
                 type="radio"
@@ -586,6 +627,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="ashamed-3"
                 name="ashamed"
                 type="radio"
@@ -599,6 +641,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="ashamed-4"
                 name="ashamed"
                 type="radio"
@@ -612,6 +655,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="ashamed-5"
                 name="ashamed"
                 type="radio"
@@ -622,7 +666,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="nervous-3"
@@ -635,6 +679,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="nervous-1"
                 name="nervous"
                 type="radio"
@@ -648,6 +693,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="nervous-2"
                 name="nervous"
                 type="radio"
@@ -661,6 +707,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="nervous-3"
                 name="nervous"
                 type="radio"
@@ -674,6 +721,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="nervous-4"
                 name="nervous"
                 type="radio"
@@ -687,6 +735,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="nervous-5"
                 name="nervous"
                 type="radio"
@@ -697,7 +746,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
             </label>
           </div>
           <div
-            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+            style="display: grid; grid-template-columns: 1fr repeat(5, minmax(32px, auto)); align-items: center; gap: 6px; padding-block: 4px;"
           >
             <label
               for="afraid-3"
@@ -710,6 +759,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="afraid-1"
                 name="afraid"
                 type="radio"
@@ -723,6 +773,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="afraid-2"
                 name="afraid"
                 type="radio"
@@ -736,6 +787,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="afraid-3"
                 name="afraid"
                 type="radio"
@@ -749,6 +801,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="afraid-4"
                 name="afraid"
                 type="radio"
@@ -762,6 +815,7 @@ exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
               style="display: grid; place-items: center;"
             >
               <input
+                aria-invalid="false"
                 id="afraid-5"
                 name="afraid"
                 type="radio"
