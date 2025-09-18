@@ -13,6 +13,8 @@ export const routes = {
     music: () => '/app/music',
     coach: () => '/app/coach',
     settings: () => '/app/settings',
+    flashGlow: () => '/app/flash-glow',
+    community: () => '/app/community',
   },
   b2b: {
     login: () => '/b2b/login',
