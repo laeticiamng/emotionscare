@@ -263,7 +263,7 @@ export default function BreathConstellationPage() {
           haptics: hapticsEnabled && !isReducedMotion,
         });
         setSaveStatus("saved");
-        setSaveMessage("Session enregistrée dans votre historique Supabase.");
+        setSaveMessage("Session enregistrée dans votre historique Supabase et votre journal d'activité.");
       } catch (error) {
         if (error instanceof BreathworkSessionAuthError) {
           setSaveStatus("unauthenticated");

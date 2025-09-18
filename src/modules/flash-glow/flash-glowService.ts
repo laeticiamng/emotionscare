@@ -17,6 +17,10 @@ export interface FlashGlowResponse {
   success: boolean;
   message: string;
   next_session_in?: string;
+  session_id?: string | null;
+  activity_session_id?: string | null;
+  mood_delta?: number | null;
+  satisfaction_score?: number | null;
 }
 
 export interface FlashGlowStats {
@@ -52,10 +56,15 @@ class FlashGlowService {
       });
 
       if (error) {
-        throw new Error(error.message || 'Erreur lors de l\'envoi des métriques');
+        const message = error.message || 'Erreur lors de l\'envoi des métriques';
+        if (typeof error.status === 'number' && error.status === 401) {
+          throw new Error('Authentification requise pour enregistrer la session Flash Glow');
+        }
+
+        throw new Error(message);
       }
 
-      return data;
+      return data as FlashGlowResponse;
     } catch (error) {
       console.error('❌ Flash Glow Service Error:', error);
       throw error;

@@ -12,6 +12,8 @@ const analysisResponseSchema = z.object({
   insights: z.array(z.string()),
   recommendations: z.array(z.string()),
   emotionalBalance: z.number().optional(),
+  persisted: z.boolean().optional(),
+  scanId: z.string().optional(),
 });
 
 export interface EmotionAnalysisResult {
@@ -21,6 +23,8 @@ export interface EmotionAnalysisResult {
   insights: string[];
   recommendations: string[];
   emotionalBalance: number;
+  persisted?: boolean;
+  scanId?: string | null;
 }
 
 export type EmotionScanRow = Database['public']['Tables']['emotion_scans']['Row'];
@@ -42,6 +46,24 @@ interface InvokePayload {
   text: string;
   context?: string;
   previousEmotions?: Record<string, number>;
+}
+
+interface EmotionScanInvokeOptions {
+  accessToken?: string | null;
+}
+
+export interface PersistEmotionScanInput {
+  userId: string;
+  mood: string | null;
+  confidence: number;
+  summary: string;
+  recommendations: string[];
+  insights: string[];
+  emotions: Record<string, number>;
+  emotionalBalance: number;
+  scanType?: string | null;
+  context?: string;
+  previousEmotions?: Record<string, number> | null;
 }
 
 function coerceNumber(value: unknown, fallback = 0): number {
@@ -81,9 +103,21 @@ function coerceStringArray(value: unknown): string[] {
   return [];
 }
 
-export async function invokeEmotionScan(payload: InvokePayload): Promise<EmotionAnalysisResult> {
+export async function invokeEmotionScan(
+  payload: InvokePayload,
+  options: EmotionScanInvokeOptions = {},
+): Promise<EmotionAnalysisResult> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (options.accessToken) {
+    headers.Authorization = `Bearer ${options.accessToken}`;
+  }
+
   const { data, error } = await supabase.functions.invoke('ai-emotion-analysis', {
     body: payload,
+    headers,
   });
 
   if (error) {
@@ -106,7 +140,42 @@ export async function invokeEmotionScan(payload: InvokePayload): Promise<Emotion
     insights: parsed.data.insights,
     recommendations: parsed.data.recommendations,
     emotionalBalance: normalizedBalance,
+    persisted: parsed.data.persisted ?? false,
+    scanId: parsed.data.scanId ?? null,
   };
+}
+
+export async function persistEmotionScanResult(
+  input: PersistEmotionScanInput,
+): Promise<EmotionScanRow> {
+  const persistedPayload = {
+    scores: input.emotions,
+    insights: input.insights,
+    context: input.context ?? null,
+    previousEmotions: input.previousEmotions ?? null,
+  };
+
+  const { data, error } = await supabase
+    .from('emotion_scans')
+    .insert({
+      user_id: input.userId,
+      scan_type: input.scanType ?? 'self-report',
+      mood: input.mood,
+      confidence: input.confidence,
+      summary: input.summary,
+      recommendations: input.recommendations,
+      insights: input.insights,
+      emotions: persistedPayload,
+      emotional_balance: input.emotionalBalance,
+    })
+    .select('*')
+    .single();
+
+  if (error) {
+    throw new Error(error.message || 'Impossible de sauvegarder le scan émotionnel');
+  }
+
+  return data as EmotionScanRow;
 }
 
 export function mapScanRow(row: EmotionScanRow): EmotionScanHistoryEntry {

@@ -256,6 +256,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
           </div>
           <div
             class="h-[280px] w-full"
+            data-testid="scores-mood-chart"
           >
             <div
               class="recharts-responsive-container"
@@ -517,6 +518,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
           </div>
           <div
             class="h-[280px] w-full"
+            data-testid="scores-sessions-chart"
           >
             <div
               class="recharts-responsive-container"
@@ -666,6 +668,7 @@ exports[`ScoresV2Panel > rend un panneau scores 1`] = `
       >
         <div
           class="h-[320px] w-full"
+          data-testid="scores-heatmap-chart"
         >
           <div
             class="recharts-responsive-container"

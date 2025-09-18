@@ -73,6 +73,8 @@ describe('useFlashGlowMachine - auto journalisation', () => {
         moodBefore: 40,
         moodAfter: 76,
         moodDelta: 36,
+        context: 'Flash Glow Ultra',
+        mode: 'core',
         autoJournal: true,
         journalEntryId: 'journal-1',
         journalSummary: 'Flash Glow Ultra - Gain ressenti',

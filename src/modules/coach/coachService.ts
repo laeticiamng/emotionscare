@@ -85,6 +85,7 @@ function normalizeEmotionLabel(value?: string | null): string {
     joie: "joie",
     heureux: "joie",
     positive: "joie",
+    enthousiaste: "joie",
     tristesse: "tristesse",
     triste: "tristesse",
     chagrin: "tristesse",
@@ -95,6 +96,7 @@ function normalizeEmotionLabel(value?: string | null): string {
     anxiete: "peur",
     anxieux: "peur",
     stress: "peur",
+    stresse: "peur",
     neutre: "neutre",
     fatigue: "neutre",
   };
@@ -120,25 +122,21 @@ async function hashText(value: string): Promise<string> {
     return "";
   }
 
-  // Use Web Crypto API (available in modern browsers)
-  if (typeof crypto !== "undefined" && crypto.subtle) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(value);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("");
+  const cryptoCandidate =
+    typeof globalThis !== "undefined"
+      ? (globalThis.crypto as Crypto | undefined) ?? (globalThis as unknown as { msCrypto?: Crypto }).msCrypto
+      : undefined;
+
+  if (!cryptoCandidate?.subtle) {
+    throw new Error("web-crypto-unavailable");
   }
 
-  // Fallback for environments without Web Crypto API
-  // Simple hash using string manipulation (less secure but works)
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) {
-    const char = value.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(16);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(value);
+  const hashBuffer = await cryptoCandidate.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 async function summarizeConversation(history: CoachHistoryItem[]): Promise<string | null> {
@@ -283,10 +281,17 @@ async function recordAnonymizedCoachLog(params: {
       .reverse()
       .find(item => item.role === "user")?.content ?? "";
 
-    const [hashedMessage, hashedResponse] = await Promise.all([
-      hashText(lastUserMessage),
-      hashText(params.response),
-    ]);
+    let hashedMessage = "";
+    let hashedResponse = "";
+
+    try {
+      [hashedMessage, hashedResponse] = await Promise.all([
+        hashText(lastUserMessage),
+        hashText(params.response),
+      ]);
+    } catch (error) {
+      console.warn("coachService: unable to hash conversation payload", error);
+    }
 
     const messagesCount = params.history.filter(item => item.role === "user").length;
     const sessionDuration = params.startedAt ? Math.max(1, Math.round((Date.now() - params.startedAt) / 1000)) : null;

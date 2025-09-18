@@ -16,6 +16,7 @@ vi.mock('@/services/api/httpClient', () => ({
 
 import {
   createJournalTextEntry,
+  createJournalVoiceEntry,
   fetchJournalFeed,
   mapLocalEntry,
 } from '../journalFeed.service';
@@ -48,6 +49,38 @@ describe('journalFeed.service', () => {
     });
 
     expect(result).toEqual({ id: 'remote-1', ts: '2024-05-20T10:00:00.000Z' });
+  });
+
+  it('normalizes voice entries before posting them', async () => {
+    postMock.mockResolvedValue(
+      buildApiResponse({ ok: true, data: { id: 'voice-1', ts: '2024-05-22T08:00:00.000Z' } })
+    );
+
+    const result = await createJournalVoiceEntry({
+      audioUrl: ' https://cdn.emotionscare.com/audio/session.wav ',
+      transcription: 'Bonjour <script>alert(1)</script> monde',
+      tags: ['Focus', '#Zen', 'zen'],
+      valence: 0.42,
+      pitchAvg: 640,
+      summaryOverride: 'Résumé <b>dangereux</b>',
+    });
+
+    expect(postMock).toHaveBeenCalledTimes(1);
+    expect(postMock).toHaveBeenCalledWith('api/v1/journal/voice', {
+      audio_url: 'https://cdn.emotionscare.com/audio/session.wav',
+      text_raw: 'Bonjour alert(1) monde\n\n#focus #zen',
+      summary_120: 'Résumé dangereux',
+      valence: 0.42,
+      emo_vec: Array(8).fill(0.42),
+      pitch_avg: 600,
+      crystal_meta: {
+        form: 'wave',
+        palette: ['#34d399', '#34d399'],
+        mesh_url: 'https://cdn.emotionscare.com/assets/crystals/gem-default.glb',
+      },
+    });
+
+    expect(result).toEqual({ id: 'voice-1', ts: '2024-05-22T08:00:00.000Z' });
   });
 
   it('throws an error when the API refuses the entry creation', async () => {
@@ -87,7 +120,7 @@ describe('journalFeed.service', () => {
         type: 'voice',
         timestamp: '2024-05-18T08:30:00.000Z',
         text: 'Salut ',
-        summary: '<b>Salut</b> <script>mal</script>',
+        summary: '<b>Salut</b> ',
         tags: ['focus', 'zen'],
         valence: 0.4,
         mood: 'positive',

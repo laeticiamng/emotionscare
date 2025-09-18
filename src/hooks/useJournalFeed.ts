@@ -3,9 +3,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   createJournalTextEntry,
+  createJournalVoiceEntry,
   fetchJournalFeed,
   JournalFeedEntry,
   mapLocalEntry,
+  type CreateVoicePayload,
 } from '@/services/journalFeed.service';
 import { loadEntries, upsertEntry, JournalEntryRec } from '@/lib/journal/store';
 import { sanitizeInput as sanitizePlain } from '@/lib/validation/dataValidator';
@@ -43,6 +45,14 @@ export const useJournalFeed = () => {
 
   const createRemote = useMutation({
     mutationFn: createJournalTextEntry,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['journal-feed', user?.id] });
+      emitLocalEvent();
+    },
+  });
+
+  const createVoiceRemote = useMutation({
+    mutationFn: createJournalVoiceEntry,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['journal-feed', user?.id] });
       emitLocalEvent();
@@ -97,8 +107,17 @@ export const useJournalFeed = () => {
     createLocal(input);
   };
 
+  const createVoiceEntry = async (input: CreateVoicePayload) => {
+    if (!user?.id) {
+      throw new Error('Connexion requise pour enregistrer une note vocale');
+    }
+    await createVoiceRemote.mutateAsync(input);
+  };
+
   const isCreating = createRemote.isPending;
   const creationError = createRemote.error as Error | null;
+  const isCreatingVoice = createVoiceRemote.isPending;
+  const creationVoiceError = createVoiceRemote.error as Error | null;
 
   return {
     entries: filteredEntries,
@@ -114,6 +133,9 @@ export const useJournalFeed = () => {
     createEntry,
     isCreating,
     creationError,
+    createVoiceEntry,
+    isCreatingVoice,
+    creationVoiceError,
   };
 };
 

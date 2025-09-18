@@ -549,6 +549,7 @@ const B2CCoachExperience: React.FC = () => {
               <CardContent className="flex-1 overflow-hidden">
                 <div className="flex h-full flex-col">
                   <div
+                    data-testid="coach-disclaimers"
                     className={`mb-4 rounded-lg border ${
                       hasConsented
                         ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-100'
@@ -674,6 +675,7 @@ const B2CCoachExperience: React.FC = () => {
                   <div className="flex gap-2">
                     <div className="flex-1 relative">
                       <Textarea
+                        data-testid="coach-input"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Partagez vos pensées, vos émotions, vos défis..."
@@ -690,16 +692,20 @@ const B2CCoachExperience: React.FC = () => {
                     </div>
                     <div className="flex flex-col gap-2">
                       <Button
+                        data-testid="coach-send"
                         onClick={sendMessage}
                         disabled={!input.trim() || isLoading || !hasConsented}
+                        aria-label="Envoyer le message"
                         className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
                       >
                         <Send className="w-4 h-4" />
                       </Button>
                       <Button
+                        data-testid="coach-voice-toggle"
                         onClick={startVoiceRecognition}
                         disabled={isListening || !hasConsented}
                         variant="outline"
+                        aria-label={isListening ? 'Arrêter la dictée vocale' : 'Activer la dictée vocale'}
                         className="bg-transparent border-gray-600 text-gray-300"
                       >
                         {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}

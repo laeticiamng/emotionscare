@@ -11,7 +11,7 @@ declare global {
 }
 
 import React, { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES } from './aliases';
 import { RouteGuard } from './guards';
@@ -46,7 +46,7 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const B2CAdaptiveMusicPage = lazy(() => import('@/modules/adaptive-music/AdaptiveMusicPage'));
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
@@ -185,7 +185,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
-  B2CMusicEnhanced,
+  B2CMusicEnhanced: B2CAdaptiveMusicPage,
   B2CAICoachPage,
   B2CJournalPage,
   B2CVRBreathGuidePage,
@@ -364,9 +364,11 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 export { routes } from './routes';
 export { ROUTE_ALIASES } from './aliases';
 export type { RouteAlias } from './aliases';
+const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
+
 export const routerV2 = createBrowserRouter([
-  // Routes principales du registry
-  ...ROUTES_REGISTRY.map(route => ({
+  // Routes principales du registry (hors routes dépréciées et wildcard)
+  ...canonicalRoutes.map(route => ({
     path: route.path,
     element: createRouteElement(route),
   })),
@@ -382,11 +384,7 @@ export const routerV2 = createBrowserRouter([
   // Fallback 404 pour toutes les autres routes
   {
     path: '*',
-    element: (
-      <SuspenseWrapper>
-        <UnifiedErrorPage />
-      </SuspenseWrapper>
-    ),
+    element: <Navigate to="/404" replace />,
   },
 ], {
   basename: import.meta.env.BASE_URL ?? '/',
@@ -402,13 +400,13 @@ if (import.meta.env.DEV) {
     .filter(route => !componentMap[route.component])
     .map(route => `${route.name}: ${route.component}`);
 
-  // Log unique au démarrage
   if (missingComponents.length > 0 && !window.__routerV2Logged) {
-    console.warn('⚠️ RouterV2: Composants manquants:', missingComponents);
+    console.error('🚨 RouterV2: composants manquants', missingComponents);
   }
 
+  // Log unique au démarrage
   if (!window.__routerV2Logged) {
-    console.log(`✅ RouterV2 initialisé: ${ROUTES_REGISTRY.length} routes`);
+    console.log(`✅ RouterV2 initialisé: ${canonicalRoutes.length} routes canoniques`);
     window.__routerV2Logged = true;
   }
 }

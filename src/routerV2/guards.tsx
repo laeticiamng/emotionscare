@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { routes } from './routes';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import type { Role } from './schema';
+import { routes } from './routes';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -29,6 +29,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
 }) => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: modeLoading } = useUserMode();
+  const location = useLocation();
 
   // Chargement en cours
   if (authLoading || modeLoading) {
@@ -41,26 +42,37 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
 
   // Authentification requise
   if (requireAuth && !isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to={routes.special.unauthorized()}
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
   }
 
-  // Vérification des rôles - Plus permissive pour éviter les blocages
+  // Vérification des rôles
   if (isAuthenticated && (requiredRole || allowedRoles.length > 0)) {
     const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
-    
-    // Pour l'instant, autoriser l'accès à tous les rôles consumer (b2c)
-    if (currentRole === 'consumer') {
-      return <>{children}</>;
-    }
-    
-    // Rôle spécifique requis (accès exclusif)
+
     if (requiredRole && currentRole !== requiredRole) {
-      return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
+      return (
+        <Navigate
+          to={routes.special.forbidden()}
+          state={{ from: location.pathname, role: currentRole, requiredRole }}
+          replace
+        />
+      );
     }
-    
-    // Liste de rôles autorisés (accès multiple)
+
     if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
-      return <Navigate to={getDefaultDashboardForRole(currentRole)} replace />;
+      return (
+        <Navigate
+          to={routes.special.forbidden()}
+          state={{ from: location.pathname, role: currentRole, allowedRoles }}
+          replace
+        />
+      );
     }
   }
 
@@ -100,21 +112,5 @@ function normalizeRole(role?: string): Role {
       return 'manager';
     default:
       return 'consumer';
-  }
-}
-
-/**
- * Retourne le dashboard par défaut selon le rôle
- */
-function getDefaultDashboardForRole(role: Role): string {
-  switch (role) {
-    case 'consumer':
-      return '/app/home';
-    case 'employee':
-      return '/b2b/user/dashboard';
-    case 'manager':
-      return '/b2b/admin/dashboard';
-    default:
-      return '/app/home';
   }
 }

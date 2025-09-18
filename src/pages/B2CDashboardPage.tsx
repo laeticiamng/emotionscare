@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import RecentEmotionScansWidget from '@/components/dashboard/widgets/RecentEmotionScansWidget';
+import JournalSummaryCard from '@/components/dashboard/widgets/JournalSummaryCard';
 import { 
   Brain, 
   Music, 
@@ -246,6 +248,20 @@ export default function B2CDashboardPage() {
               </Link>
             </Card>
           </div>
+        </section>
+
+        <section aria-labelledby="recent-scans-section" className="mb-8">
+          <h2 id="recent-scans-section" className="sr-only">
+            Historique Emotion Scan
+          </h2>
+          <RecentEmotionScansWidget />
+        </section>
+
+        <section aria-labelledby="journal-summary-section" className="mb-8">
+          <h2 id="journal-summary-section" className="sr-only">
+            Synthèse du journal émotionnel
+          </h2>
+          <JournalSummaryCard />
         </section>
 
         {/* Recommandations personnalisées */}

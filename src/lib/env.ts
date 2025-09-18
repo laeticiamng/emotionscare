@@ -18,6 +18,26 @@ export const IS_PROD = import.meta.env.PROD;
 export const API_URL = import.meta.env.VITE_API_URL || 'https://api.emotionscare.dev';
 export const WEB_URL = import.meta.env.VITE_WEB_URL || 'http://localhost:3000';
 
+// Observability / Sentry configuration
+const parseRate = (value: string | undefined, fallback: number) => {
+  if (!value) return fallback;
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(Math.max(parsed, 0), 1);
+};
+
+export const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';
+export const SENTRY_ENVIRONMENT = import.meta.env.VITE_SENTRY_ENVIRONMENT || NODE_ENV;
+export const SENTRY_TRACES_SAMPLE_RATE = parseRate(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE, 0.1);
+export const SENTRY_REPLAYS_SESSION_SAMPLE_RATE = parseRate(
+  import.meta.env.VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+  0
+);
+export const SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE = parseRate(
+  import.meta.env.VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
+  1
+);
+
 // Configuration Firebase (optionnelle)
 export const FIREBASE_CONFIG = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
@@ -37,7 +57,8 @@ export const ALLOWED_AUDIO_TYPES = (import.meta.env.VITE_ALLOWED_AUDIO_TYPES || 
 // Validation environnement
 export const ENV_VALIDATION = {
   isConfigured: !!(SUPABASE_URL && SUPABASE_ANON_KEY),
-  hasFirebase: !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId)
+  hasFirebase: !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId),
+  hasSentry: Boolean(SENTRY_DSN)
 };
 
 // Log de démarrage en développement
@@ -45,7 +66,8 @@ if (IS_DEV) {
   console.log('🔧 EmotionsCare Environment:', {
     mode: NODE_ENV,
     supabase: ENV_VALIDATION.isConfigured ? '✅' : '❌',
-    firebase: ENV_VALIDATION.hasFirebase ? '✅' : '⚠️ optionnel'
+    firebase: ENV_VALIDATION.hasFirebase ? '✅' : '⚠️ optionnel',
+    sentry: ENV_VALIDATION.hasSentry ? '✅' : '⚠️ optionnel'
   });
 }
 
@@ -57,6 +79,11 @@ export default {
   IS_PROD,
   API_URL,
   WEB_URL,
+  SENTRY_DSN,
+  SENTRY_ENVIRONMENT,
+  SENTRY_TRACES_SAMPLE_RATE,
+  SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
   FIREBASE_CONFIG,
   UPLOAD_MAX_SIZE,
   ALLOWED_IMAGE_TYPES,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ArrowLeft, Volume2, Save, Play, Pause, RotateCcw, Trash2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,12 @@ import { Slider } from '@/components/ui/slider';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { FadeIn, SeoHead } from '@/COMPONENTS.reg';
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 import { useMusicControls } from '@/hooks/useMusicControls';
 import { adaptiveMusicService } from '@/services/adaptiveMusicService';
 import type { MusicTrack } from '@/types/music';
+import { useMoodMixerStore } from '@/store/moodMixer.store';
+import type { MoodPresetRecord } from '@/types/mood-mixer';
 
 interface MoodVibe {
   id: string;
@@ -20,8 +21,6 @@ interface MoodVibe {
   clarity: number;
   description: string;
 }
-
-type MoodPresetRow = Database['public']['Tables']['mood_presets']['Row'];
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
@@ -35,7 +34,7 @@ const buildBlend = (soft: number, clear: number) => ({
   focus: clamp01(1 - clear / 100),
 });
 
-const mapPresetToVibe = (preset: MoodPresetRow): MoodVibe => ({
+const mapPresetToVibe = (preset: MoodPresetRecord): MoodVibe => ({
   id: preset.id,
   name: preset.name,
   softness: preset.softness,
@@ -49,15 +48,36 @@ const B2CMoodMixerPage: React.FC = () => {
   const [softness, setSoftness] = useState([50]);
   const [clarity, setClarity] = useState([50]);
   const [currentVibe, setCurrentVibe] = useState<string>('');
-  const [savedVibes, setSavedVibes] = useState<MoodVibe[]>([]);
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [isLoadingPresets, setIsLoadingPresets] = useState(true);
-  const [isSavingPreset, setIsSavingPreset] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [dustParticles, setDustParticles] = useState<Array<{ x: number; y: number; opacity: number }>>([]);
   const [isFetchingPreview, setIsFetchingPreview] = useState(false);
   const [previewSource, setPreviewSource] = useState<'api' | 'mock'>('mock');
   const [previewError, setPreviewError] = useState<string | null>(null);
   const { playTrack, pause, isPlaying: isPreviewPlaying, isLoading: isAudioLoading, currentTrack } = useMusicControls();
+  const {
+    presets,
+    isLoading,
+    isMutating,
+    selectedPresetId,
+    loadPresets,
+    selectPreset,
+    createPreset,
+    updatePreset,
+    deletePreset,
+    reset: resetStore,
+  } = useMoodMixerStore((state) => ({
+    presets: state.presets,
+    isLoading: state.isLoading,
+    isMutating: state.isMutating,
+    selectedPresetId: state.selectedPresetId,
+    loadPresets: state.loadPresets,
+    selectPreset: state.selectPreset,
+    createPreset: state.createPreset,
+    updatePreset: state.updatePreset,
+    deletePreset: state.deletePreset,
+    reset: state.reset,
+  }));
 
   // Générateur de nom de vibe basé sur les sliders
   const generateVibeName = useCallback((soft: number, clear: number) => {
@@ -74,51 +94,80 @@ const B2CMoodMixerPage: React.FC = () => {
     }
   }, []);
 
-  const fetchSavedVibes = useCallback(async () => {
-    setIsLoadingPresets(true);
-    try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+  useEffect(() => {
+    let isMounted = true;
 
-      if (authError) {
-        throw authError;
-      }
+    supabase.auth
+      .getUser()
+      .then(({ data, error }) => {
+        if (!isMounted) {
+          return;
+        }
+        if (error) {
+          console.error('Error retrieving mood mixer session:', error);
+          setUserId(null);
+          return;
+        }
 
-      if (!user) {
-        setSavedVibes([]);
-        setActivePresetId(null);
+        setUserId(data?.user?.id ?? null);
+      })
+      .catch((error) => {
+        if (isMounted) {
+          console.error('Error retrieving mood mixer session:', error);
+          setUserId(null);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setSessionChecked(true);
+        }
+      });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) {
         return;
       }
+      setUserId(session?.user?.id ?? null);
+      setSessionChecked(true);
+    });
 
-      const { data, error } = await supabase
-        .from('mood_presets')
-        .select('id, user_id, name, description, softness, clarity, blend, created_at, updated_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        throw error;
-      }
-
-      const vibes = (data ?? []).map(mapPresetToVibe).slice(0, 6);
-      setSavedVibes(vibes);
-
-      if (!vibes.some((vibe) => vibe.id === activePresetId)) {
-        setActivePresetId(null);
-      }
-    } catch (error) {
-      console.error('Error fetching mood presets:', error);
-      toast.error('Impossible de charger vos vibes pour le moment');
-    } finally {
-      setIsLoadingPresets(false);
-    }
-  }, [activePresetId]);
+    return () => {
+      isMounted = false;
+      authListener?.subscription.unsubscribe();
+      resetStore();
+    };
+  }, [resetStore]);
 
   useEffect(() => {
-    fetchSavedVibes();
-  }, [fetchSavedVibes]);
+    if (!sessionChecked) {
+      return;
+    }
+
+    if (!userId) {
+      resetStore();
+      return;
+    }
+
+    loadPresets().catch((error) => {
+      console.error('Error fetching mood presets:', error);
+      toast.error('Impossible de charger vos vibes pour le moment');
+    });
+  }, [sessionChecked, userId, loadPresets, resetStore]);
+
+  const savedVibes = useMemo(() => {
+    if (!userId) {
+      return [];
+    }
+
+    return [...presets]
+      .filter((preset) => preset.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 6)
+      .map(mapPresetToVibe);
+  }, [presets, userId]);
+
+  const activePresetId = selectedPresetId;
+  const isLoadingPresets = !sessionChecked || isLoading;
 
   // Animation des particules de poussière
   useEffect(() => {
@@ -276,134 +325,75 @@ const B2CMoodMixerPage: React.FC = () => {
   };
 
   const saveCurrentVibe = useCallback(async () => {
-    if (isSavingPreset) {
+    if (isMutating) {
       return;
     }
 
-    setIsSavingPreset(true);
+    if (!userId) {
+      toast.error('Connectez-vous pour sauvegarder vos vibes');
+      return;
+    }
+
+    const description = buildDescription(softness[0], clarity[0]);
+    const blend = buildBlend(softness[0], clarity[0]);
+
     try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError) {
-        throw authError;
-      }
-
-      if (!user) {
-        toast.error('Connectez-vous pour sauvegarder vos vibes');
-        return;
-      }
-
-      const description = buildDescription(softness[0], clarity[0]);
-      const blend = buildBlend(softness[0], clarity[0]);
-      const { data, error } = await supabase
-        .from('mood_presets')
-        .insert({
-          user_id: user.id,
-          name: currentVibe || generateVibeName(softness[0], clarity[0]),
-          description,
-          softness: softness[0],
-          clarity: clarity[0],
-          blend,
-        })
-        .select('id, user_id, name, description, softness, clarity, blend, created_at, updated_at')
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      const newVibe = mapPresetToVibe(data as MoodPresetRow);
-      setSavedVibes((prev) => [newVibe, ...prev].slice(0, 6));
-      setActivePresetId(newVibe.id);
+      await createPreset({
+        userId,
+        name: currentVibe || generateVibeName(softness[0], clarity[0]),
+        description,
+        softness: softness[0],
+        clarity: clarity[0],
+        blend,
+      });
       toast.success('Ambiance sauvegardée');
     } catch (error) {
       console.error('Error saving mood preset:', error);
       toast.error('Impossible de sauvegarder la vibe');
-    } finally {
-      setIsSavingPreset(false);
     }
-  }, [clarity, currentVibe, generateVibeName, isSavingPreset, softness]);
+  }, [clarity, createPreset, currentVibe, generateVibeName, isMutating, softness, userId]);
 
   const updateActiveVibe = useCallback(async () => {
-    if (!activePresetId || isSavingPreset) {
+    if (!activePresetId || isMutating) {
       return;
     }
 
-    setIsSavingPreset(true);
+    if (!userId) {
+      toast.error('Connectez-vous pour mettre à jour vos vibes');
+      return;
+    }
+
+    const description = buildDescription(softness[0], clarity[0]);
+    const blend = buildBlend(softness[0], clarity[0]);
+
     try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError) {
-        throw authError;
-      }
-
-      if (!user) {
-        toast.error('Connectez-vous pour mettre à jour vos vibes');
-        return;
-      }
-
-      const description = buildDescription(softness[0], clarity[0]);
-      const blend = buildBlend(softness[0], clarity[0]);
-      const { data, error } = await supabase
-        .from('mood_presets')
-        .update({
-          name: currentVibe || generateVibeName(softness[0], clarity[0]),
-          description,
-          softness: softness[0],
-          clarity: clarity[0],
-          blend,
-        })
-        .eq('id', activePresetId)
-        .eq('user_id', user.id)
-        .select('id, user_id, name, description, softness, clarity, blend, created_at, updated_at')
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      const updatedVibe = mapPresetToVibe(data as MoodPresetRow);
-      setSavedVibes((prev) =>
-        prev.map((vibe) => (vibe.id === updatedVibe.id ? updatedVibe : vibe))
-      );
+      await updatePreset(activePresetId, {
+        userId,
+        name: currentVibe || generateVibeName(softness[0], clarity[0]),
+        description,
+        softness: softness[0],
+        clarity: clarity[0],
+        blend,
+      });
       toast.success('Ambiance mise à jour');
     } catch (error) {
       console.error('Error updating mood preset:', error);
       toast.error('Impossible de mettre à jour la vibe');
-    } finally {
-      setIsSavingPreset(false);
     }
-  }, [activePresetId, clarity, currentVibe, generateVibeName, isSavingPreset, softness]);
+  }, [activePresetId, clarity, currentVibe, generateVibeName, isMutating, softness, updatePreset, userId]);
 
-  const loadVibe = (vibe: MoodVibe) => {
+  const loadVibe = useCallback((vibe: MoodVibe) => {
     setSoftness([vibe.softness]);
     setClarity([vibe.clarity]);
     setCurrentVibe(vibe.name);
-    setActivePresetId(vibe.id);
-  };
+    selectPreset(vibe.id);
+  }, [selectPreset]);
 
   const handleDeleteVibe = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>, vibeId: string) => {
       event.stopPropagation();
 
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError) {
-        console.error('Error retrieving auth session:', authError);
-        toast.error('Session utilisateur introuvable');
-        return;
-      }
-
-      if (!user) {
+      if (!userId) {
         toast.error('Connectez-vous pour gérer vos vibes');
         return;
       }
@@ -413,27 +403,14 @@ const B2CMoodMixerPage: React.FC = () => {
       }
 
       try {
-        const { error } = await supabase
-          .from('mood_presets')
-          .delete()
-          .eq('id', vibeId)
-          .eq('user_id', user.id);
-
-        if (error) {
-          throw error;
-        }
-
-        setSavedVibes((prev) => prev.filter((vibe) => vibe.id !== vibeId));
-        if (activePresetId === vibeId) {
-          setActivePresetId(null);
-        }
+        await deletePreset(vibeId);
         toast.success('Ambiance supprimée');
       } catch (error) {
         console.error('Error deleting mood preset:', error);
         toast.error('Impossible de supprimer la vibe');
       }
     },
-    [activePresetId]
+    [deletePreset, userId]
   );
 
   const getVibeColor = () => {
@@ -553,7 +530,7 @@ const B2CMoodMixerPage: React.FC = () => {
               size="icon"
               onClick={saveCurrentVibe}
               className="hover:bg-white/10"
-              disabled={isSavingPreset}
+              disabled={isMutating}
               aria-label="Sauvegarder la vibe"
               title="Sauvegarder la vibe actuelle"
             >
@@ -565,7 +542,7 @@ const B2CMoodMixerPage: React.FC = () => {
                 size="icon"
                 onClick={updateActiveVibe}
                 className="hover:bg-white/10"
-                disabled={isSavingPreset}
+                disabled={isMutating}
                 aria-label="Mettre à jour la vibe sélectionnée"
                 title="Mettre à jour la vibe sélectionnée"
               >
@@ -612,6 +589,7 @@ const B2CMoodMixerPage: React.FC = () => {
                 return (
                   <Card
                     key={vibe.id}
+                    data-testid={`mood-vibe-${vibe.id}`}
                     className={`p-3 bg-card/40 backdrop-blur-sm border transition-all cursor-pointer group hover:bg-card/60 ${
                       isActive ? 'border-primary/60 ring-1 ring-primary/40' : 'border-border/30'
                     }`}
@@ -638,7 +616,7 @@ const B2CMoodMixerPage: React.FC = () => {
                           onClick={(event) => handleDeleteVibe(event, vibe.id)}
                           aria-label={`Supprimer ${vibe.name}`}
                           title="Supprimer cette vibe"
-                          disabled={isSavingPreset}
+                          disabled={isMutating}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

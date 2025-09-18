@@ -6,10 +6,12 @@ import { usePulseClock } from "@/COMPONENTS.reg";
 import { ff } from "@/lib/flags/ff";
 import { useSound } from "@/COMPONENTS.reg";       // si P5 dispo
 import { recordEvent } from "@/lib/scores/events"; // si P6 dispo
-import { supabase } from "@/integrations/supabase/client";
 import { createFlashGlowJournalEntry } from "@/modules/flash-glow/journal";
 import type { JournalEntry } from "@/modules/journal/journalService";
 import { toast } from "@/hooks/use-toast";
+import { flashGlowService } from "@/modules/flash-glow/flash-glowService";
+import type { FlashGlowSession } from "@/modules/flash-glow/flash-glowService";
+import { routes } from "@/routerV2/routes";
 
 type Theme = "cyan" | "violet" | "amber" | "emerald";
 type PresetKey = "calme" | "focus" | "recovery";
@@ -229,20 +231,6 @@ export default function FlashGlowUltraPage() {
       }
 
       try {
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-
-        if (userError) {
-          setAutoSaveStatus("error");
-          setAutoSaveError(userError.message || "Erreur d'authentification Supabase");
-          return;
-        }
-
-        if (!userData?.user) {
-          setAutoSaveStatus("unauthenticated");
-          setAutoSaveError("Connectez-vous pour enregistrer vos sessions Flash Glow Ultra.");
-          return;
-        }
-
         setAutoSaveStatus("saving");
         setAutoSaveError(null);
 
@@ -260,63 +248,69 @@ export default function FlashGlowUltraPage() {
                   : 1
           : null;
 
-        const { data, error } = await supabase
-          .from("user_activity_sessions")
-          .insert({
-            user_id: userData.user.id,
-            activity_type: "flash_glow_ultra",
-            duration_seconds: actualDurationSec,
-            completed_at: new Date().toISOString(),
-            mood_before: normalizedBaseline.toString(),
-            mood_after: normalizedAfter !== null ? normalizedAfter.toString() : null,
-            satisfaction_score: satisfactionScore ?? undefined,
-            session_data: {
-              preset,
-              bpm,
-              intensity,
-              theme,
-              shape,
-              target_minutes: targetMinutes,
-              actual_minutes: Number((actualDurationSec / 60).toFixed(2)),
-              stages: summaries.map((stage) => ({
-                key: stage.key,
-                label: stage.label,
-                planned_seconds: stage.plannedSeconds,
-                actual_seconds: stage.actualSeconds,
-                portion: stage.portion
-              })),
-              safe_bpm: safeBpm,
-              reason,
-              started_at: new Date(sessionStartedAt).toISOString(),
-              mood: {
-                before: normalizedBaseline,
-                after: normalizedAfter,
-                delta: computedMoodDelta
-              },
-              journal_entry_id: journalEntry?.id || null
-            }
-          })
-          .select("id")
-          .single();
+        const intensityPercent = Math.round(Math.max(0, Math.min(1, intensity)) * 100);
 
-        if (error) {
-          setAutoSaveStatus("error");
-          setAutoSaveError(error.message ?? "Erreur lors de l'enregistrement Supabase");
-          return;
-        }
+        const sessionPayload: FlashGlowSession = {
+          duration_s: actualDurationSec,
+          label: moodLabel,
+          glow_type: preset,
+          intensity: intensityPercent,
+          result: reason === "auto_complete" ? "completed" : "interrupted",
+          metadata: {
+            preset,
+            bpm,
+            theme,
+            shape,
+            mode: 'ultra',
+            context: 'Flash Glow Ultra',
+            target_minutes: targetMinutes,
+            actual_minutes: Number((actualDurationSec / 60).toFixed(2)),
+            stages: summaries.map((stage) => ({
+              key: stage.key,
+              label: stage.label,
+              planned_seconds: stage.plannedSeconds,
+              actual_seconds: stage.actualSeconds,
+              portion: stage.portion
+            })),
+            safe_bpm: safeBpm,
+            reason,
+            started_at: new Date(sessionStartedAt).toISOString(),
+            ended_at: new Date().toISOString(),
+            recommendation: recommendationMessage,
+            satisfactionScore,
+            journalEntryId: journalEntry?.id ?? null,
+            moodBefore: normalizedBaseline,
+            moodAfter: normalizedAfter,
+            moodDelta: computedMoodDelta
+          }
+        };
 
-        setSessionRecordId(data?.id ?? null);
+        const response = await flashGlowService.endSession(sessionPayload);
+
         if (journalEntry) {
           toast({
             title: "Journal mis à jour ✨",
             description: recommendationMessage
           });
         }
+
+        if (response?.activity_session_id) {
+          setSessionRecordId(response.activity_session_id);
+        } else {
+          setSessionRecordId(null);
+        }
+
+        if (typeof response?.mood_delta === "number") {
+          setMoodDelta(response.mood_delta);
+        }
+
         setAutoSaveStatus("saved");
       } catch (err: any) {
         console.error("Auto-save Flash Glow Ultra session failed", err);
-        setAutoSaveStatus("error");
-        setAutoSaveError(err?.message ?? "Erreur inattendue lors de l'enregistrement de la session");
+        const message = err?.message ?? "Erreur inattendue lors de l'enregistrement de la session";
+        const isAuthError = /authent/i.test(message) || /unauthor/i.test(message);
+        setAutoSaveStatus(isAuthError ? "unauthenticated" : "error");
+        setAutoSaveError(message);
       }
     },
     [sessionStartedAt, elapsedSeconds, sessionTargetMinutes, durationMin, bpm, preset, intensity, theme, shape]
@@ -683,14 +677,18 @@ export default function FlashGlowUltraPage() {
           </small>
 
           {autoSaveStatus !== "idle" && (
-            <div style={{ fontSize: 12, lineHeight: 1.5 }}>
+            <div
+              role="status"
+              aria-live="polite"
+              style={{ display: "grid", gap: 8, fontSize: 12, lineHeight: 1.5 }}
+            >
               {autoSaveStatus === "saving" && (
-                <span style={{ color: "var(--accent, #f97316)" }}>
+                <div style={{ color: "var(--accent, #f97316)" }}>
                   Enregistrement automatique en cours...
-                </span>
+                </div>
               )}
               {autoSaveStatus === "saved" && (
-                <span style={{ color: "var(--success, #22c55e)" }}>
+                <div style={{ color: "var(--success, #22c55e)" }}>
                   Session enregistrée automatiquement
                   {sessionRecordId ? ` (#${sessionRecordId.slice(0, 8)})` : ""}.
                   {moodDelta !== null && (
@@ -698,15 +696,41 @@ export default function FlashGlowUltraPage() {
                       Δ humeur {moodDelta > 0 ? `+${moodDelta}` : moodDelta}
                     </span>
                   )}
-                </span>
+                </div>
               )}
               {autoSaveStatus === "unauthenticated" && (
-                <span style={{ color: "var(--warning, #facc15)" }}>
-                  Connectez-vous pour enregistrer vos sessions Flash Glow Ultra.
-                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "12px 14px",
+                    borderRadius: 12,
+                    border: "1px solid rgba(250, 204, 21, 0.35)",
+                    background: "rgba(250, 204, 21, 0.08)",
+                    color: "var(--warning, #facc15)"
+                  }}
+                >
+                  <span style={{ flex: "1 1 240px" }}>
+                    {autoSaveError ?? "Connectez-vous pour enregistrer vos sessions Flash Glow Ultra."}
+                  </span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    <Button asChild variant="warning" size="sm" data-ui="login-cta">
+                      <a href={routes.auth.login()}>
+                        Se connecter
+                      </a>
+                    </Button>
+                    {lastSessionReason && (
+                      <Button variant="ghost" size="sm" onClick={retrySave}>
+                        Réessayer l'enregistrement
+                      </Button>
+                    )}
+                  </div>
+                </div>
               )}
               {autoSaveStatus === "error" && (
-                <span style={{ color: "var(--destructive, #ef4444)" }}>
+                <div style={{ color: "var(--destructive, #ef4444)" }}>
                   Enregistrement impossible{autoSaveError ? ` : ${autoSaveError}` : ""}.
                   {lastSessionReason && (
                     <button
@@ -725,7 +749,7 @@ export default function FlashGlowUltraPage() {
                       Réessayer
                     </button>
                   )}
-                </span>
+                </div>
               )}
             </div>
           )}

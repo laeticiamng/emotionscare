@@ -70,7 +70,7 @@
   - Export/partage guidé avec synthèse de la playlist et recommandations.
 
 ### 📊 Scores Dashboard — 🟢 Livré
-- **Entrées** : `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scoresDashboard.service.ts`, `src/hooks/useChartExporter.ts`.
+- **Entrées** : `src/pages/HeatmapPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scoresDashboard.service.ts`, `src/hooks/useChartExporter.ts`.
 - **Fonctionnalités clés** :
   - Récupération Supabase (trend 30j, sessions hebdo, heatmap) + fallback local `SCORES_DASHBOARD_FALLBACK`.  
   - Graphiques Recharts (Line/Bar/Scatter) stylés, tooltips custom, palettes par type de séance.  

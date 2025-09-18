@@ -26,6 +26,18 @@ describe('health endpoints', () => {
     expect(payload.metrics).toEqual(
       expect.objectContaining({ rss: expect.any(Number), heapUsed: expect.any(Number) })
     );
+    expect(payload.latency).toEqual(
+      expect.objectContaining({ api: expect.any(Number), eventLoop: expect.any(Number) })
+    );
+    expect(Array.isArray(payload.dependencies)).toBe(true);
+    expect(payload.dependencies.length).toBeGreaterThan(0);
+    expect(payload.dependencies[0]).toEqual(
+      expect.objectContaining({
+        name: expect.any(String),
+        latency: expect.any(Number),
+        lastChecked: expect.any(String),
+      })
+    );
   });
 
   it('aliases /api/healthz to the same payload', async () => {
