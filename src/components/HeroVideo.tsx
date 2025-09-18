@@ -1,6 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
 
+const HeroFallbackImage: React.FC<{ className?: string; priority?: boolean }> = ({ className = '', priority = false }) => (
+  <picture className={`block w-full h-full ${className}`.trim()}>
+    <source srcSet="/hero/hero-fallback.avif" type="image/avif" />
+    <source srcSet="/hero/hero-fallback.webp" type="image/webp" />
+    <img
+      src="/hero/hero-fallback.webp"
+      alt="EmotionsCare - Plateforme de bien-être émotionnel"
+      className="w-full h-full object-cover"
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  </picture>
+);
+
 interface HeroVideoProps {
   className?: string;
 }
@@ -30,29 +44,16 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
 
   // Fallback vers l'image si vidéo désactivée, en erreur, ou pas encore chargée
   if (!shouldShowVideo || videoError) {
-    return (
-      <img
-        src="/hero/hero-fallback.webp"
-        alt="EmotionsCare - Plateforme de bien-être émotionnel"
-        className={`w-full h-full object-cover ${className}`}
-        loading="lazy"
-        onError={() => console.warn('[HeroVideo] Fallback image also failed to load')}
-      />
-    );
+    return <HeroFallbackImage className={className} priority={!shouldShowVideo} />;
   }
 
   return (
     <div className={`relative w-full h-full ${className}`}>
       {/* Afficher l'image en fallback pendant le chargement */}
       {!videoLoaded && (
-        <img
-          src="/hero/hero-fallback.webp"
-          alt="EmotionsCare - Plateforme de bien-être émotionnel"
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
-        />
+        <HeroFallbackImage className="absolute inset-0" />
       )}
-      
+
       <video
         className={`w-full h-full object-cover ${videoLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
         autoPlay
@@ -67,11 +68,7 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
         <source src="/hero/hero.mp4" type="video/mp4" />
         
         {/* Fallback pour navigateurs non compatibles */}
-        <img
-          src="/hero/hero-fallback.webp"
-          alt="EmotionsCare - Plateforme de bien-être émotionnel"
-          className="w-full h-full object-cover"
-        />
+        <HeroFallbackImage />
       </video>
     </div>
   );

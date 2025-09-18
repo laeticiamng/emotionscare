@@ -1,23 +1,35 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { MoodPresetBlend, MoodPresetRecord } from '@/types/mood-mixer';
+import { z } from 'zod';
 
 export type MoodPresetRow = Database['public']['Tables']['mood_presets']['Row'];
 export type MoodPresetInsert = Database['public']['Tables']['mood_presets']['Insert'];
 export type MoodPresetUpdate = Database['public']['Tables']['mood_presets']['Update'];
 
-export interface MoodPresetPayload {
-  name: string;
-  description?: string | null;
-  icon?: string | null;
-  gradient?: string | null;
-  tags?: string[];
-  blend: MoodPresetBlend;
-  softness?: number;
-  clarity?: number;
-  slug?: string | null;
-  userId?: string | null;
-}
+export const moodPresetBlendSchema = z.object({
+  joy: z.number().min(0).max(1),
+  calm: z.number().min(0).max(1),
+  energy: z.number().min(0).max(1),
+  focus: z.number().min(0).max(1),
+});
+
+export const moodPresetPayloadSchema = z.object({
+  name: z.string().trim().min(2).max(60),
+  description: z.string().trim().max(160).nullable().optional(),
+  icon: z.string().trim().max(64).nullable().optional(),
+  gradient: z.string().trim().max(80).nullable().optional(),
+  tags: z.array(z.string().trim().min(1).max(32)).max(8).optional(),
+  blend: moodPresetBlendSchema,
+  softness: z.number().min(0).max(100).optional(),
+  clarity: z.number().min(0).max(100).optional(),
+  slug: z.string().trim().max(64).nullable().optional(),
+  userId: z.string().uuid().nullable().optional(),
+});
+
+export const moodPresetUpdateSchema = moodPresetPayloadSchema.partial();
+
+export type MoodPresetPayload = z.infer<typeof moodPresetPayloadSchema>;
 
 const DEFAULT_BLEND: MoodPresetBlend = {
   joy: 0.5,
@@ -152,9 +164,11 @@ export const moodPresetsService = {
   },
 
   async createPreset(payload: MoodPresetPayload): Promise<MoodPresetRecord | null> {
+    const parsed = moodPresetPayloadSchema.parse(payload);
+
     const { data, error } = await supabase
       .from('mood_presets')
-      .insert(toInsert(payload))
+      .insert(toInsert(parsed))
       .select()
       .single();
 
@@ -167,9 +181,11 @@ export const moodPresetsService = {
   },
 
   async updatePreset(id: string, payload: Partial<MoodPresetPayload>): Promise<MoodPresetRecord | null> {
+    const parsed = moodPresetUpdateSchema.parse(payload);
+
     const { data, error } = await supabase
       .from('mood_presets')
-      .update(toUpdate(payload))
+      .update(toUpdate(parsed))
       .eq('id', id)
       .select()
       .single();

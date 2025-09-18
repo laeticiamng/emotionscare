@@ -16,6 +16,7 @@ vi.mock('@/services/api/httpClient', () => ({
 
 import {
   createJournalTextEntry,
+  createJournalVoiceEntry,
   fetchJournalFeed,
   mapLocalEntry,
 } from '../journalFeed.service';
@@ -94,6 +95,45 @@ describe('journalFeed.service', () => {
         origin: 'remote',
       },
     ]);
+  });
+
+  it('serializes voice payloads with sanitized transcript and metadata', async () => {
+    postMock.mockResolvedValue(
+      buildApiResponse({ ok: true, data: { id: 'voice-1', ts: '2024-05-21T10:00:00.000Z' } })
+    );
+
+    const blob = {
+      type: 'audio/webm',
+      async arrayBuffer() {
+        return new TextEncoder().encode('dummy').buffer;
+      },
+    } as unknown as Blob;
+
+    const result = await createJournalVoiceEntry({
+      audio: blob,
+      transcript: 'Contenu <script>alert(1)</script> #Force',
+      summary: '<b>Résumé</b>',
+      tags: ['Force', '#Calme'],
+      tone: 'positive',
+      durationSec: 42,
+      metadata: { pitch_avg: 128.4 },
+    });
+
+    expect(postMock).toHaveBeenCalledWith('api/v1/journal/voice', expect.objectContaining({
+      text_raw: expect.stringContaining('#force #calme'),
+      summary_120: 'Résumé',
+      valence: 0.35,
+      crystal_meta: expect.objectContaining({
+        duration_sec: 42,
+        tags: ['force', 'calme'],
+        pitch_avg: 128.4,
+      }),
+    }));
+
+    const payload = postMock.mock.calls[0][1];
+    expect(typeof payload.audio_url).toBe('string');
+    expect(payload.audio_url).toMatch(/^data:audio\/webm;base64,/);
+    expect(result).toEqual({ id: 'voice-1', ts: '2024-05-21T10:00:00.000Z' });
   });
 
   it('maps local entries with extracted tags', () => {

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageHeader, Card, Button, ProgressBar, Sparkline } from "@/COMPONENTS.reg"; // ProgressBar/Sparkline ajoutés en P6
 import { recordEvent } from "@/lib/scores/events"; // si P6 non intégré, cet import peut être ignoré (no-op)
@@ -11,6 +12,7 @@ import {
   deriveScore10,
   EmotionScanHistoryEntry,
   EmotionAnalysisResult,
+  persistEmotionScanResult,
 } from "@/services/emotionScan.service";
 
 const POS = [
@@ -29,8 +31,22 @@ const NEG = [
   { id: "afraid", label: "Effrayé(e)" }
 ] as const;
 
-type Likert = 1|2|3|4|5;
-type Resp = Record<(typeof POS[number] | typeof NEG[number])["id"], Likert | undefined>;
+type Likert = 1 | 2 | 3 | 4 | 5;
+type QuestionId = (typeof POS[number] | typeof NEG[number])["id"];
+type ResponsesState = Partial<Record<QuestionId, Likert>>;
+
+const LIKERT_VALUE = z.number().int().min(1).max(5);
+export const emotionScanResponsesSchema = z.object(
+  [...POS, ...NEG].reduce(
+    (acc, question) => {
+      acc[question.id] = LIKERT_VALUE;
+      return acc;
+    },
+    {} as Record<QuestionId, z.ZodNumber>
+  )
+);
+
+export type EmotionScanResponses = z.infer<typeof emotionScanResponsesSchema>;
 
 const LOCAL_HISTORY_KEY = "emotion_scan_history_v2";
 
@@ -54,11 +70,14 @@ function saveLocalHistory(values: number[]) {
 }
 
 export default function EmotionScanPage() {
-  const [resp, setResp] = React.useState<Resp>({} as any);
+  const [resp, setResp] = React.useState<ResponsesState>({});
   const [submitted, setSubmitted] = React.useState(false);
   const [analysis, setAnalysis] = React.useState<EmotionAnalysisResult | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [localHistory, setLocalHistory] = React.useState<number[]>(() => loadLocalHistory());
+  const [invalidQuestions, setInvalidQuestions] = React.useState<QuestionId[]>([]);
+  const formErrorId = React.useId();
+  const errorRef = React.useRef<HTMLParagraphElement | null>(null);
 
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -68,6 +87,12 @@ export default function EmotionScanPage() {
       setLocalHistory(loadLocalHistory());
     }
   }, [user?.id]);
+
+  React.useEffect(() => {
+    if (errorMessage) {
+      errorRef.current?.focus();
+    }
+  }, [errorMessage]);
 
   const { data: remoteHistory = [], isLoading: historyLoading } = useQuery({
     queryKey: ["emotion-scan-history", user?.id],
@@ -96,21 +121,8 @@ export default function EmotionScanPage() {
     onMutate: () => {
       setErrorMessage(null);
     },
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
       setAnalysis(result);
-
-      if (user?.id) {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ["emotion-scan-history", user.id] }),
-          queryClient.invalidateQueries({ queryKey: ["recent-scans", user.id] }),
-        ]);
-      } else {
-        setLocalHistory(prev => {
-          const next = [...prev, result.emotionalBalance].slice(-12);
-          saveLocalHistory(next);
-          return next;
-        });
-      }
     },
     onError: (error: unknown) => {
       console.error("Emotion scan analysis failed", error);
@@ -130,15 +142,34 @@ export default function EmotionScanPage() {
     if (b > -3) return "Neutre";
     if (b > -8) return "Tendu";
     return "Négatif";
-    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
     setErrorMessage(null);
+    setInvalidQuestions([]);
 
-    const positiveAnswers = POS.map(question => ({ ...question, value: resp[question.id] as number | undefined }));
-    const negativeAnswers = NEG.map(question => ({ ...question, value: resp[question.id] as number | undefined }));
+    const validation = emotionScanResponsesSchema.safeParse(resp);
+
+    if (!validation.success) {
+      const missing = Array.from(
+        new Set(
+          validation.error.issues
+            .map((issue) => issue.path[0])
+            .filter((value): value is QuestionId => typeof value === "string")
+        )
+      );
+
+      setInvalidQuestions(missing);
+      setErrorMessage("Veuillez répondre aux 10 questions avant de lancer l'analyse.");
+      return;
+    }
+
+    const normalized = validation.data as Record<QuestionId, Likert>;
+
+    const positiveAnswers = POS.map(question => ({ ...question, value: normalized[question.id] as Likert }));
+    const negativeAnswers = NEG.map(question => ({ ...question, value: normalized[question.id] as Likert }));
 
     const summaryText = summarizeLikertAnswers(positiveAnswers, negativeAnswers, balance);
 
@@ -148,6 +179,41 @@ export default function EmotionScanPage() {
         context: "Auto-évaluation I-PANAS-SF",
         previousEmotions: latestScores,
       });
+
+      if (user?.id) {
+        try {
+          const entry = await persistEmotionScanResult({
+            userId: user.id,
+            summary: summaryText,
+            context: "Auto-évaluation I-PANAS-SF",
+            result,
+            stats: { positiveAffect: pa, negativeAffect: na, balance },
+            previousEmotions: latestScores ?? null,
+            scanType: "ipanassf",
+          });
+
+          queryClient.setQueryData<EmotionScanHistoryEntry[]>(
+            ["emotion-scan-history", user.id],
+            (previous = []) => [entry, ...previous].slice(0, 12),
+          );
+
+          await queryClient.invalidateQueries({ queryKey: ["recent-scans", user.id] });
+        } catch (persistError) {
+          console.error("Failed to persist emotion scan", persistError);
+          setErrorMessage("Analyse enregistrée localement. Synchronisation impossible pour le moment.");
+          setLocalHistory(prev => {
+            const next = [...prev, result.emotionalBalance].slice(-12);
+            saveLocalHistory(next);
+            return next;
+          });
+        }
+      } else {
+        setLocalHistory(prev => {
+          const next = [...prev, result.emotionalBalance].slice(-12);
+          saveLocalHistory(next);
+          return next;
+        });
+      }
 
       try {
         recordEvent?.({
@@ -167,23 +233,49 @@ export default function EmotionScanPage() {
   }
 
   return (
-    <main aria-label="Emotion Scan">
+    <main id="main-content" aria-label="Emotion Scan">
       <PageHeader title="Emotion Scan" subtitle="Auto-évaluation rapide (I-PANAS-SF)" />
       <Card>
-        <form onSubmit={onSubmit}>
-          <fieldset>
+        <form onSubmit={onSubmit} aria-describedby={errorMessage ? formErrorId : undefined}>
+          <fieldset aria-invalid={invalidQuestions.length > 0 && submitted}>
             <legend>Émotions positives</legend>
             {POS.map(q => (
-              <LikertRow key={q.id} id={q.id} label={q.label} value={resp[q.id]} onChange={(v)=>setResp(r => ({...r, [q.id]: v}))} />
+              <LikertRow
+                key={q.id}
+                id={q.id}
+                label={q.label}
+                value={resp[q.id]}
+                onChange={(v) => setResp(r => ({ ...r, [q.id]: v }))}
+                showError={submitted && invalidQuestions.includes(q.id)}
+              />
             ))}
           </fieldset>
 
-          <fieldset style={{ marginTop: 12 }}>
+          <fieldset style={{ marginTop: 12 }} aria-invalid={invalidQuestions.length > 0 && submitted}>
             <legend>Émotions négatives</legend>
             {NEG.map(q => (
-              <LikertRow key={q.id} id={q.id} label={q.label} value={resp[q.id]} onChange={(v)=>setResp(r => ({...r, [q.id]: v}))} />
+              <LikertRow
+                key={q.id}
+                id={q.id}
+                label={q.label}
+                value={resp[q.id]}
+                onChange={(v) => setResp(r => ({ ...r, [q.id]: v }))}
+                showError={submitted && invalidQuestions.includes(q.id)}
+              />
             ))}
           </fieldset>
+
+          {errorMessage && invalidQuestions.length > 0 && (
+            <p
+              id={formErrorId}
+              ref={errorRef}
+              role="alert"
+              tabIndex={-1}
+              style={{ color: "var(--destructive)", marginTop: 8 }}
+            >
+              {errorMessage}
+            </p>
+          )}
 
           <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
             <ProgressBar value={completion * 100} max={100} />
@@ -192,6 +284,7 @@ export default function EmotionScanPage() {
               data-ui="primary-cta"
               aria-disabled={completion < 1 || emotionScanMutation.isPending}
               disabled={completion < 1 || emotionScanMutation.isPending}
+              aria-describedby={errorMessage ? formErrorId : undefined}
             >
               {emotionScanMutation.isPending ? "Analyse en cours…" : "Calculer"}
             </Button>
@@ -291,10 +384,12 @@ export default function EmotionScanPage() {
   );
 }
 
-function LikertRow({ id, label, value, onChange }: { id: string; label: string; value?: Likert; onChange: (v: Likert)=>void }) {
-  const opts: Likert[] = [1,2,3,4,5];
+function LikertRow({ id, label, value, onChange, showError }: { id: string; label: string; value?: Likert; onChange: (v: Likert) => void; showError: boolean }) {
+  const opts: Likert[] = [1, 2, 3, 4, 5];
+  const errorId = `${id}-error`;
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto auto auto", alignItems: "center", gap: 6, paddingBlock: 4 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr repeat(5, minmax(32px, auto))", alignItems: "center", gap: 6, paddingBlock: 4 }}>
       <label htmlFor={`${id}-3`} style={{ whiteSpace: "nowrap" }}>{label}</label>
       {opts.map(v => (
         <label key={v} style={{ display: "grid", placeItems: "center" }} aria-label={`${label} ${v}`}>
@@ -304,10 +399,21 @@ function LikertRow({ id, label, value, onChange }: { id: string; label: string; 
             id={`${id}-${v}`}
             checked={value === v}
             onChange={() => onChange(v)}
+            aria-describedby={showError ? errorId : undefined}
+            aria-invalid={showError}
           />
           <small>{v}</small>
         </label>
       ))}
+      {showError && (
+        <span
+          id={errorId}
+          role="alert"
+          style={{ gridColumn: "1 / -1", fontSize: "0.875rem", color: "var(--destructive)" }}
+        >
+          Sélection requise pour {label.toLowerCase()}.
+        </span>
+      )}
     </div>
   );
 }

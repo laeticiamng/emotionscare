@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createFlashGlowJournalEntry } from "@/modules/flash-glow/journal";
 import type { JournalEntry } from "@/modules/journal/journalService";
 import { toast } from "@/hooks/use-toast";
+import { sessionsService, SessionsAuthError } from "@/services/sessions.service";
 
 type Theme = "cyan" | "violet" | "amber" | "emerald";
 type PresetKey = "calme" | "focus" | "recovery";
@@ -260,52 +261,40 @@ export default function FlashGlowUltraPage() {
                   : 1
           : null;
 
-        const { data, error } = await supabase
-          .from("user_activity_sessions")
-          .insert({
-            user_id: userData.user.id,
-            activity_type: "flash_glow_ultra",
-            duration_seconds: actualDurationSec,
-            completed_at: new Date().toISOString(),
-            mood_before: normalizedBaseline.toString(),
-            mood_after: normalizedAfter !== null ? normalizedAfter.toString() : null,
-            satisfaction_score: satisfactionScore ?? undefined,
-            session_data: {
-              preset,
-              bpm,
-              intensity,
-              theme,
-              shape,
-              target_minutes: targetMinutes,
-              actual_minutes: Number((actualDurationSec / 60).toFixed(2)),
-              stages: summaries.map((stage) => ({
-                key: stage.key,
-                label: stage.label,
-                planned_seconds: stage.plannedSeconds,
-                actual_seconds: stage.actualSeconds,
-                portion: stage.portion
-              })),
-              safe_bpm: safeBpm,
-              reason,
-              started_at: new Date(sessionStartedAt).toISOString(),
-              mood: {
-                before: normalizedBaseline,
-                after: normalizedAfter,
-                delta: computedMoodDelta
-              },
-              journal_entry_id: journalEntry?.id || null
-            }
-          })
-          .select("id")
-          .single();
+        const sessionMeta = {
+          preset,
+          bpm,
+          intensity,
+          theme,
+          shape,
+          target_minutes: targetMinutes,
+          actual_minutes: Number((actualDurationSec / 60).toFixed(2)),
+          stages: summaries.map((stage) => ({
+            key: stage.key,
+            label: stage.label,
+            planned_seconds: stage.plannedSeconds,
+            actual_seconds: stage.actualSeconds,
+            portion: stage.portion
+          })),
+          safe_bpm: safeBpm,
+          reason,
+          started_at: new Date(sessionStartedAt).toISOString(),
+          satisfaction_score: satisfactionScore,
+          journal_entry_id: journalEntry?.id || null,
+          recommendation: recommendationMessage
+        };
 
-        if (error) {
-          setAutoSaveStatus("error");
-          setAutoSaveError(error.message ?? "Erreur lors de l'enregistrement Supabase");
-          return;
-        }
+        const record = await sessionsService.logSession({
+          userId: userData.user.id,
+          type: "flash_glow_ultra",
+          durationSec: actualDurationSec,
+          moodBefore: normalizedBaseline,
+          moodAfter: normalizedAfter,
+          moodDelta: computedMoodDelta ?? undefined,
+          meta: sessionMeta
+        });
 
-        setSessionRecordId(data?.id ?? null);
+        setSessionRecordId(record?.id ?? null);
         if (journalEntry) {
           toast({
             title: "Journal mis à jour ✨",
@@ -314,6 +303,11 @@ export default function FlashGlowUltraPage() {
         }
         setAutoSaveStatus("saved");
       } catch (err: any) {
+        if (err instanceof SessionsAuthError) {
+          setAutoSaveStatus("unauthenticated");
+          setAutoSaveError("Connectez-vous pour enregistrer vos sessions Flash Glow Ultra.");
+          return;
+        }
         console.error("Auto-save Flash Glow Ultra session failed", err);
         setAutoSaveStatus("error");
         setAutoSaveError(err?.message ?? "Erreur inattendue lors de l'enregistrement de la session");

@@ -469,6 +469,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/weekly-bars', '/activity-history'],
   },
   {
+    name: 'scores',
+    path: '/app/scores',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'ScoresV2Page',
+    guard: true,
+    aliases: ['/modules/scores-v2', '/modules/scores'],
+  },
+  {
     name: 'heatmap',
     path: '/app/heatmap',
     segment: 'consumer',

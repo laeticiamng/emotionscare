@@ -3,6 +3,17 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import {
+  DataValidator,
+  sanitizeInput as sanitizePlain,
+  secureTextSchema,
+} from '@/lib/validation/dataValidator';
+import {
+  createJournalTextEntry,
+  createJournalVoiceEntry,
+  fetchJournalFeed,
+  type JournalFeedEntry,
+} from '@/services/journalFeed.service';
 
 export interface JournalEntry {
   id: string;
@@ -12,8 +23,11 @@ export interface JournalEntry {
   ephemeral: boolean;
   created_at: Date;
   voice_url?: string;
-  duration?: number; // en secondes pour les entrées vocales
+  duration?: number;
   metadata?: Record<string, any>;
+  tags?: string[];
+  mood?: 'positive' | 'neutral' | 'negative';
+  type?: 'text' | 'voice';
 }
 
 export interface JournalVoiceEntry {
@@ -28,181 +42,218 @@ export interface JournalTextEntry {
   tone: 'positive' | 'neutral' | 'negative';
 }
 
+type SaveJournalEntryInput = Omit<JournalEntry, 'id' | 'created_at' | 'type' | 'tags' | 'mood'> & {
+  tags?: string[];
+  voice_blob?: Blob;
+};
+
+const buildFallbackVoiceResult = (): JournalVoiceEntry => ({
+  content: 'Entrée vocale non transcrite (service indisponible)',
+  summary: 'Réflexion personnelle enregistrée',
+  tone: 'neutral',
+});
+
+const formatDate = (value: string | Date): Date => {
+  if (value instanceof Date) return value;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+};
+
+const toPlainObject = (value: Record<string, unknown> | undefined) => {
+  if (!value) return undefined;
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return undefined;
+  }
+};
+
 class JournalService {
-  /**
-   * Traiter une entrée vocale avec Whisper + GPT
-   */
+  private entries: JournalEntry[] = [];
+  private hydrated = false;
+
+  private sanitizeContent(raw: string): string {
+    return sanitizePlain(DataValidator.validateAndSanitize(secureTextSchema, raw));
+  }
+
+  private sanitizeSummary(raw?: string): string | undefined {
+    if (!raw) return undefined;
+    return DataValidator.sanitizeHtml(raw);
+  }
+
+  private extractTags(content: string, extras: string[] = []): string[] {
+    const matches = Array.from(content.match(/#([\p{L}\p{N}_-]{2,24})/gu) ?? []).map((tag) => tag.slice(1));
+    const merged = [...matches, ...extras]
+      .map((tag) => sanitizePlain(tag).toLowerCase().replace(/[^\p{L}\p{N}_-]+/gu, ''))
+      .filter(Boolean);
+    return Array.from(new Set(merged));
+  }
+
+  private async hydrateFromRemote() {
+    if (this.hydrated) return;
+    try {
+      const feed = await fetchJournalFeed();
+      this.entries = feed.map((entry) => this.mapFeedEntryToJournalEntry(entry));
+      this.hydrated = true;
+    } catch {
+      // Pas critique : on hydrate à la volée lors du premier succès
+    }
+  }
+
+  private mapFeedEntryToJournalEntry(entry: JournalFeedEntry): JournalEntry {
+    return {
+      id: entry.id,
+      content: entry.text,
+      summary: entry.summary,
+      tone: entry.mood,
+      mood: entry.mood,
+      tags: entry.tags,
+      ephemeral: false,
+      created_at: formatDate(entry.timestamp),
+      type: entry.type,
+    };
+  }
+
   async processVoiceEntry(audioBlob: Blob): Promise<JournalVoiceEntry> {
     try {
-      // Convertir en base64 pour l'envoi
       const arrayBuffer = await audioBlob.arrayBuffer();
-      const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i += 1) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const bufferGlobal = (globalThis as Record<string, any>).Buffer;
+      const base64Audio =
+        typeof globalThis.btoa === 'function'
+          ? globalThis.btoa(binary)
+          : bufferGlobal && typeof bufferGlobal.from === 'function'
+            ? bufferGlobal.from(bytes).toString('base64')
+            : binary;
 
       const response = await supabase.functions.invoke('journal-voice', {
         body: {
           audio_data: base64Audio,
-          format: 'webm' // ou le format du blob
-        }
+          format: audioBlob.type || 'webm',
+        },
       });
 
-      if (response.error) {
-        throw new Error(`Erreur traitement vocal: ${response.error.message}`);
+      if (response.error || !response.data) {
+        throw new Error(response.error?.message ?? 'Traitement vocal indisponible');
       }
 
-      return response.data as JournalVoiceEntry;
+      const sanitizedContent = this.sanitizeContent(response.data.content ?? '');
+      const summary = this.sanitizeSummary(response.data.summary) ?? sanitizedContent.slice(0, 240);
+      const tone = response.data.tone ?? 'neutral';
+
+      return {
+        content: sanitizedContent,
+        summary,
+        tone,
+      };
     } catch (error) {
       console.error('Erreur service journal vocal:', error);
-      
-      // Fallback local basique
-      return {
-        content: "Entrée vocale non transcrite (service indisponible)",
-        summary: "Réflexion personnelle enregistrée",
-        tone: 'neutral'
-      };
+      return buildFallbackVoiceResult();
     }
   }
 
-  /**
-   * Traiter une entrée textuelle
-   */
   async processTextEntry(text: string): Promise<JournalTextEntry> {
     try {
       const response = await supabase.functions.invoke('journal-text', {
         body: {
-          content: text
-        }
+          content: text,
+        },
       });
 
-      if (response.error) {
-        throw new Error(`Erreur traitement texte: ${response.error.message}`);
+      if (response.error || !response.data) {
+        throw new Error(response.error?.message ?? 'Traitement texte indisponible');
       }
 
-      return response.data as JournalTextEntry;
+      const sanitizedContent = this.sanitizeContent(response.data.content ?? text);
+      const summary = this.sanitizeSummary(response.data.summary) ?? sanitizedContent.slice(0, 200);
+      const tone = response.data.tone ?? 'neutral';
+
+      return {
+        content: sanitizedContent,
+        summary,
+        tone,
+      };
     } catch (error) {
       console.error('Erreur service journal texte:', error);
-      
-      // Fallback local
+      const fallbackContent = this.sanitizeContent(text);
       return {
-        content: text,
-        summary: this.generateLocalSummary(text),
-        tone: this.analyzeLocalTone(text)
+        content: fallbackContent,
+        summary: fallbackContent.slice(0, 200),
+        tone: 'neutral',
       };
     }
   }
 
-  /**
-   * Sauvegarder une entrée de journal
-   */
-  async saveEntry(entry: Omit<JournalEntry, 'id' | 'created_at'>): Promise<JournalEntry> {
-    const newEntry: JournalEntry = {
-      id: Date.now().toString(),
-      created_at: new Date(),
-      ...entry
+  async saveEntry(input: SaveJournalEntryInput): Promise<JournalEntry> {
+    const sanitizedContent = this.sanitizeContent(input.content);
+    const sanitizedSummary = this.sanitizeSummary(input.summary);
+    const metadata = toPlainObject(input.metadata);
+    const explicitTags = Array.isArray(input.tags) ? input.tags : Array.isArray((metadata as any)?.tags) ? (metadata as any).tags : [];
+    const tags = this.extractTags(sanitizedContent, explicitTags);
+    const tone = input.tone ?? 'neutral';
+    const duration = typeof input.duration === 'number' && Number.isFinite(input.duration)
+      ? Math.max(0, Math.round(input.duration))
+      : undefined;
+
+    const creation = input.voice_blob
+      ? await createJournalVoiceEntry({
+        audio: input.voice_blob,
+        transcript: sanitizedContent,
+        summary: sanitizedSummary,
+        tags,
+        tone,
+        durationSec: duration,
+        metadata,
+      })
+      : await createJournalTextEntry({ content: sanitizedContent, tags });
+
+    const entry: JournalEntry = {
+      id: creation.id,
+      content: sanitizedContent,
+      summary: sanitizedSummary,
+      tone,
+      mood: tone,
+      tags,
+      ephemeral: Boolean(input.ephemeral),
+      created_at: formatDate(creation.ts),
+      voice_url: input.voice_url,
+      duration,
+      metadata,
+      type: input.voice_blob ? 'voice' : 'text',
     };
 
-    // Stocker localement (simulation, à remplacer par Supabase)
-    const existingEntries = this.getLocalEntries();
-    existingEntries.unshift(newEntry);
-    localStorage.setItem('journal_entries', JSON.stringify(existingEntries));
-
-    // Analytics
-    if (window.gtag) {
-      window.gtag('event', 'journal_entry_saved', {
-        event_category: 'journal',
-        event_label: entry.ephemeral ? 'ephemeral' : 'permanent',
-        value: entry.content.length
-      });
-    }
-
-    return newEntry;
+    this.entries = [entry, ...this.entries.filter((existing) => existing.id !== entry.id)];
+    this.hydrated = true;
+    return entry;
   }
 
-  /**
-   * Obtenir les entrées de journal
-   */
   getEntries(): JournalEntry[] {
-    return this.getLocalEntries();
+    void this.ensureHydrated();
+    return [...this.entries];
   }
 
-  /**
-   * Marquer une entrée comme "à brûler" (24h)
-   */
   async burnEntry(entryId: string): Promise<void> {
-    const entries = this.getLocalEntries();
-    const entryIndex = entries.findIndex(e => e.id === entryId);
-    
-    if (entryIndex >= 0) {
-      entries[entryIndex].ephemeral = true;
-      localStorage.setItem('journal_entries', JSON.stringify(entries));
-
-      // Analytics
-      if (window.gtag) {
-        window.gtag('event', 'journal_entry_burned', {
-          event_category: 'journal',
-          event_label: 'burn_toggle'
-        });
-      }
-    }
+    this.entries = this.entries.map((entry) =>
+      entry.id === entryId
+        ? { ...entry, ephemeral: true }
+        : entry
+    );
   }
 
-  /**
-   * Supprimer les entrées éphémères expirées
-   */
   cleanupEphemeralEntries(): void {
-    const entries = this.getLocalEntries();
-    const now = new Date();
-    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-    const filteredEntries = entries.filter(entry => {
-      if (entry.ephemeral && entry.created_at < oneDayAgo) {
-        return false; // Supprimer
-      }
-      return true; // Garder
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+    this.entries = this.entries.filter((entry) => {
+      if (!entry.ephemeral) return true;
+      return entry.created_at.getTime() >= cutoff;
     });
-
-    if (filteredEntries.length !== entries.length) {
-      localStorage.setItem('journal_entries', JSON.stringify(filteredEntries));
-    }
   }
 
-  /**
-   * Méthodes privées
-   */
-  private getLocalEntries(): JournalEntry[] {
-    try {
-      const stored = localStorage.getItem('journal_entries');
-      if (!stored) return [];
-      
-      const entries = JSON.parse(stored);
-      return entries.map((entry: any) => ({
-        ...entry,
-        created_at: new Date(entry.created_at)
-      }));
-    } catch {
-      return [];
-    }
-  }
-
-  private generateLocalSummary(text: string): string {
-    if (text.length < 50) return text;
-    
-    // Prendre les premiers mots jusqu'à une limite raisonnable
-    const words = text.split(' ');
-    const summary = words.slice(0, 20).join(' ');
-    return summary + (words.length > 20 ? '...' : '');
-  }
-
-  private analyzeLocalTone(text: string): 'positive' | 'neutral' | 'negative' {
-    const positiveWords = ['bien', 'content', 'heureux', 'super', 'génial', 'merci', 'joie'];
-    const negativeWords = ['mal', 'triste', 'difficile', 'problème', 'stress', 'fatigue'];
-    
-    const lowerText = text.toLowerCase();
-    const positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
-    
-    if (positiveCount > negativeCount) return 'positive';
-    if (negativeCount > positiveCount) return 'negative';
-    return 'neutral';
+  async ensureHydrated() {
+    await this.hydrateFromRemote();
   }
 }
 

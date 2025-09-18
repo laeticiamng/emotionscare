@@ -1,8 +1,19 @@
-import { beforeEach, describe, it, expect } from "vitest";
+import { beforeAll, beforeEach, describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { AudioPlayer } from "@/ui/AudioPlayer";
 
 describe("AudioPlayer", () => {
+  beforeAll(() => {
+    Object.defineProperty(window.HTMLMediaElement.prototype, "pause", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    Object.defineProperty(window.HTMLMediaElement.prototype, "play", {
+      configurable: true,
+      value: vi.fn().mockResolvedValue(undefined),
+    });
+  });
+
   beforeEach(() => {
     window.localStorage.clear();
   });

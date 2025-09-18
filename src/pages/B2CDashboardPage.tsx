@@ -18,9 +18,13 @@ import {
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { useEffect } from 'react';
+import EmotionScanSection from '@/components/dashboard/EmotionScanSection';
+import JournalSummaryCard from '@/components/dashboard/JournalSummaryCard';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function B2CDashboardPage() {
   const { runAudit } = useAccessibilityAudit();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Audit d'accessibilité en développement
@@ -246,6 +250,16 @@ export default function B2CDashboardPage() {
               </Link>
             </Card>
           </div>
+        </section>
+
+        {/* Journal summary */}
+        <section className="mb-8">
+          <JournalSummaryCard userId={user?.id ?? undefined} />
+        </section>
+
+        {/* Emotion Scan Widget */}
+        <section className="mb-8">
+          <EmotionScanSection userId={user?.id ?? undefined} />
         </section>
 
         {/* Recommandations personnalisées */}

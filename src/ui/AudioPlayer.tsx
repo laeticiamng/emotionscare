@@ -33,6 +33,12 @@ const formatTime = (totalSeconds: number) => {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 };
 
+type ResumeHint = {
+  key: string;
+  position: number;
+  autoPlay?: boolean;
+};
+
 type Props = {
   src: string;
   title?: string;
@@ -40,6 +46,8 @@ type Props = {
   loop?: boolean;
   defaultVolume?: number; // 0..1
   haptics?: boolean;
+  resumeHint?: ResumeHint | null;
+  onResumeApplied?: () => void;
 };
 
 export function AudioPlayer({
@@ -48,7 +56,9 @@ export function AudioPlayer({
   trackId,
   loop,
   defaultVolume = 0.8,
-  haptics = false
+  haptics = false,
+  resumeHint,
+  onResumeApplied,
 }: Props) {
   const safeDefaultVolume = clamp01(defaultVolume);
   const trackKey = React.useMemo(() => trackId ?? src, [trackId, src]);
@@ -84,6 +94,8 @@ export function AudioPlayer({
   const [resumePosition, setResumePosition] = React.useState(0);
 
   const playbackRef = React.useRef<PlaybackPersistedState>(defaultPlaybackState);
+  const pendingResumeRef = React.useRef<ResumeHint | null>(null);
+  const appliedResumeKeyRef = React.useRef<string | null>(null);
 
   const applyHaptics = React.useCallback(() => {
     if (!haptics) return;
@@ -174,6 +186,45 @@ export function AudioPlayer({
     [playbackStorageKey, dispatchPlaybackChanged, src, title]
   );
 
+  const applyResumeHint = React.useCallback(
+    async (hint: ResumeHint) => {
+      const safeKey = hint.key;
+      if (!safeKey) return;
+      if (appliedResumeKeyRef.current === safeKey) {
+        return;
+      }
+
+      pendingResumeRef.current = null;
+
+      const safePosition = Math.max(0, hint.position);
+      if (safePosition > 0) {
+        seek?.(safePosition);
+      } else {
+        seek?.(0);
+      }
+
+      let shouldPersistPlaying = false;
+      if (hint.autoPlay) {
+        try {
+          await playSound?.();
+          setPlaying(true);
+          applyHaptics();
+          shouldPersistPlaying = true;
+        } catch (error) {
+          console.warn("Auto resume playback failed", error);
+          setPlaying(false);
+        }
+      } else {
+        setPlaying(false);
+      }
+
+      persistPlayback({ position: safePosition, wasPlaying: shouldPersistPlaying });
+      appliedResumeKeyRef.current = safeKey;
+      onResumeApplied?.();
+    },
+    [seek, playSound, applyHaptics, persistPlayback, onResumeApplied]
+  );
+
   const updateFavorites = React.useCallback(
     (updater: (prev: FavoriteEntry[]) => FavoriteEntry[]) => {
       setFavorites(prev => {
@@ -194,6 +245,10 @@ export function AudioPlayer({
 
   React.useEffect(() => {
     setPlaying(false);
+  }, [trackKey]);
+
+  React.useEffect(() => {
+    appliedResumeKeyRef.current = null;
   }, [trackKey]);
 
   React.useEffect(() => {
@@ -246,6 +301,19 @@ export function AudioPlayer({
       setVolume(defaultPlaybackState.volume);
     }
   }, [playbackStorageKey, defaultPlaybackState, dispatchPlaybackChanged, src, title]);
+
+  React.useEffect(() => {
+    if (!resumeHint) return;
+    pendingResumeRef.current = resumeHint;
+    if (!ready) return;
+    void applyResumeHint(resumeHint);
+  }, [resumeHint, ready, applyResumeHint]);
+
+  React.useEffect(() => {
+    if (!ready) return;
+    if (!pendingResumeRef.current) return;
+    void applyResumeHint(pendingResumeRef.current);
+  }, [ready, applyResumeHint]);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;

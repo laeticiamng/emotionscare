@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import type { Breadcrumb, SeverityLevel } from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 
 interface SentryContextOptions {
@@ -11,7 +12,112 @@ interface SentryContextOptions {
 let sentryInitialized = false;
 let domMonitoringAttached = false;
 
-const hasSentryClient = () => Boolean(Sentry.getCurrentHub().getClient());
+export const hasSentryClient = () => Boolean(Sentry.getCurrentHub().getClient());
+
+type SentryUserContext = {
+  id: string;
+  email?: string | null;
+  mode?: string | null;
+  roles?: string[] | null;
+};
+
+type CaptureErrorOptions = {
+  level?: SeverityLevel;
+  tags?: Record<string, string>;
+  extra?: Record<string, unknown>;
+  fingerprint?: string[];
+  userMessage?: string;
+};
+
+const normaliseScopeContext = (
+  context: Record<string, unknown> | null | undefined
+): Record<string, unknown> | null => {
+  if (!context || Object.keys(context).length === 0) {
+    return null;
+  }
+
+  return context;
+};
+
+export function addSentryBreadcrumb(breadcrumb: Breadcrumb): void {
+  if (!hasSentryClient()) {
+    return;
+  }
+
+  Sentry.addBreadcrumb({
+    timestamp: Date.now() / 1000,
+    ...breadcrumb,
+  });
+}
+
+export function clearSentryUser(): void {
+  if (!hasSentryClient()) {
+    return;
+  }
+
+  Sentry.configureScope((scope) => {
+    scope.setUser(null);
+    scope.setTag('user_mode', 'guest');
+    scope.setContext('user_roles', null);
+  });
+}
+
+export function setSentryUser(user: SentryUserContext | null): void {
+  if (!hasSentryClient()) {
+    return;
+  }
+
+  if (!user) {
+    clearSentryUser();
+    return;
+  }
+
+  Sentry.setUser({ id: user.id, email: user.email ?? undefined });
+  Sentry.configureScope((scope) => {
+    scope.setTag('user_mode', user.mode ?? 'guest');
+    scope.setContext('user_roles', normaliseScopeContext(
+      user.roles && user.roles.length ? { roles: user.roles } : null
+    ));
+  });
+}
+
+export function captureAppError(
+  error: unknown,
+  options: CaptureErrorOptions = {}
+): string | undefined {
+  if (!hasSentryClient()) {
+    if (import.meta.env.DEV) {
+      console.warn('[Sentry] captureAppError skipped – client not ready', error);
+    }
+    return undefined;
+  }
+
+  const { level = 'error', tags, extra, fingerprint, userMessage } = options;
+  const throwable =
+    error instanceof Error
+      ? error
+      : new Error(typeof error === 'string' ? error : 'Unknown error');
+
+  return Sentry.captureException(throwable, (scope) => {
+    scope.setLevel(level);
+
+    if (tags) {
+      Object.entries(tags).forEach(([key, value]) => scope.setTag(key, value));
+    }
+
+    if (extra) {
+      scope.setContext('app_extra', { ...extra });
+    }
+
+    if (fingerprint) {
+      scope.setFingerprint(fingerprint);
+    }
+
+    if (userMessage) {
+      scope.setContext('user_message', { message: userMessage });
+    }
+  });
+}
 
 const parseRate = (value: string | undefined, fallback: number) => {
   if (!value) {

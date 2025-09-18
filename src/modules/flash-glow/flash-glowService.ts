@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { sessionsService, SessionsAuthError } from '@/services/sessions.service';
 
 export interface FlashGlowSession {
   duration_s: number;
@@ -10,6 +11,9 @@ export interface FlashGlowSession {
   glow_type?: string;
   intensity?: number;
   result?: 'completed' | 'interrupted';
+  mood_before?: number | null;
+  mood_after?: number | null;
+  mood_delta?: number | null;
   metadata?: Record<string, any>;
 }
 
@@ -47,17 +51,47 @@ class FlashGlowService {
    */
   async endSession(sessionData: FlashGlowSession): Promise<FlashGlowResponse> {
     try {
-      const { data, error } = await supabase.functions.invoke('flash-glow-metrics', {
-        body: sessionData
+      await sessionsService.logSession({
+        type: 'flash_glow',
+        durationSec: sessionData.duration_s,
+        moodBefore: sessionData.mood_before ?? sessionData.metadata?.moodBefore ?? null,
+        moodAfter: sessionData.mood_after ?? sessionData.metadata?.moodAfter ?? null,
+        moodDelta: sessionData.mood_delta ?? sessionData.metadata?.moodDelta ?? null,
+        meta: {
+          label: sessionData.label,
+          glowType: sessionData.glow_type ?? 'energy',
+          intensity: sessionData.intensity ?? 0,
+          ...(sessionData.metadata ?? {}),
+        },
       });
 
-      if (error) {
-        throw new Error(error.message || 'Erreur lors de l\'envoi des métriques');
+      let metricsResponse: FlashGlowResponse | null = null;
+
+      try {
+        const { data, error } = await supabase.functions.invoke('flash-glow-metrics', {
+          body: sessionData
+        });
+
+        if (error) {
+          throw new Error(error.message || 'Erreur lors de l\'envoi des métriques');
+        }
+
+        metricsResponse = data;
+      } catch (metricsError) {
+        console.warn('⚠️ Flash Glow metrics tracking failed:', metricsError);
       }
 
-      return data;
+      return metricsResponse ?? {
+        success: true,
+        message: 'Session enregistrée',
+        next_session_in: undefined
+      };
     } catch (error) {
-      console.error('❌ Flash Glow Service Error:', error);
+      if (error instanceof SessionsAuthError) {
+        console.warn('Flash Glow session logging skipped: user not authenticated');
+      } else {
+        console.error('❌ Flash Glow Service Error:', error);
+      }
       throw error;
     }
   }
@@ -67,15 +101,36 @@ class FlashGlowService {
    */
   async getStats(): Promise<FlashGlowStats> {
     try {
-      const { data, error } = await supabase.functions.invoke('flash-glow-metrics', {
-        method: 'GET'
-      });
+      const { data: userData, error: userError } = await supabase.auth.getUser();
 
-      if (error) {
-        throw new Error(error.message || 'Erreur lors de la récupération des stats');
+      if (userError || !userData?.user) {
+        throw new Error(userError?.message || 'Utilisateur non authentifié');
       }
 
-      return data;
+      const { data, error } = await supabase
+        .from('sessions')
+        .select('id, created_at, duration_sec, mood_delta, meta')
+        .eq('user_id', userData.user.id)
+        .eq('type', 'flash_glow')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        throw new Error(error.message || 'Erreur lors de la récupération des sessions Flash Glow');
+      }
+
+      const totalSessions = data?.length ?? 0;
+      const avgDuration = totalSessions
+        ? Math.round(
+          data!.reduce((acc, item) => acc + (item.duration_sec ?? 0), 0) / totalSessions
+        )
+        : 0;
+
+      return {
+        total_sessions: totalSessions,
+        avg_duration: avgDuration,
+        recent_sessions: data ?? []
+      };
     } catch (error) {
       console.error('❌ Flash Glow Stats Error:', error);
       // Retourner des stats par défaut en cas d'erreur

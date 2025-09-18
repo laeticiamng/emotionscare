@@ -49,6 +49,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
             summary: result.summary,
             tone: result.tone,
             ephemeral: false, // Par défaut, pas éphémère
+            voice_blob: event.data,
             voice_url: URL.createObjectURL(event.data),
             duration: recordingDuration
           });

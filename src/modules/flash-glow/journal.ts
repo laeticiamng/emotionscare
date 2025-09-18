@@ -91,6 +91,9 @@ export async function createFlashGlowJournalEntry({
   const labelInfo = label ? LABEL_CONFIG[label] : DEFAULT_LABEL_INFO;
   const friendlyGlowType = formatGlowType(glowType);
   const sectionTitle = context ?? 'Flash Glow';
+  const normalizedModeTag = friendlyGlowType.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const normalizedToneTag = labelInfo.title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const tags = ['flashglow', normalizedModeTag, normalizedToneTag].filter(Boolean);
 
   const summary = `${sectionTitle} - ${labelInfo.title}`;
   const contentLines = [
@@ -130,6 +133,7 @@ export async function createFlashGlowJournalEntry({
       tone: labelInfo.tone,
       ephemeral: false,
       duration: safeDuration,
+      tags,
       metadata: {
         mood_before: normalizedMoodBefore,
         mood_after: normalizedMoodAfter,

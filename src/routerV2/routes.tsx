@@ -14,6 +14,7 @@ export const routes = {
     coach: () => '/app/coach',
     settings: () => '/app/settings',
     flashGlow: () => '/app/flash-glow',
+    scores: () => '/app/scores',
     community: () => '/app/community',
   },
   b2b: {

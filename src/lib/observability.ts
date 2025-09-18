@@ -3,6 +3,18 @@
  * Logs, métriques, traces et analyses d'erreurs
  */
 
+import { addSentryBreadcrumb, captureAppError } from '@/lib/sentry-config';
+
+type BreadcrumbLevel = Parameters<typeof addSentryBreadcrumb>[0]['level'];
+
+const metaEnv = (import.meta as unknown as { env?: Record<string, any> } | undefined)?.env ?? {};
+const nodeEnv = typeof process !== 'undefined' ? process.env?.NODE_ENV : undefined;
+const isDev = typeof metaEnv.DEV === 'boolean' ? metaEnv.DEV : nodeEnv !== 'production';
+const isProd = typeof metaEnv.PROD === 'boolean' ? metaEnv.PROD : nodeEnv === 'production';
+const isBrowser = typeof window !== 'undefined';
+const isDocument = typeof document !== 'undefined';
+const isNavigator = typeof navigator !== 'undefined';
+
 // ============= Types et interfaces =============
 
 export interface LogEntry {
@@ -46,8 +58,8 @@ const CONFIG = {
   maxLogs: 1000,
   batchSize: 50,
   flushInterval: 30000, // 30 secondes
-  enableConsoleLog: process.env.NODE_ENV === 'development',
-  enableRemoteLogging: process.env.NODE_ENV === 'production',
+  enableConsoleLog: isDev,
+  enableRemoteLogging: isProd,
 };
 
 // ============= Storage local =============
@@ -113,6 +125,9 @@ class Logger {
     message: string,
     context?: Record<string, any>
   ): LogEntry {
+    const userAgent = isNavigator ? navigator.userAgent : 'server';
+    const url = isBrowser ? window.location.href : 'server';
+
     return {
       timestamp: new Date().toISOString(),
       level,
@@ -121,40 +136,64 @@ class Logger {
       context,
       userId: this.userId,
       sessionId: this.sessionId,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
+      userAgent,
+      url,
     };
+  }
+
+  private recordBreadcrumb(
+    level: BreadcrumbLevel,
+    category: string,
+    message: string,
+    context?: Record<string, any>
+  ) {
+    addSentryBreadcrumb({
+      category,
+      message,
+      level,
+      data: context,
+    });
   }
 
   setUserId(userId: string) {
     this.userId = userId;
   }
 
+  getSessionId() {
+    return this.sessionId;
+  }
+
   debug(category: string, message: string, context?: Record<string, any>) {
     const entry = this.createEntry('debug', category, message, context);
     this.storage.addLog(entry);
-    
+
     if (CONFIG.enableConsoleLog) {
       console.debug(`[${category}] ${message}`, context);
     }
+
+    this.recordBreadcrumb('debug', category, message, context);
   }
 
   info(category: string, message: string, context?: Record<string, any>) {
     const entry = this.createEntry('info', category, message, context);
     this.storage.addLog(entry);
-    
+
     if (CONFIG.enableConsoleLog) {
       console.info(`[${category}] ${message}`, context);
     }
+
+    this.recordBreadcrumb('info', category, message, context);
   }
 
   warn(category: string, message: string, context?: Record<string, any>) {
     const entry = this.createEntry('warn', category, message, context);
     this.storage.addLog(entry);
-    
+
     if (CONFIG.enableConsoleLog) {
       console.warn(`[${category}] ${message}`, context);
     }
+
+    this.recordBreadcrumb('warning', category, message, context);
   }
 
   error(category: string, message: string, error?: Error, userMessage?: string, context?: Record<string, any>) {
@@ -165,11 +204,26 @@ class Logger {
       userMessage: userMessage || 'Une erreur inattendue s\'est produite',
     };
     
+    const eventId = captureAppError(error ?? new Error(message), {
+      tags: { category },
+      extra: context ? { ...context } : undefined,
+      userMessage,
+    });
+
+    if (eventId) {
+      errorEntry.context = { ...(errorEntry.context ?? {}), sentryEventId: eventId };
+    }
+
     this.storage.addError(errorEntry);
-    
+
     if (CONFIG.enableConsoleLog) {
       console.error(`[${category}] ${message}`, error, context);
     }
+
+    this.recordBreadcrumb('error', category, message, {
+      ...context,
+      sentryEventId: eventId,
+    });
   }
 
   metric(name: string, value: number, unit = 'count', tags?: Record<string, string>) {
@@ -204,29 +258,33 @@ class PerformanceMonitor {
   }
 
   private setupPerformanceObserver() {
-    if ('PerformanceObserver' in window) {
-      this.observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          this.processPerformanceEntry(entry);
-        }
-      });
+    if (!isBrowser || !('PerformanceObserver' in window)) {
+      return;
+    }
 
-      try {
-        this.observer.observe({ 
-          entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'layout-shift'] 
-        });
-      } catch (error) {
-        this.logger.warn('performance', 'PerformanceObserver setup failed', { error });
+    this.observer = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        this.processPerformanceEntry(entry as PerformanceEntry);
       }
+    });
+
+    try {
+      this.observer.observe({
+        entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'layout-shift']
+      });
+    } catch (error) {
+      this.logger.warn('performance', 'PerformanceObserver setup failed', { error });
     }
   }
 
   private processPerformanceEntry(entry: PerformanceEntry) {
     const { name, startTime, duration } = entry;
-    
+
+    const url = isBrowser ? window.location.pathname : undefined;
+
     this.logger.metric(`performance.${entry.entryType}`, duration, 'ms', {
       name: name || 'unknown',
-      url: window.location.pathname,
+      ...(url ? { url } : {}),
     });
 
     // Web Vitals spécifiques
@@ -277,10 +335,14 @@ class UserInteractionTracker {
 
   private setupEventListeners() {
     // Clics sur boutons et liens
+    if (!isDocument || !isBrowser) {
+      return;
+    }
+
     document.addEventListener('click', (event) => {
       const target = event.target as HTMLElement;
       const button = target.closest('button, a[href], [role="button"]');
-      
+
       if (button) {
         const label = button.textContent?.trim() || button.getAttribute('aria-label') || 'unlabeled';
         const href = button.getAttribute('href');
@@ -333,8 +395,22 @@ class UserInteractionTracker {
 // ============= API publique =============
 
 export const logger = new Logger();
-export const performanceMonitor = new PerformanceMonitor(logger);
-export const userTracker = new UserInteractionTracker(logger);
+
+type PerformanceMonitorApi = {
+  measureStart: (operation: string) => void;
+  measureEnd: (operation: string, context?: Record<string, any>) => number | null;
+  disconnect: () => void;
+};
+
+const noopPerformanceMonitor: PerformanceMonitorApi = {
+  measureStart: () => {},
+  measureEnd: () => null,
+  disconnect: () => {},
+};
+
+const performanceMonitorInstance = isBrowser ? new PerformanceMonitor(logger) : null;
+export const performanceMonitor: PerformanceMonitorApi = performanceMonitorInstance ?? noopPerformanceMonitor;
+export const userTracker = isBrowser && isDocument ? new UserInteractionTracker(logger) : null;
 
 // Utilitaires pour les composants
 export const useObservability = () => {
@@ -345,7 +421,7 @@ export const useObservability = () => {
     logPageView: (pageName: string, context?: Record<string, any>) => {
       logger.info('page_view', `Page viewed: ${pageName}`, {
         page: pageName,
-        url: window.location.href,
+        ...(isBrowser ? { url: window.location.href } : {}),
         ...context,
       });
     },
@@ -367,20 +443,20 @@ export const useObservability = () => {
 };
 
 // Initialisation automatique
-if (typeof window !== 'undefined') {
+if (isBrowser) {
   // Flush périodique des logs
   setInterval(() => {
     const batch = logger.flush();
-    
+
     if (CONFIG.enableRemoteLogging && (batch.logs.length > 0 || batch.errors.length > 0)) {
       // Remote logging service integration (Sentry, LogRocket, etc.) will be added later
       console.debug('Batch flush:', batch);
     }
   }, CONFIG.flushInterval);
-  
+
   logger.info('observability', 'Observability system initialized', {
     enableConsoleLog: CONFIG.enableConsoleLog,
     enableRemoteLogging: CONFIG.enableRemoteLogging,
-    sessionId: logger['sessionId'],
+    sessionId: logger.getSessionId(),
   });
 }

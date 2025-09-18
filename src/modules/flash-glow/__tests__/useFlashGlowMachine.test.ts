@@ -4,6 +4,7 @@ import { useFlashGlowMachine } from '@/modules/flash-glow/useFlashGlowMachine';
 import { flashGlowService } from '@/modules/flash-glow/flash-glowService';
 import { createFlashGlowJournalEntry } from '@/modules/flash-glow/journal';
 import { toast } from '@/hooks/use-toast';
+import { SessionsAuthError } from '@/services/sessions.service';
 
 vi.mock('@/modules/flash-glow/flash-glowService', () => ({
   flashGlowService: {
@@ -69,6 +70,9 @@ describe('useFlashGlowMachine - auto journalisation', () => {
     }));
 
     expect(flashGlowService.endSession).toHaveBeenCalledWith(expect.objectContaining({
+      mood_before: 40,
+      mood_after: 76,
+      mood_delta: 36,
       metadata: expect.objectContaining({
         moodBefore: 40,
         moodAfter: 76,
@@ -82,6 +86,21 @@ describe('useFlashGlowMachine - auto journalisation', () => {
 
     expect(toast).toHaveBeenCalledWith(expect.objectContaining({
       description: expect.stringContaining('Votre expérience a été ajoutée automatiquement au journal')
+    }));
+  });
+
+  it('notifie l’utilisateur lorsqu’une authentification est requise', async () => {
+    const { result } = renderHook(() => useFlashGlowMachine());
+
+    const endSessionMock = flashGlowService.endSession as unknown as vi.Mock;
+    endSessionMock.mockRejectedValueOnce(new SessionsAuthError());
+
+    await act(async () => {
+      await result.current.onSessionComplete({ label: 'gain' });
+    });
+
+    expect(toast).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Connexion requise',
     }));
   });
 });

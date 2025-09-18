@@ -1,8 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { sessionsService, SessionsAuthError } from './sessions.service';
 
 type BreathworkSessionInsert = Database['public']['Tables']['breathwork_sessions']['Insert'];
 type BreathworkSessionRow = Database['public']['Tables']['breathwork_sessions']['Row'];
+
+type NormalizedPayload = {
+  duration: number;
+  cyclesPlanned: number;
+  cyclesCompleted: number;
+  density: number;
+  cadence: number;
+};
 
 export interface BreathworkLogPayload {
   technique: string;
@@ -52,6 +61,14 @@ const sanitizeCadence = (value: number): number => {
   return Number.parseFloat(Math.min(20, Math.max(1, value)).toFixed(2));
 };
 
+const normalizePayload = (payload: BreathworkLogPayload): NormalizedPayload => ({
+  duration: clampDuration(payload.durationSec),
+  cyclesPlanned: clampCycles(payload.cyclesPlanned),
+  cyclesCompleted: clampCycles(payload.cyclesCompleted),
+  density: sanitizeDensity(payload.density),
+  cadence: sanitizeCadence(payload.cadence),
+});
+
 const buildInsertPayload = (
   userId: string,
   payload: BreathworkLogPayload,
@@ -79,6 +96,42 @@ const buildInsertPayload = (
   },
 });
 
+const logUnifiedSession = async (
+  userId: string,
+  payload: BreathworkLogPayload,
+  normalized: NormalizedPayload,
+) => {
+  try {
+    await sessionsService.logSession({
+      type: 'breath',
+      durationSec: normalized.duration,
+      meta: {
+        technique: payload.technique,
+        startedAt: payload.startedAt,
+        endedAt: payload.endedAt,
+        cyclesPlanned: normalized.cyclesPlanned,
+        cyclesCompleted: normalized.cyclesCompleted,
+        density: normalized.density,
+        cadence: normalized.cadence,
+        completed: payload.completed,
+        cues: {
+          sound: payload.soundCues,
+          haptics: payload.haptics,
+        },
+      },
+      userId,
+    });
+  } catch (error) {
+    if (error instanceof SessionsAuthError) {
+      throw new BreathworkSessionAuthError();
+    }
+
+    throw new BreathworkSessionPersistError(
+      error instanceof Error ? error.message : "Impossible d'enregistrer la session de respiration",
+    );
+  }
+};
+
 export async function logBreathworkSession(payload: BreathworkLogPayload): Promise<BreathworkSessionRow> {
   const {
     data: { user },
@@ -93,6 +146,7 @@ export async function logBreathworkSession(payload: BreathworkLogPayload): Promi
     throw new BreathworkSessionAuthError();
   }
 
+  const normalized = normalizePayload(payload);
   const insertPayload = buildInsertPayload(user.id, payload);
 
   const { data, error } = await supabase
@@ -104,6 +158,8 @@ export async function logBreathworkSession(payload: BreathworkLogPayload): Promi
   if (error) {
     throw new BreathworkSessionPersistError(error.message);
   }
+
+  await logUnifiedSession(user.id, payload, normalized);
 
   return data;
 }

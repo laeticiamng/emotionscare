@@ -39,5 +39,21 @@ describe('coachService internals', () => {
     expect(first).toBe(second);
     expect(different).not.toBe(first);
   });
+
+  it('keeps summary instructions stable', () => {
+    const { SUMMARY_INSTRUCTIONS } = __coachInternals;
+
+    expect(SUMMARY_INSTRUCTIONS).toMatchInlineSnapshot(`
+"Tu es un agent de conformité EmotionsCare.
+Tu reçois l'historique d'un échange entre un utilisateur et un coach IA.
+Rédige un résumé anonymisé sans mentionner de noms propres ni de détails identifiants.
+Réponds en JSON strict avec le format suivant :
+{
+  \"summary\": \"phrase synthétique (max 180 caractères)\",
+  \"signals\": [\"mot-clé 1\", \"mot-clé 2\", \"mot-clé 3\"]
+}
+Ne fournis aucune autre clé que summary et signals."
+    `);
+  });
 });
 

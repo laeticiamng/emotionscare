@@ -44,6 +44,16 @@ interface InvokePayload {
   previousEmotions?: Record<string, number>;
 }
 
+interface PersistEmotionScanParams {
+  userId: string;
+  summary: string;
+  context?: string;
+  result: EmotionAnalysisResult;
+  stats: { positiveAffect: number; negativeAffect: number; balance: number };
+  previousEmotions?: Record<string, number> | null;
+  scanType?: string;
+}
+
 function coerceNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && !Number.isNaN(value)) {
     return value;
@@ -161,6 +171,49 @@ export async function getEmotionScanHistory(userId: string, limit = 12): Promise
   }
 
   return (data ?? []).map(mapScanRow);
+}
+
+export async function persistEmotionScanResult({
+  userId,
+  summary,
+  context,
+  result,
+  stats,
+  previousEmotions,
+  scanType = 'ipanassf',
+}: PersistEmotionScanParams): Promise<EmotionScanHistoryEntry> {
+  const payload: Database['public']['Tables']['emotion_scans']['Insert'] = {
+    user_id: userId,
+    summary,
+    mood: result.dominantEmotion,
+    confidence: result.confidence,
+    emotional_balance: result.emotionalBalance,
+    recommendations: result.recommendations,
+    insights: result.insights,
+    scan_type: scanType,
+    emotions: {
+      scores: result.emotions,
+      context: context ?? null,
+      stats: {
+        positive: stats.positiveAffect,
+        negative: stats.negativeAffect,
+        balance: stats.balance,
+      },
+      previousEmotions: previousEmotions ?? null,
+    },
+  };
+
+  const { data, error } = await supabase
+    .from('emotion_scans')
+    .insert(payload)
+    .select()
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message || "Impossible d'enregistrer le scan émotionnel");
+  }
+
+  return mapScanRow(data);
 }
 
 export function deriveScore10(normalizedBalance: number): number {

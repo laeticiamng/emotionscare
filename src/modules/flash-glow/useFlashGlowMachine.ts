@@ -9,6 +9,7 @@ import { flashGlowService, FlashGlowSession } from './flash-glowService';
 import { toast } from '@/hooks/use-toast';
 import { createFlashGlowJournalEntry } from './journal';
 import type { JournalEntry } from '@/modules/journal/journalService';
+import { SessionsAuthError } from '@/services/sessions.service';
 
 interface FlashGlowConfig {
   glowType: string;
@@ -311,6 +312,9 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         glow_type: config.glowType,
         intensity: config.intensity,
         result: 'completed',
+        mood_before: baseline ?? null,
+        mood_after: resolvedMoodAfter ?? null,
+        mood_delta: moodDelta,
         metadata: {
           timestamp: new Date().toISOString(),
           extended: sessionExtendedRef.current,
@@ -361,11 +365,18 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
 
     } catch (error) {
       console.error('Error completing session:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'enregistrer la session",
-        variant: "destructive",
-      });
+      if (error instanceof SessionsAuthError) {
+        toast({
+          title: "Connexion requise",
+          description: "Identifiez-vous pour enregistrer vos séances et alimenter votre journal.",
+        });
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible d'enregistrer la session",
+          variant: "destructive",
+        });
+      }
     }
   }, [extendSession, sessionDuration, elapsedSeconds, config, loadStats, setMoodAfter]);
 

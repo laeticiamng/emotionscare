@@ -85,7 +85,7 @@ const deriveMood = (valence?: number): 'positive' | 'neutral' | 'negative' | und
   return 'neutral';
 };
 
-const buildEmotionVector = (valence: number): number[] => {
+export const buildEmotionVector = (valence: number): number[] => {
   const clamped = Math.max(-1, Math.min(1, valence));
   return Array.from({ length: EMOTION_VECTOR_LENGTH }, () => clamped);
 };
@@ -104,6 +104,45 @@ const buildHtml = (raw: string): string => {
 const computePreview = (raw: string): string => {
   const compact = raw.replace(/\s+/g, ' ').trim();
   return compact.slice(0, 160);
+};
+
+const toneToValence = (tone?: 'positive' | 'neutral' | 'negative'): number => {
+  switch (tone) {
+    case 'positive':
+      return 0.35;
+    case 'negative':
+      return -0.35;
+    default:
+      return 0;
+  }
+};
+
+const encodeAudioBlob = async (blob: Blob): Promise<string> => {
+  const arrayBuffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+
+  if (typeof globalThis.btoa === 'function') {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return `data:${blob.type || 'application/octet-stream'};base64,${globalThis.btoa(binary)}`;
+  }
+
+  const bufferGlobal = (globalThis as Record<string, any>).Buffer;
+  if (bufferGlobal && typeof bufferGlobal.from === 'function') {
+    return `data:${blob.type || 'application/octet-stream'};base64,${bufferGlobal.from(bytes).toString('base64')}`;
+  }
+
+  // Fallback très limité
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = typeof window !== 'undefined' && typeof window.btoa === 'function'
+    ? window.btoa(binary)
+    : binary;
+  return `data:${blob.type || 'application/octet-stream'};base64,${base64}`;
 };
 
 const normalizeFeedEntry = (entry: RawFeedEntry): JournalFeedEntry => {
@@ -138,7 +177,10 @@ export async function fetchJournalFeed(): Promise<JournalFeedEntry[]> {
     throw new Error('Impossible de récupérer le journal');
   }
   const entries = payload.data?.entries ?? [];
-  return entries.filter((entry): entry is RawFeedEntry & { id: string } => Boolean(entry?.id)).map(normalizeFeedEntry);
+  return entries
+    .filter((entry): entry is RawFeedEntry & { id: string } => Boolean(entry?.id))
+    .map(normalizeFeedEntry)
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 }
 
 type CreateTextPayload = {
@@ -168,6 +210,61 @@ export async function createJournalTextEntry({ content, tags = [] }: CreateTextP
   const response = await httpClient.post<CreateEntryResponse>('api/v1/journal/text', payload);
   if (!response.data?.ok) {
     throw new Error(response.data?.['error']?.['message'] ?? 'Enregistrement impossible');
+  }
+  return response.data.data;
+}
+
+type CreateVoicePayload = {
+  audio: Blob;
+  transcript: string;
+  summary?: string;
+  tags?: string[];
+  tone?: 'positive' | 'neutral' | 'negative';
+  durationSec?: number;
+  metadata?: Record<string, unknown>;
+};
+
+export async function createJournalVoiceEntry({
+  audio,
+  transcript,
+  summary,
+  tags = [],
+  tone,
+  durationSec,
+  metadata = {},
+}: CreateVoicePayload) {
+  const cleanedTranscript = sanitizePlain(transcript);
+  let sanitizedTranscript: string;
+  try {
+    sanitizedTranscript = DataValidator.validateAndSanitize(secureTextSchema, cleanedTranscript);
+  } catch {
+    sanitizedTranscript = cleanedTranscript;
+  }
+  const normalizedTags = Array.from(new Set([...extractTags(sanitizedTranscript), ...tags.map(normalizeTag)].filter(Boolean)));
+  const appendedTranscript = normalizedTags.length
+    ? `${sanitizedTranscript}\n\n${normalizedTags.map(tag => `#${tag}`).join(' ')}`
+    : sanitizedTranscript;
+
+  const sanitizedSummaryHtml = summary ? DataValidator.sanitizeHtml(summary) : undefined;
+  const resolvedSummary = sanitizedSummaryHtml ? stripHtml(sanitizedSummaryHtml) : sanitizedTranscript.slice(0, 240);
+  const valence = toneToValence(tone);
+  const payload = {
+    audio_url: await encodeAudioBlob(audio),
+    text_raw: appendedTranscript,
+    summary_120: sanitizePlain(resolvedSummary).slice(0, 240),
+    valence,
+    emo_vec: buildEmotionVector(valence),
+    pitch_avg: typeof (metadata as any)?.pitch_avg === 'number' ? (metadata as any).pitch_avg : 0,
+    crystal_meta: {
+      ...metadata,
+      duration_sec: durationSec ?? null,
+      tags: normalizedTags,
+    },
+  };
+
+  const response = await httpClient.post<CreateEntryResponse>('api/v1/journal/voice', payload);
+  if (!response.data?.ok) {
+    throw new Error(response.data?.['error']?.['message'] ?? 'Enregistrement vocal impossible');
   }
   return response.data.data;
 }
