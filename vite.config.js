@@ -4,7 +4,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
-import viteImagemin from 'vite-plugin-imagemin';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 // Force disable TypeScript processing completely
@@ -12,7 +11,6 @@ process.env.TSC_NONPOLLING_WATCHER = 'false';
 process.env.DISABLE_TSC = 'true';
 
 export default defineConfig(({ mode }) => {
-  const shouldOptimizeImages = mode === 'production';
   const enableAnalyzer = (process.env.ANALYZE || '').toLowerCase() === 'true';
 
   return {
@@ -30,19 +28,6 @@ export default defineConfig(({ mode }) => {
         }
       }),
       mode === 'development' && componentTagger(),
-      shouldOptimizeImages && viteImagemin({
-        gifsicle: { optimizationLevel: 3 },
-        optipng: { optimizationLevel: 5 },
-        mozjpeg: { quality: 80 },
-        svgo: {
-          plugins: [
-            { name: 'removeViewBox', active: false },
-            { name: 'removeDimensions', active: true },
-          ]
-        },
-        webp: { quality: 80 },
-        avif: { quality: 70 },
-      }),
       enableAnalyzer && visualizer({
         filename: 'reports/bundle-analysis.html',
         template: 'sunburst',
