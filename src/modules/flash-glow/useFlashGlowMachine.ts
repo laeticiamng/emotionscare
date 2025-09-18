@@ -320,11 +320,17 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
           journalTone: journalEntry?.tone,
           moodBefore: baseline,
           moodAfter: resolvedMoodAfter,
-          moodDelta
+          moodDelta,
+          context: 'Flash Glow Ultra',
+          mode: sessionExtendedRef.current ? 'extended' : 'core'
         }
       };
 
-      await flashGlowService.endSession(sessionData);
+      const serviceResponse = await flashGlowService.endSession(sessionData);
+
+      if (serviceResponse && typeof serviceResponse.mood_delta === 'number') {
+        setLastMoodDelta(serviceResponse.mood_delta);
+      }
 
       if (!journalEntry) {
         journalEntry = await createFlashGlowJournalEntry({

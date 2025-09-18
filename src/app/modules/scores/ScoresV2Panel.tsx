@@ -301,7 +301,11 @@ const ScoresV2Panel: React.FC = () => {
               </div>
             </div>
             {moodTrendData.length ? (
-              <div ref={moodChartRef} className="h-[280px] w-full">
+              <div
+                ref={moodChartRef}
+                className="h-[280px] w-full"
+                data-testid="scores-mood-chart"
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={moodTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
@@ -407,7 +411,11 @@ const ScoresV2Panel: React.FC = () => {
               </div>
             </div>
             {weeklySessions.length ? (
-              <div ref={sessionsChartRef} className="h-[280px] w-full">
+              <div
+                ref={sessionsChartRef}
+                className="h-[280px] w-full"
+                data-testid="scores-sessions-chart"
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weeklySessions} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
@@ -481,7 +489,11 @@ const ScoresV2Panel: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div ref={heatmapChartRef} className="h-[320px] w-full">
+          <div
+            ref={heatmapChartRef}
+            className="h-[320px] w-full"
+            data-testid="scores-heatmap-chart"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 20, bottom: 10, left: 20 }}>
                 <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />

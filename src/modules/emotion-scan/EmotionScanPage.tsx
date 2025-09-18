@@ -11,6 +11,7 @@ import {
   deriveScore10,
   EmotionScanHistoryEntry,
   EmotionAnalysisResult,
+  persistEmotionScanResult,
 } from "@/services/emotionScan.service";
 
 const POS = [
@@ -31,6 +32,16 @@ const NEG = [
 
 type Likert = 1|2|3|4|5;
 type Resp = Record<(typeof POS[number] | typeof NEG[number])["id"], Likert | undefined>;
+
+type EmotionScanMutationVariables = {
+  text: string;
+  context?: string;
+  previousEmotions?: Record<string, number>;
+  accessToken?: string | null;
+  pa: number;
+  na: number;
+  balance: number;
+};
 
 const LOCAL_HISTORY_KEY = "emotion_scan_history_v2";
 
@@ -60,7 +71,7 @@ export default function EmotionScanPage() {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [localHistory, setLocalHistory] = React.useState<number[]>(() => loadLocalHistory());
 
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -91,15 +102,49 @@ export default function EmotionScanPage() {
   const latestScores = historyEntries[0]?.scores;
 
   const emotionScanMutation = useMutation({
-    mutationFn: (payload: { text: string; context?: string; previousEmotions?: Record<string, number> }) =>
-      invokeEmotionScan(payload),
+    mutationFn: (variables: EmotionScanMutationVariables) =>
+      invokeEmotionScan(
+        {
+          text: variables.text,
+          context: variables.context,
+          previousEmotions: variables.previousEmotions,
+        },
+        { accessToken: variables.accessToken },
+      ),
     onMutate: () => {
       setErrorMessage(null);
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result, variables) => {
       setAnalysis(result);
 
       if (user?.id) {
+        if (!result.persisted) {
+          const summary = [
+            `Émotion dominante: ${result.dominantEmotion}`,
+            `Confiance: ${result.confidence}%`,
+            `Équilibre émotionnel: ${result.emotionalBalance}/100`,
+            `Balance I-PANAS-SF: ${variables.balance >= 0 ? "+" : ""}${variables.balance}`,
+          ].join(" · ");
+
+          try {
+            await persistEmotionScanResult({
+              userId: user.id,
+              scanType: "self-report",
+              mood: result.dominantEmotion,
+              confidence: result.confidence,
+              summary,
+              recommendations: result.recommendations,
+              insights: result.insights,
+              emotions: result.emotions,
+              emotionalBalance: result.emotionalBalance,
+              context: variables.context,
+              previousEmotions: variables.previousEmotions ?? null,
+            });
+          } catch (persistError) {
+            console.error("Failed to persist emotion scan result", persistError);
+          }
+        }
+
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ["emotion-scan-history", user.id] }),
           queryClient.invalidateQueries({ queryKey: ["recent-scans", user.id] }),
@@ -147,6 +192,10 @@ export default function EmotionScanPage() {
         text: summaryText,
         context: "Auto-évaluation I-PANAS-SF",
         previousEmotions: latestScores,
+        accessToken: session?.access_token ?? null,
+        pa,
+        na,
+        balance,
       });
 
       try {

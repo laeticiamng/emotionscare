@@ -1,135 +1,179 @@
 /**
  * Routes helpers pour RouterV2
- * Helpers typés pour générer les URLs des routes
+ * Génère des URLs basées sur la source de vérité du registry.
  */
 
-// ═══════════════════════════════════════════════════════════
-// HELPERS DE ROUTES PUBLIQUES
-// ═══════════════════════════════════════════════════════════
+import { ROUTES_REGISTRY } from './registry';
+
+const routeLookup = new Map<string, string>();
+
+ROUTES_REGISTRY.forEach(route => {
+  routeLookup.set(route.name, route.path);
+});
+
+function resolveRoutePath(name: string, fallback?: string): string {
+  const path = routeLookup.get(name);
+
+  if (path) {
+    return path;
+  }
+
+  if (fallback) {
+    return fallback;
+  }
+
+  if (typeof console !== 'undefined') {
+    console.error(`[routerV2] Route inconnue: "${name}"`);
+  }
+
+  return '/';
+}
+
+const loginPath = resolveRoutePath('login');
+const signupPath = resolveRoutePath('signup');
 
 export const publicRoutes = {
-  home: () => '/',
-  about: () => '/about',
-  contact: () => '/contact',
-  privacy: () => '/privacy',
-  terms: () => '/terms',
-  legal: () => '/legal',
-  cookies: () => '/cookies',
-  services: () => '/services',
-  testimonials: () => '/testimonials',
-  blog: () => '/blog',
-  help: () => '/help',
+  home: () => resolveRoutePath('home'),
+  about: () => resolveRoutePath('about'),
+  contact: () => resolveRoutePath('contact'),
+  help: () => resolveRoutePath('help'),
+  demo: () => resolveRoutePath('demo'),
+  onboarding: () => resolveRoutePath('onboarding'),
+  privacy: () => resolveRoutePath('privacy'),
+  terms: () => resolveRoutePath('legal-terms'),
+  legal: () => resolveRoutePath('legal-terms'),
+  cookies: () => resolveRoutePath('legal-privacy'),
+  services: () => resolveRoutePath('about'),
+  testimonials: () => resolveRoutePath('about'),
+  blog: () => resolveRoutePath('help'),
+  b2cLanding: () => resolveRoutePath('b2c-landing'),
+  b2bLanding: () => resolveRoutePath('b2b-landing'),
 } as const;
-
-// ═══════════════════════════════════════════════════════════
-// HELPERS DE ROUTES D'AUTHENTIFICATION
-// ═══════════════════════════════════════════════════════════
 
 export const authRoutes = {
-  login: () => '/login',
-  signup: () => '/signup',
-  b2cLogin: () => '/b2c/login',
-  b2cRegister: () => '/b2c/register',
-  b2bUserLogin: () => '/b2b/user/login',
-  b2bAdminLogin: () => '/b2b/admin/login',
-  forgotPassword: () => '/forgot-password',
-  resetPassword: () => '/reset-password',
-  verifyEmail: () => '/verify-email',
+  login: () => loginPath,
+  signup: () => signupPath,
+  b2cLogin: () => `${loginPath}?segment=b2c`,
+  b2cRegister: () => `${signupPath}?segment=b2c`,
+  b2bUserLogin: () => `${loginPath}?segment=b2b&mode=user`,
+  b2bAdminLogin: () => `${loginPath}?segment=b2b&mode=admin`,
+  forgotPassword: () => `${loginPath}?view=forgot-password`,
+  resetPassword: () => `${loginPath}?view=reset-password`,
+  verifyEmail: () => `${loginPath}?view=verify-email`,
 } as const;
-
-// ═══════════════════════════════════════════════════════════
-// HELPERS DE ROUTES B2C
-// ═══════════════════════════════════════════════════════════
 
 export const b2cRoutes = {
-  home: () => '/b2c',
-  dashboard: () => '/app/home',
-  scan: () => '/app/scan',
-  music: () => '/app/music',
-  coach: () => '/app/coach',
-  journal: () => '/app/journal',
-  breath: () => '/app/breath',
-  vr: () => '/app/vr',
-  meditation: () => '/meditation',
-  emotions: () => '/app/emotions',
-  community: () => '/app/community',
-  settings: () => '/settings',
-  profile: () => '/profile',
-  
-  // Modules Fun-First
-  flashGlow: () => '/app/flash-glow',
-  breathwork: () => '/app/breathwork',
-  arFilters: () => '/app/ar-filters',
-  bubbleBeat: () => '/app/bubble-beat',
-  moodMixer: () => '/app/mood-mixer',
-  bossLevel: () => '/app/boss-level-grit',
-  storySynth: () => '/app/story-synth',
-  bounceBack: () => '/app/bounce-back',
-  
-  // Autres pages B2C
-  notifications: () => '/notifications',
-  feedback: () => '/feedback',
-  activity: () => '/activity-history',
-  accountDelete: () => '/account/delete',
-  profileSettings: () => '/profile/settings',
+  home: () => resolveRoutePath('b2c-landing'),
+  dashboard: () => resolveRoutePath('consumer-home'),
+  scan: () => resolveRoutePath('scan'),
+  music: () => resolveRoutePath('music'),
+  musicPremium: () => resolveRoutePath('music-premium'),
+  coach: () => resolveRoutePath('coach'),
+  coachMicro: () => resolveRoutePath('coach-micro'),
+  journal: () => resolveRoutePath('journal'),
+  journalNew: () => resolveRoutePath('journal-new'),
+  breath: () => resolveRoutePath('breath'),
+  vr: () => resolveRoutePath('vr'),
+  vrGalaxy: () => resolveRoutePath('vr-galaxy'),
+  vrBreath: () => resolveRoutePath('vr-breath'),
+  flashGlow: () => resolveRoutePath('flash-glow'),
+  flashGlowUltra: () => resolveRoutePath('flash-glow'),
+  breathwork: () => resolveRoutePath('breath'),
+  arFilters: () => resolveRoutePath('face-ar'),
+  bubbleBeat: () => resolveRoutePath('bubble-beat'),
+  moodMixer: () => resolveRoutePath('mood-mixer'),
+  bossLevel: () => resolveRoutePath('boss-grit'),
+  bounceBack: () => resolveRoutePath('bounce-back'),
+  bounceBackBattle: () => resolveRoutePath('bounce-back'),
+  storySynth: () => resolveRoutePath('story-synth'),
+  community: () => resolveRoutePath('social-cocon-b2c'),
+  socialCocon: () => resolveRoutePath('social-cocon-b2c'),
+  settings: () => resolveRoutePath('settings-general'),
+  profile: () => resolveRoutePath('settings-profile'),
+  profileSettings: () => resolveRoutePath('settings-profile'),
+  notifications: () => resolveRoutePath('settings-notifications'),
+  preferences: () => resolveRoutePath('settings-privacy'),
+  activity: () => resolveRoutePath('activity'),
+  heatmap: () => resolveRoutePath('heatmap'),
+  leaderboard: () => resolveRoutePath('leaderboard'),
+  gamification: () => resolveRoutePath('gamification'),
+  emotions: () => resolveRoutePath('scan'),
+  meditation: () => resolveRoutePath('breath'),
+  feedback: () => resolveRoutePath('help'),
+  accountDelete: () => resolveRoutePath('settings-privacy'),
 } as const;
 
-// ═══════════════════════════════════════════════════════════
-// HELPERS DE ROUTES B2B
-// ═══════════════════════════════════════════════════════════
+export const consumerRoutes = {
+  home: () => resolveRoutePath('consumer-home'),
+  dashboard: () => resolveRoutePath('consumer-home'),
+  scan: () => resolveRoutePath('scan'),
+  music: () => resolveRoutePath('music'),
+  musicPremium: () => resolveRoutePath('music-premium'),
+  coach: () => resolveRoutePath('coach'),
+  coachMicro: () => resolveRoutePath('coach-micro'),
+  journal: () => resolveRoutePath('journal'),
+  journalNew: () => resolveRoutePath('journal-new'),
+  vr: () => resolveRoutePath('vr'),
+  vrGalaxy: () => resolveRoutePath('vr-galaxy'),
+  vrBreath: () => resolveRoutePath('vr-breath'),
+  flashGlow: () => resolveRoutePath('flash-glow'),
+  moodMixer: () => resolveRoutePath('mood-mixer'),
+  bossLevel: () => resolveRoutePath('boss-grit'),
+  bounceBack: () => resolveRoutePath('bounce-back'),
+  storySynth: () => resolveRoutePath('story-synth'),
+  activity: () => resolveRoutePath('activity'),
+  heatmap: () => resolveRoutePath('heatmap'),
+  leaderboard: () => resolveRoutePath('leaderboard'),
+  gamification: () => resolveRoutePath('gamification'),
+  socialCocon: () => resolveRoutePath('social-cocon-b2c'),
+  community: () => resolveRoutePath('social-cocon-b2c'),
+  preferences: () => resolveRoutePath('settings-privacy'),
+  notifications: () => resolveRoutePath('settings-notifications'),
+  settings: () => resolveRoutePath('settings-general'),
+  profile: () => resolveRoutePath('settings-profile'),
+} as const;
 
 export const b2bRoutes = {
-  home: () => '/b2b',
-  teams: () => '/teams',
-  reports: () => '/reports',
-  events: () => '/events',
-  socialCocon: () => '/social-cocon',
-  
+  home: () => resolveRoutePath('b2b-landing'),
+  teams: () => resolveRoutePath('teams'),
+  reports: () => resolveRoutePath('admin-reports'),
+  events: () => resolveRoutePath('admin-events'),
+  socialCocon: () => resolveRoutePath('social-cocon-b2b'),
+  optimization: () => resolveRoutePath('admin-optimization'),
+  security: () => resolveRoutePath('admin-security'),
+  audit: () => resolveRoutePath('admin-audit'),
+  accessibility: () => resolveRoutePath('admin-accessibility'),
   user: {
-    dashboard: () => '/b2b/user/dashboard',
-    profile: () => '/b2b/user/profile',
-    settings: () => '/b2b/user/settings',
+    dashboard: () => resolveRoutePath('employee-home'),
   },
-  
   admin: {
-    dashboard: () => '/b2b/admin/dashboard',
-    users: () => '/b2b/admin/users',
-    analytics: () => '/b2b/admin/analytics',
-    settings: () => '/b2b/admin/settings',
+    dashboard: () => resolveRoutePath('manager-home'),
+    analytics: () => resolveRoutePath('admin-optimization'),
+    settings: () => resolveRoutePath('admin-security'),
   },
 } as const;
-
-// ═══════════════════════════════════════════════════════════
-// HELPERS DE ROUTES SPÉCIALES
-// ═══════════════════════════════════════════════════════════
 
 export const specialRoutes = {
-  chooseMode: () => '/choose-mode',
-  appGate: () => '/app-gate',
-  unauthorized: () => '/unauthorized',
-  forbidden: () => '/forbidden',
-  notFound: () => '/404',
-  serverError: () => '/500',
+  chooseMode: () => resolveRoutePath('choose-mode'),
+  appGate: () => resolveRoutePath('app-gate'),
+  unauthorized: () => resolveRoutePath('unauthorized'),
+  forbidden: () => resolveRoutePath('forbidden'),
+  notFound: () => resolveRoutePath('not-found'),
+  serverError: () => resolveRoutePath('server-error'),
 } as const;
-
-// ═══════════════════════════════════════════════════════════
-// OBJET ROUTES PRINCIPAL
-// ═══════════════════════════════════════════════════════════
 
 export const routes = {
   public: publicRoutes,
   auth: authRoutes,
   b2c: b2cRoutes,
+  consumer: consumerRoutes,
   b2b: b2bRoutes,
   special: specialRoutes,
 } as const;
 
-// ═══════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════
-
 export type PublicRoute = keyof typeof publicRoutes;
 export type AuthRoute = keyof typeof authRoutes;
 export type B2CRoute = keyof typeof b2cRoutes;
+export type ConsumerRoute = keyof typeof consumerRoutes;
 export type B2BRoute = keyof typeof b2bRoutes;
 export type SpecialRoute = keyof typeof specialRoutes;

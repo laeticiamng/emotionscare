@@ -1,5 +1,10 @@
 import httpClient from '@/services/api/httpClient';
-import { DataValidator, sanitizeInput as sanitizePlain, secureTextSchema } from '@/lib/validation/dataValidator';
+import {
+  DataValidator,
+  sanitizeInput as sanitizePlain,
+  secureTextSchema,
+  secureUrlSchema,
+} from '@/lib/validation/dataValidator';
 import sanitizeHtml from 'sanitize-html';
 
 const EMOTION_VECTOR_LENGTH = 8;
@@ -90,6 +95,48 @@ const buildEmotionVector = (valence: number): number[] => {
   return Array.from({ length: EMOTION_VECTOR_LENGTH }, () => clamped);
 };
 
+const clampValence = (valence?: number): number => {
+  if (typeof valence !== 'number' || Number.isNaN(valence)) {
+    return 0;
+  }
+  return Math.max(-1, Math.min(1, valence));
+};
+
+const clampPitch = (pitch?: number): number => {
+  if (typeof pitch !== 'number' || !Number.isFinite(pitch)) {
+    return 210;
+  }
+  const safe = Math.max(80, Math.min(600, pitch));
+  return Number.isFinite(safe) ? safe : 210;
+};
+
+const sanitizeUrl = (value: string): string => {
+  const cleaned = sanitizePlain(value);
+  const validated = DataValidator.validateAndSanitize(secureUrlSchema, cleaned);
+  return validated;
+};
+
+const crystalForms: Array<'gem' | 'spike' | 'wave'> = ['gem', 'spike', 'wave'];
+const palettePool = ['#6366f1', '#22d3ee', '#f97316', '#a855f7', '#34d399', '#facc15'];
+
+const pickColorFromTag = (tag: string, index: number): string => {
+  if (!tag) {
+    return palettePool[index % palettePool.length];
+  }
+  const hash = Array.from(tag).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return palettePool[(hash + index) % palettePool.length];
+};
+
+const buildCrystalMeta = (tags: string[]) => {
+  const form = crystalForms[tags[0]?.length ? tags[0].length % crystalForms.length : 0];
+  const palette = [pickColorFromTag(tags[0] ?? '', 0), pickColorFromTag(tags[1] ?? tags[0] ?? '', 1)];
+  return {
+    form,
+    palette,
+    mesh_url: 'https://cdn.emotionscare.com/assets/crystals/gem-default.glb',
+  };
+};
+
 const buildHtml = (raw: string): string => {
   const escaped = escapeHtml(raw);
   const paragraphs = escaped
@@ -112,6 +159,8 @@ const normalizeFeedEntry = (entry: RawFeedEntry): JournalFeedEntry => {
   const baseText = entry.preview || entry.summary || entry.summary_120 || entry.text_raw || '';
   const sanitizedText = DataValidator.sanitizeHtml(baseText);
   const plainText = stripHtml(sanitizedText);
+  const summaryHtml = entry.summary || entry.summary_120;
+  const summary = summaryHtml ? DataValidator.sanitizeHtml(summaryHtml) : undefined;
   const tags = extractTags(entry.text_raw ?? entry.preview ?? entry.summary, [
     ...(entry.tags ?? []),
     ...(entry.tag_set ?? []),
@@ -123,7 +172,7 @@ const normalizeFeedEntry = (entry: RawFeedEntry): JournalFeedEntry => {
     type,
     timestamp,
     text: plainText,
-    summary: entry.summary || entry.summary_120,
+    summary,
     tags,
     valence: entry.valence,
     mood: deriveMood(entry.valence),
@@ -168,6 +217,55 @@ export async function createJournalTextEntry({ content, tags = [] }: CreateTextP
   const response = await httpClient.post<CreateEntryResponse>('api/v1/journal/text', payload);
   if (!response.data?.ok) {
     throw new Error(response.data?.['error']?.['message'] ?? 'Enregistrement impossible');
+  }
+  return response.data.data;
+}
+
+export type CreateVoicePayload = {
+  audioUrl: string;
+  transcription: string;
+  tags?: string[];
+  valence?: number;
+  pitchAvg?: number;
+  summaryOverride?: string;
+};
+
+export async function createJournalVoiceEntry({
+  audioUrl,
+  transcription,
+  tags = [],
+  valence,
+  pitchAvg,
+  summaryOverride,
+}: CreateVoicePayload) {
+  const plainTranscription = stripHtml(transcription);
+  const sanitizedSource = sanitizePlain(plainTranscription);
+  const validatedText = DataValidator.validateAndSanitize(secureTextSchema, sanitizedSource);
+  const sanitizedText = sanitizePlain(validatedText).replace(/\s{2,}/g, ' ').trim();
+  const normalizedTags = Array.from(new Set(tags.map(normalizeTag).filter(Boolean)));
+  const appendedTags = normalizedTags.length
+    ? `${sanitizedText}\n\n${normalizedTags.map(tag => `#${tag}`).join(' ')}`
+    : sanitizedText;
+
+  const normalizedValence = clampValence(valence);
+  const summarySource = summaryOverride
+    ? sanitizePlain(stripHtml(summaryOverride))
+    : computePreview(appendedTags);
+  const summary = summarySource.replace(/\s{2,}/g, ' ').trim().slice(0, 150);
+
+  const payload = {
+    audio_url: sanitizeUrl(audioUrl),
+    text_raw: appendedTags,
+    summary_120: summary,
+    valence: normalizedValence,
+    emo_vec: buildEmotionVector(normalizedValence),
+    pitch_avg: clampPitch(pitchAvg),
+    crystal_meta: buildCrystalMeta(normalizedTags),
+  };
+
+  const response = await httpClient.post<CreateEntryResponse>('api/v1/journal/voice', payload);
+  if (!response.data?.ok) {
+    throw new Error(response.data?.['error']?.['message'] ?? 'Enregistrement vocal impossible');
   }
   return response.data.data;
 }

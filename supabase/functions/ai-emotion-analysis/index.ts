@@ -2,9 +2,38 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 import { supabase } from "../_shared/supa_client.ts"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const allowedOriginEnv = Deno.env.get('EMOTION_SCAN_ALLOWED_ORIGINS')?.split(',')
+  .map((value) => value.trim())
+  .filter(Boolean)
+
+function resolveAllowedOrigin(request: Request): string {
+  const origin = request.headers.get('origin') ?? request.headers.get('Origin') ?? ''
+
+  if (!allowedOriginEnv || allowedOriginEnv.length === 0) {
+    return origin || '*'
+  }
+
+  if (allowedOriginEnv.includes('*')) {
+    return origin || '*'
+  }
+
+  if (origin && allowedOriginEnv.includes(origin)) {
+    return origin
+  }
+
+  return allowedOriginEnv[0]
+}
+
+function createCorsHeaders(request: Request) {
+  const allowOrigin = resolveAllowedOrigin(request)
+
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+  }
 }
 
 interface EmotionAnalysisRequest {
@@ -22,6 +51,8 @@ interface EmotionAnalysisResponse {
 }
 
 serve(async (req) => {
+  const corsHeaders = createCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -171,8 +202,11 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
       previousEmotions: previousEmotions || null
     }
 
+    let persisted = false
+    let scanId: string | null = null
+
     if (userId) {
-      const { error: insertError } = await supabase
+      const { data: inserted, error: insertError } = await supabase
         .from("emotion_scans")
         .insert({
           user_id: userId,
@@ -185,11 +219,15 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
           emotions: persistedPayload,
           emotional_balance: emotionalBalance
         })
+        .select('id')
+        .single()
 
       if (insertError) {
         console.error("❌ Erreur enregistrement emotion_scans:", insertError)
       } else {
-        console.log("🗄️ Emotion scan enregistré", { userId, mood: dominantEmotion })
+        persisted = true
+        scanId = inserted?.id ?? null
+        console.log("🗄️ Emotion scan enregistré", { userId, mood: dominantEmotion, scanId })
       }
     } else {
       console.log("ℹ️ Aucun utilisateur authentifié, saut de l'enregistrement")
@@ -201,14 +239,16 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
       ...result,
       emotionalBalance,
       confidence: normalizedConfidence,
+      persisted,
+      scanId,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
   } catch (error) {
     console.error('❌ Erreur analyse émotion:', error)
-    
-    return new Response(JSON.stringify({ 
+
+    return new Response(JSON.stringify({
       error: error.message,
       emotions: {
         joie: 5, tristesse: 3, colere: 2, peur: 3,
@@ -217,7 +257,9 @@ Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
       dominantEmotion: 'neutral',
       confidence: 0.5,
       insights: ['Analyse indisponible temporairement'],
-      recommendations: ['Réessayez dans quelques instants']
+      recommendations: ['Réessayez dans quelques instants'],
+      persisted: false,
+      scanId: null
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

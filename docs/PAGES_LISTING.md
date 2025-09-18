@@ -46,7 +46,7 @@
 | Journal | `/app/journal` | 🟢 | Feed React Query sanitisé avec recherche, filtres par tags, création sécurisée et analytics facultatifs. | `src/modules/journal/JournalPage.tsx` |
 | Coach IA | `/app/coach` | 🟢 | Parcours consentement → prompt AI → réponses normalisées, logs anonymisés (`coach_conversations`). | `src/pages/B2CAICoachPage.tsx`, `src/modules/coach/coachService.ts` |
 | Adaptive Music | `/app/music` | 🟢 | Recommandations mood→playlist, favoris, reprise audio via `moodPlaylist.service`. | `src/modules/adaptive-music/AdaptiveMusicPage.tsx` |
-| Scores Dashboard | `/app/heatmap`, `/app/activity`, `/app/leaderboard` | 🟢 | Agrégats Supabase (tendances, heatmap, sessions) avec export PNG. | `src/app/modules/scores/ScoresV2Panel.tsx` |
+| Scores Dashboard | `/app/heatmap`, `/app/activity`, `/app/leaderboard` | 🟢 | Agrégats Supabase (tendances, heatmap, sessions) avec export PNG. | `src/pages/HeatmapPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx` |
 
 ## ⚙️ Paramètres, abonnement & légal
 | Page | Route(s) | Statut | Description | Fichier principal |

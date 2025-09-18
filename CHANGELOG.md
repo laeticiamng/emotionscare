@@ -1,6 +1,14 @@
 
 # Changelog
 
+## [1.1.16] - 2025-06-05
+
+### Ajouté
+- Initialisation Sentry basée sur l'environnement avec tag de release et configuration des taux d'échantillonnage.
+- Endpoint `/health` enrichi avec mesures de latence, état des dépendances et validation Zod côté serveur.
+- Optimisations front : skip links globaux, focus visible forcé et lazy-load automatique des images.
+- Pipeline Vite amélioré avec compression WebP/AVIF et rapport bundle optionnel via `ANALYZE=true`.
+
 ## [1.1.14] - 2025-06-05
 
 ### Ajouté
@@ -9,6 +17,11 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+
+## [1.1.15] - 2025-06-05
+
+### Ajouté
+- Nouvelle page `/app/heatmap` affichant le tableau de bord Scores & Heatmap (Recharts, export PNG, test e2e visuel Playwright).
 
 ## [1.1.13] - 2025-06-04
 

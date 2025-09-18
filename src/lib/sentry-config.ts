@@ -1,5 +1,12 @@
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
+import {
+  SENTRY_DSN,
+  SENTRY_ENVIRONMENT,
+  SENTRY_TRACES_SAMPLE_RATE,
+  SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
+} from '@/lib/env';
 
 interface SentryContextOptions {
   component?: string;
@@ -13,21 +20,12 @@ let domMonitoringAttached = false;
 
 const hasSentryClient = () => Boolean(Sentry.getCurrentHub().getClient());
 
-const parseRate = (value: string | undefined, fallback: number) => {
-  if (!value) {
-    return fallback;
-  }
-
-  const parsed = Number.parseFloat(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
 export function initializeSentry(): void {
   if (sentryInitialized || typeof window === 'undefined') {
     return;
   }
 
-  const dsn = import.meta.env.VITE_SENTRY_DSN;
+  const dsn = SENTRY_DSN;
 
   if (!dsn) {
     if (import.meta.env.DEV) {
@@ -37,13 +35,16 @@ export function initializeSentry(): void {
   }
 
   try {
+    const release = import.meta.env.VITE_APP_VERSION ?? import.meta.env.VITE_COMMIT_SHA;
+
     Sentry.init({
       dsn,
-      environment: import.meta.env.VITE_SENTRY_ENVIRONMENT ?? import.meta.env.MODE ?? 'development',
+      environment: SENTRY_ENVIRONMENT ?? import.meta.env.MODE ?? 'development',
+      release,
       integrations: [new BrowserTracing()],
-      tracesSampleRate: parseRate(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE, 0.1),
-      replaysSessionSampleRate: parseRate(import.meta.env.VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE, 0),
-      replaysOnErrorSampleRate: parseRate(import.meta.env.VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE, 1.0),
+      tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE,
+      replaysSessionSampleRate: SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+      replaysOnErrorSampleRate: SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
       beforeSend(event) {
         if (event.exception?.values?.[0]?.value?.includes("Cannot read properties of undefined (reading 'add')")) {
           event.tags = {
@@ -102,6 +103,12 @@ export function initializeSentry(): void {
     });
 
     sentryInitialized = true;
+
+    if (release) {
+      Sentry.configureScope((scope) => {
+        scope.setTag('appVersion', release);
+      });
+    }
 
     if (import.meta.env.DEV) {
       console.log('[Sentry] Error tracking initialized for "reading add" errors');
