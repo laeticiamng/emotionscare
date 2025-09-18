@@ -19,7 +19,7 @@ export { MusicProvider, useMusic, MusicContext } from './MusicContext';
 export { FeedbackProvider, useFeedback } from './FeedbackContext';
 export { InnovationProvider, useInnovation } from './InnovationContext';
 export { EthicsProvider, useEthics } from './EthicsContext';
-export { ErrorProvider, useError } from './ErrorContext';
+export { ErrorProvider, useErrorHandler as useError } from './ErrorContext';
 
 // ========== CONTEXTES SIMPLIFIÉS POUR COMPATIBILITÉ ==========
 // Ces providers existent mais avec des implémentations minimales
