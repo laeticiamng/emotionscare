@@ -120,6 +120,7 @@ async function hashText(value: string): Promise<string> {
     return "";
   }
 
+  // Use Web Crypto API (available in modern browsers)
   if (typeof crypto !== "undefined" && crypto.subtle) {
     const encoder = new TextEncoder();
     const data = encoder.encode(value);
@@ -129,8 +130,15 @@ async function hashText(value: string): Promise<string> {
       .join("");
   }
 
-  const { createHash } = await import("node:crypto");
-  return createHash("sha256").update(value).digest("hex");
+  // Fallback for environments without Web Crypto API
+  // Simple hash using string manipulation (less secure but works)
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    const char = value.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
 }
 
 async function summarizeConversation(history: CoachHistoryItem[]): Promise<string | null> {
