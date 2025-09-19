@@ -1,4 +1,4 @@
-import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { z } from './zod.ts';
 
 export const MBreakSchema = z.object({
   ts: z.string().datetime().optional(),
