@@ -44,11 +44,23 @@
 - **Services** : `src/services/breathworkSessions.service.ts` (persistance) et `@/ui/hooks/useBreathPattern`.
 - **Persistance Supabase** : mutualise `public.sessions` (log des séances Breath/FlashGlow) sous RLS owner-only, indexes `user_id`, `created_at`, `type`.
 - **Fonctionnalités clés** :
-  - Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.  
-  - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.  
-  - Options audio/haptique via `useSound` + enregistrement Supabase des sessions (gestion erreurs auth/persistance).  
+  - Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.
+  - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.
+  - Options audio/haptique via `useSound` + enregistrement Supabase des sessions (gestion erreurs auth/persistance).
   - Émissions d'events analytics facultatifs (`recordEvent`).
   - ✅ QA 06/2025 : régression manuelle post build, couverture e2e générale `breath-constellation-session.spec.ts`.
+
+### 🌬️ Breath Guidance — 🟢 Livré
+- **Entrée** : `src/pages/breath/index.tsx` routé via `/breath`.
+- **Modules partagés** : `src/modules/breath/protocols.ts`, `src/modules/breath/useSessionClock.ts`, composants `BreathCircle` & `BreathProgress`, journalisation `src/modules/breath/logging.ts`.
+- **Persistance Supabase** : table `public.sessions` (type `breath`, durée, `mood_delta`, `meta` JSONB) + journal local via `journalService`.
+- **Fonctionnalités clés** :
+  - Protocoles 4-7-8 et cohérence cardiaque (variant 4,5/5,5) avec cadence auto et séquence générée jusqu'à la durée choisie (3–10 min).
+  - Session clock accessible (`useSessionClock`) avec raccourci clavier Espace (start/pause/resume), aria-live, focus management, Sentry breadcrumbs `breath:protocol:*` et `session:*`.
+  - Motion-safe : bascule automatique vers barre de progression si `prefers-reduced-motion` actif, animation cercle sinon ; audio cue opt-in via `useSound`.
+  - Mesure silencieuse STAI-6 opt-in (feature flag `FF_ASSESS_STAI6`) avec appels `POST /assess/start|submit`, aucun score affiché, réponses utilisées pour recommandations.
+  - Fin de séance : `logAndJournal` enregistre la session Supabase + note auto (delta d’humeur calculé, notes utilisateur), toasts doux en cas d'échec Supabase.
+  - ✅ QA 06/2025 : tests unitaires `src/modules/breath/__tests__/*` (protocoles, session clock, mood utils) + e2e `tests/e2e/breath-guided-session.spec.ts` (4-7-8 + cohérence, pause/resume, zéro warning console).
 
 ### 📝 Journal — 🟢 Livré
 - **Entrée** : `src/modules/journal/JournalPage.tsx` sur `/app/journal`.
