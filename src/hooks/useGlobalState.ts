@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore, shallow } from '@/store/appStore';
 import { useErrorHandler } from '@/contexts/ErrorContext';
 import { useCache } from '@/contexts/CacheContext';
 
@@ -8,7 +8,43 @@ import { useCache } from '@/contexts/CacheContext';
  * Combine Zustand store, gestion d'erreurs et cache
  */
 export const useGlobalState = () => {
-  const store = useAppStore();
+  const stateSlice = useAppStore(
+    (state) => ({
+      user: state.user,
+      isAuthenticated: state.isAuthenticated,
+      isLoading: state.isLoading,
+      theme: state.theme,
+      sidebarCollapsed: state.sidebarCollapsed,
+      activeModule: state.activeModule,
+      cache: state.cache,
+      cacheTimestamps: state.cacheTimestamps,
+      preferences: state.preferences,
+      modules: state.modules,
+    }),
+    shallow
+  );
+
+  const actions = useAppStore(
+    (state) => ({
+      setUser: state.setUser,
+      setTheme: state.setTheme,
+      setAuthenticated: state.setAuthenticated,
+      setLoading: state.setLoading,
+      toggleSidebar: state.toggleSidebar,
+      setActiveModule: state.setActiveModule,
+      updatePreferences: state.updatePreferences,
+      updateMusicState: state.updateMusicState,
+      updateEmotionState: state.updateEmotionState,
+      updateJournalState: state.updateJournalState,
+      updateCoachState: state.updateCoachState,
+      setCache: state.setCache,
+      getCache: state.getCache,
+      clearCache: state.clearCache,
+      isCacheValid: state.isCacheValid,
+      reset: state.reset,
+    }),
+    shallow
+  );
   const errorHandler = useErrorHandler();
   const cache = useCache();
 
@@ -32,23 +68,26 @@ export const useGlobalState = () => {
 
   // Wrapper pour les actions du store avec gestion d'erreurs
   const wrappedActions = {
-    setUser: (user: any) => safeAction(() => store.setUser(user), 'Erreur lors de la mise à jour de l\'utilisateur'),
-    setTheme: (theme: any) => safeAction(() => store.setTheme(theme), 'Erreur lors du changement de thème'),
-    updatePreferences: (prefs: any) => safeAction(() => store.updatePreferences(prefs), 'Erreur lors de la mise à jour des préférences'),
-    updateMusicState: (state: any) => safeAction(() => store.updateMusicState(state), 'Erreur lors de la mise à jour de la musique'),
-    updateEmotionState: (state: any) => safeAction(() => store.updateEmotionState(state), 'Erreur lors de la mise à jour des émotions'),
-    updateJournalState: (state: any) => safeAction(() => store.updateJournalState(state), 'Erreur lors de la mise à jour du journal'),
-    updateCoachState: (state: any) => safeAction(() => store.updateCoachState(state), 'Erreur lors de la mise à jour du coach'),
+    setUser: (user: any) => safeAction(() => actions.setUser(user), 'Erreur lors de la mise à jour de l\'utilisateur'),
+    setTheme: (theme: any) => safeAction(() => actions.setTheme(theme), 'Erreur lors du changement de thème'),
+    updatePreferences: (prefs: any) => safeAction(() => actions.updatePreferences(prefs), 'Erreur lors de la mise à jour des préférences'),
+    updateMusicState: (state: any) => safeAction(() => actions.updateMusicState(state), 'Erreur lors de la mise à jour de la musique'),
+    updateEmotionState: (state: any) => safeAction(() => actions.updateEmotionState(state), 'Erreur lors de la mise à jour des émotions'),
+    updateJournalState: (state: any) => safeAction(() => actions.updateJournalState(state), 'Erreur lors de la mise à jour du journal'),
+    updateCoachState: (state: any) => safeAction(() => actions.updateCoachState(state), 'Erreur lors de la mise à jour du coach'),
   };
 
   return {
     // État du store
-    ...store,
-    
+    ...stateSlice,
+
+    // Actions exposées en direct
+    ...actions,
+
     // Actions wrappées
     actions: {
       ...wrappedActions,
-      ...store,
+      ...actions,
     },
     
     // Gestion d'erreurs

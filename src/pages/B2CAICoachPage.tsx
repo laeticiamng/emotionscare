@@ -10,7 +10,7 @@ import { ArrowLeft, Send, Mic, MicOff, Bot, User, Heart, Brain, Lightbulb, BookO
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMood } from '@/contexts/MoodContext';
-import { useAppStore } from '@/store/appStore';
+import { useAppStore, selectUserRole } from '@/store/appStore';
 import B2BCoachPage from '@/pages/b2b/user/CoachPage';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -726,7 +726,7 @@ const B2CCoachExperience: React.FC = () => {
 };
 
 const B2CAICoachPage: React.FC = () => {
-  const userRole = useAppStore((state) => state.user?.role);
+  const userRole = useAppStore(selectUserRole);
   const isB2B = userRole === 'b2b_user' || userRole === 'b2b_admin';
 
   if (isB2B) {
