@@ -29,15 +29,15 @@
   - ✅ QA 06/2025 : scénario e2e `mood-mixer-crud.spec.ts` (CRUD complet) + tests `useMoodMixerStore` (7 cas) et `useJournalStore` (4 cas) pour l'enrichissement historique.
 
 ### ⚡ Flash Glow & Ultra — 🟢 Livré
-- **Entrées** : `src/modules/flash-glow/useFlashGlowMachine.ts`, `src/modules/flash-glow/journal.ts`, `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
-- **Services** : `src/modules/flash-glow/flash-glowService.ts`, intégration journal via `createFlashGlowJournalEntry`.
-- **Persistance Supabase** : table `public.sessions` (type, durée, `mood_delta`, `meta` JSONB) avec indexes sur `user_id`, `created_at desc`, `type` + RLS owner-only.
+- **Entrées** : `src/pages/flash-glow/index.tsx` (parcours SESS-01 sur `/app/flash-glow`) & `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
+- **Services** : `src/hooks/useSessionClock.ts`, `src/modules/flash/useFlashPhases.ts`, `src/modules/flash/sessionService.ts` (`logAndJournal`).
+- **Persistance Supabase** : tables `public.user_activity_sessions` + `public.journal_entries` (RLS owner-only, indexes `user_id`/`created_at`).
 - **Fonctionnalités clés** :
-  - Machine d'état asynchrone (idle → active → ending) gérant timers, extensions et haptique.  
-  - Suivi des humeurs (`moodBaseline`, `moodAfter`, `moodDelta`) avec clamp et calcul auto.  
-  - Journalisation automatique en fin de session (contenu enrichi, tags, sauvegarde Supabase + toast de feedback).  
-  - Statistiques locales (nombre/temps moyen) et toasts en cas d'interruption.
-  - ✅ QA 06/2025 : scénario e2e `flash-glow-ultra-session.spec.ts` + tests `useGlowStore` (5 cas) couvrant start/pause/resume/reset.
+  - Horloge robuste (tick 1 s, pause sur `visibilitychange`) via `useSessionClock` + phases `warmup → glow → settle` (`useFlashPhases`).
+  - `computeMoodDelta` calcule le delta valence/arousal silencieux, `logAndJournal` enregistre activité + entrée journal par défaut bienveillante.
+  - UI accessible (`aria-live`, CTA contextuel Start/Pause/Reprendre/Relancer, variante `prefers-reduced-motion` sans flash).
+  - Breadcrumbs Sentry `session:*`, `flash:phase_change`, `journal:auto:insert` + toasts succès/erreur.
+  - ✅ QA 06/2025 : e2e `flash-glow-session.spec.ts` (start → pause → reprise → completion) + tests unitaires `useSessionClock` & `useFlashPhases`.
 
 ### 🌌 Breath Constellation — 🟢 Livré
 - **Entrée** : `src/modules/breath-constellation/BreathConstellationPage.tsx` via `/app/breath`.
