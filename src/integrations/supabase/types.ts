@@ -438,6 +438,41 @@ export type Database = {
         }
         Relationships: []
       }
+      assessments: {
+        Row: {
+          created_at: string
+          id: string
+          instrument: string
+          score_json: Json
+          ts: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instrument: string
+          score_json: Json
+          ts?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instrument?: string
+          score_json?: Json
+          ts?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audio_tracks: {
         Row: {
           created_at: string
@@ -6390,6 +6425,36 @@ export type Database = {
           period?: string
           team_id?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      org_assess_rollups: {
+        Row: {
+          created_at: string
+          id: string
+          instrument: string
+          n: number
+          org_id: string
+          period: string
+          text_summary: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instrument: string
+          n: number
+          org_id: string
+          period: string
+          text_summary?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instrument?: string
+          n?: number
+          org_id?: string
+          period?: string
+          text_summary?: string | null
         }
         Relationships: []
       }
