@@ -61,9 +61,9 @@
 
 ### Routes d'Erreur 🚨
 ```
-/401 → UnauthorizedPage
-/403 → ForbiddenPage  
-/404 → NotFoundPage
+/401 → Error401Page
+/403 → Error403Page
+/404 → Error404Page
 /503 → ServerErrorPage
 ```
 

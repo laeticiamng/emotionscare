@@ -65,9 +65,6 @@ const ROUTER_V2_PAGES = [
   'AccessibilityPage.tsx',
   
   // System
-  'UnauthorizedPage.tsx',
-  'ForbiddenPage.tsx',
-  'NotFoundPage.tsx',
   'ServerErrorPage.tsx',
   
   // Completes

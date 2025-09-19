@@ -67,9 +67,6 @@ const REQUIRED_PAGES = [
   'B2BAccessibilityPage.tsx',
 
   // System
-  'UnauthorizedPage.tsx',
-  'ForbiddenPage.tsx',
-  'NotFoundPage.tsx',
   'ServerErrorPage.tsx',
 
   // Fallbacks nécessaires
@@ -85,7 +82,7 @@ const REQUIRED_PAGES = [
 
 // Dossiers à garder (avec contenu nécessaire)
 const REQUIRED_DIRS = [
-  'errors' // Pour ForbiddenPage
+  'errors' // Pages d'erreur 401/403/404
 ];
 
 console.log('🧹 NETTOYAGE FINAL DES PAGES');

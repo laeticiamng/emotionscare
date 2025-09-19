@@ -19,8 +19,8 @@ describe('RouterV2 aliases', () => {
         .map(route => route.path),
     );
 
-    ROUTE_ALIASES.forEach(alias => {
-      const baseTarget = alias.to.split('?')[0];
+    Object.values(ROUTE_ALIASES).forEach(aliasTarget => {
+      const baseTarget = aliasTarget.split('?')[0];
       expect(canonicalPaths.has(baseTarget)).toBe(true);
     });
   });

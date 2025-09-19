@@ -26,7 +26,7 @@ export default function CompleteFusionReport() {
     },
     {
       name: 'UnifiedErrorPage',
-      fusedFrom: ['404Page', 'Enhanced404Page', 'NotFoundPage'],
+      fusedFrom: ['404Page', 'Enhanced404Page', 'Error404Page'],
       status: 'completed',
       location: 'src/pages/unified/UnifiedErrorPage.tsx'
     },
@@ -45,7 +45,7 @@ export default function CompleteFusionReport() {
     'src/pages/DashboardPage.tsx', 
     'src/pages/CompleteDashboardPage.tsx',
     'src/pages/SimpleLogin.tsx',
-    'src/pages/NotFoundPage.tsx',
+    'src/pages/errors/404.tsx',
     'src/pages/Enhanced404Page.tsx',
     'src/components/error/Enhanced404Page.tsx'
   ];

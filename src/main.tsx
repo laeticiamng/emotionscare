@@ -1,13 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
-import { ThemeProvider, I18nProvider } from '@/COMPONENTS.reg';
+import { I18nProvider } from '@/COMPONENTS.reg';
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
+import { RootProvider } from '@/providers';
+import { router } from '@/routerV2';
 
 // Configuration de l'attribut lang pour l'accessibilité
 document.documentElement.lang = 'fr';
@@ -78,15 +80,21 @@ if (typeof window !== 'undefined') {
   enableGlobalImageOptimizations();
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Application root element not found');
+}
+
+createRoot(rootElement).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
+    <RootProvider>
       <AccessibilityProvider>
         <I18nProvider>
           <AccessibilitySkipLinks />
-          <App />
+          <RouterProvider router={router} />
         </I18nProvider>
       </AccessibilityProvider>
-    </ThemeProvider>
+    </RootProvider>
   </React.StrictMode>
 );

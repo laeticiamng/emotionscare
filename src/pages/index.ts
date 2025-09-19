@@ -85,10 +85,10 @@ export { default as LegalTermsPage } from './LegalTermsPage';
 export { default as LegalPrivacyPage } from './LegalPrivacyPage';
 
 // System & Error pages
-export { default as UnauthorizedPage } from './UnauthorizedPage';
-export { default as NotFoundPage } from './NotFoundPage';
+export { default as Error401Page } from './errors/401';
+export { default as Error403Page } from './errors/403';
+export { default as Error404Page } from './errors/404';
 export { default as ServerErrorPage } from './ServerErrorPage';
-export { default as ForbiddenPage } from './ForbiddenPage';
 
 // Development pages
 export { default as ValidationPage } from './ValidationPage';
