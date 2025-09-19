@@ -73,14 +73,16 @@
   - ✅ QA 06/2025 : scénario e2e `journal-feed.spec.ts` + tests `useJournalStore` (4 cas) pour la recherche et la gestion d'entrées.
 
 ### 🧭 Coach IA — 🟢 Livré
-- **Entrée** : `src/pages/B2CAICoachPage.tsx` (`/app/coach`).
-- **Services** : `src/modules/coach/coachService.ts`, edge function `supabase/functions/ai-coach/index.ts`.
+- **Entrée** : `src/pages/B2CAICoachPage.tsx` (`/app/coach`) rendu via `CoachView`.
+- **Services** : `src/services/coach/coachApi.ts` (SSE + fallback) et fonction edge `supabase/functions/ai-coach/index.ts`.
+- **Persistance Supabase** : table `public.coach_logs` (résumé ≤ 280 caractères, `thread_id`, `mode`) avec RLS owner-only + indexes `user_id`, `thread_id`.
 - **Fonctionnalités clés** :
-  - Consentement obligatoire (checkbox + token session) avant toute requête AI.  
-  - Normalisation des prompts selon audience (B2C/B2B) et clamp de l'historique envoyé.  
-  - Hachage du transcript, journalisation anonymisée (`coach_conversations`) et stockage des suggestions/techniques.  
-  - UI riche (personnalités sélectionnables, ressources, voice toggle) et toasts en cas d'échec.
-  - ✅ QA 06/2025 : scénario e2e `coach-ai-session.spec.ts` validant consentement → réponse.
+  - Consentement explicite (modal opt-in, stockage local + `user_metadata`) avant tout envoi.
+  - Hash utilisateur Web Crypto (SHA-256) pour tagger les sessions sans exposer l’UUID.
+  - Edge sécurisée (JWT obligatoire, CORS restreint, rate-limit 30 req/min, modération + désescalade) et réponses streamées SSE.
+  - UI conversation accessible (`aria-live`, envoi Ctrl+Entrée, actions rapides respiration/journal/musique, badge B2B).
+  - Observabilité safe : breadcrumbs Sentry redacts, logs anonymisés `coach_logs`, refus crise/self-harm avec messages ressources.
+  - ✅ QA 07/2025 : tests unitaires (`hash`, prompts, redaction), Deno guardrails, Playwright `coach.smoke.spec.ts` (consentement → réponse stub).
 
 ### 🎵 Adaptive Music — 🟢 Livré
 - **Entrée** : `src/modules/adaptive-music/AdaptiveMusicPage.tsx` sur `/app/music`.
