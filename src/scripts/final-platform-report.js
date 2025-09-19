@@ -68,7 +68,7 @@ function generateReport() {
         '/app/social-cocon (B2CSocialCoconPage)',
         '/app/leaderboard (B2CGamificationPage)',
         '/app/activity (B2CWeeklyBarsPage)',
-        '/app/heatmap (B2CHeatmapVibesPage)',
+        '/app/scores (ScoresPage)',
         '/settings/general (B2CSettingsPage)',
         '/settings/profile (B2CProfileSettingsPage)',
         '/settings/privacy (B2CPrivacyTogglesPage)',

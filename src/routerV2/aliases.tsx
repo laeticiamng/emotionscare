@@ -71,7 +71,7 @@ export const ROUTE_ALIASES = {
   // ═══════════════════════════════════════════════════════════
   '/weekly-bars': '/app/activity',
   '/activity-history': '/app/activity',
-  '/heatmap-vibes': '/app/heatmap',
+  '/heatmap-vibes': '/app/scores',
 
   // ═══════════════════════════════════════════════════════════
   // PARAMÈTRES

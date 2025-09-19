@@ -72,6 +72,7 @@ const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
 const B2BSocialCoconPage = lazy(() => import('@/pages/B2BSocialCoconPage'));
 const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
+const B2BReportsHeatmapPage = lazy(() => import('@/pages/b2b/reports'));
 const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
 
 // Additional B2B pages - use correct paths
@@ -116,7 +117,7 @@ const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -202,7 +203,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Analytics & Gamification
   GamificationPage,
   LeaderboardPage,
-  HeatmapPage,
+  ScoresPage,
   
   // Settings
   B2CSettingsPage,
@@ -214,6 +215,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BTeamsPage,
   B2BSocialCoconPage,
   B2BReportsPage,
+  B2BReportsHeatmapPage,
   B2BEventsPage,
   B2BOptimisationPage,
   B2BSecurityPage,

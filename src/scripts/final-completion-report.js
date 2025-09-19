@@ -51,7 +51,7 @@ console.log('    • Social Cocon (/app/social-cocon)');
 console.log('\n  📊 ANALYTICS (3 modules):');
 console.log('    • Gamification (/app/leaderboard)');
 console.log('    • Historique Activité (/app/activity)');
-console.log('    • Heatmap Vibes (/app/heatmap)');
+console.log('    • Scores & Vibes (/app/scores)');
 
 console.log('\n  ⚙️ PARAMÈTRES (4 sections):');
 console.log('    • Général (/settings/general)');

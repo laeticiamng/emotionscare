@@ -41,7 +41,7 @@ const PageIntegrityChecker: React.FC = () => {
     { path: '/preferences', name: 'Préférences' },
     { path: '/teams', name: 'Équipes B2B' },
     { path: '/weekly-bars', name: 'Barres Hebdomadaires' },
-    { path: '/heatmap-vibes', name: 'Heatmap Vibes' }
+    { path: '/heatmap-vibes', name: 'Scores & vibes' }
   ];
 
   const checkPageIntegrity = async (pageInfo: { path: string; name: string }): Promise<PageStatus> => {

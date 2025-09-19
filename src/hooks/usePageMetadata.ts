@@ -257,12 +257,23 @@ const PAGE_METADATA: Record<string, Omit<PageMetadata, 'loadingState'>> = {
     allowedRoles: ['b2c', 'b2b_user', 'b2b_admin'],
     hasQuickActions: false
   },
-  '/app/heatmap': {
-    title: 'Heatmap des Émotions',
-    description: 'Cartographie de vos humeurs',
+  '/app/scores': {
+    title: 'Scores & vibes',
+    description: 'Courbes d’humeur, séances et heatmap quotidienne',
     breadcrumbs: [
       { label: 'Accueil', path: '/app/home' },
-      { label: 'Heatmap', path: '/app/heatmap' }
+      { label: 'Scores & vibes', path: '/app/scores' }
+    ],
+    requiresAuth: true,
+    allowedRoles: ['b2c', 'b2b_user', 'b2b_admin'],
+    hasQuickActions: false
+  },
+  '/app/heatmap': {
+    title: 'Scores & vibes',
+    description: 'Courbes d’humeur, séances et heatmap quotidienne',
+    breadcrumbs: [
+      { label: 'Accueil', path: '/app/home' },
+      { label: 'Scores & vibes', path: '/app/scores' }
     ],
     requiresAuth: true,
     allowedRoles: ['b2c', 'b2b_user', 'b2b_admin'],

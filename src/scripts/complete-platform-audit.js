@@ -44,7 +44,7 @@ const mockRegistry = [
   // Analytics
   { name: 'leaderboard', path: '/app/leaderboard', segment: 'consumer', component: 'B2CGamificationPage', guard: true },
   { name: 'activity', path: '/app/activity', segment: 'consumer', component: 'B2CActivityHistoryPage', guard: true },
-  { name: 'heatmap', path: '/app/heatmap', segment: 'manager', component: 'B2CHeatmapVibesPage', guard: true },
+  { name: 'scores', path: '/app/scores', segment: 'manager', component: 'ScoresPage', guard: true },
   
   // Settings
   { name: 'settings-general', path: '/settings/general', segment: 'consumer', component: 'B2CSettingsPage', guard: true },
