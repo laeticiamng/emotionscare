@@ -29,6 +29,16 @@
   - ✅ QA 06/2025 : scénario e2e `mood-mixer-crud.spec.ts` (CRUD complet) + tests `useMoodMixerStore` (7 cas) et `useJournalStore` (4 cas) pour l'enrichissement historique.
 
 ### ⚡ Flash Glow & Ultra — 🟢 Livré
+- **Entrées** : `src/modules/flash-glow/useFlashGlowMachine.ts`, `src/modules/flash-glow/journal.ts`, `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
+- **Services** : `src/modules/flash-glow/flash-glowService.ts`, intégration journal via `createFlashGlowJournalEntry`, moteur partagé `src/services/sessions/sessionsApi.ts`.
+- **Persistance Supabase** : table `public.sessions` (type, durée, `mood_delta`, `meta` JSONB) avec indexes sur `user_id`, `created_at desc`, `type` + RLS owner-only.
+- **Fonctionnalités clés** :
+  - Machine d'état asynchrone couplée au hook commun `useSessionClock` (start/pause/resume/complete) avec breadcrumbs Sentry `session:*`.
+  - Suivi des humeurs (`moodBaseline`, `moodAfter`) et calcul directionnel via `computeMoodDelta` sérialisé dans `meta`.
+  - Journalisation automatique Supabase via `logAndJournal` (insert `sessions` + entrée `journal_entries` bienveillante) et fallback local.
+  - Interface Flash Glow Ultra migrée sur le moteur partagé (`useSessionClock`) avec région `aria-live`, focus conservé et auto-journal `logAndJournal` (couverture `flashGlowUltraSession.test.tsx`).
+  - Statistiques locales (nombre/temps moyen) et toasts en cas d'interruption.
+  - ✅ QA 06/2025 : scénario e2e `flash-glow-ultra-session.spec.ts` + tests `useGlowStore` (5 cas) couvrant start/pause/resume/reset.
 - **Entrées** : `src/pages/flash-glow/index.tsx` (parcours SESS-01 sur `/app/flash-glow`) & `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
 - **Services** : `src/hooks/useSessionClock.ts`, `src/modules/flash/useFlashPhases.ts`, `src/modules/flash/sessionService.ts` (`logAndJournal`).
 - **Persistance Supabase** : tables `public.user_activity_sessions` + `public.journal_entries` (RLS owner-only, indexes `user_id`/`created_at`).
@@ -41,13 +51,19 @@
 
 ### 🌌 Breath Constellation — 🟢 Livré
 - **Entrée** : `src/modules/breath-constellation/BreathConstellationPage.tsx` via `/app/breath`.
-- **Services** : `src/services/breathworkSessions.service.ts` (persistance) et `@/ui/hooks/useBreathPattern`.
+- **Services** : `src/services/breathworkSessions.service.ts`, moteur partagé `src/services/sessions/sessionsApi.ts`, hook `@/ui/hooks/useBreathPattern`.
 - **Persistance Supabase** : mutualise `public.sessions` (log des séances Breath/FlashGlow) sous RLS owner-only, indexes `user_id`, `created_at`, `type`.
 - **Fonctionnalités clés** :
-  - Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.
+
+- Protocoles nommés (cohérence, sommeil profond, carré, triangle) avec cadence calculée et bénéfices contextualisés.
+  - Horloge partagée `useSessionClock` respectant `prefers-reduced-motion` (aria-live, focus conservé, pause/reprise instrumentées Sentry).
+  - Options audio/haptique via `useSound`, enregistrement Supabase (`logBreathworkSession`) + insertion automatique journal via `logAndJournal`.
+
+- Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.
   - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.
   - Options audio/haptique via `useSound` + enregistrement Supabase des sessions (gestion erreurs auth/persistance).
   - Émissions d'events analytics facultatifs (`recordEvent`).
+  - ✅ Tests accessibilité : `BreathConstellationStatus.test.tsx` (annonces `aria-live`) en complément du smoke e2e.
   - ✅ QA 06/2025 : régression manuelle post build, couverture e2e générale `breath-constellation-session.spec.ts`.
 
 ### 🌬️ Breath Guidance — 🟢 Livré

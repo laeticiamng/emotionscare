@@ -5,10 +5,15 @@ exports[`FlashGlowUltraPage > rend la page et le CTA Démarrer 1`] = `
   <main
     aria-label="Flash Glow Ultra"
   >
-    <div>
-      Flash Glow Ultra
-    </div>
-    <div>
+    <header>
+      <h1>
+        Flash Glow Ultra
+      </h1>
+      <p>
+        Glow respiratoire avancé, sûr et personnalisable
+      </p>
+    </header>
+    <section>
       <section
         style="display: grid; gap: 16px;"
       >
@@ -107,6 +112,34 @@ exports[`FlashGlowUltraPage > rend la page et le CTA Démarrer 1`] = `
               step="1"
               type="range"
               value="2"
+            />
+          </label>
+        </div>
+        <div
+          style="display: grid; gap: 8px; background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 16px;"
+        >
+          <label>
+            Humeur avant séance : 
+            50
+            /100
+            <input
+              max="100"
+              min="0"
+              step="1"
+              type="range"
+              value="50"
+            />
+          </label>
+          <label>
+            Humeur après séance : 
+            50
+            /100
+            <input
+              max="100"
+              min="0"
+              step="1"
+              type="range"
+              value="50"
             />
           </label>
         </div>
@@ -316,13 +349,24 @@ exports[`FlashGlowUltraPage > rend la page et le CTA Démarrer 1`] = `
           glow
         </div>
         <div
-          style="display: flex; gap: 8px;"
+          style="display: grid; gap: 4px;"
         >
-          <button
-            data-ui="primary-cta"
+          <div
+            aria-live="polite"
+            role="status"
+            style="font-size: 12px; opacity: 0.85;"
           >
-            Démarrer
-          </button>
+            Séance prête.
+          </div>
+          <div
+            style="display: flex; gap: 8px;"
+          >
+            <button
+              data-ui="primary-cta"
+            >
+              Démarrer
+            </button>
+          </div>
         </div>
         <small
           style="opacity: 0.75;"
@@ -330,7 +374,7 @@ exports[`FlashGlowUltraPage > rend la page et le CTA Démarrer 1`] = `
           Sécurité anti-flash activée (≤3 Hz). Si tu utilises “Réduction des animations” sur ton appareil, l’animation devient très douce.
         </small>
       </section>
-    </div>
+    </section>
   </main>
 </div>
 `;
