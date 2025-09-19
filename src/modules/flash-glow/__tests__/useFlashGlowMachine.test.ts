@@ -4,6 +4,7 @@ import { useFlashGlowMachine } from '@/modules/flash-glow/useFlashGlowMachine';
 import { flashGlowService } from '@/modules/flash-glow/flash-glowService';
 import { createFlashGlowJournalEntry } from '@/modules/flash-glow/journal';
 import { toast } from '@/hooks/use-toast';
+import { logAndJournal } from '@/services/sessions/sessionsApi';
 
 vi.mock('@/modules/flash-glow/flash-glowService', () => ({
   flashGlowService: {
@@ -31,14 +32,56 @@ vi.mock('@/hooks/use-toast', () => ({
   toast: vi.fn()
 }));
 
+const mockClock = {
+  state: 'idle' as 'idle' | 'running' | 'paused' | 'completed',
+  elapsedMs: 0,
+  progress: 0,
+  start: vi.fn(() => {
+    mockClock.state = 'running';
+  }),
+  pause: vi.fn(() => {
+    mockClock.state = 'paused';
+  }),
+  resume: vi.fn(() => {
+    mockClock.state = 'running';
+  }),
+  complete: vi.fn(() => {
+    mockClock.state = 'completed';
+  }),
+  reset: vi.fn(() => {
+    mockClock.state = 'idle';
+    mockClock.elapsedMs = 0;
+    mockClock.progress = 0;
+  }),
+  onTick: vi.fn(() => () => {})
+};
+
+vi.mock('@/modules/sessions/hooks/useSessionClock', () => ({
+  useSessionClock: () => mockClock
+}));
+
+vi.mock('@/services/sessions/sessionsApi', () => ({
+  logAndJournal: vi.fn().mockResolvedValue({
+    id: 'session-1',
+    type: 'flash_glow',
+    duration_sec: 65,
+    mood_delta: 7,
+    meta: {},
+    created_at: new Date().toISOString()
+  })
+}));
+
+vi.mock('@sentry/react', () => ({
+  addBreadcrumb: vi.fn(),
+  captureException: vi.fn()
+}));
+
 describe('useFlashGlowMachine - auto journalisation', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
     vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
+    mockClock.state = 'idle';
+    mockClock.elapsedMs = 0;
+    mockClock.progress = 0;
   });
 
   it('crée une entrée de journal et enrichit les métadonnées lors de la complétion', async () => {
@@ -49,9 +92,13 @@ describe('useFlashGlowMachine - auto journalisation', () => {
     });
 
     await act(async () => {
-      const promise = result.current.startSession({ moodBaseline: 40 });
-      vi.runAllTimers();
-      await promise;
+      await result.current.startSession({ moodBaseline: 40 });
+    });
+
+    act(() => {
+      mockClock.elapsedMs = 65000;
+      mockClock.progress = 1;
+      mockClock.state = 'completed';
     });
 
     await act(async () => {
@@ -65,20 +112,36 @@ describe('useFlashGlowMachine - auto journalisation', () => {
       recommendation: 'Recommandation test',
       moodBefore: 40,
       moodAfter: 76,
-      moodDelta: 36
+      moodDelta: 7,
+      duration: 65
     }));
 
     expect(flashGlowService.endSession).toHaveBeenCalledWith(expect.objectContaining({
       metadata: expect.objectContaining({
         moodBefore: 40,
         moodAfter: 76,
-        moodDelta: 36,
+        moodDelta: 7,
         context: 'Flash Glow Ultra',
         mode: 'core',
         autoJournal: true,
         journalEntryId: 'journal-1',
         journalSummary: 'Flash Glow Ultra - Gain ressenti',
-        journalTone: 'positive'
+        journalTone: 'positive',
+        elapsed_ms: 65000
+      })
+    }));
+
+    expect(logAndJournal).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'flash_glow',
+      duration_sec: 65,
+      mood_delta: 7,
+      meta: expect.objectContaining({
+        glowType: expect.any(String),
+        intensity: expect.any(Number),
+        mood_before: 40,
+        mood_after: 76,
+        mood_delta: 7,
+        elapsed_ms: 65000
       })
     }));
 
