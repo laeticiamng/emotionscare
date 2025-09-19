@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react';
+
 /**
  * Système d'internationalisation centralisé
  * Textes, formats, pluriels et contextes
@@ -298,9 +300,7 @@ export const t = (
 
 // ============= Hook React =============
 
-import { useState, useEffect } from 'react';
-
-export const useTranslation = (initialLocale?: Locale) => {
+  export const useTranslation = (initialLocale?: Locale) => {
   const [locale, setLocaleState] = useState<Locale>(initialLocale || currentLocale);
   
   useEffect(() => {
@@ -328,8 +328,6 @@ export const useTranslation = (initialLocale?: Locale) => {
 
 // ============= Composant de traduction =============
 
-import React from 'react';
-
 interface TransProps {
   i18nKey: string;
   count?: number;
@@ -350,5 +348,5 @@ export const Trans: React.FC<TransProps> = ({ i18nKey, count, context, component
     });
   }
   
-  return <>{translation}</>;
+  return React.createElement(React.Fragment, null, translation);
 };

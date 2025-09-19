@@ -24,7 +24,6 @@ export function usePulseClock(bpm: number, running: boolean) {
     };
     raf.current = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(raf.current); last.current = null; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, CAP_BPM]);
 
   return phase01;

@@ -451,8 +451,8 @@ export default function EnhancedBuddySystem() {
 
         {/* Découverte */}
         <TabsContent value="discovery" className="space-y-4">
-          <Card>
-            <CardHeader>
+              <Card>
+                <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5" />
                 Filtres de Recherche
@@ -754,7 +754,7 @@ export default function EnhancedBuddySystem() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-2 mt-4">
                       {matchedBuddies.slice(0, 2).map(buddy => (
                         <Button
@@ -769,8 +769,8 @@ export default function EnhancedBuddySystem() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </CardContent>
+              </CardContent>
+            </Card>
 
             {/* Activité en cours */}
             <Card>

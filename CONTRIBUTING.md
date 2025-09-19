@@ -142,6 +142,23 @@ npm run storybook        # Interface composants
 - Les scripts Node conservent l'import classique (`import fs from 'fs'`) pour compatibilité tooling.
 - Tout import non tree-shaké doit être justifié dans la PR (bundle size).
 
+#### 🚫 Interdiction `node:*` côté client (ECC-SEC-01)
+- Tout fichier client sous `src/**` ne peut plus importer `node:*`. Le lint (`pnpm lint`) et la CI bloquent immédiatement si la règle est violée.
+- Préférez les APIs Web : `crypto.subtle`, `fetch`, `FileReader`, `Blob`, `URL`, etc. Un utilitaire `sha256` basé sur `crypto.subtle` est déjà disponible dans `src/lib/hash.ts`.
+- Les seuls dossiers autorisés à utiliser `node:*` sont les services strictement serveur (`/services/**`) et les fonctions Supabase (`/supabase/functions/**`).
+
+```ts
+// ❌ Bloqué : crash en build/runtime côté navigateur
+import { createHash } from 'node:crypto';
+
+// ✅ Correct : API Web compatible bundle client
+const encoder = new TextEncoder();
+const data = encoder.encode(message);
+const digest = await crypto.subtle.digest('SHA-256', data);
+```
+
+- Si vous avez besoin d'une fonctionnalité Node, créez un service côté serveur (API, edge function) et exposez une API HTTP/Fetch pour le client.
+
 ### Stores Zustand & sélecteurs
 - Centraliser les stores dans `src/store` et exposer des sélecteurs nommés (`export const selectX = (state) => state.x`).
 - Éviter d'accéder directement à `useStore.getState()` dans les composants : préférer `useStore(selectX)` pour profiter de la comparaison par référence.

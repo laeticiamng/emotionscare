@@ -44,7 +44,6 @@ export default function BossGritPage() {
         });
       } catch {}
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t.done]);
 
   function toggleTask(id: string) {
