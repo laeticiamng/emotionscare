@@ -1,3 +1,4 @@
+import i18n from '@/lib/i18n';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
@@ -20,7 +21,8 @@ const addAccessibilityMeta = () => {
   if (!document.querySelector('meta[name="description"]')) {
     const metaDesc = document.createElement('meta');
     metaDesc.name = 'description';
-    metaDesc.content = 'Plateforme d\'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.';
+    metaDesc.content =
+      "Plateforme d'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.";
     document.head.appendChild(metaDesc);
   }
 
@@ -31,8 +33,6 @@ const addAccessibilityMeta = () => {
     document.head.appendChild(metaViewport);
   }
 };
-
-addAccessibilityMeta();
 
 const enableGlobalImageOptimizations = () => {
   const enhance = (img: HTMLImageElement) => {
@@ -73,6 +73,12 @@ const enableGlobalImageOptimizations = () => {
   observer.observe(document.body, { childList: true, subtree: true });
 };
 
+if (typeof document !== 'undefined') {
+  document.documentElement.lang = i18n.language?.split('-')[0] ?? 'fr';
+  document.title = "EmotionsCare - Plateforme d'intelligence émotionnelle";
+  addAccessibilityMeta();
+}
+
 if (typeof window !== 'undefined') {
   initializeSentry();
   monitorDOMErrors();
@@ -97,4 +103,5 @@ createRoot(rootElement).render(
       </AccessibilityProvider>
     </RootProvider>
   </React.StrictMode>
+
 );

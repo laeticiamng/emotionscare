@@ -160,6 +160,28 @@ export function useI18n() {
   return React.useContext(I18nCtx);
 }
 
-export function t(key: string, namespace: 'common' | 'navigation' | 'dashboard' | 'settings' | 'modules' | 'auth' | 'errors' | 'legal' | 'journal' | 'coach' = 'common', options?: TOptions) {
-  return i18n.t(`${namespace}:${key}`, options);
+export function t(
+  key: string,
+  namespace: 'common' | 'navigation' | 'dashboard' | 'settings' | 'modules' | 'auth' | 'errors' | 'legal' | 'journal' | 'coach' = 'common',
+  options?: TOptions
+) {
+  const currentLanguage = (i18n.language?.split('-')[0] as Lang | undefined) ?? DEFAULT_LANG;
+  let targetLanguage: Lang = currentLanguage;
+
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY) as Lang | null;
+
+      if (stored && stored !== targetLanguage) {
+        targetLanguage = stored;
+        if (!i18n.language?.startsWith(stored)) {
+          void i18n.changeLanguage(stored);
+        }
+      }
+    } catch (error) {
+      logger.warn('Unable to read stored language for translation', error, 'i18n');
+    }
+  }
+
+  return i18n.getFixedT(targetLanguage, namespace)(key, options);
 }
