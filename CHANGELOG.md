@@ -1,6 +1,19 @@
 
 # Changelog
 
+## [1.1.17] - 2025-06-06
+
+### Ajouté
+- 12 nouveaux tests unitaires ciblant les stores Zustand (journal, glow) et le client `requestMoodPlaylist`, portant le total QA stores/mappers/clients à 26 cas.
+- Sélection de scénarios Playwright stabilisée : login, dashboard, scan → historique, Mood Mixer CRUD, Flash Glow, Journal feed, Coach IA et favoris Adaptive Music.
+
+### Documenté
+- Mise à jour des listings `docs/PAGES_LISTING.md` et `docs/MODULES_LISTING.md` avec le statut QA 06/2025 pour chaque parcours critique.
+- Enrichissement de `CONTRIBUTING.md` (barrels d'exports, interdiction `node:*`, conventions sélecteurs Zustand) et `.env.example` (clés Supabase publiques, modèles IA).
+
+### QA
+- Lint, type-check, tests unitaires Vitest et scénarios Playwright headless validés localement.
+
 ## [1.1.16] - 2025-06-05
 
 ### Ajouté

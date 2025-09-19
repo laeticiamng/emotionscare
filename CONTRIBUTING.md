@@ -132,6 +132,21 @@ npm run storybook        # Interface composants
 - **Props typées** avec TypeScript
 - **Memo** pour optimisations si besoin
 
+### Modules & exports
+- Chaque dossier applicatif dispose d'un `index.ts` (ou `index.tsx`) qui ré-exporte l'API publique du domaine.
+- Les nouveaux composants UI partagés doivent être exposés via les barrels existants (`src/components/ui` et `src/COMPONENTS.reg.tsx`).
+- `COMPONENTS.reg.tsx` reste limité à des wrappers providers & composants purement UI (pas de stores, hooks métier ou accès réseau).
+
+### Imports Node & bundling
+- **Interdiction d'utiliser les imports `node:*`** côté front : privilégier les modules standards (`fs`, `path`…) lorsqu'ils sont bundlés côté Node/scripts.
+- Les scripts Node conservent l'import classique (`import fs from 'fs'`) pour compatibilité tooling.
+- Tout import non tree-shaké doit être justifié dans la PR (bundle size).
+
+### Stores Zustand & sélecteurs
+- Centraliser les stores dans `src/store` et exposer des sélecteurs nommés (`export const selectX = (state) => state.x`).
+- Éviter d'accéder directement à `useStore.getState()` dans les composants : préférer `useStore(selectX)` pour profiter de la comparaison par référence.
+- Chaque ajout de logique store doit s'accompagner d'une suite de tests unitaires ciblant actions et sélecteurs.
+
 ### Styling
 - **Tailwind CSS** pour tout le styling
 - **Design system** défini dans index.css
