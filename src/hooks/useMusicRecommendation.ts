@@ -64,7 +64,6 @@ export function useMusicRecommendation(options: Options = {}) {
     if (autoActivate && defaultEmotion) {
       loadRecommendations(defaultEmotion);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

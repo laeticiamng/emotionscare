@@ -40,7 +40,7 @@ type ActivityState = {
   setItems: (items: ActivityItem[], cursor?: string) => void;
   appendItems: (items: ActivityItem[], cursor?: string) => void;
   setLoading: (loading: boolean) => void;
-  setLastExport: (export: ActivityState['lastExport']) => void;
+  setLastExport: (exportData: ActivityState['lastExport']) => void;
   reset: () => void;
 };
 

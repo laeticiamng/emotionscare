@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 if (!globalThis.fetch) {
   Object.assign(globalThis, require('undici'));
 }

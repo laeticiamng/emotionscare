@@ -9,7 +9,7 @@ import { CheckCircle, Zap, FileCheck, Code, Settings } from 'lucide-react';
 export default function ValidationCompleteReport() {
   const validationResults = {
     totalPagesRemaining: 112,
-    totalPagesRemoved: 25+,
+    totalPagesRemoved: '25+',
     duplicatesEliminated: '100%',
     consoleErrors: 0,
     brokenImports: 0,

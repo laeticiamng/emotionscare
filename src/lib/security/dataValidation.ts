@@ -157,11 +157,11 @@ export const rateLimiter = new RateLimiter();
 
 // SQL injection protection
 export const validateSqlInput = (input: string): boolean => {
-  const sqlInjectionPatterns = [
-    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER)\b)/i,
-    /(UNION|OR|AND)\s+\d+\s*=\s*\d+/i,
-    /['"]\s*(OR|AND)\s*['"]\d+['"]\s*=\s*['"]\d+['"]|i,
-    /--|\*|\/\*|\*\//,
+    const sqlInjectionPatterns = [
+      /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER)\b)/i,
+      /(UNION|OR|AND)\s+\d+\s*=\s*\d+/i,
+      /['"]\s*(OR|AND)\s*['"]\d+['"]\s*=\s*['"]\d+['"]/i,
+      /--|\*|\/\*|\*\//,
   ];
   
   return !sqlInjectionPatterns.some(pattern => pattern.test(input));

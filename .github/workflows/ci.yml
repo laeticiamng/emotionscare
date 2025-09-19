@@ -31,12 +31,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
       - name: 🔧 Install dependencies
         run: npm ci --prefer-offline --audit=false
-        
+
       - name: 🧹 Lint check
-        run: bun run lint
+        run: pnpm lint
         
       - name: 📝 Type check
         run: npm run type-check

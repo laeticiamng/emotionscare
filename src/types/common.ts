@@ -1,6 +1,6 @@
 // Type fixes pour éviter les erreurs lucide-react et TypeScript
 import { LucideProps, LucideIcon } from 'lucide-react';
-import { ComponentType, ForwardRefExoticComponent, RefAttributes } from 'react';
+import { ComponentType, ForwardRefExoticComponent, RefAttributes, createElement } from 'react';
 
 // Type correct pour les icônes lucide-react
 export type LucideIconType = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
@@ -77,7 +77,8 @@ export const renderIcon = (Icon: LucideIconType, props: Partial<LucideProps> = {
     console.warn('Invalid icon component passed to renderIcon');
     return null;
   }
-  return <Icon {...props} />;
+  const iconComponent = Icon as ComponentType<LucideProps>;
+  return createElement(iconComponent, props as LucideProps);
 };
 
 export default {

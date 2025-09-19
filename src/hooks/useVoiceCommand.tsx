@@ -25,13 +25,12 @@ export const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCo
     if (autoStart && hasSpeechRecognition) {
       startListening();
     }
-    
+
     return () => {
       if (isListening) {
         stopListening();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startListening = useCallback(() => {

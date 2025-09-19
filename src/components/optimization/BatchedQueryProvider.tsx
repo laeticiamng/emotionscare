@@ -98,7 +98,7 @@ export const BatchedQueryProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setProcessedCount(prev => prev + currentBatch.length);
   }, [pendingQueries]);
 
-  const batchQuery = React.useCallback(<T>(
+  const batchQuery = React.useCallback(<T,>(
     table: string,
     filters: Record<string, any> = {},
     select = '*'
@@ -164,7 +164,7 @@ export const BatchedQueryProvider: React.FC<{ children: React.ReactNode }> = ({ 
 /**
  * Hook optimisé pour les requêtes fréquentes
  */
-export const useOptimizedQuery = <T>(
+export const useOptimizedQuery = <T,>(
   table: string,
   filters: Record<string, any> = {},
   options: {

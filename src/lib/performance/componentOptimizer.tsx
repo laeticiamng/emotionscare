@@ -12,7 +12,7 @@ export const withPerformanceMonitoring = <P extends object>(
   Component: React.ComponentType<P>,
   componentName: string
 ) => {
-  const WrappedComponent = React.memo<P>((props) => {
+  const WrappedComponent = React.memo<P,>((props) => {
     const startTime = React.useRef<number>();
     const [renderCount, setRenderCount] = React.useState(0);
 
@@ -90,7 +90,7 @@ export const useOptimizedCallback = <T extends (...args: any[]) => any>(
 /**
  * Hook pour optimiser les états
  */
-export const useOptimizedState = <T>(
+export const useOptimizedState = <T,>(
   initialValue: T,
   compareFn?: (prev: T, next: T) => boolean
 ) => {
@@ -115,7 +115,7 @@ export const useOptimizedState = <T>(
 /**
  * Hook pour lazy loading conditionnel
  */
-export const useConditionalLazyLoad = <T>(
+export const useConditionalLazyLoad = <T,>(
   condition: boolean,
   loader: () => Promise<T>,
   fallback?: T
@@ -189,7 +189,7 @@ export const LazyRenderWrapper: React.FC<{
 /**
  * Hook pour gérer les listes virtualisées
  */
-export const useVirtualizedList = <T>(
+export const useVirtualizedList = <T,>(
   items: T[],
   itemHeight: number,
   containerHeight: number,
