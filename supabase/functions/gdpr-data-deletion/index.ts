@@ -1,7 +1,8 @@
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { authenticateRequest, checkRateLimit, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
   const corsHeaders = {
@@ -27,12 +28,18 @@ serve(async (req) => {
       );
     }
 
-    const clientId = authResult.user.id;
-    if (!checkRateLimit(clientId, 1, 86400000)) { // 1 suppression par 24h
-      return new Response(
-        JSON.stringify({ error: 'Limite de suppressions atteinte. Veuillez patienter.' }),
-        { status: 429, headers: corsHeaders }
-      );
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'gdpr-data-deletion',
+      userId: authResult.user.id,
+      limit: 1,
+      windowMs: 86_400_000,
+      description: 'gdpr-data-deletion',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Limite de suppressions atteinte. Veuillez patienter.',
+      });
     }
 
     const { confirmationCode } = await req.json();

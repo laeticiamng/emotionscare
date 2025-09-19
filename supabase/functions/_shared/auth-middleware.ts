@@ -1,5 +1,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { hash } from './hash_user.ts';
+import { logAccess } from './logging.ts';
 
 export interface AuthResult {
   user: any | null;
@@ -62,39 +64,40 @@ export async function authorizeRole(req: Request, allowedRoles: string[]): Promi
 }
 
 /**
- * Rate limiting basique
- */
-const requestCounts = new Map<string, { count: number; resetTime: number }>();
-
-export function checkRateLimit(clientId: string, maxRequests = 60, windowMs = 60000): boolean {
-  const now = Date.now();
-  const clientData = requestCounts.get(clientId);
-  
-  if (!clientData || now > clientData.resetTime) {
-    requestCounts.set(clientId, { count: 1, resetTime: now + windowMs });
-    return true;
-  }
-  
-  if (clientData.count >= maxRequests) {
-    return false;
-  }
-  
-  clientData.count++;
-  return true;
-}
-
-/**
  * Log des tentatives d'accès non autorisées
  */
 export async function logUnauthorizedAccess(req: Request, reason: string) {
-  const ip = req.headers.get('x-forwarded-for') || 'unknown';
-  const userAgent = req.headers.get('user-agent') || 'unknown';
-  const timestamp = new Date().toISOString();
-  
-  console.warn(`[SECURITY] Accès non autorisé: ${reason}`, {
-    ip,
-    userAgent,
-    timestamp,
-    url: req.url
+  const forwarded = req.headers.get('x-forwarded-for');
+  const primaryAddress = forwarded?.split(',')[0]?.trim()
+    || req.headers.get('cf-connecting-ip')
+    || req.headers.get('x-real-ip')
+    || null;
+  const hashedIp = primaryAddress ? hash(primaryAddress) : null;
+  const path = (() => {
+    try {
+      return new URL(req.url).pathname;
+    } catch (_error) {
+      return 'unknown';
+    }
+  })();
+
+  console.warn('[SECURITY] Unauthorized access blocked', {
+    route: path,
+    hashedIp,
+    reason,
   });
+
+  try {
+    await logAccess({
+      user_id: null,
+      route: path,
+      action: 'unauthorized',
+      result: 'denied',
+      ip_address: hashedIp,
+      user_agent: 'redacted',
+      details: reason,
+    });
+  } catch (error) {
+    console.warn('[SECURITY] Failed to persist unauthorized access log', error);
+  }
 }

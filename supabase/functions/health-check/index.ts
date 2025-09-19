@@ -5,63 +5,190 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  'Cache-Control': 'no-store, max-age=0',
 };
+
+const SUPABASE_LATENCY_SLO_MS = 1200;
+
+type ProviderQuota = {
+  configured: boolean;
+  remaining: number | null;
+  limit: number | null;
+  resetAt: string | null;
+};
+
+const parseNumber = (value: string | undefined): number | null => {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const buildQuota = (prefix: string): ProviderQuota => ({
+  configured: Boolean(Deno.env.get(`${prefix}_API_KEY`)),
+  remaining: parseNumber(Deno.env.get(`${prefix}_QUOTA_REMAINING`)),
+  limit: parseNumber(Deno.env.get(`${prefix}_QUOTA_LIMIT`)),
+  resetAt: Deno.env.get(`${prefix}_QUOTA_RESET_AT`) ?? null,
+});
+
+const resolveRelease = () =>
+  Deno.env.get('SENTRY_RELEASE') ??
+  Deno.env.get('VITE_APP_VERSION') ??
+  Deno.env.get('VITE_COMMIT_SHA') ??
+  Deno.env.get('GITHUB_SHA') ??
+  Deno.env.get('VERCEL_GIT_COMMIT_SHA') ??
+  'unversioned';
+
+const resolveEnvironment = () =>
+  Deno.env.get('SENTRY_ENVIRONMENT') ??
+  Deno.env.get('ENVIRONMENT') ??
+  Deno.env.get('NODE_ENV') ??
+  'development';
+
+const resolveRegion = () =>
+  Deno.env.get('SUPABASE_REGION') ??
+  Deno.env.get('FLY_REGION') ??
+  Deno.env.get('VERCEL_REGION') ??
+  'unknown';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const timestamp = new Date().toISOString();
+  const release = resolveRelease();
+  const environment = resolveEnvironment();
+  const region = resolveRegion();
+
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
-    // Test de connectivité Supabase
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('count', { count: 'exact', head: true });
+    let supabaseStatus: 'ok' | 'degraded' | 'error' | 'skipped' = 'skipped';
+    let supabaseLatency: number | null = null;
+    let supabaseError: string | null = null;
 
-    const health = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      services: {
-        supabase: error ? 'down' : 'up',
-        openai: Deno.env.get('OPENAI_API_KEY') ? 'configured' : 'missing',
-        hume: Deno.env.get('HUME_API_KEY') ? 'configured' : 'missing',
-        music_api: Deno.env.get('MUSIC_API_KEY') ? 'configured' : 'missing',
-        fal_ai: Deno.env.get('FAL_AI_API_KEY') ? 'configured' : 'missing'
-      },
-      metrics: {
-        users_count: data || 0,
-        uptime: process.uptime ? Math.floor(process.uptime()) : 'unknown'
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const start = performance.now();
+
+      try {
+        const { error } = await supabase.from('profiles').select('id', { head: true, count: 'exact' });
+        supabaseLatency = Math.round(performance.now() - start);
+
+        if (error) {
+          supabaseStatus = 'error';
+          supabaseError = (error.message ?? 'supabase_error').slice(0, 120);
+        } else if (supabaseLatency > SUPABASE_LATENCY_SLO_MS) {
+          supabaseStatus = 'degraded';
+        } else {
+          supabaseStatus = 'ok';
+        }
+      } catch (connectionError) {
+        supabaseStatus = 'error';
+        supabaseLatency = Math.round(performance.now() - start);
+        if (connectionError instanceof Error) {
+          supabaseError = connectionError.message.slice(0, 120);
+        } else {
+          supabaseError = 'unknown_error';
+        }
       }
+    }
+
+    const providers = {
+      openai: buildQuota('OPENAI'),
+      hume: buildQuota('HUME'),
+      music: {
+        configured: Boolean(Deno.env.get('MUSIC_API_KEY')),
+        remaining: parseNumber(Deno.env.get('MUSIC_API_QUOTA_REMAINING')),
+        limit: parseNumber(Deno.env.get('MUSIC_API_QUOTA_LIMIT')),
+        resetAt: Deno.env.get('MUSIC_API_QUOTA_RESET_AT') ?? null,
+      },
+      fal: {
+        configured: Boolean(Deno.env.get('FAL_AI_API_KEY')),
+        remaining: parseNumber(Deno.env.get('FAL_AI_QUOTA_REMAINING')),
+        limit: parseNumber(Deno.env.get('FAL_AI_QUOTA_LIMIT')),
+        resetAt: Deno.env.get('FAL_AI_QUOTA_RESET_AT') ?? null,
+      },
     };
 
-    const statusCode = error || !Deno.env.get('OPENAI_API_KEY') ? 503 : 200;
+    const essentialProviders: Array<keyof typeof providers> = ['openai'];
+    const missingEssentialProvider = essentialProviders.some((provider) => !providers[provider].configured);
 
-    return new Response(
-      JSON.stringify(health),
-      { 
-        status: statusCode,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
 
+    if (supabaseStatus === 'error' || missingEssentialProvider) {
+      overallStatus = 'unhealthy';
+    } else if (supabaseStatus === 'degraded') {
+      overallStatus = 'degraded';
+    }
+
+    const body = {
+      status: overallStatus,
+      timestamp,
+      release,
+      environment,
+      region,
+      checks: {
+        supabase: {
+          status: supabaseStatus,
+          latencyMs: supabaseLatency,
+          error: supabaseError,
+        },
+      },
+      providers,
+      meta: {
+        uptimeSeconds: parseNumber(Deno.env.get('RUNTIME_UPTIME_SECONDS')),
+      },
+    };
+
+    const statusCode = overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 206 : 503;
+
+    if (overallStatus !== 'healthy') {
+      console.warn('health-check degraded', {
+        status: overallStatus,
+        supabaseStatus,
+        missingEssentialProvider,
+      });
+    }
+
+    return new Response(JSON.stringify(body), {
+      status: statusCode,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+        'X-Health-Status': overallStatus,
+        'X-Health-Region': region,
+        'X-Health-Release': release,
+      },
+    });
   } catch (error) {
-    console.error('Error in health-check function:', error);
+    const sanitizedError = error instanceof Error ? error.message : 'unknown_error';
+    console.error('health-check failure', sanitizedError);
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         status: 'unhealthy',
-        error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp,
+        release,
+        environment,
+        region,
+        error: sanitizedError,
       }),
-      { 
+      {
         status: 503,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+          'X-Health-Status': 'unhealthy',
+          'X-Health-Region': region,
+          'X-Health-Release': release,
+        },
+      },
     );
   }
 });

@@ -5,6 +5,7 @@ import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
 import { ThemeProvider, I18nProvider } from '@/COMPONENTS.reg';
+import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 
@@ -79,11 +80,13 @@ if (typeof window !== 'undefined') {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <I18nProvider>
-        <AccessibilitySkipLinks />
-        <App />
-      </I18nProvider>
+    <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
+      <AccessibilityProvider>
+        <I18nProvider>
+          <AccessibilitySkipLinks />
+          <App />
+        </I18nProvider>
+      </AccessibilityProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

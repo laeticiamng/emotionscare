@@ -51,7 +51,8 @@
     "lovable:push": "npm run ci:guard && lovable sync",
     "prepare": "husky",
     "lock:check": "node scripts/validate-lockfile.mjs",
-    "generate:ui-registry": "node scripts/generate-ui-registry.mjs"
+    "generate:ui-registry": "node scripts/generate-ui-registry.mjs",
+    "sentry:upload-sourcemaps": "node scripts/upload-sourcemaps.mjs"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",

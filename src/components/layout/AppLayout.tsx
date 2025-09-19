@@ -175,6 +175,7 @@ const AppLayout: React.FC = () => {
           'lg:translate-x-0 lg:block flex flex-col'
         )}
         aria-label="Navigation principale"
+        id="primary-navigation"
       >
         {/* Sidebar Header */}
         <div className="p-6 border-b border-border">
@@ -352,7 +353,7 @@ const AppLayout: React.FC = () => {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1" role="main" id="main-content">
+        <main className="flex-1" role="main" id="main-content" tabIndex={-1}>
           <Outlet />
         </main>
       </div>

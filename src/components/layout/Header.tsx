@@ -172,18 +172,19 @@ const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header 
+    <header
       className={cn(
         'sticky top-0 z-50 w-full transition-all duration-300 border-b',
-        variant === 'transparent' 
-          ? 'bg-transparent border-transparent' 
-          : isScrolled 
-            ? 'bg-background/95 backdrop-blur-md shadow-lg border-border/50' 
+        variant === 'transparent'
+          ? 'bg-transparent border-transparent'
+          : isScrolled
+            ? 'bg-background/95 backdrop-blur-md shadow-lg border-border/50'
             : 'bg-background/90 backdrop-blur-sm border-border',
         className
       )}
       role="banner"
       aria-label="Navigation principale EmotionsCare"
+      id="global-navigation"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">

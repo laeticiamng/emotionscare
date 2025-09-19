@@ -1,6 +1,7 @@
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
-import { authenticateRequest, checkRateLimit, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
   // Headers CORS sécurisés
@@ -29,12 +30,18 @@ serve(async (req) => {
     }
 
     // Rate limiting
-    const clientId = authResult.user.id;
-    if (!checkRateLimit(clientId, 10, 60000)) { // 10 requêtes par minute
-      return new Response(
-        JSON.stringify({ error: 'Trop de requêtes. Veuillez patienter.' }),
-        { status: 429, headers: corsHeaders }
-      );
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'analyze-emotion',
+      userId: authResult.user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'analyze-emotion',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Trop de requêtes. Veuillez patienter.',
+      });
     }
 
     const { text } = await req.json();

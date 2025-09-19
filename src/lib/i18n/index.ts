@@ -8,6 +8,8 @@ import { initReactI18next } from 'react-i18next';
 import Backend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+import { logger } from '@/lib/logger';
+
 // FR Translations
 import { navigation } from './locales/fr/navigation';
 import { common } from './locales/fr/common';
@@ -17,6 +19,8 @@ import { modules } from './locales/fr/modules';
 import { auth } from './locales/fr/auth';
 import { errors } from './locales/fr/errors';
 import { legal } from './locales/fr/legal';
+import { journal } from './locales/fr/journal';
+import { coach } from './locales/fr/coach';
 
 // EN Translations
 import { navigation as navigationEN } from './locales/en/navigation';
@@ -27,6 +31,22 @@ import { modules as modulesEN } from './locales/en/modules';
 import { auth as authEN } from './locales/en/auth';
 import { errors as errorsEN } from './locales/en/errors';
 import { legal as legalEN } from './locales/en/legal';
+import { journal as journalEN } from './locales/en/journal';
+import { coach as coachEN } from './locales/en/coach';
+
+const isProduction = import.meta.env.PROD;
+const namespaces = [
+  'common',
+  'navigation',
+  'dashboard',
+  'settings',
+  'modules',
+  'auth',
+  'errors',
+  'legal',
+  'journal',
+  'coach',
+] as const;
 
 const resources = {
   fr: {
@@ -38,6 +58,8 @@ const resources = {
     auth,
     errors,
     legal,
+    journal,
+    coach,
   },
   en: {
     navigation: navigationEN,
@@ -48,6 +70,8 @@ const resources = {
     auth: authEN,
     errors: errorsEN,
     legal: legalEN,
+    journal: journalEN,
+    coach: coachEN,
   },
 };
 
@@ -57,14 +81,28 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
+    ns: namespaces,
+    defaultNS: 'common',
+    fallbackNS: ['common'],
     fallbackLng: 'fr',
     lng: 'fr', // Default to French
     debug: import.meta.env.DEV,
-    
+
+    returnEmptyString: false,
+    saveMissing: isProduction,
+    missingKeyHandler: (languages, namespace, key) => {
+      const payload = { languages, namespace, key };
+      if (isProduction) {
+        logger.error('Missing translation key detected', payload, 'i18n');
+      } else {
+        logger.warn('Missing translation key detected', payload, 'i18n');
+      }
+    },
+
     interpolation: {
       escapeValue: false,
     },
-    
+
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
@@ -75,6 +113,25 @@ i18n
       useSuspense: false,
     },
   });
+
+const i18nWithMarker = i18n as typeof i18n & {
+  __missingKeyListenerRegistered?: boolean;
+};
+
+if (!i18nWithMarker.__missingKeyListenerRegistered) {
+  i18nWithMarker.__missingKeyListenerRegistered = true;
+
+  const handleMissingKey = (languages: readonly string[], namespace: string, key: string) => {
+    const payload = { languages, namespace, key };
+    if (isProduction) {
+      logger.error('Missing translation runtime event', payload, 'i18n');
+    } else {
+      logger.warn('Missing translation runtime event', payload, 'i18n');
+    }
+  };
+
+  i18n.on('missingKey', handleMissingKey);
+}
 
 // Expose globally for profile settings
 if (typeof window !== 'undefined') {

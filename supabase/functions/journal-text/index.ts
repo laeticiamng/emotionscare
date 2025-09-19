@@ -1,10 +1,26 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import sanitizeHtml from 'npm:sanitize-html@2.17.0';
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const sanitizeUserContent = (input?: string): string => {
+  if (!input) {
+    return '';
+  }
+
+  const sanitized = sanitizeHtml(input, { allowedTags: [], allowedAttributes: {} });
+  return sanitized
+    .replace(/\u00a0/g, ' ')
+    .split('\n')
+    .map((line) => line.trim())
+    .join('\n')
+    .trim();
 };
 
 serve(async (req) => {
@@ -21,19 +37,37 @@ serve(async (req) => {
       );
     }
 
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'journal-text',
+      userId: authResult.user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'journal-text-submission',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Veuillez patienter avant de réessayer.',
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { text, lang = 'fr' } = await req.json();
+    const payload = await req.json();
+    const lang = typeof payload?.lang === 'string' ? payload.lang : 'fr';
+    const sanitizedText = sanitizeUserContent(typeof payload?.text === 'string' ? payload.text : '');
 
-    if (!text || text.trim().length === 0) {
+    if (!sanitizedText) {
       return new Response(
         JSON.stringify({ error: 'Text content required' }),
         { status: 400, headers: corsHeaders }
       );
     }
+
+    const limitedText = sanitizedText.slice(0, 5000);
 
     // Create journal entry with pending status
     const { data: entry, error } = await supabase
@@ -41,7 +75,7 @@ serve(async (req) => {
       .insert({
         user_id: authResult.user.id,
         mode: 'text',
-        text_content: text.trim(),
+        text_content: limitedText,
         status: 'processing'
       })
       .select()
@@ -57,7 +91,7 @@ serve(async (req) => {
 2. A brief, empathetic summary in French (max 2 sentences)
 3. A personalized suggestion for a wellness activity
 
-Text: "${text}"
+Text: "${limitedText}"
 
 Respond in this exact JSON format:
 {
@@ -90,8 +124,8 @@ Respond in this exact JSON format:
         .from('journal_entries')
         .update({
           mood_bucket: analysis.mood_bucket,
-          summary: analysis.summary,
-          suggestion: analysis.suggestion,
+          summary: sanitizeUserContent(analysis.summary ?? ''),
+          suggestion: sanitizeUserContent(analysis.suggestion ?? ''),
           status: 'completed'
         })
         .eq('id', entry.id);

@@ -4,9 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { LoadingState } from '@/components/loading/LoadingState';
+import { UnifiedEmptyState } from '@/components/ui/unified-empty-state';
 import { BookOpen, Plus, Sparkles, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { useError } from '@/contexts';
+import { sanitizeUserContent } from '@/lib/security/sanitize';
 
 interface JournalEntry {
   id: string;
@@ -21,12 +25,14 @@ const JournalInterface: React.FC = () => {
   const [isWriting, setIsWriting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { addError } = useError();
 
   useEffect(() => {
     loadEntries();
   }, []);
 
   const loadEntries = async () => {
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('journal_entries')
@@ -38,14 +44,23 @@ const JournalInterface: React.FC = () => {
 
       const journalEntries = data?.map(entry => ({
         id: entry.id,
-        content: entry.content,
+        content: sanitizeUserContent(entry.content ?? ''),
         date: entry.date,
-        ai_feedback: entry.ai_feedback
+        ai_feedback: entry.ai_feedback ? sanitizeUserContent(entry.ai_feedback) : undefined
       })) || [];
 
       setEntries(journalEntries);
     } catch (error) {
       console.error('Erreur chargement journal:', error);
+      const message = error instanceof Error ? error.message : 'Impossible de charger les entrées du journal';
+      addError({
+        message,
+        severity: 'medium',
+        stack: error instanceof Error ? error.stack : undefined,
+        context: {
+          scope: 'journal-load-entries',
+        },
+      });
     } finally {
       setIsLoading(false);
     }
@@ -56,11 +71,18 @@ const JournalInterface: React.FC = () => {
 
     setIsAnalyzing(true);
     try {
+      const sanitizedEntry = sanitizeUserContent(newEntry);
+
+      if (!sanitizedEntry) {
+        setIsAnalyzing(false);
+        return;
+      }
+
       // Sauvegarder l'entrée
       const { data, error } = await supabase
         .from('journal_entries')
         .insert([{
-          content: newEntry,
+          content: sanitizedEntry,
           date: new Date().toISOString()
         }])
         .select()
@@ -71,9 +93,9 @@ const JournalInterface: React.FC = () => {
       // Obtenir une analyse IA
       try {
         const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-journal', {
-          body: { 
-            content: newEntry,
-            journal_id: data.id 
+          body: {
+            content: sanitizedEntry,
+            journal_id: data.id
           }
         });
 
@@ -86,6 +108,15 @@ const JournalInterface: React.FC = () => {
         }
       } catch (analysisError) {
         console.error('Erreur analyse IA:', analysisError);
+        const message = analysisError instanceof Error ? analysisError.message : 'Analyse IA indisponible';
+        addError({
+          message,
+          severity: 'medium',
+          stack: analysisError instanceof Error ? analysisError.stack : undefined,
+          context: {
+            scope: 'journal-ai-analysis',
+          },
+        });
       }
 
       // Recharger les entrées
@@ -94,6 +125,15 @@ const JournalInterface: React.FC = () => {
       setIsWriting(false);
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
+      const message = error instanceof Error ? error.message : 'Impossible de sauvegarder votre entrée';
+      addError({
+        message,
+        severity: 'high',
+        stack: error instanceof Error ? error.stack : undefined,
+        context: {
+          scope: 'journal-save-entry',
+        },
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -101,19 +141,12 @@ const JournalInterface: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[1, 2, 3].map(i => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <div className="animate-pulse space-y-3">
-                <div className="h-4 bg-muted rounded w-3/4"></div>
-                <div className="h-3 bg-muted rounded w-1/2"></div>
-                <div className="h-20 bg-muted rounded"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <LoadingState
+        variant="page"
+        text="Chargement de votre journal..."
+        skeletonCount={3}
+        className="min-h-[320px]"
+      />
     );
   }
 
@@ -189,15 +222,13 @@ const JournalInterface: React.FC = () => {
       {/* Entries List */}
       <div className="space-y-4">
         {entries.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <p className="text-muted-foreground">Votre journal est vide</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Commencez par écrire votre première entrée
-              </p>
-            </CardContent>
-          </Card>
+          <UnifiedEmptyState
+            variant="card"
+            icon={BookOpen}
+            title="Votre journal est vide"
+            description="Commencez par écrire votre première entrée pour suivre votre évolution émotionnelle."
+            animated={false}
+          />
         ) : (
           entries.map((entry) => (
             <motion.div

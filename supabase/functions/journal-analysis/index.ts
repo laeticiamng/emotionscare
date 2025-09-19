@@ -1,9 +1,25 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import sanitizeHtml from "npm:sanitize-html@2.17.0";
+import { buildRateLimitResponse, enforceEdgeRateLimit } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const sanitizeUserContent = (input?: unknown): string => {
+  if (!input || typeof input !== 'string') {
+    return '';
+  }
+
+  const sanitized = sanitizeHtml(input, { allowedTags: [], allowedAttributes: {} });
+  return sanitized
+    .replace(/\u00a0/g, ' ')
+    .split('\n')
+    .map((line) => line.trim())
+    .join('\n')
+    .trim();
 };
 
 interface JournalAnalysisRequest {
@@ -29,7 +45,37 @@ serve(async (req) => {
   }
 
   try {
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'journal-analysis',
+      limit: 6,
+      windowMs: 60_000,
+      description: 'journal-analysis-request',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Veuillez patienter avant de réessayer.',
+      });
+    }
+
     const body = await req.json() as JournalAnalysisRequest;
+    const sanitizedEntry = sanitizeUserContent(body?.entry);
+    const sanitizedHistory = Array.isArray(body?.previous_entries)
+      ? body.previous_entries
+          .map((entry) => sanitizeUserContent(entry))
+          .filter((entry) => entry.length > 0)
+          .slice(-3)
+      : [];
+
+    if (!sanitizedEntry) {
+      return new Response(JSON.stringify({
+        error: 'Journal entry is required',
+        success: false
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     console.log('📔 Analyzing journal entry with OpenAI');
 
     const analysisType = body.analysis_type || 'comprehensive';
@@ -89,6 +135,7 @@ serve(async (req) => {
       }`
     };
 
+    const userEntryMessage = `Voici l'entrée de journal à analyser: "${sanitizedEntry}"`;
     let messages = [
       {
         role: 'system',
@@ -96,15 +143,15 @@ serve(async (req) => {
       },
       {
         role: 'user',
-        content: `Voici l'entrée de journal à analyser: "${body.entry}"`
+        content: userEntryMessage
       }
     ];
 
     // Ajouter le contexte des entrées précédentes si disponible
-    if (body.previous_entries && body.previous_entries.length > 0) {
+    if (sanitizedHistory.length > 0) {
       messages.push({
         role: 'user',
-        content: `Contexte des entrées précédentes: ${body.previous_entries.join(' | ')}`
+        content: `Contexte des entrées précédentes: ${sanitizedHistory.join(' | ')}`
       });
     }
 
@@ -131,15 +178,34 @@ serve(async (req) => {
 
     const result = await response.json();
     const analysis = JSON.parse(result.choices[0].message.content);
+    const sanitizeStructure = (value: unknown): unknown => {
+      if (typeof value === 'string') {
+        return sanitizeUserContent(value);
+      }
+
+      if (Array.isArray(value)) {
+        return value.map((item) => sanitizeStructure(item));
+      }
+
+      if (value && typeof value === 'object') {
+        return Object.fromEntries(
+          Object.entries(value as Record<string, unknown>).map(([key, val]) => [key, sanitizeStructure(val)])
+        );
+      }
+
+      return value;
+    };
+
+    const safeAnalysis = sanitizeStructure(analysis) as typeof analysis;
     
     console.log('✅ Journal analysis completed');
 
     const formattedResponse = {
       success: true,
       data: {
-        ...analysis,
+        ...safeAnalysis,
         analysis_type: analysisType,
-        entry_length: body.entry.length,
+        entry_length: sanitizedEntry.length,
         analysis_timestamp: new Date().toISOString(),
         model_used: 'gpt-4o-mini',
         has_historical_context: !!(body.previous_entries && body.previous_entries.length > 0)

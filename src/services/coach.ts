@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface CoachPersonality {
   name: string;
@@ -116,7 +117,7 @@ class CoachService {
         updated_at: data.updated_at
       };
     } catch (error) {
-      console.error('Error starting coaching session:', error);
+      logger.error('Error starting coaching session', error, 'coach.legacy');
       throw new Error('Impossible de démarrer la session de coaching');
     }
   }
@@ -190,7 +191,7 @@ class CoachService {
         emotionAnalysis: data.emotion_analysis
       };
     } catch (error) {
-      console.error('Error sending message to coach:', error);
+      logger.error('Error sending message to coach', error, 'coach.legacy');
       throw new Error('Impossible de communiquer avec le coach');
     }
   }
@@ -258,7 +259,7 @@ class CoachService {
         updated_at: session.updated_at
       }));
     } catch (error) {
-      console.error('Error fetching coaching sessions:', error);
+      logger.error('Error fetching coaching sessions', error, 'coach.legacy');
       return [];
     }
   }
@@ -291,7 +292,7 @@ class CoachService {
 
       return data;
     } catch (error) {
-      console.error('Error analyzing coaching progress:', error);
+      logger.error('Error analyzing coaching progress', error, 'coach.legacy');
       return {
         total_sessions: 0,
         average_session_length: 0,
@@ -346,7 +347,7 @@ class CoachService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error saving coaching messages:', error);
+      logger.error('Error saving coaching messages', error, 'coach.legacy');
     }
   }
 

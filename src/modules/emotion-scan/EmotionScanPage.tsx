@@ -3,7 +3,12 @@ import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageHeader, Card, Button, ProgressBar, Sparkline } from "@/COMPONENTS.reg"; // ProgressBar/Sparkline ajoutés en P6
 import { recordEvent } from "@/lib/scores/events"; // si P6 non intégré, cet import peut être ignoré (no-op)
+import { logger } from "@/lib/logger";
 import { useAuth } from "@/contexts/AuthContext";
+import { useError } from "@/contexts";
+import { LoadingState } from "@/components/loading/LoadingState";
+import { UnifiedEmptyState } from "@/components/ui/unified-empty-state";
+import { History } from "lucide-react";
 import {
   invokeEmotionScan,
   getEmotionScanHistory,
@@ -73,6 +78,7 @@ export default function EmotionScanPage() {
 
   const { user, session } = useAuth();
   const queryClient = useQueryClient();
+  const { addError } = useError();
 
   React.useEffect(() => {
     if (!user?.id) {
@@ -85,6 +91,18 @@ export default function EmotionScanPage() {
     queryFn: () => getEmotionScanHistory(user!.id, 12),
     enabled: Boolean(user?.id),
     staleTime: 60 * 1000,
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Impossible de charger l'historique des scans";
+      addError({
+        message,
+        severity: "medium",
+        stack: error instanceof Error ? error.stack : undefined,
+        context: {
+          scope: "emotion-scan-history",
+          userId: user?.id ?? "anonymous",
+        },
+      });
+    },
   });
 
   const historyEntries: EmotionScanHistoryEntry[] = React.useMemo(
@@ -141,7 +159,20 @@ export default function EmotionScanPage() {
               previousEmotions: variables.previousEmotions ?? null,
             });
           } catch (persistError) {
-            console.error("Failed to persist emotion scan result", persistError);
+            logger.error("Failed to persist emotion scan result", persistError, "emotion-scan.ui");
+            const message =
+              persistError instanceof Error
+                ? persistError.message
+                : "Impossible d'enregistrer le résultat du scan émotionnel";
+            addError({
+              message,
+              severity: "medium",
+              stack: persistError instanceof Error ? persistError.stack : undefined,
+              context: {
+                scope: "emotion-scan-persist",
+                userId: user?.id ?? "anonymous",
+              },
+            });
           }
         }
 
@@ -158,9 +189,19 @@ export default function EmotionScanPage() {
       }
     },
     onError: (error: unknown) => {
-      console.error("Emotion scan analysis failed", error);
+      logger.error("Emotion scan analysis failed", error, "emotion-scan.ui");
       setAnalysis(null);
-      setErrorMessage(error instanceof Error ? error.message : "Analyse impossible pour le moment");
+      const message = error instanceof Error ? error.message : "Analyse impossible pour le moment";
+      setErrorMessage(message);
+      addError({
+        message,
+        severity: "high",
+        stack: error instanceof Error ? error.stack : undefined,
+        context: {
+          scope: "emotion-scan-analyze",
+          userId: user?.id ?? "anonymous",
+        },
+      });
     },
   });
 
@@ -315,7 +356,12 @@ export default function EmotionScanPage() {
           <section aria-label="Historique des scans" style={{ display: "grid", gap: 8 }}>
             <h3>Historique des 12 derniers scans</h3>
             {historyLoading && user?.id ? (
-              <p style={{ color: "var(--muted-foreground)" }}>Chargement de votre historique…</p>
+              <LoadingState
+                variant="section"
+                text="Chargement de votre historique émotionnel..."
+                skeletonCount={2}
+                className="w-full"
+              />
             ) : sparklineValues.length ? (
               <div style={{ display: "grid", gap: 8 }}>
                 <Sparkline values={sparklineValues} width={320} height={56} />
@@ -331,7 +377,14 @@ export default function EmotionScanPage() {
                 )}
               </div>
             ) : (
-              <p style={{ color: "var(--muted-foreground)" }}>Aucun historique disponible pour le moment.</p>
+              <UnifiedEmptyState
+                variant="minimal"
+                size="sm"
+                icon={History}
+                title="Aucun historique pour le moment"
+                description="Réalisez un scan émotionnel pour suivre votre progression."
+                animated={false}
+              />
             )}
           </section>
         </Card>

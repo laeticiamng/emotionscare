@@ -1,5 +1,25 @@
-
+import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
+import { logger } from '@/lib/logger';
+
+const CoachMessagePayloadSchema = z.object({
+  message: z.string().min(1),
+  emotion: z.string().optional(),
+});
+
+const CoachResponseSchema = z.object({
+  response: z.string(),
+  suggestions: z.array(z.string()).optional(),
+});
+
+const RecommendationsPayloadSchema = z.object({
+  emotion: z.string().optional(),
+});
+
+const RecommendationsResponseSchema = z.object({
+  recommendations: z.array(z.string()).optional(),
+});
 
 export interface CoachMessage {
   id: string;
@@ -13,18 +33,32 @@ export interface CoachMessage {
 export class CoachService {
   static async sendMessage(message: string, emotion?: string): Promise<CoachMessage> {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-coach', {
-        body: { message, emotion }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const payload = { message, emotion };
+      const data = await invokeSupabaseEdge<typeof payload, unknown>('ai-coach', {
+        payload,
+        schema: CoachMessagePayloadSchema,
+        accessToken: session?.access_token,
+        timeoutMs: 15_000,
+        retries: 2,
+        retryDelayMs: 1_000,
       });
 
-      if (error) throw error;
+      const parsed = CoachResponseSchema.safeParse(data);
+      if (!parsed.success) {
+        logger.error('Invalid payload received from ai-coach', parsed.error.format(), 'coach.service');
+        throw new Error('Réponse du coach invalide');
+      }
 
       const botMessage: CoachMessage = {
         id: Date.now().toString(),
-        content: data.response,
+        content: parsed.data.response,
         isBot: true,
         timestamp: new Date(),
-        suggestions: data.suggestions
+        suggestions: parsed.data.suggestions,
       };
 
       // Sauvegarder la conversation
@@ -32,7 +66,7 @@ export class CoachService {
 
       return botMessage;
     } catch (error) {
-      console.error('Erreur coach IA:', error);
+      logger.error('Erreur coach IA', error, 'coach.service');
       throw new Error('Erreur lors de la communication avec le coach');
     }
   }
@@ -56,7 +90,7 @@ export class CoachService {
         emotion: conv.emotion
       }));
     } catch (error) {
-      console.error('Erreur historique conversation:', error);
+      logger.error('Erreur historique conversation', error, 'coach.service');
       return [];
     }
   }
@@ -80,27 +114,44 @@ export class CoachService {
         is_bot: true
       });
     } catch (error) {
-      console.error('Erreur sauvegarde conversation:', error);
+      logger.error('Erreur sauvegarde conversation', error, 'coach.service');
     }
   }
 
   static async getPersonalizedRecommendations(emotion?: string): Promise<string[]> {
     try {
-      const { data, error } = await supabase.functions.invoke('get-coach-recommendations', {
-        body: { emotion }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const payload = { emotion };
+      const data = await invokeSupabaseEdge<typeof payload, unknown>('get-coach-recommendations', {
+        payload,
+        schema: RecommendationsPayloadSchema,
+        accessToken: session?.access_token,
+        timeoutMs: 8_000,
+        retries: 1,
       });
 
-      if (error) throw error;
+      const parsed = RecommendationsResponseSchema.safeParse(data);
+      if (!parsed.success) {
+        logger.error('Invalid recommendations payload', parsed.error.format(), 'coach.service');
+        return DEFAULT_RECOMMENDATIONS;
+      }
 
-      return data.recommendations || [];
+      return parsed.data.recommendations && parsed.data.recommendations.length
+        ? parsed.data.recommendations
+        : DEFAULT_RECOMMENDATIONS;
     } catch (error) {
-      console.error('Erreur recommandations:', error);
-      return [
-        'Prenez quelques minutes pour respirer profondément',
-        'Essayez une courte méditation de 5 minutes',
-        'Écoutez de la musique relaxante',
-        'Prenez une pause et sortez prendre l\'air'
-      ];
+      logger.error('Erreur recommandations', error, 'coach.service');
+      return DEFAULT_RECOMMENDATIONS;
     }
   }
 }
+
+const DEFAULT_RECOMMENDATIONS = [
+  'Prenez quelques minutes pour respirer profondément',
+  'Essayez une courte méditation de 5 minutes',
+  'Écoutez de la musique relaxante',
+  'Prenez une pause et sortez prendre l\'air',
+];

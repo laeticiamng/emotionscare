@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useId, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -22,8 +22,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { LoadingState } from "@/components/loading/LoadingState";
+import { UnifiedEmptyState } from "@/components/ui/unified-empty-state";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useError } from "@/contexts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -121,10 +124,104 @@ const HeatmapCell = ({ cx, cy, fill }: { cx?: number; cy?: number; fill?: string
   );
 };
 
+const HeatmapTable: React.FC<{ data: HeatmapPoint[]; descriptionId?: string }> = ({ data, descriptionId }) => {
+  const days = useMemo(() => Array.from(new Set(data.map(point => point.day))), [data]);
+  const slots = useMemo(() => Array.from(new Set(data.map(point => point.slot))), [data]);
+  const grid = useMemo(() => {
+    const lookup = new Map<string, HeatmapPoint>();
+    data.forEach(point => {
+      lookup.set(`${point.day}-${point.slot}`, point);
+    });
+    return lookup;
+  }, [data]);
+
+  if (data.length === 0) {
+    return null;
+  }
+
+  return (
+    <details
+      className="rounded-lg border bg-muted/40 p-4 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label="Données tabulaires de la heatmap"
+      aria-describedby={descriptionId}
+    >
+      <summary className="cursor-pointer font-medium focus:outline-none focus-visible:ring-0">
+        Vue tabulaire accessible
+      </summary>
+      <div className="mt-3 overflow-x-auto">
+        <table className="min-w-full border-collapse text-left" role="table">
+          <caption className="sr-only">
+            Répartition détaillée des sessions par jour et par créneau avec intensité et humeur dominante.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Jour / Créneau
+              </th>
+              {slots.map(slot => (
+                <th
+                  key={slot}
+                  scope="col"
+                  className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                >
+                  {slot}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {days.map(day => (
+              <tr key={day} className="border-t border-border/40">
+                <th scope="row" className="px-3 py-2 text-sm font-medium text-foreground">
+                  {day}
+                </th>
+                {slots.map(slot => {
+                  const point = grid.get(`${day}-${slot}`);
+                  if (!point) {
+                    return (
+                      <td key={`${day}-${slot}`} className="px-3 py-2 text-sm text-muted-foreground">
+                        0 séance
+                      </td>
+                    );
+                  }
+
+                  return (
+                    <td key={`${day}-${slot}`} className="px-3 py-2 align-top text-sm text-foreground">
+                      <span className="block font-medium">
+                        {point.sessions} {point.sessions > 1 ? 'séances' : 'séance'}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        Intensité {point.intensity}/100 — {point.dominantMood}
+                      </span>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  );
+};
+
 const ScoresV2Panel: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { addError } = useError();
+
+  const moodHeadingId = useId();
+  const moodDescriptionId = useId();
+  const moodFigureDescriptionId = useId();
+  const sessionsHeadingId = useId();
+  const sessionsDescriptionId = useId();
+  const sessionsFigureDescriptionId = useId();
+  const heatmapHeadingId = useId();
+  const heatmapDescriptionId = useId();
+  const heatmapFigureDescriptionId = useId();
+  const heatmapLegendDescriptionId = useId();
+  const heatmapTableDescriptionId = useId();
 
   useEffect(() => {
     ensureResizeObserver();
@@ -135,7 +232,21 @@ const ScoresV2Panel: React.FC = () => {
     queryFn: () => fetchScoresDashboard(user!.id),
     enabled: Boolean(user?.id),
     staleTime: 60_000,
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : 'Impossible de charger le tableau de bord des scores';
+      addError({
+        message,
+        severity: 'high',
+        stack: err instanceof Error ? err.stack : undefined,
+        context: {
+          scope: 'scores-dashboard',
+          userId: user?.id ?? 'anonymous',
+        },
+      });
+    },
   });
+
+  const isInitialLoading = isFetching && !data;
 
   const dataset = data ?? SCORES_DASHBOARD_FALLBACK;
   const summary = dataset.summary;
@@ -195,13 +306,47 @@ const ScoresV2Panel: React.FC = () => {
         description: exportError,
         variant: 'destructive',
       });
+      addError({
+        message: exportError,
+        severity: 'medium',
+        context: {
+          scope: 'scores-export',
+          userId: user?.id ?? 'anonymous',
+        },
+      });
       resetError();
     }
-  }, [exportError, resetError, toast]);
+  }, [addError, exportError, resetError, toast, user?.id]);
 
   const moodChartRef = React.useRef<HTMLDivElement>(null);
   const sessionsChartRef = React.useRef<HTMLDivElement>(null);
   const heatmapChartRef = React.useRef<HTMLDivElement>(null);
+
+  if (!user?.id) {
+    return (
+      <section aria-label="Scores V2" className="py-10">
+        <UnifiedEmptyState
+          variant="card"
+          title="Connectez-vous pour voir vos scores"
+          description="Vos indicateurs personnalisés apparaîtront dès que vous enregistrerez vos premières activités."
+          animated={false}
+        />
+      </section>
+    );
+  }
+
+  if (isInitialLoading) {
+    return (
+      <section aria-label="Scores V2" className="py-10">
+        <LoadingState
+          variant="page"
+          text="Chargement de vos scores personnalisés..."
+          skeletonCount={4}
+          className="min-h-[420px]"
+        />
+      </section>
+    );
+  }
 
   const handleRefresh = () => {
     if (user?.id) {
@@ -224,9 +369,34 @@ const ScoresV2Panel: React.FC = () => {
   const mostIntenseSessionsLabel = mostIntenseSlot.sessions > 1 ? 'séances' : 'séance';
   const mostIntenseMoodLabel = mostIntenseSlot.dominantMood.toLowerCase();
 
+  const moodSummaryText = useMemo(
+    () =>
+      `Humeur moyenne ${formattedMoodAverage}/10, variation ${formattedMoodVariation} et pic le ${bestMoodLabel}.`,
+    [bestMoodLabel, formattedMoodAverage, formattedMoodVariation]
+  );
+
+  const sessionsSummaryText = useMemo(
+    () =>
+      `Moyenne hebdomadaire de ${averageSessionsLabel} séances, maximum observé semaine ${lastWeekLabel} et ${lastWeekGuided} séances guidées.`,
+    [averageSessionsLabel, lastWeekGuided, lastWeekLabel]
+  );
+
+  const heatmapSummaryText = useMemo(
+    () =>
+      `Créneau le plus intense ${mostIntenseSlot.day} ${mostIntenseSlot.slot} avec ${mostIntenseSlot.sessions} ${mostIntenseSessionsLabel} (${mostIntenseSlot.dominantMood.toLowerCase()}).`,
+    [mostIntenseSessionsLabel, mostIntenseSlot.day, mostIntenseSlot.dominantMood, mostIntenseSlot.sessions, mostIntenseSlot.slot]
+  );
+
+  const heatmapLegendSummary = 'Légende d’intensité de gauche à droite : intense, élevé, modéré, calme et repos.';
+
+  const moodLabelledBy = `${moodHeadingId} ${moodDescriptionId}`.trim();
+  const sessionsLabelledBy = `${sessionsHeadingId} ${sessionsDescriptionId}`.trim();
+  const heatmapLabelledBy = `${heatmapHeadingId} ${heatmapDescriptionId}`.trim();
+  const heatmapFigureDescribedBy = `${heatmapFigureDescriptionId} ${heatmapLegendDescriptionId}`.trim();
+
   return (
     <section aria-label="Scores V2" className="space-y-8">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between" id="dashboard-actions">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold tracking-tight">Scores</h1>
           <p className="text-muted-foreground">Progression, streaks et badges</p>
@@ -263,8 +433,8 @@ const ScoresV2Panel: React.FC = () => {
           <CardHeader className="pb-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <CardTitle>Évolution de l'humeur</CardTitle>
-                <CardDescription>30 derniers jours, corrélation énergie & activités</CardDescription>
+                <CardTitle id={moodHeadingId}>Évolution de l'humeur</CardTitle>
+                <CardDescription id={moodDescriptionId}>30 derniers jours, corrélation énergie & activités</CardDescription>
               </div>
               <Button
                 variant="ghost"
@@ -301,18 +471,26 @@ const ScoresV2Panel: React.FC = () => {
               </div>
             </div>
             {moodTrendData.length ? (
-              <div
-                ref={moodChartRef}
-                className="h-[280px] w-full"
-                data-testid="scores-mood-chart"
+              <figure
+                aria-labelledby={moodLabelledBy}
+                aria-describedby={moodFigureDescriptionId}
+                role="group"
               >
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={moodTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
-                    <XAxis dataKey="date" stroke={axisColor} tickFormatter={formatDate} />
-                    <YAxis stroke={axisColor} domain={[0, 10]} tickCount={6} />
-                    <Tooltip content={<MoodTooltip />} cursor={{ stroke: "rgba(99, 102, 241, 0.35)" }} />
-                    <Legend />
+                <div
+                  ref={moodChartRef}
+                  className="h-[280px] w-full"
+                  data-testid="scores-mood-chart"
+                  role="img"
+                  aria-labelledby={moodLabelledBy}
+                  aria-describedby={moodFigureDescriptionId}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={moodTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
+                      <XAxis dataKey="date" stroke={axisColor} tickFormatter={formatDate} />
+                      <YAxis stroke={axisColor} domain={[0, 10]} tickCount={6} />
+                      <Tooltip content={<MoodTooltip />} cursor={{ stroke: "rgba(99, 102, 241, 0.35)" }} />
+                      <Legend />
                     <Line
                       type="monotone"
                       dataKey="mood"
@@ -333,11 +511,20 @@ const ScoresV2Panel: React.FC = () => {
                     />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
+                </div>
+                <figcaption id={moodFigureDescriptionId} className="sr-only">
+                  {moodSummaryText}
+                </figcaption>
+              </figure>
             ) : (
-              <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-                Aucune donnée émotionnelle pour le moment.
-              </div>
+              <UnifiedEmptyState
+                variant="minimal"
+                size="sm"
+                icon={TrendingUp}
+                title="Aucune donnée émotionnelle disponible"
+                description="Effectuez vos premières séances pour visualiser votre courbe d'émotions."
+                animated={false}
+              />
             )}
           </CardContent>
         </Card>
@@ -381,8 +568,8 @@ const ScoresV2Panel: React.FC = () => {
           <CardHeader className="pb-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <CardTitle>Séances par semaine</CardTitle>
-                <CardDescription>Répartition guidée, respiration, VR et journal</CardDescription>
+                <CardTitle id={sessionsHeadingId}>Séances par semaine</CardTitle>
+                <CardDescription id={sessionsDescriptionId}>Répartition guidée, respiration, VR et journal</CardDescription>
               </div>
               <Button
                 variant="ghost"
@@ -411,32 +598,49 @@ const ScoresV2Panel: React.FC = () => {
               </div>
             </div>
             {weeklySessions.length ? (
-              <div
-                ref={sessionsChartRef}
-                className="h-[280px] w-full"
-                data-testid="scores-sessions-chart"
+              <figure
+                aria-labelledby={sessionsLabelledBy}
+                aria-describedby={sessionsFigureDescriptionId}
+                role="group"
               >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={weeklySessions} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
-                    <XAxis dataKey="week" stroke={axisColor} />
-                    <YAxis stroke={axisColor} allowDecimals={false} />
-                    <Tooltip
-                      cursor={{ fill: "rgba(129, 140, 248, 0.1)" }}
-                      contentStyle={{ borderRadius: "0.75rem", borderColor: "rgba(148,163,184,0.4)", boxShadow: "0 10px 30px rgba(15, 23, 42, 0.15)" }}
-                    />
-                    <Legend />
-                    <Bar dataKey="guided" stackId="sessions" name="Guidées" fill={sessionPalette.guided} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="breathwork" stackId="sessions" name="Respiration" fill={sessionPalette.breathwork} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="vr" stackId="sessions" name="VR" fill={sessionPalette.vr} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="journaling" stackId="sessions" name="Journal" fill={sessionPalette.journaling} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+                <div
+                  ref={sessionsChartRef}
+                  className="h-[280px] w-full"
+                  data-testid="scores-sessions-chart"
+                  role="img"
+                  aria-labelledby={sessionsLabelledBy}
+                  aria-describedby={sessionsFigureDescriptionId}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={weeklySessions} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
+                      <XAxis dataKey="week" stroke={axisColor} />
+                      <YAxis stroke={axisColor} allowDecimals={false} />
+                      <Tooltip
+                        cursor={{ fill: "rgba(129, 140, 248, 0.1)" }}
+                        contentStyle={{ borderRadius: "0.75rem", borderColor: "rgba(148,163,184,0.4)", boxShadow: "0 10px 30px rgba(15, 23, 42, 0.15)" }}
+                      />
+                      <Legend />
+                      <Bar dataKey="guided" stackId="sessions" name="Guidées" fill={sessionPalette.guided} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="breathwork" stackId="sessions" name="Respiration" fill={sessionPalette.breathwork} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="vr" stackId="sessions" name="VR" fill={sessionPalette.vr} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="journaling" stackId="sessions" name="Journal" fill={sessionPalette.journaling} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <figcaption id={sessionsFigureDescriptionId} className="sr-only">
+                  {sessionsSummaryText}
+                </figcaption>
+              </figure>
             ) : (
-              <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
-                Aucune session enregistrée pour le moment.
-              </div>
+              <UnifiedEmptyState
+                variant="minimal"
+                size="sm"
+                icon={CalendarRange}
+                title="Aucune session enregistrée"
+                description="Planifiez ou complétez une activité pour alimenter vos statistiques hebdomadaires."
+                animated={false}
+              />
             )}
           </CardContent>
         </Card>
@@ -474,8 +678,8 @@ const ScoresV2Panel: React.FC = () => {
         <CardHeader className="pb-0">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle>Heatmap Vibes</CardTitle>
-              <CardDescription>Intensité émotionnelle par moment clé de la journée</CardDescription>
+              <CardTitle id={heatmapHeadingId}>Heatmap Vibes</CardTitle>
+              <CardDescription id={heatmapDescriptionId}>Intensité émotionnelle par moment clé de la journée</CardDescription>
             </div>
             <Button
               variant="ghost"
@@ -489,39 +693,69 @@ const ScoresV2Panel: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div
-            ref={heatmapChartRef}
-            className="h-[320px] w-full"
-            data-testid="scores-heatmap-chart"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 20, right: 20, bottom: 10, left: 20 }}>
-                <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
-                <XAxis type="category" dataKey="slot" stroke={axisColor} allowDuplicatedCategory={false} />
-                <YAxis type="category" dataKey="day" stroke={axisColor} width={60} />
-                <Tooltip content={<HeatmapTooltip />} cursor={{ stroke: "rgba(148, 163, 184, 0.4)", strokeWidth: 1 }} />
-                <Scatter data={heatmapData} shape={(props) => <HeatmapCell {...props} />}>
-                  {heatmapData.map((entry) => (
-                    <Cell key={`${entry.day}-${entry.slot}`} fill={getHeatmapColor(entry.intensity)} />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            {[
-              { label: "Intense", value: 85 },
-              { label: "Élevé", value: 65 },
-              { label: "Modéré", value: 50 },
-              { label: "Calme", value: 30 },
-              { label: "Repos", value: 10 },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex items-center gap-2">
-                <span className="h-3 w-6 rounded-full" style={{ backgroundColor: getHeatmapColor(value) }} />
-                <span>{label}</span>
+          {heatmapData.length ? (
+            <>
+              <figure
+                aria-labelledby={heatmapLabelledBy}
+                aria-describedby={heatmapFigureDescribedBy}
+                role="group"
+              >
+                <div
+                  ref={heatmapChartRef}
+                  className="h-[320px] w-full"
+                  data-testid="scores-heatmap-chart"
+                  role="img"
+                  aria-labelledby={heatmapLabelledBy}
+                  aria-describedby={heatmapFigureDescribedBy}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ScatterChart margin={{ top: 20, right: 20, bottom: 10, left: 20 }}>
+                      <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
+                      <XAxis type="category" dataKey="slot" stroke={axisColor} allowDuplicatedCategory={false} />
+                      <YAxis type="category" dataKey="day" stroke={axisColor} width={60} />
+                      <Tooltip content={<HeatmapTooltip />} cursor={{ stroke: "rgba(148, 163, 184, 0.4)", strokeWidth: 1 }} />
+                      <Scatter data={heatmapData} shape={(props) => <HeatmapCell {...props} />}>
+                        {heatmapData.map((entry) => (
+                          <Cell key={`${entry.day}-${entry.slot}`} fill={getHeatmapColor(entry.intensity)} />
+                        ))}
+                      </Scatter>
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </div>
+                <figcaption id={heatmapFigureDescriptionId} className="sr-only">
+                  {heatmapSummaryText}
+                </figcaption>
+              </figure>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground" id={heatmapLegendDescriptionId}>
+                <span className="sr-only">{heatmapLegendSummary}</span>
+                {[
+                  { label: "Intense", value: 85 },
+                  { label: "Élevé", value: 65 },
+                  { label: "Modéré", value: 50 },
+                  { label: "Calme", value: 30 },
+                  { label: "Repos", value: 10 },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span className="h-3 w-6 rounded-full" style={{ backgroundColor: getHeatmapColor(value) }} />
+                    <span>{label}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <p id={heatmapTableDescriptionId} className="sr-only">
+                Vue tabulaire décrivant les intensités et nombres de séances pour chaque moment de la semaine.
+              </p>
+              <HeatmapTable data={heatmapData} descriptionId={heatmapTableDescriptionId} />
+            </>
+          ) : (
+            <UnifiedEmptyState
+              variant="minimal"
+              size="sm"
+              icon={Sparkles}
+              title="Pas encore de heatmap"
+              description="La carte de chaleur se remplira dès que plusieurs activités auront été enregistrées."
+              animated={false}
+            />
+          )}
         </CardContent>
       </Card>
     </section>

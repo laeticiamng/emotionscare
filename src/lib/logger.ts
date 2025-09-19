@@ -1,7 +1,9 @@
 /**
- * Production-safe logger utility
- * Replaces console.log calls with a proper logging system
+ * Production-safe logger utility with PII scrubbing
+ * Replaces console.log calls with a structured logging system
  */
+
+import * as Sentry from '@sentry/react';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -9,22 +11,94 @@ interface LogEntry {
   timestamp: string;
   level: LogLevel;
   message: string;
-  data?: any;
+  data?: unknown;
   context?: string;
 }
+
+const SENSITIVE_KEYWORDS = [
+  'token',
+  'secret',
+  'password',
+  'authorization',
+  'cookie',
+  'session',
+  'email',
+  'phone',
+  'address',
+  'name',
+  'user',
+  'userid',
+  'id',
+  'text',
+  'message',
+  'content',
+  'body',
+  'summary',
+];
+
+const EMAIL_REGEX = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+const TOKEN_REGEX = /(bearer\s+[A-Z0-9\-_.+/=]+)|([A-Z0-9]{16,})/gi;
+
+const redactString = (value: string, shouldRedactFully: boolean): string => {
+  const sanitized = value
+    .replace(EMAIL_REGEX, '[redacted-email]')
+    .replace(TOKEN_REGEX, (match) => (match.toLowerCase().startsWith('bearer') ? 'Bearer [redacted]' : '[redacted-token]'));
+
+  if (shouldRedactFully) {
+    return sanitized.length <= 4 ? '[redacted]' : `${sanitized.slice(0, 4)}…[redacted]`;
+  }
+
+  return sanitized.length > 512 ? `${sanitized.slice(0, 512)}…` : sanitized;
+};
 
 class Logger {
   private isDevelopment = import.meta.env.MODE === 'development';
   private logs: LogEntry[] = [];
   private maxLogs = 1000; // Keep last 1000 logs in memory
 
-  private createLogEntry(level: LogLevel, message: string, data?: any, context?: string): LogEntry {
+  private shouldRedact(keyPath: string[]): boolean {
+    return keyPath.some((key) => SENSITIVE_KEYWORDS.some((keyword) => key.includes(keyword)));
+  }
+
+  private sanitize(value: unknown, keyPath: string[] = []): unknown {
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (Array.isArray(value)) {
+      return value.slice(0, 20).map((item) => this.sanitize(item, keyPath));
+    }
+
+    if (typeof value === 'object') {
+      return Object.entries(value as Record<string, unknown>).reduce<Record<string, unknown>>((acc, [key, val]) => {
+        const nextPath = [...keyPath, key.toLowerCase()];
+        acc[key] = this.sanitize(val, nextPath);
+        return acc;
+      }, {});
+    }
+
+    if (typeof value === 'string') {
+      return redactString(value, this.shouldRedact(keyPath));
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return this.shouldRedact(keyPath) ? '[redacted]' : value;
+    }
+
+    return value;
+  }
+
+  private createLogEntry(level: LogLevel, message: string, data?: unknown, context?: string): LogEntry {
     return {
       timestamp: new Date().toISOString(),
       level,
       message,
-      data,
-      context
+      data: this.sanitize(data),
+      context,
     };
   }
 
@@ -35,61 +109,97 @@ class Logger {
     }
   }
 
-  debug(message: string, data?: any, context?: string) {
+  private reportToMonitoring(entry: LogEntry) {
+    try {
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) {
+        return;
+      }
+
+      Sentry.withScope((scope) => {
+        if (entry.context) {
+          scope.setTag('logger.context', entry.context);
+        }
+        if (entry.data) {
+          scope.setExtras({ data: entry.data });
+        }
+
+        const levelMap: Record<LogLevel, Sentry.SeverityLevel> = {
+          debug: 'debug',
+          info: 'info',
+          warn: 'warning',
+          error: 'error',
+        };
+
+        Sentry.captureMessage(entry.message, levelMap[entry.level]);
+      });
+    } catch (err) {
+      if (this.isDevelopment) {
+        console.warn('[Logger] Failed to report to monitoring service', err);
+      }
+    }
+  }
+
+  private output(level: LogLevel, message: string, data?: unknown) {
+    const args: unknown[] = [`[${level.toUpperCase()}] ${message}`];
+    if (data !== undefined) {
+      args.push(data);
+    }
+
+    switch (level) {
+      case 'debug':
+        if (this.isDevelopment) {
+          console.debug(...args);
+        }
+        break;
+      case 'info':
+        if (this.isDevelopment) {
+          console.info(...args);
+        }
+        break;
+      case 'warn':
+        console.warn(...args);
+        break;
+      case 'error':
+        console.error(...args);
+        break;
+      default:
+        console.log(...args);
+    }
+  }
+
+  debug(message: string, data?: unknown, context?: string) {
     const entry = this.createLogEntry('debug', message, data, context);
     this.storeLog(entry);
-    
-    if (this.isDevelopment) {
-      console.log(`[DEBUG] ${message}`, data || '');
-    }
+    this.output('debug', message, entry.data);
   }
 
-  info(message: string, data?: any, context?: string) {
+  info(message: string, data?: unknown, context?: string) {
     const entry = this.createLogEntry('info', message, data, context);
     this.storeLog(entry);
-    
-    if (this.isDevelopment) {
-      console.info(`[INFO] ${message}`, data || '');
-    }
+    this.output('info', message, entry.data);
   }
 
-  warn(message: string, data?: any, context?: string) {
+  warn(message: string, data?: unknown, context?: string) {
     const entry = this.createLogEntry('warn', message, data, context);
     this.storeLog(entry);
-    
-    console.warn(`[WARN] ${message}`, data || '');
-  }
-
-  error(message: string, data?: any, context?: string) {
-    const entry = this.createLogEntry('error', message, data, context);
-    this.storeLog(entry);
-    
-    console.error(`[ERROR] ${message}`, data || '');
-    
-    // In production, could send to monitoring service
+    this.output('warn', message, entry.data);
     if (!this.isDevelopment) {
       this.reportToMonitoring(entry);
     }
   }
 
-  private reportToMonitoring(entry: LogEntry) {
-    // Placeholder for production monitoring integration
-    // Could integrate with Sentry, LogRocket, etc.
-    try {
-      // Example: Send to monitoring service
-      // await fetch('/api/logs', { 
-      //   method: 'POST', 
-      //   body: JSON.stringify(entry) 
-      // });
-    } catch (err) {
-      // Silent fail for monitoring errors
-    }
+  error(message: string, data?: unknown, context?: string) {
+    const entry = this.createLogEntry('error', message, data, context);
+    this.storeLog(entry);
+    this.output('error', message, entry.data);
+    this.reportToMonitoring(entry);
   }
 
   // Get recent logs for debugging
   getLogs(level?: LogLevel): LogEntry[] {
     if (level) {
-      return this.logs.filter(log => log.level === level);
+      return this.logs.filter((log) => log.level === level);
     }
     return [...this.logs];
   }

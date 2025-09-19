@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import useOpenAI from '@/hooks/api/useOpenAI';
 import useWhisper from '@/hooks/api/useWhisper';
+import { sanitizeUserContent } from '@/lib/security/sanitize';
 
 interface Message {
   id: string;
@@ -39,11 +40,16 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   useEffect(() => {
     // Add initial message
     if (initialMessage) {
+      const sanitizedInitial = sanitizeUserContent(initialMessage);
+      if (!sanitizedInitial) {
+        return;
+      }
+
       setMessages([
         {
           id: 'initial',
           role: 'assistant',
-          content: initialMessage,
+          content: sanitizedInitial,
           timestamp: new Date()
         }
       ]);
@@ -58,38 +64,55 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   useEffect(() => {
     // Add transcribed text to input
     if (transcript) {
-      setInputMessage(prev => prev + transcript);
+      const sanitizedTranscript = sanitizeUserContent(transcript);
+      if (!sanitizedTranscript) {
+        return;
+      }
+
+      setInputMessage(prev => `${prev}${prev ? ' ' : ''}${sanitizedTranscript}`);
     }
   }, [transcript]);
-  
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
-    
+
+    const sanitizedMessage = sanitizeUserContent(inputMessage);
+
+    if (!sanitizedMessage) {
+      toast.error('Votre message ne peut pas être vide ou contenir de contenu interdit.');
+      return;
+    }
+
     const newUserMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: inputMessage,
+      content: sanitizedMessage,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, newUserMessage]);
     setInputMessage('');
     setIsLoading(true);
     
     try {
       const userFirstName = user?.user_metadata?.name?.split(' ')[0] || 'utilisateur';
-      const prompt = `Tu es un coach émotionnel bienveillant. Tu t'adresses à ${userFirstName}. Réponds de manière empathique, positive et encourageante à ce message: "${inputMessage}"`;
-      
-      const response = await generateText(prompt);
-      
+      const prompt = `Tu es un coach émotionnel bienveillant. Tu t'adresses à ${userFirstName}. Réponds de manière empathique, positive et encourageante à ce message: "${sanitizedMessage}"`;
+
+      const response = await generateText({ prompt });
+
       if (response) {
+        const sanitizedResponse = sanitizeUserContent(response);
+        if (!sanitizedResponse) {
+          toast.error("La réponse du coach a été filtrée pour des raisons de sécurité. Veuillez réessayer.");
+          return;
+        }
         const newAssistantMessage: Message = {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
-          content: response,
+          content: sanitizedResponse,
           timestamp: new Date()
         };
-        
+
         setMessages(prev => [...prev, newAssistantMessage]);
       }
     } catch (error) {
