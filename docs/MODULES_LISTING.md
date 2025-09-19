@@ -51,14 +51,14 @@
   - ✅ QA 06/2025 : régression manuelle post build, couverture e2e générale `breath-constellation-session.spec.ts`.
 
 ### 📝 Journal — 🟢 Livré
-- **Entrée** : `src/modules/journal/JournalPage.tsx` sur `/app/journal`.
-- **Services** : `src/services/journalFeed.service.ts`, `src/hooks/useJournalFeed.ts`.
+- **Entrée** : `src/pages/B2CJournalPage.tsx` → `JournalView` (`src/pages/journal/JournalView.tsx`).
+- **Services** : `src/services/journal/journalApi.ts`, hook `src/modules/journal/useJournalComposer.ts`.
+- **Persistance Supabase** : table `public.journal_entries` (texte + tags, mode `text|voice`, résumé IA) + `coach_conversations`/`coach_messages` pour le brouillon.
 - **Fonctionnalités clés** :
-  - Formulaire sanitisé (tags normalisés, suppression XSS) + création Supabase avec état optimiste.  
-  - Feed React Query avec recherche plein texte, filtres par tag, skeletons et fallback vide.  
-  - Hashing/suppression de données sensibles côté service et instrumentation analytics optionnelle.
-  - Gestion fine des erreurs de création et message utilisateur.
-  - ✅ QA 06/2025 : scénario e2e `journal-feed.spec.ts` + tests `useJournalStore` (4 cas) pour la recherche et la gestion d'entrées.
+  - Composer accessible (textarea + dictée Web Speech API, fallback upload audio) avec sanitisation stricte (DOMPurify côté rendu, `sanitize-html` côté service).
+  - Feed paginé (`useInfiniteQuery`) avec recherche plein texte, filtres multi-tags, action « Envoyer au coach » (brouillon sans PII) et carte Dashboard synchronisée.
+  - Breadcrumbs Sentry (`journal:insert_text|insert_voice|list|coach_draft`) avec redaction (longueur/tags uniquement) et validation Zod (`NoteSchema`, `FeedQuerySchema`).
+  - ✅ QA 2025-03 : tests unitaires `journalApi.spec.ts` (sanitisation, validation, mappers) + e2e Playwright `journal-feed.spec.ts` & `security.xss-journal.spec.ts` (dictée mockée, recherche, tags, dashboard).
 
 ### 🧭 Coach IA — 🟢 Livré
 - **Entrée** : `src/pages/B2CAICoachPage.tsx` (`/app/coach`).

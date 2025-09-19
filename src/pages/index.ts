@@ -108,4 +108,3 @@ export { default as MoodPresetsAdminPage } from './MoodPresetsAdminPage';
 export { default as GamificationPage } from './GamificationPage';
 export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
-export { default as JournalPage } from "@/modules/journal/JournalPage";

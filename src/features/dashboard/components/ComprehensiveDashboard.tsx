@@ -13,6 +13,7 @@ import { NAV_SCHEMA, findNavNode } from '@/lib/nav-schema';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { Sparkline } from '@/COMPONENTS.reg';
+import { LastJournalEntriesCard } from './LastJournalEntriesCard';
 import {
   getEmotionScanHistory,
   deriveScore10,
@@ -459,6 +460,8 @@ export function ComprehensiveDashboard() {
             )}
           </CardContent>
         </Card>
+
+        <LastJournalEntriesCard />
       </div>
     </div>
   );
