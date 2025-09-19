@@ -491,48 +491,6 @@ export type Database = {
           },
         ]
       }
-      breathwork_sessions: {
-        Row: {
-          actual_bpm: number | null
-          coherence_score: number | null
-          created_at: string | null
-          duration: number
-          id: string
-          session_data: Json | null
-          stress_level_after: number | null
-          stress_level_before: number | null
-          target_bpm: number | null
-          technique_type: string
-          user_id: string | null
-        }
-        Insert: {
-          actual_bpm?: number | null
-          coherence_score?: number | null
-          created_at?: string | null
-          duration?: number
-          id?: string
-          session_data?: Json | null
-          stress_level_after?: number | null
-          stress_level_before?: number | null
-          target_bpm?: number | null
-          technique_type: string
-          user_id?: string | null
-        }
-        Update: {
-          actual_bpm?: number | null
-          coherence_score?: number | null
-          created_at?: string | null
-          duration?: number
-          id?: string
-          session_data?: Json | null
-          stress_level_after?: number | null
-          stress_level_before?: number | null
-          target_bpm?: number | null
-          technique_type?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       audit_fixes: {
         Row: {
           applied: boolean | null
@@ -1261,6 +1219,213 @@ export type Database = {
           {
             foreignKeyName: "cleanup_history_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinical_consents: {
+        Row: {
+          granted_at: string | null
+          id: string
+          instrument_code: string
+          is_active: boolean | null
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string | null
+          id?: string
+          instrument_code: string
+          is_active?: boolean | null
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          granted_at?: string | null
+          id?: string
+          instrument_code?: string
+          is_active?: boolean | null
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_consents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinical_feature_flags: {
+        Row: {
+          created_at: string | null
+          flag_name: string
+          id: string
+          instrument_domain: string | null
+          is_enabled: boolean | null
+          metadata: Json | null
+          rollout_percentage: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          flag_name: string
+          id?: string
+          instrument_domain?: string | null
+          is_enabled?: boolean | null
+          metadata?: Json | null
+          rollout_percentage?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          flag_name?: string
+          id?: string
+          instrument_domain?: string | null
+          is_enabled?: boolean | null
+          metadata?: Json | null
+          rollout_percentage?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      clinical_instruments: {
+        Row: {
+          cadence: string
+          code: string
+          created_at: string | null
+          domain: string
+          id: string
+          max_score: number
+          min_score: number
+          name: string
+          questions: Json
+          thresholds: Json
+          ttl_hours: number
+        }
+        Insert: {
+          cadence: string
+          code: string
+          created_at?: string | null
+          domain: string
+          id?: string
+          max_score: number
+          min_score: number
+          name: string
+          questions: Json
+          thresholds: Json
+          ttl_hours: number
+        }
+        Update: {
+          cadence?: string
+          code?: string
+          created_at?: string | null
+          domain?: string
+          id?: string
+          max_score?: number
+          min_score?: number
+          name?: string
+          questions?: Json
+          thresholds?: Json
+          ttl_hours?: number
+        }
+        Relationships: []
+      }
+      clinical_responses: {
+        Row: {
+          cadence: string
+          context_data: Json | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          instrument_code: string
+          internal_level: number | null
+          internal_score: number | null
+          responses: Json
+          tags: string[] | null
+          user_id: string
+        }
+        Insert: {
+          cadence: string
+          context_data?: Json | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          instrument_code: string
+          internal_level?: number | null
+          internal_score?: number | null
+          responses: Json
+          tags?: string[] | null
+          user_id: string
+        }
+        Update: {
+          cadence?: string
+          context_data?: Json | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          instrument_code?: string
+          internal_level?: number | null
+          internal_score?: number | null
+          responses?: Json
+          tags?: string[] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinical_signals: {
+        Row: {
+          created_at: string | null
+          domain: string
+          expires_at: string
+          id: string
+          level: number
+          metadata: Json | null
+          module_context: string
+          source_instrument: string
+          user_id: string
+          window_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          domain: string
+          expires_at: string
+          id?: string
+          level: number
+          metadata?: Json | null
+          module_context: string
+          source_instrument: string
+          user_id: string
+          window_type: string
+        }
+        Update: {
+          created_at?: string | null
+          domain?: string
+          expires_at?: string
+          id?: string
+          level?: number
+          metadata?: Json | null
+          module_context?: string
+          source_instrument?: string
+          user_id?: string
+          window_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_signals_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_activity_summary"
             referencedColumns: ["id"]
@@ -2282,44 +2447,35 @@ export type Database = {
         Row: {
           confidence: number | null
           created_at: string | null
-          emotional_balance: number | null
-          emotions: Json | null
+          emotions: Json
           id: string
-          insights: string[] | null
           mood: string | null
-          recommendations: string[] | null
-          scan_type: string | null
-          summary: string | null
+          recommendations: Json | null
+          scan_type: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           confidence?: number | null
           created_at?: string | null
-          emotional_balance?: number | null
-          emotions?: Json | null
+          emotions?: Json
           id?: string
-          insights?: string[] | null
           mood?: string | null
-          recommendations?: string[] | null
-          scan_type?: string | null
-          summary?: string | null
+          recommendations?: Json | null
+          scan_type: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           confidence?: number | null
           created_at?: string | null
-          emotional_balance?: number | null
-          emotions?: Json | null
+          emotions?: Json
           id?: string
-          insights?: string[] | null
           mood?: string | null
-          recommendations?: string[] | null
-          scan_type?: string | null
-          summary?: string | null
+          recommendations?: Json | null
+          scan_type?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -3280,6 +3436,42 @@ export type Database = {
           members?: string[] | null
           name?: string
           topic?: string
+        }
+        Relationships: []
+      }
+      hr_aggregates: {
+        Row: {
+          created_at: string | null
+          domain: string
+          id: string
+          min_n_met: boolean | null
+          participant_count: number
+          period_end: string
+          period_start: string
+          team_id: string
+          verbalization: string
+        }
+        Insert: {
+          created_at?: string | null
+          domain: string
+          id?: string
+          min_n_met?: boolean | null
+          participant_count: number
+          period_end: string
+          period_start: string
+          team_id: string
+          verbalization: string
+        }
+        Update: {
+          created_at?: string | null
+          domain?: string
+          id?: string
+          min_n_met?: boolean | null
+          participant_count?: number
+          period_end?: string
+          period_start?: string
+          team_id?: string
+          verbalization?: string
         }
         Relationships: []
       }
@@ -5664,62 +5856,6 @@ export type Database = {
           },
         ]
       }
-      mood_presets: {
-        Row: {
-          blend: Json
-          clarity: number
-          created_at: string
-          description: string | null
-          gradient: string | null
-          icon: string | null
-          id: string
-          name: string
-          slug: string | null
-          softness: number
-          tags: string[]
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          blend?: Json
-          clarity?: number
-          created_at?: string
-          description?: string | null
-          gradient?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          slug?: string | null
-          softness?: number
-          tags?: string[]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          blend?: Json
-          clarity?: number
-          created_at?: string
-          description?: string | null
-          gradient?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          slug?: string | null
-          softness?: number
-          tags?: string[]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mood_presets_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       music_skip_logs: {
         Row: {
           id: string
@@ -7497,6 +7633,47 @@ export type Database = {
         }
         Relationships: []
       }
+      ui_suggestion_cache: {
+        Row: {
+          created_at: string | null
+          cta_route: string | null
+          display_context: string
+          expires_at: string
+          id: string
+          label_text: string
+          priority: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          cta_route?: string | null
+          display_context: string
+          expires_at: string
+          id?: string
+          label_text: string
+          priority?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          cta_route?: string | null
+          display_context?: string
+          expires_at?: string
+          id?: string
+          label_text?: string
+          priority?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ui_suggestion_cache_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       unified_music_generation: {
         Row: {
           audio_url: string | null
@@ -8708,62 +8885,6 @@ export type Database = {
         }
         Relationships: []
       }
-      mood_presets: {
-        Row: {
-          blend: Json
-          clarity: number
-          created_at: string
-          description: string | null
-          gradient: string | null
-          icon: string | null
-          id: string
-          name: string
-          slug: string | null
-          softness: number
-          tags: string[]
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          blend?: Json
-          clarity?: number
-          created_at?: string
-          description?: string | null
-          gradient?: string | null
-          icon?: string | null
-          id?: string
-          name: string
-          slug?: string | null
-          softness?: number
-          tags?: string[]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          blend?: Json
-          clarity?: number
-          created_at?: string
-          description?: string | null
-          gradient?: string | null
-          icon?: string | null
-          id?: string
-          name?: string
-          slug?: string | null
-          softness?: number
-          tags?: string[]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mood_presets_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_progress_view: {
         Row: {
           avg_duration: number | null
@@ -8860,6 +8981,10 @@ export type Database = {
         Args: { item_data: Json } | { item_id: string }
         Returns: number
       }
+      calculate_internal_level: {
+        Args: { instrument_code: string; score: number }
+        Returns: number
+      }
       calculate_item_completeness_score: {
         Args: {
           p_item_code: string
@@ -8911,6 +9036,10 @@ export type Database = {
       cleanup_duplicates: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      cleanup_expired_clinical_data: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       cleanup_expired_rate_limit_counters: {
         Args: Record<PropertyKey, never>
@@ -9454,7 +9583,7 @@ export type Database = {
               p_response_status?: string
               p_service_type: string
             }
-        Returns: undefined
+        Returns: string
       }
       log_lyrics_access: {
         Args: {
@@ -9499,7 +9628,7 @@ export type Database = {
               p_user_agent?: string
               p_user_id?: string
             }
-        Returns: undefined
+        Returns: string
       }
       log_security_finding: {
         Args: {
