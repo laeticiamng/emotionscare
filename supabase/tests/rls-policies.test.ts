@@ -29,6 +29,7 @@ interface TablePolicyExpectation {
 }
 
 const TABLE_EXPECTATIONS: TablePolicyExpectation[] = [
+  { table: 'assessments', operations: ['SELECT', 'INSERT', 'UPDATE'] },
   { table: 'journal_entries', operations: ['SELECT', 'INSERT', 'UPDATE'] },
   { table: 'mood_presets', operations: ['SELECT', 'INSERT', 'UPDATE'] },
   { table: 'emotion_metrics', operations: ['SELECT', 'INSERT', 'UPDATE'] },
