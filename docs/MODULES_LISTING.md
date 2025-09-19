@@ -12,8 +12,9 @@
 - **Services** : `invokeEmotionScan`, `getEmotionScanHistory` dans `src/services/emotionScan.service.ts`.
 - **Fonctionnalités clés** :
   - Questionnaire I-PANAS-SF complet avec calcul immédiat du score et libellé d'équilibre.  
-  - Mutation React Query vers la fonction edge Supabase (historique distant) et fallback local (`localStorage`) hors ligne.  
+  - Mutation React Query vers la fonction edge Supabase (historique distant) et fallback local (`localStorage`) hors ligne.
   - Rafraîchissement automatique des widgets « recent-scans » et enregistrement analytics optionnels via `recordEvent`.
+  - ✅ QA 06/2025 : scénario e2e `emotion-scan-dashboard.spec.ts` (parcours scan → historique) + suite unitaire `useMoodStore` (7 tests).
 
 ### 🎚️ Mood Mixer — 🟢 Livré
 - **Entrée** : `src/pages/B2CMoodMixerPage.tsx` sur `/app/mood-mixer`.
@@ -21,8 +22,9 @@
 - **Fonctionnalités clés** :
   - Chargement/sauvegarde des presets `mood_presets` (Supabase) avec clamp des ratios et synchronisation utilisateur.  
   - Génération de noms de vibes dynamiques et édition en temps réel des curseurs douceur/clarté.  
-  - Pré-écoute Adaptive Music : appel API pour récupérer une piste, contrôle lecture/pause et bascule mock/API suivant la disponibilité.  
+  - Pré-écoute Adaptive Music : appel API pour récupérer une piste, contrôle lecture/pause et bascule mock/API suivant la disponibilité.
   - Gestion accessibilité (particles conditionnels sur `prefers-reduced-motion`).
+  - ✅ QA 06/2025 : scénario e2e `mood-mixer-crud.spec.ts` (CRUD complet) + tests `useMoodMixerStore` (7 cas) et `useJournalStore` (4 cas) pour l'enrichissement historique.
 
 ### ⚡ Flash Glow & Ultra — 🟢 Livré
 - **Entrées** : `src/modules/flash-glow/useFlashGlowMachine.ts`, `src/modules/flash-glow/journal.ts`, `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
@@ -32,6 +34,7 @@
   - Suivi des humeurs (`moodBaseline`, `moodAfter`, `moodDelta`) avec clamp et calcul auto.  
   - Journalisation automatique en fin de session (contenu enrichi, tags, sauvegarde Supabase + toast de feedback).  
   - Statistiques locales (nombre/temps moyen) et toasts en cas d'interruption.
+  - ✅ QA 06/2025 : scénario e2e `flash-glow-ultra-session.spec.ts` + tests `useGlowStore` (5 cas) couvrant start/pause/resume/reset.
 
 ### 🌌 Breath Constellation — 🟢 Livré
 - **Entrée** : `src/modules/breath-constellation/BreathConstellationPage.tsx` via `/app/breath`.
@@ -41,6 +44,7 @@
   - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.  
   - Options audio/haptique via `useSound` + enregistrement Supabase des sessions (gestion erreurs auth/persistance).  
   - Émissions d'events analytics facultatifs (`recordEvent`).
+  - ✅ QA 06/2025 : régression manuelle post build, couverture e2e générale `breath-constellation-session.spec.ts`.
 
 ### 📝 Journal — 🟢 Livré
 - **Entrée** : `src/modules/journal/JournalPage.tsx` sur `/app/journal`.
@@ -48,8 +52,9 @@
 - **Fonctionnalités clés** :
   - Formulaire sanitisé (tags normalisés, suppression XSS) + création Supabase avec état optimiste.  
   - Feed React Query avec recherche plein texte, filtres par tag, skeletons et fallback vide.  
-  - Hashing/suppression de données sensibles côté service et instrumentation analytics optionnelle.  
+  - Hashing/suppression de données sensibles côté service et instrumentation analytics optionnelle.
   - Gestion fine des erreurs de création et message utilisateur.
+  - ✅ QA 06/2025 : scénario e2e `journal-feed.spec.ts` + tests `useJournalStore` (4 cas) pour la recherche et la gestion d'entrées.
 
 ### 🧭 Coach IA — 🟢 Livré
 - **Entrée** : `src/pages/B2CAICoachPage.tsx` (`/app/coach`).
@@ -59,6 +64,7 @@
   - Normalisation des prompts selon audience (B2C/B2B) et clamp de l'historique envoyé.  
   - Hachage du transcript, journalisation anonymisée (`coach_conversations`) et stockage des suggestions/techniques.  
   - UI riche (personnalités sélectionnables, ressources, voice toggle) et toasts en cas d'échec.
+  - ✅ QA 06/2025 : scénario e2e `coach-ai-session.spec.ts` validant consentement → réponse.
 
 ### 🎵 Adaptive Music — 🟢 Livré
 - **Entrée** : `src/modules/adaptive-music/AdaptiveMusicPage.tsx` sur `/app/music`.
@@ -66,8 +72,9 @@
 - **Fonctionnalités clés** :
   - Builder de requête mood→playlist (mood, intensité, durée, préférences instrumentales & contexte).  
   - Normalisation stricte de la réponse (tracks, energyProfile, guidance) avec message d'erreur en cas de payload invalide.  
-  - Gestion locale des favoris (persistés en `localStorage`) et reprise de lecture (`playback snapshot`).  
+  - Gestion locale des favoris (persistés en `localStorage`) et reprise de lecture (`playback snapshot`).
   - Export/partage guidé avec synthèse de la playlist et recommandations.
+  - ✅ QA 06/2025 : scénario e2e `adaptive-music-favorites.spec.ts` + tests `requestMoodPlaylist` (3 cas) sur la normalisation client.
 
 ### 📊 Scores Dashboard — 🟢 Livré
 - **Entrées** : `src/pages/HeatmapPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scoresDashboard.service.ts`, `src/hooks/useChartExporter.ts`.
