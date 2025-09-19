@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { ROUTES_REGISTRY } from '@/routerV2/registry';
-import { ROUTE_ALIASES } from '@/routerV2/aliases';
+import { ROUTE_ALIASES, type LegacyPath } from '@/routerV2/aliases';
 
 const findRouteByAlias = (alias: string) =>
   ROUTES_REGISTRY.find(route => route.aliases?.includes(alias));
@@ -27,9 +27,13 @@ const expectProtectedDashboard = (
     expect(route?.aliases).toContain(extraAlias);
   }
 
-  const aliasEntry = ROUTE_ALIASES.find(entry => entry.from === alias);
-  expect(aliasEntry, `alias redirect for ${alias}`).toBeTruthy();
-  expect(aliasEntry?.to).toBe(path);
+  const aliasTarget = ROUTE_ALIASES[alias as LegacyPath];
+  expect(aliasTarget, `alias redirect for ${alias}`).toBeTruthy();
+  expect(aliasTarget).toBe(path);
+
+  for (const extraAlias of extraAliases) {
+    expect(ROUTE_ALIASES[extraAlias as LegacyPath]).toBe(path);
+  }
 };
 
 test('b2c dashboard is served by RouterV2 with consumer guard', () => {

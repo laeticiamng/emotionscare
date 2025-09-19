@@ -201,8 +201,8 @@ const ImmersiveFeatures: React.FC = () => {
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((feature, index) => (
-          <motion.div
+          {features.map((feature, index) => (
+            <motion.div
             key={feature.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -265,9 +265,10 @@ const ImmersiveFeatures: React.FC = () => {
                 {feature.status === 'inactive' && 'Inactif'}
               </Badge>
             </CardContent>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          </motion.div>
+          ))}
+        </div>
 
       {/* Recommendations Panel */}
       <motion.div

@@ -10,8 +10,9 @@
 ### 🧠 Emotion Scan — 🟢 Livré
 - **Entrée** : `src/modules/emotion-scan/EmotionScanPage.tsx` routé via `/app/scan`.
 - **Services** : `invokeEmotionScan`, `getEmotionScanHistory` dans `src/services/emotionScan.service.ts`.
+- **Persistance Supabase** : table `public.emotion_scans` (payload JSONB + `mood_score`), RLS stricte (policies owner-only), indexes `user_id` + `created_at desc`.
 - **Fonctionnalités clés** :
-  - Questionnaire I-PANAS-SF complet avec calcul immédiat du score et libellé d'équilibre.  
+  - Questionnaire I-PANAS-SF complet avec calcul immédiat du score et libellé d'équilibre.
   - Mutation React Query vers la fonction edge Supabase (historique distant) et fallback local (`localStorage`) hors ligne.
   - Rafraîchissement automatique des widgets « recent-scans » et enregistrement analytics optionnels via `recordEvent`.
   - ✅ QA 06/2025 : scénario e2e `emotion-scan-dashboard.spec.ts` (parcours scan → historique) + suite unitaire `useMoodStore` (7 tests).
@@ -19,6 +20,7 @@
 ### 🎚️ Mood Mixer — 🟢 Livré
 - **Entrée** : `src/pages/B2CMoodMixerPage.tsx` sur `/app/mood-mixer`.
 - **Services** : `src/services/moodPresetsService.ts`, `src/services/moodPlaylist.service.ts` et `adaptiveMusicService`.
+- **Persistance Supabase** : table `public.mood_presets` (nom + sliders JSONB) avec RLS owner-only, indexes `user_id` + `created_at desc`.
 - **Fonctionnalités clés** :
   - Chargement/sauvegarde des presets `mood_presets` (Supabase) avec clamp des ratios et synchronisation utilisateur.  
   - Génération de noms de vibes dynamiques et édition en temps réel des curseurs douceur/clarté.  
@@ -29,6 +31,7 @@
 ### ⚡ Flash Glow & Ultra — 🟢 Livré
 - **Entrées** : `src/modules/flash-glow/useFlashGlowMachine.ts`, `src/modules/flash-glow/journal.ts`, `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
 - **Services** : `src/modules/flash-glow/flash-glowService.ts`, intégration journal via `createFlashGlowJournalEntry`.
+- **Persistance Supabase** : table `public.sessions` (type, durée, `mood_delta`, `meta` JSONB) avec indexes sur `user_id`, `created_at desc`, `type` + RLS owner-only.
 - **Fonctionnalités clés** :
   - Machine d'état asynchrone (idle → active → ending) gérant timers, extensions et haptique.  
   - Suivi des humeurs (`moodBaseline`, `moodAfter`, `moodDelta`) avec clamp et calcul auto.  
@@ -39,6 +42,7 @@
 ### 🌌 Breath Constellation — 🟢 Livré
 - **Entrée** : `src/modules/breath-constellation/BreathConstellationPage.tsx` via `/app/breath`.
 - **Services** : `src/services/breathworkSessions.service.ts` (persistance) et `@/ui/hooks/useBreathPattern`.
+- **Persistance Supabase** : mutualise `public.sessions` (log des séances Breath/FlashGlow) sous RLS owner-only, indexes `user_id`, `created_at`, `type`.
 - **Fonctionnalités clés** :
   - Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.  
   - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.  

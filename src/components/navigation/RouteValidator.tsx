@@ -58,7 +58,7 @@ export default function RouteValidator() {
       }
       
       // Simuler succès/échec basé sur le composant
-      const hasComponent = test.route.component && test.route.component !== 'NotFoundPage';
+      const hasComponent = test.route.component && test.route.component !== 'Error404Page';
       
       return {
         ...test,

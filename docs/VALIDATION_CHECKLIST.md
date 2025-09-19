@@ -5,7 +5,7 @@
 ### Navigation Publique
 - [ ] **Route racine** : `/` → HomePage s'affiche
 - [ ] **Aide** : `/help` → HelpPage s'affiche  
-- [ ] **404** : `/route-inexistante` → NotFoundPage s'affiche
+- [ ] **404** : `/route-inexistante` → Error404Page s'affiche
 - [ ] **Messages** : `/messages` → MessagesPage s'affiche
 - [ ] **Calendar** : `/calendar` → CalendarPage s'affiche
 
@@ -85,7 +85,7 @@ Cannot read properties of undefined (shell)
 ### Pages Publiques Essentielles ✅
 - [x] HomePage (/)
 - [x] HelpPage (/help)  
-- [x] NotFoundPage (/404)
+- [x] Error404Page (/404)
 - [x] MessagesPage (/messages)
 - [x] CalendarPage (/calendar)
 
@@ -102,8 +102,8 @@ Cannot read properties of undefined (shell)
 - [ ] B2BTeamsPage (/app/teams)
 
 ### Pages d'Erreur ✅
-- [x] UnauthorizedPage (/401)
-- [x] ForbiddenPage (/403) 
+- [x] Error401Page (/401)
+- [x] Error403Page (/403)
 - [x] ServerErrorPage (/503)
 
 ## 🎯 CRITÈRES DE SUCCÈS

@@ -54,7 +54,7 @@ Le système de routage d'EmotionsCare est maintenant **unifié et sans doublons*
 ├── /feedback (FeedbackPage) [Admin only]
 ├── /onboarding (OnboardingPage)
 ├── /access-diagnostic (AccessDiagnosticPage)
-└── /* (NotFoundPage) - 404 catch-all
+└── /* (Error404Page) - 404 catch-all
 ```
 
 ## 🔧 Comment ajouter une nouvelle route

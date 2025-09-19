@@ -1,105 +1,147 @@
-/**
- * RouterV2 Guards - Protection des routes par rôle
- * TICKET: FE/BE-Router-Cleanup-01
- */
-
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import type { Role } from './schema';
-import { routes } from './routes';
+import { routes } from '@/lib/routes';
+import type { Role, Segment } from './schema';
 
-interface RouteGuardProps {
-  children: React.ReactNode;
-  requiredRole?: Role;
-  allowedRoles?: Role[];
-  requireAuth?: boolean;
-}
+type GuardChildren = { children: React.ReactNode };
 
-/**
- * Guard unifié pour protéger les routes
- */
-export const RouteGuard: React.FC<RouteGuardProps> = ({
-  children,
-  requiredRole,
-  allowedRoles = [],
-  requireAuth = true,
-}) => {
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
-  const { userMode, isLoading: modeLoading } = useUserMode();
+type UserModeValue = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+
+const SEGMENT_TO_MODE: Record<Segment, UserModeValue> = {
+  public: null,
+  consumer: 'b2c',
+  employee: 'b2b_user',
+  manager: 'b2b_admin',
+};
+
+const FORCED_SEGMENT_TO_MODE: Record<string, UserModeValue> = {
+  b2c: 'b2c',
+  consumer: 'b2c',
+  b2b: 'b2b_user',
+  employee: 'b2b_user',
+  manager: 'b2b_admin',
+  admin: 'b2b_admin',
+};
+
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <LoadingAnimation text="Chargement de la navigation..." />
+  </div>
+);
+
+export const AuthGuard: React.FC<GuardChildren> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // Chargement en cours
-  if (authLoading || modeLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingAnimation text="Vérification des autorisations..." />
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingFallback />;
   }
 
-  // Authentification requise
-  if (requireAuth && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <Navigate
-        to={routes.special.unauthorized()}
+        to={routes.auth.login()}
         state={{ from: location.pathname }}
         replace
       />
     );
   }
 
-  // Vérification des rôles
-  if (isAuthenticated && (requiredRole || allowedRoles.length > 0)) {
-    const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
+  return <>{children}</>;
+};
 
-    if (requiredRole && currentRole !== requiredRole) {
-      return (
-        <Navigate
-          to={routes.special.forbidden()}
-          state={{ from: location.pathname, role: currentRole, requiredRole }}
-          replace
-        />
-      );
-    }
+interface RoleGuardProps extends GuardChildren {
+  requiredRole?: Role;
+  allowedRoles?: Role[];
+}
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
-      return (
-        <Navigate
-          to={routes.special.forbidden()}
-          state={{ from: location.pathname, role: currentRole, allowedRoles }}
-          replace
-        />
-      );
-    }
+export const RoleGuard: React.FC<RoleGuardProps> = ({
+  children,
+  requiredRole,
+  allowedRoles = [],
+}) => {
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { userMode, isLoading: modeLoading } = useUserMode();
+  const location = useLocation();
+
+  if (authLoading || modeLoading) {
+    return <LoadingFallback />;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to={routes.auth.login()}
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
+  }
+
+  if (!requiredRole && allowedRoles.length === 0) {
+    return <>{children}</>;
+  }
+
+  const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
+
+  if (requiredRole && currentRole !== requiredRole) {
+    return (
+      <Navigate
+        to={routes.special.forbidden()}
+        state={{ from: location.pathname, role: currentRole, requiredRole }}
+        replace
+      />
+    );
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
+    return (
+      <Navigate
+        to={routes.special.forbidden()}
+        state={{ from: location.pathname, role: currentRole, allowedRoles }}
+        replace
+      />
+    );
   }
 
   return <>{children}</>;
 };
 
-/**
- * Higher-Order Component pour protéger une route
- */
-export function withRoleGuard(
-  Component: React.ComponentType,
-  requiredRole?: Role,
-  options: { requireAuth?: boolean } = {}
-) {
-  return function GuardedComponent(props: any) {
-    return (
-      <RouteGuard requiredRole={requiredRole} requireAuth={options.requireAuth}>
-        <Component {...props} />
-      </RouteGuard>
-    );
-  };
+interface ModeGuardProps extends GuardChildren {
+  segment: Segment;
 }
 
-/**
- * Normalise le rôle utilisateur vers les types RouterV2
- */
-function normalizeRole(role?: string): Role {
+export const ModeGuard: React.FC<ModeGuardProps> = ({ children, segment }) => {
+  const { userMode, setUserMode, isLoading } = useUserMode();
+  const location = useLocation();
+  const [synced, setSynced] = useState(false);
+
+  const desiredMode = useMemo<UserModeValue>(() => {
+    const forced = new URLSearchParams(location.search).get('segment');
+    if (forced && FORCED_SEGMENT_TO_MODE[forced]) {
+      return FORCED_SEGMENT_TO_MODE[forced];
+    }
+    return SEGMENT_TO_MODE[segment];
+  }, [location.search, segment]);
+
+  useEffect(() => {
+    if (desiredMode && userMode !== desiredMode) {
+      setUserMode(desiredMode);
+    }
+    setSynced(true);
+  }, [desiredMode, setUserMode, userMode]);
+
+  if (isLoading || !synced) {
+    return <LoadingFallback />;
+  }
+
+  return <>{children}</>;
+};
+
+function normalizeRole(role?: string | null): Role {
   switch (role) {
     case 'b2c':
     case 'consumer':

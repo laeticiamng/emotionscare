@@ -68,7 +68,7 @@
   'Enhanced404Page',     // ✅ Exemple de référence
   'EnhancedB2CScanPage', // ✅ Intégration complète
   'HomePage',            // ✅ Navigation & semantic
-  'NotFoundPage',        // ✅ Aria-labels présents
+  'Error404Page',        // ✅ Aria-labels présents
   // ... 8 autres pages mineures
 ]
 ```

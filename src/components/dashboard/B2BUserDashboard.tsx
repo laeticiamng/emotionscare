@@ -13,9 +13,6 @@ import { toast } from 'sonner';
 
 // Import types from unified auth types
 import type { Challenge } from '@/types/badge';
-  dueDate: string;
-  type: 'daily' | 'weekly' | 'special';
-}
 
 // Type pour simuler les données du reporting
 interface ReportingMetric {

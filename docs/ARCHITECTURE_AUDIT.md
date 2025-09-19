@@ -21,7 +21,7 @@
 /help → HelpPage
 /test → TestPage
 /point20 → Point20Page
-* → NotFoundPage
+* → Error404Page
 ```
 
 ## ROUTES DÉFINIES RouterV2 (non utilisées)
@@ -81,7 +81,7 @@
 - B2CDashboardPage, B2BUserDashboardPage, B2BAdminDashboardPage
 - B2CScanPage, B2CMusicEnhanced, B2CAICoachPage
 - LoginPage, SignupPage, HelpPage
-- ForbiddenPage, NotFoundPage, ServerErrorPage
+- Error403Page, Error404Page, ServerErrorPage
 - Plein d'autres pages B2C/B2B
 
 ### ❌ MANQUANTS (pages d'erreur système)

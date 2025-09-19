@@ -3,8 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { requestMoodPlaylist, type MoodPlaylistRequest } from '../moodPlaylist.service';
 
 declare global {
-  // eslint-disable-next-line no-var
-  var fetch: typeof fetch;
+  let fetch: typeof globalThis.fetch;
 }
 
 describe('requestMoodPlaylist', () => {

@@ -1,14 +1,18 @@
 import '@/observability/sentry.client';
 import i18n from '@/lib/i18n';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
+import { I18nProvider } from '@/COMPONENTS.reg';
+import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
+import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import { RootProvider } from '@/providers';
 import { routerV2 } from '@/routerV2';
+
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -81,14 +85,19 @@ if (typeof window !== 'undefined') {
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error('Root container not found');
+  throw new Error('Application root element not found');
 }
 
-ReactDOM.createRoot(rootElement).render(
+createRoot(rootElement).render(
   <React.StrictMode>
     <RootProvider>
-      <AccessibilitySkipLinks />
-      <RouterProvider router={routerV2} />
+      <AccessibilityProvider>
+        <I18nProvider>
+          <AccessibilitySkipLinks />
+          <RouterProvider router={router} />
+        </I18nProvider>
+      </AccessibilityProvider>
     </RootProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
+
 );

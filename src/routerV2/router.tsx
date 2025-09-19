@@ -1,6 +1,7 @@
-export { router } from './router';
-export { router as routerV2 } from './router';
-export type { AppRouter } from './router';
+/**
+ * RouterV2 - Router unifié principal
+ * TICKET: FE/BE-Router-Cleanup-01
+ */
 
 // Type pour éviter les logs répétés
 declare global {
@@ -10,19 +11,16 @@ declare global {
 }
 
 import React, { lazy, Suspense } from 'react';
-import * as Sentry from '@sentry/react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
-import { ROUTE_ALIASES } from './aliases';
-import { RouteGuard } from './guards';
+import { LegacyRedirect, ROUTE_ALIAS_ENTRIES } from './aliases';
+import { AuthGuard, ModeGuard, RoleGuard } from './guards';
+import type { RouteMeta } from './schema';
 import { withErrorBoundary } from '@/contexts/ErrorContext';
 import PageErrorFallback from '@/components/error/PageErrorFallback';
 import { LoadingState } from '@/components/loading/LoadingState';
 import EnhancedShell from '@/components/layout/EnhancedShell';
 import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
-
-// RouterV2 est maintenant activé par défaut - plus de feature flag
-const FF_ROUTER_V2 = true;
 
 // ═══════════════════════════════════════════════════════════
 // LAZY IMPORTS DES PAGES
@@ -147,9 +145,9 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 
 // Pages système unifiées
-const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
-const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
-const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
+const Error401Page = lazy(() => import('@/pages/errors/401'));
+const Error403Page = lazy(() => import('@/pages/errors/403'));
+const Error404Page = lazy(() => import('@/pages/errors/404'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 
 
@@ -263,9 +261,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   LegalPrivacyPage,
   
   // System unifiées
-  UnauthorizedPage,
-  ForbiddenPage,
-  NotFoundPage: UnifiedErrorPage,
+  Error401Page,
+  Error403Page,
+  Error404Page,
   ServerErrorPage,
   
   // Import des nouveaux modules optimisés
@@ -290,22 +288,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToSocialCocon,
   RedirectToEntreprise,
   RedirectToMusic,
-};
-
-const AliasRedirect: React.FC<{ from: string; to: string }> = ({ from, to }) => {
-  React.useEffect(() => {
-    const client = Sentry.getCurrentHub().getClient();
-    if (client) {
-      Sentry.addBreadcrumb({
-        category: 'route',
-        level: 'info',
-        message: 'route:alias',
-        data: { from, to },
-      });
-    }
-  }, [from, to]);
-
-  return <Navigate to={to} replace />;
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -348,7 +330,33 @@ const LayoutWrapper: React.FC<{
 // GÉNÉRATION DES ROUTES
 // ═══════════════════════════════════════════════════════════
 
-function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
+function applyRouteGuards(element: React.ReactNode, routeMeta: RouteMeta) {
+  let guardedElement = element;
+
+  if (routeMeta.segment && routeMeta.segment !== 'public') {
+    guardedElement = (
+      <ModeGuard segment={routeMeta.segment}>
+        {guardedElement}
+      </ModeGuard>
+    );
+  }
+
+  if (routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0)) {
+    guardedElement = (
+      <RoleGuard requiredRole={routeMeta.role} allowedRoles={routeMeta.allowedRoles}>
+        {guardedElement}
+      </RoleGuard>
+    );
+  }
+
+  if (routeMeta.guard || routeMeta.requireAuth || routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0)) {
+    guardedElement = <AuthGuard>{guardedElement}</AuthGuard>;
+  }
+
+  return guardedElement;
+}
+
+function createRouteElement(routeMeta: RouteMeta) {
   const Component = componentMap[routeMeta.component];
 
   if (!Component) {
@@ -365,45 +373,27 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
     </SuspenseWrapper>
   );
 
-  // Appliquer les guards si nécessaire
-  if (routeMeta.guard || routeMeta.role) {
-    return (
-      <RouteGuard 
-        requiredRole={routeMeta.role} 
-        requireAuth={routeMeta.guard}
-      >
-        {element}
-      </RouteGuard>
-    );
-  }
-
-  return element;
+  return applyRouteGuards(element, routeMeta);
 }
 
 // ═══════════════════════════════════════════════════════════
 // CRÉATION DU ROUTER
 // ═══════════════════════════════════════════════════════════
 
-// Export des routes helpers et du router
-export { routes } from './routes';
-export { ROUTE_ALIASES } from './aliases';
-export type { RouteAlias } from './aliases';
 const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
 
-export const routerV2 = createBrowserRouter([
+export const router = createBrowserRouter([
   // Routes principales du registry (hors routes dépréciées et wildcard)
   ...canonicalRoutes.map(route => ({
     path: route.path,
     element: createRouteElement(route),
   })),
 
-  // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
-  ...(FF_ROUTER_V2
-    ? ROUTE_ALIASES.map(alias => ({
-        path: alias.from,
-        element: <AliasRedirect from={alias.from} to={alias.to} />,
-      }))
-    : []),
+  // Aliases de compatibilité
+  ...ROUTE_ALIAS_ENTRIES.map(alias => ({
+    path: alias.from,
+    element: <LegacyRedirect from={alias.from} to={alias.to} />,
+  })),
 
   // Fallback 404 pour toutes les autres routes
   {
@@ -413,6 +403,9 @@ export const routerV2 = createBrowserRouter([
 ], {
   basename: import.meta.env.BASE_URL ?? '/',
 });
+
+export const routerV2 = router;
+export type AppRouter = typeof router;
 
 // ═══════════════════════════════════════════════════════════
 // VALIDATION AU DÉMARRAGE (DEV ONLY)

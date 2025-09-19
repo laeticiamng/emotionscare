@@ -25,7 +25,7 @@
 | SignupPage | `/signup` | 🟢 | Inscription progressive avec validations et consentements explicites. | `src/pages/SignupPage.tsx` |
 | ChooseModePage | `/choose-mode` | 🟢 | Sélecteur de mode B2C/B2B utilisé pour router les nouveaux inscrits. | `src/pages/ChooseModePage.tsx` |
 | AppGatePage | `/app` | 🟢 | Dispatcher post-authentification qui redirige selon le rôle normalisé et l'état de consentement. | `src/pages/AppGatePage.tsx` |
-| Unauthorized/Forbidden/NotFound | `/401`, `/403`, `/404`, `*` | 🟢 | Garde-fous système avec messages contextualisés et CTA retour. | `src/pages/UnauthorizedPage.tsx`, etc. |
+| Pages d'erreur 401/403/404 | `/401`, `/403`, `/404`, `*` | 🟢 | Garde-fous système avec messages contextualisés et CTA retour. | `src/pages/errors/401.tsx`, `src/pages/errors/403.tsx`, `src/pages/errors/404.tsx` |
 
 ## 🧭 Dashboards & navigation
 | Page | Route(s) | Statut | Description | Fichier principal |

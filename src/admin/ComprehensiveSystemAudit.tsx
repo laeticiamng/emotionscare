@@ -95,9 +95,9 @@ export default function ComprehensiveSystemAudit() {
       { name: 'B2CAICoachPage', path: 'src/pages/B2CAICoachPage.tsx', routes: ['/app/coach'], component: 'B2CAICoachPage' },
       { name: 'B2CGamificationPage', path: 'src/pages/B2CGamificationPage.tsx', routes: ['/gamification'], component: 'B2CGamificationPage' },
       // Pages d'erreur
-      { name: '401Page', path: 'src/pages/401Page.tsx', routes: ['/401'], component: 'Page401' },
-      { name: '403Page', path: 'src/pages/403Page.tsx', routes: ['/403'], component: 'Page403' },
-      { name: '404Page', path: 'src/pages/404Page.tsx', routes: ['/404'], component: 'Page404' },
+      { name: 'Error401Page', path: 'src/pages/errors/401.tsx', routes: ['/401'], component: 'Error401Page' },
+      { name: 'Error403Page', path: 'src/pages/errors/403.tsx', routes: ['/403'], component: 'Error403Page' },
+      { name: 'Error404Page', path: 'src/pages/errors/404.tsx', routes: ['/404'], component: 'Error404Page' },
       { name: '503Page', path: 'src/pages/503Page.tsx', routes: ['/503'], component: 'ServiceUnavailablePage' },
       
       // Pages de développement (nettoyées)

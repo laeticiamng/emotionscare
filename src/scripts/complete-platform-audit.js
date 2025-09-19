@@ -61,9 +61,9 @@ const mockRegistry = [
   { name: 'admin-events', path: '/app/events', segment: 'manager', component: 'B2BEventsPage', guard: true },
   
   // System
-  { name: 'not-found', path: '/404', segment: 'public', component: 'NotFoundPage' },
-  { name: 'unauthorized', path: '/401', segment: 'public', component: 'UnauthorizedPage' },
-  { name: 'forbidden', path: '/403', segment: 'public', component: 'ForbiddenPage' },
+  { name: 'not-found', path: '/404', segment: 'public', component: 'Error404Page' },
+  { name: 'unauthorized', path: '/401', segment: 'public', component: 'Error401Page' },
+  { name: 'forbidden', path: '/403', segment: 'public', component: 'Error403Page' },
   { name: 'server-error', path: '/503', segment: 'public', component: 'ServerErrorPage' },
   
   // Redirections
