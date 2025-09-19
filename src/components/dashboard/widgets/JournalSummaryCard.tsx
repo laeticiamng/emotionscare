@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BookOpen, Loader2, MessageSquareQuote } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchJournalFeed, type JournalFeedEntry } from '@/services/journalFeed.service';
+import { listFeed } from '@/services/journal/journalApi';
+import type { SanitizedNote } from '@/modules/journal/types';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -18,7 +19,7 @@ const withinLastDays = (isoDate: string, days: number) => {
   return target >= now - days * 24 * 60 * 60 * 1000;
 };
 
-const computeTopTag = (entries: JournalFeedEntry[]): string | null => {
+const computeTopTag = (entries: SanitizedNote[]): string | null => {
   const counts = new Map<string, number>();
   entries.forEach((entry) => {
     entry.tags.forEach((tag) => {
@@ -47,20 +48,20 @@ const formatRelative = (isoDate: string) => {
 export const JournalSummaryCard: React.FC = () => {
   const { user } = useAuth();
   const { data, isLoading, isFetching, isError } = useQuery({
-    queryKey: ['journal-feed', user?.id, 'dashboard'],
-    queryFn: fetchJournalFeed,
+    queryKey: ['journal', 'feed', user?.id, 'dashboard'],
+    queryFn: () => listFeed({ limit: 10 }),
     enabled: Boolean(user?.id),
     staleTime: 60 * 1000,
   });
 
-  const entries = data ?? [];
+  const entries = (data ?? []) as SanitizedNote[];
 
   const stats = useMemo(() => {
     if (!entries.length) {
       return { lastWeek: 0, topTag: null as string | null };
     }
     return {
-      lastWeek: entries.filter((entry) => withinLastDays(entry.timestamp, 7)).length,
+      lastWeek: entries.filter((entry) => withinLastDays(entry.created_at, 7)).length,
       topTag: computeTopTag(entries),
     };
   }, [entries]);
@@ -128,9 +129,9 @@ export const JournalSummaryCard: React.FC = () => {
               >
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span className="uppercase">
-                    {entry.type === 'voice' ? 'Vocale' : 'Texte'}
+                    {entry.mode === 'voice' ? 'Vocale' : 'Texte'}
                   </span>
-                  <span>{formatRelative(entry.timestamp)}</span>
+                  <span>{formatRelative(entry.created_at)}</span>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm text-foreground">
                   {entry.summary || entry.text}
