@@ -64,7 +64,7 @@ const GlobalNavigation: React.FC = () => {
     { title: 'Ambition Arcade', route: routes.b2c.bossLevel(), icon: Gamepad2, description: 'Objectifs gamifiés' },
     { title: 'Gamification', route: routes.b2c.bossLevel(), icon: Gamepad2, description: 'Système de points' },
     { title: 'Weekly Bars', route: routes.b2c.activity(), icon: Heart, description: 'Progression hebdo' },
-    { title: 'Heatmap Vibes', route: routes.b2c.activity(), icon: Brain, description: 'Visualisation données' },
+    { title: 'Scores & vibes', route: routes.b2c.heatmap(), icon: Brain, description: 'Visualisation des humeurs' },
   ];
 
   const userRoutes: NavigationItem[] = [

@@ -55,7 +55,7 @@ const BreadcrumbNavigation: React.FC = () => {
     '/ambition-arcade': 'Ambition Arcade',
     '/gamification': 'Gamification',
     '/weekly-bars': 'Barres Hebdo',
-    '/heatmap-vibes': 'Heatmap Vibes',
+    '/heatmap-vibes': 'Scores & vibes',
     '/preferences': 'Préférences',
     '/social-cocon': 'Cocon Social',
     '/profile-settings': 'Profil',

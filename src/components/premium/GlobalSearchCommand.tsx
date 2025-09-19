@@ -53,7 +53,7 @@ const searchItems: SearchItem[] = [
   
   // Analytics
   { title: 'Analytics', description: 'Historique activité', path: '/app/activity', icon: BarChart3, category: 'Analytics', keywords: ['analytics', 'stats', 'données'] },
-  { title: 'Heatmap Vibes', description: 'Cartographie émotionnelle', path: '/app/heatmap', icon: BarChart3, category: 'Analytics', keywords: ['heatmap', 'carte', 'émotions'] },
+  { title: 'Scores & vibes', description: 'Courbes d’humeur et heatmap quotidienne', path: '/app/scores', icon: BarChart3, category: 'Analytics', keywords: ['scores', 'heatmap', 'émotions'] },
   
   // Settings
   { title: 'Paramètres Généraux', description: 'Configuration générale', path: '/settings/general', icon: Settings, category: 'Paramètres', keywords: ['paramètres', 'config', 'général'] },
