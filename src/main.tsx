@@ -1,3 +1,4 @@
+import '@/observability/sentry.client';
 import i18n from '@/lib/i18n';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -10,11 +11,8 @@ import { AccessibilityProvider } from '@/components/common/AccessibilityProvider
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import { RootProvider } from '@/providers';
-import { router } from '@/routerV2';
+import { routerV2 } from '@/routerV2';
 
-// Configuration de l'attribut lang pour l'accessibilité
-document.documentElement.lang = 'fr';
-document.title = 'EmotionsCare - Plateforme d\'intelligence émotionnelle';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -80,8 +78,6 @@ if (typeof document !== 'undefined') {
 }
 
 if (typeof window !== 'undefined') {
-  initializeSentry();
-  monitorDOMErrors();
   document.body.classList.add('enhanced-focus');
   enableGlobalImageOptimizations();
 }

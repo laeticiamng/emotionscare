@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
+import * as Sentry from "@sentry/react";
 import {
   PageHeader,
   Card,
@@ -392,6 +393,44 @@ const AdaptiveMusicPage: React.FC = () => {
         },
         context: buildPlaylistContext(selectedMood),
       }),
+    onSuccess: result => {
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) {
+        return;
+      }
+      Sentry.addBreadcrumb({
+        category: "music",
+        level: "info",
+        message: "music:playlist_success",
+        data: {
+          mood: result.mood,
+          trackCount: result.tracks.length,
+          intensity,
+        },
+      });
+      Sentry.configureScope(scope => {
+        scope.setContext("music:last_playlist", {
+          mood: result.mood,
+          trackCount: result.tracks.length,
+          durationMinutes: sessionDuration,
+          instrumentalOnly,
+        });
+      });
+    },
+    onError: error => {
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) {
+        return;
+      }
+      Sentry.addBreadcrumb({
+        category: "music",
+        level: "error",
+        message: "music:playlist_error",
+        data: {
+          reason: error.name,
+        },
+      });
+    },
   });
 
   const [activeTrack, setActiveTrack] = React.useState<MoodPlaylistTrack | null>(null);
@@ -437,10 +476,31 @@ const AdaptiveMusicPage: React.FC = () => {
   const handleSelectMood = (value: string) => {
     setHasManualSelection(true);
     setSelectedMood(value);
+    const client = Sentry.getCurrentHub().getClient();
+    if (client) {
+      Sentry.addBreadcrumb({
+        category: "music",
+        level: "info",
+        message: "music:mood_change",
+        data: { mood: value },
+      });
+    }
   };
 
   const handleSelectTrack = (track: MoodPlaylistTrack) => {
     setActiveTrack(track);
+    const client = Sentry.getCurrentHub().getClient();
+    if (client) {
+      Sentry.addBreadcrumb({
+        category: "music",
+        level: "info",
+        message: "music:track_select",
+        data: {
+          trackId: track.id,
+          energy: Number(track.energy.toFixed(2)),
+        },
+      });
+    }
     recordEvent?.({
       module: "adaptive-music",
       startedAt: new Date().toISOString(),

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import * as Sentry from "@sentry/react";
 import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
 import { getCoachContext } from "@/lib/coach/context";
 import { buildAdvice } from "@/lib/coach/engine";
@@ -11,7 +12,41 @@ export default function CoachPage() {
   const [advice, setAdvice] = React.useState(() => buildAdvice(getCoachContext(), "soft"));
 
   function regen(m: "soft"|"boost" = mode) {
-    setAdvice(buildAdvice(getCoachContext(), m));
+    const client = Sentry.getCurrentHub().getClient();
+    if (client) {
+      Sentry.addBreadcrumb({
+        category: "coach",
+        level: "info",
+        message: "coach:generate:start",
+        data: { mode: m },
+      });
+      Sentry.configureScope(scope => {
+        scope.setTag("coach_mode", m);
+      });
+    }
+
+    try {
+      const nextAdvice = buildAdvice(getCoachContext(), m);
+      setAdvice(nextAdvice);
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "coach",
+          level: "info",
+          message: "coach:generate:success",
+          data: { count: nextAdvice.length },
+        });
+      }
+    } catch (error) {
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "coach",
+          level: "error",
+          message: "coach:generate:error",
+          data: { reason: error instanceof Error ? error.name : "unknown" },
+        });
+      }
+      throw error;
+    }
   }
 
   function onLaunch(a: { key: string; href: string }) {
@@ -25,9 +60,20 @@ export default function CoachPage() {
         meta: { advice: a.key, href: a.href }
       });
     } catch {}
+    const client = Sentry.getCurrentHub().getClient();
+    if (client) {
+      Sentry.addBreadcrumb({
+        category: "coach",
+        level: "info",
+        message: "coach:launch",
+        data: { key: a.key },
+      });
+    }
   }
 
-  React.useEffect(() => { regen(mode); }, [mode]);
+  React.useEffect(() => {
+    regen(mode);
+  }, [mode]);
 
   return (
     <main aria-label="Coach">

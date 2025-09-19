@@ -1,24 +1,149 @@
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
-import {
-  BUILD_INFO,
-  SENTRY_DSN,
-  SENTRY_ENVIRONMENT,
-  SENTRY_RELEASE,
-  SENTRY_TRACES_SAMPLE_RATE,
-  SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
-  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
-} from '@/lib/env';
+import { BrowserTracing } from '@sentry/react';
+import { Replay } from '@sentry/replay';
+import type { Breadcrumb, Event as SentryEvent } from '@sentry/types';
+import { BUILD_INFO, SENTRY_CONFIG } from '@/lib/env';
 
-interface SentryContextOptions {
+declare const __APP_COMMIT_SHA__: string | undefined;
+
+type SentryContextOptions = {
   component?: string;
   operation?: string;
   element?: string;
   attempted?: string;
-}
+};
 
 let sentryInitialized = false;
 let domMonitoringAttached = false;
+
+const sensitiveKeyPattern = /(content|message|prompt|transcript|body|text|summary|entry|payload|answer|comment|note|journal|chat)/i;
+const sensitiveUrlPattern = /(journal|coach|chat|conversation)/i;
+
+const resolveCommitSha = () => {
+  if (typeof __APP_COMMIT_SHA__ === 'string' && __APP_COMMIT_SHA__.length > 0) {
+    return __APP_COMMIT_SHA__;
+  }
+  if (BUILD_INFO.commitSha) {
+    return BUILD_INFO.commitSha;
+  }
+  return 'unknown';
+};
+
+const commitSha = resolveCommitSha();
+const fallbackRelease = BUILD_INFO.release ?? `emotionscare@${commitSha}`;
+
+const sanitizeUrl = (value: string) => {
+  if (!value) return value;
+  if (value.startsWith('/')) {
+    return value.split('?')[0];
+  }
+  try {
+    const parsed = new URL(value);
+    parsed.search = '';
+    parsed.hash = '';
+    return parsed.toString();
+  } catch {
+    return value.split('?')[0];
+  }
+};
+
+const sanitizeString = (value: string) => {
+  if (sensitiveUrlPattern.test(value)) {
+    return '[scrubbed]';
+  }
+  if (value.length <= 140) {
+    return value;
+  }
+  return `${value.slice(0, 70)}…${value.slice(-16)}`;
+};
+
+const sanitizeData = (input: unknown, depth = 0): unknown => {
+  if (input == null) {
+    return input;
+  }
+
+  if (depth > 3) {
+    return '[trimmed]';
+  }
+
+  if (Array.isArray(input)) {
+    return input.slice(0, 5).map(item => sanitizeData(item, depth + 1));
+  }
+
+  if (typeof input === 'object') {
+    const entries = Object.entries(input as Record<string, unknown>).map(([key, value]) => {
+      if (sensitiveKeyPattern.test(key)) {
+        return [key, '[scrubbed]'];
+      }
+      if (typeof value === 'string' && sensitiveKeyPattern.test(value)) {
+        return [key, '[scrubbed]'];
+      }
+      return [key, sanitizeData(value, depth + 1)];
+    });
+    return Object.fromEntries(entries);
+  }
+
+  if (typeof input === 'string') {
+    return sanitizeString(input);
+  }
+
+  return input;
+};
+
+const sanitizeBreadcrumb = (breadcrumb: Breadcrumb): Breadcrumb => ({
+  ...breadcrumb,
+  message: breadcrumb.message ? sanitizeString(breadcrumb.message) : breadcrumb.message,
+  data: breadcrumb.data ? (sanitizeData(breadcrumb.data) as Record<string, unknown>) : undefined,
+});
+
+const sanitizeEvent = (event: SentryEvent): SentryEvent | null => {
+  if (event.request) {
+    if (event.request.url) {
+      const sanitizedUrl = sanitizeUrl(event.request.url);
+      event.request.url = sanitizedUrl;
+      if (sensitiveUrlPattern.test(sanitizedUrl)) {
+        event.request.data = undefined;
+        event.request.cookies = undefined;
+        event.request.query_string = undefined;
+      }
+    }
+
+    if (event.request.headers) {
+      const whitelistedHeaders = ['referer', 'user-agent', 'accept-language'];
+      const nextHeaders: Record<string, string> = {};
+      for (const header of whitelistedHeaders) {
+        const value = (event.request.headers as Record<string, string | undefined>)[header];
+        if (value) {
+          nextHeaders[header] = sanitizeString(String(value));
+        }
+      }
+      event.request.headers = Object.keys(nextHeaders).length ? nextHeaders : undefined;
+    }
+
+    if (event.request.data) {
+      event.request.data = '[scrubbed]';
+    }
+  }
+
+  if (event.user) {
+    const { id, ip_address } = event.user;
+    event.user = id || ip_address ? { id, ip_address } : undefined;
+  }
+
+  if (event.contexts) {
+    event.contexts = sanitizeData(event.contexts) as typeof event.contexts;
+  }
+
+  if (event.extra) {
+    event.extra = sanitizeData(event.extra) as typeof event.extra;
+  }
+
+  if (event.breadcrumbs) {
+    event.breadcrumbs = event.breadcrumbs.slice(-50).map(sanitizeBreadcrumb);
+  }
+
+  return event;
+};
 
 const hasSentryClient = () => Boolean(Sentry.getCurrentHub().getClient());
 
@@ -27,130 +152,104 @@ export function initializeSentry(): void {
     return;
   }
 
-  const dsn = SENTRY_DSN;
+  const dsn = SENTRY_CONFIG.dsn;
 
   if (!dsn) {
     if (import.meta.env.DEV) {
-      console.info('[Sentry] Aucun DSN détecté, initialisation ignorée');
+      console.info('[Sentry] DSN non configuré, instrumentation désactivée.');
     }
     return;
   }
 
-  try {
-    const release = SENTRY_RELEASE;
-    const environment = SENTRY_ENVIRONMENT ?? import.meta.env.MODE ?? 'development';
+  const environment = SENTRY_CONFIG.environment ?? import.meta.env.MODE ?? 'development';
+  const tracesSampleRate = Number.isFinite(SENTRY_CONFIG.tracesSampleRate)
+    ? SENTRY_CONFIG.tracesSampleRate
+    : 0.2;
+  const replaysSessionSampleRate = Number.isFinite(SENTRY_CONFIG.replaysSessionSampleRate)
+    ? SENTRY_CONFIG.replaysSessionSampleRate
+    : 0;
+  const replaysOnErrorSampleRate = Number.isFinite(SENTRY_CONFIG.replaysOnErrorSampleRate)
+    ? SENTRY_CONFIG.replaysOnErrorSampleRate
+    : 0;
 
-    Sentry.init({
-      dsn,
-      environment,
-      release,
-      integrations: [new BrowserTracing()],
-      tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE,
-      replaysSessionSampleRate: SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
-      replaysOnErrorSampleRate: SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
-      beforeSend(event) {
-        if (event.exception?.values?.[0]?.value?.includes("Cannot read properties of undefined (reading 'add')")) {
-          event.tags = {
-            ...event.tags,
-            errorType: 'reading_add',
-            critical: true,
-            component: 'dom_manipulation'
-          };
+  const integrations = [
+    new BrowserTracing({
+      tracePropagationTargets: [
+        /^https?:\/\/localhost(?::\d+)?/,
+        /^https?:\/\/[^/]*supabase\.co/,
+        /^https?:\/\/api\.emotionscare\.com/,
+      ],
+    }),
+  ];
 
-          event.contexts = {
-            ...event.contexts,
-            debugging: {
-              suggestion: 'Use safe-helpers.ts functions instead of direct .add() calls',
-              documentation: 'Check src/lib/safe-helpers.ts for safe alternatives',
-              preventable: true
-            }
-          };
+  if (replaysSessionSampleRate > 0 || replaysOnErrorSampleRate > 0) {
+    integrations.push(
+      new Replay({
+        blockAllMedia: true,
+        maskAllInputs: true,
+        sessionSampleRate: replaysSessionSampleRate,
+        errorSampleRate: replaysOnErrorSampleRate || 0.1,
+      }),
+    );
+  }
 
-          event.level = 'error';
-        }
+  Sentry.init({
+    dsn,
+    environment,
+    release: fallbackRelease,
+    integrations,
+    tracesSampleRate,
+    replaysSessionSampleRate,
+    replaysOnErrorSampleRate,
+    beforeSend(event) {
+      return sanitizeEvent(event);
+    },
+  });
 
-        if (import.meta.env.DEV) {
-          console.group('🚨 Sentry Error Report');
-          console.error('Error:', event.exception?.values?.[0]?.value);
-          console.error('Context:', event.contexts);
-          console.error('Tags:', event.tags);
-          console.groupEnd();
-        }
-
-        return event;
-      }
+  Sentry.configureScope(scope => {
+    scope.setTag('environment', environment);
+    scope.setTag('release', fallbackRelease);
+    scope.setTag('commit_sha', commitSha);
+    scope.setTag('app_version', BUILD_INFO.version ?? 'unknown');
+    scope.setTag('feature_flag_router_v2', 'enabled');
+    scope.setContext('build', {
+      version: BUILD_INFO.version ?? 'unknown',
+      commitSha,
+      release: fallbackRelease,
     });
+  });
 
-    Sentry.configureScope((scope) => {
-      scope.setTag('deploymentEnvironment', environment);
+  Sentry.addGlobalEventProcessor(event => sanitizeEvent(event));
 
-      if (release) {
-        scope.setTag('release', release);
-      }
+  sentryInitialized = true;
 
-      scope.setContext('build', {
-        version: BUILD_INFO.version ?? 'unknown',
-        commitSha: BUILD_INFO.commitSha ?? 'unknown',
-        release: release ?? 'unversioned',
-      });
-    });
-
-    Sentry.addGlobalEventProcessor((event) => {
-      if (event.exception?.values?.[0]?.stacktrace?.frames) {
-        const frames = event.exception.values[0].stacktrace.frames;
-
-        const hasDOMFrame = frames.some(
-          (frame) =>
-            frame.filename?.includes('AccessibilityEnhancer') ||
-            frame.filename?.includes('theme-provider') ||
-            frame.filename?.includes('MoodMixer') ||
-            frame.function?.includes('classList')
-        );
-
-        if (hasDOMFrame) {
-          event.tags = {
-            ...event.tags,
-            domError: true,
-            feature: 'ui_interaction'
-          };
-        }
-      }
-
-      return event;
-    });
-
-    sentryInitialized = true;
-
-    if (import.meta.env.DEV) {
-      console.log('[Sentry] Error tracking initialized for "reading add" errors');
-    }
-  } catch (error) {
-    console.error('[Sentry] Failed to initialize:', error);
+  if (import.meta.env.DEV) {
+    console.log('[Sentry] Observabilité initialisée');
   }
 }
 
 export function reportReadingAddError(error: Error, context: SentryContextOptions): void {
   if (!hasSentryClient()) {
     if (import.meta.env.DEV) {
-      console.warn('[Sentry] Cannot report error, Sentry not available');
+      console.warn('[Sentry] Client inactif, impossible de reporter l\'erreur.');
     }
     return;
   }
 
-  Sentry.withScope((scope) => {
+  Sentry.withScope(scope => {
     scope.setLevel('error');
-    scope.setTag('errorType', 'reading_add');
-    scope.setTag('critical', true);
+    scope.setTag('error_type', 'reading_add');
+    scope.setTag('critical', 'true');
 
     if (context.component) scope.setTag('component', context.component);
     if (context.operation) scope.setTag('operation', context.operation);
 
-    scope.setContext('errorDetails', {
-      element: context.element || 'unknown',
-      attempted: context.attempted || 'unknown operation',
+    scope.setContext('errorDetails', sanitizeData({
+      element: context.element ?? 'unknown',
+      attempted: context.attempted ?? 'unknown',
       preventable: true,
-      solution: 'Use safe-helpers.ts functions'
-    });
+      solution: 'Use safe-helpers.ts functions',
+    }) as Record<string, unknown>);
 
     Sentry.captureException(error);
   });
@@ -163,11 +262,12 @@ export function monitorDOMErrors(): void {
 
   const originalError = window.onerror;
   window.onerror = (message, source, lineno, colno, error) => {
-    if (typeof message === 'string' && message.includes("Cannot read properties of undefined (reading 'add')")) {
-      reportReadingAddError(error || new Error(message), {
+    const messageText = typeof message === 'string' ? message : '';
+    if (messageText.includes("Cannot read properties of undefined (reading 'add')")) {
+      reportReadingAddError(error || new Error(messageText), {
         component: source ? source.split('/').pop() : 'unknown',
         operation: 'dom_manipulation',
-        attempted: 'add_operation'
+        attempted: 'add_operation',
       });
     }
 
@@ -178,13 +278,12 @@ export function monitorDOMErrors(): void {
     return false;
   };
 
-  window.addEventListener('unhandledrejection', (event) => {
+  window.addEventListener('unhandledrejection', event => {
     const reason = event.reason as Error | undefined;
-
     if (reason?.message?.includes("Cannot read properties of undefined (reading 'add')")) {
       reportReadingAddError(reason, {
         component: 'promise',
-        operation: 'async_dom_manipulation'
+        operation: 'async_dom_manipulation',
       });
     }
   });
@@ -192,6 +291,6 @@ export function monitorDOMErrors(): void {
   domMonitoringAttached = true;
 
   if (import.meta.env.DEV) {
-    console.log('[Sentry] DOM error monitoring active');
+    console.log('[Sentry] Surveillance DOM activée');
   }
 }
