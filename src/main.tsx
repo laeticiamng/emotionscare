@@ -1,24 +1,22 @@
+import i18n from '@/lib/i18n';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
-import { ThemeProvider, I18nProvider } from '@/COMPONENTS.reg';
-import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
-import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
-
-// Configuration de l'attribut lang pour l'accessibilité
-document.documentElement.lang = 'fr';
-document.title = 'EmotionsCare - Plateforme d\'intelligence émotionnelle';
+import { RootProvider } from '@/providers';
+import { routerV2 } from '@/routerV2';
+import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
   if (!document.querySelector('meta[name="description"]')) {
     const metaDesc = document.createElement('meta');
     metaDesc.name = 'description';
-    metaDesc.content = 'Plateforme d\'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.';
+    metaDesc.content =
+      "Plateforme d'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.";
     document.head.appendChild(metaDesc);
   }
 
@@ -29,8 +27,6 @@ const addAccessibilityMeta = () => {
     document.head.appendChild(metaViewport);
   }
 };
-
-addAccessibilityMeta();
 
 const enableGlobalImageOptimizations = () => {
   const enhance = (img: HTMLImageElement) => {
@@ -71,6 +67,12 @@ const enableGlobalImageOptimizations = () => {
   observer.observe(document.body, { childList: true, subtree: true });
 };
 
+if (typeof document !== 'undefined') {
+  document.documentElement.lang = i18n.language?.split('-')[0] ?? 'fr';
+  document.title = "EmotionsCare - Plateforme d'intelligence émotionnelle";
+  addAccessibilityMeta();
+}
+
 if (typeof window !== 'undefined') {
   initializeSentry();
   monitorDOMErrors();
@@ -78,15 +80,17 @@ if (typeof window !== 'undefined') {
   enableGlobalImageOptimizations();
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root container not found');
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
-      <AccessibilityProvider>
-        <I18nProvider>
-          <AccessibilitySkipLinks />
-          <App />
-        </I18nProvider>
-      </AccessibilityProvider>
-    </ThemeProvider>
-  </React.StrictMode>
+    <RootProvider>
+      <AccessibilitySkipLinks />
+      <RouterProvider router={routerV2} />
+    </RootProvider>
+  </React.StrictMode>,
 );
