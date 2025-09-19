@@ -29,26 +29,38 @@
   - ✅ QA 06/2025 : scénario e2e `mood-mixer-crud.spec.ts` (CRUD complet) + tests `useMoodMixerStore` (7 cas) et `useJournalStore` (4 cas) pour l'enrichissement historique.
 
 ### ⚡ Flash Glow & Ultra — 🟢 Livré
-- **Entrées** : `src/modules/flash-glow/useFlashGlowMachine.ts`, `src/modules/flash-glow/journal.ts`, `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
-- **Services** : `src/modules/flash-glow/flash-glowService.ts`, intégration journal via `createFlashGlowJournalEntry`.
-- **Persistance Supabase** : table `public.sessions` (type, durée, `mood_delta`, `meta` JSONB) avec indexes sur `user_id`, `created_at desc`, `type` + RLS owner-only.
+- **Entrées** : `src/pages/flash-glow/index.tsx` (parcours SESS-01 sur `/app/flash-glow`) & `src/modules/flash-glow-ultra/FlashGlowUltraPage.tsx`.
+- **Services** : `src/hooks/useSessionClock.ts`, `src/modules/flash/useFlashPhases.ts`, `src/modules/flash/sessionService.ts` (`logAndJournal`).
+- **Persistance Supabase** : tables `public.user_activity_sessions` + `public.journal_entries` (RLS owner-only, indexes `user_id`/`created_at`).
 - **Fonctionnalités clés** :
-  - Machine d'état asynchrone (idle → active → ending) gérant timers, extensions et haptique.  
-  - Suivi des humeurs (`moodBaseline`, `moodAfter`, `moodDelta`) avec clamp et calcul auto.  
-  - Journalisation automatique en fin de session (contenu enrichi, tags, sauvegarde Supabase + toast de feedback).  
-  - Statistiques locales (nombre/temps moyen) et toasts en cas d'interruption.
-  - ✅ QA 06/2025 : scénario e2e `flash-glow-ultra-session.spec.ts` + tests `useGlowStore` (5 cas) couvrant start/pause/resume/reset.
+  - Horloge robuste (tick 1 s, pause sur `visibilitychange`) via `useSessionClock` + phases `warmup → glow → settle` (`useFlashPhases`).
+  - `computeMoodDelta` calcule le delta valence/arousal silencieux, `logAndJournal` enregistre activité + entrée journal par défaut bienveillante.
+  - UI accessible (`aria-live`, CTA contextuel Start/Pause/Reprendre/Relancer, variante `prefers-reduced-motion` sans flash).
+  - Breadcrumbs Sentry `session:*`, `flash:phase_change`, `journal:auto:insert` + toasts succès/erreur.
+  - ✅ QA 06/2025 : e2e `flash-glow-session.spec.ts` (start → pause → reprise → completion) + tests unitaires `useSessionClock` & `useFlashPhases`.
 
 ### 🌌 Breath Constellation — 🟢 Livré
 - **Entrée** : `src/modules/breath-constellation/BreathConstellationPage.tsx` via `/app/breath`.
 - **Services** : `src/services/breathworkSessions.service.ts` (persistance) et `@/ui/hooks/useBreathPattern`.
 - **Persistance Supabase** : mutualise `public.sessions` (log des séances Breath/FlashGlow) sous RLS owner-only, indexes `user_id`, `created_at`, `type`.
 - **Fonctionnalités clés** :
-  - Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.  
-  - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.  
-  - Options audio/haptique via `useSound` + enregistrement Supabase des sessions (gestion erreurs auth/persistance).  
+  - Protocoles nommés (cohérence 5-5, 4-7-8, box, triangle) avec cadence calculée et bénéfices contextualisés.
+  - Support `prefers-reduced-motion` : désactive animations complexes et affiche instructions textuelles.
+  - Options audio/haptique via `useSound` + enregistrement Supabase des sessions (gestion erreurs auth/persistance).
   - Émissions d'events analytics facultatifs (`recordEvent`).
   - ✅ QA 06/2025 : régression manuelle post build, couverture e2e générale `breath-constellation-session.spec.ts`.
+
+### 🌬️ Breath Guidance — 🟢 Livré
+- **Entrée** : `src/pages/breath/index.tsx` routé via `/breath`.
+- **Modules partagés** : `src/modules/breath/protocols.ts`, `src/modules/breath/useSessionClock.ts`, composants `BreathCircle` & `BreathProgress`, journalisation `src/modules/breath/logging.ts`.
+- **Persistance Supabase** : table `public.sessions` (type `breath`, durée, `mood_delta`, `meta` JSONB) + journal local via `journalService`.
+- **Fonctionnalités clés** :
+  - Protocoles 4-7-8 et cohérence cardiaque (variant 4,5/5,5) avec cadence auto et séquence générée jusqu'à la durée choisie (3–10 min).
+  - Session clock accessible (`useSessionClock`) avec raccourci clavier Espace (start/pause/resume), aria-live, focus management, Sentry breadcrumbs `breath:protocol:*` et `session:*`.
+  - Motion-safe : bascule automatique vers barre de progression si `prefers-reduced-motion` actif, animation cercle sinon ; audio cue opt-in via `useSound`.
+  - Mesure silencieuse STAI-6 opt-in (feature flag `FF_ASSESS_STAI6`) avec appels `POST /assess/start|submit`, aucun score affiché, réponses utilisées pour recommandations.
+  - Fin de séance : `logAndJournal` enregistre la session Supabase + note auto (delta d’humeur calculé, notes utilisateur), toasts doux en cas d'échec Supabase.
+  - ✅ QA 06/2025 : tests unitaires `src/modules/breath/__tests__/*` (protocoles, session clock, mood utils) + e2e `tests/e2e/breath-guided-session.spec.ts` (4-7-8 + cohérence, pause/resume, zéro warning console).
 
 ### 📝 Journal — 🟢 Livré
 - **Entrée** : `src/pages/B2CJournalPage.tsx` → `JournalView` (`src/pages/journal/JournalView.tsx`).
@@ -61,14 +73,16 @@
   - ✅ QA 2025-03 : tests unitaires `journalApi.spec.ts` (sanitisation, validation, mappers) + e2e Playwright `journal-feed.spec.ts` & `security.xss-journal.spec.ts` (dictée mockée, recherche, tags, dashboard).
 
 ### 🧭 Coach IA — 🟢 Livré
-- **Entrée** : `src/pages/B2CAICoachPage.tsx` (`/app/coach`).
-- **Services** : `src/modules/coach/coachService.ts`, edge function `supabase/functions/ai-coach/index.ts`.
+- **Entrée** : `src/pages/B2CAICoachPage.tsx` (`/app/coach`) rendu via `CoachView`.
+- **Services** : `src/services/coach/coachApi.ts` (SSE + fallback) et fonction edge `supabase/functions/ai-coach/index.ts`.
+- **Persistance Supabase** : table `public.coach_logs` (résumé ≤ 280 caractères, `thread_id`, `mode`) avec RLS owner-only + indexes `user_id`, `thread_id`.
 - **Fonctionnalités clés** :
-  - Consentement obligatoire (checkbox + token session) avant toute requête AI.  
-  - Normalisation des prompts selon audience (B2C/B2B) et clamp de l'historique envoyé.  
-  - Hachage du transcript, journalisation anonymisée (`coach_conversations`) et stockage des suggestions/techniques.  
-  - UI riche (personnalités sélectionnables, ressources, voice toggle) et toasts en cas d'échec.
-  - ✅ QA 06/2025 : scénario e2e `coach-ai-session.spec.ts` validant consentement → réponse.
+  - Consentement explicite (modal opt-in, stockage local + `user_metadata`) avant tout envoi.
+  - Hash utilisateur Web Crypto (SHA-256) pour tagger les sessions sans exposer l’UUID.
+  - Edge sécurisée (JWT obligatoire, CORS restreint, rate-limit 30 req/min, modération + désescalade) et réponses streamées SSE.
+  - UI conversation accessible (`aria-live`, envoi Ctrl+Entrée, actions rapides respiration/journal/musique, badge B2B).
+  - Observabilité safe : breadcrumbs Sentry redacts, logs anonymisés `coach_logs`, refus crise/self-harm avec messages ressources.
+  - ✅ QA 07/2025 : tests unitaires (`hash`, prompts, redaction), Deno guardrails, Playwright `coach.smoke.spec.ts` (consentement → réponse stub).
 
 ### 🎵 Adaptive Music — 🟢 Livré
 - **Entrée** : `src/modules/adaptive-music/AdaptiveMusicPage.tsx` sur `/app/music`.
@@ -80,13 +94,15 @@
   - Export/partage guidé avec synthèse de la playlist et recommandations.
   - ✅ QA 06/2025 : scénario e2e `adaptive-music-favorites.spec.ts` + tests `requestMoodPlaylist` (3 cas) sur la normalisation client.
 
-### 📊 Scores Dashboard — 🟢 Livré
-- **Entrées** : `src/pages/HeatmapPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scoresDashboard.service.ts`, `src/hooks/useChartExporter.ts`.
+### 📊 Scores & vibes — 🟢 Livré
+- **Entrées** : `src/pages/ScoresPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scores/dataApi.ts`, `src/features/scores/*`.
+- **Données Supabase** : `emotion_scans.payload` (valence, arousal, labels) et `sessions` (type, created_at) sous RLS owner-only (aucune donnée textuelle du journal).
 - **Fonctionnalités clés** :
-  - Récupération Supabase (trend 30j, sessions hebdo, heatmap) + fallback local `SCORES_DASHBOARD_FALLBACK`.
-  - Graphiques Recharts (Line/Bar/Scatter) stylés, tooltips custom, palettes par type de séance.
-  - Carte récap niveau/XP avec calcul du progrès et slots intenses.
-  - Export PNG haute résolution via `useChartExporter` (scale, padding, toast d'erreur).
+  - Agrégation React Query (cache 60s) + lissage (moving average) pour les courbes valence/arousal sur 30 jours.
+  - Barres hebdomadaires empilées (8 semaines glissantes) + heatmap SVG personnalisée des vibes dominantes (calm/focus/bright/reset).
+  - Respect accessibility : aria-label/role="img", texte de synthèse pour lecteurs d'écran, animation désactivée si `prefers-reduced-motion`.
+  - Export PNG fiable via bouton dédié (html2canvas-free) + breadcrumbs Sentry `scores:fetch:*` & `scores:export:png`.
+  - ✅ QA 06/2025 : tests unitaires `src/services/scores/__tests__/dataApi.test.ts` (mappers/agrégations) + e2e `tests/e2e/scores-heatmap-dashboard.spec.ts` (chargement, interactions, export).
 
 ### 🩺 Observabilité — Endpoint `/health`
 - **Entrée** : service Fastify `services/api/server.ts` exposant `/health`, `/healthz` et `/api/healthz`.

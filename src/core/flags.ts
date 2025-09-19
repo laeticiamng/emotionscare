@@ -5,6 +5,7 @@ interface FeatureFlags {
   FF_VR: boolean;
   FF_COMMUNITY: boolean;
   FF_MANAGER_DASH: boolean;
+  FF_ASSESS_STAI6: boolean;
   [key: string]: boolean;
 }
 
@@ -14,6 +15,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_VR: true,
   FF_COMMUNITY: true,
   FF_MANAGER_DASH: true,
+  FF_ASSESS_STAI6: false,
 };
 
 let flagsCache: FeatureFlags | null = null;

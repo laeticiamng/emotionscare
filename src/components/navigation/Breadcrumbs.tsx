@@ -40,7 +40,7 @@ const Breadcrumbs: React.FC = () => {
     '/b2c/ar-filters': 'Filtres AR',
     '/b2c/ambition-arcade': 'Ambition Arcade',
     '/b2c/weekly-bars': 'Barres Hebdo',
-    '/b2c/heatmap-vibes': 'Heatmap Vibes',
+    '/b2c/heatmap-vibes': 'Scores & vibes',
     
     // Paramètres B2C
     '/b2c/profile-settings': 'Profil',
