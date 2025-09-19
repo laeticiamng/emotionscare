@@ -1,0 +1,35 @@
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    font: 12pt/1.4 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: #111827 !important;
+  }
+
+  a {
+    color: #111827 !important;
+    text-decoration: none !important;
+  }
+
+  article {
+    break-inside: avoid;
+  }
+}

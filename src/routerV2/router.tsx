@@ -72,6 +72,7 @@ const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
 const B2BSocialCoconPage = lazy(() => import('@/pages/B2BSocialCoconPage'));
 const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
+const B2BReportsHeatmapPage = lazy(() => import('@/pages/b2b/reports'));
 const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
 
 // Additional B2B pages - use correct paths
@@ -214,6 +215,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BTeamsPage,
   B2BSocialCoconPage,
   B2BReportsPage,
+  B2BReportsHeatmapPage,
   B2BEventsPage,
   B2BOptimisationPage,
   B2BSecurityPage,

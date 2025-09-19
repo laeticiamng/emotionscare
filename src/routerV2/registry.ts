@@ -94,6 +94,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2BSelectionPage',
   },
   {
+    name: 'b2b-reports-heatmap',
+    path: '/b2b/reports',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    guard: true,
+    component: 'B2BReportsHeatmapPage',
+  },
+  {
     name: 'login',
     path: '/login',
     segment: 'public',
