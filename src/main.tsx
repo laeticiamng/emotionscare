@@ -1,3 +1,4 @@
+import '@/observability/sentry.client';
 import i18n from '@/lib/i18n';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -8,7 +9,6 @@ import './theme/theme.css';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import { RootProvider } from '@/providers';
 import { routerV2 } from '@/routerV2';
-import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -74,8 +74,6 @@ if (typeof document !== 'undefined') {
 }
 
 if (typeof window !== 'undefined') {
-  initializeSentry();
-  monitorDOMErrors();
   document.body.classList.add('enhanced-focus');
   enableGlobalImageOptimizations();
 }

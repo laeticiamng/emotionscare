@@ -1,7 +1,38 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { createApp } from '../server';
 
 const app = createApp();
+
+const originalFetch = global.fetch;
+
+const createResponse = (status = 200) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  headers: { get: () => null } as Record<string, unknown>,
+  json: async () => ({}),
+  text: async () => '',
+});
+
+let fetchMock: ReturnType<typeof vi.fn>;
+
+beforeEach(() => {
+  process.env.SUPABASE_URL = 'https://supabase.test';
+  process.env.SUPABASE_ANON_KEY = 'anon';
+  process.env.HEALTH_STORAGE_URL = 'https://storage.test/ping';
+  process.env.HEALTH_FUNCTIONS = 'ai-emotion-analysis,ai-coach';
+
+  fetchMock = vi.fn();
+  global.fetch = fetchMock as unknown as typeof global.fetch;
+});
+
+afterEach(() => {
+  global.fetch = originalFetch;
+  vi.resetAllMocks();
+  delete process.env.SUPABASE_URL;
+  delete process.env.SUPABASE_ANON_KEY;
+  delete process.env.HEALTH_STORAGE_URL;
+  delete process.env.HEALTH_FUNCTIONS;
+});
 
 afterAll(async () => {
   await app.close();
@@ -9,6 +40,13 @@ afterAll(async () => {
 
 describe('health endpoints', () => {
   it('returns service status for /health without authentication', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200));
+
     const response = await app.inject({ method: 'GET', url: '/health' });
 
     expect(response.statusCode).toBe(200);
@@ -16,35 +54,54 @@ describe('health endpoints', () => {
 
     const payload = response.json();
     expect(payload).toMatchObject({
-      ok: expect.any(Boolean),
-      version: expect.any(String),
-      services: expect.objectContaining({
-        api: true,
-      }),
+      status: 'ok',
+      timestamp: expect.any(String),
+      signature: expect.any(String),
+      checks: {
+        supabase: expect.objectContaining({ status: 'ok', latency_ms: expect.any(Number) }),
+        storage: expect.objectContaining({ status: 'ok', latency_ms: expect.any(Number) }),
+        functions: expect.any(Array),
+      },
     });
-    expect(typeof payload.uptime).toBe('number');
-    expect(payload.metrics).toEqual(
-      expect.objectContaining({ rss: expect.any(Number), heapUsed: expect.any(Number) })
-    );
-    expect(payload.latency).toEqual(
-      expect.objectContaining({ api: expect.any(Number), eventLoop: expect.any(Number) })
-    );
-    expect(Array.isArray(payload.dependencies)).toBe(true);
-    expect(payload.dependencies.length).toBeGreaterThan(0);
-    expect(payload.dependencies[0]).toEqual(
-      expect.objectContaining({
-        name: expect.any(String),
-        latency: expect.any(Number),
-        lastChecked: expect.any(String),
-      })
+    expect(payload.signature.length).toBeGreaterThan(10);
+    expect(payload.checks.functions).toHaveLength(2);
+    expect(payload.checks.functions[0]).toEqual(
+      expect.objectContaining({ name: 'ai-emotion-analysis', latency_ms: expect.any(Number) })
     );
   });
 
   it('aliases /api/healthz to the same payload', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200));
+
     const response = await app.inject({ method: 'GET', url: '/api/healthz' });
 
     expect(response.statusCode).toBe(200);
     const payload = response.json();
-    expect(payload.services.api).toBe(true);
+    expect(payload.status).toBe('ok');
+  });
+
+  it('marks status degraded when a critical function is down', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(503))
+      .mockResolvedValueOnce(createResponse(200))
+      .mockResolvedValueOnce(createResponse(200));
+
+    const response = await app.inject({ method: 'GET', url: '/health' });
+
+    expect(response.statusCode).toBe(200);
+    const payload = response.json();
+    expect(payload.status).toBe('degraded');
+    expect(payload.checks.functions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'ai-emotion-analysis', status: 'down' }),
+      ]),
+    );
   });
 });

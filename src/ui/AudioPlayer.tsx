@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import * as Sentry from "@sentry/react";
 import { useSound } from "@/ui/hooks/useSound";
 import { clamp01 } from "@/lib/audio/utils";
 
@@ -84,6 +85,22 @@ export function AudioPlayer({
   const [resumePosition, setResumePosition] = React.useState(0);
 
   const playbackRef = React.useRef<PlaybackPersistedState>(defaultPlaybackState);
+
+  const logPlaybackBreadcrumb = React.useCallback(
+    (message: string, level: 'info' | 'error' = 'info', data?: Record<string, unknown>) => {
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) {
+        return;
+      }
+      Sentry.addBreadcrumb({
+        category: 'music',
+        level,
+        message,
+        data: { trackId: trackKey, ...(data ?? {}) },
+      });
+    },
+    [trackKey],
+  );
 
   const applyHaptics = React.useCallback(() => {
     if (!haptics) return;
@@ -325,6 +342,7 @@ export function AudioPlayer({
     updateFavorites(prev => {
       const exists = prev.some(entry => entry.id === trackKey);
       if (exists) {
+        logPlaybackBreadcrumb('music:favourite_toggle', 'info', { state: 'removed' });
         return prev.filter(entry => entry.id !== trackKey);
       }
 
@@ -337,9 +355,10 @@ export function AudioPlayer({
       };
 
       const next = [...sanitized, nextEntry];
+      logPlaybackBreadcrumb('music:favourite_toggle', 'info', { state: 'added' });
       return next.slice(-50);
     });
-  }, [trackKey, title, src, updateFavorites]);
+  }, [trackKey, title, src, updateFavorites, logPlaybackBreadcrumb]);
 
   const handleResume = React.useCallback(async () => {
     if (resumePosition <= 0.01) return;
@@ -348,7 +367,10 @@ export function AudioPlayer({
     setPlaying(true);
     applyHaptics();
     persistPlayback({ wasPlaying: true, position: resumePosition });
-  }, [resumePosition, seek, playSound, applyHaptics, persistPlayback]);
+    logPlaybackBreadcrumb('music:resume', 'info', {
+      position: Number(resumePosition.toFixed(1)),
+    });
+  }, [resumePosition, seek, playSound, applyHaptics, persistPlayback, logPlaybackBreadcrumb]);
 
   const hasResume = resumePosition > 0.5 && !playing;
 
@@ -360,16 +382,25 @@ export function AudioPlayer({
         applyHaptics();
         const position = getTime?.() ?? 0;
         persistPlayback({ wasPlaying: true, position });
+        logPlaybackBreadcrumb('music:play', 'info', {
+          position: Number(position.toFixed(1)),
+        });
       } else {
         pauseSound?.();
         const position = getTime?.() ?? 0;
         setPlaying(false);
         persistPlayback({ wasPlaying: false, position });
+        logPlaybackBreadcrumb('music:pause', 'info', {
+          position: Number(position.toFixed(1)),
+        });
       }
     } catch (error) {
       console.warn("Audio toggle error", error);
+      logPlaybackBreadcrumb('music:play_error', 'error', {
+        reason: error instanceof Error ? error.name : 'unknown',
+      });
     }
-  }, [playing, playSound, pauseSound, getTime, applyHaptics, persistPlayback]);
+  }, [playing, playSound, pauseSound, getTime, applyHaptics, persistPlayback, logPlaybackBreadcrumb]);
 
   return (
     <div aria-label={title ?? "Lecteur audio"} style={{ display: "grid", gap: 8 }}>

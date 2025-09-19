@@ -11,6 +11,7 @@ declare global {
 }
 
 import React, { lazy, Suspense } from 'react';
+import * as Sentry from '@sentry/react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES } from './aliases';
@@ -292,6 +293,22 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToMusic,
 };
 
+const AliasRedirect: React.FC<{ from: string; to: string }> = ({ from, to }) => {
+  React.useEffect(() => {
+    const client = Sentry.getCurrentHub().getClient();
+    if (client) {
+      Sentry.addBreadcrumb({
+        category: 'route',
+        level: 'info',
+        message: 'route:alias',
+        data: { from, to },
+      });
+    }
+  }, [from, to]);
+
+  return <Navigate to={to} replace />;
+};
+
 // ═══════════════════════════════════════════════════════════
 // WRAPPER COMPONENTS
 // ═══════════════════════════════════════════════════════════
@@ -382,12 +399,12 @@ export const routerV2 = createBrowserRouter([
   })),
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
-  ...(FF_ROUTER_V2 ? ROUTE_ALIASES.map(alias => {
-    return {
-      path: alias.from,
-      element: <Navigate to={alias.to} replace />,
-    };
-  }) : []),
+  ...(FF_ROUTER_V2
+    ? ROUTE_ALIASES.map(alias => ({
+        path: alias.from,
+        element: <AliasRedirect from={alias.from} to={alias.to} />,
+      }))
+    : []),
 
   // Fallback 404 pour toutes les autres routes
   {

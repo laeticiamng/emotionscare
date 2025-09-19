@@ -79,10 +79,21 @@
 ### 📊 Scores Dashboard — 🟢 Livré
 - **Entrées** : `src/pages/HeatmapPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scoresDashboard.service.ts`, `src/hooks/useChartExporter.ts`.
 - **Fonctionnalités clés** :
-  - Récupération Supabase (trend 30j, sessions hebdo, heatmap) + fallback local `SCORES_DASHBOARD_FALLBACK`.  
-  - Graphiques Recharts (Line/Bar/Scatter) stylés, tooltips custom, palettes par type de séance.  
-  - Carte récap niveau/XP avec calcul du progrès et slots intenses.  
+  - Récupération Supabase (trend 30j, sessions hebdo, heatmap) + fallback local `SCORES_DASHBOARD_FALLBACK`.
+  - Graphiques Recharts (Line/Bar/Scatter) stylés, tooltips custom, palettes par type de séance.
+  - Carte récap niveau/XP avec calcul du progrès et slots intenses.
   - Export PNG haute résolution via `useChartExporter` (scale, padding, toast d'erreur).
+
+### 🩺 Observabilité — Endpoint `/health`
+- **Entrée** : service Fastify `services/api/server.ts` exposant `/health`, `/healthz` et `/api/healthz`.
+- **Vérifications effectuées** :
+  - Supabase (`auth` + requête REST légère) avec latence et statut (`ok|degraded|down`).
+  - Fonctions critiques (par défaut `ai-emotion-analysis`, `ai-coach`) pingées en `HEAD`.
+  - Stockage public (URL configurable) via requête `HEAD`.
+- **Réponse JSON minifiée** : `{ status, timestamp, checks: { supabase, functions[], storage }, signature }`.
+  - `signature` = SHA-256 du payload + `HEALTH_SIGNING_SECRET` pour détecter toute altération.
+  - Exposition contrôlée par CORS (`HEALTH_ALLOWED_ORIGINS`) et rate-limit mémoire (60 req/min/IP par défaut).
+- **Tests** : `services/api/tests/health.test.ts` simule succès + fonction en panne, vérifie latences et signature.
 
 ## Modules en bêta ou prototypes
 - **B2C fun-first hérités** (`src/pages/modules/*`) : conservés pour démos gamifiées (Story Synth, Bubble Beat…).

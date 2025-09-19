@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import * as Sentry from "@sentry/react";
 import { PageHeader, Card, Button, Input, Textarea, LoadingSpinner } from "@/COMPONENTS.reg";
 import { useJournalFeed } from "@/hooks/useJournalFeed";
 import { recordEvent } from "@/lib/scores/events";
@@ -50,7 +51,32 @@ export default function JournalPage() {
     const parsedTags = parseTags(tagsInput);
 
     try {
+      const client = Sentry.getCurrentHub().getClient();
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "journal",
+          level: "info",
+          message: "journal:insert:start",
+          data: { contentLength: content.length, tagCount: parsedTags.length },
+        });
+        Sentry.configureScope(scope => {
+          scope.setContext("journal:last_attempt", {
+            contentLength: content.length,
+            tagCount: parsedTags.length,
+          });
+        });
+      }
+
       await createEntry({ content, tags: parsedTags });
+
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "journal",
+          level: "info",
+          message: "journal:insert:success",
+          data: { tagCount: parsedTags.length },
+        });
+      }
 
       try {
         recordEvent?.({
@@ -70,6 +96,15 @@ export default function JournalPage() {
       setTagsInput("");
     } catch (err) {
       console.error("journal entry creation failed", err);
+      const client = Sentry.getCurrentHub().getClient();
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "journal",
+          level: "error",
+          message: "journal:insert:error",
+          data: { reason: err instanceof Error ? err.name : "unknown" },
+        });
+      }
     }
   };
 

@@ -3,15 +3,43 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { execSync } from 'node:child_process';
 import { componentTagger } from "lovable-tagger";
 import { visualizer } from 'rollup-plugin-visualizer';
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 // Force disable TypeScript processing completely
 process.env.TSC_NONPOLLING_WATCHER = 'false';
 process.env.DISABLE_TSC = 'true';
 
+const resolveCommitSha = () => {
+  const candidates = [
+    process.env.VITE_COMMIT_SHA,
+    process.env.SENTRY_RELEASE,
+    process.env.GITHUB_SHA,
+    process.env.VERCEL_GIT_COMMIT_SHA,
+  ].filter(Boolean);
+
+  if (candidates.length > 0) {
+    return candidates[0];
+  }
+
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim();
+  } catch {
+    return 'unknown';
+  }
+};
+
 export default defineConfig(({ mode }) => {
   const enableAnalyzer = (process.env.ANALYZE || '').toLowerCase() === 'true';
+  const commitSha = resolveCommitSha();
+  const releaseName = `emotionscare@${commitSha}`;
+  const enableSentryPlugin =
+    !!process.env.SENTRY_AUTH_TOKEN &&
+    !!process.env.SENTRY_ORG &&
+    !!process.env.SENTRY_PROJECT &&
+    mode !== 'development';
 
   return {
     server: {
@@ -31,12 +59,25 @@ export default defineConfig(({ mode }) => {
         gzipSize: true,
         brotliSize: true,
       }),
+      enableSentryPlugin &&
+        sentryVitePlugin({
+          org: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          release: releaseName,
+          telemetry: false,
+          sourcemaps: {
+            assets: './dist/**',
+            ignore: ['node_modules'],
+          },
+        }),
     ].filter(Boolean),
-  
+
     // Force disable all TypeScript processing
     define: {
       'process.env.TSC_COMPILE_ON_ERROR': 'false',
-      'process.env.SKIP_TYPE_CHECK': 'true'
+      'process.env.SKIP_TYPE_CHECK': 'true',
+      __APP_COMMIT_SHA__: JSON.stringify(commitSha),
     },
 
     preview: {
@@ -52,7 +93,7 @@ export default defineConfig(({ mode }) => {
 
     build: {
       target: 'esnext',
-      sourcemap: mode === 'development',
+      sourcemap: mode === 'development' ? 'inline' : true,
       cssCodeSplit: true,
       minify: 'esbuild',
       reportCompressedSize: false,

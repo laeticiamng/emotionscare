@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Sentry from "@sentry/react";
 import { PageHeader, Card, Button, ProgressBar, Sparkline } from "@/COMPONENTS.reg"; // ProgressBar/Sparkline ajoutés en P6
 import { recordEvent } from "@/lib/scores/events"; // si P6 non intégré, cet import peut être ignoré (no-op)
 import { logger } from "@/lib/logger";
@@ -129,11 +130,54 @@ export default function EmotionScanPage() {
         },
         { accessToken: variables.accessToken },
       ),
-    onMutate: () => {
+    onMutate: (variables) => {
       setErrorMessage(null);
+      const client = Sentry.getCurrentHub().getClient();
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "scan",
+          level: "info",
+          message: "scan:start",
+          data: {
+            balance: Number(variables.balance?.toFixed(2) ?? 0),
+            pa: variables.pa,
+            na: variables.na,
+            authenticated: Boolean(user?.id),
+          },
+        });
+        Sentry.configureScope(scope => {
+          scope.setContext("scan:last_submission", {
+            pa: variables.pa,
+            na: variables.na,
+            balance: variables.balance,
+            hasPrevious: Boolean(variables.previousEmotions),
+          });
+        });
+      }
     },
     onSuccess: async (result, variables) => {
       setAnalysis(result);
+
+      const client = Sentry.getCurrentHub().getClient();
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "scan",
+          level: "info",
+          message: "scan:success",
+          data: {
+            balance: Number(variables.balance?.toFixed(2) ?? 0),
+            mood: result.dominantEmotion,
+            persisted: Boolean(result.persisted),
+          },
+        });
+        Sentry.configureScope(scope => {
+          scope.setContext("scan:last_result", {
+            balance: result.emotionalBalance,
+            confidence: result.confidence,
+            mood: result.dominantEmotion,
+          });
+        });
+      }
 
       if (user?.id) {
         if (!result.persisted) {
@@ -193,6 +237,17 @@ export default function EmotionScanPage() {
       setAnalysis(null);
       const message = error instanceof Error ? error.message : "Analyse impossible pour le moment";
       setErrorMessage(message);
+      const client = Sentry.getCurrentHub().getClient();
+      if (client) {
+        Sentry.addBreadcrumb({
+          category: "scan",
+          level: "error",
+          message: "scan:error",
+          data: {
+            reason: error instanceof Error ? error.name : "unknown",
+          },
+        });
+      }
       addError({
         message,
         severity: "high",

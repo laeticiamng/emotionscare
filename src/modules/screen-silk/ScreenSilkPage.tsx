@@ -2,7 +2,8 @@
  * ScreenSilkPage - Page principale du module Screen Silk
  */
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import * as Sentry from '@sentry/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,25 @@ import {
 export const ScreenSilkPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const logSessionEvent = useCallback(
+    (message: string, level: 'info' | 'error' = 'info', data?: Record<string, unknown>) => {
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) {
+        return;
+      }
+      Sentry.addBreadcrumb({
+        category: 'session',
+        level,
+        message,
+        data,
+      });
+    },
+    [],
+  );
+
+  const completionOriginRef = useRef<'auto' | 'manual'>('auto');
+  const interruptOriginRef = useRef<'manual' | 'machine'>('machine');
   
   const [duration, setDuration] = useState([120]); // 2 minutes par défaut
   const [enableBlur, setEnableBlur] = useState(true);
@@ -35,6 +55,11 @@ export const ScreenSilkPage: React.FC = () => {
     enableBlur,
     blinkInterval,
     onComplete: (label) => {
+      logSessionEvent('session:complete', 'info', {
+        label,
+        origin: completionOriginRef.current,
+      });
+      completionOriginRef.current = 'auto';
       const messages = {
         gain: "Excellente pause ! Vos yeux vous remercient ✨",
         léger: "Pause bénéfique, continuez ainsi 👀",
@@ -47,6 +72,10 @@ export const ScreenSilkPage: React.FC = () => {
       });
     },
     onInterrupt: () => {
+      logSessionEvent('session:interrupt', 'info', {
+        origin: interruptOriginRef.current,
+      });
+      interruptOriginRef.current = 'machine';
       toast({
         title: "Pause interrompue",
         description: "Pas de souci, vous pouvez reprendre quand vous voulez",
@@ -62,10 +91,27 @@ export const ScreenSilkPage: React.FC = () => {
     interrupt,
     completeWithLabel,
     isActive,
-    isLoading
+    isLoading,
+    error,
   } = useScreenSilkMachine(config);
 
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+    logSessionEvent('session:error', 'error', {
+      reason: error instanceof Error ? error.message : 'unknown',
+    });
+  }, [error, logSessionEvent]);
+
   const handleStart = () => {
+    completionOriginRef.current = 'auto';
+    interruptOriginRef.current = 'machine';
+    logSessionEvent('session:start', 'info', {
+      duration: duration[0],
+      enableBlur,
+      blinkInterval,
+    });
     startSession();
     
     // Analytics
@@ -79,7 +125,13 @@ export const ScreenSilkPage: React.FC = () => {
   };
 
   const handleStop = () => {
+    interruptOriginRef.current = 'manual';
     interrupt();
+  };
+
+  const handleManualComplete = (label: 'gain' | 'léger' | 'incertain') => {
+    completionOriginRef.current = 'manual';
+    completeWithLabel(label);
   };
 
   const formatTime = (seconds: number): string => {
@@ -235,7 +287,7 @@ export const ScreenSilkPage: React.FC = () => {
                           Arrêter
                         </Button>
                         <Button
-                          onClick={() => completeWithLabel('gain')}
+                          onClick={() => handleManualComplete('gain')}
                           size="lg"
                           variant="default"
                           className="gap-2"
