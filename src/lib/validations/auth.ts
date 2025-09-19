@@ -26,12 +26,24 @@ export const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
-export const unifiedRegisterSchema = registerSchema.extend({
+export const unifiedRegisterSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email requis')
+    .email('Format email invalide'),
+  password: z
+    .string()
+    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Le mot de passe doit contenir au moins une minuscule, une majuscule et un chiffre'),
+  confirmPassword: z.string(),
   fullName: z
     .string()
     .trim()
     .min(2, 'Le nom complet doit contenir au moins 2 caractères')
     .max(100, 'Le nom complet ne peut pas dépasser 100 caractères')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"],
 });
 
 export const resetPasswordSchema = z.object({
