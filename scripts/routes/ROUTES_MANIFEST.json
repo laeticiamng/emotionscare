@@ -330,15 +330,15 @@
     },
     {
       "name": "unauthorized",
-      "path": "/unauthorized",
-      "component": "UnauthorizedPage",
+      "path": "/401",
+      "component": "Error401Page",
       "segment": "public",
       "layout": "simple"
     },
     {
       "name": "forbidden",
-      "path": "/forbidden",
-      "component": "ForbiddenPage",
+      "path": "/403",
+      "component": "Error403Page",
       "segment": "public",
       "layout": "simple"
     },
@@ -352,14 +352,14 @@
     {
       "name": "not-found",
       "path": "/404",
-      "component": "NotFoundPage",
+      "component": "Error404Page",
       "segment": "public",
       "layout": "simple"
     },
     {
       "name": "catch-all",
       "path": "*",
-      "component": "NotFoundPage",
+      "component": "Error404Page",
       "segment": "public",
       "layout": "simple"
     }

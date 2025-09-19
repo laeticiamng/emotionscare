@@ -1,5 +1,5 @@
 /**
- * UNIFIED ERROR PAGE - Fusion de 404Page + Enhanced404Page + NotFoundPage
+ * UNIFIED ERROR PAGE - Fusion de 404Page + Enhanced404Page + Error404Page
  * Préserve EXACTEMENT la même fonctionnalité des trois composants
  */
 
@@ -82,7 +82,7 @@ export default function UnifiedErrorPage({
     },
   ];
 
-  // Version Simple (comme NotFoundPage)
+  // Version Simple (comme Error404Page)
   if (variant === 'simple') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4" data-testid="page-root">

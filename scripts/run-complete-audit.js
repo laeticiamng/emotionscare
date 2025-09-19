@@ -126,9 +126,10 @@ const criticalPages = [
   'src/pages/EventsPage.tsx',
   'src/pages/OptimisationPage.tsx',
   'src/pages/SettingsPage.tsx',
-  'src/pages/ErrorPages/NotFoundPage.tsx',
-  'src/pages/ErrorPages/ServerErrorPage.tsx',
-  'src/pages/ErrorPages/UnauthorizedPage.tsx'
+  'src/pages/errors/404.tsx',
+  'src/pages/ServerErrorPage.tsx',
+  'src/pages/errors/401.tsx',
+  'src/pages/errors/403.tsx'
 ];
 
 let pagesFound = 0;
