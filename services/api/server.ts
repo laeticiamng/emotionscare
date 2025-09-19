@@ -1,13 +1,11 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { createHash } from 'node:crypto';
 
 import { VoiceSchema, TextSchema } from '../journal/lib/validate';
 import { hash } from '../journal/lib/hash';
 import { insertVoice, insertText, listFeed } from '../journal/lib/db';
 import { createServer } from '../lib/server';
 import { moodPlaylistRequestSchema, buildMoodPlaylistResponse } from './music';
-import { z } from 'zod';
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -33,168 +31,317 @@ const defaultJournalDb: JournalDb = {
   listFeed,
 };
 
-const dependencyStatusSchema = z.object({
-  name: z.string(),
-  ok: z.boolean(),
-  latency: z.number(),
-  optional: z.boolean().default(false),
-  lastChecked: z.string(),
-  error: z.string().optional(),
-});
+type CheckStatus = 'ok' | 'degraded' | 'down';
 
-type DependencyStatus = z.infer<typeof dependencyStatusSchema>;
-
-const healthPayloadSchema = z.object({
-  ok: z.boolean(),
-  version: z.string(),
-  uptime: z.number(),
-  timestamp: z.string(),
-  services: z.object({
-    api: z.boolean(),
-    database: z.boolean(),
-    storage: z.boolean(),
-    ai: z.boolean(),
-  }),
-  metrics: z.object({
-    rss: z.number(),
-    heapUsed: z.number(),
-  }),
-  latency: z.object({
-    api: z.number(),
-    eventLoop: z.number(),
-  }),
-  dependencies: z.array(dependencyStatusSchema),
-});
-
-type HealthPayload = z.infer<typeof healthPayloadSchema>;
-
-const appStartedAt = Date.now();
-
-const resolveVersion = (() => {
-  let cached: string | null = null;
-  return () => {
-    if (cached) return cached;
-    try {
-      const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
-      cached = pkg.version ?? '0.0.0';
-    } catch {
-      cached = '0.0.0';
-    }
-    return cached;
-  };
-})();
-
-const DEFAULT_DEPENDENCY_TIMEOUT = Number.parseInt(process.env.HEALTHCHECK_TIMEOUT_MS ?? '1500', 10);
-
-const measureEventLoopDelay = async () => {
-  const start = performance.now();
-  await new Promise((resolve) => setImmediate(resolve));
-  return performance.now() - start;
+type BasicCheck = {
+  status: CheckStatus;
+  latency_ms: number;
+  error?: string;
 };
 
-const checkDependency = async (
-  name: string,
-  target?: string,
-  { optional = false, method = 'HEAD' }: { optional?: boolean; method?: 'HEAD' | 'GET' } = {}
-): Promise<DependencyStatus> => {
-  const lastChecked = new Date().toISOString();
+type FunctionCheck = BasicCheck & {
+  name: string;
+};
 
-  if (!target) {
-    return dependencyStatusSchema.parse({
-      name,
-      ok: false,
-      latency: 0,
-      optional: true,
-      lastChecked,
-      error: 'not_configured',
-    });
-  }
+type HealthChecks = {
+  supabase: BasicCheck;
+  functions: FunctionCheck[];
+  storage: BasicCheck;
+};
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), DEFAULT_DEPENDENCY_TIMEOUT);
-  const started = performance.now();
+type HealthResponse = {
+  status: CheckStatus;
+  timestamp: string;
+  checks: HealthChecks;
+  signature: string;
+};
 
-  try {
-    const response = await fetch(target, {
-      method,
-      cache: 'no-store',
-      redirect: 'follow',
-      signal: controller.signal,
-    });
+const DEFAULT_DEPENDENCY_TIMEOUT = Number.parseInt(process.env.HEALTHCHECK_TIMEOUT_MS ?? '1500', 10);
+const HEALTH_RATE_LIMIT = Number.parseInt(process.env.HEALTH_RATE_LIMIT ?? '60', 10);
+const HEALTH_RATE_WINDOW = Number.parseInt(process.env.HEALTH_RATE_WINDOW_MS ?? '60000', 10);
 
-    const latency = performance.now() - started;
+const parseList = (value?: string) =>
+  value
+    ? value
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean)
+    : [];
 
-    if (!response.ok) {
-      return dependencyStatusSchema.parse({
-        name,
-        ok: false,
-        latency,
-        optional,
-        lastChecked,
-        error: `http_${response.status}`,
-      });
+const getAllowedOrigins = () => parseList(process.env.HEALTH_ALLOWED_ORIGINS);
+const getSupabaseUrl = () =>
+  process.env.HEALTH_SUPABASE_URL ??
+  process.env.SUPABASE_URL ??
+  process.env.VITE_SUPABASE_URL ??
+  null;
+const getSupabaseKey = () =>
+  process.env.HEALTH_SUPABASE_KEY ??
+  process.env.SUPABASE_ANON_KEY ??
+  process.env.VITE_SUPABASE_ANON_KEY ??
+  '';
+const getFunctionTargets = () => parseList(process.env.HEALTH_FUNCTIONS ?? 'ai-emotion-analysis,ai-coach');
+const getDirectStorageUrl = () => process.env.HEALTH_STORAGE_URL ?? null;
+const getStorageBucket = () => process.env.HEALTH_STORAGE_BUCKET ?? null;
+const getStorageObject = () => process.env.HEALTH_STORAGE_OBJECT ?? null;
+
+const createRateLimiter = (limit: number, windowMs: number) => {
+  const bucket = new Map<string, { count: number; resetAt: number }>();
+  const normalizedLimit = Number.isFinite(limit) && limit > 0 ? limit : 60;
+  const normalizedWindow = Number.isFinite(windowMs) && windowMs > 0 ? windowMs : 60000;
+
+  return (key: string) => {
+    const now = Date.now();
+    const entry = bucket.get(key);
+    if (!entry || now >= entry.resetAt) {
+      bucket.set(key, { count: 1, resetAt: now + normalizedWindow });
+      return true;
     }
 
-    return dependencyStatusSchema.parse({
-      name,
-      ok: true,
-      latency,
-      optional,
-      lastChecked,
-    });
-  } catch (error) {
-    const latency = performance.now() - started;
-    return dependencyStatusSchema.parse({
-      name,
-      ok: false,
-      latency,
-      optional,
-      lastChecked,
-      error: error instanceof Error ? error.message : 'unknown_error',
+    if (entry.count >= normalizedLimit) {
+      return false;
+    }
+
+    entry.count += 1;
+    return true;
+  };
+};
+
+const healthRateLimiter = createRateLimiter(HEALTH_RATE_LIMIT, HEALTH_RATE_WINDOW);
+
+const timedFetch = async (url: string, init: RequestInit = {}) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_DEPENDENCY_TIMEOUT);
+
+  try {
+    return await fetch(url, {
+      ...init,
+      cache: 'no-store',
+      signal: controller.signal,
     });
   } finally {
     clearTimeout(timeout);
   }
 };
 
-const buildHealthPayload = async (): Promise<HealthPayload> => {
-  const overallStart = performance.now();
+const buildSupabaseHeaders = () => {
+  const supabaseAnonKey = getSupabaseKey();
+  if (!supabaseAnonKey) {
+    return {
+      Accept: 'application/json',
+    } as Record<string, string>;
+  }
 
-  const [database, storage, ai] = await Promise.all([
-    checkDependency('database', process.env.HEALTHCHECK_DATABASE_URL ?? process.env.DATABASE_URL ?? process.env.SUPABASE_URL),
-    checkDependency('storage', process.env.SUPABASE_STORAGE_URL ?? process.env.SUPABASE_URL, { optional: true }),
-    checkDependency('ai', process.env.HEALTHCHECK_AI_URL ?? process.env.OPENAI_HEALTH_URL, { optional: true }),
-  ]);
+  return {
+    Accept: 'application/json',
+    apikey: supabaseAnonKey,
+    Authorization: `Bearer ${supabaseAnonKey}`,
+  } as Record<string, string>;
+};
 
-  const memory = process.memoryUsage();
-  const apiLatency = performance.now() - overallStart;
-  const eventLoop = await measureEventLoopDelay();
+const pingSupabase = async (): Promise<BasicCheck> => {
+  const supabaseUrl = getSupabaseUrl();
+  if (!supabaseUrl) {
+    return { status: 'degraded', latency_ms: 0, error: 'not_configured' };
+  }
 
-  const services = {
-    api: true,
-    database: database.ok || database.optional,
-    storage: storage.ok || storage.optional,
-    ai: ai.ok || ai.optional,
-  };
+  const headers = buildSupabaseHeaders();
+  const started = performance.now();
 
-  const payload = {
-    ok: [database, storage, ai].every((dependency) => dependency.ok || dependency.optional),
-    version: process.env.APP_VERSION ?? resolveVersion(),
-    uptime: Math.round((Date.now() - appStartedAt) / 1000),
+  try {
+    const authUrl = new URL('/auth/v1/settings', supabaseUrl).toString();
+    const restUrl = new URL('/rest/v1/?select=1', supabaseUrl).toString();
+
+    const authResponse = await timedFetch(authUrl, { headers });
+    const restResponse = await timedFetch(restUrl, {
+      headers: { ...headers, Range: '0-0' },
+      method: 'GET',
+    });
+
+    const latency = Math.round(performance.now() - started);
+    const restOk = restResponse.status < 500;
+    const success = authResponse.ok && restOk;
+
+    return {
+      status: success ? 'ok' : restOk ? 'degraded' : 'down',
+      latency_ms: latency,
+      error: success ? undefined : restOk ? `http_${restResponse.status}` : `http_${restResponse.status}`,
+    };
+  } catch (error) {
+    return {
+      status: 'down',
+      latency_ms: Math.round(performance.now() - started),
+      error: error instanceof Error ? error.name : 'unknown_error',
+    };
+  }
+};
+
+const pingFunction = async (name: string): Promise<FunctionCheck> => {
+  const supabaseUrl = getSupabaseUrl();
+  if (!supabaseUrl) {
+    return { name, status: 'degraded', latency_ms: 0, error: 'not_configured' };
+  }
+
+  const headers = buildSupabaseHeaders();
+  const endpoint = new URL(`/functions/v1/${name}`, supabaseUrl).toString();
+  const started = performance.now();
+
+  try {
+    const response = await timedFetch(endpoint, { method: 'HEAD', headers });
+    const latency = Math.round(performance.now() - started);
+
+    if (!response.ok) {
+      return {
+        name,
+        status: response.status >= 500 ? 'down' : 'degraded',
+        latency_ms: latency,
+        error: `http_${response.status}`,
+      };
+    }
+
+    return { name, status: 'ok', latency_ms: latency };
+  } catch (error) {
+    return {
+      name,
+      status: 'down',
+      latency_ms: Math.round(performance.now() - started),
+      error: error instanceof Error ? error.name : 'unknown_error',
+    };
+  }
+};
+
+const resolveStorageUrl = () => {
+  const directStorageUrl = getDirectStorageUrl();
+  if (directStorageUrl) {
+    return directStorageUrl;
+  }
+
+  const supabaseUrl = getSupabaseUrl();
+  const storageBucket = getStorageBucket();
+  const storageObject = getStorageObject();
+  if (supabaseUrl && storageBucket && storageObject) {
+    return new URL(`/storage/v1/object/public/${storageBucket}/${storageObject}`, supabaseUrl).toString();
+  }
+
+  return null;
+};
+
+const pingStorage = async (): Promise<BasicCheck> => {
+  const target = resolveStorageUrl();
+  if (!target) {
+    return { status: 'degraded', latency_ms: 0, error: 'not_configured' };
+  }
+
+  const started = performance.now();
+
+  try {
+    const response = await timedFetch(target, { method: 'HEAD' });
+    const latency = Math.round(performance.now() - started);
+
+    if (!response.ok) {
+      return {
+        status: response.status >= 500 ? 'down' : 'degraded',
+        latency_ms: latency,
+        error: `http_${response.status}`,
+      };
+    }
+
+    return { status: 'ok', latency_ms: latency };
+  } catch (error) {
+    return {
+      status: 'down',
+      latency_ms: Math.round(performance.now() - started),
+      error: error instanceof Error ? error.name : 'unknown_error',
+    };
+  }
+};
+
+const computeOverallStatus = (
+  supabase: BasicCheck,
+  functions: FunctionCheck[],
+  storage: BasicCheck,
+): CheckStatus => {
+  if (supabase.status === 'down') {
+    return 'down';
+  }
+
+  if (supabase.status === 'degraded') {
+    return 'degraded';
+  }
+
+  if (storage.status === 'down') {
+    return 'degraded';
+  }
+
+  if (storage.status === 'degraded') {
+    return 'degraded';
+  }
+
+  if (functions.some(fn => fn.status === 'down')) {
+    return 'degraded';
+  }
+
+  if (functions.some(fn => fn.status === 'degraded')) {
+    return 'degraded';
+  }
+
+  return 'ok';
+};
+
+const signPayload = (payload: Omit<HealthResponse, 'signature'>) => {
+  const secret = process.env.HEALTH_SIGNING_SECRET ?? '';
+  const canonical = JSON.stringify(payload);
+  return createHash('sha256').update(canonical + secret).digest('hex');
+};
+
+const buildHealthPayload = async (): Promise<HealthResponse> => {
+  const supabaseCheck = await pingSupabase();
+  const functionChecks = await Promise.all(
+    getFunctionTargets().map(target => pingFunction(target)),
+  );
+  const storageCheck = await pingStorage();
+
+  const basePayload = {
+    status: computeOverallStatus(supabaseCheck, functionChecks, storageCheck),
     timestamp: new Date().toISOString(),
-    services,
-    metrics: {
-      rss: memory.rss,
-      heapUsed: memory.heapUsed,
+    checks: {
+      supabase: supabaseCheck,
+      functions: functionChecks,
+      storage: storageCheck,
     },
-    latency: {
-      api: Number(apiLatency.toFixed(2)),
-      eventLoop: Number(eventLoop.toFixed(2)),
-    },
-    dependencies: [database, storage, ai],
-  } satisfies HealthPayload;
+  } as const;
 
-  return healthPayloadSchema.parse(payload);
+  return {
+    ...basePayload,
+    signature: signPayload(basePayload),
+  };
+};
+
+const buildRateLimitedPayload = (): HealthResponse => {
+  const base = {
+    status: 'degraded' as CheckStatus,
+    timestamp: new Date().toISOString(),
+    checks: {
+      supabase: { status: 'degraded', latency_ms: 0, error: 'rate_limited' },
+      functions: [] as FunctionCheck[],
+      storage: { status: 'degraded', latency_ms: 0, error: 'rate_limited' },
+    },
+  } as const;
+
+  return {
+    ...base,
+    signature: signPayload(base),
+  };
+};
+
+const applyHealthCors = (request: any, reply: any) => {
+  const origin = request.headers?.origin as string | undefined;
+  const allowedOrigins = getAllowedOrigins();
+  if (origin && allowedOrigins.includes(origin)) {
+    reply.header('access-control-allow-origin', origin);
+  }
+
+  reply.header('access-control-allow-methods', 'GET');
+  reply.header('vary', 'origin');
 };
 
 export function createApp(options: CreateAppOptions = {}) {
@@ -206,8 +353,22 @@ export function createApp(options: CreateAppOptions = {}) {
 
   return createServer({
     registerRoutes(app) {
-      const sendHealth = async (_req: any, reply: any) => {
+      const sendHealth = async (request: any, reply: any) => {
+        applyHealthCors(request, reply);
         reply.header('cache-control', 'no-store');
+
+        const identifier = String(
+          request.ip ??
+            request.headers?.['x-forwarded-for'] ??
+            request.headers?.['x-real-ip'] ??
+            'anonymous',
+        );
+
+        if (!healthRateLimiter(identifier)) {
+          reply.code(429).send(buildRateLimitedPayload());
+          return;
+        }
+
         const payload = await buildHealthPayload();
         reply.send(payload);
       };
