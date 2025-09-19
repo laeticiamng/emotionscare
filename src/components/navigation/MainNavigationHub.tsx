@@ -61,7 +61,7 @@ const MainNavigationHub: React.FC = () => {
     // Analytics & Progress
     { title: 'Gamification', description: 'Système de récompenses', path: '/app/leaderboard', icon: Trophy, category: 'analytics' },
     { title: 'Activité', description: 'Historique et tendances', path: '/app/activity', icon: BarChart3, category: 'analytics' },
-    { title: 'Heatmap', description: 'Carte de chaleur émotionnelle', path: '/app/heatmap', icon: Grid3X3, category: 'analytics' },
+    { title: 'Scores & vibes', description: 'Courbes d’humeur et heatmap quotidienne', path: '/app/scores', icon: Grid3X3, category: 'analytics' },
     { title: 'Communauté', description: 'Réseau social thérapeutique', path: '/app/community', icon: Users, category: 'analytics' },
     
     // Settings

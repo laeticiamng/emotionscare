@@ -118,7 +118,7 @@ const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -204,7 +204,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Analytics & Gamification
   GamificationPage,
   LeaderboardPage,
-  HeatmapPage,
+  ScoresPage,
   
   // Settings
   B2CSettingsPage,

@@ -94,13 +94,15 @@
   - Export/partage guidé avec synthèse de la playlist et recommandations.
   - ✅ QA 06/2025 : scénario e2e `adaptive-music-favorites.spec.ts` + tests `requestMoodPlaylist` (3 cas) sur la normalisation client.
 
-### 📊 Scores Dashboard — 🟢 Livré
-- **Entrées** : `src/pages/HeatmapPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scoresDashboard.service.ts`, `src/hooks/useChartExporter.ts`.
+### 📊 Scores & vibes — 🟢 Livré
+- **Entrées** : `src/pages/ScoresPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scores/dataApi.ts`, `src/features/scores/*`.
+- **Données Supabase** : `emotion_scans.payload` (valence, arousal, labels) et `sessions` (type, created_at) sous RLS owner-only (aucune donnée textuelle du journal).
 - **Fonctionnalités clés** :
-  - Récupération Supabase (trend 30j, sessions hebdo, heatmap) + fallback local `SCORES_DASHBOARD_FALLBACK`.
-  - Graphiques Recharts (Line/Bar/Scatter) stylés, tooltips custom, palettes par type de séance.
-  - Carte récap niveau/XP avec calcul du progrès et slots intenses.
-  - Export PNG haute résolution via `useChartExporter` (scale, padding, toast d'erreur).
+  - Agrégation React Query (cache 60s) + lissage (moving average) pour les courbes valence/arousal sur 30 jours.
+  - Barres hebdomadaires empilées (8 semaines glissantes) + heatmap SVG personnalisée des vibes dominantes (calm/focus/bright/reset).
+  - Respect accessibility : aria-label/role="img", texte de synthèse pour lecteurs d'écran, animation désactivée si `prefers-reduced-motion`.
+  - Export PNG fiable via bouton dédié (html2canvas-free) + breadcrumbs Sentry `scores:fetch:*` & `scores:export:png`.
+  - ✅ QA 06/2025 : tests unitaires `src/services/scores/__tests__/dataApi.test.ts` (mappers/agrégations) + e2e `tests/e2e/scores-heatmap-dashboard.spec.ts` (chargement, interactions, export).
 
 ### 🩺 Observabilité — Endpoint `/health`
 - **Entrée** : service Fastify `services/api/server.ts` exposant `/health`, `/healthz` et `/api/healthz`.

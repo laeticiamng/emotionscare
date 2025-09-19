@@ -82,7 +82,7 @@ const routesByCategory = {
     '✅ /app/social-cocon - Espaces privés sécurisés',
     '✅ /app/leaderboard - Gamification complète',
     '✅ /app/activity - Analytics de progression',
-    '✅ /app/heatmap - Cartographie émotionnelle',
+    '✅ /app/scores - Scores & heatmap émotions',
     '✅ /app/voice-journal - Journal vocal IA',
     '✅ /app/emotion-scan - Analyse faciale multi-angle'
   ],

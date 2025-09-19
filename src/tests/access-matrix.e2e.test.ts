@@ -95,7 +95,7 @@ test.describe('Matrice d\'accès RBAC - Employee', () => {
   });
 
   test('Employee - Heatmap interdite', async ({ page }) => {
-    await page.goto('/app/heatmap');
+    await page.goto('/app/scores');
     await expect(page).toHaveURL('/403');
   });
 });
@@ -136,7 +136,7 @@ test.describe('Matrice d\'accès RBAC - Manager', () => {
   });
 
   test('Manager - Heatmap accessible avec anonymat', async ({ page }) => {
-    await page.goto('/app/heatmap');
+    await page.goto('/app/scores');
     await expect(page.locator('[data-testid="heatmap-page"]')).toBeVisible();
     
     // Vérifier anonymisation (min 5 personnes)

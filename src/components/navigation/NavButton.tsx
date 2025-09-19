@@ -210,7 +210,7 @@ function getNodeLabel(node: NavNode): string {
     'nav.learn.edn': 'EDN',
     'nav.analytics': 'Analytics',
     'nav.analytics.weekly': 'Barres Hebdo',
-    'nav.analytics.heatmap': 'Heatmap',
+    'nav.analytics.heatmap': 'Scores & vibes',
     'nav.wellness': 'Bien-être',
     'nav.wellness.breathwork': 'Respiration',
     'nav.wellness.vr': 'VR',

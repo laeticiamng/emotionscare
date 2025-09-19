@@ -278,11 +278,11 @@ const PremiumNavigation: React.FC = () => {
           segment: 'consumer'
         },
         {
-          id: 'heatmap',
-          title: 'Heatmap Émotionnelle',
-          description: 'Visualisation de vos patterns',
+          id: 'scores',
+          title: 'Scores & Vibes',
+          description: 'Visualisation douce des humeurs et séances',
           icon: <Layers className="w-5 h-5" />,
-          path: '/app/heatmap',
+          path: '/app/scores',
           category: 'analytics',
           premium: true,
           xp: 190,

@@ -70,7 +70,7 @@ const navigationItems: NavigationItem[] = [
   
   // Analytics
   { id: 'weekly-bars', label: 'Weekly Bars', icon: BarChart3, href: '/app/activity', category: 'Analytics', description: 'Graphiques hebdo' },
-  { id: 'heatmap-vibes', label: 'Heatmap Vibes', icon: Heart, href: '/app/heatmap', category: 'Analytics', description: 'Carte émotionnelle' },
+  { id: 'scores-vibes', label: 'Scores & vibes', icon: Heart, href: '/app/scores', category: 'Analytics', description: 'Courbes d’humeur et heatmap quotidienne' },
   { id: 'leaderboard', label: 'Classements', icon: Target, href: '/app/leaderboard', category: 'Analytics', description: 'Compétition amicale' },
   
   // Social & Communauté
