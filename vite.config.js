@@ -22,10 +22,7 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths(),
       react({
         // Configuration React sans TypeScript du tout
-        typescript: false,
-        babel: {
-          plugins: [tsconfigPaths(), ]
-        }
+        typescript: false
       }),
       mode === 'development' && componentTagger(),
       enableAnalyzer && visualizer({
