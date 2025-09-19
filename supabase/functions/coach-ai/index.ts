@@ -1,13 +1,73 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import sanitizeHtml from "npm:sanitize-html@2.17.0";
 import { authorizeRole } from '../_shared/auth.ts';
+import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const sanitizeUserContent = (input?: unknown): string => {
+  if (!input || typeof input !== 'string') {
+    return '';
+  }
+
+  const sanitized = sanitizeHtml(input, { allowedTags: [], allowedAttributes: {} });
+  return sanitized
+    .replace(/\u00a0/g, ' ')
+    .split('\n')
+    .map((line) => line.trim())
+    .join('\n')
+    .trim();
+};
+
+const sanitizeHistory = (history: unknown): Array<{ role: string; content: string }> => {
+  if (!Array.isArray(history)) {
+    return [];
+  }
+
+  return history
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') {
+        return null;
+      }
+
+      const role = (entry as Record<string, unknown>).role;
+      const content = sanitizeUserContent((entry as Record<string, unknown>).content);
+
+      if (!content || typeof role !== 'string') {
+        return null;
+      }
+
+      return { role, content };
+    })
+    .filter((entry): entry is { role: string; content: string } => entry !== null)
+    .slice(-6);
+};
+
+const sanitizeContext = (context: unknown): Record<string, unknown> => {
+  if (!context || typeof context !== 'object') {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(context as Record<string, unknown>).map(([key, value]) => {
+      if (typeof value === 'string') {
+        return [key, sanitizeUserContent(value)];
+      }
+
+      if (Array.isArray(value)) {
+        return [key, value.map((item) => (typeof item === 'string' ? sanitizeUserContent(item) : item))];
+      }
+
+      return [key, value];
+    })
+  );
 };
 
 serve(async (req) => {
@@ -23,18 +83,44 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const { userMessage, personality, context, conversationHistory, isOpening } = await req.json();
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'coach-ai',
+      userId: user.id,
+      limit: 6,
+      windowMs: 60_000,
+      description: 'coach-ai-prompt',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Veuillez patienter avant de réessayer.',
+      });
+    }
+
+    const payload = await req.json();
+    const sanitizedMessage = sanitizeUserContent(payload?.userMessage);
+    const sanitizedPersonality = sanitizeContext(payload?.personality);
+    const sanitizedContext = sanitizeContext(payload?.context);
+    const sanitizedHistory = sanitizeHistory(payload?.conversationHistory);
+    const isOpening = Boolean(payload?.isOpening);
+
+    if (!sanitizedMessage) {
+      return new Response(JSON.stringify({ error: 'Message utilisateur requis' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     if (!openAIApiKey) {
-      // Fallback coaching advice
-      const fallbackAdvice = generateFallbackCoaching(emotionData, requestType);
       return new Response(
-        JSON.stringify(fallbackAdvice),
+        JSON.stringify({
+          response: "Le coach est momentanément indisponible, mais nous restons à votre écoute.",
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const prompt = buildCoachingPrompt(userMessage, personality, context, conversationHistory, isOpening);
+    const prompt = buildCoachingPrompt(sanitizedMessage, sanitizedPersonality, sanitizedContext, sanitizedHistory, isOpening);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -57,10 +143,12 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const coaching = data.choices[0].message.content;
+    const coaching = data.choices[0].message.content ?? '';
+    const sanitizedResponse = sanitizeUserContent(coaching) ||
+      "Je suis là pour vous accompagner, mais je n'ai pas pu formuler une réponse sécurisée. Essayez de reformuler votre demande.";
 
     // Parse the response to extract structured coaching advice
-    return new Response(JSON.stringify({ response: coaching }), {
+    return new Response(JSON.stringify({ response: sanitizedResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 

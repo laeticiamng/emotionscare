@@ -1,7 +1,8 @@
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { authorizeRole, checkRateLimit, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { authorizeRole, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
   const corsHeaders = {
@@ -29,12 +30,18 @@ serve(async (req) => {
     }
 
     // Rate limiting plus strict pour les invitations
-    const clientId = authResult.user.id;
-    if (!checkRateLimit(clientId, 5, 300000)) { // 5 invitations par 5 minutes
-      return new Response(
-        JSON.stringify({ error: 'Limite d\'invitations atteinte. Veuillez patienter.' }),
-        { status: 429, headers: corsHeaders }
-      );
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'send-invitation',
+      userId: authResult.user.id,
+      limit: 5,
+      windowMs: 300_000,
+      description: 'send-invitation',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Limite d’invitations atteinte. Veuillez patienter.',
+      });
     }
 
     const { email, role, organizationId } = await req.json();

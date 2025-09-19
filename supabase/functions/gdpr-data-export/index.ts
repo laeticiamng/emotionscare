@@ -1,7 +1,8 @@
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { authenticateRequest, checkRateLimit, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
   const corsHeaders = {
@@ -27,12 +28,18 @@ serve(async (req) => {
       );
     }
 
-    const clientId = authResult.user.id;
-    if (!checkRateLimit(clientId, 3, 3600000)) { // 3 exports par heure
-      return new Response(
-        JSON.stringify({ error: 'Limite d\'exports atteinte. Veuillez patienter.' }),
-        { status: 429, headers: corsHeaders }
-      );
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'gdpr-data-export',
+      userId: authResult.user.id,
+      limit: 3,
+      windowMs: 3_600_000,
+      description: 'gdpr-data-export',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        message: 'Limite d’exports atteinte. Veuillez patienter.',
+      });
     }
 
     const { format = 'json' } = await req.json();

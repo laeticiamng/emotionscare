@@ -1,8 +1,10 @@
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import {
+  BUILD_INFO,
   SENTRY_DSN,
   SENTRY_ENVIRONMENT,
+  SENTRY_RELEASE,
   SENTRY_TRACES_SAMPLE_RATE,
   SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
   SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
@@ -35,11 +37,12 @@ export function initializeSentry(): void {
   }
 
   try {
-    const release = import.meta.env.VITE_APP_VERSION ?? import.meta.env.VITE_COMMIT_SHA;
+    const release = SENTRY_RELEASE;
+    const environment = SENTRY_ENVIRONMENT ?? import.meta.env.MODE ?? 'development';
 
     Sentry.init({
       dsn,
-      environment: SENTRY_ENVIRONMENT ?? import.meta.env.MODE ?? 'development',
+      environment,
       release,
       integrations: [new BrowserTracing()],
       tracesSampleRate: SENTRY_TRACES_SAMPLE_RATE,
@@ -78,6 +81,20 @@ export function initializeSentry(): void {
       }
     });
 
+    Sentry.configureScope((scope) => {
+      scope.setTag('deploymentEnvironment', environment);
+
+      if (release) {
+        scope.setTag('release', release);
+      }
+
+      scope.setContext('build', {
+        version: BUILD_INFO.version ?? 'unknown',
+        commitSha: BUILD_INFO.commitSha ?? 'unknown',
+        release: release ?? 'unversioned',
+      });
+    });
+
     Sentry.addGlobalEventProcessor((event) => {
       if (event.exception?.values?.[0]?.stacktrace?.frames) {
         const frames = event.exception.values[0].stacktrace.frames;
@@ -103,12 +120,6 @@ export function initializeSentry(): void {
     });
 
     sentryInitialized = true;
-
-    if (release) {
-      Sentry.configureScope((scope) => {
-        scope.setTag('appVersion', release);
-      });
-    }
 
     if (import.meta.env.DEV) {
       console.log('[Sentry] Error tracking initialized for "reading add" errors');

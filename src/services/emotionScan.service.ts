@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
+import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
+import { logger } from '@/lib/logger';
 
 const POSITIVE_KEYS = ['joie', 'confiance', 'anticipation', 'surprise'] as const;
 const NEGATIVE_KEYS = ['tristesse', 'colere', 'peur', 'degout'] as const;
@@ -42,11 +44,13 @@ export interface EmotionScanHistoryEntry {
   scanType: string | null;
 }
 
-interface InvokePayload {
-  text: string;
-  context?: string;
-  previousEmotions?: Record<string, number>;
-}
+const InvokePayloadSchema = z.object({
+  text: z.string().min(1),
+  context: z.string().optional(),
+  previousEmotions: z.record(z.number()).optional(),
+});
+
+type InvokePayload = z.infer<typeof InvokePayloadSchema>;
 
 interface EmotionScanInvokeOptions {
   accessToken?: string | null;
@@ -107,26 +111,18 @@ export async function invokeEmotionScan(
   payload: InvokePayload,
   options: EmotionScanInvokeOptions = {},
 ): Promise<EmotionAnalysisResult> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (options.accessToken) {
-    headers.Authorization = `Bearer ${options.accessToken}`;
-  }
-
-  const { data, error } = await supabase.functions.invoke('ai-emotion-analysis', {
-    body: payload,
-    headers,
+  const result = await invokeSupabaseEdge<typeof payload, unknown>('ai-emotion-analysis', {
+    payload,
+    schema: InvokePayloadSchema,
+    accessToken: options.accessToken,
+    timeoutMs: 12_000,
+    retries: 2,
+    retryDelayMs: 750,
   });
 
-  if (error) {
-    throw new Error(error.message || 'Échec de l\'analyse émotionnelle');
-  }
-
-  const parsed = analysisResponseSchema.safeParse(data);
+  const parsed = analysisResponseSchema.safeParse(result);
   if (!parsed.success) {
-    console.error('Invalid analysis payload', parsed.error.format());
+    logger.error('Invalid analysis payload received', parsed.error.format(), 'emotionScan.invoke');
     throw new Error("Réponse d'analyse émotionnelle invalide");
   }
 
@@ -172,6 +168,7 @@ export async function persistEmotionScanResult(
     .single();
 
   if (error) {
+    logger.error('Failed to insert emotion scan row', error, 'emotionScan.persist');
     throw new Error(error.message || 'Impossible de sauvegarder le scan émotionnel');
   }
 

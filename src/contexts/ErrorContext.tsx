@@ -26,6 +26,7 @@ export interface ErrorContextType {
 
 // Context
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
+export { ErrorContext };
 
 // Provider
 export const ErrorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -134,13 +135,16 @@ export const withErrorBoundary = <P extends object>(
   Component: React.ComponentType<P>,
   fallback?: React.ComponentType<{ error: Error; resetError: () => void }>
 ) => {
-  return React.forwardRef<any, P>((props, ref) => {
-    return (
-      <ErrorBoundary fallback={fallback}>
-        <Component {...props} ref={ref} />
-      </ErrorBoundary>
-    );
-  });
+  const WrappedComponent: React.FC<P> = props => (
+    <ErrorBoundary fallback={fallback}>
+      <Component {...props} />
+    </ErrorBoundary>
+  );
+
+  const componentName = Component.displayName ?? Component.name ?? 'Component';
+  WrappedComponent.displayName = `WithErrorBoundary(${componentName})`;
+
+  return WrappedComponent;
 };
 
 // Error Boundary Component
@@ -148,6 +152,8 @@ class ErrorBoundary extends React.Component<
   { children: ReactNode; fallback?: React.ComponentType<{ error: Error; resetError: () => void }> },
   { hasError: boolean; error: Error | null }
 > {
+  static contextType = ErrorContext;
+
   constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -159,6 +165,19 @@ class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error Boundary caught an error:', error, errorInfo);
+
+    const errorContext = this.context as ErrorContextType | undefined;
+
+    if (errorContext) {
+      errorContext.addError({
+        message: error.message,
+        severity: 'critical',
+        stack: error.stack,
+        context: {
+          componentStack: errorInfo.componentStack,
+        },
+      });
+    }
   }
 
   resetError = () => {

@@ -15,7 +15,9 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES } from './aliases';
 import { RouteGuard } from './guards';
-import LoadingAnimation from '@/components/ui/loading-animation';
+import { withErrorBoundary } from '@/contexts/ErrorContext';
+import PageErrorFallback from '@/components/error/PageErrorFallback';
+import { LoadingState } from '@/components/loading/LoadingState';
 import EnhancedShell from '@/components/layout/EnhancedShell';
 import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 
@@ -297,8 +299,12 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
 const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <Suspense
     fallback={
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingAnimation text="Chargement..." />
+      <div className="bg-background">
+        <LoadingState
+          variant="page"
+          text="Chargement de la page..."
+          className="min-h-screen"
+        />
       </div>
     }
   >
@@ -328,15 +334,17 @@ const LayoutWrapper: React.FC<{
 
 function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
   const Component = componentMap[routeMeta.component];
-  
+
   if (!Component) {
     return <Navigate to="/404" replace />;
   }
 
+  const ComponentWithBoundary = withErrorBoundary(Component, PageErrorFallback);
+
   const element = (
     <SuspenseWrapper>
       <LayoutWrapper layout={routeMeta.layout}>
-        <Component />
+        <ComponentWithBoundary />
       </LayoutWrapper>
     </SuspenseWrapper>
   );

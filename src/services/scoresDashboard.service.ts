@@ -1,6 +1,7 @@
 import { differenceInCalendarDays, getISOWeek, isAfter, parseISO, startOfISOWeek, subWeeks } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database, Json } from '@/integrations/supabase/types';
+import { logger } from '@/lib/logger';
 import { computeBalanceFromScores, deriveScore10 } from './emotionScan.service';
 
 export interface MoodTrendPoint {
@@ -185,25 +186,25 @@ export async function fetchScoresDashboard(userId?: string): Promise<ScoresDashb
   const vrGalaxy = vrGalaxyResult.data ?? [];
 
   if (scanResult.error) {
-    console.error('Unable to load emotion scans for scores dashboard', scanResult.error);
+    logger.warn('Unable to load emotion scans for scores dashboard', scanResult.error, 'scores.fetch');
   }
   if (flashGlowResult.error) {
-    console.error('Unable to load Flash Glow metrics for scores dashboard', flashGlowResult.error);
+    logger.warn('Unable to load Flash Glow metrics for scores dashboard', flashGlowResult.error, 'scores.fetch');
   }
   if (breathworkResult.error) {
-    console.error('Unable to load breathwork sessions for scores dashboard', breathworkResult.error);
+    logger.warn('Unable to load breathwork sessions for scores dashboard', breathworkResult.error, 'scores.fetch');
   }
   if (journalResult.error) {
-    console.error('Unable to load journal entries for scores dashboard', journalResult.error);
+    logger.warn('Unable to load journal entries for scores dashboard', journalResult.error, 'scores.fetch');
   }
   if (musicResult.error) {
-    console.error('Unable to load music sessions for scores dashboard', musicResult.error);
+    logger.warn('Unable to load music sessions for scores dashboard', musicResult.error, 'scores.fetch');
   }
   if (vrBreathResult.error) {
-    console.error('Unable to load VR breath metrics for scores dashboard', vrBreathResult.error);
+    logger.warn('Unable to load VR breath metrics for scores dashboard', vrBreathResult.error, 'scores.fetch');
   }
   if (vrGalaxyResult.error) {
-    console.error('Unable to load VR galaxy metrics for scores dashboard', vrGalaxyResult.error);
+    logger.warn('Unable to load VR galaxy metrics for scores dashboard', vrGalaxyResult.error, 'scores.fetch');
   }
 
   const moodTrend = mapScansToTrend(scans);
