@@ -146,6 +146,10 @@ npm run storybook        # Interface composants
 - Centraliser les stores dans `src/store` et exposer des sélecteurs nommés (`export const selectX = (state) => state.x`).
 - Éviter d'accéder directement à `useStore.getState()` dans les composants : préférer `useStore(selectX)` pour profiter de la comparaison par référence.
 - Chaque ajout de logique store doit s'accompagner d'une suite de tests unitaires ciblant actions et sélecteurs.
+- Pour les sélecteurs qui retournent plusieurs clés ou des objets, utiliser `useAppStore(selector, shallow)` afin d'éviter les rerenders inutiles.
+- Les actions doivent rester pures et immuables : pas de mutation in-place ni d'effets secondaires implicites.
+- Utiliser `subscribeWithSelector` pour les écoutes sans rerender (analytics, logging) et garder `devtools` activé uniquement en développement.
+- Documenter toute nouvelle branche persistée et l'ajouter au `partialize` associé afin de conserver une hydratation minimale.
 
 ### Styling
 - **Tailwind CSS** pour tout le styling
