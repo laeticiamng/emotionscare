@@ -439,6 +439,8 @@ export function sanitizeAggregateText(text: string): string {
     .replace(/• (?=[\.,])/g, '•')
     .trim();
 
+
+
   if (!cleaned) {
     return '';
   }

@@ -331,14 +331,14 @@
     {
       "name": "unauthorized",
       "path": "/401",
-      "component": "Error401Page",
+      "component": "UnauthorizedPage",
       "segment": "public",
       "layout": "simple"
     },
     {
       "name": "forbidden",
       "path": "/403",
-      "component": "Error403Page",
+      "component": "ForbiddenPage",
       "segment": "public",
       "layout": "simple"
     },
@@ -352,14 +352,14 @@
     {
       "name": "not-found",
       "path": "/404",
-      "component": "Error404Page",
+      "component": "UnifiedErrorPage",
       "segment": "public",
       "layout": "simple"
     },
     {
       "name": "catch-all",
       "path": "*",
-      "component": "Error404Page",
+      "component": "UnifiedErrorPage",
       "segment": "public",
       "layout": "simple"
     }
