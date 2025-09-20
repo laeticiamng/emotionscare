@@ -86,6 +86,9 @@ export { default as LegalTermsPage } from './LegalTermsPage';
 export { default as LegalPrivacyPage } from './LegalPrivacyPage';
 
 // System & Error pages
+export { default as UnauthorizedPage } from './UnauthorizedPage';
+export { default as ForbiddenPage } from './ForbiddenPage';
+export { default as UnifiedErrorPage } from './unified/UnifiedErrorPage';
 export { default as Error401Page } from './errors/401';
 export { default as Error403Page } from './errors/403';
 export { default as Error404Page } from './errors/404';

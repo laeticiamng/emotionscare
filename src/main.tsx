@@ -6,13 +6,10 @@ import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
-import { I18nProvider } from '@/COMPONENTS.reg';
-import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import { RootProvider } from '@/providers';
 import { routerV2 } from '@/routerV2';
-
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -91,13 +88,8 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <React.StrictMode>
     <RootProvider>
-      <AccessibilityProvider>
-        <I18nProvider>
-          <AccessibilitySkipLinks />
-          <RouterProvider router={routerV2} />
-        </I18nProvider>
-      </AccessibilityProvider>
+      <AccessibilitySkipLinks />
+      <RouterProvider router={routerV2} />
     </RootProvider>
   </React.StrictMode>
-
 );

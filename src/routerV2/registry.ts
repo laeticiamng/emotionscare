@@ -849,21 +849,21 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/401',
     segment: 'public',
     layout: 'marketing',
-    component: 'Error401Page',
+    component: 'UnauthorizedPage',
   },
   {
     name: 'forbidden',
     path: '/403',
     segment: 'public',
     layout: 'marketing',
-    component: 'Error403Page',
+    component: 'ForbiddenPage',
   },
   {
     name: 'not-found',
     path: '/404',
     segment: 'public',
     layout: 'marketing',
-    component: 'Error404Page',
+    component: 'UnifiedErrorPage',
   },
   {
     name: 'server-error',
@@ -914,7 +914,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '*',
     segment: 'public',
     layout: 'simple',
-    component: 'Error404Page',
+    component: 'UnifiedErrorPage',
     meta: {
       title: 'Page introuvable - EmotionsCare',
       description: 'Cette page n\'existe pas',
