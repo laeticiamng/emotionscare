@@ -1,8 +1,18 @@
-# EmotionsCare – Variables d'environnement
+# Variables d'environnement clés
 
-## Assessments cliniques
+Ce document résume les variables nécessaires pour activer les agrégations B2B textuelles.
 
-| Variable | Description | Valeur recommandée (dev) |
+## Supabase
+
+| Variable | Description |
+| --- | --- |
+| `SUPABASE_URL` | URL du projet Supabase utilisée par les fonctions Edge. |
+| `SUPABASE_ANON_KEY` | Clé publique utilisée côté Edge pour interroger Supabase avec RLS actif. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clé réservée aux tâches batch (upsert des rollups). Ne jamais l'exposer au client. |
+
+## Feature flags
+
+| Variable | Valeur recommandée | Description |
 | --- | --- | --- |
 | `CORS_ORIGINS` | Liste des origines autorisées pour les Edge Functions cliniques (`/functions/v1/assess-start`). | `https://app.prod.tld,https://staging.app.tld,http://localhost:5173` |
 | `FF_ASSESS_WHO5` | Active la diffusion du WHO-5 via l'Edge. | `true` |
@@ -11,5 +21,5 @@
 | `FF_ASSESS_SAM` | Active la diffusion du SAM via l'Edge. | `true` |
 | `FF_ASSESS_SUDS` | Active la diffusion du SUDS via l'Edge. | `true` |
 | `FF_ORCH_BREATH` | Active l’orchestration adaptative du module respiration. | `true` |
+| `FF_B2B_AGGREGATES` | `true` | Active l'endpoint `/assess/aggregate` et les vues B2B correspondantes. |
 
-> ℹ️ Ces variables sont lues côté Edge. Toute désactivation (`false`) renvoie une erreur `instrument_disabled`.

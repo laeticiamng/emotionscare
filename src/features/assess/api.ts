@@ -1,23 +1,19 @@
-import type { InstrumentCatalog, InstrumentCode, LocaleCode } from '@/lib/assess/types';
-
-export async function startAssessment(
-  instrument: InstrumentCode,
-  locale: LocaleCode = 'fr',
-  fetchImpl: typeof fetch = fetch,
-): Promise<InstrumentCatalog> {
-  const response = await fetchImpl('/functions/v1/assess-start', {
+export async function submitAssessment(
+  instrument: string,
+  answers: Record<string, number>,
+  ts?: string,
+): Promise<{ status: 'ok'; summary: string }> {
+  const res = await fetch('/functions/v1/assess-submit', {
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({ instrument, locale }),
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ instrument, answers, ts }),
   });
 
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    const reason = typeof data?.error === 'string' ? data.error : 'assess_start_failed';
-    throw new Error(reason);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const errorMessage = typeof data?.error === 'string' ? data.error : 'assess_submit_failed';
+    throw new Error(errorMessage);
   }
 
-  return response.json() as Promise<InstrumentCatalog>;
+  return data as { status: 'ok'; summary: string };
 }

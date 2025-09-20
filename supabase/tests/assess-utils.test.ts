@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { summarizeAssessment, sanitizeAggregateText } from '../functions/_shared/assess.ts';
+import { summarizeAssessment } from '../functions/_shared/assess.ts';
+import { sanitizeAggregateText } from '../functions/_shared/clinical_text.ts';
 
 describe('summarizeAssessment determineLevel', () => {
   it.each([
@@ -31,7 +32,7 @@ describe('sanitizeAggregateText', () => {
 
     expect(sanitized).not.toMatch(/\d/);
     expect(sanitized).not.toMatch(/score|niveau|point/i);
-    expect(sanitized.startsWith('•')).toBe(true);
-    expect(sanitized).toBe('• moyen •/• (•) avec • à surveiller.');
+    expect(sanitized.startsWith('•')).toBe(false);
+    expect(sanitized).toBe('moyen / () avec à surveiller.');
   });
 });

@@ -3,7 +3,8 @@ import { z } from '../_shared/zod.ts';
 import { createClient } from '../_shared/supabase.ts';
 
 import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
-import { sanitizeAggregateText, instrumentSchema } from '../_shared/assess.ts';
+import { instrumentSchema } from '../_shared/assess.ts';
+import { sanitizeAggregateText } from '../_shared/clinical_text.ts';
 import { appendCorsHeaders, preflightResponse, rejectCors, resolveCors } from '../_shared/cors.ts';
 import { applySecurityHeaders, json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
@@ -11,11 +12,10 @@ import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
-import { signJsonPayload } from '../_shared/signature.ts';
 
 const aggregateSchema = z.object({
-  org_id: z.string().min(1),
-  period: z.string().regex(/^[0-9]{4}-(0[1-9]|1[0-2])$/, 'invalid_period'),
+  org_id: z.string().uuid(),
+  period: z.string().regex(/^[0-9]{4}-(0[1-9]|1[0-2]|W[0-5][0-9])$/, 'invalid_period'),
   instruments: z.array(instrumentSchema).optional(),
 });
 
@@ -23,7 +23,6 @@ const ORG_ALLOWED_ROLES = ['b2b_admin', 'b2b_hr', 'b2b_user', 'admin'] as const;
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-const CSV_SIGNING_SECRET = Deno.env.get('CSV_SIGNING_SECRET') ?? '';
 
 serve(async (req) => {
   const startedAt = Date.now();
@@ -141,6 +140,45 @@ serve(async (req) => {
 
     const { org_id: orgId, period, instruments } = parsed.data;
 
+    const metadata = auth.user.user_metadata ?? {};
+    const appMetadata = auth.user.app_metadata ?? {};
+    const claimedOrgIds = new Set<string>();
+
+    if (typeof metadata.org_id === 'string' && metadata.org_id.length > 0) {
+      claimedOrgIds.add(metadata.org_id);
+    }
+    if (Array.isArray(metadata.org_ids)) {
+      metadata.org_ids.filter((value): value is string => typeof value === 'string').forEach((value) => {
+        if (value.length > 0) claimedOrgIds.add(value);
+      });
+    }
+    if (typeof appMetadata.org_id === 'string' && appMetadata.org_id.length > 0) {
+      claimedOrgIds.add(appMetadata.org_id);
+    }
+    if (Array.isArray(appMetadata.org_ids)) {
+      appMetadata.org_ids.filter((value: unknown): value is string => typeof value === 'string').forEach((value) => {
+        if (value.length > 0) claimedOrgIds.add(value);
+      });
+    }
+
+    if (claimedOrgIds.size === 0) {
+      await logUnauthorizedAccess(req, 'missing_org_claim');
+      const response = appendCorsHeaders(json(403, { error: 'forbidden' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'forbidden', stage: 'org_claim_missing' },
+      );
+    }
+
+    if (!claimedOrgIds.has(orgId)) {
+      await logUnauthorizedAccess(req, 'forbidden_org_scope');
+      const response = appendCorsHeaders(json(403, { error: 'forbidden' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'forbidden', stage: 'org_scope' },
+      );
+    }
+
     const authHeader = req.headers.get('authorization');
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: {
@@ -149,21 +187,6 @@ serve(async (req) => {
     });
 
     hashedOrgId = hash(orgId);
-
-    const metadata = auth.user.user_metadata ?? {};
-    const orgClaims = Array.isArray(metadata.org_ids)
-      ? metadata.org_ids
-      : metadata.org_id
-        ? [metadata.org_id]
-        : [];
-    if (orgClaims.length > 0 && !orgClaims.includes(orgId)) {
-      await logUnauthorizedAccess(req, 'forbidden_org_scope');
-      const response = appendCorsHeaders(json(403, { error: 'forbidden' }), cors);
-      return finalize(
-        applySecurityHeaders(response, { cacheControl: 'no-store' }),
-        { outcome: 'denied', error: 'forbidden', stage: 'org_scope' },
-      );
-    }
 
     let query = supabase
       .from('org_assess_rollups')
@@ -187,31 +210,17 @@ serve(async (req) => {
       );
     }
 
-    const sanitizedRows = (data ?? [])
+    const summaries = (data ?? [])
       .filter((row) => typeof row.n === 'number' && row.n >= 5)
       .map((row) => {
         const sanitizedText = sanitizeAggregateText(row.text_summary ?? '');
-        const nValue = typeof row.n === 'number' ? row.n : null;
         return {
           instrument: row.instrument,
           period: row.period,
           text: sanitizedText,
-          n: nValue,
         };
-      });
-
-    const summaries = await Promise.all(
-      sanitizedRows.map(async (entry) => ({
-        ...entry,
-        signature: await signJsonPayload(CSV_SIGNING_SECRET, {
-          org: hashedOrgId,
-          instrument: entry.instrument,
-          period: entry.period,
-          text: entry.text,
-          n: entry.n,
-        }),
-      })),
-    );
+      })
+      .filter((summary) => summary.text.length > 0 && !/\d/.test(summary.text));
 
     addSentryBreadcrumb({
       category: 'assess',

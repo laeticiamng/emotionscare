@@ -3,7 +3,6 @@ import { z } from '../_shared/zod.ts';
 import { createClient } from '../_shared/supabase.ts';
 
 import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
-import { getCatalog, instrumentSchema, InstrumentCode, summarizeAssessment } from '../_shared/assess.ts';
 import { appendCorsHeaders, preflightResponse, rejectCors, resolveCors } from '../_shared/cors.ts';
 import { applySecurityHeaders, json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
@@ -11,11 +10,13 @@ import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
+import { computeLevel, scoreToJson } from '../../../src/lib/assess/scoring.ts';
+import type { InstrumentCode } from '../../../src/lib/assess/types.ts';
 
 const answerValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 
 const submitSchema = z.object({
-  instrument: instrumentSchema,
+  instrument: z.enum(['WHO5', 'STAI6', 'SAM', 'SUDS']),
   answers: z.record(answerValueSchema).refine(
     (value) => Object.keys(value).length > 0,
     'answers_required',
@@ -28,6 +29,13 @@ const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const SIGNAL_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 const SIGNAL_MODULE_CONTEXT = 'assessment_submit';
 
+const FEATURE_FLAGS: Record<InstrumentCode, string> = {
+  WHO5: Deno.env.get('FF_ASSESS_WHO5') ?? 'true',
+  STAI6: Deno.env.get('FF_ASSESS_STAI6') ?? 'true',
+  SAM: Deno.env.get('FF_ASSESS_SAM') ?? 'true',
+  SUDS: Deno.env.get('FF_ASSESS_SUDS') ?? 'true',
+};
+
 type OrchestrationHint = {
   action: string;
   intensity: 'low' | 'medium' | 'high';
@@ -38,21 +46,6 @@ type OrchestrationHint = {
 const instrumentDomains: Record<InstrumentCode, string> = {
   WHO5: 'wellbeing',
   STAI6: 'anxiety',
-  PANAS: 'affect',
-  PSS10: 'stress',
-  UCLA3: 'social',
-  MSPSS: 'social',
-  AAQ2: 'flexibility',
-  POMS: 'mood',
-  SSQ: 'vr_safety',
-  ISI: 'sleep',
-  GAS: 'goals',
-  GRITS: 'persistence',
-  BRS: 'resilience',
-  WEMWBS: 'wellbeing',
-  UWES: 'engagement',
-  CBI: 'burnout',
-  CVSQ: 'vision',
   SAM: 'valence_arousal',
   SUDS: 'distress',
 };
@@ -63,8 +56,7 @@ function getInstrumentDomain(instrument: InstrumentCode): string {
 
 function buildOrchestrationHints(
   instrument: InstrumentCode,
-  level: number,
-  scores: Record<string, number>,
+  level: 0 | 1 | 2 | 3 | 4,
 ): OrchestrationHint[] {
   const hints: OrchestrationHint[] = [];
 
@@ -89,18 +81,6 @@ function buildOrchestrationHints(
       }
       break;
 
-    case 'PANAS': {
-      const positiveAffect = scores['PA'];
-      const negativeAffect = scores['NA'];
-      if (typeof positiveAffect === 'number' && positiveAffect < 40) {
-        hints.push({ action: 'offer_social', intensity: 'medium', context: 'community_nudge' });
-      }
-      if (typeof negativeAffect === 'number' && negativeAffect > 60) {
-        hints.push({ action: 'gentle_tone', intensity: 'high', context: 'journal_suggestions' });
-      }
-      break;
-    }
-
     case 'SUDS':
       if (level >= 3) {
         hints.push({ action: 'extend_session', intensity: 'medium', context: 'flash_glow', duration: 'medium' });
@@ -109,19 +89,33 @@ function buildOrchestrationHints(
       }
       break;
 
-    case 'AAQ2':
-      if (level >= 3) {
-        hints.push(
-          { action: 'coach_defusion_cards', intensity: 'high', context: 'coach_ui' },
-          { action: 'coach_centering_cards', intensity: 'medium', context: 'coach_ui' },
-        );
-      } else if (level <= 1) {
-        hints.push({ action: 'coach_celebrate_flexibility', intensity: 'low', context: 'coach_ui' });
+    case 'SAM':
+      if (level <= 1) {
+        hints.push({ action: 'warm_check_in', intensity: 'medium', context: 'mood_module' });
+      } else if (level >= 3) {
+        hints.push({ action: 'celebrate_mood', intensity: 'low', context: 'mood_module' });
       }
       break;
+
   }
 
   return hints;
+}
+
+function isInstrumentEnabled(instrument: InstrumentCode): boolean {
+  const raw = FEATURE_FLAGS[instrument];
+  if (!raw) return true;
+  return raw !== 'false' && raw.toLowerCase() !== 'off';
+}
+
+function sanitizeAnswers(values: Record<string, unknown>): Record<string, number> {
+  const sanitized: Record<string, number> = {};
+  for (const [key, value] of Object.entries(values)) {
+    const numeric = Number(value);
+    if (Number.isNaN(numeric)) continue;
+    sanitized[key] = numeric;
+  }
+  return sanitized;
 }
 
 serve(async (req) => {
@@ -227,10 +221,56 @@ serve(async (req) => {
     }
 
     const { instrument, answers, ts } = parsed.data;
-    const summary = summarizeAssessment(instrument, answers);
-    const catalog = getCatalog(instrument, 'fr');
-    const hints = buildOrchestrationHints(instrument, summary.level, summary.scores);
-    const severity = summary.level >= 3 ? 'high' : summary.level <= 1 ? 'low' : 'moderate';
+
+    if (!isInstrumentEnabled(instrument)) {
+      const response = appendCorsHeaders(json(404, { error: 'instrument_disabled' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'instrument_disabled', stage: 'feature_flag' },
+      );
+    }
+
+    addSentryBreadcrumb({
+      category: 'assess:submit',
+      message: 'assess:submit:payload_received',
+      data: { instrument },
+    });
+
+    const authHeader = req.headers.get('authorization') ?? '';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: consent, error: consentError } = await supabase
+      .from('clinical_consents')
+      .select('is_active, revoked_at')
+      .eq('instrument_code', instrument)
+      .order('granted_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (consentError) {
+      console.error('[assess-submit] consent_lookup_failed', { code: consentError.code });
+      captureSentryException(consentError, { route: 'assess-submit', stage: 'optin_lookup' });
+      const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'error', error: 'internal_error', stage: 'optin_lookup' },
+      );
+    }
+
+    if (!consent || consent.revoked_at || consent.is_active === false) {
+      const response = appendCorsHeaders(json(403, { error: 'optin_required' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'optin_required', stage: 'optin_check' },
+      );
+    }
+
+    const level = computeLevel(instrument, sanitizeAnswers(answers));
+    const score = scoreToJson(instrument, level);
+    const hints = buildOrchestrationHints(instrument, level);
+    const severity: 'calm' | 'balanced' | 'alert' = level >= 3 ? 'alert' : level <= 1 ? 'calm' : 'balanced';
 
     addSentryBreadcrumb({
       category: 'assess',
@@ -244,21 +284,21 @@ serve(async (req) => {
       data: { instrument },
     });
 
-    const authHeader = req.headers.get('authorization') ?? '';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    const submittedAt = ts ?? new Date().toISOString();
+    const scorePayload = {
+      summary: score.summary,
+      level: score.level,
+      instrument_version: score.instrument_version,
+      generated_at: score.generated_at,
+      ...(score.focus ? { focus: score.focus } : {}),
+    };
 
     const payload = {
       user_id: auth.user.id,
       instrument,
-      score_json: {
-        summary: summary.summary,
-        focus: summary.focus ?? null,
-        instrument_version: catalog.version,
-        generated_at: new Date().toISOString(),
-      },
-      ts: ts ?? new Date().toISOString(),
+      score_json: scorePayload,
+      submitted_at: submittedAt,
+      ts: submittedAt,
     };
 
     const { error } = await supabase.from('assessments').insert(payload);
@@ -278,12 +318,13 @@ serve(async (req) => {
       domain: getInstrumentDomain(instrument),
       module_context: SIGNAL_MODULE_CONTEXT,
       metadata: {
-        summary: summary.summary,
-        focus: summary.focus ?? null,
+        summary: score.summary,
+        focus: score.focus ?? null,
         severity,
         hints,
       },
       expires_at: new Date(Date.now() + SIGNAL_TTL_MS).toISOString(),
+      level,
     };
 
     const maybeProcess = (globalThis as { process?: { env?: Record<string, unknown> } }).process;
@@ -309,7 +350,7 @@ serve(async (req) => {
       action: 'assess:submit',
       result: 'success',
       user_agent: 'redacted',
-      details: `instrument=${instrument};hints=${hints.length}`,
+      details: `instrument=${instrument};hints=${hints.length > 0 ? 'present' : 'none'}`,
     });
 
     addSentryBreadcrumb({
@@ -318,7 +359,7 @@ serve(async (req) => {
       data: { instrument },
     });
 
-    const response = appendCorsHeaders(json(200, { status: 'ok', stored: true, signal: true }), cors);
+    const response = appendCorsHeaders(json(200, { status: 'ok', summary: score.summary }), cors);
     applySecurityHeaders(response, { cacheControl: 'no-store' });
     return finalize(response, { outcome: 'success', stage: 'summary_stored' });
   } catch (error) {
