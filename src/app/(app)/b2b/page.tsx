@@ -2,6 +2,11 @@ import Link from 'next/link';
 
 const CARDS = [
   {
+    href: '/b2b/reports',
+    title: 'Rapports mensuels',
+    description: 'Consulter un récit de trois phrases et une action douce, prêt à imprimer.',
+  },
+  {
     href: '/b2b/teams',
     title: 'Gestion des équipes',
     description: 'Inviter, rôler et suivre vos membres sans exposer leurs données sensibles.',

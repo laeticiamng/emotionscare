@@ -138,6 +138,44 @@ export async function fetchOptimisation(period?: string): Promise<OptimisationSu
   return payload.suggestions;
 }
 
+export interface MonthlyReportPayload {
+  title: string;
+  period: string;
+  team_label?: string | null;
+  summary: string[];
+  action: string;
+}
+
+export async function listReportPeriods(): Promise<string[]> {
+  const payload = await callEdge<{ periods?: string[] }>('b2b-report', {
+    method: 'GET',
+  });
+  return Array.isArray(payload.periods) ? payload.periods : [];
+}
+
+export async function fetchMonthlyReport(period: string, teamId?: string | null): Promise<MonthlyReportPayload> {
+  const payload = await callEdge<MonthlyReportPayload>('b2b-report', {
+    method: 'GET',
+    search: {
+      period,
+      team_id: teamId ?? undefined,
+    },
+  });
+  return payload;
+}
+
+export async function exportMonthlyReportCsv(period: string, teamId?: string | null) {
+  return callEdge<{ url: string | null; expires_at: string | null; fallback: { signature: string; csv: string } | null }>(
+    'b2b-report-export',
+    {
+      payload: {
+        period,
+        team_id: teamId ?? null,
+      },
+    },
+  );
+}
+
 export type AuditLogItem = {
   occurred_at: string;
   event: string;

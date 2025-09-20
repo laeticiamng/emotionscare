@@ -15,11 +15,16 @@ const allowedOrigins = (Deno.env.get('B2B_ALLOWED_ORIGINS') ?? '')
   .filter(origin => origin.length > 0);
 
 const suiteEnabled = (Deno.env.get('FF_B2B_SUITE') ?? 'false').toLowerCase() === 'true';
+const reportsEnabled = (Deno.env.get('FF_B2B_REPORTS') ?? 'false').toLowerCase() === 'true';
 
 const textEncoder = new TextEncoder();
 
 export function isSuiteEnabled(): boolean {
   return suiteEnabled;
+}
+
+export function isReportsEnabled(): boolean {
+  return reportsEnabled;
 }
 
 export function normalizeEmail(email: string): string {
