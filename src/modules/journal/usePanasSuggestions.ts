@@ -306,7 +306,7 @@ export function usePanasSuggestions(): UsePanasSuggestionsResult {
   const requestConsent = useCallback(async () => {
     try {
       setIsRequestingConsent(true)
-      await assessment.grantConsent('PANAS')
+      await assessment.grantConsent()
       await assessment.triggerAssessment('PANAS')
       setPromptVisible(false)
       const now = Date.now()

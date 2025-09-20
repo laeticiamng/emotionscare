@@ -13,8 +13,8 @@
 
 insert into public.assessments (user_id, instrument, score_json)
 values
-  (:'demo_uid'::uuid, 'WHO5', '{"summary":"semaine posée"}'),
-  (:'demo_uid'::uuid, 'STAI6', '{"summary":"anxiété modérée"}')
+  (:'demo_uid'::uuid, 'WHO5', '{"summary":"semaine posée","level":3,"instrument_version":"1.0"}'),
+  (:'demo_uid'::uuid, 'STAI6', '{"summary":"tension modérée","level":2,"instrument_version":"1.0"}')
 on conflict do nothing;
 
 insert into public.org_assess_rollups (org_id, period, instrument, n, text_summary)

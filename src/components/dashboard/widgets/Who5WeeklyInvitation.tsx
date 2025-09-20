@@ -22,7 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { clinicalScoringService, type InstrumentCatalog } from '@/services/clinicalScoring';
+import { clinicalScoringService, type InstrumentCatalog } from '@/services/clinicalScoringService';
 
 const STORAGE_KEY = 'dashboard:who5-invite:v1';
 const WEEKLY_INTERVAL = 7 * 24 * 60 * 60 * 1000;
@@ -65,10 +65,17 @@ export const Who5WeeklyInvitation: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (assessment.state.catalog) {
+      setCatalog(assessment.state.catalog);
+    }
+  }, [assessment.state.catalog]);
+
   const now = Date.now();
 
   const shouldShowCard = useMemo(() => {
     if (!catalog) return false;
+    if (!assessment.state.canDisplay) return false;
     if (inviteState.snoozedUntil) {
       const snoozedUntil = new Date(inviteState.snoozedUntil).getTime();
       if (snoozedUntil > now) {
@@ -109,7 +116,7 @@ export const Who5WeeklyInvitation: React.FC = () => {
     setInviteState(prev => ({ ...prev, lastPromptAt: timestamp, snoozedUntil: undefined }));
 
     if (!hasConsent) {
-      await assessment.grantConsent('WHO5');
+      await assessment.grantConsent();
     }
 
     await assessment.triggerAssessment('WHO5', {
@@ -161,7 +168,8 @@ export const Who5WeeklyInvitation: React.FC = () => {
       }
 
       if (!submitted) {
-        submitted = await clinicalScoringService.submitResponse('WHO5', formattedAnswers);
+        const fallback = await clinicalScoringService.submitResponse('WHO5', formattedAnswers);
+        submitted = fallback.success;
       }
 
       if (submitted) {

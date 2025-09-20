@@ -1,6 +1,10 @@
 import { useState, useCallback } from 'react';
 import { ModuleState, SessionResult, ModuleContext } from '@/types/modules';
-import { clinicalScoringService } from '@/services/clinicalScoring';
+import {
+  clinicalScoringService,
+  isSupportedInstrument,
+  type InstrumentCode as ClinicalInstrumentCode,
+} from '@/services/clinicalScoringService';
 import { useToast } from '@/hooks/useToast';
 
 export const useModuleSession = () => {
@@ -25,13 +29,33 @@ export const useModuleSession = () => {
     setState('verbal-feedback');
 
     try {
-      // Submit clinical data if responses provided
-      if (responses) {
-        await clinicalScoringService.submitResponse(
-          context.id,
-          responses,
-          { module: context.name, preset: context.preset }
-        );
+      // Submit clinical data if responses provided and instrument is supported
+      if (responses && typeof context.id === 'string') {
+        const instrument = context.id.toUpperCase();
+
+        if (isSupportedInstrument(instrument)) {
+          const answers: Record<string, unknown> = Array.isArray(responses)
+            ? responses.reduce<Record<string, unknown>>((acc, value, index) => {
+                acc[String(index + 1)] = value;
+                return acc;
+              }, {})
+            : typeof responses === 'object'
+              ? (responses as Record<string, unknown>)
+              : {};
+
+          if (Object.keys(answers).length > 0) {
+            await clinicalScoringService.submitResponse(
+              instrument as ClinicalInstrumentCode,
+              answers,
+              {
+                metadata: {
+                  module: context.name,
+                  preset: context.preset,
+                },
+              },
+            );
+          }
+        }
       }
 
       // Get session result from cache
