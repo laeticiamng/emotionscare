@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   deriveActionSuggestion,
+  deriveHeatmapInsight,
   groupCellsByInstrument,
   mapSummariesToCells,
   type HeatmapCellInput,
@@ -36,11 +37,27 @@ describe('deriveActionSuggestion', () => {
   });
 
   it('maps fatigue keyword to cocon pause recommendation', () => {
-    expect(deriveActionSuggestion('Sentiment de fatigue partagé par l’équipe')).toContain('pause cocon');
+    expect(deriveActionSuggestion('Sentiment de fatigue partagé par l’équipe')).toBe('protéger un créneau de récupération');
   });
 
   it('falls back to neutral check-in suggestion', () => {
-    expect(deriveActionSuggestion('Ambiance stable')).toBe('check-in court sans agenda');
+    expect(deriveActionSuggestion('Ambiance à clarifier')).toBe('planifier un check-in ouvert');
+  });
+});
+
+describe('deriveHeatmapInsight', () => {
+  it('returns matching tone and label for tense summaries', () => {
+    const insight = deriveHeatmapInsight('Une tension ressentie dans le collectif');
+    expect(insight.tone).toBe('tense');
+    expect(insight.label).toBe('tension sensible');
+    expect(insight.action).toBe('resserrer la charge de réunions');
+    expect(insight.tooltip).toBe('Tension ressentie');
+  });
+
+  it('prefers backend suggestion when provided', () => {
+    const insight = deriveHeatmapInsight('Énergie forte', 'animer un café énergie');
+    expect(insight.action).toBe('animer un café énergie');
+    expect(insight.label).toBe('élan engagé');
   });
 });
 
