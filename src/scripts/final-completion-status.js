@@ -105,7 +105,7 @@ console.log('  ✓ Protection par rôle (consumer/employee/manager)');
 console.log('  ✓ Routes authentifiées sécurisées');
 console.log('  ✓ Guards automatiques selon configuration');
 console.log('  ✓ Redirections automatiques selon le rôle');
-console.log('  ✓ Pages système (401, 403, 404, 503) fonctionnelles');
+console.log('  ✓ Pages système (401, 403, 404, 500) fonctionnelles');
 
 console.log('\n✅ EXPÉRIENCE UTILISATEUR OPTIMISÉE:');
 console.log('====================================');

@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import type { InstrumentCode } from '@/hooks/useAssessment';
 
 const historyEntrySchema = z.object({
-  ts: z.string(),
+  submitted_at: z.string().optional(),
+  ts: z.string().optional(),
   score_json: z.object({
     summary: z.string(),
     level: z.number().int().min(0).max(4),
@@ -24,8 +25,9 @@ export interface AssessmentHistoryEntry {
 const fetchHistory = async (instrument: InstrumentCode, limit: number): Promise<AssessmentHistoryEntry[]> => {
   const { data, error } = await supabase
     .from('assessments')
-    .select('ts, score_json')
+    .select('submitted_at, ts, score_json')
     .eq('instrument', instrument)
+    .order('submitted_at', { ascending: false, nullsFirst: false })
     .order('ts', { ascending: false })
     .limit(limit);
 
@@ -39,7 +41,11 @@ const fetchHistory = async (instrument: InstrumentCode, limit: number): Promise<
   }
 
   return parsed.data.map((entry) => ({
-    timestamp: entry.score_json.generated_at ?? entry.ts,
+    timestamp:
+      entry.score_json.generated_at ??
+      entry.submitted_at ??
+      entry.ts ??
+      new Date().toISOString(),
     summary: entry.score_json.summary,
     level: entry.score_json.level,
     version: entry.score_json.instrument_version ?? undefined,

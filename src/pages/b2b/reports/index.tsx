@@ -76,7 +76,7 @@ export default function B2BReportsHeatmapPage() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  const featureEnabled = has('FF_B2B_RH') && has('FF_ASSESS_AGGREGATE');
+  const featureEnabled = has('FF_B2B_RH') && has('FF_B2B_AGGREGATES');
   const query = useHeatmapMatrix(
     {
       orgId,
@@ -176,7 +176,7 @@ export default function B2BReportsHeatmapPage() {
         <header className="space-y-2">
           <h1 className="text-2xl font-semibold text-slate-900">Heatmap RH</h1>
           <p className="text-sm text-slate-600">
-            Cette vue est désactivée. Activez FF_B2B_RH et FF_ASSESS_AGGREGATE pour consulter les agrégats confidentiels.
+            Cette vue est désactivée. Activez FF_B2B_RH et FF_B2B_AGGREGATES pour consulter les agrégats confidentiels.
           </p>
         </header>
       </main>

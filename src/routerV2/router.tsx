@@ -16,8 +16,7 @@ import { ROUTES_REGISTRY } from './registry';
 import { LegacyRedirect, ROUTE_ALIAS_ENTRIES } from './aliases';
 import { AuthGuard, ModeGuard, RoleGuard } from './guards';
 import type { RouteMeta } from './schema';
-import { withErrorBoundary } from '@/contexts/ErrorContext';
-import PageErrorFallback from '@/components/error/PageErrorFallback';
+import { PageErrorBoundary } from '@/components/error/PageErrorBoundary';
 import { LoadingState } from '@/components/loading/LoadingState';
 import EnhancedShell from '@/components/layout/EnhancedShell';
 import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
@@ -145,12 +144,13 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
+const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
 
 // Pages système unifiées
-const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
-const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
-const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
-const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
+const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
+const ForbiddenPage = lazy(() => import('@/pages/errors/403/page'));
+const UnifiedErrorPage = lazy(() => import('@/pages/errors/404/page'));
+const ServerErrorPage = lazy(() => import('@/pages/errors/500/page'));
 
 
 
@@ -285,6 +285,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
+  ErrorBoundaryTestPage,
   
   // Composants de redirection
   RedirectToScan,
@@ -367,12 +368,12 @@ function createRouteElement(routeMeta: RouteMeta) {
     return <Navigate to="/404" replace />;
   }
 
-  const ComponentWithBoundary = withErrorBoundary(Component, PageErrorFallback);
-
   const element = (
     <SuspenseWrapper>
       <LayoutWrapper layout={routeMeta.layout}>
-        <ComponentWithBoundary />
+        <PageErrorBoundary route={routeMeta.path} feature={routeMeta.name} resetKeys={[routeMeta.path]}>
+          <Component />
+        </PageErrorBoundary>
       </LayoutWrapper>
     </SuspenseWrapper>
   );

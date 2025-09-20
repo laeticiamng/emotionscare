@@ -4,7 +4,6 @@ export interface HeatmapCellInput {
   text: string;
   team?: string;
   action?: string;
-  n?: number | null;
 }
 
 export interface HeatmapCell {
@@ -36,12 +35,6 @@ export function labelInstrument(key: string): string {
 
 export function mapSummariesToCells(entries: HeatmapCellInput[]): HeatmapCell[] {
   return entries
-    .filter((entry) => {
-      if (typeof entry.n === 'number') {
-        return entry.n >= 5;
-      }
-      return true;
-    })
     .map((entry) => ({
       instrument: entry.instrument,
       period: entry.period,

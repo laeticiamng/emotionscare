@@ -34,14 +34,13 @@ function formatPeriodLabel(period: string): string {
 }
 
 function buildCsvContent(period: string, summaries: AggregateSummary[] | undefined): string {
-  const header = 'period,instrument,text_summary,n,signature';
+  const header = 'period,instrument,text_summary,action';
   const rows = (summaries ?? []).map(summary => {
     const values = [
       summary.period,
       summary.instrument,
       summary.text.replace(/"/g, '""'),
-      typeof summary.n === 'number' && summary.n >= 5 ? String(summary.n) : '',
-      summary.signature ?? '',
+      summary.action ? summary.action.replace(/"/g, '""') : '',
     ];
     return values.map(value => `"${value}"`).join(',');
   });
@@ -119,17 +118,6 @@ const B2BReportDetailPage: React.FC = () => {
       toast({ description: 'Aucun agrégat disponible pour cette période.', variant: 'destructive' });
       return;
     }
-    const unsignedSummaries = query.data.filter(summary => !summary.signature);
-    if (unsignedSummaries.length > 0) {
-      Sentry.addBreadcrumb({
-        category: 'b2b:reports:export_csv',
-        message: 'blocked_missing_signature',
-        level: 'warning',
-        data: { period, signed: false, missing: unsignedSummaries.length },
-      });
-      toast({ description: 'Signature manquante pour un agrégat, export indisponible.', variant: 'destructive' });
-      return;
-    }
     const csv = buildCsvContent(period, query.data);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -142,9 +130,9 @@ const B2BReportDetailPage: React.FC = () => {
     URL.revokeObjectURL(url);
     Sentry.addBreadcrumb({
       category: 'b2b:reports:export_csv',
-      message: 'download',
+      message: 'download_plain_text',
       level: 'info',
-      data: { period, signed: true },
+      data: { period, rows: query.data.length },
     });
   }, [period, query.data, toast]);
 
@@ -236,7 +224,7 @@ const B2BReportDetailPage: React.FC = () => {
           </Button>
           <Button onClick={handleExportCsv}>
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-            Exporter CSV signé
+            Exporter le récit (texte)
           </Button>
         </div>
       </header>

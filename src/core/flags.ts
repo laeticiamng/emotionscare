@@ -15,7 +15,9 @@ interface FeatureFlags {
   FF_MANAGER_DASH: boolean;
   FF_SCORES: boolean;
   FF_SCAN: boolean;
+  FF_SCAN_SAM: boolean;
   FF_B2B_RH: boolean;
+  FF_B2B_AGGREGATES: boolean;
   FF_ASSESS_AGGREGATE: boolean;
 
   // Clinical Assessment Feature Flags
@@ -39,6 +41,7 @@ interface FeatureFlags {
   FF_ASSESS_CBI: boolean;
   FF_ASSESS_CVSQ: boolean;
   FF_ASSESS_SAM: boolean;
+  FF_ZERO_NUMBERS?: boolean;
 
   [key: string]: boolean;
 }
@@ -59,7 +62,9 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_MANAGER_DASH: true,
   FF_SCORES: true,
   FF_SCAN: true,
+  FF_SCAN_SAM: true,
   FF_B2B_RH: true,
+  FF_B2B_AGGREGATES: true,
   FF_ASSESS_AGGREGATE: true,
 
   // Clinical assessments – disabled by default, opt-in via remote config
@@ -83,6 +88,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_CBI: true,
   FF_ASSESS_CVSQ: true,
   FF_ASSESS_SAM: true,
+  FF_ZERO_NUMBERS: true,
 };
 
 let flagsCache: FeatureFlags | null = null;

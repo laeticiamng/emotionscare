@@ -3,10 +3,9 @@
 ## Flux de données et contraintes
 
 - **Source unique** : toutes les synthèses proviennent de la table `org_assess_rollups` exposée via l’Edge Function `assess-aggregate` (voir ECC-DATA-02 / ECC-EDGE-01).
-- **Filtrage min_n ≥ 5** :
-  - La fonction Edge ne renvoie que des agrégats respectant le seuil.
-  - Le service `getHeatmap` filtre à nouveau côté front lorsque `n` est présent dans la réponse.
+- **Filtrage min_n ≥ 5** : la fonction Edge ne renvoie que des agrégats respectant le seuil, aucune donnée chiffrée n’est transmise.
 - **Zéro données individuelles** : le front n’interroge jamais les tables d’assessments brutes.
+- **Nettoyage texte** : l’Edge applique `sanitizeAggregateText` pour retirer nombres, pourcentages et vocabulaire de scoring.
 - **JWT obligatoire** : l’appel Edge est signé avec le token Supabase de l’utilisateur manager (RLS + CORS déjà appliqués côté Edge).
 
 ## Composants principaux
@@ -50,12 +49,12 @@
 - **Structure** : trois sections maximum — tendance douce, leviers ayant aidé, pistes à explorer (actions concrètes).
 - **Génération** : `generateMonthlyNarrative` transforme les agrégats WEMWBS/SWEMWBS, CBI, UWES en récit humain sans métriques, en s’appuyant sur des mots-clés positifs/attentifs.
 - **Actions** : deux recommandations maximum, vocabulaire sans chiffres, pensées comme micro-gestes accessibles.
-- **Observabilité** : breadcrumbs `b2b:reports:view` (list/detail) et `b2b:reports:export_csv` avec `signed=true`.
+- **Observabilité** : breadcrumbs `b2b:reports:view` (list/detail) et `b2b:reports:export_csv` (texte uniquement).
 - **Partage** : lien staff suffixé `?share=staff`, meta `noindex`, bouton copie/`navigator.share`.
 
-## Export CSV signé
+## Export CSV texte
 
-- **Colonnes** : `period`, `instrument`, `text_summary`, `n` (uniquement si ≥5), `signature` HMAC (Edge `CSV_SIGNING_SECRET`).
-- **Flux** : téléchargement direct côté front, pas de stockage persistant. Signature calculée avec l’ID organisation hashé.
+- **Colonnes** : `period`, `instrument`, `text_summary`, `action` (optionnelle), toutes sans chiffres.
+- **Flux** : téléchargement direct côté front, pas de stockage persistant.
 - **Rétention conseillée** : les CSV partagés en interne doivent être purgés sous 24 h (recommandation RGPD interne).
-- **Sûreté** : aucun identifiant utilisateur, texte déjà aseptisé (`sanitizeAggregateText`).
+- **Sûreté** : aucun identifiant utilisateur, texte aseptisé côté Edge (`sanitizeAggregateText`).

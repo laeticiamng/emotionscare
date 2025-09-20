@@ -90,6 +90,7 @@ const assessmentSchema = z.object({
     level: z.number().int().min(0).max(4),
     generated_at: z.string().optional(),
   }),
+  submitted_at: z.string().optional(),
   ts: z.string().optional(),
 });
 
@@ -368,8 +369,9 @@ const fetchAssessments = async (): Promise<AssessmentMap> => {
   try {
     const { data, error } = await supabase
       .from('assessments')
-      .select('instrument, score_json, ts')
+      .select('instrument, score_json, submitted_at, ts')
       .in('instrument', TRACKED_INSTRUMENTS)
+      .order('submitted_at', { ascending: false, nullsFirst: false })
       .order('ts', { ascending: false })
       .limit(20);
 
@@ -393,7 +395,11 @@ const fetchAssessments = async (): Promise<AssessmentMap> => {
       result[instrument] = {
         summary: entry.score_json.summary,
         level: entry.score_json.level,
-        recordedAt: entry.score_json.generated_at ?? entry.ts ?? new Date().toISOString(),
+        recordedAt:
+          entry.score_json.generated_at ??
+          entry.submitted_at ??
+          entry.ts ??
+          new Date().toISOString(),
       };
     }
 
