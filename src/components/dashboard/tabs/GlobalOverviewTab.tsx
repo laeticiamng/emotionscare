@@ -9,6 +9,8 @@ interface GlobalOverviewTabProps {
   userRole?: UserRole;
 }
 
+const SLEEP_REMINDER_STORAGE_KEY = 'breath:isi:status';
+
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRole }) => {
   const stats = [
     {
@@ -40,6 +42,29 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
       color: 'text-orange-500'
     }
   ];
+
+  const [showSoothingReminder, setShowSoothingReminder] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(SLEEP_REMINDER_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { level?: string; updatedAt?: string } | null;
+      if (!parsed || parsed.level !== 'high') return;
+      const updatedAt = parsed.updatedAt ? new Date(parsed.updatedAt) : null;
+      if (updatedAt && Number.isNaN(updatedAt.getTime())) {
+        setShowSoothingReminder(true);
+        return;
+      }
+      const now = Date.now();
+      if (!updatedAt || now - updatedAt.getTime() <= 7 * 24 * 60 * 60 * 1000) {
+        setShowSoothingReminder(true);
+      }
+    } catch (error) {
+      console.warn('Soothing reminder flag parse failed', error);
+    }
+  }, []);
 
   return (
     <div className={className}>
@@ -95,6 +120,13 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
               <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg">
                 <p className="text-sm">Votre bien-être s'améliore ! Continuez vos bonnes habitudes</p>
               </div>
+              {showSoothingReminder && (
+                <div className="rounded-lg border border-amber-200/80 bg-amber-50/80 p-3 dark:border-amber-900/60 dark:bg-amber-950/40">
+                  <p className="text-sm text-amber-900 dark:text-amber-100">
+                    Rappel hebdo : programme une respiration apaisante 4-7-8 pour protéger ton sommeil.
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

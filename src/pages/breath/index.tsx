@@ -71,9 +71,65 @@ const STAI_SCALE = [
   { value: '4', label: 'Toujours' },
 ] as const;
 
+const FALLBACK_ISI_ITEMS: AssessmentItem[] = [
+  { id: 'i1', text: "Difficulté d'endormissement." },
+  { id: 'i2', text: 'Réveils nocturnes fréquents.' },
+  { id: 'i3', text: 'Réveil précoce non désiré.' },
+  { id: 'i4', text: 'Satisfaction globale du sommeil.' },
+  { id: 'i5', text: 'Impact sur le quotidien (fatigue, humeur).' },
+  { id: 'i6', text: 'Perception du problème de sommeil.' },
+  { id: 'i7', text: 'Préoccupation vis-à-vis du sommeil.' },
+];
+
+const ISI_SCALE = [
+  { value: '0', label: 'Aucun' },
+  { value: '1', label: 'Léger' },
+  { value: '2', label: 'Modéré' },
+  { value: '3', label: 'Important' },
+  { value: '4', label: 'Très important' },
+] as const;
+
+const SLEEP_REMINDER_STORAGE_KEY = 'breath:isi:status';
+
+type ClinicalLevel = 'low' | 'moderate' | 'high';
+
+type InsightItem = {
+  id: string;
+  title: string;
+  description: string;
+  tone?: 'info' | 'warning';
+};
+
 const clampMinutes = (value: number): number => {
   if (!Number.isFinite(value)) return 5;
   return Math.min(10, Math.max(1, Math.round(value)));
+};
+
+const extractValues = (answers: Record<string, number>): number[] =>
+  Object.values(answers).filter(value => Number.isFinite(value));
+
+const computeAverage = (values: number[]): number | null => {
+  if (!values.length) return null;
+  const total = values.reduce((acc, value) => acc + value, 0);
+  return total / values.length;
+};
+
+const computeStaiLevel = (answers: Record<string, number>): ClinicalLevel | null => {
+  const values = extractValues(answers);
+  const average = computeAverage(values);
+  if (average === null) return null;
+  if (average >= 3) return 'high';
+  if (average >= 2.2) return 'moderate';
+  return 'low';
+};
+
+const computeIsiLevel = (answers: Record<string, number>): ClinicalLevel | null => {
+  const values = extractValues(answers);
+  if (!values.length) return null;
+  const total = values.reduce((acc, value) => acc + value, 0);
+  if (total >= 15) return 'high';
+  if (total >= 10) return 'moderate';
+  return 'low';
 };
 
 const formatMs = (value: number): string => {
@@ -149,7 +205,11 @@ const toSeconds = (ms: number): number => Math.max(1, Math.round(ms / 1000));
 
 export default function BreathPage() {
   const { prefersReducedMotion } = useMotionPrefs();
-  const { toast } = useToast();
+  const {
+    success: showSuccessToast,
+    error: showErrorToast,
+    warning: showWarningToast,
+  } = useToast();
   const { flags } = useFlags();
 
   const [protocol, setProtocol] = useState<ProtocolPreset>('478');
@@ -171,10 +231,131 @@ export default function BreathPage() {
     after: 'idle',
   });
   const [showStaiOptInDialog, setShowStaiOptInDialog] = useState(false);
+  const [sleepPresetEnabled, setSleepPresetEnabled] = useState(false);
+  const [isiOptIn, setIsiOptIn] = useState(false);
+  const [isiItems, setIsiItems] = useState<AssessmentItem[]>([]);
+  const [isiStatus, setIsiStatus] = useState<AssessmentStatus>('idle');
+  const [isiResponses, setIsiResponses] = useState<Record<string, string>>({});
+  const [isiSubmissionStatus, setIsiSubmissionStatus] = useState<AssessmentStatus>('idle');
+  const [showIsiOptInDialog, setShowIsiOptInDialog] = useState(false);
+  const [clinicalSummaries, setClinicalSummaries] = useState<InsightItem[]>([]);
+  const [orchestrationHints, setOrchestrationHints] = useState<InsightItem[]>([]);
+  const [sleepPackVisible, setSleepPackVisible] = useState(false);
+  const [sleepReminderActive, setSleepReminderActive] = useState(false);
 
   const staiToggleLabelId = useId();
   const staiToggleHintId = useId();
   const staiDialogDescriptionId = useId();
+  const isiToggleLabelId = useId();
+  const isiToggleHintId = useId();
+  const isiDialogDescriptionId = useId();
+
+  const updateSummary = useCallback((id: string, entry: InsightItem | null) => {
+    setClinicalSummaries(prev => {
+      const filtered = prev.filter(item => item.id !== id);
+      if (!entry) {
+        return filtered;
+      }
+      return [...filtered, entry];
+    });
+  }, []);
+
+  const updateHint = useCallback((id: string, entry: InsightItem | null) => {
+    setOrchestrationHints(prev => {
+      const filtered = prev.filter(item => item.id !== id);
+      if (!entry) {
+        return filtered;
+      }
+      return [...filtered, entry];
+    });
+  }, []);
+
+  const persistSleepReminder = useCallback((active: boolean) => {
+    if (typeof window === 'undefined') return;
+    if (active) {
+      const payload = { level: 'high', updatedAt: new Date().toISOString() } as const;
+      window.localStorage.setItem(SLEEP_REMINDER_STORAGE_KEY, JSON.stringify(payload));
+    } else {
+      window.localStorage.removeItem(SLEEP_REMINDER_STORAGE_KEY);
+    }
+  }, []);
+
+  const handleStaiLevel = useCallback(
+    (level: ClinicalLevel | null) => {
+      if (level === 'high') {
+        updateSummary('stai', {
+          id: 'stai',
+          title: 'Besoin d’apaisement détecté',
+          description: 'Tes réponses STAI indiquent une tension élevée. Nous privilégions une expiration prolongée.',
+        });
+        updateHint('stai-cadence', {
+          id: 'stai-cadence',
+          title: 'Cadence expirations longues',
+          description: 'Cadence recommandée : inspiration 4 s / expiration 6 s pour ancrer le besoin d’apaisement.',
+        });
+        setCoherenceVariant('45-55');
+        return;
+      }
+
+      updateSummary('stai', null);
+      updateHint('stai-cadence', null);
+    },
+    [updateSummary, updateHint],
+  );
+
+  const handleIsiLevel = useCallback(
+    (level: ClinicalLevel | null) => {
+      if (level === 'high') {
+        updateSummary('isi', {
+          id: 'isi',
+          title: 'Sommeil fragile détecté',
+          description: 'Les réponses ISI montrent un sommeil fragile. Le preset Endormissement 4-7-8 est activé par défaut.',
+        });
+        updateHint('isi-sequence', {
+          id: 'isi-sequence',
+          title: 'Séquence pré-sommeil activée',
+          description: 'Séance 4-7-8 proposée automatiquement pour préparer l’endormissement.',
+        });
+        updateHint('dashboard-reminder', {
+          id: 'dashboard-reminder',
+          title: 'Rappel hebdo respiratoire',
+          description: 'Un rappel “respiration apaisante” est ajouté discrètement sur le tableau de bord.',
+        });
+        setSleepPackVisible(true);
+        setSleepReminderActive(true);
+        persistSleepReminder(true);
+        setSleepPresetEnabled(true);
+        setProtocol('478');
+        return;
+      }
+
+      if (level === 'moderate') {
+        updateSummary('isi', {
+          id: 'isi',
+          title: 'Sommeil à surveiller',
+          description: 'Continue les routines douces, le preset Endormissement reste disponible si besoin.',
+        });
+        updateHint('isi-sequence', {
+          id: 'isi-sequence',
+          title: 'Routine sommeil recommandée',
+          description: 'Programmer une respiration 4-7-8 en fin de journée aide à stabiliser ton sommeil.',
+        });
+        updateHint('dashboard-reminder', null);
+        setSleepPackVisible(false);
+        setSleepReminderActive(false);
+        persistSleepReminder(false);
+        return;
+      }
+
+      updateSummary('isi', null);
+      updateHint('isi-sequence', null);
+      updateHint('dashboard-reminder', null);
+      setSleepPackVisible(false);
+      setSleepReminderActive(false);
+      persistSleepReminder(false);
+    },
+    [persistSleepReminder, updateSummary, updateHint],
+  );
 
   const sound = useSound?.('/sounds/click.mp3', { volume: 0.4 });
   const hasCompletedRef = useRef(false);
@@ -201,6 +382,11 @@ export default function BreathPage() {
       setProtocol(protocolParam as ProtocolPreset);
     }
 
+    const presetParam = params.get('preset')?.toLowerCase();
+    if (presetParam === 'endormissement') {
+      setSleepPresetEnabled(true);
+    }
+
     const minutesParam = params.get('minutes');
     const secondsParam = params.get('seconds');
 
@@ -216,6 +402,19 @@ export default function BreathPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (sleepPresetEnabled) {
+      setProtocol('478');
+      setMinutes(prev => (prev < 5 ? 5 : prev));
+    }
+  }, [sleepPresetEnabled]);
+
+  useEffect(() => {
+    if (sleepPresetEnabled && protocol !== '478') {
+      setSleepPresetEnabled(false);
+    }
+  }, [protocol, sleepPresetEnabled]);
 
   const steps = useMemo(() => makeProtocol(protocol, { minutes, ...overrides }), [protocol, minutes, overrides]);
 
@@ -343,12 +542,74 @@ export default function BreathPage() {
     }
   }, [flags.FF_ASSESS_STAI6]);
 
+  const loadIsiCatalogue = useCallback(async () => {
+    if (!isiOptIn) {
+      showWarningToast({
+        title: 'Active l’option ISI',
+        description: 'Confirme l’opt-in pour accéder au suivi hebdomadaire.',
+      });
+      return;
+    }
+
+    if (!sleepPresetEnabled) {
+      showWarningToast({
+        title: 'Preset Endormissement requis',
+        description: 'Active le preset sommeil pour lancer le suivi ISI.',
+      });
+      return;
+    }
+
+    if (!flags.FF_ASSESS_ISI) {
+      setIsiItems(FALLBACK_ISI_ITEMS);
+      setIsiStatus('ready');
+      return;
+    }
+
+    setIsiStatus('loading');
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+
+      const response = await fetch('/assess/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ instrument: 'ISI', locale: 'fr' }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Assess start failed: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const items: AssessmentItem[] = Array.isArray(payload?.items) && payload.items.length
+        ? payload.items
+        : FALLBACK_ISI_ITEMS;
+
+      setIsiItems(items);
+      setIsiStatus('ready');
+
+      Sentry.addBreadcrumb({
+        category: 'assess',
+        level: 'info',
+        message: 'assess:start',
+        data: { instrument: 'ISI', count: items.length },
+      });
+    } catch (error) {
+      console.error('ISI catalogue load failed', error);
+      setIsiItems(FALLBACK_ISI_ITEMS);
+      setIsiStatus('error');
+    }
+  }, [flags.FF_ASSESS_ISI, isiOptIn, sleepPresetEnabled]);
+
   const submitAssessment = useCallback(async (phase: StaiPhase) => {
     const answers = phase === 'before' ? staiBeforeResponses : staiAfterResponses;
     const items = staiItems;
 
     if (!items.length || Object.keys(answers).length < items.length) {
-      toast.warning({
+      showWarningToast({
         title: 'Complète les 6 réponses',
         description: 'Merci de répondre à chaque item pour enregistrer le ressenti.',
       });
@@ -388,15 +649,94 @@ export default function BreathPage() {
       }
 
       setStaiSubmissionStatus(prev => ({ ...prev, [phase]: 'submitted' }));
-      toast.success({
+      showSuccessToast({
         title: phase === 'before' ? 'Check-in pré-séance enregistré' : 'Check-in post-séance enregistré',
       });
+      const level = computeStaiLevel(payloadAnswers);
+      handleStaiLevel(level);
     } catch (error) {
       console.error('STAI-6 submit failed', error);
       setStaiSubmissionStatus(prev => ({ ...prev, [phase]: 'error' }));
-      toast.error({ title: 'Impossible d’enregistrer les réponses STAI pour le moment.' });
+      showErrorToast({ title: 'Impossible d’enregistrer les réponses STAI pour le moment.' });
     }
-  }, [staiItems, staiBeforeResponses, staiAfterResponses, toast, flags.FF_ASSESS_STAI6]);
+  }, [
+    staiItems,
+    staiBeforeResponses,
+    staiAfterResponses,
+    flags.FF_ASSESS_STAI6,
+    handleStaiLevel,
+    showWarningToast,
+    showSuccessToast,
+    showErrorToast,
+  ]);
+
+  const submitIsiAssessment = useCallback(async () => {
+    if (!isiItems.length) {
+      showWarningToast({
+        title: 'Prépare la mesure',
+        description: 'Appuie sur “Préparer la mesure hebdo” pour charger les items ISI.',
+      });
+      return;
+    }
+
+    if (Object.keys(isiResponses).length < isiItems.length) {
+      showWarningToast({
+        title: 'Complète les 7 réponses',
+        description: 'Merci de partager ton ressenti pour chaque item sommeil.',
+      });
+      return;
+    }
+
+    const payloadAnswers = Object.fromEntries(
+      Object.entries(isiResponses).map(([key, value]) => [key, Number.parseInt(value, 10)]),
+    );
+
+    setIsiSubmissionStatus('loading');
+
+    try {
+      if (flags.FF_ASSESS_ISI) {
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+
+        const response = await fetch('/assess/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ instrument: 'ISI', answers: payloadAnswers, ts: new Date().toISOString() }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Assess submit failed: ${response.status}`);
+        }
+
+        Sentry.addBreadcrumb({
+          category: 'assess',
+          level: 'info',
+          message: 'assess:submit',
+          data: { instrument: 'ISI' },
+        });
+      }
+
+      setIsiSubmissionStatus('submitted');
+      showSuccessToast({ title: 'Suivi sommeil enregistré' });
+      const level = computeIsiLevel(payloadAnswers);
+      handleIsiLevel(level);
+    } catch (error) {
+      console.error('ISI submit failed', error);
+      setIsiSubmissionStatus('error');
+      showErrorToast({ title: 'Impossible d’enregistrer le suivi sommeil pour le moment.' });
+    }
+  }, [
+    flags.FF_ASSESS_ISI,
+    isiItems,
+    isiResponses,
+    handleIsiLevel,
+    showWarningToast,
+    showSuccessToast,
+    showErrorToast,
+  ]);
 
   const startSession = useCallback(() => {
     if (!steps.length) return;
@@ -506,13 +846,13 @@ export default function BreathPage() {
       });
 
       if (!result.errors.session) {
-        toast.success({
+        showSuccessToast({
           title: 'Session enregistrée',
           description: 'Ton historique a été mis à jour et une note a été ajoutée au journal.',
         });
         setCompletionMessage('Session enregistrée dans ton historique et ton journal.');
       } else {
-        toast.warning({
+        showWarningToast({
           title: 'Session terminée',
           description: 'Impossible de journaliser côté Supabase. Tes notes locales sont conservées.',
         });
@@ -520,14 +860,14 @@ export default function BreathPage() {
       }
 
       if (result.errors.journal) {
-        toast.warning({
+        showWarningToast({
           title: 'Journal indisponible',
           description: 'La note automatique n’a pas pu être enregistrée localement.',
         });
       }
     } catch (error) {
       console.error('Breath session logging failed', error);
-      toast.error({ title: 'Impossible de sauvegarder la session pour le moment.' });
+      showErrorToast({ title: 'Impossible de sauvegarder la session pour le moment.' });
       setCompletionMessage('Session terminée. Sauvegarde différée en raison d’une erreur.');
     }
 
@@ -550,7 +890,9 @@ export default function BreathPage() {
     prefersReducedMotion,
     coherenceVariant,
     staiOptIn,
-    toast,
+    showSuccessToast,
+    showWarningToast,
+    showErrorToast,
   ]);
 
   useEffect(() => {
@@ -593,6 +935,22 @@ export default function BreathPage() {
     }
   }, [staiOptIn, loadStaiCatalogue]);
 
+  useEffect(() => {
+    if (!staiOptIn) {
+      handleStaiLevel(null);
+    }
+  }, [staiOptIn, handleStaiLevel]);
+
+  useEffect(() => {
+    if (!isiOptIn) {
+      setIsiStatus('idle');
+      setIsiItems([]);
+      setIsiResponses({});
+      setIsiSubmissionStatus('idle');
+      handleIsiLevel(null);
+    }
+  }, [isiOptIn, handleIsiLevel]);
+
   const handleMinutesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMinutes(clampMinutes(Number.parseInt(event.target.value, 10)));
   };
@@ -614,6 +972,23 @@ export default function BreathPage() {
     setShowStaiOptInDialog(false);
     setStaiOptIn(false);
   };
+
+  const confirmIsiOptIn = () => {
+    setIsiOptIn(true);
+    setShowIsiOptInDialog(false);
+    if (!sleepPresetEnabled) {
+      setSleepPresetEnabled(true);
+    }
+  };
+
+  const cancelIsiOptIn = () => {
+    setShowIsiOptInDialog(false);
+    setIsiOptIn(false);
+  };
+
+  const handleIsiAnswerChange = useCallback((id: string, value: string) => {
+    setIsiResponses(prev => ({ ...prev, [id]: value }));
+  }, []);
 
   const renderStaiForm = (phase: StaiPhase) => {
     if (!staiOptIn) return null;
@@ -782,6 +1157,21 @@ export default function BreathPage() {
               </div>
             </div>
 
+            <div className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
+              <div>
+                <Label htmlFor="sleep-preset-toggle">Preset “Endormissement”</Label>
+                <p className="text-xs text-muted-foreground">
+                  Active la routine 4-7-8 et le suivi ISI hebdomadaire discret.
+                </p>
+              </div>
+              <Switch
+                id="sleep-preset-toggle"
+                checked={sleepPresetEnabled}
+                onCheckedChange={value => setSleepPresetEnabled(Boolean(value))}
+                disabled={sessionClock.state !== 'idle'}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label>Auto-évaluation avant séance</Label>
               <Slider
@@ -930,32 +1320,205 @@ export default function BreathPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Mesure silencieuse STAI-6</CardTitle>
-            <CardDescription>
-              Option pour suivre ton niveau d’anxiété état avant/après la séance. Aucun score affiché, uniquement des insights personnalisés.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
-              <div>
-                <p id={staiToggleLabelId} className="text-sm font-medium text-slate-900">Activer STAI-6</p>
-                <p id={staiToggleHintId} className="text-xs text-muted-foreground">
-                  Renseigne des réponses qualitatives avant et après la séance.
-                </p>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Mesure silencieuse STAI-6</CardTitle>
+              <CardDescription>
+                Option pour suivre ton niveau d’anxiété état avant/après la séance. Aucun score affiché, uniquement des insights personnalisés.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
+                <div>
+                  <p id={staiToggleLabelId} className="text-sm font-medium text-slate-900">Activer STAI-6</p>
+                  <p id={staiToggleHintId} className="text-xs text-muted-foreground">
+                    Renseigne des réponses qualitatives avant et après la séance.
+                  </p>
+                </div>
+                <Switch
+                  checked={staiOptIn}
+                  onCheckedChange={handleStaiSwitchChange}
+                  aria-labelledby={staiToggleLabelId}
+                  aria-describedby={staiToggleHintId}
+                />
               </div>
-              <Switch
-                checked={staiOptIn}
-                onCheckedChange={handleStaiSwitchChange}
-                aria-labelledby={staiToggleLabelId}
-                aria-describedby={staiToggleHintId}
-              />
-            </div>
-            {staiOptIn && renderStaiForm('before')}
-            {staiOptIn && sessionClock.state === 'completed' && renderStaiForm('after')}
-          </CardContent>
-        </Card>
+              {staiOptIn && renderStaiForm('before')}
+              {staiOptIn && sessionClock.state === 'completed' && renderStaiForm('after')}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Suivi sommeil ISI (hebdomadaire)</CardTitle>
+              <CardDescription>
+                Disponible lorsque le preset “Endormissement” est actif. Aucune note affichée, uniquement un résumé sommeil.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
+                <div>
+                  <p id={isiToggleLabelId} className="text-sm font-medium text-slate-900">Activer ISI hebdo</p>
+                  <p id={isiToggleHintId} className="text-xs text-muted-foreground">
+                    Une mesure par semaine pour ajuster la préparation au sommeil.
+                  </p>
+                </div>
+                <Switch
+                  checked={isiOptIn}
+                  onCheckedChange={value => {
+                    if (value) {
+                      setShowIsiOptInDialog(true);
+                    } else {
+                      setIsiOptIn(false);
+                    }
+                  }}
+                  aria-labelledby={isiToggleLabelId}
+                  aria-describedby={isiToggleHintId}
+                />
+              </div>
+
+              {!isiOptIn && (
+                <p className="text-sm text-muted-foreground">
+                  Active le suivi sommeil pour recevoir un check-in hebdomadaire discret.
+                </p>
+              )}
+
+              {isiOptIn && !sleepPresetEnabled && (
+                <p className="rounded-md border border-amber-200 bg-amber-50/70 p-3 text-sm text-amber-800">
+                  Active le preset “Endormissement” pour déclencher la mesure ISI.
+                </p>
+              )}
+
+              {isiOptIn && (
+                <>
+                  {isiStatus === 'idle' && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => void loadIsiCatalogue()}
+                      disabled={!sleepPresetEnabled}
+                    >
+                      Préparer la mesure hebdo
+                    </Button>
+                  )}
+                  {isiStatus === 'loading' && (
+                    <p className="text-sm text-muted-foreground">Préparation de l’échelle sommeil…</p>
+                  )}
+                  {isiStatus === 'error' && (
+                    <p className="text-sm text-amber-600">
+                      Catalogue indisponible, affichage d’une version simplifiée.
+                    </p>
+                  )}
+                  {(isiStatus === 'ready' || isiStatus === 'error') &&
+                    isiItems.map(item => {
+                      const itemId = `isi-${item.id}`;
+                      return (
+                        <div key={itemId} className="space-y-2 rounded-lg border border-slate-200/70 bg-white/70 p-3">
+                          <p id={`${itemId}-label`} className="text-sm font-medium text-slate-800">{item.text}</p>
+                          <RadioGroup
+                            value={isiResponses[item.id] ?? ''}
+                            onValueChange={value => handleIsiAnswerChange(item.id, value)}
+                            className="grid gap-2 sm:grid-cols-5"
+                            aria-labelledby={`${itemId}-label`}
+                          >
+                            {ISI_SCALE.map(option => {
+                              const optionId = `${itemId}-${option.value}`;
+                              return (
+                                <div key={option.value} className="flex items-center space-x-2 rounded-md border border-transparent bg-slate-50/80 p-2 hover:border-slate-300">
+                                  <RadioGroupItem id={optionId} value={option.value} />
+                                  <Label htmlFor={optionId} className="text-sm font-medium text-slate-700">
+                                    {option.label}
+                                  </Label>
+                                </div>
+                              );
+                            })}
+                          </RadioGroup>
+                        </div>
+                      );
+                    })}
+                  {isiItems.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={isiSubmissionStatus === 'loading'}
+                        onClick={() => void submitIsiAssessment()}
+                      >
+                        {isiSubmissionStatus === 'submitted'
+                          ? 'Réponses enregistrées'
+                          : isiSubmissionStatus === 'loading'
+                            ? 'Enregistrement…'
+                            : 'Enregistrer les réponses'}
+                      </Button>
+                      {isiSubmissionStatus === 'submitted' && (
+                        <span className="text-sm text-emerald-600">Merci pour ton suivi hebdo.</span>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Adaptations automatiques</CardTitle>
+              <CardDescription>
+                Résumés et orchestrations issus de tes évaluations opt-in. Aucun score n’est affiché.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {clinicalSummaries.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Active STAI-6 ou ISI pour voir apparaître des résumés personnalisés.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {clinicalSummaries.map(item => (
+                    <li
+                      key={item.id}
+                      className="space-y-1 rounded-md border border-slate-200/70 bg-white/70 p-3"
+                    >
+                      <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                      <p className="text-sm text-slate-700">{item.description}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {orchestrationHints.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Orchestration</p>
+                  <ul className="space-y-2">
+                    {orchestrationHints.map(item => (
+                      <li
+                        key={item.id}
+                        className="space-y-1 rounded-md border border-indigo-200 bg-indigo-50/70 p-3 text-indigo-900"
+                      >
+                        <p className="text-sm font-semibold">{item.title}</p>
+                        <p className="text-sm">{item.description}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {sleepPackVisible && (
+                <Button asChild variant="secondary">
+                  <a href="https://nyvee.app/pack-sommeil" target="_blank" rel="noreferrer">
+                    Explorer le Pack Sommeil Nyvée
+                  </a>
+                </Button>
+              )}
+
+              {sleepReminderActive && orchestrationHints.some(item => item.id === 'dashboard-reminder') && (
+                <p className="rounded-md border border-emerald-200 bg-emerald-50/70 p-3 text-sm text-emerald-700">
+                  Un rappel “respiration apaisante” est désormais présent sur ton tableau de bord.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </section>
       <Dialog open={showStaiOptInDialog} onOpenChange={setShowStaiOptInDialog}>
         <DialogContent aria-describedby={staiDialogDescriptionId} role="dialog">
@@ -976,6 +1539,29 @@ export default function BreathPage() {
             </Button>
             <Button onClick={confirmStaiOptIn}>
               Activer STAI-6
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showIsiOptInDialog} onOpenChange={setShowIsiOptInDialog}>
+        <DialogContent aria-describedby={isiDialogDescriptionId} role="dialog">
+          <DialogHeader>
+            <DialogTitle>Confirmer le suivi sommeil ISI</DialogTitle>
+            <DialogDescription id={isiDialogDescriptionId}>
+              Les réponses sont utilisées pour ajuster automatiquement le preset Endormissement et rester invisibles en interface.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-2 text-sm text-slate-700">
+            <li>• Sept items hebdomadaires, jamais de score affiché.</li>
+            <li>• Les données sont stockées avec chiffrement clinique.</li>
+            <li>• Possibilité d’arrêter le suivi à tout moment.</li>
+          </ul>
+          <DialogFooter className="gap-2 sm:justify-end">
+            <Button variant="outline" onClick={cancelIsiOptIn}>
+              Annuler
+            </Button>
+            <Button onClick={confirmIsiOptIn}>
+              Activer ISI hebdo
             </Button>
           </DialogFooter>
         </DialogContent>
