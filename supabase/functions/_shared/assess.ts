@@ -427,7 +427,8 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
 export function sanitizeAggregateText(text: string): string {
   // Remove any numerical data that might leak individual scores
   const cleaned = text
-    .replace(/\d+(\.\d+)?%?/g, '') // Remove all numbers
+    .replace(/\d+(?:[.,]\d+)?\s*%?/g, '') // Remove all numbers (dot/comma decimals + optional %)
+    .replace(/%/g, '') // Remove any stray percentage symbols
     .replace(/score|niveau|points?/gi, '') // Remove scoring terms
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
