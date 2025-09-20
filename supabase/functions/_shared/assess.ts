@@ -426,13 +426,17 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
 }
 
 export function sanitizeAggregateText(text: string): string {
-  // Remove any numerical data that might leak individual scores
-  return text
-    .replace(/\d+(?:\.\d+)?%?/g, '•') // Replace all numbers by bullet markers
-    .replace(/score|niveau|points?/gi, '') // Remove scoring terms
-    .replace(/\s*•\s*/g, ' • ') // Normalize spacing around bullets
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .replace(/• (?=[\.,])/g, '•') // Avoid spaces before punctuation
+  const cleaned = text
+    // Replace numerical hints (with optional decimal separators and %)
+    .replace(/\d+(?:[.,]\d+)?\s*%?/g, '•')
+    // Remove explicit scoring vocabulary that could hint at raw values
+    .replace(/score|niveau|points?/gi, '')
+    // Normalise spacing around bullet markers
+    .replace(/\s*•\s*/g, ' • ')
+    // Collapse extraneous whitespace
+    .replace(/\s+/g, ' ')
+    // Avoid spaces before punctuation following bullets
+    .replace(/• (?=[\.,])/g, '•')
     .trim();
 
   if (!cleaned) {
