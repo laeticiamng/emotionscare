@@ -44,11 +44,22 @@ export interface EmotionScanHistoryEntry {
   scanType: string | null;
 }
 
-const InvokePayloadSchema = z.object({
-  text: z.string().min(1),
-  context: z.string().optional(),
-  previousEmotions: z.record(z.number()).optional(),
-});
+const InvokePayloadSchema = z
+  .object({
+    text: z.string().min(1).optional(),
+    audioBase64: z.string().min(1).optional(),
+    audioUrl: z.string().url().optional(),
+    locale: z.string().min(2).max(10).optional(),
+    context: z.string().optional(),
+    previousEmotions: z.record(z.number()).optional(),
+  })
+  .refine(
+    (payload) => Boolean(payload.text && payload.text.trim()) || payload.audioBase64 || payload.audioUrl,
+    {
+      message: 'Au moins un texte descriptif ou une source audio est requis',
+      path: ['text'],
+    },
+  );
 
 type InvokePayload = z.infer<typeof InvokePayloadSchema>;
 

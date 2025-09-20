@@ -40,7 +40,10 @@ type Likert = 1|2|3|4|5;
 type Resp = Record<(typeof POS[number] | typeof NEG[number])["id"], Likert | undefined>;
 
 type EmotionScanMutationVariables = {
-  text: string;
+  text?: string;
+  audioBase64?: string;
+  audioUrl?: string;
+  locale?: string;
   context?: string;
   previousEmotions?: Record<string, number>;
   accessToken?: string | null;
@@ -127,6 +130,9 @@ export default function EmotionScanPage() {
       invokeEmotionScan(
         {
           text: variables.text,
+          audioBase64: variables.audioBase64,
+          audioUrl: variables.audioUrl,
+          locale: variables.locale,
           context: variables.context,
           previousEmotions: variables.previousEmotions,
         },
