@@ -9,6 +9,7 @@ import CameraSampler from '@/features/scan/CameraSampler';
 import SamSliders from '@/features/scan/SamSliders';
 import MicroGestes from '@/features/scan/MicroGestes';
 import { useSamOrchestration } from '@/features/mood/useSamOrchestration';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { useAssessment } from '@/hooks/useAssessment';
 import { withGuard } from '@/routerV2/withGuard';
 
@@ -115,23 +116,26 @@ const B2CScanPage: React.FC = () => {
 
   if (!featureEnabled) {
     return (
-      <PageRoot>
-        <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
-          <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-12">
-            <h1 className="text-3xl font-semibold text-foreground">Scanner émotionnel indisponible</h1>
-            <p className="text-sm text-muted-foreground">
-              Cette expérience en temps réel est temporairement désactivée pour votre espace. Aucun signal n’est enregistré.
-            </p>
+      <ConsentGate>
+        <PageRoot>
+          <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
+            <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-12">
+              <h1 className="text-3xl font-semibold text-foreground">Scanner émotionnel indisponible</h1>
+              <p className="text-sm text-muted-foreground">
+                Cette expérience en temps réel est temporairement désactivée pour votre espace. Aucun signal n’est enregistré.
+              </p>
+            </div>
           </div>
-        </div>
-      </PageRoot>
+        </PageRoot>
+      </ConsentGate>
     );
   }
 
   return (
-    <PageRoot>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10">
-        <div className="container mx-auto flex flex-col gap-10 px-4 py-10">
+    <ConsentGate>
+      <PageRoot>
+        <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10">
+          <div className="container mx-auto flex flex-col gap-10 px-4 py-10">
           <header className="space-y-4">
             <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-4 py-1 text-xs font-medium text-primary">
               {modeLabel}
@@ -202,9 +206,10 @@ const B2CScanPage: React.FC = () => {
             </div>
             <MicroGestes gestures={gestures} summary={activeSummary} />
           </main>
+          </div>
         </div>
-      </div>
-    </PageRoot>
+      </PageRoot>
+    </ConsentGate>
   );
 };
 

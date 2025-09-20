@@ -156,13 +156,14 @@ export const getCardOrderFromLevel = (level: number): string[] => {
 };
 
 export function useWho5Orchestration(): Who5Orchestration {
-  const { clinicalAccepted } = useConsent();
+  const { status } = useConsent();
+  const hasClinicalConsent = status === 'accepted';
   const { flags } = useFlags();
   const zeroNumbersReady = flags.FF_ZERO_NUMBERS ?? true;
   const who5Assessment = useAssessment('WHO5');
   const history = useAssessmentHistory('WHO5', {
     limit: 1,
-    enabled: clinicalAccepted && who5Assessment.state.canDisplay,
+    enabled: hasClinicalConsent && who5Assessment.state.canDisplay,
   });
 
   const [snoozedUntil, setSnoozedUntil] = useState<string | null>(() => readStoredSnooze());
@@ -185,12 +186,12 @@ export function useWho5Orchestration(): Who5Orchestration {
       isWho5Due({
         lastCompletedAt,
         snoozedUntil,
-        hasConsent: clinicalAccepted,
+        hasConsent: hasClinicalConsent,
         isFlagEnabled: who5Assessment.state.isFlagEnabled,
         canDisplay: who5Assessment.state.canDisplay,
         zeroNumbersReady,
       }),
-    [clinicalAccepted, lastCompletedAt, snoozedUntil, who5Assessment.state.canDisplay, who5Assessment.state.isFlagEnabled, zeroNumbersReady],
+    [hasClinicalConsent, lastCompletedAt, snoozedUntil, who5Assessment.state.canDisplay, who5Assessment.state.isFlagEnabled, zeroNumbersReady],
   );
 
   const inviteLoggedRef = useRef<string | null>(null);

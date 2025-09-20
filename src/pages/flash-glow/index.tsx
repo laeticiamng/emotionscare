@@ -29,6 +29,7 @@ import { clinicalScoringService } from '@/services/clinicalScoringService';
 import useCurrentMood from '@/hooks/useCurrentMood';
 import { ff } from '@/lib/flags/ff';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 const completionToastMessage = 'ça vient';
 const BASE_DURATION_MS = 90_000;
@@ -629,18 +630,20 @@ const FlashGlowView: React.FC = () => {
 
   if (!flashEnabled) {
     return (
-      <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold">Flash Glow</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Cette expérience lumineuse est momentanément indisponible.
-            </p>
-          </CardContent>
-        </Card>
-      </main>
+      <ConsentGate>
+        <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">Flash Glow</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Cette expérience lumineuse est momentanément indisponible.
+              </p>
+            </CardContent>
+          </Card>
+        </main>
+      </ConsentGate>
     );
   }
 
@@ -675,7 +678,8 @@ const FlashGlowView: React.FC = () => {
   const stateLabel = statusLabels[session.state] ?? statusLabels.idle;
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
+    <ConsentGate>
+      <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-semibold">Flash Glow apaisant</CardTitle>
@@ -902,7 +906,8 @@ const FlashGlowView: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </main>
+      </main>
+    </ConsentGate>
   );
 };
 

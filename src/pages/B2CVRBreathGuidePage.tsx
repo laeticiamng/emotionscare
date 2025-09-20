@@ -167,7 +167,8 @@ export default function B2CVRBreathGuidePage() {
   const phaseProgress = (phaseTime / getCurrentPhaseDuration()) * 100;
 
   return (
-    <>
+    <ConsentGate>
+      <>
       {/* Skip Links pour l'accessibilité */}
       <a 
         href="#main-content" 
@@ -467,7 +468,8 @@ export default function B2CVRBreathGuidePage() {
           )}
         </AnimatePresence>
       </main>
-    </div>
-  </>
+      </div>
+      </>
+    </ConsentGate>
   );
 }

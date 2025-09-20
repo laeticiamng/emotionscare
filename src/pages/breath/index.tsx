@@ -20,6 +20,7 @@ import { logAndJournal } from '@/modules/breath/logging';
 import { computeMoodDelta, sanitizeMoodScore } from '@/modules/breath/mood';
 import { useSound } from '@/COMPONENTS.reg';
 import { useFlags } from '@/core/flags';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -1065,7 +1066,8 @@ export default function BreathPage() {
   };
 
   return (
-    <main className="space-y-6 p-6" aria-label="Module de respiration guidée">
+    <ConsentGate>
+      <main className="space-y-6 p-6" aria-label="Module de respiration guidée">
       <PageHeader
         title="Respiration guidée"
         subtitle="Séance 4-7-8 ou cohérence cardiaque avec guidances douces, journalisation automatique et respect du motion-safe."
@@ -1566,6 +1568,7 @@ export default function BreathPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </main>
+      </main>
+    </ConsentGate>
   );
 }

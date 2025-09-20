@@ -24,8 +24,13 @@ const userModeState = {
 };
 
 const consentState = {
-  clinicalAccepted: true,
-  setClinicalAccepted: () => {},
+  status: 'accepted' as const,
+  scope: 'clinical',
+  wasRevoked: false,
+  loading: false,
+  accept: vi.fn(),
+  revoke: vi.fn(),
+  refresh: vi.fn(),
 };
 
 vi.mock('@/contexts/AuthContext', () => ({
@@ -54,7 +59,8 @@ describe('useRouteAllowed', () => {
   beforeEach(() => {
     authState.user = null;
     userModeState.userMode = null;
-    consentState.clinicalAccepted = true;
+    consentState.status = 'accepted';
+    consentState.wasRevoked = false;
   });
 
   const renderGuards = (guards: Guard[]) => renderHook(() => useRouteAllowed(guards));
@@ -93,5 +99,16 @@ describe('useRouteAllowed', () => {
 
     expect(result.current.allowed).toBe(false);
     expect(result.current.reason).toBe('role');
+  });
+
+  it('blocks access when clinical consent is missing', () => {
+    consentState.status = 'none';
+
+    const { result } = renderGuards([
+      { type: 'consent', scope: 'clinical' },
+    ]);
+
+    expect(result.current.allowed).toBe(false);
+    expect(result.current.reason).toBe('consent');
   });
 });
