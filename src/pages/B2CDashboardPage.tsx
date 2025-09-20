@@ -25,6 +25,9 @@ import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
 import { orderQuickActions } from '@/features/dashboard/orchestration/weeklyPlanMapper';
 import { useDashboardStore } from '@/store/dashboard.store';
+import { useFlags } from '@/core/flags';
+import { useAdaptivePlayback } from '@/hooks/music/useAdaptivePlayback';
+import { PRESET_DETAILS } from '@/services/music/presetMetadata';
 
 type QuickAction = {
   id: string;
@@ -88,11 +91,22 @@ const QUICK_ACTIONS: QuickAction[] = [
 
 export default function B2CDashboardPage() {
   const { runAudit } = useAccessibilityAudit();
+  const { has } = useFlags();
+  const playback = useAdaptivePlayback();
   const summaryTone = useDashboardStore((state) => state.wellbeingSummary?.tone ?? null);
   const ephemeralSignal = useDashboardStore((state) => state.ephemeralSignal);
   const setEphemeralSignal = useDashboardStore((state) => state.setEphemeralSignal);
   const [activeTone, setActiveTone] = useState(summaryTone);
   const shouldReduceMotion = useReducedMotion();
+
+  const musicSnapshot = playback.snapshot;
+  const presetLabel = musicSnapshot?.presetId && musicSnapshot.presetId in PRESET_DETAILS
+    ? PRESET_DETAILS[musicSnapshot.presetId as keyof typeof PRESET_DETAILS].label
+    : null;
+  const musicTitle = musicSnapshot?.title ?? 'Ambiance personnalisée';
+  const musicReminderText = musicSnapshot
+    ? `${musicTitle} reste à portée, une bulle ${presetLabel ?? 'très douce'} prête à se relancer.`
+    : 'Lance une ambiance personnalisée et nous la garderons précieusement ici.';
 
   useEffect(() => {
     if (ephemeralSignal) {
@@ -190,6 +204,27 @@ export default function B2CDashboardPage() {
             Découvrez vos outils d'intelligence émotionnelle personnalisés
           </p>
         </header>
+
+        {has('FF_MUSIC') && (
+          <section aria-labelledby="music-reminder" className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle id="music-reminder">Ta piste du moment</CardTitle>
+                <CardDescription>
+                  Un rappel tout en mots de ta dernière bulle sonore.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">{musicReminderText}</p>
+                <Button asChild size="sm">
+                  <Link to="/app/music" aria-label="Revenir à la musique adaptative">
+                    Lancer la lecture
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Rituel hebdomadaire WHO-5 */}
         <section aria-labelledby="weekly-plan" className="mb-8">
