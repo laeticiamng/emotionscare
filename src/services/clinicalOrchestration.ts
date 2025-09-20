@@ -23,7 +23,6 @@ export interface ClinicalSignal {
   source_instrument: string;
   domain: string;
   level: number; // 0-4 severity
-  window_type: string;
   module_context: string;
   metadata: any;
   expires_at: string;
