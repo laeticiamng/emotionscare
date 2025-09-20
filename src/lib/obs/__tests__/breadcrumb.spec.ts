@@ -1,29 +1,23 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-const sentryMocks = vi.hoisted(() => ({
-  addBreadcrumb: vi.fn(),
-  getClient: vi.fn(),
-}));
-
-vi.mock('@sentry/nextjs', () => ({
-  addBreadcrumb: sentryMocks.addBreadcrumb,
-  getCurrentHub: () => ({ getClient: sentryMocks.getClient }),
-}));
+import {
+  __resetSentryMocks,
+  addBreadcrumb as sentryAddBreadcrumb,
+  getClient as sentryGetClient,
+} from '@sentry/nextjs';
 
 import { addBreadcrumb } from '../breadcrumb';
 
 describe('addBreadcrumb', () => {
   beforeEach(() => {
-    sentryMocks.addBreadcrumb.mockReset();
-    sentryMocks.getClient.mockReset();
-    sentryMocks.getClient.mockReturnValue({});
+    __resetSentryMocks();
   });
 
   it('adds a sanitized breadcrumb when a client is available', () => {
     addBreadcrumb('ui.click', { email: 'user@example.com', url: 'https://app.example.com/path?token=abc123' }, 'cta');
 
-    expect(sentryMocks.addBreadcrumb).toHaveBeenCalledTimes(1);
-    const crumb = sentryMocks.addBreadcrumb.mock.calls[0][0];
+    expect(sentryAddBreadcrumb).toHaveBeenCalledTimes(1);
+    const crumb = sentryAddBreadcrumb.mock.calls[0][0];
     expect(crumb.category).toBe('ui.click');
     expect(crumb.message).toBe('cta');
     expect(crumb.level).toBe('info');
@@ -31,10 +25,10 @@ describe('addBreadcrumb', () => {
   });
 
   it('skips breadcrumb creation when no client is registered', () => {
-    sentryMocks.getClient.mockReturnValueOnce(null);
+    sentryGetClient.mockReturnValueOnce(null);
 
     addBreadcrumb('ui.click');
 
-    expect(sentryMocks.addBreadcrumb).not.toHaveBeenCalled();
+    expect(sentryAddBreadcrumb).not.toHaveBeenCalled();
   });
 });

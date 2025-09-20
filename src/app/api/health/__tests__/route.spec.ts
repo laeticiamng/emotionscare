@@ -32,7 +32,7 @@ describe('GET /api/health', () => {
   it('returns latencies for each probe when everything is healthy', async () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://demo.supabase.co';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://preview.example.com';
+    process.env.SUPABASE_FUNCTIONS_URL = '';
     process.env.SENTRY_RELEASE = '1.2.3';
     process.env.SENTRY_ENVIRONMENT = 'preview';
 
@@ -57,12 +57,20 @@ describe('GET /api/health', () => {
     expect(payload.storage_ms).toEqual(expect.any(Number));
     expect(payload.version).toBe('1.2.3');
     expect(payload.env).toBe('preview');
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://demo.supabase.co/functions/v1/health-edge',
+      expect.objectContaining({ method: 'POST', cache: 'no-store' }),
+    );
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://demo.supabase.co/storage/v1/object/public/health/pixel.png',
+      expect.objectContaining({ method: 'HEAD', cache: 'no-store' }),
+    );
   });
 
   it('returns degraded status when a probe fails and soft fail is enabled', async () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://demo.supabase.co';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://preview.example.com';
     process.env.HEALTH_SOFT_FAIL = 'true';
 
     const selectMock = vi.fn().mockResolvedValue({ error: { message: 'boom' } });
@@ -78,6 +86,26 @@ describe('GET /api/health', () => {
     expect(payload.status).toBe('degraded');
     expect(payload.error).toContain('boom');
     expect(payload.failing_probe).toBe('supabase');
+  });
+
+  it('uses the override when a custom functions URL is provided', async () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://demo.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+    process.env.SUPABASE_FUNCTIONS_URL = 'https://edge.example.com/functions/v1';
+
+    const selectMock = vi.fn().mockResolvedValue({ error: null });
+    const fromMock = vi.fn(() => ({ select: selectMock }));
+    createClientMock.mockReturnValue({ from: fromMock } as any);
+
+    (global.fetch as vi.Mock).mockResolvedValue(new Response(null, { status: 200 }));
+
+    const response = await GET(new Request('https://app.test/api/health'));
+    expect(response.status).toBe(200);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://edge.example.com/functions/v1/health-edge',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   it('rejects calls without the required access key', async () => {

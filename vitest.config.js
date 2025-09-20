@@ -26,6 +26,7 @@ export default defineConfig({
       '@/routerV2': path.resolve(process.cwd(), './src/lib/routerV2'),
       '@/routerV2/routes.config': path.resolve(process.cwd(), './src/lib/routerV2/routes.config.ts'),
       '@/guards': path.resolve(process.cwd(), './src/lib/routerV2/guards.ts'),
+      '@sentry/nextjs': path.resolve(process.cwd(), './src/test/mocks/sentry-nextjs.ts'),
     },
   },
   test: {

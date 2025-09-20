@@ -71,7 +71,7 @@ Ce document décrit les briques livrées pour l'observabilité actionnable de la
   ```
 - Pings réalisés :
   1. `supabase.from('assessments').select('id', { head: true, limit: 1 })` (service role recommandé),
-  2. `POST` sur l'Edge Function [`health-edge`](../supabase/functions/health-edge/index.ts) pour mesurer le cold start edge,
+  2. `POST` sur l'Edge Function [`health-edge`](../supabase/functions/health-edge/index.ts) (base `SUPABASE_FUNCTIONS_URL` si définie, sinon `NEXT_PUBLIC_SUPABASE_URL/functions/v1`),
   3. `HEAD` sur `storage/v1/object/public/health/pixel.png`.
 - Options de sécurité :
   - `HEALTH_ACCESS_KEY` impose un header `X-EC-Health-Key` (401 sinon),
@@ -95,7 +95,7 @@ Ce document décrit les briques livrées pour l'observabilité actionnable de la
 | `SENTRY_RELEASE` | Identifiant de version (généralement `$GITHUB_SHA`). |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | URL du collector OTLP HTTP. |
 | `OTEL_EXPORTER_OTLP_HEADERS` | Headers additionnels (`key=value` séparés par des virgules). |
-| `NEXT_PUBLIC_BASE_URL` | Base URL publique du frontend (utilisée pour joindre les Edge Functions). |
+| `SUPABASE_FUNCTIONS_URL` | (Optionnel) Base explicite pour les Edge Functions (`.../functions/v1`, défaut : `NEXT_PUBLIC_SUPABASE_URL`). |
 | `HEALTH_ACCESS_KEY` | Clé optionnelle pour restreindre `/api/health`. |
 | `HEALTH_SOFT_FAIL` | `true` ⇒ le endpoint reste en 200 avec `status="degraded"` en cas d’erreur. |
 

@@ -38,24 +38,33 @@ const parseHeaders = (value: string | null | undefined): Record<string, string> 
     }, {});
 };
 
-const resolveBaseUrl = (): string | null => {
-  const raw = process.env.NEXT_PUBLIC_BASE_URL ?? process.env.VERCEL_URL ?? null;
-  if (!raw) {
-    return null;
-  }
-
+const normalizeUrl = (value: string): URL | null => {
   try {
-    const url = raw.startsWith('http') ? new URL(raw) : new URL(`https://${raw}`);
-    url.pathname = '/';
-    return url.toString().replace(/\/$/, '');
+    return new URL(value);
   } catch {
-    return null;
+    try {
+      return new URL(`https://${value}`);
+    } catch {
+      return null;
+    }
   }
 };
 
-const buildUrl = (base: string, path: string): string => {
-  const url = new URL(path, base.endsWith('/') ? `${base}` : `${base}/`);
-  return url.toString();
+const resolveEdgeFunctionUrl = (supabaseUrl: string): string => {
+  const override = process.env.SUPABASE_FUNCTIONS_URL;
+  if (override) {
+    const normalized = normalizeUrl(override);
+    if (normalized) {
+      const base = normalized.href.endsWith('/') ? normalized.href : `${normalized.href}/`;
+      try {
+        return new URL('health-edge', base).toString();
+      } catch {
+        // fall through to Supabase project default
+      }
+    }
+  }
+
+  return new URL('/functions/v1/health-edge', supabaseUrl).toString();
 };
 
 const resolveVersion = (): string =>
@@ -84,12 +93,10 @@ export async function GET(request: Request): Promise<Response> {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const baseUrl = resolveBaseUrl();
 
   const missing = [] as string[];
   if (!supabaseUrl) missing.push('supabase_url');
   if (!serviceRoleKey) missing.push('service_role_key');
-  if (!baseUrl) missing.push('base_url');
 
   if (missing.length) {
     const body = {
@@ -126,7 +133,7 @@ export async function GET(request: Request): Promise<Response> {
     });
     supabaseMs = supa.ms;
 
-    const edgeUrl = buildUrl(baseUrl, '/functions/v1/health-edge');
+    const edgeUrl = resolveEdgeFunctionUrl(supabaseUrl);
     failingProbe = 'edge';
     const edge = await measure(async () => {
       const response = await fetch(edgeUrl, { method: 'POST', cache: 'no-store' });
