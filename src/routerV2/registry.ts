@@ -313,17 +313,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/emotions'],
     deprecated: true,
   },
-  // community -> social-cocon
   {
-    name: 'community-redirect',
+    name: 'community',
     path: '/app/community',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'RedirectToSocialCocon',
+    component: 'B2CCommunautePage',
     guard: true,
     aliases: ['/community'],
-    deprecated: true,
   },
   {
     name: 'screen-silk',
