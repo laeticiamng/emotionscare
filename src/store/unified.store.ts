@@ -4,7 +4,9 @@
  */
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 import { logger } from '@/lib/logger';
 
 // Auth State
@@ -108,51 +110,55 @@ interface AppStore extends AuthState, ThemeState, MusicState, CoachState, Notifi
   setDashboardPreferences: (prefs: Record<string, any>) => void;
 }
 
-export const useAppStore = create<AppStore>()(
+const initialState = {
+  // Initial Auth State
+  user: null,
+  session: null,
+  isLoading: false,
+  error: null,
+
+  // Initial Theme State
+  theme: 'system',
+  fontSize: 'medium',
+  highContrast: false,
+  reducedMotion: false,
+
+  // Initial Music State
+  currentTrack: null,
+  isPlaying: false,
+  volume: 0.7,
+  playlist: [],
+  repeat: 'none',
+  shuffle: false,
+
+  // Initial Coach State
+  conversations: [],
+  currentConversation: null,
+  coachPreferences: {
+    personality: 'empathetic',
+    language: 'fr',
+    responseLength: 'medium',
+  },
+
+  // Initial Notifications State
+  notifications: [],
+  notificationPreferences: {
+    push: true,
+    email: true,
+    sound: true,
+    emailFrequency: 'daily',
+  },
+
+  // Initial Dashboard State
+  widgets: [],
+  layout: 'grid',
+  dashboardPreferences: {},
+};
+
+const unifiedStoreBase = create<AppStore>()(
   persist(
     (set, get) => ({
-      // Initial Auth State
-      user: null,
-      session: null,
-      isLoading: false,
-      error: null,
-
-      // Initial Theme State
-      theme: 'system',
-      fontSize: 'medium',
-      highContrast: false,
-      reducedMotion: false,
-
-      // Initial Music State
-      currentTrack: null,
-      isPlaying: false,
-      volume: 0.7,
-      playlist: [],
-      repeat: 'none',
-      shuffle: false,
-
-      // Initial Coach State
-      conversations: [],
-      currentConversation: null,
-      coachPreferences: {
-        personality: 'empathetic',
-        language: 'fr',
-        responseLength: 'medium',
-      },
-
-      // Initial Notifications State
-      notifications: [],
-      notificationPreferences: {
-        push: true,
-        email: true,
-        sound: true,
-        emailFrequency: 'daily',
-      },
-
-      // Initial Dashboard State
-      widgets: [],
-      layout: 'grid',
-      dashboardPreferences: {},
+      ...initialState,
 
       // Auth Actions
       setUser: (user) => {
@@ -192,7 +198,7 @@ export const useAppStore = create<AppStore>()(
 
       setFontSize: (fontSize) => {
         set({ fontSize });
-        document.documentElement.style.fontSize = 
+        document.documentElement.style.fontSize =
           fontSize === 'small' ? '14px' : fontSize === 'large' ? '18px' : '16px';
       },
 
@@ -246,9 +252,9 @@ export const useAppStore = create<AppStore>()(
       // Coach Actions
       addConversation: (conversation) => {
         const { conversations } = get();
-        set({ 
+        set({
           conversations: [conversation, ...conversations],
-          currentConversation: conversation 
+          currentConversation: conversation
         });
         logger.info('New coach conversation created', { id: conversation.id }, 'COACH');
       },
@@ -259,13 +265,13 @@ export const useAppStore = create<AppStore>()(
 
       updateConversation: (id, updates) => {
         const { conversations, currentConversation } = get();
-        const updatedConversations = conversations.map(c => 
+        const updatedConversations = conversations.map(c =>
           c.id === id ? { ...c, ...updates } : c
         );
-        set({ 
+        set({
           conversations: updatedConversations,
-          currentConversation: currentConversation?.id === id 
-            ? { ...currentConversation, ...updates } 
+          currentConversation: currentConversation?.id === id
+            ? { ...currentConversation, ...updates }
             : currentConversation
         });
       },
@@ -304,8 +310,8 @@ export const useAppStore = create<AppStore>()(
 
       markAsRead: (id) => {
         const { notifications } = get();
-        set({ 
-          notifications: notifications.map(n => 
+        set({
+          notifications: notifications.map(n =>
             n.id === id ? { ...n, read: true } : n
           )
         });
@@ -329,8 +335,8 @@ export const useAppStore = create<AppStore>()(
 
       updateWidget: (id, updates) => {
         const { widgets } = get();
-        set({ 
-          widgets: widgets.map(w => 
+        set({
+          widgets: widgets.map(w =>
             w.id === id ? { ...w, ...updates } : w
           )
         });
@@ -345,9 +351,8 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'emotionscare-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: () => localStorage,
       partialize: (state) => ({
-        // Only persist non-sensitive data
         theme: state.theme,
         fontSize: state.fontSize,
         highContrast: state.highContrast,
@@ -363,6 +368,8 @@ export const useAppStore = create<AppStore>()(
     }
   )
 );
+
+export const useAppStore = createSelectors(unifiedStoreBase);
 
 // Selectors for optimized re-renders
 export const useAuth = () => useAppStore((state) => ({

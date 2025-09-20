@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+
+import { createImmutableStore } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -34,20 +36,20 @@ interface OnboardingState {
   currentStep: OnboardingStep;
   completed: boolean;
   flowId?: string;
-  
+
   // Draft data
   profileDraft?: ProfileDraft;
   goalsDraft?: GoalsDraft;
   sensorsDraft?: SensorsDraft;
   notificationsEnabled: boolean;
-  
+
   // Suggestions
   moduleSuggestions: ModuleSuggestion[];
-  
+
   // UI state
   loading: boolean;
   error: string | null;
-  
+
   // Actions
   setStep: (step: OnboardingStep) => void;
   nextStep: () => void;
@@ -77,27 +79,27 @@ const initialState = {
   error: null,
 };
 
-export const useOnboardingStore = create<OnboardingState>()(
-  persist(
+const onboardingStoreBase = create<OnboardingState>()(
+  createImmutableStore(
     (set, get) => ({
       ...initialState,
-      
+
       setStep: (currentStep) => set({ currentStep }),
-      
+
       nextStep: () => {
         const current = get().currentStep;
         if (current < 5) {
           set({ currentStep: (current + 1) as OnboardingStep });
         }
       },
-      
+
       prevStep: () => {
         const current = get().currentStep;
         if (current > 0) {
           set({ currentStep: (current - 1) as OnboardingStep });
         }
       },
-      
+
       setCompleted: (completed) => set({ completed }),
       setFlowId: (flowId) => set({ flowId }),
       setProfileDraft: (profileDraft) => set({ profileDraft }),
@@ -107,19 +109,23 @@ export const useOnboardingStore = create<OnboardingState>()(
       setModuleSuggestions: (moduleSuggestions) => set({ moduleSuggestions }),
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
-      
+
       reset: () => set(initialState),
     }),
     {
-      name: 'onboarding-store',
-      partialize: (state) => ({
-        currentStep: state.currentStep,
-        completed: state.completed,
-        profileDraft: state.profileDraft,
-        goalsDraft: state.goalsDraft,
-        sensorsDraft: state.sensorsDraft,
-        notificationsEnabled: state.notificationsEnabled,
-      }),
+      persist: {
+        name: 'onboarding-store',
+        partialize: (state) => ({
+          currentStep: state.currentStep,
+          completed: state.completed,
+          profileDraft: state.profileDraft,
+          goalsDraft: state.goalsDraft,
+          sensorsDraft: state.sensorsDraft,
+          notificationsEnabled: state.notificationsEnabled,
+        }),
+      },
     }
   )
 );
+
+export const useOnboardingStore = createSelectors(onboardingStoreBase);

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type FeedbackCategory = 'bug'|'suggestion'|'other';
 
@@ -33,7 +34,7 @@ type FeedbackState = {
   clearDraft: () => void;
 };
 
-export const useFeedbackStore = create<FeedbackState>()(
+const useFeedbackStoreBase = create<FeedbackState>()(
   persist(
     (set) => ({
       isOpen: false,
@@ -74,3 +75,5 @@ export const useFeedbackStore = create<FeedbackState>()(
     }
   )
 );
+
+export const useFeedbackStore = createSelectors(useFeedbackStoreBase);

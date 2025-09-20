@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 import {
   safeClassAdd,
   safeClassRemove,
@@ -94,7 +95,7 @@ const applyA11yToDocument = (a11y: A11y) => {
   }
 };
 
-export const useSettingsStore = create<SettingsState>()(
+const useSettingsStoreBase = create<SettingsState>()(
   persist(
     (set, get) => ({
       profile: initialState,
@@ -170,3 +171,5 @@ export const useSettingsStore = create<SettingsState>()(
     }
   )
 );
+
+export const useSettingsStore = createSelectors(useSettingsStoreBase);

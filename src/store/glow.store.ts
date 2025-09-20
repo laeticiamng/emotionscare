@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type GlowPattern = '4-2-4' | '4-6-8' | '5-5';
 
@@ -68,7 +69,7 @@ const initialState: GlowState = {
   enableHaptic: true,
 };
 
-export const useGlowStore = create<GlowStore>()(
+const useGlowStoreBase = create<GlowStore>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -180,3 +181,5 @@ export const useGlowStore = create<GlowStore>()(
     }
   )
 );
+
+export const useGlowStore = createSelectors(useGlowStoreBase);

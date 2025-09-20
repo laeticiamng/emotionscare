@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import { devtools, persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
+
+import { persist, type PersistOptions } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 // Types pour le store global
 export interface User {
@@ -63,32 +65,21 @@ export interface AppState {
 }
 
 export interface AppActions {
-  // Authentification
   setUser: (user: User | null) => void;
   setAuthenticated: (isAuthenticated: boolean) => void;
   setLoading: (isLoading: boolean) => void;
-
-  // UI Actions
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   toggleSidebar: () => void;
   setActiveModule: (module: string | null) => void;
-
-  // Cache Actions
   setCache: (key: string, value: unknown) => void;
   getCache: (key: string) => unknown;
   clearCache: (key?: string) => void;
   isCacheValid: (key: string, maxAge?: number) => boolean;
-
-  // Préférences
   updatePreferences: (preferences: Partial<AppState['preferences']>) => void;
-
-  // Modules Actions
   updateMusicState: (state: Partial<AppState['modules']['music']>) => void;
   updateEmotionState: (state: Partial<AppState['modules']['emotion']>) => void;
   updateJournalState: (state: Partial<AppState['modules']['journal']>) => void;
   updateCoachState: (state: Partial<AppState['modules']['coach']>) => void;
-
-  // Reset
   reset: () => void;
 }
 
@@ -134,173 +125,176 @@ const createDefaultState = (): AppState => ({
   },
 });
 
-const store = persist<AppStore>(
-  (set, get) => ({
-    ...createDefaultState(),
+const appStorePersistOptions = {
+  name: 'ec-app-store',
+  storage: () => localStorage,
+  version: 1,
+  migrate: (persistedState: Partial<AppState> | undefined, _version: number) => {
+    const defaults = createDefaultState();
+    const state = (persistedState ?? {}) as Partial<AppState>;
 
-    // Authentification Actions
-    setUser: (user) =>
-      set((state) => ({
-        ...state,
-        user,
-      })),
+    return {
+      theme: state.theme ?? defaults.theme,
+      preferences: {
+        ...defaults.preferences,
+        ...(state.preferences ?? {}),
+      },
+      modules: {
+        music: {
+          ...defaults.modules.music,
+          ...(state.modules?.music ?? {}),
+        },
+        emotion: {
+          ...defaults.modules.emotion,
+          ...(state.modules?.emotion ?? {}),
+        },
+      },
+    } as Partial<AppStore>;
+  },
+  partialize: (state: AppStore) => ({
+    theme: state.theme,
+    preferences: state.preferences,
+    modules: {
+      music: state.modules.music,
+      emotion: state.modules.emotion,
+    },
+  }),
+} satisfies PersistOptions<AppStore>;
 
-    setAuthenticated: (isAuthenticated) =>
-      set((state) => ({
-        ...state,
-        isAuthenticated,
-      })),
+const appStoreBase = create<AppStore>()(
+  persist(
+    (set, get) => ({
+      ...createDefaultState(),
 
-    setLoading: (isLoading) =>
-      set((state) => ({
-        ...state,
-        isLoading,
-      })),
+      setUser: (user) =>
+        set((state) => ({
+          ...state,
+          user,
+        })),
 
-    // UI Actions
-    setTheme: (theme) =>
-      set((state) => ({
-        ...state,
-        theme,
-      })),
+      setAuthenticated: (isAuthenticated) =>
+        set((state) => ({
+          ...state,
+          isAuthenticated,
+        })),
 
-    toggleSidebar: () =>
-      set((state) => ({
-        ...state,
-        sidebarCollapsed: !state.sidebarCollapsed,
-      })),
+      setLoading: (isLoading) =>
+        set((state) => ({
+          ...state,
+          isLoading,
+        })),
 
-    setActiveModule: (module) =>
-      set((state) => ({
-        ...state,
-        activeModule: module,
-      })),
+      setTheme: (theme) =>
+        set((state) => ({
+          ...state,
+          theme,
+        })),
 
-    // Cache Actions
-    setCache: (key, value) =>
-      set((state) => ({
-        ...state,
-        cache: { ...state.cache, [key]: value },
-        cacheTimestamps: { ...state.cacheTimestamps, [key]: Date.now() },
-      })),
+      toggleSidebar: () =>
+        set((state) => ({
+          ...state,
+          sidebarCollapsed: !state.sidebarCollapsed,
+        })),
 
-    getCache: (key) => get().cache[key],
+      setActiveModule: (module) =>
+        set((state) => ({
+          ...state,
+          activeModule: module,
+        })),
 
-    clearCache: (key) =>
-      set((state) => {
-        if (!key) {
+      setCache: (key, value) =>
+        set((state) => ({
+          ...state,
+          cache: { ...state.cache, [key]: value },
+          cacheTimestamps: { ...state.cacheTimestamps, [key]: Date.now() },
+        })),
+
+      getCache: (key) => get().cache[key],
+
+      clearCache: (key) =>
+        set((state) => {
+          if (!key) {
+            return {
+              ...state,
+              cache: {},
+              cacheTimestamps: {},
+            };
+          }
+
+          const { [key]: _, ...restCache } = state.cache;
+          const { [key]: __, ...restTimestamps } = state.cacheTimestamps;
+
           return {
             ...state,
-            cache: {},
-            cacheTimestamps: {},
+            cache: restCache,
+            cacheTimestamps: restTimestamps,
           };
-        }
+        }),
 
-        const { [key]: _, ...restCache } = state.cache;
-        const { [key]: __, ...restTimestamps } = state.cacheTimestamps;
-
-        return {
-          ...state,
-          cache: restCache,
-          cacheTimestamps: restTimestamps,
-        };
-      }),
-
-    isCacheValid: (key, maxAge = 5 * 60 * 1000) => {
-      const timestamp = get().cacheTimestamps[key];
-      return typeof timestamp === 'number' && Date.now() - timestamp < maxAge;
-    },
-
-    // Préférences
-    updatePreferences: (preferences) =>
-      set((state) => ({
-        ...state,
-        preferences: { ...state.preferences, ...preferences },
-      })),
-
-    // Modules Actions
-    updateMusicState: (musicState) =>
-      set((state) => ({
-        ...state,
-        modules: {
-          ...state.modules,
-          music: { ...state.modules.music, ...musicState },
-        },
-      })),
-
-    updateEmotionState: (emotionState) =>
-      set((state) => ({
-        ...state,
-        modules: {
-          ...state.modules,
-          emotion: { ...state.modules.emotion, ...emotionState },
-        },
-      })),
-
-    updateJournalState: (journalState) =>
-      set((state) => ({
-        ...state,
-        modules: {
-          ...state.modules,
-          journal: { ...state.modules.journal, ...journalState },
-        },
-      })),
-
-    updateCoachState: (coachState) =>
-      set((state) => ({
-        ...state,
-        modules: {
-          ...state.modules,
-          coach: { ...state.modules.coach, ...coachState },
-        },
-      })),
-
-    // Reset
-    reset: () => set(() => createDefaultState()),
-  }),
-  {
-    name: 'ec-app-store',
-    storage: createJSONStorage(() => localStorage),
-    version: 1,
-    migrate: (persistedState, _version) => {
-      const defaults = createDefaultState();
-      const state = (persistedState ?? {}) as Partial<AppState>;
-
-      return {
-        theme: state.theme ?? defaults.theme,
-        preferences: {
-          ...defaults.preferences,
-          ...(state.preferences ?? {}),
-        },
-        modules: {
-          music: {
-            ...defaults.modules.music,
-            ...(state.modules?.music ?? {}),
-          },
-          emotion: {
-            ...defaults.modules.emotion,
-            ...(state.modules?.emotion ?? {}),
-          },
-        },
-      } as Partial<AppStore>;
-    },
-    partialize: (state) => ({
-      theme: state.theme,
-      preferences: state.preferences,
-      modules: {
-        music: state.modules.music,
-        emotion: state.modules.emotion,
+      isCacheValid: (key, maxAge = 5 * 60 * 1000) => {
+        const timestamp = get().cacheTimestamps[key];
+        return typeof timestamp === 'number' && Date.now() - timestamp < maxAge;
       },
+
+      updatePreferences: (preferences) =>
+        set((state) => ({
+          ...state,
+          preferences: { ...state.preferences, ...preferences },
+        })),
+
+      updateMusicState: (musicState) =>
+        set((state) => ({
+          ...state,
+          modules: {
+            ...state.modules,
+            music: { ...state.modules.music, ...musicState },
+          },
+        })),
+
+      updateEmotionState: (emotionState) =>
+        set((state) => ({
+          ...state,
+          modules: {
+            ...state.modules,
+            emotion: { ...state.modules.emotion, ...emotionState },
+          },
+        })),
+
+      updateJournalState: (journalState) =>
+        set((state) => ({
+          ...state,
+          modules: {
+            ...state.modules,
+            journal: { ...state.modules.journal, ...journalState },
+          },
+        })),
+
+      updateCoachState: (coachState) =>
+        set((state) => ({
+          ...state,
+          modules: {
+            ...state.modules,
+            coach: { ...state.modules.coach, ...coachState },
+          },
+        })),
+
+      reset: () => set(() => createDefaultState()),
     }),
-  }
+    appStorePersistOptions
+  )
 );
 
-const enhancedStore = subscribeWithSelector(store);
-const devtoolsEnabled = process.env.NODE_ENV !== 'production';
+Object.defineProperty(appStoreBase, 'persist', {
+  configurable: false,
+  enumerable: false,
+  writable: false,
+  value: {
+    getOptions: () => appStorePersistOptions,
+  },
+});
 
-export const useAppStore = create<AppStore>()(
-  devtoolsEnabled ? devtools(enhancedStore, { name: 'EC App Store' }) : enhancedStore
-);
+export const useAppStore = createSelectors(appStoreBase);
+export { shallow };
 
 // Sélecteurs pour optimiser les re-renders
 export const selectUser = (state: AppState) => state.user;
@@ -317,5 +311,3 @@ export const selectJournalModule = (state: AppState) => state.modules.journal;
 export const selectCoachModule = (state: AppState) => state.modules.coach;
 export const selectUserRole = (state: AppState) => state.user?.role ?? null;
 export const selectCacheEntry = (key: string) => (state: AppState) => state.cache[key];
-
-export { shallow };
