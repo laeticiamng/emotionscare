@@ -3,8 +3,37 @@
  * TICKET: FE/BE-Router-Cleanup-01 - Performance 100%
  */
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+
+type RoutePreloader = () => Promise<unknown>;
+
+const ROUTE_PRELOADERS = new Map<string, RoutePreloader>([
+  ['/', () => import('@/components/HomePage')],
+  ['/about', () => import('@/pages/AboutPage')],
+  ['/contact', () => import('@/pages/ContactPage')],
+  ['/help', () => import('@/pages/HelpPage')],
+  ['/login', () => import('@/pages/unified/UnifiedLoginPage')],
+  ['/signup', () => import('@/pages/SignupPage')],
+  ['/app', () => import('@/pages/AppGatePage')],
+  ['/app/home', () => import('@/pages/B2CDashboardPage')],
+  ['/app/scan', () => import('@/pages/B2CScanPage')],
+  ['/app/music', () => import('@/modules/adaptive-music/AdaptiveMusicPage')],
+  ['/app/coach', () => import('@/pages/B2CAICoachPage')],
+  ['/app/journal', () => import('@/pages/B2CJournalPage')],
+  ['/b2c', () => import('@/components/SimpleB2CPage')],
+  ['/entreprise', () => import('@/pages/B2BEntreprisePage')],
+]);
+
+const pendingPreloads = new Map<string, Promise<void>>();
+
+const normalizePath = (path: string): string => {
+  if (!path || path === '/') {
+    return '/';
+  }
+
+  return path.endsWith('/') ? path.slice(0, -1) : path;
+};
 
 // Cache des routes pour éviter les recalculs
 const routeCache = new Map<string, any>();
@@ -31,20 +60,33 @@ class RouterPerformanceManager {
 
   // Précharger une route
   preloadRoute(path: string): void {
-    if (!this.preloadedRoutes.has(path)) {
-      const startTime = performance.now();
-      
-      // Simulation du préchargement
-      import(/* webpackChunkName: "route-[request]" */ `@/pages${path}Page`)
-        .then(() => {
-          const loadTime = performance.now() - startTime;
-          this.updateMetrics(path, { loadTime });
-          this.preloadedRoutes.add(path);
-        })
-        .catch(() => {
-          // Route non trouvée, on ignore silencieusement
-        });
+    const normalizedPath = normalizePath(path);
+    if (this.preloadedRoutes.has(normalizedPath) || pendingPreloads.has(normalizedPath)) {
+      return;
     }
+
+    const loader = ROUTE_PRELOADERS.get(normalizedPath);
+    if (!loader) {
+      return;
+    }
+
+    const startTime = performance.now();
+    const pending = loader()
+      .then(() => {
+        const loadTime = performance.now() - startTime;
+        this.updateMetrics(normalizedPath, { loadTime });
+        this.preloadedRoutes.add(normalizedPath);
+      })
+      .catch(error => {
+        if (import.meta.env.DEV) {
+          console.warn(`[routerV2] Échec du préchargement de ${normalizedPath}`, error);
+        }
+      })
+      .finally(() => {
+        pendingPreloads.delete(normalizedPath);
+      });
+
+    pendingPreloads.set(normalizedPath, pending.then(() => undefined));
   }
 
   // Mettre à jour les métriques
@@ -112,6 +154,15 @@ export function useRouteOptimization() {
     
     return routeCache.get(path);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const interval = window.setInterval(() => manager.cleanupCache(), 60_000);
+    return () => window.clearInterval(interval);
+  }, [manager]);
 
   return {
     preloadProbableRoutes,

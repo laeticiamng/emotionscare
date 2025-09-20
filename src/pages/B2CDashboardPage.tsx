@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import RecentEmotionScansWidget from '@/components/dashboard/widgets/RecentEmotionScansWidget';
-import JournalSummaryCard from '@/components/dashboard/widgets/JournalSummaryCard';
-import WeeklyPlanCard from '@/components/dashboard/widgets/WeeklyPlanCard';
 import {
   Brain,
   Music,
@@ -28,6 +25,11 @@ import { useDashboardStore } from '@/store/dashboard.store';
 import { useFlags } from '@/core/flags';
 import { useAdaptivePlayback } from '@/hooks/music/useAdaptivePlayback';
 import { PRESET_DETAILS } from '@/services/music/presetMetadata';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
+const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
+const JournalSummaryCard = React.lazy(() => import('@/components/dashboard/widgets/JournalSummaryCard'));
 
 type QuickAction = {
   id: string;
@@ -88,6 +90,39 @@ const QUICK_ACTIONS: QuickAction[] = [
     accent: 'bg-green-500/10 text-green-600',
   },
 ];
+
+const WeeklyPlanSkeleton: React.FC = () => (
+  <Card aria-hidden className="border-dashed">
+    <CardHeader className="space-y-2">
+      <Skeleton className="h-4 w-32" />
+      <Skeleton className="h-5 w-56" />
+    </CardHeader>
+    <CardContent className="space-y-3">
+      <Skeleton className="h-3 w-full" />
+      <Skeleton className="h-3 w-5/6" />
+      <Skeleton className="h-3 w-3/4" />
+      <div className="grid gap-3 sm:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} className="h-16 w-full" />
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const DashboardWidgetSkeleton: React.FC<{ lines?: number }> = ({ lines = 4 }) => (
+  <Card aria-hidden className="border-dashed">
+    <CardHeader className="space-y-2">
+      <Skeleton className="h-4 w-40" />
+      <Skeleton className="h-3 w-1/2" />
+    </CardHeader>
+    <CardContent className="space-y-3">
+      {Array.from({ length: lines }).map((_, index) => (
+        <Skeleton key={index} className="h-3 w-full" />
+      ))}
+    </CardContent>
+  </Card>
+);
 
 export default function B2CDashboardPage() {
   const { runAudit } = useAccessibilityAudit();
@@ -231,7 +266,15 @@ export default function B2CDashboardPage() {
           <h2 id="weekly-plan" className="sr-only">
             Plan de la semaine
           </h2>
-          <WeeklyPlanCard />
+          <Suspense
+            fallback={(
+              <div aria-busy="true" aria-live="polite">
+                <WeeklyPlanSkeleton />
+              </div>
+            )}
+          >
+            <WeeklyPlanCard />
+          </Suspense>
         </section>
 
 
@@ -349,14 +392,30 @@ export default function B2CDashboardPage() {
           <h2 id="recent-scans-section" className="sr-only">
             Historique Emotion Scan
           </h2>
-          <RecentEmotionScansWidget />
+          <Suspense
+            fallback={(
+              <div aria-busy="true" aria-live="polite">
+                <DashboardWidgetSkeleton lines={6} />
+              </div>
+            )}
+          >
+            <RecentEmotionScansWidget />
+          </Suspense>
         </section>
 
         <section aria-labelledby="journal-summary-section" className="mb-8">
           <h2 id="journal-summary-section" className="sr-only">
             Synthèse du journal émotionnel
           </h2>
-          <JournalSummaryCard />
+          <Suspense
+            fallback={(
+              <div aria-busy="true" aria-live="polite">
+                <DashboardWidgetSkeleton lines={5} />
+              </div>
+            )}
+          >
+            <JournalSummaryCard />
+          </Suspense>
         </section>
 
         {/* Recommandations personnalisées */}
