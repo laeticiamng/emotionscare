@@ -83,7 +83,7 @@ Delivers the textual catalogue and announces cadence, feature flags, and signal 
 #### Error responses
 
 - `401` `{ "error": "unauthorized" }` — missing or invalid JWT.
-- `403` `{ "error": "forbidden_origin" }` — origin not in `CORS_ORIGINS`.
+- `403` `{ "error": "forbidden_origin" }` — origin not in `ALLOWED_ORIGINS`.
 - `409` `{ "error": "cadence_violation", "retry_at": "2025-03-12T08:00:00Z" }` —
   instrument requested too soon.
 - `422` `{ "error": "invalid_payload", "field": "instrument" }` — schema mismatch.
@@ -252,7 +252,7 @@ only counts ≥ 5 are rolled up before a flag is emitted at org level.
 
 | Variable | Purpose |
 | --- | --- |
-| `CORS_ORIGINS` | Comma-separated list of allowed origins. |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed origins. |
 | `SUPABASE_URL` | Supabase project URL. |
 | `SUPABASE_ANON_KEY` | Anonymous key used with end-user JWT for RLS inserts. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role key reserved for batch recompute (Edge cron). |

@@ -46,7 +46,7 @@ vi.mock('../functions/_shared/zod.ts', () => ({ z: require('zod') }));
 const envStore: Record<string, string | undefined> = {
   SUPABASE_URL: 'https://example.supabase.co',
   SUPABASE_ANON_KEY: 'anon-key',
-  CORS_ORIGINS: 'https://example.com',
+  ALLOWED_ORIGINS: 'https://example.com',
   CSV_SIGNING_SECRET: 'test-signing-secret',
   FF_ASSESS_WHO5: 'true',
   FF_ASSESS_STAI6: 'true',
@@ -95,7 +95,7 @@ beforeEach(() => {
   resetEdgeRateLimits();
   envStore.SUPABASE_URL = 'https://example.supabase.co';
   envStore.SUPABASE_ANON_KEY = 'anon-key';
-  envStore.CORS_ORIGINS = 'https://example.com';
+  envStore.ALLOWED_ORIGINS = 'https://example.com';
   envStore.CSV_SIGNING_SECRET = 'test-signing-secret';
   envStore.FF_ASSESS_WHO5 = 'true';
   envStore.FF_ASSESS_STAI6 = 'true';

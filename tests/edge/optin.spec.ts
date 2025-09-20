@@ -184,7 +184,7 @@ beforeEach(() => {
   envStore.clear();
   envStore.set('SUPABASE_URL', 'https://edge.supabase.local');
   envStore.set('SUPABASE_ANON_KEY', 'anon-key');
-  envStore.set('CORS_ORIGINS', 'https://app.local');
+  envStore.set('ALLOWED_ORIGINS', 'https://app.local');
 
   handlerRef.current = null;
   resetQueues();

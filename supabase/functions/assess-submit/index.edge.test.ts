@@ -135,7 +135,7 @@ vi.mock('../../../src/lib/assess/scoring.ts', () => ({
 
 beforeEach(() => {
   envValues.clear();
-  envValues.set('CORS_ORIGINS', 'https://app.local');
+  envValues.set('ALLOWED_ORIGINS', 'https://app.local');
   envValues.set('SUPABASE_URL', 'https://stub.supabase');
   envValues.set('SUPABASE_ANON_KEY', 'anon');
   envValues.set('FF_ASSESS_WHO5', 'true');

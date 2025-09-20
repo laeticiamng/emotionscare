@@ -14,7 +14,7 @@ Ce document résume les variables nécessaires pour activer les agrégations B2B
 
 | Variable | Valeur recommandée | Description |
 | --- | --- | --- |
-| `CORS_ORIGINS` | Liste des origines autorisées pour les Edge Functions cliniques (`/functions/v1/assess-start`). | `https://app.prod.tld,https://staging.app.tld,http://localhost:5173` |
+| `ALLOWED_ORIGINS` | Liste des origines autorisées pour les Edge Functions cliniques (`/functions/v1/assess-start`). | `https://app.emotionscare.com,https://staging.emotionscare.com` |
 | `FF_ASSESS_WHO5` | Active la diffusion du WHO-5 via l'Edge. | `true` |
 | `FF_ASSESS_STAI6` | Active la diffusion du STAI-6 via l'Edge. | `true` |
 | `FF_ASSESS_ISI` | Active la diffusion de l'ISI hebdomadaire via l'Edge. | `true` |

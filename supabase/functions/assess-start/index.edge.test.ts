@@ -112,7 +112,7 @@ vi.mock('../_shared/metrics.ts', () => ({
 
 beforeEach(() => {
   envValues.clear();
-  envValues.set('CORS_ORIGINS', 'https://app.local');
+  envValues.set('ALLOWED_ORIGINS', 'https://app.local');
   vi.resetModules();
   authenticateRequest.mockClear();
   logUnauthorizedAccess.mockClear();
