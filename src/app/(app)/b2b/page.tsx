@@ -2,6 +2,11 @@ import Link from 'next/link';
 
 const CARDS = [
   {
+    href: '/b2b/rh',
+    title: 'Heatmap RH textuelle',
+    description: 'Visualiser le climat d’équipe sans chiffres, avec redirection vers les rapports détaillés.',
+  },
+  {
     href: '/b2b/teams',
     title: 'Gestion des équipes',
     description: 'Inviter, rôler et suivre vos membres sans exposer leurs données sensibles.',

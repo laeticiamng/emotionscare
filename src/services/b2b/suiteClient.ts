@@ -138,6 +138,28 @@ export async function fetchOptimisation(period?: string): Promise<OptimisationSu
   return payload.suggestions;
 }
 
+export type HeatmapCell = {
+  team_id: string | null;
+  team_label: string;
+  instrument: string;
+  summary: string;
+};
+
+export async function fetchHeatmap(params: { period: string }): Promise<HeatmapCell[]> {
+  const payload = await callEdge<{ period: string; cells: HeatmapCell[] }>('b2b-heatmap', {
+    method: 'GET',
+    search: { period: params.period },
+  });
+  return payload.cells;
+}
+
+export async function fetchHeatmapPeriods(): Promise<string[]> {
+  const payload = await callEdge<{ periods: string[] }>('b2b-heatmap-periods', {
+    method: 'GET',
+  });
+  return payload.periods;
+}
+
 export type AuditLogItem = {
   occurred_at: string;
   event: string;
