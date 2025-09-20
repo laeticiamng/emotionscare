@@ -10,7 +10,7 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
       {
         group: ["node:*"],
         message:
-          "Interdit dans le bundle client. Utilise les APIs Web (crypto.subtle, fetch, File API, etc.)."
+          "Interdit dans le bundle client. Utilise les APIs Web (crypto.subtle via '@/lib/hash', fetch, File API, etc.)."
       },
       ...extraPatterns.map((pattern) =>
         typeof pattern === "string" ? { group: [pattern] } : pattern

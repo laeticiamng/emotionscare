@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { sha256 } from '@/modules/coach/lib/hash';
+import { sha256, webCryptoUnavailableMessage } from '@/lib/hash';
 import { buildSystemPrompt, COACH_DISCLAIMERS } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 
@@ -10,6 +10,15 @@ describe('coach utils', () => {
     expect(value).toHaveLength(64);
     expect(await sha256('user-123')).toBe(value);
     expect(await sha256('user-124')).not.toBe(value);
+  });
+
+  it('throws a clear error when Web Crypto is missing', async () => {
+    try {
+      vi.stubGlobal('crypto', undefined as unknown as Crypto);
+      await expect(sha256('user-123')).rejects.toThrow(webCryptoUnavailableMessage);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('builds system prompt according to mode and locale', () => {
