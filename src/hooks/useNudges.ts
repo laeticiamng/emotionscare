@@ -1,79 +1,109 @@
 import { useEffect } from 'react';
-import { useDashboardStore } from '@/store/dashboard.store';
+import { shallow } from 'zustand/shallow';
+import { useDashboardStore, type Nudge } from '@/store/dashboard.store';
+import { NUDGE_TONE_LABELS } from '@/features/dashboard/orchestration/weeklyPlanMapper';
 
-const MOCK_NUDGES = [
-  {
-    text: '1 min pour respirer ?',
-    deeplink: '/flash-glow?quick=true',
-    emoji: '✨'
-  },
-  {
-    text: 'Micro-pause 90 secondes',
-    deeplink: '/screen-silk?duration=90',
-    emoji: '🌊'
-  },
-  {
-    text: 'Note rapide dans ton journal',
-    deeplink: '/journal?mode=quick',
-    emoji: '📝'
-  },
-  {
-    text: 'Musique apaisante ?',
-    deeplink: '/music?mood=calm',
-    emoji: '🎵'
-  }
-];
+type NudgeTone = keyof typeof NUDGE_TONE_LABELS;
+
+const NUDGE_LIBRARY: Record<'default' | NudgeTone, Nudge[]> = {
+  default: [
+    {
+      text: 'Un souffle ensemble ?',
+      deeplink: '/app/breath',
+      emoji: '🫧',
+    },
+    {
+      text: 'Poser quelques mots dans le journal ?',
+      deeplink: '/app/journal',
+      emoji: '🖊️',
+    },
+  ],
+  delicate: [
+    {
+      text: `${NUDGE_TONE_LABELS.delicate} : un temps de respiration guidée ?`,
+      deeplink: '/app/breath',
+      emoji: '🫧',
+    },
+    {
+      text: `${NUDGE_TONE_LABELS.delicate} : Nyvée est disponible`,
+      deeplink: '/app/coach',
+      emoji: '🤍',
+    },
+  ],
+  steady: [
+    {
+      text: `${NUDGE_TONE_LABELS.steady} : écrire un ressenti ?`,
+      deeplink: '/app/journal?mode=quick',
+      emoji: '📝',
+    },
+    {
+      text: `${NUDGE_TONE_LABELS.steady} : une ambiance sonore feutrée ?`,
+      deeplink: '/app/music',
+      emoji: '🎧',
+    },
+  ],
+  energized: [
+    {
+      text: `${NUDGE_TONE_LABELS.energized} Ambition Arcade est prêt`,
+      deeplink: '/app/ambition-arcade',
+      emoji: '🚀',
+    },
+    {
+      text: `${NUDGE_TONE_LABELS.energized} Partage cette énergie dans le scan`,
+      deeplink: '/app/scan',
+      emoji: '✨',
+    },
+  ],
+};
 
 export const useNudges = () => {
-  const store = useDashboardStore();
+  const { nudge, loading, setLoading, setNudge, tone } = useDashboardStore(
+    (state) => ({
+      nudge: state.nudge,
+      loading: state.loading.nudge,
+      setLoading: state.setLoading,
+      setNudge: state.setNudge,
+      tone: state.ephemeralSignal?.tone ?? state.wellbeingSummary?.tone ?? null,
+    }),
+    shallow,
+  );
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchNudge = async () => {
       try {
-        store.setLoading('nudge', true);
-        
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Show nudge based on time of day and random chance
-        const hour = new Date().getHours();
-        const shouldShowNudge = Math.random() > 0.3; // 70% chance
-        
-        if (!shouldShowNudge) {
-          store.setNudge(null);
-          return;
-        }
+        setLoading('nudge', true);
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
-        // Different nudges based on time of day
-        let availableNudges = [...MOCK_NUDGES];
-        
-        if (hour >= 12 && hour < 14) {
-          // Lunch time - prioritize micro-break
-          availableNudges = MOCK_NUDGES.filter(n => n.deeplink.includes('screen-silk'));
-        } else if (hour >= 18) {
-          // Evening - prioritize calm activities
-          availableNudges = MOCK_NUDGES.filter(n => 
-            n.deeplink.includes('music') || n.deeplink.includes('journal')
-          );
+        const toneKey: 'default' | NudgeTone = tone ?? 'default';
+        const pool = NUDGE_LIBRARY[toneKey];
+        const suggestion = pool[Math.floor(Math.random() * pool.length)];
+
+        if (!cancelled) {
+          setNudge(suggestion);
         }
-        
-        const randomNudge = availableNudges[Math.floor(Math.random() * availableNudges.length)];
-        store.setNudge(randomNudge);
       } catch (error) {
         console.error('Failed to fetch nudge:', error);
-        store.setNudge(null);
+        if (!cancelled) {
+          setNudge(null);
+        }
       } finally {
-        store.setLoading('nudge', false);
+        if (!cancelled) {
+          setLoading('nudge', false);
+        }
       }
     };
 
-    if (store.nudge === null && !store.loading.nudge) {
-      fetchNudge();
-    }
-  }, []); // Empty dependencies to run only once
+    fetchNudge();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setLoading, setNudge, tone]);
 
   return {
-    nudge: store.nudge,
-    loading: store.loading.nudge
+    nudge,
+    loading,
   };
 };

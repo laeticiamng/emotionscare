@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,26 +6,115 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import RecentEmotionScansWidget from '@/components/dashboard/widgets/RecentEmotionScansWidget';
 import JournalSummaryCard from '@/components/dashboard/widgets/JournalSummaryCard';
-import Who5WeeklyInvitation from '@/components/dashboard/widgets/Who5WeeklyInvitation';
-import { 
-  Brain, 
-  Music, 
-  BookOpen, 
-  Headphones, 
-  Target, 
-  TrendingUp, 
+import WeeklyPlanCard from '@/components/dashboard/widgets/WeeklyPlanCard';
+import {
+  Brain,
+  Music,
+  BookOpen,
+  MessageCircle,
+  Sparkles,
+  Target,
+  TrendingUp,
   Calendar,
   Settings,
   HelpCircle,
-  ChevronRight
+  ChevronRight,
+  Wind,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
-import { useEffect } from 'react';
-import { useClinicalConsent } from '@/hooks/useClinicalConsent';
+import { motion, useReducedMotion } from 'framer-motion';
+import { orderQuickActions } from '@/features/dashboard/orchestration/weeklyPlanMapper';
+import { useDashboardStore } from '@/store/dashboard.store';
+
+type QuickAction = {
+  id: string;
+  title: string;
+  description: string;
+  to: string;
+  icon: React.ElementType;
+  accent: string;
+};
+
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    id: 'breath',
+    title: 'Respiration douce',
+    description: 'Un instant pour revenir au calme',
+    to: '/app/breath',
+    icon: Wind,
+    accent: 'bg-sky-500/10 text-sky-600',
+  },
+  {
+    id: 'nyvee',
+    title: 'Parler à Nyvée',
+    description: 'Support immédiat et bienveillant',
+    to: '/app/coach',
+    icon: MessageCircle,
+    accent: 'bg-purple-500/10 text-purple-600',
+  },
+  {
+    id: 'music',
+    title: 'Musique thérapeutique',
+    description: 'Sons adaptatifs personnalisés',
+    to: '/app/music',
+    icon: Music,
+    accent: 'bg-blue-500/10 text-blue-600',
+  },
+  {
+    id: 'ambition',
+    title: 'Ambition Arcade',
+    description: 'Gamifier vos objectifs positifs',
+    to: '/app/ambition-arcade',
+    icon: Sparkles,
+    accent: 'bg-amber-500/10 text-amber-600',
+  },
+  {
+    id: 'scan',
+    title: 'Scanner mes émotions',
+    description: 'Analyse faciale temps réel',
+    to: '/app/scan',
+    icon: Brain,
+    accent: 'bg-primary/10 text-primary',
+  },
+  {
+    id: 'journal',
+    title: 'Journal émotionnel',
+    description: 'Consignez vos ressentis',
+    to: '/app/journal',
+    icon: BookOpen,
+    accent: 'bg-green-500/10 text-green-600',
+  },
+];
 
 export default function B2CDashboardPage() {
   const { runAudit } = useAccessibilityAudit();
-  const who5Consent = useClinicalConsent('WHO5');
+  const summaryTone = useDashboardStore((state) => state.wellbeingSummary?.tone ?? null);
+  const ephemeralSignal = useDashboardStore((state) => state.ephemeralSignal);
+  const setEphemeralSignal = useDashboardStore((state) => state.setEphemeralSignal);
+  const [activeTone, setActiveTone] = useState(summaryTone);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (ephemeralSignal) {
+      setActiveTone(ephemeralSignal.tone);
+      setEphemeralSignal(null);
+      return;
+    }
+
+    if (summaryTone !== activeTone) {
+      setActiveTone(summaryTone);
+    }
+  }, [activeTone, ephemeralSignal, setEphemeralSignal, summaryTone]);
+
+  const orderedQuickActions = useMemo(
+    () => orderQuickActions(QUICK_ACTIONS, activeTone ?? undefined).slice(0, 4),
+    [activeTone],
+  );
+
+  const quickActionTransition = useMemo(
+    () => (shouldReduceMotion ? { duration: 0 } : { duration: 0.28, ease: 'easeOut' }),
+    [shouldReduceMotion],
+  );
 
   useEffect(() => {
     // Audit d'accessibilité en développement
@@ -103,11 +192,11 @@ export default function B2CDashboardPage() {
         </header>
 
         {/* Rituel hebdomadaire WHO-5 */}
-        <section aria-labelledby="who5-section" className="mb-8">
-          <h2 id="who5-section" className="sr-only">
-            Invitation hebdomadaire WHO-5
+        <section aria-labelledby="weekly-plan" className="mb-8">
+          <h2 id="weekly-plan" className="sr-only">
+            Plan de la semaine
           </h2>
-          <Who5WeeklyInvitation />
+          <WeeklyPlanCard />
         </section>
 
 
@@ -189,76 +278,35 @@ export default function B2CDashboardPage() {
         {/* Actions rapides */}
         <section id="quick-actions" aria-labelledby="actions-title" className="mb-8">
           <h2 id="actions-title" className="text-xl font-semibold mb-4">
-            Actions rapides
+            Actions rapides adaptées
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
-              <Link to="/app/scan" className="block p-6" aria-describedby="scan-desc">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Brain className="h-5 w-5 text-primary" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Scanner mes émotions</h3>
-                    <p id="scan-desc" className="text-sm text-muted-foreground">
-                      Analyse faciale temps réel
-                    </p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-                </div>
-              </Link>
-            </Card>
-
-            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
-              <Link to="/app/music" className="block p-6" aria-describedby="music-desc">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-500/10 rounded-lg">
-                    <Music className="h-5 w-5 text-blue-500" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Musique thérapeutique</h3>
-                    <p id="music-desc" className="text-sm text-muted-foreground">
-                      Sons adaptatifs personnalisés
-                    </p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-                </div>
-              </Link>
-            </Card>
-
-            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
-              <Link to="/app/journal" className="block p-6" aria-describedby="journal-desc">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-green-500/10 rounded-lg">
-                    <BookOpen className="h-5 w-5 text-green-500" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Journal émotionnel</h3>
-                    <p id="journal-desc" className="text-sm text-muted-foreground">
-                      Consignez vos ressentis
-                    </p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-                </div>
-              </Link>
-            </Card>
-
-            <Card className="group hover:shadow-md transition-shadow cursor-pointer">
-              <Link to="/app/coach" className="block p-6" aria-describedby="coach-desc">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-purple-500/10 rounded-lg">
-                    <Headphones className="h-5 w-5 text-purple-500" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Coach IA</h3>
-                    <p id="coach-desc" className="text-sm text-muted-foreground">
-                      Conseils personnalisés
-                    </p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-                </div>
-              </Link>
-            </Card>
+            {orderedQuickActions.map((action) => {
+              const ActionIcon = action.icon;
+              return (
+                <motion.div key={action.id} layout transition={quickActionTransition} className="h-full">
+                  <Card className="group hover:shadow-md transition-shadow cursor-pointer h-full">
+                    <Link to={action.to} className="block p-6 h-full" aria-describedby={`${action.id}-desc`}>
+                      <div className="flex items-start space-x-3">
+                        <div className={`p-2 rounded-lg ${action.accent}`}>
+                          <ActionIcon className="h-5 w-5" aria-hidden="true" />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <h3 className="font-medium">{action.title}</h3>
+                          <p id={`${action.id}-desc`} className="text-sm text-muted-foreground">
+                            {action.description}
+                          </p>
+                        </div>
+                        <ChevronRight
+                          className="h-4 w-4 ml-auto translate-x-0 group-hover:translate-x-1 transition-transform"
+                          aria-hidden="true"
+                        />
+                      </div>
+                    </Link>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
 
