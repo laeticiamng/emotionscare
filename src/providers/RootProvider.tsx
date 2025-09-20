@@ -18,6 +18,7 @@ import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { I18nProvider } from '@/lib/i18n/i18n';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { ConsentProvider } from '@/features/clinical-optin/ConsentProvider';
 
 import { ensureI18n, type AppLocale } from './i18n/client';
 import { queryClient } from './queryClient';
@@ -46,22 +47,24 @@ export function RootProvider({ children, locale = 'fr' }: RootProviderProps) {
                             <UnifiedProvider>
                               <MoodProvider>
                                 <MusicProvider>
-                                  {children}
-                                  <Toaster
-                                    richColors
-                                    position="top-center"
-                                    className="toaster group"
-                                    closeButton
-                                    toastOptions={{
-                                      classNames: {
-                                        toast:
-                                          'group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium',
-                                        description: 'group-[.toast]:text-muted-foreground',
-                                        actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
-                                        cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
-                                      },
-                                    }}
-                                  />
+                                  <ConsentProvider>
+                                    {children}
+                                    <Toaster
+                                      richColors
+                                      position="top-center"
+                                      className="toaster group"
+                                      closeButton
+                                      toastOptions={{
+                                        classNames: {
+                                          toast:
+                                            'group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium',
+                                          description: 'group-[.toast]:text-muted-foreground',
+                                          actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
+                                          cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
+                                        },
+                                      }}
+                                    />
+                                  </ConsentProvider>
                                 </MusicProvider>
                               </MoodProvider>
                             </UnifiedProvider>

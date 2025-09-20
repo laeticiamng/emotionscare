@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import ZeroNumberBoundary from '@/components/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { useFlags } from '@/core/flags';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import useStai6Orchestration from '@/features/orchestration/useStai6Orchestration';
 import NyveeFlowController from '@/features/nyvee/NyveeFlowController';
 import { PostCheck } from '@/features/nyvee/components/PostCheck';
@@ -38,8 +39,12 @@ const B2CNyveeCoconPage: FC = () => {
   }, [orchestration.guidance]);
 
   return (
-    <ZeroNumberBoundary enabled={zeroNumbersActive} className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-10">
+    <ConsentGate>
+      <ZeroNumberBoundary
+        enabled={zeroNumbersActive}
+        className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950"
+      >
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-10">
         <PreCheck
           visible={orchestration.preDue}
           summaryLabel={orchestration.summaryLabel}
@@ -97,7 +102,8 @@ const B2CNyveeCoconPage: FC = () => {
           prefersReducedMotion={prefersReducedMotion}
         />
       </div>
-    </ZeroNumberBoundary>
+      </ZeroNumberBoundary>
+    </ConsentGate>
   );
 };
 

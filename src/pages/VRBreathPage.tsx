@@ -26,6 +26,7 @@ import VRModeControls from '@/components/vr/VRModeControls';
 import { useVRPerformanceGuard } from '@/hooks/useVRPerformanceGuard';
 import { useVRSafetyStore } from '@/store/vrSafety.store';
 import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface CosmicBreathSession {
   id: string;
@@ -382,29 +383,32 @@ const VRBreathPage: React.FC = () => {
 
   if (showReward && selectedSession) {
     return (
-      <RewardSystem
-        reward={{
-          type: 'constellation',
-          name: selectedSession.constellation,
-          description: universe.artifacts.description,
-          moduleId: 'vr-breath'
-        }}
-        badgeText="Cosmos apaisé ✨"
-        onComplete={handleRewardComplete}
-      />
+      <ConsentGate>
+        <RewardSystem
+          reward={{
+            type: 'constellation',
+            name: selectedSession.constellation,
+            description: universe.artifacts.description,
+            moduleId: 'vr-breath'
+          }}
+          badgeText="Cosmos apaisé ✨"
+          onComplete={handleRewardComplete}
+        />
+      </ConsentGate>
     );
   }
 
   return (
-    <UniverseEngine
-      universe={universe}
-      isEntering={isEntering}
-      onEnterComplete={handleUniverseEnterComplete}
-      enableParticles={enableParticles}
-      enableAmbianceSound={false}
-      particleDensity={visualParticleMode}
-      className="min-h-screen"
-    >
+    <ConsentGate>
+      <UniverseEngine
+        universe={universe}
+        isEntering={isEntering}
+        onEnterComplete={handleUniverseEnterComplete}
+        enableParticles={enableParticles}
+        enableAmbianceSound={false}
+        particleDensity={visualParticleMode}
+        className="min-h-screen"
+      >
       {/* Header - Optimized */}
       <header className="relative z-50 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -636,6 +640,7 @@ const VRBreathPage: React.FC = () => {
         </AnimatePresence>
       </main>
     </UniverseEngine>
+    </ConsentGate>
   );
 };
 

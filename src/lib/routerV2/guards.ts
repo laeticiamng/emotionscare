@@ -76,12 +76,20 @@ export function useRouteAllowed(guards?: Guard[]) {
   try {
     consentContext = useConsent();
   } catch {
-    consentContext = { clinicalAccepted: true } as ReturnType<typeof useConsent>;
+    consentContext = {
+      status: 'accepted',
+      scope: 'clinical',
+      wasRevoked: false,
+      loading: false,
+      accept: async () => {},
+      revoke: async () => {},
+      refresh: async () => undefined,
+    } as ReturnType<typeof useConsent>;
   }
 
   const { user } = authContext;
   const { userMode } = userModeContext;
-  const { clinicalAccepted } = consentContext;
+  const hasClinicalConsent = consentContext?.status === 'accepted';
 
   const currentRole = useMemo<Role | null>(() => {
     const metadataRole =
@@ -127,7 +135,7 @@ export function useRouteAllowed(guards?: Guard[]) {
     }
 
     if (guard.type === 'consent') {
-      if (guard.scope === 'clinical' && !clinicalAccepted) {
+      if (guard.scope === 'clinical' && !hasClinicalConsent) {
         return { allowed: false, reason: 'consent' as GuardFailureReason };
       }
     }

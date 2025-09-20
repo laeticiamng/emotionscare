@@ -14,6 +14,7 @@ import { ff } from '@/lib/flags/ff';
 import { b2bRoutes } from '@/lib/routes';
 import { useAggregateSummaries, type AggregateSummary } from '@/services/b2b/reportsApi';
 import { generateMonthlyNarrative } from '@/features/b2b/reports/narrative';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import '@/styles/print-b2b.css';
 
 dayjs.locale('fr');
@@ -138,55 +139,59 @@ const B2BReportDetailPage: React.FC = () => {
 
   if (!reportsEnabled) {
     return (
-      <main className="mx-auto max-w-4xl space-y-6 p-6">
-        <PageSEO
-          title="Rapport mensuel"
-          description="Synthèse mensuelle désactivée"
-          noIndex
-        />
-        <Card>
-          <CardHeader>
-            <CardTitle>Rapport indisponible</CardTitle>
-            <CardDescription>
-              Les récits mensuels ne sont pas encore activés sur cet environnement.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline">
-              <Link to={b2bRoutes.reports()}>Retour aux rapports</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </main>
+      <ConsentGate>
+        <main className="mx-auto max-w-4xl space-y-6 p-6">
+          <PageSEO
+            title="Rapport mensuel"
+            description="Synthèse mensuelle désactivée"
+            noIndex
+          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapport indisponible</CardTitle>
+              <CardDescription>
+                Les récits mensuels ne sont pas encore activés sur cet environnement.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="outline">
+                <Link to={b2bRoutes.reports()}>Retour aux rapports</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </ConsentGate>
     );
   }
 
   if (!period || !orgId) {
     return (
-      <main className="mx-auto max-w-4xl space-y-6 p-6">
-        <PageSEO
-          title="Rapport mensuel"
-          description="Synthèse non disponible"
-          noIndex
-        />
-        <Card>
-          <CardHeader>
-            <CardTitle>Accès impossible</CardTitle>
-            <CardDescription>
-              Merci de vérifier les paramètres d’organisation pour consulter les rapports.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline">
-              <Link to={b2bRoutes.reports()}>Retour à la liste</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </main>
+      <ConsentGate>
+        <main className="mx-auto max-w-4xl space-y-6 p-6">
+          <PageSEO
+            title="Rapport mensuel"
+            description="Synthèse non disponible"
+            noIndex
+          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Accès impossible</CardTitle>
+              <CardDescription>
+                Merci de vérifier les paramètres d’organisation pour consulter les rapports.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild variant="outline">
+                <Link to={b2bRoutes.reports()}>Retour à la liste</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </ConsentGate>
     );
   }
 
-  return (
+  const reportContent = (
     <main className="mx-auto max-w-4xl space-y-6 p-6" aria-labelledby="report-title">
       <PageSEO
         title={`Rapport ${periodLabel}`}
@@ -282,6 +287,8 @@ const B2BReportDetailPage: React.FC = () => {
       </footer>
     </main>
   );
+
+  return <ConsentGate>{reportContent}</ConsentGate>;
 };
 
 export default B2BReportDetailPage;

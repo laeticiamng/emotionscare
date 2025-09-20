@@ -12,6 +12,7 @@ import { ff } from '@/lib/flags/ff';
 import { b2bRoutes } from '@/lib/routes';
 import '@/styles/print-b2b.css';
 import { withGuard } from '@/routerV2/withGuard';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 dayjs.locale('fr');
 
@@ -81,68 +82,72 @@ const B2BReportsPage: React.FC = () => {
 
   if (!reportsEnabled) {
     return (
-      <main className="mx-auto flex max-w-4xl flex-col gap-6 p-6">
-        <PageSEO
-          title="Rapports mensuels"
-          description="Synthèses texte-only dédiées aux managers"
-          canonical="/app/reports"
-          noIndex
-        />
-        {EMPTY_STATE}
-      </main>
+      <ConsentGate>
+        <main className="mx-auto flex max-w-4xl flex-col gap-6 p-6">
+          <PageSEO
+            title="Rapports mensuels"
+            description="Synthèses texte-only dédiées aux managers"
+            canonical="/app/reports"
+            noIndex
+          />
+          {EMPTY_STATE}
+        </main>
+      </ConsentGate>
     );
   }
 
   return (
-    <main className="mx-auto max-w-4xl space-y-6 p-6" aria-labelledby="b2b-reporting-title">
-      <PageSEO
-        title="Rapports mensuels"
-        description="Synthèses narratives des ressentis collectifs, sans métriques sensibles."
-        canonical="/app/reports"
-        noIndex
-      />
+    <ConsentGate>
+      <main className="mx-auto max-w-4xl space-y-6 p-6" aria-labelledby="b2b-reporting-title">
+        <PageSEO
+          title="Rapports mensuels"
+          description="Synthèses narratives des ressentis collectifs, sans métriques sensibles."
+          canonical="/app/reports"
+          noIndex
+        />
 
-      <header className="space-y-3">
-        <p className="text-xs uppercase tracking-wide text-slate-400">Rapports managers</p>
-        <h1 id="b2b-reporting-title" className="text-3xl font-semibold text-slate-900">
-          Récits mensuels — {orgName}
-        </h1>
-        <p className="text-sm text-slate-600">{generationNotice}</p>
-        <p className="text-xs text-slate-500">
-          Export et impression disponibles. Confidentialité renforcée, aucun identifiant individuel.
-        </p>
-      </header>
+        <header className="space-y-3">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Rapports managers</p>
+          <h1 id="b2b-reporting-title" className="text-3xl font-semibold text-slate-900">
+            Récits mensuels — {orgName}
+          </h1>
+          <p className="text-sm text-slate-600">{generationNotice}</p>
+          <p className="text-xs text-slate-500">
+            Export et impression disponibles. Confidentialité renforcée, aucun identifiant individuel.
+          </p>
+        </header>
 
-      <section className="grid gap-4" aria-label="Liste des rapports disponibles">
-        {periodOptions.map(option => (
-          <Card key={option.value} className="transition-shadow hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between gap-4">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-2xl">
-                  <FileText className="h-5 w-5 text-slate-500" aria-hidden="true" />
-                  {option.label}
-                </CardTitle>
-                <CardDescription>{option.subtitle}</CardDescription>
-              </div>
-              <Button asChild className="no-print">
-                <Link
-                  to={b2bRoutes.reportDetail(option.value)}
-                  aria-label={`Ouvrir le rapport ${option.label}`}
-                >
-                  Consulter le récit
-                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-600">
-                Synthèse narrative couvrant le bien-être, l’engagement et les signaux d’attention, sans métrique chiffrée.
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
-    </main>
+        <section className="grid gap-4" aria-label="Liste des rapports disponibles">
+          {periodOptions.map(option => (
+            <Card key={option.value} className="transition-shadow hover:shadow-md">
+              <CardHeader className="flex flex-row items-center justify-between gap-4">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-2xl">
+                    <FileText className="h-5 w-5 text-slate-500" aria-hidden="true" />
+                    {option.label}
+                  </CardTitle>
+                  <CardDescription>{option.subtitle}</CardDescription>
+                </div>
+                <Button asChild className="no-print">
+                  <Link
+                    to={b2bRoutes.reportDetail(option.value)}
+                    aria-label={`Ouvrir le rapport ${option.label}`}
+                  >
+                    Consulter le récit
+                    <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-600">
+                  Synthèse narrative couvrant le bien-être, l’engagement et les signaux d’attention, sans métrique chiffrée.
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
+      </main>
+    </ConsentGate>
   );
 };
 

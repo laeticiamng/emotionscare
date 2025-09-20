@@ -23,6 +23,7 @@ import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface VinylTrack {
   id: string;
@@ -277,28 +278,31 @@ const B2CMusicEnhanced: React.FC = () => {
 
   if (showReward && selectedTrack) {
     return (
-      <RewardSystem
-        reward={{
-          type: 'crystal',
-          name: 'Cristal Sonore',
-          description: universe.artifacts.description,
-          moduleId: 'music'
-        }}
-        badgeText="Harmonie créée ♪"
-        onComplete={handleRewardComplete}
-      />
+      <ConsentGate>
+        <RewardSystem
+          reward={{
+            type: 'crystal',
+            name: 'Cristal Sonore',
+            description: universe.artifacts.description,
+            moduleId: 'music'
+          }}
+          badgeText="Harmonie créée ♪"
+          onComplete={handleRewardComplete}
+        />
+      </ConsentGate>
     );
   }
 
   return (
-    <UniverseEngine
-      universe={universe}
-      isEntering={isEntering}
-      onEnterComplete={handleUniverseEnterComplete}
-      enableParticles={true}
-      enableAmbianceSound={false}
-      className="min-h-screen"
-    >
+    <ConsentGate>
+      <UniverseEngine
+        universe={universe}
+        isEntering={isEntering}
+        onEnterComplete={handleUniverseEnterComplete}
+        enableParticles={true}
+        enableAmbianceSound={false}
+        className="min-h-screen"
+      >
       {/* Header */}
       <header className="relative z-50 p-6">
         <div className="flex items-center justify-between">
@@ -625,8 +629,9 @@ const B2CMusicEnhanced: React.FC = () => {
           )}
         </AnimatePresence>
       </main>
-    </UniverseEngine>
+      </UniverseEngine>
+    </ConsentGate>
   );
-};
+}
 
 export default B2CMusicEnhanced;

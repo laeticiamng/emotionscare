@@ -16,6 +16,7 @@ import { useVRSafetyStore } from '@/store/vrSafety.store';
 import VRModeControls from '@/components/vr/VRModeControls';
 import { useVRPerformanceGuard } from '@/hooks/useVRPerformanceGuard';
 import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface Constellation {
   id: string;
@@ -315,7 +316,8 @@ export default function B2CVRGalaxyPage() {
   }, [starCount]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
+    <ConsentGate>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
       {/* Background Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {backgroundStars.map((star) => (
@@ -666,5 +668,6 @@ export default function B2CVRGalaxyPage() {
         </AnimatePresence>
       </div>
     </div>
+    </ConsentGate>
   );
 }
