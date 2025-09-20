@@ -285,7 +285,6 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
     [instrument],
   );
 
-  return {
   const submit = useCallback<UseAssessmentResult['submit']>(
     async (rawAnswers, options) => {
       try {
