@@ -57,7 +57,8 @@ npm run test        # Tests unitaires
 
 - **[Configuration développement](./docs/DEVELOPMENT_SETUP.md)** - Guide détaillé
 - **[Contribution](./CONTRIBUTING.md)** - Standards de code
-- **[Build de production](./docs/BUILD_CHECKLIST.md)** - Checklist déploiement
+- **[Contrat clinique Assess](./docs/ASSESS_CONTRACT.md)** - Spécification front ↔ Edge ↔ DB
+- **[Déploiement](./docs/deploy.md)** - Checklist déploiement
 
 ## 🎯 Fonctionnalités principales
 
@@ -104,7 +105,7 @@ npm run preview     # Test local du build
 
 - 🐛 **Issues GitHub** pour les bugs
 - 💬 **Discussions** pour les questions  
-- 📧 **Email** : support@emotionscare.dev
+- 📧 **Email** : `support@emotionscare.dev`
 
 ---
 

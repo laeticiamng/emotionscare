@@ -397,27 +397,28 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
       2: 'bien-être stable',
       3: 'bien-être élevé',
       4: 'bien-être rayonnant'
+
     },
     'STAI6': {
-      0: 'grande sérénité',
-      1: 'calme ressenti',
-      2: 'état équilibré',
-      3: 'tension présente',
-      4: 'besoin d\'apaisement'
+      0: 'tension apaisée',
+      1: 'tension douce',
+      2: 'tension modérée',
+      3: 'tension élevée',
+      4: 'tension intense'
     },
     'SUDS': {
-      0: 'grande tranquillité',
-      1: 'sérénité',
-      2: 'état neutre',
-      3: 'tension élevée',
-      4: 'détresse importante'
+      0: 'tension très basse',
+      1: 'tension apaisée',
+      2: 'tension équilibrée',
+      3: 'tension forte',
+      4: 'tension critique'
     },
     'SAM': {
-      0: 'humeur difficile',
-      1: 'tonalité plus basse',
-      2: 'état mixte',
-      3: 'bonne humeur',
-      4: 'excellente forme'
+      0: 'affect à soutenir',
+      1: 'affect en hausse',
+      2: 'affect neutre',
+      3: 'affect positif',
+      4: 'affect rayonnant'
     }
   };
 
@@ -433,4 +434,19 @@ export function sanitizeAggregateText(text: string): string {
     .replace(/\s+/g, ' ') // Normalize whitespace
     .replace(/• (?=[\.,])/g, '•') // Avoid spaces before punctuation
     .trim();
+
+  if (!cleaned) {
+    return '';
+  }
+
+  return cleaned.startsWith('•') ? cleaned : `• ${cleaned}`;
+}
+
+export function sanitizeSummaryText(text: string): string {
+  const cleaned = text
+    .replace(/\d+(?:[.,]\d+)?%?/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned.length > 0 ? cleaned : 'résumé disponible';
 }

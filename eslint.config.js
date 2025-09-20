@@ -39,6 +39,15 @@ export default [
     }
   },
   {
+    files: ["src/app/**/*.{ts,tsx,js,jsx}"],
+    plugins: {
+      ec,
+    },
+    rules: {
+      "ec/no-clinical-score-terms": "error",
+    }
+  },
+  {
     files: ["services/**/*.{ts,tsx,js,jsx,mjs,cjs}", "supabase/functions/**/*.{ts,tsx,js,jsx,mjs,cjs}"],
     rules: {
       "no-restricted-imports": "off",
