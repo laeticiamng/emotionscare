@@ -38,6 +38,7 @@ import {
   AudioPlayerFavoriteEntry,
 } from "@/ui/AudioPlayer";
 import { useMood } from "@/contexts/MoodContext";
+import type { MoodVibe } from "@/utils/moodVibes";
 import { recordEvent } from "@/lib/scores/events";
 import {
   Clock,
@@ -129,6 +130,13 @@ const deriveIntensity = (arousal?: number): number => {
     return 0.5;
   }
   return Number(Math.min(1, Math.max(0, arousal / 100)).toFixed(2));
+};
+
+const VIBE_TO_MUSIC_MOOD: Record<MoodVibe, string> = {
+  calm: "relaxed",
+  bright: "joyful",
+  focus: "focus",
+  reset: "sleep",
 };
 
 const MOOD_OPTIONS: Array<{
@@ -354,10 +362,13 @@ const AdaptiveMusicPage: React.FC = () => {
   const [sessionDuration, setSessionDuration] = React.useState(20);
   const [instrumentalOnly, setInstrumentalOnly] = React.useState(true);
 
-  const suggestedMood = React.useMemo(
-    () => deriveMoodFromProfile(currentMood.valence, currentMood.arousal),
-    [currentMood.valence, currentMood.arousal]
-  );
+  const suggestedMood = React.useMemo(() => {
+    const vibe = currentMood.vibe;
+    if (vibe && VIBE_TO_MUSIC_MOOD[vibe]) {
+      return VIBE_TO_MUSIC_MOOD[vibe];
+    }
+    return deriveMoodFromProfile(currentMood.valence, currentMood.arousal);
+  }, [currentMood.arousal, currentMood.valence, currentMood.vibe]);
 
   const [selectedMood, setSelectedMood] = React.useState(suggestedMood);
 
