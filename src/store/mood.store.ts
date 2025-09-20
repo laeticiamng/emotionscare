@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export interface BrsAnswer {
   id: string;
@@ -60,7 +61,7 @@ const initialState: MoodStoreState = {
   currentPromptId: null,
 };
 
-export const useMoodStore = create<MoodStore>()(
+const useMoodStoreBase = create<MoodStore>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -169,3 +170,5 @@ export const useMoodStore = create<MoodStore>()(
     }
   )
 );
+
+export const useMoodStore = createSelectors(useMoodStoreBase);

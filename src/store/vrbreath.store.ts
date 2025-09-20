@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type VRBreathPattern = '4-2-4' | '4-6-8' | '5-5';
 
@@ -45,7 +46,7 @@ const initialState = {
   audioEnabled: false, // Mute par défaut comme spécifié
 };
 
-export const useVRBreathStore = create<VRBreathState>()(
+const useVRBreathStoreBase = create<VRBreathState>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -106,3 +107,5 @@ if (typeof window !== 'undefined') {
     useVRBreathStore.getState().setReduceMotion(e.matches);
   });
 }
+
+export const useVRBreathStore = createSelectors(useVRBreathStoreBase);

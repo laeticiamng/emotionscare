@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type AccountStatus = 'active' | 'soft_deleted';
 
@@ -22,8 +24,6 @@ interface AccountState {
   purgeAt?: string;
   loading: boolean;
   error: string | null;
-  
-  // Actions
   setStatus: (status: AccountStatus) => void;
   setPurgeAt: (purgeAt?: string) => void;
   setLoading: (loading: boolean) => void;
@@ -41,19 +41,17 @@ const initialState = {
   error: null,
 };
 
-export const useAccountStore = create<AccountState>()(
+const accountStoreBase = create<AccountState>()(
   persist(
     (set, get) => ({
       ...initialState,
-      
       setStatus: (status) => set({ status }),
       setPurgeAt: (purgeAt) => set({ purgeAt }),
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
-      
       softDelete: async (reason) => {
         set({ loading: true, error: null });
-        
+
         try {
           const response = await fetch('/api/me/delete', {
             method: 'POST',
@@ -62,42 +60,39 @@ export const useAccountStore = create<AccountState>()(
             },
             body: JSON.stringify({ reason }),
           });
-          
+
           if (!response.ok) {
             throw new Error('Failed to delete account');
           }
-          
+
           const data: DeleteResp = await response.json();
-          set({ 
+          set({
             status: data.status,
             purgeAt: data.purge_at,
-            loading: false 
+            loading: false,
           });
-          
-          // Analytics
+
           if (typeof window !== 'undefined' && window.gtag) {
             window.gtag('event', 'account_delete_confirmed');
           }
-          
+
           return true;
         } catch (error) {
-          set({ 
+          set({
             loading: false,
-            error: error instanceof Error ? error.message : 'Erreur de suppression'
+            error: error instanceof Error ? error.message : 'Erreur de suppression',
           });
-          
-          // Analytics
+
           if (typeof window !== 'undefined' && window.gtag) {
             window.gtag('event', 'account_delete_error');
           }
-          
+
           return false;
         }
       },
-
       undelete: async () => {
         set({ loading: true, error: null });
-        
+
         try {
           const response = await fetch('/api/me/undelete', {
             method: 'POST',
@@ -105,52 +100,38 @@ export const useAccountStore = create<AccountState>()(
               'Content-Type': 'application/json',
             },
           });
-          
+
           if (!response.ok) {
             throw new Error('Failed to restore account');
           }
-          
+
           const data: UndeleteResp = await response.json();
-          set({ 
+          set({
             status: data.status,
             purgeAt: undefined,
-            loading: false 
+            loading: false,
           });
-          
-          // Analytics
+
           if (typeof window !== 'undefined' && window.gtag) {
             window.gtag('event', 'account_undelete_success');
           }
-          
+
           return true;
         } catch (error) {
-          set({ 
+          set({
             loading: false,
-            error: error instanceof Error ? error.message : 'Erreur de restauration'
+            error: error instanceof Error ? error.message : 'Erreur de restauration',
           });
           return false;
         }
       },
-
       checkStatus: async () => {
         try {
-          // Skip API calls in development/demo mode
           console.log('Account status check skipped in demo mode');
-          /*
-          const response = await fetch('/api/me/account');
-          if (!response.ok) return;
-          
-          const data: MeAccount = await response.json();
-          set({ 
-            status: data.status,
-            purgeAt: data.purge_at 
-          });
-          */
         } catch (error) {
           console.warn('Failed to check account status:', error);
         }
       },
-
       reset: () => set(initialState),
     }),
     {
@@ -162,3 +143,5 @@ export const useAccountStore = create<AccountState>()(
     }
   )
 );
+
+export const useAccountStore = createSelectors(accountStoreBase);

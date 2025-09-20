@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type PrivacyKey = 'cam' | 'mic' | 'hr' | 'gps' | 'social' | 'nft';
 export type PrivacyPrefs = Record<PrivacyKey, boolean>;
@@ -29,7 +30,7 @@ const initialPrefs: PrivacyPrefs = {
   nft: false,
 };
 
-export const usePrivacyStore = create<PrivacyState>()(
+const usePrivacyStoreBase = create<PrivacyState>()(
   persist(
     (set, get) => ({
       prefs: initialPrefs,
@@ -136,3 +137,5 @@ export const usePrivacyStore = create<PrivacyState>()(
     }
   )
 );
+
+export const usePrivacyStore = createSelectors(usePrivacyStoreBase);

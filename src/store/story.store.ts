@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type StoryChoice = { 
   id: string; 
@@ -74,7 +75,7 @@ const initialState: StoryState = {
   transcriptUrl: null,
 };
 
-export const useStoryStore = create<StoryStore>()(
+const useStoryStoreBase = create<StoryStore>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -136,3 +137,5 @@ export const useStoryStore = create<StoryStore>()(
     }
   )
 );
+
+export const useStoryStore = createSelectors(useStoryStoreBase);

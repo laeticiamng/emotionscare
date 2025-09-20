@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type ChannelPrefs = {
   push: boolean;
@@ -61,7 +62,7 @@ const initialState = {
   error: null
 };
 
-export const useNotifyStore = create<NotifyState>()(
+const useNotifyStoreBase = create<NotifyState>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -126,3 +127,5 @@ export const useNotifyStore = create<NotifyState>()(
     }
   )
 );
+
+export const useNotifyStore = createSelectors(useNotifyStoreBase);

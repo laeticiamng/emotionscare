@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 import { UserCollection, Reward, RewardType } from '@/types/rewards';
 
 interface CollectionState {
@@ -15,7 +16,7 @@ interface CollectionState {
   getCollectionProgress: () => { [key in RewardType]: number };
 }
 
-export const useCollectionStore = create<CollectionState>()(
+const useCollectionStoreBase = create<CollectionState>()(
   persist(
     (set, get) => ({
       collection: {
@@ -127,3 +128,5 @@ export const useCollectionStore = create<CollectionState>()(
     }
   )
 );
+
+export const useCollectionStore = createSelectors(useCollectionStoreBase);

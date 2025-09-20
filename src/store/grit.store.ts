@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+
+import { createImmutableStore } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export interface GritEvent {
   t: number;
@@ -8,8 +10,8 @@ export interface GritEvent {
 }
 
 export interface HumeSummary {
-  frustration_index?: number; // 0..1
-  focus_index?: number;       // 0..1
+  frustration_index?: number;
+  focus_index?: number;
   samples?: Array<{ t: number; emo: string; conf: number }>;
 }
 
@@ -47,11 +49,10 @@ const initialState: GritStoreState = {
   humeSummary: null,
 };
 
-export const useGritStore = create<GritStore>()(
-  persist(
+const gritStoreBase = create<GritStore>()(
+  createImmutableStore(
     (set, get) => ({
       ...initialState,
-      
       startQuest: (questId: string) => {
         const now = Date.now();
         set({
@@ -64,7 +65,6 @@ export const useGritStore = create<GritStore>()(
           humeSummary: null,
         });
       },
-      
       pauseQuest: () => {
         const state = get();
         if (state.status === 'active' && state.pauseCount < 1) {
@@ -76,7 +76,6 @@ export const useGritStore = create<GritStore>()(
           });
         }
       },
-      
       resumeQuest: () => {
         const state = get();
         if (state.status === 'paused') {
@@ -87,7 +86,6 @@ export const useGritStore = create<GritStore>()(
           });
         }
       },
-      
       finishQuest: () => {
         const state = get();
         if (state.status === 'active' || state.status === 'paused') {
@@ -98,7 +96,6 @@ export const useGritStore = create<GritStore>()(
           });
         }
       },
-      
       abortQuest: (reason?: string) => {
         const state = get();
         if (state.status === 'active' || state.status === 'paused') {
@@ -109,37 +106,29 @@ export const useGritStore = create<GritStore>()(
           });
         }
       },
-      
       addEvent: (eventData) => {
         const state = get();
         const event: GritEvent = { ...eventData, t: Date.now() };
-        set({
-          events: [...state.events, event],
-        });
+        set({ events: [...state.events, event] });
       },
-      
-      updateElapsedTime: (time: number) => {
-        set({ elapsedTime: time });
-      },
-      
-      setHumeSummary: (summary: HumeSummary) => {
-        set({ humeSummary: summary });
-      },
-      
-      reset: () => {
-        set(initialState);
-      },
+      updateElapsedTime: (time: number) => set({ elapsedTime: time }),
+      setHumeSummary: (summary: HumeSummary) => set({ humeSummary: summary }),
+      reset: () => set(initialState),
     }),
     {
-      name: 'grit-store',
-      partialize: (state) => ({
-        questId: state.questId,
-        startedAt: state.startedAt,
-        status: state.status,
-        pauseCount: state.pauseCount,
-        events: state.events,
-        elapsedTime: state.elapsedTime,
-      }),
+      persist: {
+        name: 'grit-store',
+        partialize: (state) => ({
+          questId: state.questId,
+          startedAt: state.startedAt,
+          status: state.status,
+          pauseCount: state.pauseCount,
+          events: state.events,
+          elapsedTime: state.elapsedTime,
+        }),
+      },
     }
   )
 );
+
+export const useGritStore = createSelectors(gritStoreBase);

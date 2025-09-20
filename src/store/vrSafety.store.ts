@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type VRSafetyLevel = 'clear' | 'caution' | 'alert';
 export type VRParticleMode = 'standard' | 'soft' | 'minimal';
@@ -25,7 +26,7 @@ const defaultState: Omit<VRSafetyState, 'setPendingPrompt' | 'recordCheck' | 'se
   pendingPrompt: false,
 };
 
-export const useVRSafetyStore = create<VRSafetyState>()(
+const useVRSafetyStoreBase = create<VRSafetyState>()(
   persist(
     (set, get) => ({
       ...defaultState,
@@ -92,3 +93,5 @@ if (typeof window !== 'undefined') {
     useVRSafetyStore.getState().setPrefersReducedMotion(event.matches);
   });
 }
+
+export const useVRSafetyStore = createSelectors(useVRSafetyStoreBase);

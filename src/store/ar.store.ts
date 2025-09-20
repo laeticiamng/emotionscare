@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type Emotion = 'joy' | 'calm' | 'sad' | 'anger' | 'fear' | 'surprise' | 'neutral';
 
@@ -58,7 +59,7 @@ const initialState: ARState = {
   error: null,
 };
 
-export const useARStore = create<ARStore>()(
+const useARStoreBase = create<ARStore>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -120,3 +121,5 @@ export const useARStore = create<ARStore>()(
     }
   )
 );
+
+export const useARStore = createSelectors(useARStoreBase);
