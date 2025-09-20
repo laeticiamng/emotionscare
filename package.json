@@ -142,6 +142,7 @@
     "framer-motion": "^11.1.2",
     "glob": "^11.0.2",
     "globby": "^14.0.2",
+    "html2canvas": "^1.4.1",
     "hume": "^0.11.1",
     "i18next": "^25.2.1",
     "imagemin-avif": "^0.1.6",

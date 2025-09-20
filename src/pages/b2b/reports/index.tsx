@@ -6,7 +6,7 @@ import { Printer } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { B2BHeatmap } from '@/features/b2b/reports/B2BHeatmap';
 import { ExportButton } from '@/features/b2b/reports/ExportButton';
-import { DEFAULT_INSTRUMENTS, getHeatmap } from '@/services/b2b/reportsApi';
+import { DEFAULT_INSTRUMENTS, useHeatmap } from '@/services/b2b/reportsApi';
 import { groupCellsByInstrument, labelInstrument, type HeatmapCell } from '@/features/b2b/reports/utils';
 import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import { Button } from '@/components/ui/button';
