@@ -103,10 +103,7 @@ serve(async (req) => {
       details: `instrument=${instrument} locale=${resolvedLocale}`,
     });
 
-    const response = json(200, payload);
-    response.headers.set('RateLimit-Limit', String(rateDecision.limit));
-    response.headers.set('RateLimit-Remaining', String(rateDecision.remaining));
-    response.headers.set('RateLimit-Reset', String(rateDecision.resetAt));
+    const response = json(200, { ...catalog, instrument: catalog.code });
     return appendCorsHeaders(response, cors);
   } catch (error) {
     captureSentryException(error, { route: 'assess-start' });
