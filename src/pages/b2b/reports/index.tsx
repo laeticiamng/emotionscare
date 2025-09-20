@@ -1,13 +1,14 @@
 import React from 'react';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
+import 'dayjs/locale/fr';
 import { Printer } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFlags } from '@/core/flags';
 import { B2BHeatmap } from '@/features/b2b/reports/B2BHeatmap';
 import { ExportButton } from '@/features/b2b/reports/ExportButton';
-import { DEFAULT_INSTRUMENTS, useHeatmap } from '@/services/b2b/reportsApi';
-import { groupCellsByInstrument, labelInstrument, type HeatmapCell } from '@/features/b2b/reports/utils';
+import { DEFAULT_INSTRUMENTS, useHeatmapMatrix } from '@/services/b2b/reportsApi';
+import { deriveHeatmapInsight, labelInstrument } from '@/features/b2b/reports/utils';
 import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,35 +20,52 @@ import {
 } from '@/components/ui/select';
 import '@/styles/print-b2b.css';
 
-dayjs.extend(isoWeek);
+dayjs.locale('fr');
 
-const PERIOD_OPTIONS = Array.from({ length: 8 }).map((_, index) =>
-  dayjs().subtract(index, 'week').format('YYYY-[W]WW'),
-);
+const MONTH_WINDOW = 3;
+const PERIOD_OPTION_COUNT = 6;
+const ORG_TEAM_LABEL = 'Organisation';
 
-const DEFAULT_PERIOD = PERIOD_OPTIONS[0];
-
-const TEAM_OPTION_ALL = 'all';
-const INSTRUMENT_OPTION_ALL = 'all';
-
-function formatPeriodLabel(value: string): string {
-  if (!value.includes('W')) {
+function formatPeriod(value: string): string {
+  const parsed = dayjs(value, 'YYYY-MM');
+  if (!parsed.isValid()) {
     return value;
   }
-  const [year, week] = value.split('-');
-  return `Semaine ${week.replace('W', '')} — ${year}`;
+  return parsed.format('MMMM YYYY');
 }
+
+function buildPeriods(anchor: string): string[] {
+  const parsed = dayjs(anchor, 'YYYY-MM');
+  if (!parsed.isValid()) {
+    return [anchor];
+  }
+  return Array.from({ length: MONTH_WINDOW }).map((_, index) => parsed.subtract(index, 'month').format('YYYY-MM'));
+}
+
+function normalizeTeam(team?: string | null): string {
+  const value = team?.trim();
+  return value && value.length > 0 ? value : ORG_TEAM_LABEL;
+}
+
+const PERIOD_OPTIONS = Array.from({ length: PERIOD_OPTION_COUNT }).map((_, index) =>
+  dayjs().subtract(index, 'month').format('YYYY-MM'),
+);
 
 export default function B2BReportsHeatmapPage() {
   const { user } = useAuth();
+  const { has } = useFlags();
   const heatmapRef = React.useRef<HTMLDivElement>(null);
-  const [period, setPeriod] = React.useState<string>(DEFAULT_PERIOD);
-  const [selectedTeam, setSelectedTeam] = React.useState<string>(TEAM_OPTION_ALL);
-  const [selectedInstrument, setSelectedInstrument] = React.useState<string>(INSTRUMENT_OPTION_ALL);
+  const [anchorPeriod, setAnchorPeriod] = React.useState<string>(PERIOD_OPTIONS[0]);
+  const [selectedTeam, setSelectedTeam] = React.useState<string>('all');
   const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
   const orgId = user?.user_metadata?.org_id as string | undefined;
   const orgName = (user?.user_metadata?.org_name as string | undefined) ?? 'Votre organisation';
+  const visiblePeriods = React.useMemo(() => buildPeriods(anchorPeriod), [anchorPeriod]);
+
+  React.useEffect(() => {
+    Sentry.addBreadcrumb({ category: 'b2b:heatmap:view', message: 'open', level: 'info' });
+  }, []);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -58,57 +76,81 @@ export default function B2BReportsHeatmapPage() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  const query = useHeatmap({
-    orgId,
-    period,
-    instruments: selectedInstrument === INSTRUMENT_OPTION_ALL ? undefined : [selectedInstrument],
-  });
+  const featureEnabled = has('FF_B2B_RH') && has('FF_ASSESS_AGGREGATE');
+  const query = useHeatmapMatrix(
+    {
+      orgId,
+      periods: visiblePeriods,
+      instruments: DEFAULT_INSTRUMENTS.slice(),
+    },
+    { enabled: Boolean(orgId && featureEnabled) },
+  );
+
+  const allCells = query.data ?? [];
+  const normalizedSelectedTeam = selectedTeam === 'all' ? null : selectedTeam;
 
   const teamOptions = React.useMemo(() => {
     const teams = new Set<string>();
-    (query.data ?? []).forEach((cell) => {
-      if (cell.team) {
-        teams.add(cell.team);
-      }
+    teams.add(ORG_TEAM_LABEL);
+    allCells.forEach((cell) => {
+      teams.add(normalizeTeam(cell.team));
     });
-    return Array.from(teams).sort();
-  }, [query.data]);
+    if (normalizedSelectedTeam && !teams.has(normalizedSelectedTeam)) {
+      teams.add(normalizedSelectedTeam);
+    }
+    return Array.from(teams).sort((a, b) => {
+      if (a === ORG_TEAM_LABEL) return -1;
+      if (b === ORG_TEAM_LABEL) return 1;
+      return a.localeCompare(b, 'fr');
+    });
+  }, [allCells, normalizedSelectedTeam]);
 
-  const filteredCells = React.useMemo(() => {
-    if (!query.data) return [];
-    return query.data.filter((cell) => {
-      if (selectedTeam !== TEAM_OPTION_ALL) {
-        return cell.team === selectedTeam;
-      }
-      return true;
-    });
-  }, [query.data, selectedTeam]);
+  const visibleCellCount = React.useMemo(
+    () =>
+      allCells.filter((cell) =>
+        normalizedSelectedTeam ? normalizeTeam(cell.team) === normalizedSelectedTeam : true,
+      ).length,
+    [allCells, normalizedSelectedTeam],
+  );
 
   React.useEffect(() => {
-    performanceMonitor.recordMetric('b2b_reports.visible_cells', filteredCells.length);
-  }, [filteredCells.length]);
+    performanceMonitor.recordMetric('b2b_reports.visible_cells', visibleCellCount);
+  }, [visibleCellCount]);
 
   const textualSummaries = React.useMemo(() => {
-    if (filteredCells.length === 0) {
+    if (allCells.length === 0) {
       return [];
     }
-    const grouped = groupCellsByInstrument(filteredCells);
-    return Object.entries(grouped).map(([instrumentKey, instrumentCells]) => {
-      const instrumentLabel = labelInstrument(instrumentKey);
-      const segments = Array.from(new Set(instrumentCells.map((cell) => cell.team ?? 'Organisation')));
-      const highlights = instrumentCells
-        .map((cell) => (cell.team ? `${cell.team} : ${cell.text}` : cell.text))
-        .filter(Boolean)
-        .slice(0, 2);
-      return {
-        instrument: instrumentLabel,
-        total: instrumentCells.length,
-        segments,
-        highlights,
-        hasMore: instrumentCells.length > highlights.length,
-      };
+    const periodRank = new Map<string, number>();
+    visiblePeriods.forEach((period, index) => {
+      periodRank.set(period, index);
     });
-  }, [filteredCells]);
+
+    return DEFAULT_INSTRUMENTS.map((instrument) => {
+      const instrumentCells = allCells
+        .filter(
+          (cell) =>
+            cell.instrument === instrument &&
+            (normalizedSelectedTeam ? normalizeTeam(cell.team) === normalizedSelectedTeam : true),
+        )
+        .sort((a, b) => (periodRank.get(a.period) ?? 99) - (periodRank.get(b.period) ?? 99));
+
+      if (instrumentCells.length === 0) {
+        return null;
+      }
+
+      const highlights = instrumentCells.slice(0, 4).map((cell) => {
+        const insight = deriveHeatmapInsight(cell.text, cell.action);
+        const team = normalizeTeam(cell.team);
+        return `${formatPeriod(cell.period)} · ${team} : ${insight.label}`;
+      });
+
+      return {
+        instrument: labelInstrument(instrument),
+        highlights,
+      };
+    }).filter(Boolean) as Array<{ instrument: string; highlights: string[] }>;
+  }, [allCells, normalizedSelectedTeam, visiblePeriods]);
 
   const handlePrint = React.useCallback(() => {
     Sentry.addBreadcrumb({ category: 'b2b:print', message: 'trigger', level: 'info' });
@@ -128,8 +170,22 @@ export default function B2BReportsHeatmapPage() {
     );
   }
 
+  if (!featureEnabled) {
+    return (
+      <main className="mx-auto max-w-4xl space-y-6 p-6">
+        <header className="space-y-2">
+          <h1 className="text-2xl font-semibold text-slate-900">Heatmap RH</h1>
+          <p className="text-sm text-slate-600">
+            Cette vue est désactivée. Activez FF_B2B_RH et FF_ASSESS_AGGREGATE pour consulter les agrégats confidentiels.
+          </p>
+        </header>
+      </main>
+    );
+  }
+
   const isLoading = query.isLoading || query.isFetching;
   const hasError = Boolean(query.error);
+  const todayLabel = dayjs().format('D MMMM YYYY');
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-6" aria-labelledby="b2b-reports-title">
@@ -141,11 +197,12 @@ export default function B2BReportsHeatmapPage() {
               Heatmap RH — {orgName}
             </h1>
             <p className="text-sm text-slate-600">
-              Synthèse textuelle du bien-être, de l’engagement et du risque de burnout. Les agrégats respectent un minimum de cinq réponses.
+              Synthèse textuelle du bien-être, de l’engagement et du risque de burnout. Les agrégats respectent un minimum de cinq réponses par cellule.
             </p>
+            <p className="text-xs text-slate-500">Dernière consultation : {todayLabel}</p>
           </div>
           <div className="no-print flex flex-wrap gap-2">
-            <ExportButton targetRef={heatmapRef as React.RefObject<HTMLElement>} fileName={`heatmap-${period}.png`} />
+            <ExportButton targetRef={heatmapRef as React.RefObject<HTMLElement>} fileName={`heatmap-${visiblePeriods[0]}.png`} />
             <Button type="button" variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" aria-hidden="true" />
               Imprimer
@@ -153,24 +210,24 @@ export default function B2BReportsHeatmapPage() {
           </div>
         </div>
         <p className="text-xs text-slate-500">
-          Période sélectionnée : {formatPeriodLabel(period)} · Confidentialité renforcée
+          Périodes affichées : {visiblePeriods.map(formatPeriod).join(' · ')} · Confidentialité renforcée
         </p>
       </header>
 
       <section className="no-print rounded-xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Filtres">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label htmlFor="period-select" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Période
+              Mois de référence
             </label>
-            <Select value={period} onValueChange={setPeriod}>
+            <Select value={anchorPeriod} onValueChange={setAnchorPeriod}>
               <SelectTrigger id="period-select" aria-label="Sélectionner la période">
-                <SelectValue placeholder="Choisir une période" />
+                <SelectValue placeholder="Choisir un mois" />
               </SelectTrigger>
               <SelectContent>
                 {PERIOD_OPTIONS.map((option) => (
                   <SelectItem key={option} value={option}>
-                    {formatPeriodLabel(option)}
+                    {formatPeriod(option)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -181,41 +238,15 @@ export default function B2BReportsHeatmapPage() {
             <label htmlFor="team-select" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
               Équipe
             </label>
-            <Select
-              value={selectedTeam}
-              onValueChange={setSelectedTeam}
-              disabled={teamOptions.length === 0}
-            >
+            <Select value={selectedTeam} onValueChange={setSelectedTeam}>
               <SelectTrigger id="team-select" aria-label="Filtrer par équipe">
                 <SelectValue placeholder="Toutes les équipes" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={TEAM_OPTION_ALL}>Organisation complète</SelectItem>
+                <SelectItem value="all">Organisation complète</SelectItem>
                 {teamOptions.map((team) => (
                   <SelectItem key={team} value={team}>
                     {team}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="instrument-select"
-              className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500"
-            >
-              Instrument
-            </label>
-            <Select value={selectedInstrument} onValueChange={setSelectedInstrument}>
-              <SelectTrigger id="instrument-select" aria-label="Filtrer par instrument">
-                <SelectValue placeholder="Tous les instruments" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={INSTRUMENT_OPTION_ALL}>Tous</SelectItem>
-                {DEFAULT_INSTRUMENTS.map((instrument) => (
-                  <SelectItem key={instrument} value={instrument}>
-                    {instrument}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -232,13 +263,21 @@ export default function B2BReportsHeatmapPage() {
 
       {isLoading ? (
         <div className="space-y-4" role="status" aria-live="polite">
-          <div className="h-24 rounded-xl bg-slate-100" />
-          <div className="h-24 rounded-xl bg-slate-100" />
-          <div className="h-24 rounded-xl bg-slate-100" />
+          <div className="h-28 rounded-xl bg-slate-100" />
+          <div className="h-28 rounded-xl bg-slate-100" />
+          <div className="h-28 rounded-xl bg-slate-100" />
         </div>
       ) : (
         <>
-          <B2BHeatmap ref={heatmapRef} cells={filteredCells} reducedMotion={prefersReducedMotion} />
+          <B2BHeatmap
+            ref={heatmapRef}
+            cells={allCells}
+            periods={visiblePeriods}
+            teamFilter={selectedTeam}
+            reducedMotion={prefersReducedMotion}
+            formatPeriodLabel={formatPeriod}
+            instrumentOrder={DEFAULT_INSTRUMENTS.slice()}
+          />
           {textualSummaries.length > 0 && (
             <section
               aria-label="Synthèse textuelle des tendances"
@@ -252,19 +291,14 @@ export default function B2BReportsHeatmapPage() {
               <ul className="mt-3 space-y-3 text-sm text-slate-700">
                 {textualSummaries.map((summary) => (
                   <li key={summary.instrument} className="space-y-1">
-                    <p className="font-semibold text-slate-800">
-                      {summary.instrument} · {summary.total}{' '}
-                      {summary.total > 1 ? 'segments analysés' : 'segment analysé'}
-                    </p>
-                    <p>
-                      Équipes couvertes : {summary.segments.join(', ')}.
-                    </p>
-                    {summary.highlights.length > 0 && (
-                      <p>
-                        Points clés : {summary.highlights.join(' · ')}
-                        {summary.hasMore ? '…' : ''}
-                      </p>
-                    )}
+                    <p className="font-semibold text-slate-800">{summary.instrument}</p>
+                    <ul className="space-y-1">
+                      {summary.highlights.map((highlight, index) => (
+                        <li key={index} className="text-slate-600">
+                          {highlight}
+                        </li>
+                      ))}
+                    </ul>
                   </li>
                 ))}
               </ul>

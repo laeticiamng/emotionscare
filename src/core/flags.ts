@@ -11,6 +11,8 @@ interface FeatureFlags {
   FF_MANAGER_DASH: boolean;
   FF_SCORES: boolean;
   FF_SCAN: boolean;
+  FF_B2B_RH: boolean;
+  FF_ASSESS_AGGREGATE: boolean;
 
   // Clinical Assessment Feature Flags
   FF_ASSESS_WHO5: boolean;
@@ -47,6 +49,8 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_MANAGER_DASH: true,
   FF_SCORES: true,
   FF_SCAN: true,
+  FF_B2B_RH: true,
+  FF_ASSESS_AGGREGATE: true,
 
   // Clinical assessments – disabled by default, opt-in via remote config
   FF_ASSESS_WHO5: false,

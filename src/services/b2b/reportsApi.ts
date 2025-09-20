@@ -8,7 +8,7 @@ import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import type { HeatmapCell } from '@/features/b2b/reports/utils';
 import { mapSummariesToCells } from '@/features/b2b/reports/utils';
 
-const DEFAULT_INSTRUMENTS = ['WEMWBS', 'CBI', 'UWES'] as const;
+const DEFAULT_INSTRUMENTS = ['WEMWBS', 'SWEMWBS', 'CBI', 'UWES'] as const;
 
 const aggregateSummarySchema = z.object({
   instrument: z.string(),
@@ -48,9 +48,10 @@ async function fetchAggregateSummaries({ orgId, period, instruments }: GetHeatma
   };
 
   Sentry.addBreadcrumb({
-    category: 'b2b:agg:fetch',
+    category: 'assess:aggregate:call',
     message: 'start',
     level: 'info',
+    data: { period, instruments: payload.instruments },
   });
 
   const { data: sessionData } = await supabase.auth.getSession();
@@ -82,8 +83,12 @@ async function fetchAggregateSummaries({ orgId, period, instruments }: GetHeatma
       signature: summary.signature ?? null,
     }));
 
+    const hadBelowThreshold = summaries.some(entry => typeof entry.n === 'number' && entry.n < 5);
+    const cells = mapSummariesToCells(summaries);
+
+    Sentry.setTag('min_n_pass', hadBelowThreshold ? 'false' : 'true');
     Sentry.addBreadcrumb({
-      category: 'b2b:agg:fetch',
+      category: 'assess:aggregate:call',
       message: 'success',
       level: 'info',
       data: {
@@ -100,9 +105,10 @@ async function fetchAggregateSummaries({ orgId, period, instruments }: GetHeatma
     return summaries;
   } catch (error) {
     Sentry.addBreadcrumb({
-      category: 'b2b:agg:fetch',
+      category: 'assess:aggregate:call',
       message: 'error',
       level: 'error',
+      data: { period },
     });
     logger.error('Failed to load aggregate summaries', { error: error instanceof Error ? error.message : 'unknown' }, 'b2b.reports');
     throw error;
@@ -129,6 +135,43 @@ async function fetchHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[]> {
 
 export async function getAggregateSummaries(params: GetHeatmapParams): Promise<AggregateSummary[]> {
   return fetchAggregateSummaries(params);
+interface HeatmapMatrixParams extends UseHeatmapParams {
+  periods: string[];
+}
+
+export function useHeatmapMatrix(
+  { orgId, periods, instruments }: HeatmapMatrixParams,
+  options?: HeatmapQueryOptions,
+): UseQueryResult<HeatmapCell[], Error> {
+  const sortedInstruments = instruments && instruments.length > 0 ? [...instruments].sort() : undefined;
+  const instrumentsKey = sortedInstruments?.join('|') ?? 'all';
+  const normalizedPeriods = periods.join('|');
+  const isEnabled = Boolean(orgId && periods.length > 0) && (options?.enabled ?? true);
+
+  return useQuery<HeatmapCell[], Error, HeatmapCell[], HeatmapQueryKey>({
+    queryKey: ['b2b-heatmap', orgId, normalizedPeriods, instrumentsKey],
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    ...(options ?? {}),
+    enabled: isEnabled,
+    queryFn: async () => {
+      if (!orgId || periods.length === 0) {
+        return [];
+      }
+
+      const start = typeof performance !== 'undefined' ? performance.now() : null;
+      const results = await Promise.all(
+        periods.map(period =>
+          fetchHeatmap({ orgId, period, instruments: sortedInstruments }).then(cells => cells.map(cell => ({ ...cell }))),
+        ),
+      );
+      const flattened = results.flat();
+      if (start != null && typeof performance !== 'undefined') {
+        performanceMonitor.recordMetric('b2b_reports.fetch_latency', performance.now() - start);
+      }
+      return flattened;
+    },
+  });
 }
 
 type HeatmapQueryKey = [
