@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -27,10 +27,14 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useFlags } from '@/core/flags';
+import { useAssessment } from '@/hooks/useAssessment';
+import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { cn } from '@/lib/utils';
 import { useSocialRooms } from '@/features/social-cocon/hooks/useSocialRooms';
 import { useSocialBreakPlanner } from '@/features/social-cocon/hooks/useSocialBreakPlanner';
 import { useMspssSummary } from '@/features/social-cocon/hooks/useMspssSummary';
+import { computeSocialCoconUIHints, serializeHints } from '@/features/orchestration';
+import { createSession } from '@/services/sessions/sessionsApi';
 import {
   type ScheduleBreakPayload,
   type SocialBreakPlan,
@@ -96,6 +100,7 @@ const B2CSocialCoconPage: React.FC = () => {
   const { has } = useFlags();
   const featureEnabled = has('FF_SOCIAL_COCON');
   const mspssEnabled = has('FF_ASSESS_MSPSS');
+  const orchestratorEnabled = has('FF_ORCH_SOCIAL_COCON');
 
   const {
     rooms,
@@ -121,8 +126,36 @@ const B2CSocialCoconPage: React.FC = () => {
     isScheduling,
   } = useSocialBreakPlanner({ enabled: featureEnabled });
 
+  const mspssAssessment = useAssessment('MSPSS');
+  const { data: mspssHistory } = useAssessmentHistory('MSPSS', {
+    limit: 1,
+    enabled: featureEnabled && mspssEnabled && orchestratorEnabled && mspssAssessment.state.canDisplay,
+  });
   const { summary: mspssSummary } = useMspssSummary({ enabled: featureEnabled && mspssEnabled });
   const supportLow = mspssSummary?.supportLevel === 'low';
+
+  const mspssLevel = orchestratorEnabled
+    ? mspssHistory?.[0]?.level ?? mspssAssessment.state.lastComputation?.level
+    : undefined;
+
+  const socialHints = useMemo(
+    () => (orchestratorEnabled ? computeSocialCoconUIHints({ mspssLevel }) : []),
+    [mspssLevel, orchestratorEnabled],
+  );
+
+  const shouldPrioritizeCta = socialHints.some(
+    (hint) => hint.action === 'prioritize_cta' && hint.key === 'plan_pause',
+  );
+  const shouldPromoteRooms = socialHints.some(
+    (hint) => hint.action === 'promote_rooms_private' && hint.enabled,
+  );
+
+  const serializedHints = useMemo(() => serializeHints(socialHints), [socialHints]);
+  const hintsSignature = useMemo(() => serializedHints.join('|'), [serializedHints]);
+  const lastLoggedSignature = useRef<string | null>(null);
+  const highlightSupport = shouldPrioritizeCta || supportLow;
+  const planSectionOrder = shouldPrioritizeCta ? 'lg:order-1' : 'lg:order-2';
+  const roomsSectionOrder = shouldPrioritizeCta ? 'lg:order-2' : 'lg:order-1';
 
   const [roomForm, setRoomForm] = useState({
     name: '',
@@ -140,13 +173,41 @@ const B2CSocialCoconPage: React.FC = () => {
   });
   const [hintTagged, setHintTagged] = useState(false);
 
-  const quickSuggestions = useMemo(() => createQuickSuggestions(supportLow), [supportLow]);
+  const quickSuggestions = useMemo(
+    () => createQuickSuggestions(highlightSupport),
+    [highlightSupport],
+  );
 
   useEffect(() => {
     if (!scheduleForm.roomId && rooms.length > 0) {
       setScheduleForm((prev) => ({ ...prev, roomId: rooms[0].id }));
     }
   }, [rooms, scheduleForm.roomId]);
+
+  useEffect(() => {
+    if (!orchestratorEnabled) return;
+    if (hintsSignature === lastLoggedSignature.current) return;
+    lastLoggedSignature.current = hintsSignature;
+
+    Sentry.addBreadcrumb({
+      category: 'orch:social',
+      message: 'apply',
+      level: 'info',
+      data: { hints: serializedHints },
+    });
+
+    if (serializedHints.length === 0) {
+      return;
+    }
+
+    void createSession({
+      type: 'social_cocon',
+      duration_sec: 0,
+      meta: { hints: serializedHints },
+    }).catch((error) => {
+      Sentry.captureException(error);
+    });
+  }, [orchestratorEnabled, serializedHints, hintsSignature]);
 
   if (!featureEnabled) {
     return (
@@ -311,7 +372,7 @@ const B2CSocialCoconPage: React.FC = () => {
               <p className="text-muted-foreground">
                 Créez une room privée pour un moment d'écoute douce, planifiez une mini-pause et invitez une personne de confiance. Aucun détail clinique n'est affiché, seulement votre envie de souffler ensemble.
               </p>
-              {supportLow && (
+              {highlightSupport && (
                 <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-700">
                   <div className="flex items-start gap-3">
                     <Sparkles className="h-5 w-5 mt-0.5" aria-hidden="true" />
@@ -341,8 +402,8 @@ const B2CSocialCoconPage: React.FC = () => {
         </motion.section>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <section className={cn('space-y-4', supportLow ? 'lg:order-1' : 'lg:order-2')}>
-            <Card className="h-full">
+          <section className={cn('space-y-4', planSectionOrder)}>
+            <Card className={cn('h-full border', shouldPrioritizeCta && 'border-rose-200 shadow-lg shadow-rose-100/60')}>
               <CardHeader className="space-y-1">
                 <div className="flex items-center justify-between">
                   <div>
@@ -539,7 +600,7 @@ const B2CSocialCoconPage: React.FC = () => {
             </Card>
           </section>
 
-          <section className={cn('space-y-4', supportLow ? 'lg:order-2' : 'lg:order-1')}>
+          <section className={cn('space-y-4', roomsSectionOrder)}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
@@ -622,7 +683,13 @@ const B2CSocialCoconPage: React.FC = () => {
                   const membership = memberships[room.id];
                   const isMember = Boolean(membership);
                   return (
-                    <Card key={room.id} className="border border-white/40 bg-white/90 shadow-sm">
+                    <Card
+                      key={room.id}
+                      className={cn(
+                        'border shadow-sm',
+                        shouldPromoteRooms ? 'border-rose-200 bg-rose-50/80' : 'border-white/40 bg-white/90',
+                      )}
+                    >
                       <CardHeader className="space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <div className="space-y-1">

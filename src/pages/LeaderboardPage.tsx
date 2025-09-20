@@ -1,442 +1,293 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, Trophy, Medal, Star, Crown, 
-  TrendingUp, Users, Calendar, Award, Target
-} from 'lucide-react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowLeft, Feather, Heart, Sparkles, Waves } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
+
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFlags } from '@/core/flags';
+import { useAssessment } from '@/hooks/useAssessment';
+import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
+import { computeAurasUIHints, serializeHints } from '@/features/orchestration';
+import { createSession } from '@/services/sessions/sessionsApi';
+import { cn } from '@/lib/utils';
 
-interface LeaderboardEntry {
-  id: string;
-  rank: number;
-  user: {
-    name: string;
-    avatar: string;
-    level: number;
-  };
-  score: number;
-  change: number; // +/-
-  badges: string[];
-  streak: number;
-  category: string;
-}
+type AuraKey = 'cool_gentle' | 'neutral' | 'warm_soft';
 
-interface Achievement {
-  id: string;
-  title: string;
+type AuraCopy = {
+  label: string;
   description: string;
-  icon: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  progress?: number;
-  maxProgress?: number;
-  unlocked: boolean;
-}
+  glow: string;
+  accent: string;
+  microActions: string[];
+  affirmations: string[];
+  rituals: string[];
+  ambiance: string;
+};
+
+const auraDictionary: Record<AuraKey, AuraCopy> = {
+  cool_gentle: {
+    label: 'Halo brise marine',
+    description:
+      'Ton aura est douce et demande un entourage apaisant. On ralentit, on écoute en silence et on invite une présence discrète.',
+    glow: 'bg-sky-200/60',
+    accent: 'text-sky-700',
+    microActions: [
+      'Ouvrir un salon confidentiel pour un temps d’écoute sans commentaire.',
+      'Proposer un souffle guidé avec quelqu’un de confiance en mode très doux.',
+      'Activer une notification “pause connexion” pour rappeler un moment partagé.',
+    ],
+    affirmations: [
+      '« Je peux me laisser porter, la communauté veille sur moi. »',
+      '« Je mérite un espace où l’on m’accueille tel que je suis. »',
+    ],
+    rituals: [
+      'Inviter une personne à partager un souvenir rassurant en message vocal doux.',
+      'Partager une playlist ambient et se synchroniser sur quelques respirations lentes.',
+    ],
+    ambiance: 'Ambiance conseillée : bruits d’eau, murmures rassurants et lumière tamisée.',
+  },
+  neutral: {
+    label: 'Halo équilibre nuage',
+    description:
+      'Ton aura reste stable et ouverte. On peut explorer des liens subtils, proposer de petits jeux d’empathie ou de gratitude.',
+    glow: 'bg-violet-200/50',
+    accent: 'text-violet-700',
+    microActions: [
+      'Inviter quelqu’un à un cercle de gratitude sans attente de réponse immédiate.',
+      'Partager un message collectif “merci d’être là” dans le fil communautaire.',
+      'Programmer un rituel hebdomadaire de check-in vocal très court.',
+    ],
+    affirmations: [
+      '« Ma simple présence nourrit déjà la douceur du groupe. »',
+      '« Je peux proposer un lien sans pression et m’ajuster ensuite. »',
+    ],
+    rituals: [
+      'Composer une visualisation guidée à plusieurs, chacun ajoute une image positive.',
+      'Créer une carte postale sonore avec quelques mots chuchotés et un fond musical léger.',
+    ],
+    ambiance: 'Ambiance conseillée : nappes aériennes, clochettes et respiration partagée.',
+  },
+  warm_soft: {
+    label: 'Halo soleil coton',
+    description:
+      'Ton aura rayonne vers les autres. C’est le moment d’envoyer une chaleur collective, de célébrer les progrès et d’encourager les partages sensibles.',
+    glow: 'bg-amber-200/60',
+    accent: 'text-amber-700',
+    microActions: [
+      'Organiser une bulle “merci” pour célébrer un geste attentionné de la communauté.',
+      'Envoyer une carte vocale lumineuse à une personne plus discrète.',
+      'Proposer un rituel d’ancrage en duo : visualiser un souvenir heureux et le raconter.',
+    ],
+    affirmations: [
+      '« Ma chaleur inspire et reste accueillante pour toutes les sensibilités. »',
+      '« Je peux rayonner sans me perdre, en gardant une écoute curieuse. »',
+    ],
+    rituals: [
+      'Planifier une rencontre audio “rayon doux” pour encourager les idées audacieuses.',
+      'Partager un tableau de gratitude collaboratif avec des mots lumineux.',
+    ],
+    ambiance: 'Ambiance conseillée : textures chaleureuses, voix enjouées et fond musical solaire.',
+  },
+};
+
+const pageBackground: Record<AuraKey, string> = {
+  cool_gentle: 'from-sky-50 via-white to-indigo-50',
+  neutral: 'from-violet-50 via-white to-rose-50',
+  warm_soft: 'from-amber-50 via-rose-50 to-white',
+};
+
+const haloRing: Record<AuraKey, string> = {
+  cool_gentle: 'border-sky-200',
+  neutral: 'border-violet-200',
+  warm_soft: 'border-amber-200',
+};
 
 const LeaderboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedPeriod, setSelectedPeriod] = useState('week');
-  const [selectedCategory, setSelectedCategory] = useState('overall');
-  
-  const [leaderboard] = useState<LeaderboardEntry[]>([
-    {
-      id: '1',
-      rank: 1,
-      user: { name: 'Sarah M.', avatar: '👩‍💼', level: 42 },
-      score: 2847,
-      change: 2,
-      badges: ['🔥', '🎯', '⭐'],
-      streak: 15,
-      category: 'overall',
-    },
-    {
-      id: '2',
-      rank: 2,
-      user: { name: 'Alex R.', avatar: '👨‍💻', level: 38 },
-      score: 2756,
-      change: -1,
-      badges: ['🚀', '💪', '🧘'],
-      streak: 12,
-      category: 'overall',
-    },
-    {
-      id: '3',
-      rank: 3,
-      user: { name: 'Maya K.', avatar: '👩‍🎨', level: 35 },
-      score: 2643,
-      change: 1,
-      badges: ['🎨', '💖', '🌟'],
-      streak: 8,
-      category: 'overall',
-    },
-    {
-      id: '4',
-      rank: 4,
-      user: { name: 'Vous', avatar: '😊', level: 28 },
-      score: 2156,
-      change: 3,
-      badges: ['🎵', '📚', '🌱'],
-      streak: 7,
-      category: 'overall',
-    },
-    {
-      id: '5',
-      rank: 5,
-      user: { name: 'Lucas D.', avatar: '👨‍🚀', level: 31 },
-      score: 2089,
-      change: -2,
-      badges: ['🔬', '🎮', '⚡'],
-      streak: 5,
-      category: 'overall',
-    },
-  ]);
+  const prefersReducedMotion = useReducedMotion();
+  const { has } = useFlags();
+  const orchestratorEnabled = has('FF_ORCH_AURAS');
+  const who5Enabled = has('FF_ASSESS_WHO5');
 
-  const [achievements] = useState<Achievement[]>([
-    {
-      id: '1',
-      title: 'Série Parfaite',
-      description: 'Complétez 7 jours consécutifs d\'activités',
-      icon: '🔥',
-      rarity: 'common',
-      progress: 7,
-      maxProgress: 7,
-      unlocked: true,
-    },
-    {
-      id: '2',
-      title: 'Maître de la Méditation',
-      description: 'Terminez 50 sessions de méditation',
-      icon: '🧘‍♀️',
-      rarity: 'rare',
-      progress: 35,
-      maxProgress: 50,
-      unlocked: false,
-    },
-    {
-      id: '3',
-      title: 'Explorateur VR',
-      description: 'Découvrez tous les environnements VR',
-      icon: '🥽',
-      rarity: 'epic',
-      progress: 8,
-      maxProgress: 12,
-      unlocked: false,
-    },
-    {
-      id: '4',
-      title: 'Légende Émotionnelle',
-      description: 'Atteignez le niveau 50 en analyse émotionnelle',
-      icon: '👑',
-      rarity: 'legendary',
-      progress: 28,
-      maxProgress: 50,
-      unlocked: false,
-    },
-  ]);
+  const whoAssessment = useAssessment('WHO5');
+  const { data: whoHistory } = useAssessmentHistory('WHO5', {
+    limit: 1,
+    enabled: orchestratorEnabled && who5Enabled && whoAssessment.state.canDisplay,
+  });
 
-  const rarityColors = {
-    common: 'bg-gray-100 text-gray-700 border-gray-300',
-    rare: 'bg-blue-100 text-blue-700 border-blue-300',
-    epic: 'bg-purple-100 text-purple-700 border-purple-300',
-    legendary: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-  };
+  const whoLevel = orchestratorEnabled
+    ? whoHistory?.[0]?.level ?? whoAssessment.state.lastComputation?.level
+    : undefined;
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1: return <Crown className="w-6 h-6 text-yellow-500" />;
-      case 2: return <Medal className="w-6 h-6 text-gray-400" />;
-      case 3: return <Award className="w-6 h-6 text-amber-600" />;
-      default: return <div className="w-6 h-6 flex items-center justify-center font-bold text-muted-foreground">{rank}</div>;
+  const auraHints = useMemo(
+    () => computeAurasUIHints({ who5Level: orchestratorEnabled ? whoLevel : undefined }),
+    [orchestratorEnabled, whoLevel],
+  );
+
+  const auraKey = (auraHints.find((hint) => hint.action === 'set_aura')?.key ?? 'neutral') as AuraKey;
+  const aura = auraDictionary[auraKey];
+
+  const serializedHints = useMemo(() => serializeHints(auraHints), [auraHints]);
+  const hintsSignature = useMemo(() => serializedHints.join('|'), [serializedHints]);
+  const lastLoggedSignature = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!orchestratorEnabled) return;
+    if (hintsSignature === lastLoggedSignature.current) return;
+    lastLoggedSignature.current = hintsSignature;
+
+    Sentry.addBreadcrumb({
+      category: 'orch:auras',
+      message: 'apply',
+      level: 'info',
+      data: { hints: serializedHints },
+    });
+
+    if (serializedHints.length === 0) {
+      return;
     }
-  };
 
-  const getChangeIcon = (change: number) => {
-    if (change > 0) return <TrendingUp className="w-4 h-4 text-green-500" />;
-    if (change < 0) return <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />;
-    return <div className="w-4 h-4" />;
-  };
+    void createSession({
+      type: 'auras',
+      duration_sec: 0,
+      meta: { hints: serializedHints },
+    }).catch((error) => {
+      Sentry.captureException(error);
+    });
+  }, [orchestratorEnabled, serializedHints, hintsSignature]);
 
-  const currentUser = leaderboard.find(entry => entry.user.name === 'Vous');
+  const auraMotion = prefersReducedMotion
+    ? { initial: { opacity: 1, scale: 1 }, animate: { opacity: 1, scale: 1 } }
+    : {
+        initial: { opacity: 0.8, scale: 0.96 },
+        animate: { opacity: 1, scale: 1, transition: { duration: 1.4, ease: 'easeInOut' } },
+      };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:to-slate-800">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-semibold">Classements</h1>
-              <p className="text-sm text-muted-foreground">Compétition amicale et récompenses</p>
+    <ZeroNumberBoundary
+      as="div"
+      className={cn('min-h-screen bg-gradient-to-b', pageBackground[auraKey])}
+    >
+      <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-8">
+        <header className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
+            Retour
+          </Button>
+          <div className="text-right">
+            <p className={cn('text-xs uppercase tracking-wide', aura.accent)}>Orchestration sociale</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Auras partagées</h1>
+          </div>
+        </header>
+
+        <motion.section
+          initial={auraMotion.initial}
+          animate={auraMotion.animate}
+          className={cn(
+            'relative overflow-hidden rounded-3xl border bg-white/80 p-8 shadow-sm backdrop-blur',
+            haloRing[auraKey],
+          )}
+        >
+          <div className="absolute inset-0" aria-hidden="true">
+            <div className={cn('absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl', aura.glow)} />
+          </div>
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-4 lg:max-w-xl">
+              <p className={cn('text-sm font-medium', aura.accent)}>Aura actuelle</p>
+              <h2 className="text-3xl font-semibold text-slate-900">{aura.label}</h2>
+              <p className="text-base text-slate-700">{aura.description}</p>
+            </div>
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-white/40 blur-xl" aria-hidden="true" />
+                <motion.div
+                  className="relative flex h-28 w-28 items-center justify-center rounded-full border border-white/60 bg-white/70"
+                  animate={prefersReducedMotion ? undefined : { rotate: [0, 6, -4, 0] }}
+                  transition={prefersReducedMotion ? undefined : { duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <Heart className={cn('h-10 w-10', aura.accent)} aria-hidden="true" />
+                </motion.div>
+              </div>
+              <p className="text-sm text-muted-foreground text-center max-w-[200px]">{aura.ambiance}</p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-yellow-500" />
-          </div>
-        </div>
-      </div>
+        </motion.section>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        
-        {/* Filtres */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-40">
-              <Calendar className="w-4 h-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="day">Aujourd'hui</SelectItem>
-              <SelectItem value="week">Cette semaine</SelectItem>
-              <SelectItem value="month">Ce mois</SelectItem>
-              <SelectItem value="year">Cette année</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-48">
-              <Target className="w-4 h-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="overall">Général</SelectItem>
-              <SelectItem value="wellness">Bien-être</SelectItem>
-              <SelectItem value="meditation">Méditation</SelectItem>
-              <SelectItem value="vr">Réalité Virtuelle</SelectItem>
-              <SelectItem value="journal">Journal</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Classement Principal */}
-          <div className="lg:col-span-2 space-y-4">
-            
-            {/* Votre Position */}
-            {currentUser && (
-              <Card className="p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-200">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full font-bold">
-                    #{currentUser.rank}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold">Votre position</span>
-                      {getChangeIcon(currentUser.change)}
-                      <span className={`text-sm ${currentUser.change > 0 ? 'text-green-600' : currentUser.change < 0 ? 'text-red-600' : 'text-gray-600'}`}>
-                        {currentUser.change > 0 ? '+' : ''}{currentUser.change}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{currentUser.score} points</span>
-                      <span>Niveau {currentUser.user.level}</span>
-                      <span>{currentUser.streak} jours consécutifs</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    {currentUser.badges.map((badge, i) => (
-                      <span key={i} className="text-lg">{badge}</span>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            )}
-
-            {/* Podium */}
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">🏆 Podium de la Semaine</h2>
-              <div className="flex items-end justify-center gap-4 mb-6">
-                
-                {/* 2ème place */}
-                <div className="text-center">
-                  <div className="w-16 h-20 bg-gray-200 rounded-t-lg flex items-end justify-center pb-2 mb-2">
-                    <span className="text-2xl">{leaderboard[1]?.user.avatar}</span>
-                  </div>
-                  <Medal className="w-8 h-8 text-gray-400 mx-auto mb-1" />
-                  <p className="font-semibold text-sm">{leaderboard[1]?.user.name}</p>
-                  <p className="text-xs text-muted-foreground">{leaderboard[1]?.score} pts</p>
-                </div>
-
-                {/* 1ère place */}
-                <div className="text-center">
-                  <div className="w-20 h-24 bg-yellow-200 rounded-t-lg flex items-end justify-center pb-2 mb-2">
-                    <span className="text-3xl">{leaderboard[0]?.user.avatar}</span>
-                  </div>
-                  <Crown className="w-10 h-10 text-yellow-500 mx-auto mb-1" />
-                  <p className="font-semibold">{leaderboard[0]?.user.name}</p>
-                  <p className="text-sm text-muted-foreground">{leaderboard[0]?.score} pts</p>
-                </div>
-
-                {/* 3ème place */}
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-amber-100 rounded-t-lg flex items-end justify-center pb-2 mb-2">
-                    <span className="text-2xl">{leaderboard[2]?.user.avatar}</span>
-                  </div>
-                  <Award className="w-8 h-8 text-amber-600 mx-auto mb-1" />
-                  <p className="font-semibold text-sm">{leaderboard[2]?.user.name}</p>
-                  <p className="text-xs text-muted-foreground">{leaderboard[2]?.score} pts</p>
-                </div>
-              </div>
-            </Card>
-
-            {/* Classement Complet */}
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Classement Complet</h2>
-              <div className="space-y-3">
-                {leaderboard.map((entry, index) => (
-                  <motion.div
-                    key={entry.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-center gap-4 p-3 rounded-lg border ${
-                      entry.user.name === 'Vous' ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center w-8">
-                      {getRankIcon(entry.rank)}
-                    </div>
-                    
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="text-2xl">{entry.user.avatar}</div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">{entry.user.name}</span>
-                          {entry.user.name === 'Vous' && <Badge variant="outline">Vous</Badge>}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Niveau {entry.user.level} • {entry.streak} jours
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="flex gap-1">
-                        {entry.badges.map((badge, i) => (
-                          <span key={i} className="text-sm">{badge}</span>
-                        ))}
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">{entry.score}</p>
-                        <div className="flex items-center gap-1">
-                          {getChangeIcon(entry.change)}
-                          <span className={`text-xs ${
-                            entry.change > 0 ? 'text-green-600' : 
-                            entry.change < 0 ? 'text-red-600' : 'text-gray-600'
-                          }`}>
-                            {entry.change > 0 ? '+' : ''}{entry.change}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card className="border border-white/60 bg-white/90 shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Sparkles className={cn('h-5 w-5', aura.accent)} aria-hidden="true" />
+                Micro-actions à tenter
+              </CardTitle>
+              <CardDescription>
+                Des gestes sans métriques pour nourrir l’appartenance et faire rayonner ton aura.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {aura.microActions.map((action) => (
+                  <li key={action} className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white/70 p-3 text-sm text-slate-700">
+                    <Feather className={cn('mt-1 h-4 w-4 flex-shrink-0', aura.accent)} aria-hidden="true" />
+                    <span>{action}</span>
+                  </li>
                 ))}
-              </div>
-            </Card>
-          </div>
+              </ul>
+            </CardContent>
+          </Card>
 
-          {/* Sidebar - Achievements */}
-          <div className="space-y-6">
-            
-            {/* Statistiques Rapides */}
-            <Card className="p-4">
-              <h3 className="font-semibold mb-3">Vos Statistiques</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm">Position actuelle</span>
-                  <span className="font-semibold">#{currentUser?.rank || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Points totaux</span>
-                  <span className="font-semibold">{currentUser?.score || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Série actuelle</span>
-                  <span className="font-semibold">{currentUser?.streak || 0} jours</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm">Badges obtenus</span>
-                  <span className="font-semibold">{currentUser?.badges.length || 0}</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Achievements */}
-            <Card className="p-4">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-500" />
-                Accomplissements
-              </h3>
-              <div className="space-y-3">
-                {achievements.map((achievement) => (
-                  <div key={achievement.id} className={`p-3 rounded-lg border ${
-                    achievement.unlocked ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
-                  }`}>
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl">{achievement.icon}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">{achievement.title}</span>
-                          <Badge className={rarityColors[achievement.rarity]}>
-                            {achievement.rarity}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {achievement.description}
-                        </p>
-                        {!achievement.unlocked && achievement.progress !== undefined && (
-                          <div className="space-y-1">
-                            <Progress 
-                              value={(achievement.progress / (achievement.maxProgress || 1)) * 100} 
-                              className="h-2"
-                            />
-                            <p className="text-xs text-muted-foreground">
-                              {achievement.progress}/{achievement.maxProgress}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+          <Card className="border border-white/60 bg-white/90 shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Heart className={cn('h-5 w-5', aura.accent)} aria-hidden="true" />
+                Affirmations à souffler
+              </CardTitle>
+              <CardDescription>
+                Des phrases à répéter ou partager pour ancrer une atmosphère rassurante.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {aura.affirmations.map((affirmation) => (
+                  <li key={affirmation} className="rounded-xl border border-slate-100 bg-white/80 p-3 text-sm text-slate-700">
+                    {affirmation}
+                  </li>
                 ))}
-              </div>
-            </Card>
-
-            {/* Défis de la Semaine */}
-            <Card className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-              <h3 className="font-semibold mb-3 text-purple-900">🎯 Défis de la Semaine</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center">
-                  <span>Méditer 5 jours</span>
-                  <Badge className="bg-green-100 text-green-700">3/5</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Scan émotionnel quotidien</span>
-                  <Badge className="bg-yellow-100 text-yellow-700">6/7</Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Session VR</span>
-                  <Badge className="bg-purple-100 text-purple-700">1/2</Badge>
-                </div>
-              </div>
-            </Card>
-          </div>
+              </ul>
+            </CardContent>
+          </Card>
         </div>
+
+        <Card className="border border-white/60 bg-white/90 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Waves className={cn('h-5 w-5', aura.accent)} aria-hidden="true" />
+              Rituels à partager
+            </CardTitle>
+            <CardDescription>
+              Des invitations collectives pour prolonger l’effet halo dans Social Cocon ou la Communauté.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ul className="space-y-3 text-sm text-slate-700">
+              {aura.rituals.map((ritual) => (
+                <li key={ritual} className="rounded-xl border border-slate-100 bg-white/70 p-3">
+                  {ritual}
+                </li>
+              ))}
+            </ul>
+            <div className="rounded-2xl border border-slate-100 bg-white/70 p-4 text-sm text-slate-600">
+              <p>
+                Tip : partage ton aura avec l’équipe ou un·e pair via le Social Cocon. Mentionne simplement la couleur ressentie et l’envie associée, sans chiffre ni classement.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </ZeroNumberBoundary>
   );
 };
 
