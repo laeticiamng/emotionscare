@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { useAppStore } from '@/store/appStore';
+import { migrate as migrateConfig, partialize as partializeConfig, useAppStore } from '@/store/appStore';
 
-const STORAGE_KEY = 'ec-app-store';
+const STORAGE_KEY = 'ec.app.v3';
 
 describe('appStore persistence', () => {
   beforeEach(() => {
@@ -13,24 +13,26 @@ describe('appStore persistence', () => {
   it('partialize ne persiste que les branches prévues', () => {
     const store = useAppStore.getState();
     store.setTheme('dark');
+    store.setAuthenticated(true);
     store.setUser({ id: 'u-1', email: 'user@example.com', role: 'b2c' });
     store.updatePreferences({ notifications: false });
     store.updateMusicState({ isPlaying: true });
     store.updateEmotionState({ currentMood: 'joyful' });
-    store.updateJournalState({ currentEntry: { id: 'draft-1' } });
+    store.setCache('transient', { foo: 'bar' });
 
     const raw = localStorage.getItem(STORAGE_KEY);
     expect(raw).toBeTruthy();
 
     const persisted = JSON.parse(raw!);
 
-    expect(persisted.version).toBe(1);
+    expect(persisted.version).toBe(3);
+    expect(persisted.state.user).toEqual({ id: 'u-1', email: 'user@example.com', role: 'b2c' });
+    expect(persisted.state.isAuthenticated).toBe(true);
     expect(persisted.state.theme).toBe('dark');
     expect(persisted.state.preferences.notifications).toBe(false);
     expect(persisted.state.modules.music.isPlaying).toBe(true);
-    expect(persisted.state.modules.emotion.currentMood).toBe('joyful');
-    expect(persisted.state.user).toBeUndefined();
-    expect(persisted.state.modules.journal).toBeUndefined();
+    expect(persisted.state.modules.emotion).toBeUndefined();
+    expect(persisted.state.cache).toBeUndefined();
   });
 
   it('migrate fusionne les valeurs persistées avec les valeurs par défaut', () => {
@@ -39,27 +41,50 @@ describe('appStore persistence', () => {
 
     const migrated = migrate?.(
       {
-        theme: 'dark',
-        preferences: {
-          notifications: false,
-        },
-        modules: {
-          music: {
-            isPlaying: true,
+        state: {
+          cache: { stale: 'value' },
+          cacheTimestamps: { stale: 123 },
+          preferences: {
+            notifications: false,
+          },
+          modules: {
+            music: {
+              isPlaying: true,
+            },
           },
         },
       },
-      0
+      2
     ) as any;
 
     const defaults = useAppStore.getState();
 
-    expect(migrated.theme).toBe('dark');
-    expect(migrated.preferences.notifications).toBe(false);
-    expect(migrated.preferences.autoSave).toBe(defaults.preferences.autoSave);
-    expect(migrated.preferences.analyticsEnabled).toBe(defaults.preferences.analyticsEnabled);
-    expect(migrated.modules.music.volume).toBe(defaults.modules.music.volume);
-    expect(migrated.modules.music.isPlaying).toBe(true);
-    expect(migrated.modules.emotion).toEqual(defaults.modules.emotion);
+    expect(migrated.state.cache).toEqual({});
+    expect(migrated.state.cacheTimestamps).toEqual({});
+    expect(migrated.state.preferences.notifications).toBe(false);
+    expect(migrated.state.preferences.autoSave).toBe(defaults.preferences.autoSave);
+    expect(migrated.state.modules.music.volume).toBe(defaults.modules.music.volume);
+    expect(migrated.state.modules.music.isPlaying).toBe(true);
+  });
+
+  it('expose les helpers de partialize et migrate pour vérification unitaire', () => {
+    const state = useAppStore.getState();
+    const snapshot = partializeConfig(state);
+
+    expect(snapshot.cache).toBeUndefined();
+    expect(snapshot.modules.music).toEqual(state.modules.music);
+
+    const migrated = migrateConfig(
+      {
+        state: {
+          cache: { foo: 'bar' },
+          cacheTimestamps: { foo: Date.now() },
+        },
+      },
+      1
+    ) as any;
+
+    expect(migrated.state.cache).toEqual({});
+    expect(migrated.state.cacheTimestamps).toEqual({});
   });
 });

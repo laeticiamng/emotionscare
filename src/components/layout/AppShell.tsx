@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { HealthBadge } from '@/components/system/HealthBadge';
-import { Toaster } from '@/components/ui/sonner';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import Header from './Header';
@@ -128,8 +127,7 @@ const AppShell: React.FC = () => {
       </div>
       
       <Footer />
-      <Toaster />
-      
+
       {/* Feedback System */}
       <FeedbackFab />
       <FeedbackModal />

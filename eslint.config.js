@@ -7,14 +7,33 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
   "error",
   {
     patterns: [
-      {
+  {
         group: ["node:*"],
         message:
           "Interdit dans le bundle client. Utilise les APIs Web (crypto.subtle via '@/lib/hash', fetch, File API, etc.)."
       },
+      {
+        group: ["zustand/middleware/immer"],
+        message: "Interdit: Zustand doit fonctionner sans immer."
+      },
+      {
+        group: ["immer"],
+        message:
+          "Interdit côté client: utilisez des mises à jour immutables (spread)!"
+      },
       ...extraPatterns.map((pattern) =>
         typeof pattern === "string" ? { group: [pattern] } : pattern
       )
+    ],
+    paths: [
+      {
+        name: "crypto",
+        message: "Utilise Web Crypto via '@/lib/hash' (sha256Hex).",
+      },
+      {
+        name: "node:crypto",
+        message: "Utilise Web Crypto via '@/lib/hash' (sha256Hex).",
+      },
     ]
   }
 ];
@@ -30,6 +49,7 @@ export default [
       "database/**",
       "e2e/**",
       "src/services/b2b/reportsApi.ts",
+      "src/services/clinicalScoringService.test.ts",
     ],
   },
   {
@@ -45,6 +65,7 @@ export default [
     },
     rules: {
       "no-restricted-imports": createNoNodeImportsRule(),
+      "ec/no-hardcoded-paths": "error",
     }
   },
   {

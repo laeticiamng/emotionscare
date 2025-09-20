@@ -54,12 +54,11 @@ describe('clinicalScoringService.calculate', () => {
     expect(computation.summary).toBe('éclat vibrant');
     expect(computation.hints).toEqual(
       expect.arrayContaining([
-      expect.objectContaining({ action: 'invite_creativity' }),
-    ]),
+        expect.objectContaining({ action: 'invite_creativity' }),
+      ]),
     );
   });
 
-  it('interprets elevated PSS-10 answers and surfaces load management hints', () => {
   it('maps PSS-10 stress into high load with soothing summary', () => {
     const computation = clinicalScoringService.calculate(
       'PSS10',

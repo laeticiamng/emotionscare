@@ -1,67 +1,32 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-
-import { auth as frAuth } from '@/lib/i18n/locales/fr/auth';
-import { coach as frCoach } from '@/lib/i18n/locales/fr/coach';
-import { common as frCommon } from '@/lib/i18n/locales/fr/common';
-import { dashboard as frDashboard } from '@/lib/i18n/locales/fr/dashboard';
-import { errors as frErrors } from '@/lib/i18n/locales/fr/errors';
-import { journal as frJournal } from '@/lib/i18n/locales/fr/journal';
-import { legal as frLegal } from '@/lib/i18n/locales/fr/legal';
-import { modules as frModules } from '@/lib/i18n/locales/fr/modules';
-import { navigation as frNavigation } from '@/lib/i18n/locales/fr/navigation';
-import { settings as frSettings } from '@/lib/i18n/locales/fr/settings';
-
-import { auth as enAuth } from '@/lib/i18n/locales/en/auth';
-import { coach as enCoach } from '@/lib/i18n/locales/en/coach';
-import { common as enCommon } from '@/lib/i18n/locales/en/common';
-import { dashboard as enDashboard } from '@/lib/i18n/locales/en/dashboard';
-import { errors as enErrors } from '@/lib/i18n/locales/en/errors';
-import { journal as enJournal } from '@/lib/i18n/locales/en/journal';
-import { legal as enLegal } from '@/lib/i18n/locales/en/legal';
-import { modules as enModules } from '@/lib/i18n/locales/en/modules';
-import { navigation as enNavigation } from '@/lib/i18n/locales/en/navigation';
-import { settings as enSettings } from '@/lib/i18n/locales/en/settings';
+import type { AppLocale } from '@/providers/i18n/resources';
+import { resources } from '@/providers/i18n/resources';
+import { ensureI18n } from '@/providers/i18n/client';
 
 const STORAGE_KEY = 'lang';
-const FALLBACK_LANGUAGE = 'fr' as const;
-const SUPPORTED_LANGUAGES = ['fr', 'en'] as const;
-const NAMESPACES = [
-  'common',
-  'navigation',
-  'dashboard',
-  'settings',
-  'modules',
-  'auth',
-  'errors',
-  'legal',
-  'journal',
-  'coach',
-] as const;
-
-type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+const FALLBACK_LANGUAGE: AppLocale = 'fr';
+const SUPPORTED_LANGUAGES = Object.keys(resources) as AppLocale[];
 
 const isBrowser = typeof window !== 'undefined';
 
-const isSupportedLanguage = (value: string | null): value is SupportedLanguage => {
-  return Boolean(value && SUPPORTED_LANGUAGES.includes(value as SupportedLanguage));
+const isSupportedLanguage = (value: string | null): value is AppLocale => {
+  return Boolean(value && SUPPORTED_LANGUAGES.includes(value as AppLocale));
 };
 
-const readStoredLanguage = (): SupportedLanguage | null => {
+const readStoredLanguage = (): AppLocale | null => {
   if (!isBrowser) {
     return null;
   }
 
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return isSupportedLanguage(stored) ? stored : null;
+    return isSupportedLanguage(stored) ? (stored as AppLocale) : null;
   } catch (error) {
     console.warn('[i18n] Unable to read language from localStorage', error);
     return null;
   }
 };
 
-const detectBrowserLanguage = (): SupportedLanguage | null => {
+const detectBrowserLanguage = (): AppLocale | null => {
   if (!isBrowser) {
     return null;
   }
@@ -72,10 +37,10 @@ const detectBrowserLanguage = (): SupportedLanguage | null => {
   }
 
   const normalized = navigatorLanguage.toLowerCase().split('-')[0];
-  return isSupportedLanguage(normalized) ? normalized : null;
+  return isSupportedLanguage(normalized) ? (normalized as AppLocale) : null;
 };
 
-const persistLanguage = (language: SupportedLanguage) => {
+const persistLanguage = (language: AppLocale) => {
   if (!isBrowser) {
     return;
   }
@@ -87,13 +52,13 @@ const persistLanguage = (language: SupportedLanguage) => {
   }
 };
 
-const applyDocumentLanguage = (language: SupportedLanguage) => {
+const applyDocumentLanguage = (language: AppLocale) => {
   if (typeof document !== 'undefined') {
     document.documentElement.lang = language;
   }
 };
 
-const resolveInitialLanguage = (): SupportedLanguage => {
+const resolveInitialLanguage = (): AppLocale => {
   const storedLanguage = readStoredLanguage();
   if (storedLanguage) {
     return storedLanguage;
@@ -107,67 +72,11 @@ const resolveInitialLanguage = (): SupportedLanguage => {
   return FALLBACK_LANGUAGE;
 };
 
-const resources = {
-  fr: {
-    common: frCommon,
-    navigation: frNavigation,
-    dashboard: frDashboard,
-    settings: frSettings,
-    modules: frModules,
-    auth: frAuth,
-    errors: frErrors,
-    legal: frLegal,
-    journal: frJournal,
-    coach: frCoach,
-  },
-  en: {
-    common: enCommon,
-    navigation: enNavigation,
-    dashboard: enDashboard,
-    settings: enSettings,
-    modules: enModules,
-    auth: enAuth,
-    errors: enErrors,
-    legal: enLegal,
-    journal: enJournal,
-    coach: enCoach,
-  },
-};
-
 const initialLanguage = resolveInitialLanguage();
+const i18nInstance = ensureI18n(initialLanguage);
 
 if (!readStoredLanguage() && isBrowser) {
   persistLanguage(initialLanguage);
-}
-
-const initializeI18n = () =>
-  i18n
-    .use(initReactI18next)
-    .init({
-      resources,
-      ns: NAMESPACES,
-      defaultNS: 'common',
-      fallbackNS: ['common'],
-      lng: initialLanguage,
-      fallbackLng: [FALLBACK_LANGUAGE, 'en'],
-      supportedLngs: SUPPORTED_LANGUAGES,
-      load: 'languageOnly',
-      returnEmptyString: false,
-      interpolation: {
-        escapeValue: false,
-      },
-      react: {
-        useSuspense: false,
-      },
-    });
-
-if (!i18n.isInitialized) {
-  void initializeI18n();
-} else if (i18n.language && isSupportedLanguage(i18n.language.split('-')[0])) {
-  const normalized = i18n.language.split('-')[0] as SupportedLanguage;
-  if (normalized !== initialLanguage) {
-    void i18n.changeLanguage(normalized);
-  }
 }
 
 applyDocumentLanguage(initialLanguage);
@@ -175,8 +84,8 @@ applyDocumentLanguage(initialLanguage);
 let listenersAttached = false;
 
 if (!listenersAttached) {
-  i18n.on('languageChanged', (nextLanguage) => {
-    const normalized = (nextLanguage?.split?.('-')[0] ?? FALLBACK_LANGUAGE) as SupportedLanguage;
+  i18nInstance.on('languageChanged', nextLanguage => {
+    const normalized = (nextLanguage?.split?.('-')[0] ?? FALLBACK_LANGUAGE) as AppLocale;
     persistLanguage(normalized);
     applyDocumentLanguage(normalized);
   });
@@ -197,8 +106,8 @@ if (isBrowser) {
       if (key === STORAGE_KEY) {
         const normalized = value.split('-')[0];
 
-        if (isSupportedLanguage(normalized) && !i18n.language?.startsWith(normalized)) {
-          void i18n.changeLanguage(normalized);
+        if (isSupportedLanguage(normalized) && !i18nInstance.language?.startsWith(normalized)) {
+          void i18nInstance.changeLanguage(normalized);
         }
       }
     }) as typeof storage.setItem;
@@ -207,4 +116,4 @@ if (isBrowser) {
   }
 }
 
-export default i18n;
+export default i18nInstance;

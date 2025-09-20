@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { sendMessage } from '@/services/coach/coachApi';
 import { CoachConsent } from '@/modules/coach/CoachConsent';
-import { sha256 } from '@/lib/hash';
+import { sha256Hex } from '@/lib/hash';
 import { COACH_DISCLAIMERS, CoachMode } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 import { useFlags } from '@/core/flags';
@@ -166,7 +166,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
 
         if (typeof authUser.id === 'string') {
           try {
-            const hashed = await sha256(authUser.id);
+            const hashed = await sha256Hex(authUser.id);
             if (mounted) {
               setUserHash(hashed);
             }

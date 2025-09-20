@@ -11,7 +11,7 @@ Ce référentiel regroupe les règles incontournables déjà implémentées dans
 - Exceptions : dossiers `services/**` & `supabase/functions/**` (server/edge uniquement).
 
 ## 🔐 Hash & pseudonymisation
-- `src/lib/hash.ts` fournit `sha256(text)` basé uniquement sur Web Crypto.
+- `src/lib/hash.ts` fournit `sha256Hex(text)` basé uniquement sur Web Crypto.
 - Edge : `_shared/hash_user.ts` (Deno) applique le même algo → cohérence côté serveur.
 - Aucun UUID utilisateur brut n'est loggé ; toujours passer par `hash(user.id)`.
 
@@ -39,7 +39,7 @@ Ce référentiel regroupe les règles incontournables déjà implémentées dans
 
 ## ✅ Checklist avant merge
 - [ ] Aucune dépendance `node:*` dans `src/**`.
-- [ ] Hash utilisateur via `sha256` (Web Crypto) pour tout log/ID client.
+- [ ] Hash utilisateur via `sha256Hex` (Web Crypto) pour tout log/ID client.
 - [ ] Nouveaux logs Sentry passent par `captureException`/`addBreadcrumb` sans PII.
 - [ ] Nouveaux endpoints Supabase : policies RLS + `noindex` si exposent des données.
 - [ ] DNT respecté pour toute nouvelle collecte (fallback opt-out explicite).
