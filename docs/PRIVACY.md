@@ -4,7 +4,7 @@ Ce module premium a été revu pour respecter les attentes cliniques et B2B. Voi
 
 ## Données côté client
 - ✅ Consentement explicite enregistré en `localStorage` (`coach:consent:v1`) et synchronisé dans `auth.user_metadata.coach_consent_at` pour éviter de redemander.
-- ✅ Hash utilisateur (`sha256` Web Crypto) utilisé uniquement comme étiquette de session côté Edge (aucune diffusion de l’UUID réel).
+- ✅ Hash utilisateur (`sha256Hex` Web Crypto) utilisé uniquement comme étiquette de session côté Edge (aucune diffusion de l’UUID réel).
 - ✅ Breadcrumbs Sentry limités (événements `coach:send|receive|error` sans contenu du message, uniquement métadonnées anonymisées).
 - ❌ Aucun stockage local du transcript complet ; la conversation reste en mémoire temps-réel.
 

@@ -153,7 +153,7 @@ npm run storybook        # Interface composants
 
 #### 🚫 Interdiction `node:*` côté client (ECC-SEC-01)
 - Tout fichier client sous `src/**` ne peut plus importer `node:*`. Le lint (`pnpm lint`) et la CI bloquent immédiatement si la règle est violée.
-- Préférez les APIs Web : `crypto.subtle`, `fetch`, `FileReader`, `Blob`, `URL`, etc. Un utilitaire `sha256` basé sur `crypto.subtle` est déjà disponible dans `src/lib/hash.ts`.
+- Préférez les APIs Web : `crypto.subtle`, `fetch`, `FileReader`, `Blob`, `URL`, etc. Un utilitaire `sha256Hex` basé sur `crypto.subtle` est déjà disponible dans `src/lib/hash.ts`.
 - Les seuls dossiers autorisés à utiliser `node:*` sont les services strictement serveur (`/services/**`) et les fonctions Supabase (`/supabase/functions/**`).
 
 ```ts
