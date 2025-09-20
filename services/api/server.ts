@@ -1,9 +1,12 @@
 import { performance } from 'node:perf_hooks';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 
 import { VoiceSchema, TextSchema } from '../journal/lib/validate';
 import { hash } from '../journal/lib/hash';
 import { insertVoice, insertText, listFeed } from '../journal/lib/db';
+import type { FastifyBaseLogger } from 'fastify';
+
 import { createServer } from '../lib/server';
 import { moodPlaylistRequestSchema, buildMoodPlaylistResponse } from './music';
 
@@ -49,16 +52,37 @@ type HealthChecks = {
   storage: BasicCheck;
 };
 
+type RuntimeInfo = {
+  node: string;
+  platform: NodeJS.Platform;
+  environment: string;
+};
+
+type UptimeInfo = {
+  seconds: number;
+  since: string;
+};
+
 type HealthResponse = {
   status: CheckStatus;
+  version: string;
+  runtime: RuntimeInfo;
+  uptime: UptimeInfo;
   timestamp: string;
   checks: HealthChecks;
   signature: string;
 };
 
+const require = createRequire(import.meta.url);
+const packageJson = require('../../package.json') as { version?: string };
+const packageVersion = packageJson?.version ?? '0.0.0';
+const bootTime = Date.now();
+
 const DEFAULT_DEPENDENCY_TIMEOUT = Number.parseInt(process.env.HEALTHCHECK_TIMEOUT_MS ?? '1500', 10);
 const HEALTH_RATE_LIMIT = Number.parseInt(process.env.HEALTH_RATE_LIMIT ?? '60', 10);
 const HEALTH_RATE_WINDOW = Number.parseInt(process.env.HEALTH_RATE_WINDOW_MS ?? '60000', 10);
+
+const getAppVersion = () => process.env.RELEASE_VERSION ?? packageVersion;
 
 const parseList = (value?: string) =>
   value
@@ -67,6 +91,17 @@ const parseList = (value?: string) =>
         .map(item => item.trim())
         .filter(Boolean)
     : [];
+
+const getRuntimeInfo = (): RuntimeInfo => ({
+  node: process.version,
+  platform: process.platform,
+  environment: process.env.NODE_ENV ?? 'development',
+});
+
+const getUptimeInfo = (): UptimeInfo => ({
+  seconds: Number(process.uptime().toFixed(3)),
+  since: new Date(bootTime).toISOString(),
+});
 
 const getAllowedOrigins = () => parseList(process.env.HEALTH_ALLOWED_ORIGINS);
 const getSupabaseUrl = () =>
@@ -83,6 +118,8 @@ const getFunctionTargets = () => parseList(process.env.HEALTH_FUNCTIONS ?? 'ai-e
 const getDirectStorageUrl = () => process.env.HEALTH_STORAGE_URL ?? null;
 const getStorageBucket = () => process.env.HEALTH_STORAGE_BUCKET ?? null;
 const getStorageObject = () => process.env.HEALTH_STORAGE_OBJECT ?? null;
+const getSentryHeartbeatUrl = () =>
+  process.env.SENTRY_HEARTBEAT_URL ?? process.env.SENTRY_CRON_HEARTBEAT_URL ?? null;
 
 const createRateLimiter = (limit: number, windowMs: number) => {
   const bucket = new Map<string, { count: number; resetAt: number }>();
@@ -120,6 +157,28 @@ const timedFetch = async (url: string, init: RequestInit = {}) => {
     });
   } finally {
     clearTimeout(timeout);
+  }
+};
+
+const sendSentryHeartbeat = async (status: CheckStatus, logger?: FastifyBaseLogger) => {
+  const url = getSentryHeartbeatUrl();
+  if (!url) {
+    return;
+  }
+
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'user-agent': 'emotionscare-health/1.0',
+      },
+      body: JSON.stringify({ status, checked_at: new Date().toISOString() }),
+    });
+  } catch (error) {
+    if (logger?.warn) {
+      logger.warn({ err: error }, 'healthcheck.sentry_heartbeat_failed');
+    }
   }
 };
 
@@ -302,6 +361,9 @@ const buildHealthPayload = async (): Promise<HealthResponse> => {
 
   const basePayload = {
     status: computeOverallStatus(supabaseCheck, functionChecks, storageCheck),
+    version: getAppVersion(),
+    runtime: getRuntimeInfo(),
+    uptime: getUptimeInfo(),
     timestamp: new Date().toISOString(),
     checks: {
       supabase: supabaseCheck,
@@ -319,6 +381,9 @@ const buildHealthPayload = async (): Promise<HealthResponse> => {
 const buildRateLimitedPayload = (): HealthResponse => {
   const base = {
     status: 'degraded' as CheckStatus,
+    version: getAppVersion(),
+    runtime: getRuntimeInfo(),
+    uptime: getUptimeInfo(),
     timestamp: new Date().toISOString(),
     checks: {
       supabase: { status: 'degraded', latency_ms: 0, error: 'rate_limited' },
@@ -371,6 +436,7 @@ export function createApp(options: CreateAppOptions = {}) {
 
         const payload = await buildHealthPayload();
         reply.send(payload);
+        void sendSentryHeartbeat(payload.status, app.log);
       };
 
       app.get('/health', sendHealth);

@@ -37,6 +37,7 @@ import {
 import { Link, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { withLandingUtm } from "@/lib/utm";
 import { useLazyRender } from "@/hooks/useLazyRender";
 
 const Footer = lazy(() => import("@/components/layout/Footer"));
@@ -564,7 +565,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                         <Separator className="my-4" />
 
                         <Button variant="ghost" className="w-full group-hover:bg-primary/10 group-hover:text-primary transition-all" asChild>
-                          <Link to={feature.demo}>
+                          <Link to={withLandingUtm(feature.demo)}>
                             <span>Essayer maintenant</span>
                             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Link>

@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout";
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
-import { 
-  Scan, 
-  Music, 
+import {
+  Scan,
+  Music,
   MessageCircle, 
   PenTool, 
   Eye, 
@@ -28,6 +28,7 @@ import {
   Monitor
 } from "lucide-react";
 import { CopyBadge } from "@/components/transverse";
+import { withLandingUtm } from "@/lib/utm";
 
 /**
  * B2C HOME PAGE - EMOTIONSCARE  
@@ -36,6 +37,7 @@ import { CopyBadge } from "@/components/transverse";
 export default function B2CHomePage() {
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
+  const goTo = (path: string) => navigate(withLandingUtm(path));
 
   const moduleCategories = useMemo(() => [
     {
@@ -291,7 +293,7 @@ export default function B2CHomePage() {
                     {...getScaleInProps(categoryIndex * 0.1 + moduleIndex * 0.05)}
                     whileHover={hoverEffect}
                     className="cursor-pointer"
-                    onClick={() => navigate(module.path)}
+                    onClick={() => goTo(module.path)}
                   >
                     <Card
                       className="h-full hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary"
@@ -357,7 +359,7 @@ export default function B2CHomePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/scan')}
+                  onClick={() => goTo('/app/scan')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Scanner mes émotions - Analyse faciale en temps réel"
                 >
@@ -366,7 +368,7 @@ export default function B2CHomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/flash-glow')}
+                  onClick={() => goTo('/app/flash-glow')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Flash Glow - Session de thérapie lumière de 2 minutes"
                 >
@@ -375,7 +377,7 @@ export default function B2CHomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/music')}
+                  onClick={() => goTo('/app/music')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Musique thérapeutique - Sons adaptatifs personnalisés"
                 >
@@ -384,7 +386,7 @@ export default function B2CHomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/journal')}
+                  onClick={() => goTo('/app/journal')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Journal émotionnel - Consignez vos ressentis"
                 >

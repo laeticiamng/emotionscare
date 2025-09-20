@@ -41,6 +41,42 @@ Pour chacun : entrées, routes, dépendances clefs (assessments Edge, sessions
 - **Tests** : e2e `emotion-scan-dashboard.spec.ts`, unitaires `emotionScan.service.test.ts`.
 
 ### 🎵 Adaptive Music — 🟢 Livré
+- **Entrée** : `src/modules/adaptive-music/AdaptiveMusicPage.tsx` sur `/app/music`.
+- **Services** : `src/services/moodPlaylist.service.ts`, `src/hooks/useMusicControls.ts`.
+- **Fonctionnalités clés** :
+  - Builder de requête mood→playlist (mood, intensité, durée, préférences instrumentales & contexte).  
+  - Normalisation stricte de la réponse (tracks, energyProfile, guidance) avec message d'erreur en cas de payload invalide.  
+  - Gestion locale des favoris (persistés en `localStorage`) et reprise de lecture (`playback snapshot`).
+  - Export/partage guidé avec synthèse de la playlist et recommandations.
+  - ✅ QA 06/2025 : scénario e2e `adaptive-music-favorites.spec.ts` + tests `requestMoodPlaylist` (3 cas) sur la normalisation client.
+
+### 📊 Scores & vibes — 🟢 Livré
+- **Entrées** : `src/pages/ScoresPage.tsx`, `src/app/modules/scores/ScoresV2Panel.tsx`, `src/services/scores/dataApi.ts`, `src/features/scores/*`.
+- **Données Supabase** : `emotion_scans.payload` (valence, arousal, labels) et `sessions` (type, created_at) sous RLS owner-only (aucune donnée textuelle du journal).
+- **Fonctionnalités clés** :
+  - Agrégation React Query (cache 60s) + lissage (moving average) pour les courbes valence/arousal sur 30 jours.
+  - Barres hebdomadaires empilées (8 semaines glissantes) + heatmap SVG personnalisée des vibes dominantes (calm/focus/bright/reset).
+  - Respect accessibility : aria-label/role="img", texte de synthèse pour lecteurs d'écran, animation désactivée si `prefers-reduced-motion`.
+  - Export PNG fiable via bouton dédié (html2canvas-free) + breadcrumbs Sentry `scores:fetch:*` & `scores:export:png`.
+  - ✅ QA 06/2025 : tests unitaires `src/services/scores/__tests__/dataApi.test.ts` (mappers/agrégations) + e2e `tests/e2e/scores-heatmap-dashboard.spec.ts` (chargement, interactions, export).
+
+### 🩺 Observabilité — Endpoint `/health`
+- **Entrée** : service Fastify `services/api/server.ts` exposant `/health`, `/healthz` et `/api/healthz`.
+- **Vérifications effectuées** :
+  - Supabase (ping léger REST + latence) avec statut (`ok|degraded|down`).
+  - Fonctions critiques (par défaut `ai-emotion-analysis`, `ai-coach`) pingées en `HEAD`.
+  - Stockage public (URL configurable) via requête `HEAD`.
+- **Réponse JSON** : `{ status, version, runtime: { node, platform, environment }, uptime: { seconds, since }, timestamp, checks: { supabase, functions[], storage }, signature }`.
+  - `signature` = SHA-256 du payload + `HEALTH_SIGNING_SECRET` pour détecter toute altération.
+  - Heartbeat Sentry optionnel via `SENTRY_HEARTBEAT_URL`/`SENTRY_CRON_HEARTBEAT_URL` après chaque succès.
+  - Exposition contrôlée par CORS (`HEALTH_ALLOWED_ORIGINS`) et rate-limit mémoire (60 req/min/IP par défaut).
+- **Tests** : `services/api/tests/health.test.ts` simule succès + fonction en panne, vérifie latences et signature.
+
+## Modules en bêta ou prototypes
+- **B2C fun-first hérités** (`src/pages/modules/*`) : conservés pour démos gamifiées (Story Synth, Bubble Beat…).
+- **Admin & outils** (`src/modules/admin`, `src/modules/screen-silk`) : fonctions internes, statut 🟠.
+
+> _Mettez à jour ce fichier dès qu'un module change de statut ou qu'un nouveau service partagé est introduit._
 - **Entrée** : `src/modules/adaptive-music/AdaptiveMusicPage.tsx` (`/app/music`, `/app/music-premium`).
 - **Dépendances** :
   - Favorites hook (`useMusicFavorites`).
