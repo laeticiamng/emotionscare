@@ -20,7 +20,8 @@ interface ProfileSettingsPageProps {
 }
 
 export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-testid': testId }) => {
-  const { user, setUser } = useAppStore();
+  const user = useAppStore.use.user();
+  const setUser = useAppStore.use.setUser();
   const [isLoading, setIsLoading] = React.useState(false);
   
   const [formData, setFormData] = React.useState({

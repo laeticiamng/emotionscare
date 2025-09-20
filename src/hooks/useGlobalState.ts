@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppStore, shallow } from '@/store/appStore';
+import { useStoreActions, useGlobalStateSlice } from '@/store/hooks';
 import { useErrorHandler } from '@/contexts/ErrorContext';
 import { useCache } from '@/contexts/CacheContext';
 
@@ -8,43 +8,9 @@ import { useCache } from '@/contexts/CacheContext';
  * Combine Zustand store, gestion d'erreurs et cache
  */
 export const useGlobalState = () => {
-  const stateSlice = useAppStore(
-    (state) => ({
-      user: state.user,
-      isAuthenticated: state.isAuthenticated,
-      isLoading: state.isLoading,
-      theme: state.theme,
-      sidebarCollapsed: state.sidebarCollapsed,
-      activeModule: state.activeModule,
-      cache: state.cache,
-      cacheTimestamps: state.cacheTimestamps,
-      preferences: state.preferences,
-      modules: state.modules,
-    }),
-    shallow
-  );
+  const stateSlice = useGlobalStateSlice();
 
-  const actions = useAppStore(
-    (state) => ({
-      setUser: state.setUser,
-      setTheme: state.setTheme,
-      setAuthenticated: state.setAuthenticated,
-      setLoading: state.setLoading,
-      toggleSidebar: state.toggleSidebar,
-      setActiveModule: state.setActiveModule,
-      updatePreferences: state.updatePreferences,
-      updateMusicState: state.updateMusicState,
-      updateEmotionState: state.updateEmotionState,
-      updateJournalState: state.updateJournalState,
-      updateCoachState: state.updateCoachState,
-      setCache: state.setCache,
-      getCache: state.getCache,
-      clearCache: state.clearCache,
-      isCacheValid: state.isCacheValid,
-      reset: state.reset,
-    }),
-    shallow
-  );
+  const actions = useStoreActions();
   const errorHandler = useErrorHandler();
   const cache = useCache();
 
