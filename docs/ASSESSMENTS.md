@@ -31,8 +31,8 @@ Ce guide couvre les flux, la sécurité et les règles produit (zéro score chif
 - Les scores numériques restent côté Edge/B2B pour calibrer les recommandations (coach, dashboards).
 
 ## 🛡️ Agrégations B2B (min_n ≥ 5)
-- `assess-aggregate` et les vues `org_assess_rollups` imposent `min_n ≥ 5` (check constraint + policy `org_rollups_min_n_guard`).
-- Les endpoints `org-dashboard-weekly`, `org-dashboard-export` réinjectent `min_n` dans la réponse (tag Sentry `min_n_pass`).
+- `assess-aggregate` et les vues `org_assess_rollups` imposent `min_n ≥ 5` via la policy `org_rollups_read_min5` (RLS) et un contrôle de non-négativité sur `n`.
+- Les endpoints `org-dashboard-weekly`, `org-dashboard-export` réinjectent `min_n` dans la réponse (tag Sentry `b2b_text_only` côté heatmap).
 - UI B2B (`/app/reports`, `/app/events`, `/app/optimization`) :
   - Afficher un garde anonymat si `eligible === false` ou `min_n_met === false`.
   - Ne jamais afficher d'agrégat si la taille d'échantillon est insuffisante (masquer la cellule, message explicite).

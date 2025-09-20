@@ -73,6 +73,8 @@ const startResponseSchema = z.object({
 
 export type AnswerValue = string | number | boolean;
 
+export type AssessmentPhase = 'pre' | 'post';
+
 interface AssessmentState {
   instrument: InstrumentCode;
   locale: LocaleCode;
@@ -102,13 +104,22 @@ export interface UseAssessmentResult {
   instrument: InstrumentCode;
   state: AssessmentState;
   isEligible: boolean;
+  isDue: (phase: AssessmentPhase) => boolean;
   start: (locale?: LocaleCode) => Promise<InstrumentCatalog | undefined>;
   triggerAssessment: (instrumentOverride?: InstrumentCode, callbacks?: AssessmentCallbacks) => Promise<boolean>;
-  submit: (answers: Record<string, AnswerValue>, options?: { timestamp?: string }) => Promise<boolean>;
-  submitResponse: (answers: Record<string, AnswerValue>, options?: { timestamp?: string }) => Promise<boolean>;
+  submit: (
+    answers: Record<string, AnswerValue>,
+    options?: { timestamp?: string; phase?: AssessmentPhase },
+  ) => Promise<boolean>;
+  submitResponse: (
+    answers: Record<string, AnswerValue>,
+    options?: { timestamp?: string; phase?: AssessmentPhase },
+  ) => Promise<boolean>;
   grantConsent: () => Promise<void>;
   declineConsent: () => Promise<void>;
   reset: () => void;
+  lastLevel: number | null;
+  lastSummary: string | null;
 }
 
 const HISTORY_QUERY_KEY = (instrument: InstrumentCode) => ['assessment-history', instrument] as const;
@@ -132,6 +143,9 @@ const sanitizeAnswers = (answers: Record<string, AnswerValue>) => {
     return acc;
   }, {});
 };
+
+const PRE_CHECK_COOLDOWN_MS = 4 * 60 * 60 * 1000;
+const POST_CHECK_WINDOW_MS = 2 * 60 * 60 * 1000;
 
 const toastLabels = {
   mustConsent: {
@@ -179,6 +193,12 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
       initialFlagKeys.some((key) => Boolean(flags[key])) && !consent.isDNTEnabled && consent.decision !== 'declined',
     error: null,
   }));
+  const [phaseCompletion, setPhaseCompletion] = useState<{ pre: string | null; post: string | null }>({
+    pre: null,
+    post: null,
+  });
+  const [lastSummary, setLastSummary] = useState<string | null>(null);
+  const [lastLevel, setLastLevel] = useState<number | null>(null);
 
   useEffect(() => {
     const keys = resolveFlagKeys(instrument);
@@ -195,6 +215,14 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
       canDisplay,
     }));
   }, [flags, instrument, consent.hasConsented, consent.decision, consent.loading, consent.isDNTEnabled]);
+
+  useEffect(() => {
+    const computation = state.lastComputation;
+    if (computation) {
+      setLastSummary(computation.summary);
+      setLastLevel(computation.level);
+    }
+  }, [state.lastComputation]);
 
   const start = useCallback<UseAssessmentResult['start']>(
     async (locale) => {
@@ -329,8 +357,20 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
           throw new Error('submit_failed');
         }
 
+        const phase = options?.phase;
         runCallbacks(result.computation);
         queryClient.invalidateQueries({ queryKey: HISTORY_QUERY_KEY(instrument) }).catch(() => undefined);
+
+        if (phase) {
+          const generatedAt = result.computation.generatedAt;
+          setPhaseCompletion((prev) => ({
+            pre: phase === 'pre' ? generatedAt : prev.pre,
+            post: phase === 'pre' ? null : phase === 'post' ? generatedAt : prev.post,
+          }));
+        }
+
+        setLastSummary(result.computation.summary);
+        setLastLevel(result.computation.level);
 
         setState((prev) => ({
           ...prev,
@@ -371,19 +411,73 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
       currentInstrument: null,
       error: null,
     }));
+    setPhaseCompletion({ pre: null, post: null });
     callbacksRef.current = null;
   }, []);
 
-  return useMemo<UseAssessmentResult>(() => ({
-    instrument,
-    state,
-    isEligible: state.canDisplay,
-    start,
-    triggerAssessment,
-    submit,
-    submitResponse: submit,
-    grantConsent,
-    declineConsent,
-    reset,
-  }), [declineConsent, grantConsent, instrument, start, state, submit, triggerAssessment, reset]);
+  const isDue = useCallback(
+    (phase: AssessmentPhase) => {
+      if (!state.canDisplay) {
+        return false;
+      }
+
+      if (phase === 'pre') {
+        if (!phaseCompletion.pre) {
+          return true;
+        }
+        const last = new Date(phaseCompletion.pre).getTime();
+        if (Number.isNaN(last)) {
+          return true;
+        }
+        return Date.now() - last > PRE_CHECK_COOLDOWN_MS;
+      }
+
+      if (!phaseCompletion.pre) {
+        return false;
+      }
+
+      const preTime = new Date(phaseCompletion.pre).getTime();
+      if (Number.isNaN(preTime)) {
+        return false;
+      }
+
+      if (phaseCompletion.post) {
+        return false;
+      }
+
+      return Date.now() - preTime < POST_CHECK_WINDOW_MS;
+    },
+    [phaseCompletion.post, phaseCompletion.pre, state.canDisplay],
+  );
+
+  return useMemo<UseAssessmentResult>(
+    () => ({
+      instrument,
+      state,
+      isEligible: state.canDisplay,
+      isDue,
+      start,
+      triggerAssessment,
+      submit,
+      submitResponse: submit,
+      grantConsent,
+      declineConsent,
+      reset,
+      lastLevel,
+      lastSummary,
+    }),
+    [
+      declineConsent,
+      grantConsent,
+      instrument,
+      isDue,
+      lastLevel,
+      lastSummary,
+      start,
+      state,
+      submit,
+      triggerAssessment,
+      reset,
+    ],
+  );
 };

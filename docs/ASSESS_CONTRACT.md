@@ -229,15 +229,14 @@ only counts ≥ 5 are rolled up before a flag is emitted at org level.
 - `org_id` (`uuid`) — external organisation reference.
 - `period` (`text`) — aggregation key such as `2025-W38` or `2025-09`.
 - `instrument` (`text`) — questionnaire code.
-- `n` (`int`) — participant count; constraint `org_rollups_min_n` enforces `n ≥ 5`.
+- `n` (`int`) — participant count; contrainte `org_rollups_min_n_non_negative` impose `n ≥ 0` (RLS coupe sous 5).
 - `text_summary` (`text`) — qualitative aggregation (e.g. “semaine plus posée”).
 - `flags` (`text[]`) — union of safeguarding cues already anonymised.
 - `created_at` (`timestamptz`, default `now()`).
 
 **Rules**
 - Unique per `(org_id, period, instrument)` to avoid duplicates.
-- Returns only text fields and boolean toggles; metrics below 5 participants are
-  discarded before leaving Supabase.
+- Returns only text fields; metrics sous 5 réponses sont filtrées par RLS côté base.
 - Indexes on `(org_id, period)` and `instrument` for reporting filters.
 
 ## DNT & Observability
@@ -256,7 +255,7 @@ only counts ≥ 5 are rolled up before a flag is emitted at org level.
 | `CORS_ORIGINS` | Comma-separated list of allowed origins. |
 | `SUPABASE_URL` | Supabase project URL. |
 | `SUPABASE_ANON_KEY` | Anonymous key used with end-user JWT for RLS inserts. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service role key for aggregate reads. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key reserved for batch recompute (Edge cron). |
 | `SENTRY_DSN` | Optional DSN to enable Sentry reporting. Ignored when `X-DNT: 1`. |
 | `EDGE_RATE_LIMIT_ASSESS_START` | Override for `/assess/start` rate limit. |
 | `EDGE_RATE_LIMIT_ASSESS_SUBMIT` | Override for `/assess/submit`. |

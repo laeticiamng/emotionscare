@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: B2B Aggregates API
+  version: 1.0.0
+paths:
+  /assess/aggregate:
+    post:
+      summary: Obtenir les synthèses agrégées textuelles
+      description: Retourne des résumés cliniques anonymisés pour une organisation et une période données.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_id:
+                  type: string
+                  format: uuid
+                period:
+                  type: string
+                  description: Mois (YYYY-MM) ou semaine ISO (YYYY-W##).
+                instruments:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - org_id
+                - period
+      responses:
+        '200':
+          description: Liste des synthèses textuelles par instrument.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        instrument:
+                          type: string
+                        period:
+                          type: string
+                        text:
+                          type: string
+                      required:
+                        - instrument
+                        - period
+                        - text
+        '401':
+          description: Authentification requise.
+        '403':
+          description: Organisation non autorisée ou claim manquant.
+        '422':
+          description: Corps de requête invalide.
+        '429':
+          description: Limite de taux dépassée.
+        '500':
+          description: Erreur interne.
