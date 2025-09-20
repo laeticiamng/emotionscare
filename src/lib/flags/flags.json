@@ -6,6 +6,7 @@
   "new-audio-engine": false,
   "FF_FLASH": true,
   "FF_ASSESS_SUDS": true,
+  "FF_ORCH_FLASHGLOW": true,
   "FF_B2B_REPORTS": true,
   "FF_B2B_AGGREGATES": true
 }
