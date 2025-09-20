@@ -7,6 +7,7 @@
 import React, { createContext, useContext, useReducer, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { musicOrchestrationService, type MusicOrchestrationPreset } from '@/services/music/orchestration';
 
 // ==================== TYPES ====================
 export interface MusicTrack {
@@ -43,6 +44,10 @@ interface MusicState {
   volume: number;
   currentTime: number;
   duration: number;
+
+  // Orchestration preset
+  activePreset: MusicOrchestrationPreset;
+  lastPresetChange: string | null;
   
   // Playlist
   playlist: MusicTrack[];
@@ -72,6 +77,7 @@ type MusicAction =
   | { type: 'SET_VOLUME'; payload: number }
   | { type: 'SET_CURRENT_TIME'; payload: number }
   | { type: 'SET_DURATION'; payload: number }
+  | { type: 'SET_ACTIVE_PRESET'; payload: { preset: MusicOrchestrationPreset; timestamp: string } }
   | { type: 'SET_PLAYLIST'; payload: MusicTrack[] }
   | { type: 'SET_PLAYLIST_INDEX'; payload: number }
   | { type: 'TOGGLE_SHUFFLE' }
@@ -86,6 +92,8 @@ type MusicAction =
   | { type: 'SET_ADAPTIVE_VOLUME'; payload: boolean };
 
 // ==================== REDUCER ====================
+const initialPreset = musicOrchestrationService.getActivePreset();
+
 const initialState: MusicState = {
   currentTrack: null,
   isPlaying: false,
@@ -93,6 +101,8 @@ const initialState: MusicState = {
   volume: 0.7,
   currentTime: 0,
   duration: 0,
+  activePreset: initialPreset,
+  lastPresetChange: null,
   playlist: [],
   currentPlaylistIndex: 0,
   shuffleMode: false,
@@ -121,6 +131,12 @@ const musicReducer = (state: MusicState, action: MusicAction): MusicState => {
       return { ...state, currentTime: action.payload };
     case 'SET_DURATION':
       return { ...state, duration: action.payload };
+    case 'SET_ACTIVE_PRESET':
+      return {
+        ...state,
+        activePreset: action.payload.preset,
+        lastPresetChange: action.payload.timestamp,
+      };
     case 'SET_PLAYLIST':
       return { ...state, playlist: action.payload, currentPlaylistIndex: 0 };
     case 'SET_PLAYLIST_INDEX':
@@ -204,6 +220,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [state, dispatch] = useReducer(musicReducer, initialState);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeUpdateIntervalRef = useRef<number>();
+  const crossfadeFrameRef = useRef<number>();
+  const isPlayingRef = useRef(initialState.isPlaying);
 
   // ==================== AUDIO SETUP ====================
   useEffect(() => {
@@ -249,6 +267,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       audio.pause();
     };
   }, []);
+
+  useEffect(() => {
+    isPlayingRef.current = state.isPlaying;
+  }, [state.isPlaying]);
 
   // ==================== PLAYBACK CONTROLS ====================
   const play = useCallback(async (track?: MusicTrack) => {
@@ -338,6 +360,123 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       dispatch({ type: 'SET_VOLUME', payload: clampedVolume });
     }
   }, []);
+
+  const applyPresetProfile = useCallback(
+    (preset: MusicOrchestrationPreset, options?: { immediate?: boolean }) => {
+      const timestamp = new Date().toISOString();
+      dispatch({ type: 'SET_ACTIVE_PRESET', payload: { preset, timestamp } });
+
+      const audio = audioRef.current;
+      const clampedVolume = Math.max(0, Math.min(1, preset.volume));
+
+      if (!audio) {
+        dispatch({ type: 'SET_VOLUME', payload: clampedVolume });
+        return;
+      }
+
+      audio.playbackRate = preset.playbackRate;
+
+      try {
+        (audio as any).preservesPitch = true;
+        (audio as any).mozPreservesPitch = true;
+      } catch (_) {
+        // Ignore unsupported properties
+      }
+
+      const shouldFade = isPlayingRef.current && !options?.immediate && preset.crossfadeMs > 0;
+
+      if (!shouldFade) {
+        setVolume(clampedVolume);
+        return;
+      }
+
+      if (typeof window === 'undefined' || typeof window.requestAnimationFrame === 'undefined') {
+        setVolume(clampedVolume);
+        return;
+      }
+
+      if (crossfadeFrameRef.current) {
+        window.cancelAnimationFrame(crossfadeFrameRef.current);
+        crossfadeFrameRef.current = undefined;
+      }
+
+      const startVolume = audio.volume;
+      const startTime = window.performance?.now?.() ?? Date.now();
+      const duration = preset.crossfadeMs;
+
+      const step = (time: number) => {
+        const now = time ?? (window.performance?.now?.() ?? Date.now());
+        const progress = Math.min(1, (now - startTime) / duration);
+        const interpolated = startVolume + (clampedVolume - startVolume) * progress;
+        audio.volume = Math.max(0, Math.min(1, interpolated));
+
+        if (progress < 1) {
+          crossfadeFrameRef.current = window.requestAnimationFrame(step);
+        } else {
+          crossfadeFrameRef.current = undefined;
+          setVolume(clampedVolume);
+        }
+      };
+
+      crossfadeFrameRef.current = window.requestAnimationFrame(step);
+    },
+    [dispatch, setVolume]
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const resumePreset = musicOrchestrationService.getActivePreset();
+      applyPresetProfile(resumePreset, { immediate: true });
+
+      const evaluation = await musicOrchestrationService.refreshFromClinicalSignals();
+      if (!mounted) return;
+
+      applyPresetProfile(evaluation.preset, { immediate: !evaluation.changed });
+    };
+
+    bootstrap().catch(error => {
+      console.error('Failed to initialize music orchestration preset:', error);
+    });
+
+    const handleMoodUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<{ valence?: number; arousal?: number; timestamp?: string }>;
+      if (!customEvent.detail) return;
+
+      const { valence, arousal, timestamp } = customEvent.detail;
+      const parsedValence = Number(valence);
+      const parsedArousal = Number(arousal);
+      const safeValence = Number.isFinite(parsedValence)
+        ? Math.max(0, Math.min(100, parsedValence))
+        : 50;
+      const safeArousal = Number.isFinite(parsedArousal)
+        ? Math.max(0, Math.min(100, parsedArousal))
+        : 50;
+      const evaluation = musicOrchestrationService.handleMoodUpdate({
+        valence: safeValence,
+        arousal: safeArousal,
+        timestamp: timestamp || new Date().toISOString(),
+      });
+
+      applyPresetProfile(evaluation.preset, { immediate: !evaluation.changed });
+    };
+
+    window.addEventListener('mood.updated', handleMoodUpdate as EventListener);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener('mood.updated', handleMoodUpdate as EventListener);
+      if (crossfadeFrameRef.current) {
+        window.cancelAnimationFrame(crossfadeFrameRef.current);
+        crossfadeFrameRef.current = undefined;
+      }
+    };
+  }, [applyPresetProfile]);
 
   // ==================== PLAYLIST MANAGEMENT ====================
   const setPlaylist = useCallback((tracks: MusicTrack[]) => {
