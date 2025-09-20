@@ -242,20 +242,28 @@ export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHoo
 
     // Store orchestration signals in database (invisible to UI)
     if (actions.length > 0) {
-      const { error } = await supabase
-        .from('clinical_signals')
-        .insert({
-          source_instrument: instrument,
-          domain: instrument === 'WHO5' ? 'wellbeing' : instrument === 'STAI6' ? 'anxiety' : 'affect',
-          level: actions.includes('increase_support') ? 1 : actions.includes('gentle_tone') ? 2 : 3,
-          window_type: 'contextual',
-          module_context: 'assessment_response',
-          metadata: { actions },
-          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h
-        });
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error('Error retrieving user for orchestration signal:', userError);
+      }
 
-      if (error) {
-        console.error('Error storing orchestration signals:', error);
+      const userId = userData?.user?.id;
+      if (userId) {
+        const { error } = await supabase
+          .from('clinical_signals')
+          .insert({
+            user_id: userId,
+            source_instrument: instrument,
+            domain: instrument === 'WHO5' ? 'wellbeing' : instrument === 'STAI6' ? 'anxiety' : 'affect',
+            level: actions.includes('increase_support') ? 1 : actions.includes('gentle_tone') ? 2 : 3,
+            module_context: 'assessment_response',
+            metadata: { actions },
+            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h
+          });
+
+        if (error) {
+          console.error('Error storing orchestration signals:', error);
+        }
       }
     }
 
