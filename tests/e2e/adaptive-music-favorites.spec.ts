@@ -195,6 +195,62 @@ test.describe('Adaptive Music favorites and resume', () => {
     expect(storedFavorites.some((entry: any) => entry?.trackId === 'track-relaxed-01')).toBeTruthy();
   });
 
+  test('records pre and post POMS check-ins to adapt the preset', async ({ page }) => {
+    await page.route('**/rest/v1/clinical_consents**', async (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+        return;
+      }
+      if (method === 'POST' || method === 'PATCH') {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ id: 'consent-poms' }]) });
+        return;
+      }
+      await route.continue();
+    });
+
+    await page.route('**/functions/v1/assess-start', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          instrument: 'POMS',
+          locale: 'fr',
+          name: 'POMS-SF',
+          version: '1.0',
+          expiry_minutes: 10,
+          items: [
+            { id: '1', prompt: 'Tension', type: 'scale', min: 1, max: 4 },
+          ],
+        }),
+      });
+    });
+
+    await page.route('**/functions/v1/assess-submit', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    });
+
+    await page.goto('/app/music');
+
+    await expect(page.getByRole('heading', { name: /Adaptive Music/i })).toBeVisible({ timeout: 20_000 });
+
+    await page.getByRole('button', { name: /Oui, allons-y/i }).click();
+    await expect(page.getByText(/Ton ressenti de départ est bien pris en compte/i)).not.toBeVisible();
+
+    await page.getByLabel('Encore un peu de tension', { exact: false }).check();
+    await page.getByLabel('Présence constante', { exact: false }).check();
+    await page.getByRole('button', { name: /Enregistrer ce ressenti/i }).first().click();
+
+    await expect(page.getByText(/Ton ressenti de départ est bien pris en compte/i)).toBeVisible();
+
+    await page.getByLabel('Épaules très souples', { exact: false }).check();
+    await page.getByLabel('Besoin de repos', { exact: false }).check();
+    await page.getByRole('button', { name: /Enregistrer ce ressenti/i }).last().click();
+
+    await expect(page.getByText(/Une légère fatigue s'installe/i)).toBeVisible();
+    await expect(page.getByText(/Encore 2 min/i)).toBeVisible();
+  });
+
   test('allows declining the POMS opt-in', async ({ page }) => {
     await page.goto('/app/music');
 
