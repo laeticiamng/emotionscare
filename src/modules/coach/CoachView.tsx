@@ -10,6 +10,7 @@ import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 import { useFlags } from '@/core/flags';
 import { useAssessment, type AssessmentCatalog } from '@/hooks/useAssessment';
 import { useToast } from '@/hooks/use-toast';
+import { useClinicalHints } from '@/hooks/useClinicalHints';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,6 +131,8 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   const controllerRef = useRef<AbortController | null>(null);
   const featureAaqEnabled = flags.FF_ASSESS_AAQ2 !== false;
   const isRigidityHigh = aaqFlexHint === 'rigide';
+  const clinicalHints = useClinicalHints();
+  const nyveeHints = clinicalHints.moduleCues.nyvee;
 
   useEffect(() => {
     const consentFlag = typeof window !== 'undefined' ? window.localStorage.getItem(CONSENT_STORAGE_KEY) : null;
@@ -272,6 +275,16 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       },
     ];
 
+    if (nyveeHints?.autoGrounding && !cards.some(card => card.id === 'grounding')) {
+      cards.unshift({
+        id: 'grounding',
+        title: nyveeHints.groundingLabel,
+        description: 'Prochaine session : repère 5 sensations, 4 éléments à toucher, 3 sons, 2 parfums, 1 mot apaisant.',
+        to: '/app/breath',
+        tone: 'highlight',
+      });
+    }
+
     if (isRigidityHigh || aaqFlexHint === 'transition') {
       cards.push({
         id: 'centrage',
@@ -283,7 +296,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     }
 
     return cards;
-  }, [aaqFlexHint, isRigidityHigh]);
+  }, [aaqFlexHint, isRigidityHigh, nyveeHints?.autoGrounding, nyveeHints?.groundingLabel]);
 
   const handleAnswerChange = useCallback((itemId: string, value: string) => {
     setAaqAnswers(prev => ({ ...prev, [itemId]: value }));

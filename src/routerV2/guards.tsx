@@ -160,6 +160,9 @@ function normalizeRole(role?: string | null): Role {
       return 'employee';
     case 'b2b_admin':
     case 'manager':
+    case 'org_admin':
+    case 'org_owner':
+    case 'owner':
       return 'manager';
     default:
       return 'consumer';

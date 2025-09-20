@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import type { EmotionResult } from '@/types/emotion';
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
 import { useClinicalConsent } from '@/hooks/useClinicalConsent';
+import { useClinicalHints } from '@/hooks/useClinicalHints';
 
 const B2CScanPage: React.FC = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
@@ -23,6 +24,54 @@ const B2CScanPage: React.FC = () => {
   const { state: musicState, generateEmotionPlaylist } = useMusic();
   const { toast } = useToast();
   const samConsent = useClinicalConsent('SAM');
+  const clinicalHints = useClinicalHints();
+  const scanHints = clinicalHints.moduleCues.scan;
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const lastDispatchKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setPrefersReducedMotion(media.matches);
+    update();
+
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!scanHints?.shouldDispatchMood) {
+      return;
+    }
+
+    const key = `${scanHints.microGesture}-${scanHints.intensity}-${scanHints.tone}`;
+    if (lastDispatchKey.current === key) {
+      return;
+    }
+    lastDispatchKey.current = key;
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('mood.updated', {
+          detail: {
+            tone: scanHints.tone,
+            intensity: scanHints.intensity,
+            cue: scanHints.microGesture,
+          },
+        }),
+      );
+    }
+
+    if (scanHints.microGesture === 'long_exhale') {
+      toast({
+        title: 'Expiration longue',
+        description: 'Prolonge doucement l’expiration, les épaules relâchées.',
+      });
+    }
+  }, [scanHints, toast]);
 
   const handleEmotionDetected = async (result: EmotionResult) => {
     setScanHistory(prev => [result, ...prev.slice(0, 9)]);
@@ -59,7 +108,7 @@ const B2CScanPage: React.FC = () => {
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="relative">
                 <Brain className="h-12 w-12 text-primary" />
-                <div className="absolute -inset-2 rounded-full bg-primary/20 animate-pulse" />
+                <div className={`absolute -inset-2 rounded-full bg-primary/20 ${prefersReducedMotion ? '' : 'animate-pulse'}`} />
               </div>
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
@@ -68,6 +117,11 @@ const B2CScanPage: React.FC = () => {
                 <p className="text-lg text-muted-foreground mt-2">
                   Analysez vos émotions en temps réel avec l'intelligence artificielle avancée
                 </p>
+                {scanHints && (
+                  <p className="text-sm text-muted-foreground mt-2" aria-live="polite">
+                    {scanHints.microGestureLabel}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center gap-2">

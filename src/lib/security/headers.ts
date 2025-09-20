@@ -3,6 +3,23 @@
  * Security headers management
  */
 
+export const APP_BASE_CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' https://rsms.me https://fonts.gstatic.com data:",
+  "style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com",
+  "script-src 'self' https://cdn.gpteng.co",
+  "connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.emotionscare.com https://api.openai.com https://cdn.gpteng.co https://api.hume.ai https://*.sentry.io https://*.ingest.sentry.io wss://*.supabase.co wss://*.supabase.in",
+  "media-src 'self' blob: https://*.supabase.co https://storage.googleapis.com",
+  "frame-src 'self'",
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "object-src 'none'",
+].join('; ');
+
 export const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
@@ -17,7 +34,8 @@ export const SECURITY_HEADERS = {
   'Cross-Origin-Embedder-Policy': 'credentialless',
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Resource-Policy': 'same-site',
-  'X-Robots-Tag': 'noindex'
+  'X-Robots-Tag': 'noindex',
+  'Content-Security-Policy': APP_BASE_CSP,
 };
 
 /**
@@ -52,11 +70,14 @@ export const applySecurityMeta = (): void => {
   if (typeof document === 'undefined') return;
 
   // Remove existing security meta tags
-  const existingMetas = document.querySelectorAll('meta[name^="security-"], meta[http-equiv^="X-"]');
+  const existingMetas = document.querySelectorAll(
+    'meta[name^="security-"], meta[http-equiv^="X-"], meta[http-equiv="Content-Security-Policy"]',
+  );
   existingMetas.forEach(meta => meta.remove());
 
   // Add security meta tags
   const metas = [
+    { httpEquiv: 'Content-Security-Policy', content: APP_BASE_CSP },
     { httpEquiv: 'X-Content-Type-Options', content: 'nosniff' },
     { httpEquiv: 'X-Frame-Options', content: 'DENY' },
     { httpEquiv: 'X-XSS-Protection', content: '1; mode=block' },

@@ -171,6 +171,24 @@ const sanitizeString = (value: string) => {
   return `${cleaned.slice(0, 70)}…${cleaned.slice(-16)}`;
 };
 
+const sanitizeUrlSearchParams = (params: URLSearchParams): Record<string, string> => {
+  const sanitized: Record<string, string> = {};
+  params.forEach((value, key) => {
+    if (isPiiKey(key)) {
+      sanitized[key] = '[redacted]';
+      return;
+    }
+
+    if (containsSensitiveString(value)) {
+      sanitized[key] = '[scrubbed]';
+      return;
+    }
+
+    sanitized[key] = sanitizeString(value);
+  });
+  return sanitized;
+};
+
 const sanitizeData = (input: unknown, depth = 0): unknown => {
   if (input == null) {
     return input;
@@ -182,6 +200,10 @@ const sanitizeData = (input: unknown, depth = 0): unknown => {
 
   if (Array.isArray(input)) {
     return input.slice(0, 5).map(item => sanitizeData(item, depth + 1));
+  }
+
+  if (typeof URLSearchParams !== 'undefined' && input instanceof URLSearchParams) {
+    return sanitizeUrlSearchParams(input);
   }
 
   if (input instanceof Date) {
@@ -198,8 +220,12 @@ const sanitizeData = (input: unknown, depth = 0): unknown => {
         return [key, '[redacted]'];
       }
 
+      if (sensitiveKeyPattern.test(key)) {
+        return [key, '[scrubbed]'];
+      }
+
       if (typeof value === 'string') {
-        if (sensitiveKeyPattern.test(key) || sensitiveKeyPattern.test(value)) {
+        if (sensitiveKeyPattern.test(value)) {
           return [key, '[scrubbed]'];
         }
         return [key, sanitizeString(value)];
@@ -238,6 +264,19 @@ const containsSensitiveValue = (value: unknown, depth = 0): boolean => {
     return value.some(item => containsSensitiveValue(item, depth + 1));
   }
 
+  if (typeof URLSearchParams !== 'undefined' && value instanceof URLSearchParams) {
+    let sensitive = false;
+    value.forEach((entryValue, entryKey) => {
+      if (sensitive) {
+        return;
+      }
+      if (isPiiKey(entryKey) || containsSensitiveString(entryValue)) {
+        sensitive = true;
+      }
+    });
+    return sensitive;
+  }
+
   if (typeof value === 'object') {
     if (depth > 3) {
       return false;
@@ -245,6 +284,9 @@ const containsSensitiveValue = (value: unknown, depth = 0): boolean => {
 
     return Object.entries(value as Record<string, unknown>).some(([key, nested]) => {
       if (isPiiKey(key) || isUserIdentifierKey(key)) {
+        if (typeof nested === 'string' && (nested.startsWith('[redacted') || nested.startsWith('[scrubbed'))) {
+          return false;
+        }
         return true;
       }
       return containsSensitiveValue(nested, depth + 1);
@@ -298,6 +340,16 @@ const resolveDoNotTrackPreference = (): boolean => {
   }
 
   return false;
+};
+
+const markDoNotTrackPreference = (): void => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('data-dnt', doNotTrackEnabled ? 'true' : 'false');
+  }
+
+  if (typeof window !== 'undefined') {
+    (window as Record<string, unknown>).__EMOTIONSCARE_DNT__ = doNotTrackEnabled;
+  }
 };
 
 const recordWebVital = (name: WebVitalName, value: number, extra: Record<string, unknown>): void => {
@@ -387,12 +439,20 @@ const sanitizeEvent = (event: SentryEvent): SentryEvent | null => {
     ...event.tags,
     pii_scrubbed: 'true',
     dnt: doNotTrackEnabled ? 'true' : 'false',
+    telemetry_disabled: doNotTrackEnabled ? 'true' : 'false',
   };
 
   return event;
 };
 
 const hasSentryClient = () => Boolean(Sentry.getCurrentHub().getClient());
+
+export const SENTRY_PRIVACY_GUARDS = {
+  sanitizeEvent,
+  sanitizeBreadcrumb,
+  sanitizeData,
+  containsSensitiveValue,
+};
 
 export function initializeSentry(): void {
   if (sentryInitialized || typeof window === 'undefined') {
@@ -420,6 +480,7 @@ export function initializeSentry(): void {
     : 0;
 
   doNotTrackEnabled = resolveDoNotTrackPreference();
+  markDoNotTrackPreference();
 
   const tracesSampleRate = doNotTrackEnabled ? 0 : baseTracesSampleRate;
   const replaysSessionSampleRate = doNotTrackEnabled ? 0 : baseReplaysSessionSampleRate;
@@ -458,6 +519,9 @@ export function initializeSentry(): void {
     tracesSampleRate,
     replaysSessionSampleRate,
     replaysOnErrorSampleRate,
+    sendDefaultPii: false,
+    autoSessionTracking: !doNotTrackEnabled,
+    enableTracing: tracesSampleRate > 0,
     beforeSend(event) {
       return sanitizeEvent(event);
     },
