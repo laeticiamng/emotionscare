@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { bossGritOrchestrator } from '@/features/orchestration/bossGrit.orchestrator';
 
 const SHORT_DURATION_MS = 180_000;
@@ -67,32 +69,33 @@ export default function BossGritPage(): JSX.Element {
     if (!gritAssessment.isEligible || !brsAssessment.isEligible) {
       return;
     }
-    if (typeof gritLevel !== 'number' || typeof brsLevel !== 'number') {
-      return;
-    }
 
-    const actions = bossGritOrchestrator({ gritLevel, brsLevel });
+    const actions = bossGritOrchestrator({
+      gritLevel: typeof gritLevel === 'number' ? gritLevel : undefined,
+      brsLevel: typeof brsLevel === 'number' ? brsLevel : undefined,
+    });
     const durationAction = actions.find((action) => action.action === 'set_challenge_duration');
     const compassionAction = actions.find((action) => action.action === 'enable_compassion_streak');
 
+    const resolvedDuration =
+      durationAction && 'ms' in durationAction ? durationAction.ms : LONG_DURATION_MS;
+    const durationLabel = resolvedDuration === SHORT_DURATION_MS ? 'short' : 'long';
+    const breadcrumbMessage = durationLabel === 'short' ? 'orch:grit:short' : 'orch:grit:steady';
+    const compassionEnabled =
+      compassionAction && 'enabled' in compassionAction ? Boolean(compassionAction.enabled) : true;
+
     Sentry.addBreadcrumb({
       category: 'orch',
-      message: 'orch:grit:apply',
+      message: breadcrumbMessage,
       level: 'info',
       data: {
-        duration: durationAction && 'ms' in durationAction && durationAction.ms === SHORT_DURATION_MS ? 'short' : 'long',
-        compassion_streak: compassionAction && 'enabled' in compassionAction ? compassionAction.enabled : false,
+        duration: durationLabel,
+        compassion: compassionEnabled,
       },
     });
 
-    if (durationAction && 'ms' in durationAction) {
-      setChallengeDuration(durationAction.ms);
-    }
-
-    if (compassionAction && 'enabled' in compassionAction) {
-      setCompassionStreakEnabled(Boolean(compassionAction.enabled));
-    }
-
+    setChallengeDuration(resolvedDuration);
+    setCompassionStreakEnabled(compassionEnabled);
     setSessionState('idle');
     setSessionSaved(false);
     setSaveError(null);
@@ -134,8 +137,8 @@ export default function BossGritPage(): JSX.Element {
         duration_sec: durationSeconds,
         meta: {
           module: 'grit',
-          duration_label: durationKey,
-          compassion_streak: compassionStreakEnabled ? 'active' : 'inactive',
+          duration: durationKey,
+          compassion: compassionStreakEnabled,
         },
       });
       setSessionState('completed');
@@ -150,8 +153,31 @@ export default function BossGritPage(): JSX.Element {
 
   const canDisplay = gritAssessment.isEligible && brsAssessment.isEligible;
 
-  return (
-    <main className="min-h-screen bg-muted/20 px-4 py-10">
+  const consentFallback = (
+    <main className="px-4 py-10">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <header className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">Boss Grit</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Défi de résilience bienveillant</h1>
+          <p className="text-base text-muted-foreground">
+            Accepte le suivi clinique doux pour débloquer les défis ajustés à ta constance du moment.
+          </p>
+        </header>
+
+        <Card role="region" aria-label="Consentement Boss Grit">
+          <CardHeader>
+            <CardTitle>Activer Boss Grit</CardTitle>
+            <CardDescription>
+              Ton opt-in clinique permet d’ajuster la durée et la douceur des défis, sans jamais dévoiler de scores.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    </main>
+  );
+
+  const pageContent = (
+    <main className="px-4 py-10">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <header className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Boss Grit</p>
@@ -226,5 +252,11 @@ export default function BossGritPage(): JSX.Element {
         )}
       </div>
     </main>
+  );
+
+  return (
+    <ZeroNumberBoundary className="min-h-screen bg-muted/20">
+      <ConsentGate fallback={consentFallback}>{pageContent}</ConsentGate>
+    </ZeroNumberBoundary>
   );
 }

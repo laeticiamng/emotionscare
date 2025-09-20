@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import dayjs from 'dayjs';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
@@ -144,7 +143,7 @@ export interface UseAssessmentResult {
   instrument: InstrumentCode;
   state: AssessmentState;
   isEligible: boolean;
-  isDue: (phase: AssessmentPhase) => boolean;
+  isDue: (phase: AssessmentPhase, options?: { module?: string }) => boolean;
   start: (locale?: LocaleCode) => Promise<InstrumentCatalog | undefined>;
   triggerAssessment: (instrumentOverride?: InstrumentCode, callbacks?: AssessmentCallbacks) => Promise<boolean>;
   submit: (
@@ -159,7 +158,6 @@ export interface UseAssessmentResult {
   declineConsent: () => Promise<void>;
   reset: () => void;
   lastSubscaleLevel: (subscale: 'tension' | 'fatigue' | 'vigor') => number | undefined;
-  isDue: (phase: 'pre' | 'post', options?: { module?: string }) => boolean;
   lastLevel: number | null;
   lastSummary: string | null;
 }
@@ -477,49 +475,6 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
         return false;
       }
 
-      const lastCompletedAt = state.lastCompletedAt;
-      if (!lastCompletedAt) {
-        return true;
-      }
-
-      const last = dayjs(lastCompletedAt);
-      if (!last.isValid()) {
-        return true;
-      }
-
-      if (phase === 'pre') {
-        return dayjs().diff(last, 'hour', true) >= 6;
-      }
-
-      if (phase === 'post') {
-        return dayjs().diff(last, 'minute', true) >= 30;
-      }
-
-      return false;
-    },
-    [state.canDisplay, state.hasConsent, state.isFlagEnabled, state.lastCompletedAt],
-  );
-
-  return useMemo<UseAssessmentResult>(() => ({
-    instrument,
-    state,
-    isEligible: state.canDisplay,
-    start,
-    triggerAssessment,
-    submit,
-    submitResponse: submit,
-    grantConsent,
-    declineConsent,
-    reset,
-    lastSubscaleLevel,
-    isDue,
-  }), [declineConsent, grantConsent, instrument, start, state, submit, triggerAssessment, reset, lastSubscaleLevel, isDue]);
-  const isDue = useCallback(
-    (phase: AssessmentPhase) => {
-      if (!state.canDisplay) {
-        return false;
-      }
-
       if (phase === 'pre') {
         if (!phaseCompletion.pre) {
           return true;
@@ -532,7 +487,17 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
       }
 
       if (!phaseCompletion.pre) {
-        return false;
+        const lastCompletedAt = state.lastCompletedAt;
+        if (!lastCompletedAt) {
+          return true;
+        }
+
+        const last = new Date(lastCompletedAt).getTime();
+        if (Number.isNaN(last)) {
+          return true;
+        }
+
+        return Date.now() - last >= 30 * 60 * 1000;
       }
 
       const preTime = new Date(phaseCompletion.pre).getTime();
@@ -546,7 +511,14 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
 
       return Date.now() - preTime < POST_CHECK_WINDOW_MS;
     },
-    [phaseCompletion.post, phaseCompletion.pre, state.canDisplay],
+    [
+      phaseCompletion.post,
+      phaseCompletion.pre,
+      state.canDisplay,
+      state.hasConsent,
+      state.isFlagEnabled,
+      state.lastCompletedAt,
+    ],
   );
 
   return useMemo<UseAssessmentResult>(
@@ -562,6 +534,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
       grantConsent,
       declineConsent,
       reset,
+      lastSubscaleLevel,
       lastLevel,
       lastSummary,
     }),
@@ -571,6 +544,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
       instrument,
       isDue,
       lastLevel,
+      lastSubscaleLevel,
       lastSummary,
       start,
       state,

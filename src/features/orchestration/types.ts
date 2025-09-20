@@ -1,16 +1,21 @@
+export type AuraKey = 'cool_gentle' | 'neutral' | 'warm_soft';
+
 export type TextProgressKey = 'doucement' | 'sur la bonne voie' | 'presque là';
 
-export interface SetTextProgressAction {
-  action: 'set_text_progress';
+export interface SetAuraAction {
+  action: 'set_aura';
+  key: AuraKey;
+}
+
+export interface SetProgressTextAction {
+  action: 'set_progress_text';
   key: TextProgressKey;
 }
 
 export interface InjectMicroLeversAction {
   action: 'inject_micro_levers';
-  items: string[];
+  items: readonly string[];
 }
-
-export type AmbitionOrchestrationAction = SetTextProgressAction | InjectMicroLeversAction;
 
 export interface SetChallengeDurationAction {
   action: 'set_challenge_duration';
@@ -22,9 +27,7 @@ export interface EnableCompassionStreakAction {
   enabled: boolean;
 }
 
-export type BossGritOrchestrationAction = SetChallengeDurationAction | EnableCompassionStreakAction;
-
-export type PathVariantKey = 'hr' | 'default';
+export type PathVariantKey = 'default' | 'hr';
 
 export interface SetPathVariantAction {
   action: 'set_path_variant';
@@ -36,6 +39,19 @@ export interface SetPathDurationAction {
   ms: number;
 }
 
+export interface PostCtaAction {
+  action: 'post_cta';
+  key: 'nyvee' | 'flash_glow';
+}
+
+export type AmbitionOrchestrationAction = SetProgressTextAction | InjectMicroLeversAction;
+
+export type BossGritOrchestrationAction = SetChallengeDurationAction | EnableCompassionStreakAction;
+
+export type BubbleBeatOrchestrationAction =
+  | SetPathVariantAction
+  | SetPathDurationAction
+  | PostCtaAction;
 export type PostCtaAction =
   | { action: 'post_cta'; key: 'nyvee_suggest' }
   | { action: 'post_cta'; key: 'screen_silk' }
@@ -43,18 +59,21 @@ export type PostCtaAction =
 
 export type BubbleBeatOrchestrationAction = SetPathVariantAction | SetPathDurationAction | PostCtaAction;
 
+export type AurasOrchestrationAction = SetAuraAction;
+
 export interface AmbitionOrchestratorInput {
-  gasLevel: number;
+  gasLevel?: number;
 }
 
 export interface BossGritOrchestratorInput {
-  gritLevel: number;
-  brsLevel: number;
+  gritLevel?: number;
+  brsLevel?: number;
 }
 
 export interface BubbleBeatOrchestratorInput {
-  pss10Level: number;
+  pssLevel?: number;
 }
+
 export type AssessmentLevel = 0 | 1 | 2 | 3 | 4;
 
 export interface SetStoryBedAction {
@@ -99,6 +118,13 @@ export type UIHint =
   | { action: 'promote_cta'; key: 'schedule_break' }
   | { action: 'highlight_rooms_private' }
   | { action: 'none' }
+  | SetAuraAction
+  | SetProgressTextAction
+  | InjectMicroLeversAction
+  | SetChallengeDurationAction
+  | EnableCompassionStreakAction
+  | SetPathVariantAction
+  | SetPathDurationAction
   | { action: 'set_aura'; key: 'cool_gentle' | 'neutral' | 'warm_soft' }
   | SetStoryBedAction
   | SetStoryVoiceAction
@@ -124,7 +150,7 @@ export interface AurasLevels {
   who5Level?: number;
 }
 
-export type Orchestrator<TInput> = (input: TInput) => UIHint[];
+export type Orchestrator<TInput, THint extends UIHint = UIHint> = (input: TInput) => THint[];
 
 export const serializeHints = (hints: UIHint[]): string[] =>
   hints.map((hint) => {

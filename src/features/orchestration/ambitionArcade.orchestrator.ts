@@ -2,11 +2,27 @@ import type { AmbitionOrchestrationAction, AmbitionOrchestratorInput, TextProgre
 
 const MICRO_LEVERS = ['1 geste simple', '2 minutes de marche', 'respirer 1 minute'] as const;
 
-export function ambitionOrchestrator({ gasLevel }: AmbitionOrchestratorInput): AmbitionOrchestrationAction[] {
-  const label: TextProgressKey = gasLevel <= 1 ? 'doucement' : gasLevel >= 3 ? 'presque là' : 'sur la bonne voie';
+const resolveProgressLabel = (gasLevel: number | undefined): TextProgressKey => {
+  if (typeof gasLevel !== 'number') {
+    return 'sur la bonne voie';
+  }
+
+  if (gasLevel <= 1) {
+    return 'doucement';
+  }
+
+  if (gasLevel >= 3) {
+    return 'presque là';
+  }
+
+  return 'sur la bonne voie';
+};
+
+export function ambitionArcadeOrchestrator({ gasLevel }: AmbitionOrchestratorInput): AmbitionOrchestrationAction[] {
+  const label = resolveProgressLabel(gasLevel);
 
   return [
-    { action: 'set_text_progress', key: label },
+    { action: 'set_progress_text', key: label },
     { action: 'inject_micro_levers', items: [...MICRO_LEVERS] },
   ];
 }

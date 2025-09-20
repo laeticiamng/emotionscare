@@ -3,8 +3,10 @@ import type { BossGritOrchestrationAction, BossGritOrchestratorInput } from './t
 const SHORT_DURATION_MS = 180_000;
 const STANDARD_DURATION_MS = 600_000;
 
+const resolveLevel = (value: number | undefined) => (typeof value === 'number' ? value : 2);
+
 export function bossGritOrchestrator({ gritLevel, brsLevel }: BossGritOrchestratorInput): BossGritOrchestrationAction[] {
-  const short = gritLevel <= 1 || brsLevel <= 1;
+  const short = resolveLevel(gritLevel) <= 1 || resolveLevel(brsLevel) <= 1;
 
   return [
     { action: 'set_challenge_duration', ms: short ? SHORT_DURATION_MS : STANDARD_DURATION_MS },
