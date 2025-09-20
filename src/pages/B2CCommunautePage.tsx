@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { useReducedMotion } from 'framer-motion';
@@ -11,6 +11,7 @@ import {
   Users,
 } from 'lucide-react';
 
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import PageSEO from '@/components/seo/PageSEO';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
+import { computeCommunityUIHints, serializeHints } from '@/features/orchestration';
+import { createSession } from '@/services/sessions/sessionsApi';
 
 const BANNER_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
 const STORAGE_KEYS = {
@@ -86,14 +89,6 @@ type ReportDraft = {
   postId: string | null;
   reason: (typeof REPORT_REASONS)[number]['id'];
   message: string;
-};
-
-type AssessmentNudge = {
-  type: 'ucla' | 'mspss';
-  title: string;
-  description: string;
-  cta?: string;
-  summary?: string;
 };
 
 const nowTimestamp = () => new Date().toLocaleTimeString('fr-FR', {
@@ -177,34 +172,11 @@ const detectSensitiveTerm = (message: string) => {
   return null;
 };
 
-const buildUCLANudge = (level?: number, summary?: string): AssessmentNudge | null => {
-  if (level === undefined) return null;
-  if (level < 3) return null;
-  return {
-    type: 'ucla',
-    title: 'Envie d’une écoute douce ? 💛',
-    description: "On peut rejoindre un espace vocal calme pour se sentir entouré·e, même quelques minutes.",
-    cta: 'Écoute 2 min ?',
-    summary,
-  };
-};
-
-const buildMSPSSNudge = (level?: number, summary?: string): AssessmentNudge | null => {
-  if (level === undefined) return null;
-  if (level > 1) return null;
-  return {
-    type: 'mspss',
-    title: 'Des mots tout prêts pour soutenir',
-    description: "Quand le soutien paraît plus discret, proposer un message empathique peut réchauffer l’espace.",
-    summary,
-  };
-};
-
 const B2CCommunautePage: React.FC = () => {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const { toast } = useToast();
-  const { flags } = useFlags();
+  const { has } = useFlags();
 
   const [posts, setPosts] = useState<CommunityPost[]>(initialPosts);
   const [activeReplyPost, setActiveReplyPost] = useState<string | null>(null);
@@ -213,53 +185,146 @@ const B2CCommunautePage: React.FC = () => {
   const [reportDraft, setReportDraft] = useState<ReportDraft>({ postId: null, reason: REPORT_REASONS[0].id, message: '' });
   const [showSocialConfirm, setShowSocialConfirm] = useState(false);
 
-  const communityEnabled = flags.FF_COMMUNITY;
+  const communityEnabled = has('FF_COMMUNITY');
+  const orchestratorEnabled = has('FF_ORCH_COMMUNITY');
+  const uclaInstrumentEnabled = has('FF_ASSESS_UCLA3');
+  const mspssInstrumentEnabled = has('FF_ASSESS_MSPSS');
 
   const uclaAssessment = useAssessment('UCLA3');
   const mspAssessment = useAssessment('MSPSS');
 
   const { data: uclaHistory } = useAssessmentHistory('UCLA3', {
     limit: 1,
-    enabled: communityEnabled && uclaAssessment.state.canDisplay,
+    enabled: communityEnabled && uclaInstrumentEnabled && uclaAssessment.state.canDisplay,
   });
   const { data: mspssHistory } = useAssessmentHistory('MSPSS', {
     limit: 1,
-    enabled: communityEnabled && mspAssessment.state.canDisplay,
+    enabled: communityEnabled && mspssInstrumentEnabled && mspAssessment.state.canDisplay,
   });
 
   const latestUCLA = uclaHistory?.[0];
   const latestMSPSS = mspssHistory?.[0];
 
   const uclaCooldown = useBannerCooldown('UCLA3');
-  const mspssCooldown = useBannerCooldown('MSPSS');
 
-  const uclaNudge = useMemo(() => {
-    if (!uclaAssessment.state.canDisplay || uclaCooldown.isCoolingDown) return null;
-    return buildUCLANudge(latestUCLA?.level, latestUCLA?.summary);
-  }, [uclaAssessment.state.canDisplay, uclaCooldown.isCoolingDown, latestUCLA]);
+  const resolvedUclaLevel = orchestratorEnabled && uclaInstrumentEnabled
+    ? latestUCLA?.level ?? uclaAssessment.state.lastComputation?.level
+    : undefined;
+  const resolvedMspssLevel = orchestratorEnabled && mspssInstrumentEnabled
+    ? latestMSPSS?.level ?? mspAssessment.state.lastComputation?.level
+    : undefined;
 
-  const mspssNudge = useMemo(() => {
-    if (!mspAssessment.state.canDisplay || mspssCooldown.isCoolingDown) return null;
-    return buildMSPSSNudge(latestMSPSS?.level, latestMSPSS?.summary);
-  }, [mspAssessment.state.canDisplay, mspssCooldown.isCoolingDown, latestMSPSS]);
+  const communityLevels = useMemo(
+    () => ({
+      ucla3Level: typeof resolvedUclaLevel === 'number' ? resolvedUclaLevel : undefined,
+      mspssLevel: typeof resolvedMspssLevel === 'number' ? resolvedMspssLevel : undefined,
+    }),
+    [resolvedUclaLevel, resolvedMspssLevel],
+  );
+
+  const rawCommunityHints = useMemo(
+    () => (orchestratorEnabled ? computeCommunityUIHints(communityLevels) : []),
+    [communityLevels, orchestratorEnabled],
+  );
+
+  const communityHints = useMemo(() => {
+    if (!orchestratorEnabled) return [];
+    return rawCommunityHints.filter((hint) => {
+      if (hint.action === 'show_banner' && uclaCooldown.isCoolingDown) {
+        return false;
+      }
+      return true;
+    });
+  }, [orchestratorEnabled, rawCommunityHints, uclaCooldown.isCoolingDown]);
+
+  const shouldShowBanner = communityHints.some(
+    (hint) => hint.action === 'show_banner' && hint.key === 'listen_two_minutes',
+  );
+  const shouldPinSocialCocon = communityHints.some(
+    (hint) => hint.action === 'pin_card' && hint.key === 'social_cocon',
+  );
+  const shouldSuggestReplies = communityHints.some(
+    (hint) => hint.action === 'suggest_replies' && hint.key === 'empathic_templates',
+  );
+
+  const bannerTrapRef = useRef<HTMLDivElement | null>(null);
+  const bannerCtaRef = useRef<HTMLButtonElement | null>(null);
+  const serializedHints = useMemo(() => serializeHints(communityHints), [communityHints]);
+  const hintsSignature = useMemo(() => serializedHints.join('|'), [serializedHints]);
+  const lastLoggedSignature = useRef<string | null>(null);
 
   useEffect(() => {
     Sentry.addBreadcrumb({ category: 'community:view', message: 'open', level: 'info' });
   }, []);
 
   useEffect(() => {
-    if (uclaNudge) {
-      Sentry.addBreadcrumb({ category: 'community:view', message: 'nudge_shown', level: 'info', data: { tag: 'nudge_ucla' } });
-      uclaCooldown.markSeen();
+    if (!shouldShowBanner) {
+      return;
     }
-  }, [uclaNudge, uclaCooldown]);
+    if (bannerCtaRef.current) {
+      bannerCtaRef.current.focus();
+    }
+    uclaCooldown.markSeen();
+  }, [shouldShowBanner, uclaCooldown]);
 
   useEffect(() => {
-    if (mspssNudge) {
-      Sentry.addBreadcrumb({ category: 'community:view', message: 'nudge_shown', level: 'info', data: { tag: 'nudge_mspss' } });
-      mspssCooldown.markSeen();
+    if (!shouldShowBanner) return;
+    const trapNode = bannerTrapRef.current;
+    if (!trapNode) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusable = trapNode.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey) {
+        if (document.activeElement === first) {
+          last.focus();
+          event.preventDefault();
+        }
+        return;
+      }
+
+      if (document.activeElement === last) {
+        first.focus();
+        event.preventDefault();
+      }
+    };
+
+    trapNode.addEventListener('keydown', handleKeyDown);
+    return () => {
+      trapNode.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [shouldShowBanner]);
+
+  useEffect(() => {
+    if (!orchestratorEnabled) return;
+    if (hintsSignature === lastLoggedSignature.current) return;
+    lastLoggedSignature.current = hintsSignature;
+
+    Sentry.addBreadcrumb({
+      category: 'orch:community',
+      message: 'apply',
+      level: 'info',
+      data: { hints: serializedHints },
+    });
+
+    if (serializedHints.length === 0) {
+      return;
     }
-  }, [mspssNudge, mspssCooldown]);
+
+    void createSession({
+      type: 'community',
+      duration_sec: 0,
+      meta: { hints: serializedHints },
+    }).catch((error) => {
+      Sentry.captureException(error);
+    });
+  }, [orchestratorEnabled, serializedHints, hintsSignature]);
 
   const transitionClasses = prefersReducedMotion ? '' : 'transition-colors duration-200';
 
@@ -302,6 +367,31 @@ const B2CCommunautePage: React.FC = () => {
       toast({ title: 'Merci pour ce partage', description: 'Ton message rejoint la communauté.' });
     }
   }, [newPost, toast]);
+
+  const handleQuickEmpathyCopy = useCallback(
+    (templateId: EmpathyTemplateId) => {
+      const template = EMPATHY_TEMPLATES.find((entry) => entry.id === templateId);
+      if (!template) return;
+
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        void navigator.clipboard
+          .writeText(template.text)
+          .then(() => {
+            toast({
+              title: 'Texte prêt',
+              description: 'Ton message empathique est copié, tu peux le coller où tu veux.',
+            });
+          })
+          .catch(() => {
+            toast({ title: 'Copie indisponible', description: template.text });
+          });
+        return;
+      }
+
+      toast({ title: 'Suggestion', description: template.text });
+    },
+    [toast],
+  );
 
   const handleTemplateSelect = useCallback((postId: string, templateId: EmpathyTemplateId) => {
     const template = EMPATHY_TEMPLATES.find((entry) => entry.id === templateId) ?? EMPATHY_TEMPLATES[0];
@@ -433,7 +523,7 @@ const B2CCommunautePage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-4xl bg-gradient-to-b from-emerald-50 via-white to-white">
+    <ZeroNumberBoundary as="div" className="mx-auto min-h-screen max-w-4xl bg-gradient-to-b from-emerald-50 via-white to-white">
       <PageSEO title="Communauté" description="Partage et entraide" noIndex />
 
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-emerald-100 bg-white/90 px-4 py-3 backdrop-blur">
@@ -468,50 +558,61 @@ const B2CCommunautePage: React.FC = () => {
           </div>
         </section>
 
-        {(uclaNudge || mspssNudge) && (
-          <section className="grid gap-4 md:grid-cols-2">
-            {uclaNudge && (
-              <article className="rounded-2xl border border-amber-100 bg-amber-50/80 p-4 shadow-sm">
-                <header className="flex items-center gap-2">
-                  <HeartHandshake className="h-5 w-5 text-amber-600" aria-hidden="true" />
-                  <h2 className="text-sm font-semibold text-amber-700">{uclaNudge.title}</h2>
-                </header>
-                <p className="mt-2 text-sm text-amber-700">{uclaNudge.description}</p>
-                {uclaNudge.summary && (
-                  <p className="mt-2 text-xs text-amber-600" aria-live="polite">
-                    Signal discret : {uclaNudge.summary}
-                  </p>
-                )}
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <Button onClick={() => setShowSocialConfirm(true)} className="bg-amber-500 text-white hover:bg-amber-500/90">
-                    {uclaNudge.cta}
-                  </Button>
-                  <span className="text-xs text-amber-600">Pas d’obligation, juste une option douce.</span>
+        {shouldShowBanner && (
+          <section
+            ref={bannerTrapRef}
+            className="rounded-3xl border border-emerald-200 bg-emerald-50/90 p-5 shadow-sm focus:outline-none"
+            role="region"
+            aria-live="polite"
+            aria-label="Invitation Social Cocon"
+          >
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-emerald-700">
+                  <HeartHandshake className="h-4 w-4" aria-hidden="true" />
+                  <span>Besoin d’écoute douce</span>
                 </div>
-              </article>
-            )}
-            {mspssNudge && (
-              <article className="rounded-2xl border border-sky-100 bg-sky-50/80 p-4 shadow-sm">
-                <header className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-sky-600" aria-hidden="true" />
-                  <h2 className="text-sm font-semibold text-sky-700">{mspssNudge.title}</h2>
-                </header>
-                <p className="mt-2 text-sm text-sky-700">{mspssNudge.description}</p>
-                {mspssNudge.summary && (
-                  <p className="mt-2 text-xs text-sky-600" aria-live="polite">
-                    Signal discret : {mspssNudge.summary}
-                  </p>
-                )}
-                <ul className="mt-3 space-y-2 text-sm">
-                  {EMPATHY_TEMPLATES.map((template) => (
-                    <li key={template.id} className="rounded-lg border border-sky-100 bg-white/70 p-2">
-                      <strong className="block text-xs uppercase tracking-wide text-sky-600">{template.label}</strong>
-                      <span>{template.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            )}
+                <h2 className="text-lg font-semibold text-emerald-900">Un espace vocal pour souffler</h2>
+                <p className="text-sm text-emerald-700">
+                  On te propose d’ouvrir Social Cocon pendant quelques minutes, sans partage de chiffres ni de pression.
+                </p>
+              </div>
+              <div className="flex flex-col items-start gap-2 md:items-end">
+                <Button
+                  ref={bannerCtaRef}
+                  onClick={() => setShowSocialConfirm(true)}
+                  className="bg-emerald-600 text-white hover:bg-emerald-600/90"
+                >
+                  Écoute 2 min ?
+                </Button>
+                <span className="text-xs text-emerald-700">Invitation optionnelle, tu restes libre.</span>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {shouldSuggestReplies && (
+          <section className="rounded-3xl border border-sky-100 bg-sky-50/80 p-5 shadow-sm" aria-live="polite">
+            <header className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-sky-600" aria-hidden="true" />
+              <h2 className="text-sm font-semibold text-sky-700">Réponses prêtes à envoyer</h2>
+            </header>
+            <p className="mt-2 text-sm text-sky-700">
+              Sélectionne une suggestion, elle sera copiée pour l’envoyer en un geste.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {EMPATHY_TEMPLATES.map((template) => (
+                <Button
+                  key={template.id}
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleQuickEmpathyCopy(template.id)}
+                >
+                  {template.label}
+                </Button>
+              ))}
+            </div>
           </section>
         )}
 
@@ -541,6 +642,32 @@ const B2CCommunautePage: React.FC = () => {
         <section>
           <h2 className="sr-only">Fil empathique</h2>
           <ul className="space-y-4">
+            {shouldPinSocialCocon && (
+              <li className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 shadow-sm">
+                <article>
+                  <header className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+                      <h3 className="text-sm font-semibold text-emerald-800">Social Cocon en accès rapide</h3>
+                    </div>
+                    <Badge variant="outline" className="text-xs text-emerald-700">
+                      Audio + texte confidentiel
+                    </Badge>
+                  </header>
+                  <p className="mt-2 text-sm text-emerald-700">
+                    Tu peux ouvrir une room privée instantanément pour une écoute sans chiffre ni historique.
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Button size="sm" onClick={() => setShowSocialConfirm(true)}>
+                      Rejoindre le Social Cocon
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => navigate('/app/social-cocon')}>
+                      Voir les rooms
+                    </Button>
+                  </div>
+                </article>
+              </li>
+            )}
             {posts.map((post) => (
               <li key={post.id} className="rounded-2xl border border-emerald-100 bg-white/90 p-4 shadow-sm focus-within:ring-2 focus-within:ring-emerald-200" tabIndex={-1}>
                 <article aria-label={`Message de ${post.alias}`}>
@@ -702,7 +829,7 @@ const B2CCommunautePage: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </ZeroNumberBoundary>
   );
 };
 

@@ -9,6 +9,9 @@ interface FeatureFlags {
   FF_VR: boolean;
   FF_COMMUNITY: boolean;
   FF_SOCIAL_COCON: boolean;
+  FF_ORCH_COMMUNITY: boolean;
+  FF_ORCH_SOCIAL_COCON: boolean;
+  FF_ORCH_AURAS: boolean;
   FF_MANAGER_DASH: boolean;
   FF_SCORES: boolean;
   FF_SCAN: boolean;
@@ -53,6 +56,9 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_VR: true,
   FF_COMMUNITY: true,
   FF_SOCIAL_COCON: true,
+  FF_ORCH_COMMUNITY: true,
+  FF_ORCH_SOCIAL_COCON: true,
+  FF_ORCH_AURAS: true,
   FF_MANAGER_DASH: true,
   FF_SCORES: true,
   FF_SCAN: true,
