@@ -124,6 +124,7 @@ npm run test:e2e         # Tests end-to-end
 npm run lint             # Vérification code
 npm run build            # Build production
 npm run storybook        # Interface composants
+npm run gen:openapi      # Génération des types API depuis les specs
 ```
 
 ## 🎯 Standards de code
@@ -139,6 +140,13 @@ npm run storybook        # Interface composants
 - **Hooks** pour la logique state
 - **Props typées** avec TypeScript
 - **Memo** pour optimisations si besoin
+
+### Design system premium
+- Utiliser les composants disponibles dans `src/ui` et les variables `tokens.css`.
+- Chaque nouveau composant ou variation doit être accompagné de stories (`Controls` + `A11y notes`).
+- Pas de chiffres exposés dans les libellés UI ; privilégier des formulations descriptives (“ambiance sereine”, “guidage respiration douce”).
+- Le focus visible doit utiliser `FocusRing` ou la classe `ec-focus-ring`.
+- Respecter `prefers-reduced-motion` (animations neutralisées dans le design system).
 
 ### Modules & exports
 - Chaque dossier applicatif dispose d'un `index.ts` (ou `index.tsx`) qui ré-exporte l'API publique du domaine.
@@ -178,10 +186,9 @@ const digest = await crypto.subtle.digest('SHA-256', data);
 - Documenter toute nouvelle branche persistée et l'ajouter au `partialize` associé afin de conserver une hydratation minimale.
 
 ### Styling
-- **Tailwind CSS** pour tout le styling
-- **Design system** défini dans index.css
-- **Composants shadcn/ui** comme base
-- **Pas de CSS inline** ou styles custom
+- Les styles globaux sont centralisés dans `tokens.css` et `src/styles/ds-components.css`.
+- Pas de `styled-components` ni de CSS-in-JS : utiliser les classes fournies par le design system.
+- Toute exception locale doit rester purement utilitaire (pas de valeurs magiques). Documenter les raisons dans la PR.
 
 ### Terminologie & contenu UI
 - Interdiction des termes cliniques explicites en UI (`dépression`, `diagnostic`, etc.) → utiliser un vocabulaire bien-être.
@@ -215,6 +222,7 @@ Avant de soumettre, vérifiez :
 #### ✅ Code
 - [ ] Code lint sans erreurs (`npm run lint`)
 - [ ] Types TypeScript valides (`npm run type-check`)
+- [ ] Types OpenAPI régénérés (`npm run gen:openapi`)
 - [ ] Tests passent (`npm run test`)
 - [ ] Build réussit (`npm run build`)
 

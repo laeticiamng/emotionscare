@@ -1,12 +1,4 @@
 export type LocaleCode = 'fr' | 'en' | 'es' | 'de' | 'it';
-export type InstrumentCode = 'WHO5' | 'STAI6' | 'SAM' | 'SUDS';
-
-export interface ScoringResult {
-  level: 0 | 1 | 2 | 3 | 4;
-  summary: string;
-  focus?: string;
-  instrument_version: string;
-  generated_at: string;
 
 export type InstrumentCode = 'WHO5' | 'STAI6' | 'SAM' | 'SUDS';
 
@@ -28,13 +20,37 @@ export interface InstrumentCatalog {
   locale: LocaleCode;
   name: string;
   version: string;
-  name: string;
-  version: string;
-  items: InstrumentItem[];
   expiry_minutes: number;
+  items: InstrumentItem[];
+}
+
+export interface ScoringResult {
+  level: 0 | 1 | 2 | 3 | 4;
+  summary: string;
+  focus?: string;
+  instrument_version: string;
+  generated_at: string;
 }
 
 export interface StartRequest {
   instrument: InstrumentCode;
   locale?: LocaleCode;
+}
+
+export type StartResponse = InstrumentCatalog;
+
+export interface SubmitRequest {
+  instrument: InstrumentCode;
+  locale: LocaleCode;
+  answers: Record<string, number | string | boolean>;
+  timestamp?: string;
+  phase?: 'pre' | 'post';
+}
+
+export interface SubmitResponse {
+  level: 0 | 1 | 2 | 3 | 4;
+  summary: string;
+  focus?: string;
+  instrument_version: string;
+  generated_at: string;
 }

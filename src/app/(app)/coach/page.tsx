@@ -457,7 +457,7 @@ function CoachPageInner() {
             <CardHeader>
               <CardTitle>Souplesse psychologique</CardTitle>
               <CardDescription>
-                Ce mini-check-in reste confidentiel et dure moins de deux minutes. Aucun score chiffré ne s’affiche.
+                Ce mini-check-in reste confidentiel et dure moins de deux minutes. Aucune donnée chiffrée ne s’affiche.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

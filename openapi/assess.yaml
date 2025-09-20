@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: EmotionsCare Assessment API
+  version: 1.0.0
+  description: |
+    API d’orchestration des évaluations qualitatives. Les réponses et retours sont textuels et anonymisés.
+servers:
+  - url: https://edge.emotionscare.dev
+paths:
+  /assess/start:
+    post:
+      summary: Démarrer une évaluation
+      description: Crée une session d’évaluation en vérifiant l’opt-in et les instruments autorisés.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instrument:
+                  type: string
+                  description: Identifiant fonctionnel de l’outil (ex. who5, stai6, moodscan).
+                locale:
+                  type: string
+                  description: Code langue conforme BCP 47.
+                context:
+                  type: string
+                  description: Informations textuelles facultatives (jamais de PII).
+              required:
+                - instrument
+      responses:
+        '200':
+          description: Session créée.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessionId:
+                    type: string
+                    format: uuid
+                  intro:
+                    type: string
+                    description: Message d’accueil textuel.
+                  questions:
+                    type: array
+                    description: Liste séquentielle des questions.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        prompt:
+                          type: string
+                        help:
+                          type: string
+                          nullable: true
+                        choices:
+                          type: array
+                          items:
+                            type: string
+                      required:
+                        - id
+                        - prompt
+                        - choices
+                required:
+                  - sessionId
+                  - intro
+                  - questions
+        '401':
+          description: Authentification requise.
+        '403':
+          description: Opt-in absent ou instrument interdit.
+        '429':
+          description: Limite de fréquence atteinte.
+  /assess/submit:
+    post:
+      summary: Enregistrer une réponse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  format: uuid
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      questionId:
+                        type: string
+                      value:
+                        type: string
+                        description: Réponse textuelle ou identifiant de choix.
+                    required:
+                      - questionId
+                      - value
+                completion:
+                  type: string
+                  nullable: true
+                  description: Texte facultatif pour marquer la fin de session.
+              required:
+                - sessionId
+                - answers
+      responses:
+        '200':
+          description: Étape suivante.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [pending, complete]
+                  nextQuestionId:
+                    type: string
+                    nullable: true
+                  message:
+                    type: string
+                    description: Guidance textuelle pour l’utilisatrice.
+                required:
+                  - status
+                  - message
+        '401':
+          description: Authentification requise.
+        '404':
+          description: Session introuvable.
+        '409':
+          description: Session clôturée.
+  /assess/aggregate:
+    post:
+      summary: Obtenir un résumé personnalisé
+      description: Génère un retour qualitatif pour la session sans aucune donnée chiffrée.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionId:
+                  type: string
+                  format: uuid
+              required:
+                - sessionId
+      responses:
+        '200':
+          description: Synthèse textuelle prête à afficher.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headline:
+                    type: string
+                    description: Phrase clé rassurante.
+                  summary:
+                    type: string
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+                  tone:
+                    type: string
+                    description: Tag interne (ex. mellow, uplift, grounding).
+                required:
+                  - headline
+                  - summary
+                  - suggestions
+        '401':
+          description: Authentification requise.
+        '404':
+          description: Session introuvable ou expirée.
+        '409':
+          description: Opt-in manquant.

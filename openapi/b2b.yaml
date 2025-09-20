@@ -1,12 +1,62 @@
 openapi: 3.0.3
 info:
-  title: B2B Aggregates API
+  title: EmotionsCare B2B Narrative API
   version: 1.0.0
+  description: |
+    Endpoints textuels pour les organisations partenaires. Aucun indicateur chiffré ni donnée personnelle n’est retourné.
+servers:
+  - url: https://edge.emotionscare.dev
 paths:
-  /assess/aggregate:
+  /b2b/teams/list:
+    get:
+      summary: Lister les cercles accompagnés
+      description: Retourne des équipes agrégées avec une indication qualitative de taille.
+      parameters:
+        - in: query
+          name: organisationId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Liste textuelle des équipes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  teams:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        sizeLabel:
+                          type: string
+                          description: Libellé qualitatif (ex. petite cohorte, grande division).
+                        lastTouchpoint:
+                          type: string
+                          description: Résumé textuel du dernier accompagnement.
+                      required:
+                        - id
+                        - name
+                        - sizeLabel
+                        - lastTouchpoint
+                required:
+                  - teams
+        '401':
+          description: Jeton manquant ou invalide.
+        '403':
+          description: Accès refusé pour l’organisation.
+  /b2b/reports/summary:
     post:
-      summary: Obtenir les synthèses agrégées textuelles
-      description: Retourne des résumés cliniques anonymisés pour une organisation et une période données.
+      summary: Générer un rapport narratif
+      description: Produit une synthèse textuelle par équipe et thématique, sans métrique numérique.
       requestBody:
         required: true
         content:
@@ -14,49 +64,153 @@ paths:
             schema:
               type: object
               properties:
-                org_id:
+                organisationId:
                   type: string
                   format: uuid
-                period:
+                focus:
                   type: string
-                  description: Mois (YYYY-MM) ou semaine ISO (YYYY-W##).
-                instruments:
+                  description: Thématique du rapport (ex. présence, sérénité collective).
+                teams:
                   type: array
                   items:
                     type: string
+                    format: uuid
               required:
-                - org_id
-                - period
+                - organisationId
       responses:
         '200':
-          description: Liste des synthèses textuelles par instrument.
+          description: Rapport textuel prêt pour diffusion.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  summaries:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  headline:
+                    type: string
+                  narratives:
                     type: array
                     items:
                       type: object
                       properties:
-                        instrument:
+                        teamId:
                           type: string
-                        period:
+                          format: uuid
+                        tone:
                           type: string
-                        text:
+                        story:
                           type: string
                       required:
-                        - instrument
-                        - period
-                        - text
+                        - teamId
+                        - tone
+                        - story
+                required:
+                  - generatedAt
+                  - headline
+                  - narratives
         '401':
-          description: Authentification requise.
+          description: Jeton manquant ou invalide.
         '403':
-          description: Organisation non autorisée ou claim manquant.
-        '422':
-          description: Corps de requête invalide.
+          description: Organisation non autorisée.
+  /b2b/audit/trail:
+    get:
+      summary: Consulter les actions sensibles
+      description: Fournit une trace textuelle (redacted) des actions opérées par l’organisation.
+      parameters:
+        - in: query
+          name: organisationId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: since
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Flux d’événements anonymisés.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        occurredAt:
+                          type: string
+                          format: date-time
+                        actorHash:
+                          type: string
+                          description: Hachage non réversible.
+                        description:
+                          type: string
+                      required:
+                        - occurredAt
+                        - actorHash
+                        - description
+                required:
+                  - events
+        '401':
+          description: Jeton manquant ou invalide.
+        '403':
+          description: Organisation non autorisée.
+  /b2b/exports/journal:
+    post:
+      summary: Préparer un export textuel
+      description: Génère un lien sécurisé contenant des extraits narratifs anonymes. Aucune PII et aucune métrique chiffrée.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organisationId:
+                  type: string
+                  format: uuid
+                expiresInMinutes:
+                  type: integer
+                  minimum: 5
+                  maximum: 60
+                  description: Durée de validité du lien signé.
+              required:
+                - organisationId
+      responses:
+        '200':
+          description: Lien généré.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  downloadUrl:
+                    type: string
+                    format: uri
+                  guidance:
+                    type: string
+                    description: Instructions d’usage et restrictions RLS.
+                required:
+                  - downloadUrl
+                  - guidance
+        '401':
+          description: Jeton manquant ou invalide.
+        '403':
+          description: Organisation non autorisée.
         '429':
-          description: Limite de taux dépassée.
-        '500':
-          description: Erreur interne.
+          description: Trop de requêtes.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
