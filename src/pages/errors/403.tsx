@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, Home, UserSwitch } from 'lucide-react';
+import { ShieldAlert, Home, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { routes } from '@/lib/routes';
 
@@ -30,7 +30,7 @@ const Error403Page: React.FC = () => {
           </Button>
           <Button asChild variant="outline" size="lg" className="gap-2">
             <Link to={routes.auth.login()} aria-label="Changer de compte">
-              <UserSwitch className="h-4 w-4" aria-hidden="true" />
+              <LogOut className="h-4 w-4" aria-hidden="true" />
               Changer de compte
             </Link>
           </Button>
