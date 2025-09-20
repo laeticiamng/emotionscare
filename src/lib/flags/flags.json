@@ -3,5 +3,7 @@
   "data-delete": false, 
   "scores-v2": false, 
   "telemetry-opt-in": false,
-  "new-audio-engine": false 
+  "new-audio-engine": false,
+  "FF_FLASH": true,
+  "FF_ASSESS_SUDS": true
 }
