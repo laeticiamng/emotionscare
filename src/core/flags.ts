@@ -35,24 +35,24 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_COMMUNITY: true,
   FF_MANAGER_DASH: true,
   
-  // Clinical assessments - opt-in by default
-  FF_ASSESS_WHO5: true,      // Well-being thermometer - gentle weekly
-  FF_ASSESS_STAI6: true,     // Anxiety state - pre/post exercises
-  FF_ASSESS_PANAS: true,     // Positive/Negative affect - content personalization
-  FF_ASSESS_PSS10: false,    // Perceived stress - monthly only
-  FF_ASSESS_UCLA3: false,    // Loneliness - bi-weekly max
-  FF_ASSESS_MSPSS: false,    // Social support - monthly
-  FF_ASSESS_AAQ2: true,      // Psychological flexibility - ACT coaching
-  FF_ASSESS_POMS: true,      // Mood states - music/story adaptation
-  FF_ASSESS_SSQ: true,       // VR sickness - safety critical
-  FF_ASSESS_ISI: false,      // Insomnia - targeted only
-  FF_ASSESS_GAS: true,       // Goal attainment - ambition module
-  FF_ASSESS_GRITS: false,    // Grit scale - monthly
-  FF_ASSESS_BRS: false,      // Resilience - monthly
-  FF_ASSESS_WEMWBS: false,   // Well-being (B2B) - organizational
-  FF_ASSESS_UWES: false,     // Work engagement (B2B) - organizational
-  FF_ASSESS_CBI: false,      // Burnout (B2B) - organizational
-  FF_ASSESS_CVSQ: true,      // Computer vision syndrome - screen health
+  // Clinical assessments – disabled by default, opt-in via remote config
+  FF_ASSESS_WHO5: false,
+  FF_ASSESS_STAI6: false,
+  FF_ASSESS_PANAS: false,
+  FF_ASSESS_PSS10: false,
+  FF_ASSESS_UCLA3: false,
+  FF_ASSESS_MSPSS: false,
+  FF_ASSESS_AAQ2: false,
+  FF_ASSESS_POMS: false,
+  FF_ASSESS_SSQ: false,
+  FF_ASSESS_ISI: false,
+  FF_ASSESS_GAS: false,
+  FF_ASSESS_GRITS: false,
+  FF_ASSESS_BRS: false,
+  FF_ASSESS_WEMWBS: false,
+  FF_ASSESS_UWES: false,
+  FF_ASSESS_CBI: false,
+  FF_ASSESS_CVSQ: false,
 };
 
 let flagsCache: FeatureFlags | null = null;

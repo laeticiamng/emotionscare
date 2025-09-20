@@ -26,7 +26,7 @@ import {
   logAndJournal,
   type MoodSnapshot,
 } from '@/modules/flash/sessionService';
-import { clinicalScoringService } from '@/services/clinicalScoring';
+import { clinicalScoringService } from '@/services/clinicalScoringService';
 
 const phaseThemes = {
   warmup: { theme: 'emerald' as const, intensity: 0.45, shape: 'ring' as const },
@@ -129,14 +129,16 @@ const FlashGlowView: React.FC = () => {
 
   const submitSudsMeasurement = async (stage: 'pre' | 'post', value: number) => {
     try {
-      await clinicalScoringService.submitResponse('SUDS', { '1': value }, {
-        stage,
-        module: 'flash_glow',
-        extended: hasExtended,
-        iteration: stage === 'post' ? postSudsValues.length + 1 : 0,
-        recorded_at: new Date().toISOString(),
+      const result = await clinicalScoringService.submitResponse('SUDS', { '1': value }, {
+        metadata: {
+          stage,
+          module: 'flash_glow',
+          extended: hasExtended,
+          iteration: stage === 'post' ? postSudsValues.length + 1 : 0,
+          recorded_at: new Date().toISOString(),
+        },
       });
-      return true;
+      return result.success;
     } catch (error) {
       console.error('Error submitting SUDS measure:', error);
       toast({
