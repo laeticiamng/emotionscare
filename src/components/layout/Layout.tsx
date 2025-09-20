@@ -1,6 +1,5 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Toaster } from 'sonner';
 import GlobalNav from '@/components/GlobalNav';
 import SecurityFooter from '@/components/SecurityFooter';
 
@@ -14,14 +13,6 @@ const Layout: React.FC = () => {
       </main>
       
       <SecurityFooter />
-      
-      <Toaster 
-        position="top-right" 
-        toastOptions={{
-          className: 'bg-background border border-border',
-          duration: 4000,
-        }}
-      />
     </div>
   );
 };
