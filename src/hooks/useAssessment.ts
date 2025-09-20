@@ -30,6 +30,7 @@ export const instrumentCodes = [
   'MSPSS',
   'AAQ2',
   'POMS',
+  'POMS_TENSION',
   'ISI',
   'GAS',
   'GRITS',
@@ -39,6 +40,17 @@ export const instrumentCodes = [
 
 export type InstrumentCode = (typeof instrumentCodes)[number];
 export type LocaleCode = ClinicalLocaleCode;
+
+const instrumentRuntimeMap: Partial<Record<InstrumentCode, ClinicalInstrumentCode>> = {
+  POMS_TENSION: 'POMS',
+};
+
+const instrumentFlagAliases: Partial<Record<InstrumentCode, string[]>> = {
+  POMS: ['FF_ASSESS_POMS', 'FF_ASSESS_POMS_TENSION'],
+  POMS_TENSION: ['FF_ASSESS_POMS_TENSION', 'FF_ASSESS_POMS'],
+};
+
+const resolveFlagKeys = (inst: InstrumentCode): string[] => instrumentFlagAliases[inst] ?? [`FF_ASSESS_${inst}`];
 
 const startItemSchema = z.object({
   id: z.string(),
@@ -143,8 +155,10 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { flags } = useFlags();
-  const consent = useClinicalConsent(instrument as ClinicalInstrumentCode);
+  const runtimeInstrument = instrumentRuntimeMap[instrument] ?? (instrument as ClinicalInstrumentCode);
+  const consent = useClinicalConsent(runtimeInstrument as ClinicalInstrumentCode);
   const callbacksRef = useRef<AssessmentCallbacks | null>(null);
+  const initialFlagKeys = resolveFlagKeys(instrument);
 
   const [state, setState] = useState<AssessmentState>(() => ({
     instrument,
@@ -158,14 +172,16 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
     hasConsent: consent.hasConsented,
     consentDecision: consent.decision,
     isConsentLoading: consent.loading,
-    isFlagEnabled: Boolean(flags[`FF_ASSESS_${instrument}`]),
+    isFlagEnabled: initialFlagKeys.some((key) => Boolean(flags[key])),
     isDNTEnabled: consent.isDNTEnabled,
-    canDisplay: Boolean(flags[`FF_ASSESS_${instrument}`]) && !consent.isDNTEnabled && consent.decision !== 'declined',
+    canDisplay:
+      initialFlagKeys.some((key) => Boolean(flags[key])) && !consent.isDNTEnabled && consent.decision !== 'declined',
     error: null,
   }));
 
   useEffect(() => {
-    const isFlagEnabled = Boolean(flags[`FF_ASSESS_${instrument}`]);
+    const keys = resolveFlagKeys(instrument);
+    const isFlagEnabled = keys.some((key) => Boolean(flags[key]));
     const canDisplay = isFlagEnabled && !consent.isDNTEnabled && consent.decision !== 'declined';
 
     setState((prev) => ({
@@ -199,7 +215,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
         const response = await invokeSupabaseEdge<{ instrument: InstrumentCode; locale: LocaleCode }, unknown>(
           'assess-start',
           {
-            payload: { instrument, locale: targetLocale },
+            payload: { instrument: runtimeInstrument as InstrumentCode, locale: targetLocale },
             accessToken,
           },
         );
@@ -211,7 +227,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
 
         const payload = parsed.data;
         const catalog: InstrumentCatalog = {
-          code: instrument as ClinicalInstrumentCode,
+          code: runtimeInstrument,
           locale: payload.locale,
           name: payload.name,
           version: payload.version,
@@ -240,7 +256,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
         return undefined;
       }
     },
-    [consent.decision, state.canDisplay, state.locale, instrument, toast],
+    [consent.decision, state.canDisplay, state.locale, instrument, runtimeInstrument, toast],
   );
 
   const triggerAssessment = useCallback<UseAssessmentResult['triggerAssessment']>(
@@ -300,7 +316,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
         setState((prev) => ({ ...prev, isSubmitting: true, error: null }));
 
         const result = await clinicalScoringService.submitResponse(
-          instrument as ClinicalInstrumentCode,
+          runtimeInstrument,
           sanitized,
           {
             locale: state.locale,
@@ -334,7 +350,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
         return false;
       }
     },
-    [instrument, queryClient, runCallbacks, state.locale, toast],
+    [instrument, queryClient, runCallbacks, runtimeInstrument, state.locale, toast],
   );
 
   const grantConsent = useCallback(async () => {
