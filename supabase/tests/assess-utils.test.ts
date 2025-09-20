@@ -31,6 +31,7 @@ describe('sanitizeAggregateText', () => {
 
     expect(sanitized).not.toMatch(/\d/);
     expect(sanitized).not.toMatch(/score|niveau|point/i);
-    expect(sanitized).toBe('moyen / () avec à surveiller.');
+    expect(sanitized.startsWith('•')).toBe(true);
+    expect(sanitized).toBe('• moyen •/• (•) avec • à surveiller.');
   });
 });
