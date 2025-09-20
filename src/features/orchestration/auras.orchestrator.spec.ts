@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { aurasOrchestrator } from './leaderboardAuras.orchestrator';
+import { aurasOrchestrator } from './auras.orchestrator';
 
 describe('aurasOrchestrator', () => {
   it('returns cool aura for low WHO-5 level', () => {

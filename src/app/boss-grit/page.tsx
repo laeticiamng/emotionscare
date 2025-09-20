@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { bossGritOrchestrator } from '@/features/orchestration/bossGrit.orchestrator';
 
 const SHORT_DURATION_MS = 180_000;
@@ -74,14 +76,16 @@ export default function BossGritPage(): JSX.Element {
     const actions = bossGritOrchestrator({ gritLevel, brsLevel });
     const durationAction = actions.find((action) => action.action === 'set_challenge_duration');
     const compassionAction = actions.find((action) => action.action === 'enable_compassion_streak');
+    const appliedDuration = durationAction && 'ms' in durationAction ? durationAction.ms : challengeDuration;
+    const isShort = appliedDuration === SHORT_DURATION_MS;
 
     Sentry.addBreadcrumb({
       category: 'orch',
-      message: 'orch:grit:apply',
+      message: isShort ? 'orch:grit:short' : 'orch:grit:steady',
       level: 'info',
       data: {
-        duration: durationAction && 'ms' in durationAction && durationAction.ms === SHORT_DURATION_MS ? 'short' : 'long',
-        compassion_streak: compassionAction && 'enabled' in compassionAction ? compassionAction.enabled : false,
+        duration: isShort ? 'short' : 'long',
+        compassion: compassionAction && 'enabled' in compassionAction ? (compassionAction.enabled ? 'active' : 'inactive') : 'inactive',
       },
     });
 
@@ -134,8 +138,8 @@ export default function BossGritPage(): JSX.Element {
         duration_sec: durationSeconds,
         meta: {
           module: 'grit',
-          duration_label: durationKey,
-          compassion_streak: compassionStreakEnabled ? 'active' : 'inactive',
+          duration: durationKey,
+          compassion: compassionStreakEnabled,
         },
       });
       setSessionState('completed');
@@ -151,8 +155,8 @@ export default function BossGritPage(): JSX.Element {
   const canDisplay = gritAssessment.isEligible && brsAssessment.isEligible;
 
   return (
-    <main className="min-h-screen bg-muted/20 px-4 py-10">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+    <ZeroNumberBoundary className="min-h-screen bg-muted/20 px-4 py-10">
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <header className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Boss Grit</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Défi de résilience bienveillant</h1>
@@ -161,70 +165,74 @@ export default function BossGritPage(): JSX.Element {
           </p>
         </header>
 
-        {!canDisplay && (
-          <Card role="region" aria-label="Activation des défis adaptés">
-            <CardHeader>
-              <CardTitle>Activer les bilans mensuels</CardTitle>
-              <CardDescription>
-                Lorsque tu autorises les bilans GRIT-S et BRS, les défis s’ajustent automatiquement à ton énergie du moment.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )}
+        <ConsentGate>
+          <div className="space-y-6">
+            {!canDisplay && (
+              <Card role="region" aria-label="Activation des défis adaptés">
+                <CardHeader>
+                  <CardTitle>Activer les bilans mensuels</CardTitle>
+                  <CardDescription>
+                    Lorsque tu autorises les bilans GRIT-S et BRS, les défis s’ajustent automatiquement à ton énergie du moment.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            )}
 
-        {canDisplay && (
-          <Card role="region" aria-live="polite">
-            <CardHeader>
-              <CardTitle>{durationInfo.label}</CardTitle>
-              <CardDescription>{durationInfo.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <section className="space-y-2">
-                <h2 className="text-base font-semibold text-foreground">Compassion streak</h2>
-                <p className="text-sm text-muted-foreground">
-                  {compassionStreakEnabled
-                    ? 'Ta série reste intacte même si tu ralentis ou fais une pause. On salue la régularité, pas la performance.'
-                    : 'La série classique est active.'}
-                </p>
-              </section>
+            {canDisplay && (
+              <Card role="region" aria-live="polite">
+                <CardHeader>
+                  <CardTitle>{durationInfo.label}</CardTitle>
+                  <CardDescription>{durationInfo.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <section className="space-y-2">
+                    <h2 className="text-base font-semibold text-foreground">Compassion streak</h2>
+                    <p className="text-sm text-muted-foreground">
+                      {compassionStreakEnabled
+                        ? 'Ta série reste intacte même si tu ralentis ou fais une pause. On salue la régularité, pas la performance.'
+                        : 'La série classique est active.'}
+                    </p>
+                  </section>
 
-              {sessionState === 'idle' && (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Prépare ton mini-rituel : quelques respirations, une intention et c’est parti.
-                  </p>
-                  <Button type="button" onClick={startChallenge}>
-                    Lancer le défi bienveillant
-                  </Button>
-                </div>
-              )}
+                  {sessionState === 'idle' && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Prépare ton mini-rituel : quelques respirations, une intention et c’est parti.
+                      </p>
+                      <Button type="button" onClick={startChallenge}>
+                        Lancer le défi bienveillant
+                      </Button>
+                    </div>
+                  )}
 
-              {sessionState === 'running' && (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Prends ton temps. Le défi se termine en douceur quand tu appuies sur le bouton ci-dessous.
-                  </p>
-                  <Button type="button" onClick={endChallenge} disabled={isSaving}>
-                    Terminer en douceur
-                  </Button>
-                </div>
-              )}
+                  {sessionState === 'running' && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Prends ton temps. Le défi se termine en douceur quand tu appuies sur le bouton ci-dessous.
+                      </p>
+                      <Button type="button" onClick={endChallenge} disabled={isSaving}>
+                        Terminer en douceur
+                      </Button>
+                    </div>
+                  )}
 
-              {sessionState === 'completed' && sessionSaved && (
-                <p className="text-sm text-muted-foreground" aria-live="assertive">
-                  Défi enregistré. Tu peux savourer la bienveillance accumulée ou relancer un nouveau défi.
-                </p>
-              )}
+                  {sessionState === 'completed' && sessionSaved && (
+                    <p className="text-sm text-muted-foreground" aria-live="assertive">
+                      Défi enregistré. Tu peux savourer la bienveillance accumulée ou relancer un nouveau défi.
+                    </p>
+                  )}
 
-              {saveError && (
-                <div role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                  {saveError}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </main>
+                  {saveError && (
+                    <div role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                      {saveError}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </ConsentGate>
+      </main>
+    </ZeroNumberBoundary>
   );
 }

@@ -15,4 +15,10 @@ describe('bossGritOrchestrator', () => {
 
     expect(actions).toContainEqual({ action: 'set_challenge_duration', ms: 600_000 });
   });
+
+  it('defaults to the longer challenge when no levels are provided', () => {
+    const actions = bossGritOrchestrator({});
+
+    expect(actions).toContainEqual({ action: 'set_challenge_duration', ms: 600_000 });
+  });
 });

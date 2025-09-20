@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import * as Sentry from '@sentry/react';
 
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { bubbleBeatOrchestrator } from '@/features/orchestration/bubbleBeat.orchestrator';
 import type { PathVariantKey } from '@/features/orchestration/types';
 
@@ -37,7 +39,7 @@ export default function BubbleBeatPage(): JSX.Element {
 
   const [variant, setVariant] = useState<PathVariantKey>('default');
   const [durationMs, setDurationMs] = useState(DEFAULT_DURATION_MS);
-  const [ctaKey, setCtaKey] = useState<string | null>(null);
+  const [ctaKey, setCtaKey] = useState<'nyvee' | 'flash_glow'>('flash_glow');
   const [sessionState, setSessionState] = useState<'idle' | 'running' | 'completed'>('idle');
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false);
@@ -62,18 +64,18 @@ export default function BubbleBeatPage(): JSX.Element {
       return;
     }
 
-    const actions = bubbleBeatOrchestrator({ pss10Level: level });
+    const actions = bubbleBeatOrchestrator({ pssLevel: level ?? undefined });
     const variantAction = actions.find((action) => action.action === 'set_path_variant');
     const durationAction = actions.find((action) => action.action === 'set_path_duration');
     const ctaAction = actions.find((action) => action.action === 'post_cta');
 
     Sentry.addBreadcrumb({
       category: 'orch',
-      message: 'orch:bubble:apply',
+      message: variantAction && 'key' in variantAction && variantAction.key === 'hr' ? 'orch:bubble:hr' : 'orch:bubble:soft',
       level: 'info',
       data: {
         variant: variantAction && 'key' in variantAction ? variantAction.key : 'default',
-        has_cta: Boolean(ctaAction),
+        cta: ctaAction && 'key' in ctaAction ? ctaAction.key : 'flash_glow',
       },
     });
 
@@ -92,7 +94,7 @@ export default function BubbleBeatPage(): JSX.Element {
     if (ctaAction && 'key' in ctaAction) {
       setCtaKey(ctaAction.key);
     } else {
-      setCtaKey(null);
+      setCtaKey('flash_glow');
     }
 
     setSessionState('idle');
@@ -126,8 +128,8 @@ export default function BubbleBeatPage(): JSX.Element {
         meta: {
           module: 'bubble',
           variant,
-          duration_label: durationMs <= CALM_DURATION_MS ? 'court' : 'standard',
-          cta: ctaKey ?? 'none',
+          duration: durationMs <= CALM_DURATION_MS ? 'short' : 'standard',
+          post: ctaKey,
         },
       });
       setSessionState('completed');
@@ -145,8 +147,8 @@ export default function BubbleBeatPage(): JSX.Element {
   const durationHint = durationMs <= CALM_DURATION_MS ? 'Environ deux minutes' : 'Environ cinq minutes';
 
   return (
-    <main className="min-h-screen bg-muted/20 px-4 py-10">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+    <ZeroNumberBoundary className="min-h-screen bg-muted/20 px-4 py-10">
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <header className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Bubble Beat</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Libération musicale anti-stress</h1>
@@ -155,74 +157,78 @@ export default function BubbleBeatPage(): JSX.Element {
           </p>
         </header>
 
-        {!canDisplay && (
-          <Card role="region" aria-label="Activation de l’orchestration Bubble Beat">
-            <CardHeader>
-              <CardTitle>Activer le suivi du stress</CardTitle>
-              <CardDescription>
-                Dès que tu autorises l’évaluation douce PSS-10, Bubble Beat prépare un parcours adapté et plus léger en cas de pic de stress.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )}
+        <ConsentGate>
+          <div className="space-y-6">
+            {!canDisplay && (
+              <Card role="region" aria-label="Activation de l’orchestration Bubble Beat">
+                <CardHeader>
+                  <CardTitle>Activer le suivi du stress</CardTitle>
+                  <CardDescription>
+                    Dès que tu autorises l’évaluation douce PSS-10, Bubble Beat prépare un parcours adapté et plus léger en cas de pic de stress.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            )}
 
-        {canDisplay && (
-          <Card role="region" aria-live="polite">
-            <CardHeader>
-              <CardTitle>{variantInfo.title}</CardTitle>
-              <CardDescription>{variantInfo.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <section className="space-y-2">
-                <h2 className="text-base font-semibold text-foreground">Cue respiratoire</h2>
-                <p className="text-sm text-muted-foreground">{variantInfo.breathingCue}</p>
-                <p className="text-sm text-muted-foreground">Durée proposée : {durationHint}.</p>
-              </section>
+            {canDisplay && (
+              <Card role="region" aria-live="polite">
+                <CardHeader>
+                  <CardTitle>{variantInfo.title}</CardTitle>
+                  <CardDescription>{variantInfo.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <section className="space-y-2">
+                    <h2 className="text-base font-semibold text-foreground">Cue respiratoire</h2>
+                    <p className="text-sm text-muted-foreground">{variantInfo.breathingCue}</p>
+                    <p className="text-sm text-muted-foreground">Durée proposée : {durationHint}.</p>
+                  </section>
 
-              {sessionState === 'idle' && (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Installe-toi confortablement, choisis un volume doux et laisse les bulles guider ton relâchement.
-                  </p>
-                  <Button type="button" onClick={startSession}>
-                    Démarrer la séance
-                  </Button>
-                </div>
-              )}
-
-              {sessionState === 'running' && (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Ferme les yeux si tu le souhaites, les transitions respectent la réduction des mouvements.
-                  </p>
-                  <Button type="button" onClick={completeSession} disabled={isSaving}>
-                    Terminer la bulle sonore
-                  </Button>
-                </div>
-              )}
-
-              {sessionState === 'completed' && sessionSaved && (
-                <div className="space-y-2" aria-live="assertive">
-                  <p className="text-sm text-muted-foreground">
-                    Séance enregistrée. Respire un instant avant de poursuivre ta journée.
-                  </p>
-                  {ctaKey === 'nyvee_suggest' && (
-                    <Button asChild variant="secondary">
-                      <Link href={CTA_LINK}>Parler à Nyvée</Link>
-                    </Button>
+                  {sessionState === 'idle' && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Installe-toi confortablement, choisis un volume doux et laisse les bulles guider ton relâchement.
+                      </p>
+                      <Button type="button" onClick={startSession}>
+                        Démarrer la séance
+                      </Button>
+                    </div>
                   )}
-                </div>
-              )}
 
-              {saveError && (
-                <div role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                  {saveError}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </main>
+                  {sessionState === 'running' && (
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        Ferme les yeux si tu le souhaites, les transitions respectent la réduction des mouvements.
+                      </p>
+                      <Button type="button" onClick={completeSession} disabled={isSaving}>
+                        Terminer la bulle sonore
+                      </Button>
+                    </div>
+                  )}
+
+                  {sessionState === 'completed' && sessionSaved && (
+                    <div className="space-y-2" aria-live="assertive">
+                      <p className="text-sm text-muted-foreground">
+                        Séance enregistrée. Respire un instant avant de poursuivre ta journée.
+                      </p>
+                      {ctaKey === 'nyvee' && (
+                        <Button asChild variant="secondary">
+                          <Link href={CTA_LINK}>Parler à Nyvée</Link>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {saveError && (
+                    <div role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                      {saveError}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </ConsentGate>
+      </main>
+    </ZeroNumberBoundary>
   );
 }

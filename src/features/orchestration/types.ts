@@ -1,7 +1,7 @@
 export type TextProgressKey = 'doucement' | 'sur la bonne voie' | 'presque là';
 
-export interface SetTextProgressAction {
-  action: 'set_text_progress';
+export interface SetProgressTextAction {
+  action: 'set_progress_text';
   key: TextProgressKey;
 }
 
@@ -10,7 +10,7 @@ export interface InjectMicroLeversAction {
   items: string[];
 }
 
-export type AmbitionOrchestrationAction = SetTextProgressAction | InjectMicroLeversAction;
+export type AmbitionOrchestrationAction = SetProgressTextAction | InjectMicroLeversAction;
 
 export interface SetChallengeDurationAction {
   action: 'set_challenge_duration';
@@ -38,7 +38,7 @@ export interface SetPathDurationAction {
 
 export interface PostCtaAction {
   action: 'post_cta';
-  key: 'nyvee_suggest';
+  key: 'nyvee' | 'flash_glow';
 }
 
 export type BubbleBeatOrchestrationAction =
@@ -47,16 +47,16 @@ export type BubbleBeatOrchestrationAction =
   | PostCtaAction;
 
 export interface AmbitionOrchestratorInput {
-  gasLevel: number;
+  gasLevel?: number;
 }
 
 export interface BossGritOrchestratorInput {
-  gritLevel: number;
-  brsLevel: number;
+  gritLevel?: number;
+  brsLevel?: number;
 }
 
 export interface BubbleBeatOrchestratorInput {
-  pss10Level: number;
+  pssLevel?: number;
 }
 export type AssessmentLevel = 0 | 1 | 2 | 3 | 4;
 
