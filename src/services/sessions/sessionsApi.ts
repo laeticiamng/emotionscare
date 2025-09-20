@@ -7,6 +7,8 @@ export type SessionType =
   | 'breath'
   | 'music'
   | 'scan'
+  | 'vr_breath'
+  | 'vr_galaxy'
   | 'ambition'
   | 'grit'
   | 'bubble'
