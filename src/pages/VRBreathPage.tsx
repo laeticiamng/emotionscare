@@ -20,6 +20,8 @@ import { CosmicBreathingOrb } from '@/components/breath/CosmicBreathingOrb';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
+import { VRSafetyCheck } from '@/components/vr/VRSafetyCheck';
+import { useVRSafetyStore } from '@/store/vrSafety.store';
 
 interface CosmicBreathSession {
   id: string;
@@ -73,6 +75,9 @@ const VRBreathPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { play, pause } = useMusic();
+  const { particleMode, fallbackEnabled, prefersReducedMotion } = useVRSafetyStore();
+
+  const allowMotion = !prefersReducedMotion && !fallbackEnabled;
   
   // Get optimized universe config
   const universe = getOptimizedUniverse('vrBreath');
@@ -89,13 +94,16 @@ const VRBreathPage: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [phaseTimer, setPhaseTimer] = useState(0);
   const [showReward, setShowReward] = useState(false);
+  const [showSafetyCheck, setShowSafetyCheck] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const phaseIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Optimized animations
+  const particleCountForAnimation = particleMode === 'standard' ? 6 : particleMode === 'soft' ? 3 : 0;
   const { entranceVariants, breathingVariants, cleanupAnimation } = useOptimizedAnimation({
-    enableComplexAnimations: true,
+    enableComplexAnimations: allowMotion && particleMode !== 'minimal',
+    particleCount: particleCountForAnimation,
     useCSSAnimations: true,
   });
 
@@ -145,7 +153,8 @@ const VRBreathPage: React.FC = () => {
     setCurrentPhase('inhale');
     setPhaseTimer(session.inhaleTime);
     setIsActive(true);
-    
+    setShowSafetyCheck(false);
+
     // Start ambient music
     play();
     
@@ -217,7 +226,8 @@ const VRBreathPage: React.FC = () => {
   const handleRewardComplete = () => {
     setShowReward(false);
     setSelectedSession(null);
-    
+    setShowSafetyCheck(true);
+
     toast({
       title: "Cosmos apaisé ✨",
       description: "Ta nouvelle constellation brille dans ta galaxie personnelle",
@@ -258,24 +268,30 @@ const VRBreathPage: React.FC = () => {
       universe={universe}
       isEntering={isEntering}
       onEnterComplete={handleUniverseEnterComplete}
-      enableParticles={true}
+      enableParticles={particleMode !== 'minimal' && !prefersReducedMotion}
       enableAmbianceSound={false}
+      particleDensity={particleMode}
       className="min-h-screen"
     >
       {/* Header - Optimized */}
       <header className="relative z-50 p-6">
         <div className="flex items-center justify-between">
-          <Link 
-            to="/app" 
+          <Link
+            to="/app"
             className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
             <span className="font-medium">Retour</span>
           </Link>
-          
+
           <div className="flex items-center space-x-2 text-white">
             <Star className="h-6 w-6" />
             <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
+            {fallbackEnabled && (
+              <Badge variant="secondary" className="bg-white/10 text-white/70 border-white/20">
+                Mode doux actif
+              </Badge>
+            )}
           </div>
         </div>
       </header>
@@ -286,18 +302,18 @@ const VRBreathPage: React.FC = () => {
           {!selectedSession ? (
             <motion.div
               key="selection"
-              variants={entranceVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
+              variants={allowMotion ? entranceVariants : undefined}
+              initial={allowMotion ? 'hidden' : { opacity: 1 }}
+              animate={allowMotion ? 'visible' : { opacity: 1 }}
+              exit={allowMotion ? 'hidden' : { opacity: 1 }}
               className="space-y-12"
             >
               {/* Introduction */}
               <div className="text-center space-y-6">
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, type: "spring" }}
+                  initial={allowMotion ? { scale: 0 } : { opacity: 1 }}
+                  animate={allowMotion ? { scale: 1 } : { opacity: 1 }}
+                  transition={allowMotion ? { delay: 0.5, type: "spring" } : undefined}
                   className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
                   style={{ background: 'radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent)' }}
                 >
@@ -313,18 +329,25 @@ const VRBreathPage: React.FC = () => {
                 </p>
               </div>
 
+              <VRSafetyCheck
+                open={showSafetyCheck}
+                moduleContext="vr_breath"
+                onClose={() => setShowSafetyCheck(false)}
+                className="max-w-xl mx-auto"
+              />
+
               {/* Sessions Grid */}
               <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
                 {cosmicSessions.map((session, index) => (
                   <motion.div
                     key={session.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + index * 0.2 }}
-                    whileHover={{ scale: 1.05, y: -10 }}
-                    whileTap={{ scale: 0.95 }}
+                    initial={allowMotion ? { opacity: 0, y: 30 } : { opacity: 1 }}
+                    animate={allowMotion ? { opacity: 1, y: 0 } : { opacity: 1 }}
+                    transition={allowMotion ? { delay: 0.7 + index * 0.2 } : undefined}
+                    whileHover={allowMotion ? { scale: 1.05, y: -10 } : undefined}
+                    whileTap={allowMotion ? { scale: 0.95 } : undefined}
                   >
-                    <Card 
+                    <Card
                       className="h-full bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 transition-all duration-300 cursor-pointer group"
                       onClick={() => startSession(session)}
                     >
