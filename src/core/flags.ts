@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface FeatureFlags {
+  FF_NYVEE: boolean;
   FF_DASHBOARD: boolean;
   FF_COACH: boolean;
   FF_PREMIUM_SUNO: boolean;
@@ -33,6 +34,7 @@ interface FeatureFlags {
 
 // Default flags - can be overridden by API
 const DEFAULT_FLAGS: FeatureFlags = {
+  FF_NYVEE: false,
   FF_DASHBOARD: true,
   FF_COACH: false,
   FF_PREMIUM_SUNO: true,
