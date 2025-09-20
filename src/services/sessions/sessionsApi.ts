@@ -17,6 +17,10 @@ export type SessionType =
   | 'social_cocon'
   | 'auras'
   | 'coach'
+  | 'story_synth'
+  | 'activity'
+  | 'screen_silk'
+  | 'weekly_bars'
 
 export type SessionRecord = {
   id: string
@@ -163,7 +167,15 @@ const mkDefaultText = (input: { type: SessionType; mood_delta?: number | null })
           ? 'Voyage sonore clôturé.'
           : input.type === 'scan'
             ? 'Exploration sensorielle finalisée.'
-            : 'Séance terminée.'
+            : input.type === 'story_synth'
+              ? 'Conte apaisant consigné.'
+              : input.type === 'activity'
+                ? 'Moments ressources consignés.'
+                : input.type === 'screen_silk'
+                  ? 'Pause Screen Silk notée.'
+                  : input.type === 'weekly_bars'
+                    ? 'Lecture hebdomadaire enregistrée.'
+                    : 'Séance terminée.'
   const change = input.mood_delta != null ? "Je me sens un peu différent·e qu'avant." : 'Je prends note de mon ressenti présent.'
   return `${label} ${change}`
 }

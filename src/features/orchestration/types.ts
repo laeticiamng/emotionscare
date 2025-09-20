@@ -36,15 +36,12 @@ export interface SetPathDurationAction {
   ms: number;
 }
 
-export interface PostCtaAction {
-  action: 'post_cta';
-  key: 'nyvee_suggest';
-}
+export type PostCtaAction =
+  | { action: 'post_cta'; key: 'nyvee_suggest' }
+  | { action: 'post_cta'; key: 'screen_silk' }
+  | { action: 'post_cta'; key: 'flash_glow' };
 
-export type BubbleBeatOrchestrationAction =
-  | SetPathVariantAction
-  | SetPathDurationAction
-  | PostCtaAction;
+export type BubbleBeatOrchestrationAction = SetPathVariantAction | SetPathDurationAction | PostCtaAction;
 
 export interface AmbitionOrchestratorInput {
   gasLevel: number;
@@ -60,6 +57,41 @@ export interface BubbleBeatOrchestratorInput {
 }
 export type AssessmentLevel = 0 | 1 | 2 | 3 | 4;
 
+export interface SetStoryBedAction {
+  action: 'set_story_bed';
+  key: 'cocon';
+}
+
+export interface SetStoryVoiceAction {
+  action: 'set_story_voice';
+  key: 'slow';
+}
+
+export interface ShortenSceneAction {
+  action: 'shorten_scene';
+  ms: number;
+}
+
+export interface ShowHighlightsAction {
+  action: 'show_highlights';
+  items: string[];
+}
+
+export interface SetBlinkReminderAction {
+  action: 'set_blink_reminder';
+  key: 'gentle';
+}
+
+export interface SetBlurOpacityAction {
+  action: 'set_blur_opacity';
+  key: 'low' | 'very_low';
+}
+
+export interface ShowBarsTextAction {
+  action: 'show_bars_text';
+  items: string[];
+}
+
 export type UIHint =
   | { action: 'show_banner'; key: 'listen_two_minutes' }
   | { action: 'pin_card'; key: 'social_cocon' }
@@ -67,7 +99,15 @@ export type UIHint =
   | { action: 'promote_cta'; key: 'schedule_break' }
   | { action: 'highlight_rooms_private' }
   | { action: 'none' }
-  | { action: 'set_aura'; key: 'cool_gentle' | 'neutral' | 'warm_soft' };
+  | { action: 'set_aura'; key: 'cool_gentle' | 'neutral' | 'warm_soft' }
+  | SetStoryBedAction
+  | SetStoryVoiceAction
+  | ShortenSceneAction
+  | ShowHighlightsAction
+  | SetBlinkReminderAction
+  | SetBlurOpacityAction
+  | ShowBarsTextAction
+  | PostCtaAction;
 
 export interface CommunityLevels {
   uclaLevel?: number;
