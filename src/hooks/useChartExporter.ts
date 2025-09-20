@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import type { RefObject } from 'react';
-import { exportSvgToPng, type SvgExportOptions } from '@/lib/export/svgExport';
+import { exportElementToPng, type DomExportOptions } from '@/lib/export/domExport';
 
-export interface ChartExportOptions extends SvgExportOptions {}
+export interface ChartExportOptions extends DomExportOptions {}
 
 export function useChartExporter(defaultOptions?: ChartExportOptions) {
   const [isExporting, setIsExporting] = useState(false);
@@ -16,16 +16,10 @@ export function useChartExporter(defaultOptions?: ChartExportOptions) {
         return;
       }
 
-      const svg = element.querySelector('svg');
-      if (!svg || !(svg instanceof SVGSVGElement)) {
-        setError('Le graphique sélectionné ne contient pas de rendu SVG exportable.');
-        return;
-      }
-
       try {
         setIsExporting(true);
         setError(null);
-        await exportSvgToPng(svg, { ...defaultOptions, ...options });
+        await exportElementToPng(element, { ...defaultOptions, ...options });
       } catch (exportError) {
         console.error('Chart export failed', exportError);
         setError(exportError instanceof Error ? exportError.message : 'Export impossible.');

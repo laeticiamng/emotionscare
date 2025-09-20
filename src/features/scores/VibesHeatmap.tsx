@@ -4,16 +4,15 @@ import { format, startOfISOWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 import type { VibePoint } from '@/services/scores/dataApi';
+import {
+  buildHeatmapIntensity,
+  describeVibe,
+  describeVibeIntensity,
+  getVibeColor,
+} from './verbalizers';
 
 const CELL_SIZE = 22;
 const CELL_GAP = 6;
-const VIBE_COLORS: Record<string, string> = {
-  calm: '#34d399',
-  focus: '#0ea5e9',
-  bright: '#f97316',
-  reset: '#a855f7',
-};
-
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 export interface VibesHeatmapProps {
@@ -27,8 +26,6 @@ export const VibesHeatmap = forwardRef<HTMLDivElement, VibesHeatmapProps>(functi
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const { cells, columnCount } = useMemo(() => buildCells(points), [points]);
-  const width = columnCount * CELL_SIZE + Math.max(0, columnCount - 1) * CELL_GAP;
-  const height = DAYS.length * CELL_SIZE + (DAYS.length - 1) * CELL_GAP;
 
   return (
     <figure
@@ -48,34 +45,61 @@ export const VibesHeatmap = forwardRef<HTMLDivElement, VibesHeatmapProps>(functi
               </span>
             ))}
           </div>
-          <svg width={width} height={height} role="presentation" aria-hidden="true">
+          <div
+            role="grid"
+            aria-label="Vibes quotidiennes"
+            className="grid"
+            style={{
+              gridTemplateColumns: `repeat(${Math.max(columnCount, 1)}, ${CELL_SIZE}px)`,
+              gap: `${CELL_GAP}px`,
+              gridAutoRows: `${CELL_SIZE}px`,
+              gridAutoFlow: 'column',
+            }}
+          >
             {cells.map(cell => (
-              <rect
+              <div
                 key={cell.key}
-                x={cell.x}
-                y={cell.y}
-                width={CELL_SIZE}
-                height={CELL_SIZE}
-                rx={6}
-                fill={cell.fill}
+                role="gridcell"
+                tabIndex={0}
+                className="h-[22px] w-[22px] rounded-md outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                style={{ backgroundColor: cell.fill }}
+                aria-label={cell.ariaLabel}
+                title={cell.title}
+                data-testid={`heatmap-cell-${cell.key}`}
               >
-                <title>{cell.title}</title>
-              </rect>
+                <span className="sr-only">{cell.title}</span>
+              </div>
             ))}
-          </svg>
+          </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-3" role="list" aria-label="Légende des vibes">
-          {Object.entries(VIBE_COLORS).map(([vibe, color]) => (
-            <div key={vibe} className="flex items-center gap-2" role="listitem">
-              <span className="inline-flex h-3 w-3 rounded-sm" style={{ backgroundColor: color }} aria-hidden="true" />
-              <span className="text-xs text-muted-foreground">
-                {labelForVibe(vibe)}
-              </span>
-            </div>
-          ))}
+          {['calm', 'focus', 'bright', 'reset'].map(vibeKey => {
+            const descriptor = describeVibe(vibeKey);
+            if (!descriptor) {
+              return null;
+            }
+            return (
+              <div key={vibeKey} className="flex items-center gap-2" role="listitem">
+                <span
+                  className="inline-flex h-3 w-3 rounded-sm"
+                  style={{ backgroundColor: descriptor.palette.medium }}
+                  aria-hidden="true"
+                />
+                <span className="text-xs text-muted-foreground">{capitalize(descriptor.label)}</span>
+              </div>
+            );
+          })}
           <div className="flex items-center gap-2" role="listitem">
             <span className="inline-flex h-3 w-3 rounded-sm bg-muted" aria-hidden="true" />
             <span className="text-xs text-muted-foreground">Aucune vibe détectée</span>
+          </div>
+          <div className="flex items-center gap-2" role="listitem">
+            <div className="flex h-3 overflow-hidden rounded-sm border border-border" aria-hidden="true">
+              <span className="h-full w-3 bg-slate-200" />
+              <span className="h-full w-3 bg-slate-400" />
+              <span className="h-full w-3 bg-slate-600" />
+            </div>
+            <span className="text-xs text-muted-foreground">Intensité de la vibe</span>
           </div>
         </div>
       </div>
@@ -85,10 +109,9 @@ export const VibesHeatmap = forwardRef<HTMLDivElement, VibesHeatmapProps>(functi
 
 interface HeatmapCell {
   key: string;
-  x: number;
-  y: number;
   fill: string;
   title: string;
+  ariaLabel: string;
 }
 
 function buildCells(points: VibePoint[]): { cells: HeatmapCell[]; columnCount: number } {
@@ -108,38 +131,32 @@ function buildCells(points: VibePoint[]): { cells: HeatmapCell[]; columnCount: n
     if (!weekColumns.has(weekStart)) {
       weekColumns.set(weekStart, weekColumns.size);
     }
-    const column = weekColumns.get(weekStart) ?? 0;
-    const dayOfWeek = ((date.getDay() + 6) % 7); // monday = 0
-    const x = column * (CELL_SIZE + CELL_GAP);
-    const y = dayOfWeek * (CELL_SIZE + CELL_GAP);
-    const fill = point.vibe ? VIBE_COLORS[point.vibe] ?? '#94a3b8' : '#d1d5db';
+    const intensity = buildHeatmapIntensity(point);
+    const descriptor = point.vibe ? describeVibe(point.vibe) : undefined;
+    const fill = point.vibe ? getVibeColor(point.vibe, intensity ?? 'medium') : '#e2e8f0';
     const label = format(date, "EEEE d MMMM", { locale: fr });
-    const title = point.vibe ? `${label} — ${labelForVibe(point.vibe)}` : `${label} — aucune vibe dominante`;
+    const vibeLabel = descriptor?.label ? capitalize(descriptor.label) : 'Aucune vibe dominante';
+    const intensityLabel = point.vibe ? describeVibeIntensity(intensity) : 'nuance neutre';
+    const title = point.vibe ? `${capitalize(label)} — ${vibeLabel} (${intensityLabel})` : `${capitalize(label)} — aucune vibe dominante`;
+    const ariaLabel = point.vibe
+      ? `${capitalize(label)} : vibe ${vibeLabel}, ${intensityLabel}.`
+      : `${capitalize(label)} : aucune vibe dominante.`;
     cells.push({
-      key: `${point.date}-${column}`,
-      x,
-      y,
+      key: `${point.date}-${weekColumns.get(weekStart) ?? 0}-${((date.getDay() + 6) % 7)}`,
       fill,
       title,
+      ariaLabel,
     });
   });
 
   return { cells, columnCount: weekColumns.size };
 }
 
-function labelForVibe(vibe: string) {
-  switch (vibe) {
-    case 'calm':
-      return 'Calm';
-    case 'focus':
-      return 'Focus';
-    case 'bright':
-      return 'Bright';
-    case 'reset':
-      return 'Reset';
-    default:
-      return vibe;
+function capitalize(value: string) {
+  if (!value) {
+    return value;
   }
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export default VibesHeatmap;

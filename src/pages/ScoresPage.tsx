@@ -1,8 +1,25 @@
 import React from 'react';
 import { FadeIn, PageHeader } from '@/COMPONENTS.reg';
+import { useFlags } from '@/core/flags';
 import ScoresV2Panel from '@/modules/scores/ScoresV2Panel';
 
 const ScoresPage: React.FC = () => {
+  const { flags } = useFlags();
+
+  if (!flags.FF_SCORES) {
+    return (
+      <main className="space-y-8 pb-16" aria-label="Scores émotionnels">
+        <PageHeader
+          title="Scores & vibes"
+          subtitle="Visualisation synthétique de vos scans, séances et vibes dominantes sur les dernières semaines"
+        />
+        <section className="rounded-lg border border-dashed bg-muted/30 p-6 text-sm text-muted-foreground">
+          Cette visualisation est en phase de lancement et n'est pas encore activée pour votre espace.
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="space-y-8 pb-16" aria-label="Scores émotionnels">
       <PageHeader

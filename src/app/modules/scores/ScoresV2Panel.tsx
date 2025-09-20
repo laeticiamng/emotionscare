@@ -8,8 +8,8 @@ import ExportButton from '@/features/scores/ExportButton';
 import Mood30dChart from '@/features/scores/Mood30dChart';
 import SessionsWeeklyChart from '@/features/scores/SessionsWeeklyChart';
 import VibesHeatmap from '@/features/scores/VibesHeatmap';
+import { buildMoodVerbalSeries, summarizeMoodVerbalSeries } from '@/features/scores/verbalizers';
 import {
-  computeSeriesSummary,
   getMoodSeries30d,
   getSessionsWeekly,
   getVibesHeatmap,
@@ -70,7 +70,8 @@ const ScoresV2Panel: React.FC = () => {
   const sessionRows = sessionsQuery.data ?? [];
   const vibePoints = vibesQuery.data ?? [];
 
-  const vibeSummary = useMemo(() => computeSeriesSummary(moodPoints), [moodPoints]);
+  const moodSeries = useMemo(() => buildMoodVerbalSeries(moodPoints), [moodPoints]);
+  const moodSummary = useMemo(() => summarizeMoodVerbalSeries(moodSeries), [moodSeries]);
 
   useEffect(() => {
     if (!exportError || typeof window === 'undefined') {
@@ -100,7 +101,7 @@ const ScoresV2Panel: React.FC = () => {
         <CardHeader>
           <CardTitle id={moodTitleId}>Évolution de l'humeur (30 derniers jours)</CardTitle>
           <CardDescription id={moodDescriptionId}>
-            Valence (agréable ↔ difficile) et activation (calme ↔ énergisé) lissées sur 3 jours. Données issues des scans émotionnels.
+            Lecture verbalisée des scans émotionnels lissés sur trois jours, combinant valence et activation pour décrire l’ambiance ressentie.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -108,15 +109,9 @@ const ScoresV2Panel: React.FC = () => {
             <LoadingState text="Analyse des émotions en cours" />
           ) : hasMeaningfulMood(moodPoints) ? (
             <>
-              <Mood30dChart ref={moodChartRef} points={moodPoints} titleId={moodTitleId} descriptionId={moodDescriptionId} />
+              <Mood30dChart ref={moodChartRef} series={moodSeries} titleId={moodTitleId} descriptionId={moodDescriptionId} />
               <div className="flex flex-wrap items-center justify-between gap-3" aria-live="polite">
-                <p className="text-sm text-muted-foreground">
-                  Série couvrant {vibeSummary.rangeDays} jours. Vibe dominante:{' '}
-                  {Object.entries(vibeSummary.vibeShare)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([vibe, count]) => `${labelForVibe(vibe)} (${count})`)
-                    .join(', ') || 'aucune'}.
-                </p>
+                <p className="text-sm text-muted-foreground">{moodSummary}</p>
                 <ExportButton
                   targetRef={moodChartRef}
                   fileName="humeur-30-jours"
@@ -141,7 +136,7 @@ const ScoresV2Panel: React.FC = () => {
         <CardHeader>
           <CardTitle id={sessionsTitleId}>Séances par semaine</CardTitle>
           <CardDescription id={sessionsDescriptionId}>
-            Total des pratiques guidées, respiration, musique ou autres activités enregistrées sur 8 semaines glissantes.
+            Panorama hebdomadaire des pratiques guidées, respirations, musiques ou autres activités sur les huit dernières semaines.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -183,7 +178,7 @@ const ScoresV2Panel: React.FC = () => {
         <CardHeader>
           <CardTitle id={heatmapTitleId}>Carte des vibes quotidiennes</CardTitle>
           <CardDescription id={heatmapDescriptionId}>
-            Synthèse de la vibe dominante détectée chaque jour (calm, focus, bright, reset). Les jours sans mesure apparaissent en gris.
+            Synthèse de la vibe dominante détectée chaque jour (posé, focalisé, lumineux, régénérant). Les teintes plus foncées indiquent une présence renforcée, les jours sans mesure restent en gris doux.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -218,20 +213,5 @@ const ScoresV2Panel: React.FC = () => {
     </section>
   );
 };
-
-function labelForVibe(vibe: string) {
-  switch (vibe) {
-    case 'calm':
-      return 'calm';
-    case 'focus':
-      return 'focus';
-    case 'bright':
-      return 'bright';
-    case 'reset':
-      return 'reset';
-    default:
-      return vibe;
-  }
-}
 
 export default ScoresV2Panel;

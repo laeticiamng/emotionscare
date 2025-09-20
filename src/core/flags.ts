@@ -5,6 +5,7 @@ interface FeatureFlags {
   FF_VR: boolean;
   FF_COMMUNITY: boolean;
   FF_MANAGER_DASH: boolean;
+  FF_SCORES: boolean;
   
   // Clinical Assessment Feature Flags
   FF_ASSESS_WHO5: boolean;
@@ -34,6 +35,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_VR: true,
   FF_COMMUNITY: true,
   FF_MANAGER_DASH: true,
+  FF_SCORES: true,
   
   // Clinical assessments - opt-in by default
   FF_ASSESS_WHO5: true,      // Well-being thermometer - gentle weekly
