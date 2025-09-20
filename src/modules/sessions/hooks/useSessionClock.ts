@@ -256,6 +256,7 @@ export function useSessionClock(options: Options = {}): Return {
     if (autoStart) {
       start()
     }
+  }, [])
   }, [autoStart, start])
 
   const progress = useMemo(() => {
