@@ -3,7 +3,7 @@ import { z } from '../_shared/zod.ts';
 import { createClient } from '../_shared/supabase.ts';
 
 import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
-import { getCatalog, instrumentSchema, summarizeAssessment } from '../_shared/assess.ts';
+import { getCatalog, instrumentSchema, sanitizeSummaryText, summarizeAssessment } from '../_shared/assess.ts';
 import { appendCorsHeaders, preflightResponse, rejectCors, resolveCors } from '../_shared/cors.ts';
 import { json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
@@ -76,10 +76,17 @@ serve(async (req) => {
     const { instrument, answers, ts } = parsed.data;
     const summary = summarizeAssessment(instrument, answers);
     const catalog = getCatalog(instrument, 'fr');
+    const sanitizedSummary = sanitizeSummaryText(summary.summary);
 
     addSentryBreadcrumb({
       category: 'assess:submit',
       message: 'summary generated',
+      data: { instrument },
+    });
+
+    addSentryBreadcrumb({
+      category: 'assess:submit',
+      message: 'storing sanitized summary',
       data: { instrument },
     });
 
@@ -89,9 +96,10 @@ serve(async (req) => {
     });
 
     const payload = {
+      user_id: auth.user.id,
       instrument,
       score_json: {
-        summary: summary.summary,
+        summary: sanitizedSummary,
         focus: summary.focus,
         instrument_version: catalog.version,
         generated_at: new Date().toISOString(),
@@ -114,6 +122,12 @@ serve(async (req) => {
       result: 'success',
       user_agent: 'redacted',
       details: `instrument=${instrument}`,
+    });
+
+    addSentryBreadcrumb({
+      category: 'assess:submit',
+      message: 'assessment stored',
+      data: { instrument },
     });
 
     const response = json(200, { status: 'ok', stored: true });

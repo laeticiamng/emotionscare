@@ -252,6 +252,7 @@ describe('assess-submit function', () => {
     expect(response.status).toBe(200);
     expect(insertMock).toHaveBeenCalledTimes(1);
     const payload = insertMock.mock.calls[0][0];
+    expect(payload.user_id).toBe('user-123');
     expect(payload.instrument).toBe('WHO5');
     expect(payload.score_json.summary).toMatch(/bien-être|affect|tension/);
     expect(payload.score_json.summary).not.toMatch(/\d/);
@@ -260,6 +261,12 @@ describe('assess-submit function', () => {
       route: 'assess-submit',
       action: 'assess:submit',
       result: 'success',
+    }));
+    expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'storing sanitized summary',
+    }));
+    expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'assessment stored',
     }));
   });
 
