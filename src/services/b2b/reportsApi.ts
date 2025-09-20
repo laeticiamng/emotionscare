@@ -269,5 +269,3 @@ export function useAggregateSummaries(
 }
 
 export { DEFAULT_INSTRUMENTS };
-export type { HeatmapCell };
-export type { AggregateSummary };

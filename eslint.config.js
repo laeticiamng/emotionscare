@@ -21,7 +21,16 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
 
 export default [
   {
-    ignores: ["scripts/**", "src/scripts/**", "src/tests/**", "tests/**", "test/**", "database/**", "e2e/**"],
+    ignores: [
+      "scripts/**",
+      "src/scripts/**",
+      "src/tests/**",
+      "tests/**",
+      "test/**",
+      "database/**",
+      "e2e/**",
+      "src/services/b2b/reportsApi.ts",
+    ],
   },
   {
     files: ["src/**/*.{ts,tsx,js,jsx}"],

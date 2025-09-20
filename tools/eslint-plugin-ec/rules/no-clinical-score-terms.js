@@ -6,6 +6,8 @@ const FORBIDDEN_PATTERNS = [
   { regex: /\bscores?\b/i, label: "score" },
   { regex: /\bpoints?\b/i, label: "points" },
   { regex: /%/, label: "%" },
+  { regex: /\banxi[ée]t[ée]\b/i, label: "anxiété" },
+  { regex: /\bburnout\b/i, label: "burnout" },
 ];
 
 const NON_TEXTUAL_ATTRIBUTES = new Set([

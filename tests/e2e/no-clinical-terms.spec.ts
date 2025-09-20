@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { OFFICIAL_ROUTES_ARRAY } from '../../src/routesManifest';
 
-const bannedTerms = [/score/i, /dépression/i, /anxi[ée]t[ée]/i];
+const bannedTerms = [/score/i, /dépression/i, /anxi[ée]t[ée]/i, /burnout/i, /%/];
 
 test.describe('Clinical wording guard', () => {
   for (const route of OFFICIAL_ROUTES_ARRAY) {
