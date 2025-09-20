@@ -75,7 +75,8 @@ serve(async (req) => {
       .from('org_assess_rollups')
       .select('instrument, period, n, text_summary')
       .eq('org_id', orgId)
-      .eq('period', period);
+      .eq('period', period)
+      .gte('n', 5);
 
     if (instruments && instruments.length > 0) {
       query = query.in('instrument', instruments);
