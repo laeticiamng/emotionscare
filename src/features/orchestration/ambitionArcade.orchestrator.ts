@@ -1,6 +1,10 @@
 import type { AmbitionOrchestrationAction, AmbitionOrchestratorInput, TextProgressKey } from './types';
 
-const MICRO_LEVERS = ['1 geste simple', '2 minutes de marche', 'respirer 1 minute'] as const;
+const MICRO_LEVERS = [
+  'un geste simple',
+  'quelques pas de marche',
+  'respirer calmement',
+] as const;
 
 export function ambitionArcadeOrchestrator({ gasLevel }: AmbitionOrchestratorInput = {}): AmbitionOrchestrationAction[] {
   const label: TextProgressKey =
