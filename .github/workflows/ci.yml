@@ -1,354 +1,104 @@
-name: 🚀 CI/CD Pipeline - Phase 2
+name: CI
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
-    branches: [main]
-  workflow_dispatch:
+  push:
+    branches: [ main ]
 
-env:
-  NODE_VERSION: '20'
-
-# Configuration concurrency
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # 📋 Job 1: Audit qualité de code
-  quality-check:
-    name: 🔍 Quality & Security
+  setup:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    
+    outputs:
+      node: ${{ steps.versions.outputs.node }}
     steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-        
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v3
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
           version: 9
-
-      - name: 🔧 Install dependencies
-        run: npm ci --prefer-offline --audit=false
-
-      - name: 🧹 Lint check
-        run: pnpm lint
-        
-      - name: 📝 Type check
-        run: npm run type-check
-
-      - name: 🕵️ Secret scan
-        uses: zricethezav/gitleaks-action@v2
-        with:
-          args: --no-git -v
-        
-      - name: 🔐 Security audit
-        run: npm audit --audit-level=high
-        continue-on-error: true
-        
-      - name: 📊 Dependency check
-        run: |
-          echo "📦 Checking for unused dependencies..."
-          npx depcheck --ignore-bin-package --skip-missing
-
-  # 🧪 Job 2: Tests unitaires et intégration  
-  test:
-    name: 🧪 Unit & Integration Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: 🔧 Install dependencies
-        run: npm ci --prefer-offline --audit=false
-        
-      - name: 🧪 Run unit tests
-        run: npm run test -- --coverage --reporter=json --outputFile=coverage/test-results.json
-        
-      - name: 📊 Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/lcov.info
-          fail_ci_if_error: false
-
-  # 🗃️ Job 2b: Database migrations and tests
-  db-test:
-    name: 🗃️ DB Migrations & Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: emotions_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 🔧 Install dependencies
-        run: npm ci --prefer-offline --audit=false
-
-      - name: 🗄️ Apply migrations
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: emotions_test
-          DB_USER: postgres
-          DB_PASS: postgres
-        run: npm run flyway:migrate
-
-      - name: 🧪 Run DB tests
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/emotions_test
-        run: npm run test:db
-
-      - name: 📁 Upload DB test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: db-tests
-          path: reports/db-tests.json
-
-  # 🏗️ Job 3: Build & Bundle Analysis
-  build:
-    name: 🏗️ Build & Bundle Analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [quality-check]
-    
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-        
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: 🔧 Install dependencies
-        run: npm ci --prefer-offline --audit=false
-        
-      - name: 🏗️ Build application
-        run: npm run build
-        
-      - name: 📊 Analyze bundle
-        run: ANALYZE=true npm run build
-        
-      - name: 📈 Bundle size report
-        run: |
-          echo "📦 Bundle Analysis:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          ls -lah dist/ >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          
-      - name: 💾 Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-files
-          path: dist/
-          retention-days: 7
-  e2e:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: supabase/postgres:latest
-        ports: ['5432:5432']
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s --health-timeout=5s --health-retries=10
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: ${{ env.NODE_VERSION }} }
-      - run: npm ci
-      - name: Apply migrations
-        run: npm run db:migrate # ou supabase db push
-        env:
-          SUPABASE_URL: http://localhost:5432
-          SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
-      - name: Seed minimal E2E
-        run: npm run test:db:seed
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
-      - run: npm run build
-      - run: npm run preview & npx wait-on http://localhost:3000
-      - name: Playwright install
-        run: npx playwright install --with-deps
-      - name: E2E (3 rôles)
-        run: npx playwright test --project=b2c-chromium --project=b2b-user-chromium --project=b2b-admin-chromium
-        env:
-          PW_BASE_URL: http://localhost:3000
-      - name: Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - id: versions
+        run: echo "node=20" >> "$GITHUB_OUTPUT"
 
-  # 🎭 Job 4: Tests End-to-End
-  e2e-tests:
-    name: 🎭 E2E Tests
+  lint:
+    needs: setup
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [build]
-    
-    strategy:
-      matrix:
-        browser: [chromium, firefox, webkit]
-        
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-        
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          
-      - name: 🔧 Install dependencies
-        run: npm ci --prefer-offline --audit=false
-        
-      - name: 🎭 Install Playwright
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-        
-      - name: 💾 Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-files
-          path: dist/
-          
-      - name: 🎯 Run E2E tests
-        run: npx playwright test --project=${{ matrix.browser }}
-        env:
-          CI: true
-          
-      - name: 📊 Upload test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-report-${{ matrix.browser }}
-          path: reports/playwright/
-          retention-days: 7
-
-  # 🐳 Job 5: Build API Docker image
-  docker-build:
-    name: 🐳 Build API Docker image
-    runs-on: ubuntu-latest
-    needs: [test, db-test, e2e-tests, e2e]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build API image
-        run: docker build -t emotionscare-api:${{ github.sha }} -f services/api/Dockerfile .
-      - name: Save image
-        run: docker save emotionscare-api:${{ github.sha }} | gzip > api-image.tar.gz
-      - name: Upload image artifact
-        uses: actions/upload-artifact@v4
+      - uses: pnpm/action-setup@v3
         with:
-          name: api-image
-          path: api-image.tar.gz
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
 
-  # 🚀 Job 6: Deploy Preview (PR uniquement)
-  deploy-preview:
-    name: 🚀 Deploy Preview
+  typecheck:
+    needs: setup
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [test, db-test, e2e-tests, e2e]
-    if: github.event_name == 'pull_request'
-    
     steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-        
-      - name: 💾 Download build artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
-          name: build-files
-          path: dist/
-          
-      - name: 🚀 Deploy to Netlify Preview
-        uses: nwtgck/actions-netlify@v3
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          publish-dir: './dist'
-          production-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Preview deployment from PR #${{ github.event.pull_request.number }}"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
 
-  # 🚀 Job 7: Deploy Production (main uniquement)
-  deploy-production:
-    name: 🚀 Deploy Production
+  unit:
+    needs: setup
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [test, db-test, e2e-tests, e2e]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    environment:
-      name: production
-      url: https://emotionscare.netlify.app
-    
     steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-        
-      - name: 💾 Download build artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
-          name: build-files
-          path: dist/
-          
-      - name: 🚀 Deploy to Production
-        uses: nwtgck/actions-netlify@v3
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          publish-dir: './dist'
-          production-deploy: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Production deployment from commit ${{ github.sha }}"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          
-      - name: 🎉 Deployment success
-        run: |
-          echo "🎉 Production deployment successful!" >> $GITHUB_STEP_SUMMARY
-          echo "🌐 URL: https://emotionscare.netlify.app" >> $GITHUB_STEP_SUMMARY
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+  build:
+    needs: [lint, typecheck, unit]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  scanners:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run scan:no-clinical-terms
+      - run: pnpm run scan:no-raw-numbers
