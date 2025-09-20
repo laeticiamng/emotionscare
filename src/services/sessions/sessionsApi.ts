@@ -14,6 +14,7 @@ export type SessionType =
   | 'community'
   | 'social_cocon'
   | 'auras'
+  | 'coach'
 
 export type SessionRecord = {
   id: string
