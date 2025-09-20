@@ -1,5 +1,4 @@
 export { router } from './router';
-export { router as routerV2 } from './router';
 export type { AppRouter } from './router';
 
 // Type pour éviter les logs répétés
