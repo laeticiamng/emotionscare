@@ -5,7 +5,7 @@ import { createClient } from '../_shared/supabase.ts';
 import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
 import { sanitizeAggregateText, instrumentSchema } from '../_shared/assess.ts';
 import { appendCorsHeaders, preflightResponse, rejectCors, resolveCors } from '../_shared/cors.ts';
-import { json } from '../_shared/http.ts';
+import { applySecurityHeaders, json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
 import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
@@ -14,9 +14,11 @@ import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 
 const aggregateSchema = z.object({
   org_id: z.string().min(1),
-  period: z.string().min(1),
+  period: z.string().regex(/^[0-9]{4}-(0[1-9]|1[0-2])$/, 'invalid_period'),
   instruments: z.array(instrumentSchema).optional(),
 });
+
+const ORG_ALLOWED_ROLES = ['b2b_admin', 'b2b_hr', 'b2b_user', 'admin'] as const;
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -45,22 +47,31 @@ serve(async (req) => {
   };
 
   if (req.method === 'OPTIONS') {
-    return finalize(preflightResponse(cors));
+    return finalize(applySecurityHeaders(preflightResponse(cors), { cacheControl: 'no-store' }));
   }
 
   if (!cors.allowed) {
-    return finalize(rejectCors(cors), { outcome: 'denied', error: 'origin_not_allowed' });
+    return finalize(applySecurityHeaders(rejectCors(cors), { cacheControl: 'no-store' }), {
+      outcome: 'denied',
+      error: 'origin_not_allowed',
+    });
   }
 
   if (req.method !== 'POST') {
     const response = appendCorsHeaders(new Response('Method Not Allowed', { status: 405 }), cors);
-    return finalize(response, { outcome: 'denied', error: 'method_not_allowed' });
+    return finalize(
+      applySecurityHeaders(response, { cacheControl: 'no-store' }),
+      { outcome: 'denied', error: 'method_not_allowed' },
+    );
   }
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     console.error('[assess-aggregate] missing Supabase configuration');
     const response = appendCorsHeaders(json(500, { error: 'configuration_error' }), cors);
-    return finalize(response, { outcome: 'error', error: 'configuration_error' });
+    return finalize(
+      applySecurityHeaders(response, { cacheControl: 'no-store' }),
+      { outcome: 'error', error: 'configuration_error' },
+    );
   }
 
   try {
@@ -70,37 +81,81 @@ serve(async (req) => {
         await logUnauthorizedAccess(req, auth.error ?? 'unauthorized');
       }
       const response = appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
-      return finalize(response, { outcome: 'denied', error: 'unauthorized' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'unauthorized' },
+      );
     }
 
     hashedUserId = hash(auth.user.id);
+
+    const userRole = auth.user.user_metadata?.role ?? 'b2c';
+    if (!ORG_ALLOWED_ROLES.includes(userRole as (typeof ORG_ALLOWED_ROLES)[number])) {
+      await logUnauthorizedAccess(req, 'forbidden_role');
+      const response = appendCorsHeaders(json(403, { error: 'forbidden' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'forbidden', stage: 'role_check' },
+      );
+    }
 
     const rateDecision = await enforceEdgeRateLimit(req, {
       route: 'assess-aggregate',
       userId: auth.user.id,
       description: 'aggregate assessment rollups',
+      limit: 5,
+      windowMs: 60_000,
     });
     if (!rateDecision.allowed) {
+      addSentryBreadcrumb({
+        category: 'assess',
+        message: 'assess:aggregate:rate_limited',
+        data: { identifier: rateDecision.identifier, retry_after: rateDecision.retryAfterSeconds },
+      });
       const response = buildRateLimitResponse(rateDecision, cors.headers);
-      return finalize(response, { outcome: 'denied', error: 'rate_limited' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'rate_limited', stage: 'rate_limit' },
+      );
     }
 
     const body = await req.json().catch(() => null);
     if (!body) {
       const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
-      return finalize(response, { outcome: 'denied', error: 'invalid_body' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'invalid_body' },
+      );
     }
 
     const parsed = aggregateSchema.safeParse(body);
     if (!parsed.success) {
       const response = appendCorsHeaders(json(422, { error: 'invalid_body', details: 'validation_failed' }), cors);
-      return finalize(response, { outcome: 'denied', error: 'validation_failed' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'validation_failed' },
+      );
     }
 
     const { org_id: orgId, period, instruments } = parsed.data;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     hashedOrgId = hash(orgId);
+
+    const metadata = auth.user.user_metadata ?? {};
+    const orgClaims = Array.isArray(metadata.org_ids)
+      ? metadata.org_ids
+      : metadata.org_id
+        ? [metadata.org_id]
+        : [];
+    if (orgClaims.length > 0 && !orgClaims.includes(orgId)) {
+      await logUnauthorizedAccess(req, 'forbidden_org_scope');
+      const response = appendCorsHeaders(json(403, { error: 'forbidden' }), cors);
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'forbidden', stage: 'org_scope' },
+      );
+    }
 
     let query = supabase
       .from('org_assess_rollups')
@@ -118,7 +173,10 @@ serve(async (req) => {
       captureSentryException(error, { route: 'assess-aggregate', stage: 'db_read' });
       console.error('[assess-aggregate] failed to load rollups', { message: error.message });
       const response = appendCorsHeaders(json(500, { error: 'read_failed' }), cors);
-      return finalize(response, { outcome: 'error', error: 'read_failed', stage: 'db_read' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'error', error: 'read_failed', stage: 'db_read' },
+      );
     }
 
     const summaries = (data ?? [])
@@ -149,11 +207,15 @@ serve(async (req) => {
     });
 
     const response = appendCorsHeaders(json(200, { summaries }), cors);
+    applySecurityHeaders(response, { cacheControl: 'private, max-age=120, must-revalidate' });
     return finalize(response, { outcome: 'success', stage: 'summaries_served' });
   } catch (error) {
     captureSentryException(error, { route: 'assess-aggregate' });
     console.error('[assess-aggregate] unexpected error', { message: error instanceof Error ? error.message : 'unknown' });
     const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
-    return finalize(response, { outcome: 'error', error: 'internal_error' });
+    return finalize(
+      applySecurityHeaders(response, { cacheControl: 'no-store' }),
+      { outcome: 'error', error: 'internal_error' },
+    );
   }
 });

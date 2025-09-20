@@ -57,6 +57,14 @@ function setDefaultAuthSuccess() {
   });
 }
 
+function setOrgAuthSuccess(options: { role?: string; orgs?: string[] } = {}) {
+  const { role = 'b2b_admin', orgs = ['org-1'] } = options;
+  authenticateRequestMock.mockResolvedValue({
+    status: 200,
+    user: { id: 'user-123', user_metadata: { role, org_ids: orgs } },
+  });
+}
+
 async function importEdgeHandler(modulePath: string) {
   handlerRef.current = null;
   await vi.resetModules();
@@ -83,6 +91,7 @@ beforeEach(() => {
   envStore.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
   envStore.CORS_ORIGINS = 'https://example.com';
   delete envStore.EDGE_RATE_LIMIT_ASSESS_START;
+  delete envStore.EDGE_RATE_LIMIT_ASSESS_AGGREGATE;
   (globalThis as Record<string, unknown>).Deno = {
     env: {
       get: (key: string) => envStore[key],
@@ -320,7 +329,7 @@ describe('assess-aggregate function', () => {
         'content-type': 'application/json',
         origin: 'https://example.com',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-Q1' }),
+      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
     }));
 
     expect(response.status).toBe(401);
@@ -328,7 +337,7 @@ describe('assess-aggregate function', () => {
   });
 
   it('validates request body', async () => {
-    setDefaultAuthSuccess();
+    setOrgAuthSuccess();
     const handler = await importEdgeHandler('../functions/assess-aggregate/index.ts');
 
     const response = await handler(new Request('https://edge/assess-aggregate', {
@@ -343,15 +352,49 @@ describe('assess-aggregate function', () => {
     expect(response.status).toBe(422);
   });
 
+  it('rejects users without organisational role', async () => {
+    setOrgAuthSuccess({ role: 'member' });
+    const handler = await importEdgeHandler('../functions/assess-aggregate/index.ts');
+
+    const response = await handler(new Request('https://edge/assess-aggregate', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://example.com',
+      },
+      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+    }));
+
+    expect(response.status).toBe(403);
+    expect(logUnauthorizedAccessMock).toHaveBeenCalledWith(expect.anything(), 'forbidden_role');
+  });
+
+  it('rejects users outside the requested organisation scope', async () => {
+    setOrgAuthSuccess({ orgs: ['org-2'] });
+    const handler = await importEdgeHandler('../functions/assess-aggregate/index.ts');
+
+    const response = await handler(new Request('https://edge/assess-aggregate', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://example.com',
+      },
+      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+    }));
+
+    expect(response.status).toBe(403);
+    expect(logUnauthorizedAccessMock).toHaveBeenCalledWith(expect.anything(), 'forbidden_org_scope');
+  });
+
   it('returns sanitized summaries filtered on n >= 5', async () => {
-    setDefaultAuthSuccess();
+    setOrgAuthSuccess();
     const selectMock = vi.fn();
     const eqMock = vi.fn();
     const inMock = vi.fn();
     const gteMock = vi.fn();
     const result = { data: [
-      { instrument: 'WHO5', period: '2024-Q1', n: 7, text_summary: 'Équipe sereine et 12,5 % initiatives positives.' },
-      { instrument: 'STAI6', period: '2024-Q1', n: 3, text_summary: 'Sensibilité ponctuelle.' },
+      { instrument: 'WHO5', period: '2024-03', n: 7, text_summary: 'Équipe sereine et 12,5 % initiatives positives.' },
+      { instrument: 'STAI6', period: '2024-03', n: 3, text_summary: 'Sensibilité ponctuelle.' },
     ], error: null };
     const builder: any = {
       select: selectMock,
@@ -376,7 +419,7 @@ describe('assess-aggregate function', () => {
         'content-type': 'application/json',
         origin: 'https://example.com',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-Q1' }),
+      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
     }));
 
     expect(response.status).toBe(200);
@@ -405,7 +448,7 @@ describe('assess-aggregate function', () => {
   });
 
   it('propagates database errors', async () => {
-    setDefaultAuthSuccess();
+    setOrgAuthSuccess();
     const error = { message: 'db read failed' };
     const builder: any = {
       select: vi.fn(),
@@ -430,7 +473,7 @@ describe('assess-aggregate function', () => {
         'content-type': 'application/json',
         origin: 'https://example.com',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-Q1', instruments: ['WHO5'] }),
+      body: JSON.stringify({ org_id: 'org-1', period: '2024-03', instruments: ['WHO5'] }),
     }));
 
     expect(response.status).toBe(500);
@@ -438,5 +481,50 @@ describe('assess-aggregate function', () => {
       route: 'assess-aggregate',
       stage: 'db_read',
     }));
+  });
+
+  it('enforces per-user rate limits', async () => {
+    envStore.EDGE_RATE_LIMIT_ASSESS_AGGREGATE = '1';
+    setOrgAuthSuccess();
+
+    const selectMock = vi.fn();
+    const eqMock = vi.fn();
+    const inMock = vi.fn();
+    const gteMock = vi.fn();
+    const result = { data: [], error: null };
+    const builder: any = {
+      select: selectMock,
+      eq: eqMock,
+      in: inMock,
+      gte: gteMock,
+      then: (onFulfilled: (value: unknown) => unknown, onRejected?: (reason: unknown) => unknown) =>
+        Promise.resolve(result).then(onFulfilled, onRejected),
+    };
+    selectMock.mockReturnValue(builder);
+    eqMock.mockReturnValue(builder);
+    inMock.mockReturnValue(builder);
+    gteMock.mockReturnValue(builder);
+    const fromMock = vi.fn(() => builder);
+    supabaseClientMock.mockReturnValue({ from: fromMock });
+
+    const handler = await importEdgeHandler('../functions/assess-aggregate/index.ts');
+
+    const makeRequest = () => new Request('https://edge/assess-aggregate', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://example.com',
+      },
+      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+    });
+
+    const ok = await handler(makeRequest());
+    expect(ok.status).toBe(200);
+
+    const limited = await handler(makeRequest());
+    expect(limited.status).toBe(429);
+    const payload = await limited.json();
+    expect(payload.error).toBe('rate_limited');
+    expect(payload.retry_after).toBeGreaterThan(0);
   });
 });

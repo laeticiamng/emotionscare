@@ -4,7 +4,7 @@ import { z } from '../_shared/zod.ts';
 import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
 import { getCatalog, instrumentSchema, localeSchema } from '../_shared/assess.ts';
 import { appendCorsHeaders, preflightResponse, rejectCors, resolveCors } from '../_shared/cors.ts';
-import { json } from '../_shared/http.ts';
+import { applySecurityHeaders, json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
 import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
@@ -38,16 +38,22 @@ serve(async (req) => {
   };
 
   if (req.method === 'OPTIONS') {
-    return finalize(preflightResponse(cors));
+    return finalize(applySecurityHeaders(preflightResponse(cors), { cacheControl: 'no-store' }));
   }
 
   if (!cors.allowed) {
-    return finalize(rejectCors(cors), { outcome: 'denied', error: 'origin_not_allowed' });
+    return finalize(applySecurityHeaders(rejectCors(cors), { cacheControl: 'no-store' }), {
+      outcome: 'denied',
+      error: 'origin_not_allowed',
+    });
   }
 
   if (req.method !== 'POST') {
     const response = appendCorsHeaders(new Response('Method Not Allowed', { status: 405 }), cors);
-    return finalize(response, { outcome: 'denied', error: 'method_not_allowed' });
+    return finalize(
+      applySecurityHeaders(response, { cacheControl: 'no-store' }),
+      { outcome: 'denied', error: 'method_not_allowed' },
+    );
   }
 
   try {
@@ -57,7 +63,10 @@ serve(async (req) => {
         await logUnauthorizedAccess(req, auth.error ?? 'unauthorized');
       }
       const response = appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
-      return finalize(response, { outcome: 'denied', error: 'unauthorized' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'unauthorized' },
+      );
     }
 
     hashedUserId = hash(auth.user.id);
@@ -66,22 +75,38 @@ serve(async (req) => {
       route: 'assess-start',
       userId: auth.user.id,
       description: 'start assessment instrument delivery',
+      limit: 10,
+      windowMs: 60_000,
     });
     if (!rateDecision.allowed) {
+      addSentryBreadcrumb({
+        category: 'assess',
+        message: 'assess:start:rate_limited',
+        data: { identifier: rateDecision.identifier, retry_after: rateDecision.retryAfterSeconds },
+      });
       const response = buildRateLimitResponse(rateDecision, cors.headers);
-      return finalize(response, { outcome: 'denied', error: 'rate_limited' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'rate_limited', stage: 'rate_limit' },
+      );
     }
 
     const body = await req.json().catch(() => null);
     if (!body) {
       const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
-      return finalize(response, { outcome: 'denied', error: 'invalid_body' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'invalid_body' },
+      );
     }
 
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
       const response = appendCorsHeaders(json(422, { error: 'invalid_body', details: 'validation_failed' }), cors);
-      return finalize(response, { outcome: 'denied', error: 'validation_failed' });
+      return finalize(
+        applySecurityHeaders(response, { cacheControl: 'no-store' }),
+        { outcome: 'denied', error: 'validation_failed' },
+      );
     }
 
     const { instrument, locale } = parsed.data;
@@ -91,27 +116,14 @@ serve(async (req) => {
     try {
       catalog = getCatalog(instrument, resolvedLocale);
     } catch (_error) {
-      return appendCorsHeaders(
-        json(422, { error: 'invalid_body', details: 'catalog_unavailable' }),
-        cors,
+      return finalize(
+        applySecurityHeaders(
+          appendCorsHeaders(json(422, { error: 'invalid_body', details: 'catalog_unavailable' }), cors),
+          { cacheControl: 'no-store' },
+        ),
+        { outcome: 'denied', error: 'catalog_unavailable' },
       );
     }
-
-    const payload = {
-      instrument,
-      locale: resolvedLocale,
-      name: catalog.name,
-      version: catalog.version,
-      expiry_minutes: catalog.expiry_minutes,
-      items: catalog.items.map((item) => ({
-        id: item.id,
-        prompt: item.prompt,
-        type: item.type,
-        options: item.options,
-        min: item.min,
-        max: item.max,
-      })),
-    };
 
     addSentryBreadcrumb({
       category: 'assess',
@@ -129,13 +141,18 @@ serve(async (req) => {
       details: `instrument=${instrument} locale=${resolvedLocale}`,
     });
 
+    const ttlSeconds = Math.max(30, Math.min(catalog.expiry_minutes * 60, 600));
     const responsePayload = { instrument, locale: locale ?? 'fr', ...catalog };
     const response = appendCorsHeaders(json(200, responsePayload), cors);
+    applySecurityHeaders(response, { cacheControl: `private, max-age=${ttlSeconds}, must-revalidate` });
     return finalize(response, { outcome: 'success', stage: 'catalog_served' });
   } catch (error) {
     captureSentryException(error, { route: 'assess-start' });
     console.error('[assess-start] unexpected error', { message: error instanceof Error ? error.message : 'unknown' });
     const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
-    return finalize(response, { outcome: 'error', error: 'internal_error' });
+    return finalize(
+      applySecurityHeaders(response, { cacheControl: 'no-store' }),
+      { outcome: 'error', error: 'internal_error' },
+    );
   }
 });
