@@ -5,7 +5,14 @@ exports[`AdaptiveMusicPage > rend la page et la playlist adaptative 1`] = `
   <main
     aria-label="Adaptive Music"
     class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:px-8"
+    data-testid="adaptive-music-page"
   >
+    <div
+      aria-live="polite"
+      class="sr-only"
+    >
+      Brume velours. Intensité velours, tout en rondeur.
+    </div>
     <div
       class="relative overflow-hidden rounded-2xl p-6 mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background"
       style="opacity: 0; transform: translateY(-20px) translateZ(0);"
@@ -62,7 +69,7 @@ exports[`AdaptiveMusicPage > rend la page et la playlist adaptative 1`] = `
                 <p
                   class="text-muted-foreground"
                 >
-                  Une playlist générée pour soutenir votre état émotionnel actuel.
+                  Une bulle sonore qui se cale sur ton souffle et tes ressentis du moment.
                 </p>
               </div>
             </div>
@@ -171,30 +178,73 @@ exports[`AdaptiveMusicPage > rend la page et la playlist adaptative 1`] = `
         class="rounded-xl border bg-card text-card-foreground shadow"
       >
         <div
-          class="flex flex-col p-6 space-y-6"
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="font-semibold leading-none tracking-tight"
+          >
+            Horizon sonore du moment
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Nous ajustons la texture pour rester dans le confort
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
         >
           <div
-            class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"
+            class="rounded-lg border border-muted/60 bg-muted/20 p-4"
           >
-            <div>
-              <h3
-                class="font-semibold leading-none tracking-tight"
+            <div
+              class="flex items-center justify-between"
+            >
+              <div>
+                <p
+                  class="text-sm text-muted-foreground"
+                >
+                  Une présence nette qui accompagne les pensées avec douceur.
+                </p>
+                <p
+                  class="text-lg font-semibold"
+                >
+                  🎯
+                   
+                  Brume velours
+                </p>
+              </div>
+              <div
+                class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
               >
-                Playlist adaptative
-              </h3>
-              <p
-                class="text-sm text-muted-foreground"
-              >
-                Ajustez les paramètres pour générer une session ciblée et reprendre où vous voulez.
-              </p>
+                Focus
+              </div>
             </div>
-            <button
-              class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs"
-              type="button"
+            <p
+              class="mt-3 text-sm text-muted-foreground"
+            >
+              Ambiance souple qui chuchote et laisse respirer.
+            </p>
+            <p
+              class="text-xs text-muted-foreground"
+            >
+              Le flux reste régulier, sans heurt.
+            </p>
+            <p
+              class="text-xs text-muted-foreground"
+            >
+              Intensité velours, tout en rondeur.
+            </p>
+          </div>
+          <div
+            class="rounded-lg border border-muted/60 bg-muted/10 p-4"
+          >
+            <div
+              class="flex items-center gap-2 text-sm font-medium"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-refresh-cw mr-2 h-4 w-4"
+                class="lucide lucide-sparkles h-4 w-4"
                 fill="none"
                 height="24"
                 stroke="currentColor"
@@ -206,513 +256,109 @@ exports[`AdaptiveMusicPage > rend la page et la playlist adaptative 1`] = `
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                  d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
                 />
                 <path
-                  d="M21 3v5h-5"
+                  d="M5 3v4"
                 />
                 <path
-                  d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                  d="M19 17v4"
                 />
                 <path
-                  d="M8 16H3v5"
+                  d="M3 5h4"
+                />
+                <path
+                  d="M17 19h4"
                 />
               </svg>
-              Actualiser
-            </button>
-          </div>
-          <div
-            class="grid gap-4 md:grid-cols-2"
-          >
-            <div
-              class="space-y-2"
-            >
-              <label
-                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                for="adaptive-mood"
-              >
-                Humeur cible
-              </label>
-              <button
-                aria-autocomplete="none"
-                aria-controls="radix-:r0:"
-                aria-expanded="false"
-                class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
-                data-state="closed"
-                dir="ltr"
-                id="adaptive-mood"
-                role="combobox"
-                type="button"
-              >
-                <span
-                  style="pointer-events: none;"
-                >
-                  <div
-                    class="flex flex-col"
-                  >
-                    <span
-                      class="font-medium"
-                    >
-                      😌
-                       
-                      Apaisement
-                    </span>
-                    <span
-                      class="text-xs text-muted-foreground"
-                    >
-                      Texturé et doux pour relâcher la pression
-                    </span>
-                  </div>
-                </span>
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-chevron-down h-4 w-4 opacity-50"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="m6 9 6 6 6-6"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div
-              class="space-y-2"
-            >
-              <label
-                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                for="adaptive-duration"
-              >
-                Durée de session
-              </label>
-              <button
-                aria-autocomplete="none"
-                aria-controls="radix-:r1:"
-                aria-expanded="false"
-                class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
-                data-state="closed"
-                dir="ltr"
-                id="adaptive-duration"
-                role="combobox"
-                type="button"
-              >
-                <span
-                  style="pointer-events: none;"
-                >
-                  20
-                   minutes
-                </span>
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-chevron-down h-4 w-4 opacity-50"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="m6 9 6 6 6-6"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div
-              class="md:col-span-2 flex items-center justify-between rounded-md border px-3 py-2"
-            >
-              <div
-                class="space-y-1"
-              >
-                <label
-                  class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium"
-                  for="adaptive-instrumental"
-                >
-                  Instrumental uniquement
-                </label>
-                <p
-                  class="text-xs text-muted-foreground"
-                >
-                  Supprime les pistes avec voix pour favoriser la concentration ou la relaxation profonde.
-                </p>
-              </div>
-              <button
-                aria-checked="true"
-                aria-label="Activer uniquement les pistes instrumentales"
-                class="peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input"
-                data-state="checked"
-                id="adaptive-instrumental"
-                role="switch"
-                type="button"
-                value="on"
-              >
-                <span
-                  class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"
-                  data-state="checked"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-        <div
-          class="p-6 pt-0 space-y-4"
-        >
-          <div
-            class="space-y-6"
-          >
-            <div
-              class="rounded-lg border bg-muted/30 p-4"
-            >
-              <div
-                class="flex items-center gap-2 text-sm text-muted-foreground"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-sparkles h-4 w-4"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
-                  />
-                  <path
-                    d="M5 3v4"
-                  />
-                  <path
-                    d="M19 17v4"
-                  />
-                  <path
-                    d="M3 5h4"
-                  />
-                  <path
-                    d="M17 19h4"
-                  />
-                </svg>
-                Mock Playlist
-              </div>
-              <h3
-                class="mt-2 text-lg font-semibold"
-              >
-                First track
-              </h3>
-              <p
-                class="text-sm text-muted-foreground"
-              >
-                A calm testing track
-              </p>
-              <div
-                class="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground"
-              >
-                <span
-                  class="inline-flex items-center gap-1"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="lucide lucide-clock h-3.5 w-3.5"
-                    fill="none"
-                    height="24"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                    />
-                    <polyline
-                      points="12 6 12 12 16 14"
-                    />
-                  </svg>
-                  5:00
-                </span>
-                <span>
-                  25
-                  % énergie
-                </span>
-                <span>
-                  Focus : 
-                  Respiration
-                </span>
-                <span>
-                  Artiste : 
-                  EmotionsCare
-                </span>
-              </div>
-            </div>
-            <div
-              aria-label="First track"
-              style="display: grid; gap: 8px;"
-            >
-              <div
-                style="display: grid; gap: 6px;"
-              >
-                <strong>
-                  First track
-                </strong>
-                <div
-                  style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;"
-                >
-                  <button
-                    aria-pressed="false"
-                    data-ui="primary-cta"
-                    type="button"
-                  >
-                    Lecture
-                  </button>
-                  <button
-                    aria-pressed="false"
-                    data-ui="favorite-toggle"
-                    type="button"
-                  >
-                    Ajouter aux favoris
-                  </button>
-                </div>
-              </div>
-              <label
-                style="display: flex; gap: 8px; align-items: center;"
-              >
-                Volume
-                <input
-                  data-ui="volume-slider"
-                  max="1"
-                  min="0"
-                  step="0.01"
-                  type="range"
-                  value="0.75"
-                />
-              </label>
+              Partage ton ressenti quand tu le souhaites pour affiner encore la texture.
             </div>
           </div>
         </div>
       </div>
       <div
-        class="grid gap-6"
+        class="rounded-xl border bg-card text-card-foreground shadow"
       >
         <div
-          class="rounded-xl border bg-card text-card-foreground shadow"
+          class="flex flex-col space-y-1.5 p-6"
         >
-          <div
-            class="flex flex-col space-y-1.5 p-6"
+          <h3
+            class="font-semibold leading-none tracking-tight"
           >
-            <h3
-              class="font-semibold leading-none tracking-tight"
-            >
-              Favoris & reprise
-            </h3>
-            <p
-              class="text-sm text-muted-foreground"
-            >
-              Accédez rapidement à vos pistes sauvegardées et reprenez vos écoutes en cours.
-            </p>
-          </div>
-          <div
-            class="p-6 pt-0 space-y-4"
+            Favoris & reprise
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
           >
-            <div
-              class="rounded-md border bg-muted/20 p-3"
-            >
-              <div
-                class="flex items-center gap-2 text-sm font-medium"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-music2 h-4 w-4"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="8"
-                    cy="18"
-                    r="4"
-                  />
-                  <path
-                    d="M12 18V2l7 4"
-                  />
-                </svg>
-                Dernière lecture
-              </div>
-              <p
-                class="mt-2 text-xs text-muted-foreground"
-              >
-                Lancez une piste pour activer la reprise automatique.
-              </p>
-            </div>
-            <div
-              class="space-y-2"
-            >
-              <div
-                class="flex items-center gap-2 text-sm font-medium"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-heart h-4 w-4"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-                  />
-                </svg>
-                Favoris récents
-              </div>
-              <p
-                class="text-xs text-muted-foreground"
-              >
-                Utilisez le bouton « Ajouter aux favoris » du lecteur pour retrouver rapidement vos pistes préférées.
-              </p>
-            </div>
-          </div>
+            Retrouve ton cocon et tes bulles gardées précieusement.
+          </p>
         </div>
         <div
-          class="rounded-xl border bg-card text-card-foreground shadow"
+          class="p-6 pt-0 space-y-4"
         >
           <div
-            class="flex flex-col space-y-1.5 p-6"
-          >
-            <h3
-              class="font-semibold leading-none tracking-tight"
-            >
-              Guidance de la session
-            </h3>
-            <p
-              class="text-sm text-muted-foreground"
-            >
-              Suggestions d'utilisation basées sur l'énergie recommandée.
-            </p>
-          </div>
-          <div
-            class="p-6 pt-0 space-y-4 text-sm"
+            class="rounded-md border bg-muted/20 p-4"
           >
             <div
-              class="rounded-md border bg-muted/20 p-3"
+              class="flex items-center gap-2 text-sm font-semibold"
             >
-              <div
-                class="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground"
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-music2 h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-sparkles h-3.5 w-3.5"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
-                  />
-                  <path
-                    d="M5 3v4"
-                  />
-                  <path
-                    d="M19 17v4"
-                  />
-                  <path
-                    d="M3 5h4"
-                  />
-                  <path
-                    d="M17 19h4"
-                  />
-                </svg>
-                Energie recommandée
-              </div>
-              <p
-                class="mt-2 text-sm font-medium"
-              >
-                Alignement 
-                90
-                %
-              </p>
-              <p
-                class="text-xs text-muted-foreground"
-              >
-                Énergie cible 
-                30
-                % — baseline 
-                20
-                %
-              </p>
-            </div>
-            <div>
-              <h4
-                class="font-semibold"
-              >
-                Recommandations
-              </h4>
-              <ul
-                class="mt-2 space-y-2 text-xs text-muted-foreground"
-              >
-                <li>
-                  • 
-                  Respirez profondément avec la première piste.
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4
-                class="font-semibold"
-              >
-                Activités suggérées
-              </h4>
-              <ul
-                class="mt-2 flex flex-wrap gap-2"
-              >
-                <div
-                  class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
-                >
-                  Journal
-                </div>
-                <div
-                  class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
-                >
-                  Étirements
-                </div>
-              </ul>
+                <circle
+                  cx="8"
+                  cy="18"
+                  r="4"
+                />
+                <path
+                  d="M12 18V2l7 4"
+                />
+              </svg>
+              Ton dernier cocon
             </div>
             <p
-              class="text-xs text-muted-foreground"
+              class="mt-2 text-xs text-muted-foreground"
             >
-              Stabiliser votre système nerveux avec des textures calmes.
+              Lance une piste et nous garderons la reprise pour toi.
+            </p>
+          </div>
+          <div>
+            <div
+              class="flex items-center gap-2 text-sm font-semibold"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-heart h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                />
+              </svg>
+              Tes bulles gardées
+            </div>
+            <p
+              class="mt-2 text-xs text-muted-foreground"
+            >
+              Ajoute une bulle pour la retrouver ici à chaque visite.
             </p>
           </div>
         </div>
@@ -728,135 +374,106 @@ exports[`AdaptiveMusicPage > rend la page et la playlist adaptative 1`] = `
           <h3
             class="font-semibold leading-none tracking-tight"
           >
-            Composition de la playlist
+            Plaisir d'écoute
           </h3>
           <p
             class="text-sm text-muted-foreground"
           >
-            Parcourez les pistes générées et lancez-les instantanément.
+            Lance la piste qui résonne avec ton état du moment.
           </p>
         </div>
         <div
-          class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+          class="flex gap-2"
         >
-          Jeu de données 
-          test
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            Régénérer la sélection
+          </button>
         </div>
+      </div>
+      <div
+        class="p-6 pt-0 space-y-6"
+      >
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Nous préparons une ambiance sur mesure…
+        </p>
+      </div>
+    </div>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+    >
+      <div
+        class="flex flex-col space-y-1.5 p-6"
+      >
+        <h3
+          class="font-semibold leading-none tracking-tight"
+        >
+          Affiner avec POMS (optionnel)
+        </h3>
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Un micro check-in avant et après permet d'ajuster encore plus finement la texture.
+        </p>
+      </div>
+      <div
+        class="p-6 pt-0 space-y-4"
+      >
+        <div
+          class="flex flex-col gap-3 rounded-lg border border-muted/60 bg-muted/10 p-4"
+        >
+          <p
+            class="text-sm font-medium"
+          >
+            Tu pourras activer le mini point d'entrée quand tu le souhaites.
+          </p>
+          <p
+            class="text-xs text-muted-foreground"
+          >
+            Aucun suivi n'est lancé pour le moment, la musique s'appuie juste sur ton état du jour.
+          </p>
+          <div
+            class="flex gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-primary text-primary-foreground shadow hover:bg-primary/90 hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs"
+              type="button"
+            >
+              Activer maintenant
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+    >
+      <div
+        class="flex flex-col space-y-1.5 p-6"
+      >
+        <h3
+          class="font-semibold leading-none tracking-tight"
+        >
+          Les textures proposées
+        </h3>
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Choisis librement la piste qui résonne avec toi, elles restent toutes douces et accueillantes.
+        </p>
       </div>
       <div
         class="p-6 pt-0"
       >
-        <ul
-          class="space-y-4"
+        <p
+          class="text-sm text-muted-foreground"
         >
-          <li
-            class="flex flex-col gap-3 rounded-md border bg-background p-4 md:flex-row md:items-center md:justify-between"
-          >
-            <div
-              class="space-y-1"
-            >
-              <div
-                class="flex items-center gap-2"
-              >
-                <span
-                  class="font-semibold"
-                >
-                  First track
-                </span>
-              </div>
-              <p
-                class="text-sm text-muted-foreground"
-              >
-                EmotionsCare
-              </p>
-              <div
-                class="flex flex-wrap gap-3 text-xs text-muted-foreground"
-              >
-                <span
-                  class="inline-flex items-center gap-1"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="lucide lucide-clock h-3.5 w-3.5"
-                    fill="none"
-                    height="24"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                    />
-                    <polyline
-                      points="12 6 12 12 16 14"
-                    />
-                  </svg>
-                  5:00
-                </span>
-                <span>
-                  25
-                  % énergie
-                </span>
-                <span>
-                  Focus : 
-                  Respiration
-                </span>
-              </div>
-              <div
-                class="mt-2 flex flex-wrap gap-2"
-              >
-                <div
-                  class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
-                >
-                  calm
-                </div>
-                <div
-                  class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
-                >
-                  test
-                </div>
-              </div>
-            </div>
-            <div
-              class="flex items-center gap-3"
-            >
-              <button
-                class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs"
-                type="button"
-              >
-                <svg
-                  aria-hidden="true"
-                  class="lucide lucide-music2 mr-2 h-4 w-4"
-                  fill="none"
-                  height="24"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="8"
-                    cy="18"
-                    r="4"
-                  />
-                  <path
-                    d="M12 18V2l7 4"
-                  />
-                </svg>
-                En cours
-              </button>
-            </div>
-          </li>
-        </ul>
+          Préparation de la bulle sonore…
+        </p>
       </div>
     </div>
   </main>

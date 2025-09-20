@@ -4,6 +4,27 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AdaptiveMusicPage from "@/modules/adaptive-music/AdaptiveMusicPage";
 import MoodProvider from "@/contexts/MoodContext";
 
+vi.mock("@/integrations/supabase/client", () => {
+  const chain = {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+    upsert: vi.fn().mockResolvedValue({ error: null }),
+    delete: vi.fn().mockReturnThis(),
+  };
+
+  return {
+    supabase: {
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: null } }),
+      },
+      from: vi.fn(() => chain),
+    },
+  };
+});
+
 const mockPlaylistResponse = {
   ok: true,
   data: {
@@ -65,10 +86,20 @@ const renderWithProviders = () => {
 
 describe("AdaptiveMusicPage", () => {
   beforeEach(() => {
-    vi.spyOn(global, "fetch").mockResolvedValue({
-      ok: true,
-      json: async () => mockPlaylistResponse,
-    } as Response);
+    vi.spyOn(global, "fetch").mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      if (url.includes("/me/feature_flags")) {
+        return {
+          ok: true,
+          json: async () => ({ flags: { FF_MUSIC: true, FF_ASSESS_POMS: true } }),
+        } as Response;
+      }
+
+      return {
+        ok: true,
+        json: async () => mockPlaylistResponse,
+      } as Response;
+    });
   });
 
   afterEach(() => {
@@ -79,7 +110,7 @@ describe("AdaptiveMusicPage", () => {
     const { container, findByText } = renderWithProviders();
 
     expect(await findByText(/Adaptive Music/i)).toBeTruthy();
-    expect(await findByText(/Playlist adaptative/i)).toBeTruthy();
+    expect(await findByText(/Les textures proposées/i)).toBeTruthy();
 
     expect(container).toMatchSnapshot();
   });
