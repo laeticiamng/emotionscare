@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as Sentry from '@sentry/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,8 @@ import { Star, Heart, Wind } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useMediaQuery } from '@/hooks/use-media-query';
+import { useFlags } from '@/core/flags';
 import { logAndJournal } from '@/services/sessions/sessionsApi';
 import { clinicalOrchestration } from '@/services/clinicalOrchestration';
 
@@ -42,6 +45,17 @@ const STAI_SCALE = [
   { value: '4', label: 'Toujours' },
 ] as const;
 
+const STAI_POSITIVE_ITEMS = new Set(['s1', 's2', 's4', 's6']);
+
+type StaiSummaryLevel = 'low' | 'moderate' | 'high';
+
+type StaiSummary = {
+  level: StaiSummaryLevel;
+  text: string;
+  score: number;
+  average: number;
+};
+
 const MOOD_OUTCOMES: {
   id: MoodOutcome;
   label: string;
@@ -49,6 +63,7 @@ const MOOD_OUTCOMES: {
   delta: number;
   meta: string;
   journal: string;
+  summary: string;
 }[] = [
   {
     id: 'better',
@@ -57,6 +72,7 @@ const MOOD_OUTCOMES: {
     delta: 4,
     meta: 'plus_apaisé',
     journal: 'Je me sens nettement plus apaisé·e après le cocon.',
+    summary: 'ça vient',
   },
   {
     id: 'same',
@@ -65,6 +81,7 @@ const MOOD_OUTCOMES: {
     delta: 0,
     meta: 'stable',
     journal: 'Je reste sur un ressenti globalement stable après le cocon.',
+    summary: 'encore à l’équilibre',
   },
   {
     id: 'worse',
@@ -73,20 +90,71 @@ const MOOD_OUTCOMES: {
     delta: -4,
     meta: 'tension_persistante',
     journal: 'Je ressens encore de la tension après le cocon et je prendrai un autre temps pour moi.',
+    summary: 'encore un peu tendu',
   },
 ];
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
 import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
+const summarizeStai = (responses: Record<string, string>, items: AssessmentItem[]): StaiSummary | null => {
+  if (!items.length) {
+    return null;
+  }
+
+  let answered = 0;
+  let total = 0;
+
+  for (const item of items) {
+    const rawValue = Number.parseInt(responses[item.id] ?? '', 10);
+    if (!Number.isFinite(rawValue)) {
+      return null;
+    }
+
+    answered += 1;
+
+    const normalized = STAI_POSITIVE_ITEMS.has(item.id) ? 5 - rawValue : rawValue;
+    total += normalized;
+  }
+
+  if (answered !== items.length || answered === 0) {
+    return null;
+  }
+
+  const average = total / answered;
+  let level: StaiSummaryLevel = 'low';
+
+  if (average >= 3) {
+    level = 'high';
+  } else if (average >= 2.2) {
+    level = 'moderate';
+  }
+
+  const text = level === 'high' ? 'tension présente' : level === 'moderate' ? 'vigilance douce' : 'plutôt calme';
+
+  return {
+    level,
+    text,
+    score: Math.round(total * 10) / 10,
+    average: Math.round(average * 10) / 10,
+  };
+};
+
 const NyveeCocon: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { has } = useFlags();
+  const stai6Consent = useClinicalConsent('STAI6');
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   const sessionStartRef = useRef<number | null>(null);
+  const consentGrantedRef = useRef(stai6Consent.hasConsented);
 
   const [sessionState, setSessionState] = useState<'intro' | 'breathing' | 'silence' | 'anchor' | 'complete'>('intro');
   const [timeRemaining, setTimeRemaining] = useState(360);
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const [manualSoftMode, setManualSoftMode] = useState(false);
+  const [remoteCalmMode, setRemoteCalmMode] = useState(false);
+  const [remoteSuggestBreathing, setRemoteSuggestBreathing] = useState(false);
   const [calmMode, setCalmMode] = useState(false);
   const [suggestBreathing, setSuggestBreathing] = useState(false);
   const [maxSignalLevel, setMaxSignalLevel] = useState(0);
@@ -104,6 +172,30 @@ const NyveeCocon: React.FC = () => {
     after: 'idle',
   });
 
+  const nyveeEnabled = import.meta.env.DEV || has('FF_NYVEE');
+  const staiFeatureFlagEnabled = has('FF_ASSESS_STAI6') && !stai6Consent.isDNTEnabled;
+
+  const staiBeforeSummary = useMemo(() => {
+    if (!staiOptIn || !staiFeatureFlagEnabled) {
+      return null;
+    }
+    return summarizeStai(staiBeforeResponses, staiItems);
+  }, [staiOptIn, staiFeatureFlagEnabled, staiBeforeResponses, staiItems]);
+
+  const staiAfterSummary = useMemo(() => {
+    if (!staiOptIn || !staiFeatureFlagEnabled) {
+      return null;
+    }
+    return summarizeStai(staiAfterResponses, staiItems);
+  }, [staiOptIn, staiFeatureFlagEnabled, staiAfterResponses, staiItems]);
+
+  const staiPreTensionDetected = Boolean(staiBeforeSummary && staiBeforeSummary.level === 'high');
+  const staiPostTensionDetected = Boolean(staiAfterSummary && staiAfterSummary.level === 'high');
+  const currentMoodDetails = useMemo(
+    () => MOOD_OUTCOMES.find(option => option.id === moodOutcome) ?? MOOD_OUTCOMES[0],
+    [moodOutcome],
+  );
+
   const anchorSteps = [
     "5 choses que tu vois",
     "4 choses que tu touches",
@@ -112,18 +204,43 @@ const NyveeCocon: React.FC = () => {
     "1 chose que tu goûtes"
   ];
 
-  const haloConfig = useMemo(
-    () => ({
-      count: calmMode ? 2 : 3,
-      className: calmMode
-        ? 'absolute rounded-full bg-gradient-to-r from-indigo-400/5 to-purple-500/5'
-        : 'absolute rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10',
-      scale: calmMode ? [1, 1.05, 1] : [1, 1.1, 1],
-      opacity: calmMode ? 0.12 : 0.3,
-      durationBase: calmMode ? 8 : 6,
-    }),
-    [calmMode],
-  );
+  if (!nyveeEnabled) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 py-12 text-indigo-100">
+        <Card className="max-w-md border-white/10 bg-white/10 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-xl text-white">Nyvée arrive bientôt</CardTitle>
+            <CardDescription className="text-indigo-100/80">
+              Cet espace n’est pas encore activé pour ton compte. Tu peux revenir plus tard ou explorer les autres pratiques.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-end">
+            <Button
+              variant="outline"
+              className="border-indigo-400 text-indigo-200 hover:bg-indigo-500/20"
+              onClick={() => navigate('/app/home')}
+            >
+              Retourner à l’accueil
+            </Button>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
+  const haloConfig = useMemo(() => {
+    const motionSafe = prefersReducedMotion || calmMode;
+
+    return {
+      count: prefersReducedMotion ? 1 : motionSafe ? 1 : 3,
+      className: motionSafe
+        ? 'absolute rounded-full bg-gradient-to-r from-indigo-400/8 to-purple-500/8'
+        : 'absolute rounded-full bg-gradient-to-r from-indigo-500/16 to-purple-500/14',
+      scale: prefersReducedMotion ? [1, 1, 1] : motionSafe ? [1, 1.03, 1] : [1, 1.12, 1],
+      opacity: motionSafe ? 0.12 : 0.32,
+      durationBase: motionSafe ? 9 : 6,
+    };
+  }, [calmMode, prefersReducedMotion]);
 
   const backgroundClass = calmMode
     ? 'min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950'
@@ -138,8 +255,8 @@ const NyveeCocon: React.FC = () => {
         if (!isMounted) return;
 
         if (!signals.length) {
-          setCalmMode(false);
-          setSuggestBreathing(false);
+          setRemoteCalmMode(false);
+          setRemoteSuggestBreathing(false);
           setMaxSignalLevel(0);
           return;
         }
@@ -151,8 +268,8 @@ const NyveeCocon: React.FC = () => {
           return actions.includes('suggest_breathing');
         });
 
-        setCalmMode(hasReduceIntensity);
-        setSuggestBreathing(hasReduceIntensity || hasSuggest);
+        setRemoteCalmMode(hasReduceIntensity);
+        setRemoteSuggestBreathing(hasReduceIntensity || hasSuggest);
         setMaxSignalLevel(highestLevel);
       } catch (error) {
         console.error('Nyvée cocon adaptation fetch failed', error);
@@ -166,7 +283,47 @@ const NyveeCocon: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const derivedCalm = Boolean(
+      prefersReducedMotion ||
+        manualSoftMode ||
+        remoteCalmMode ||
+        (staiFeatureFlagEnabled && staiPreTensionDetected),
+    );
+    setCalmMode(derivedCalm);
+  }, [
+    prefersReducedMotion,
+    manualSoftMode,
+    remoteCalmMode,
+    staiFeatureFlagEnabled,
+    staiPreTensionDetected,
+  ]);
+
+  useEffect(() => {
+    const derivedSuggest = Boolean(remoteSuggestBreathing || (staiFeatureFlagEnabled && staiPreTensionDetected));
+    setSuggestBreathing(derivedSuggest);
+  }, [remoteSuggestBreathing, staiFeatureFlagEnabled, staiPreTensionDetected]);
+
+  useEffect(() => {
+    if (!staiFeatureFlagEnabled || !stai6Consent.hasConsented) {
+      setStaiOptIn(false);
+    }
+  }, [staiFeatureFlagEnabled, stai6Consent.hasConsented]);
+
+  useEffect(() => {
+    if (staiFeatureFlagEnabled && stai6Consent.hasConsented && !consentGrantedRef.current) {
+      setStaiOptIn(true);
+    }
+    consentGrantedRef.current = stai6Consent.hasConsented;
+  }, [staiFeatureFlagEnabled, stai6Consent.hasConsented]);
+
   const loadStaiCatalogue = useCallback(async () => {
+    if (!staiFeatureFlagEnabled) {
+      setStaiItems(FALLBACK_STAI_ITEMS);
+      setStaiStatus('idle');
+      return;
+    }
+
     setStaiStatus('loading');
     try {
       const { data } = await supabase.auth.getSession();
@@ -204,10 +361,10 @@ const NyveeCocon: React.FC = () => {
       setStaiItems(FALLBACK_STAI_ITEMS);
       setStaiStatus('error');
     }
-  }, []);
+  }, [staiFeatureFlagEnabled]);
 
   useEffect(() => {
-    if (staiOptIn) {
+    if (staiOptIn && staiFeatureFlagEnabled && stai6Consent.hasConsented) {
       setStaiBeforeResponses({});
       setStaiAfterResponses({});
       setStaiSubmissionStatus({ before: 'idle', after: 'idle' });
@@ -219,7 +376,30 @@ const NyveeCocon: React.FC = () => {
       setStaiAfterResponses({});
       setStaiSubmissionStatus({ before: 'idle', after: 'idle' });
     }
-  }, [staiOptIn, loadStaiCatalogue]);
+  }, [staiOptIn, staiFeatureFlagEnabled, stai6Consent.hasConsented, loadStaiCatalogue]);
+
+  const handleStaiToggle = useCallback(
+    (checked: boolean) => {
+      if (!staiFeatureFlagEnabled) {
+        toast({
+          title: 'Mesure indisponible',
+          description: 'Le mini check-in est momentanément désactivé.',
+        });
+        return;
+      }
+
+      if (!stai6Consent.hasConsented) {
+        toast({
+          title: 'Consentement requis',
+          description: 'Accepte la mesure clinique pour partager ton état du moment.',
+        });
+        return;
+      }
+
+      setStaiOptIn(checked);
+    },
+    [staiFeatureFlagEnabled, stai6Consent.hasConsented, toast],
+  );
 
   const submitStai = useCallback(async (phase: StaiPhase) => {
     const responses = phase === 'before' ? staiBeforeResponses : staiAfterResponses;
@@ -406,8 +586,9 @@ const NyveeCocon: React.FC = () => {
   }, [sessionState, calmMode]);
 
   const startCocon = useCallback(() => {
+    const breathingDuration = calmMode ? 150 : 120;
     setSessionState('breathing');
-    setTimeRemaining(120);
+    setTimeRemaining(breathingDuration);
     setBreathingPhase('inhale');
     sessionStartRef.current = Date.now();
     setHasLoggedSession(false);
@@ -427,7 +608,7 @@ const NyveeCocon: React.FC = () => {
 
   const moveToSilence = useCallback(() => {
     setSessionState('silence');
-    setTimeRemaining(240);
+    setTimeRemaining(calmMode ? 300 : 240);
     Sentry.addBreadcrumb({
       category: 'session',
       level: 'info',
@@ -446,6 +627,10 @@ const NyveeCocon: React.FC = () => {
     });
   }, []);
 
+  const handleQuickBreath = useCallback(() => {
+    navigate('/app/breath?protocol=478&minutes=1');
+  }, [navigate]);
+
   const handleExitCocon = useCallback(async () => {
     if (isLogging) {
       return;
@@ -456,18 +641,44 @@ const NyveeCocon: React.FC = () => {
       return;
     }
 
-    const outcomeDetails = MOOD_OUTCOMES.find(option => option.id === moodOutcome) ?? MOOD_OUTCOMES[0];
+    const outcomeDetails = currentMoodDetails;
     const startedAt = sessionStartRef.current;
     const durationSec = startedAt ? Math.max(1, Math.round((Date.now() - startedAt) / 1000)) : 360;
 
+    const intensitySource = calmMode
+      ? manualSoftMode
+        ? 'manual_soft'
+        : prefersReducedMotion
+          ? 'motion_pref'
+          : remoteCalmMode
+            ? 'remote_signal'
+            : staiPreTensionDetected
+              ? 'stai_high'
+              : 'soft_default'
+      : 'standard';
+
     const meta: Record<string, unknown> = {
       module: 'nyvee_cocon',
-      mood_delta_text: outcomeDetails.meta,
+      mood_delta_text: outcomeDetails.summary,
+      mood_delta_code: outcomeDetails.meta,
       stai_opt_in: staiOptIn,
       stai_before_submitted: staiSubmissionStatus.before === 'submitted',
       stai_after_submitted: staiSubmissionStatus.after === 'submitted',
       calm_mode: calmMode,
       suggest_breathing_prompted: suggestBreathing,
+      stai_pre_summary: staiBeforeSummary?.text ?? null,
+      stai_pre_score: staiBeforeSummary?.score ?? null,
+      stai_pre_level: staiBeforeSummary?.level ?? null,
+      stai_post_summary: staiAfterSummary?.text ?? null,
+      stai_post_score: staiAfterSummary?.score ?? null,
+      stai_post_level: staiAfterSummary?.level ?? null,
+      stai_post_tension: staiPostTensionDetected,
+      manual_soft_mode: manualSoftMode,
+      prefers_reduced_motion: prefersReducedMotion,
+      remote_signal_soft: remoteCalmMode,
+      intensity_source: intensitySource,
+      stai_feature_flag: staiFeatureFlagEnabled,
+      stai_consent: stai6Consent.hasConsented,
     };
 
     if (maxSignalLevel > 0) {
@@ -492,6 +703,8 @@ const NyveeCocon: React.FC = () => {
         duration_sec: durationSec,
         mood: outcomeDetails.id,
         calm_mode: calmMode,
+        intensity_source: intensitySource,
+        stai_post_tension: staiPostTensionDetected,
       },
     });
 
@@ -523,16 +736,25 @@ const NyveeCocon: React.FC = () => {
     }
   }, [
     calmMode,
+    currentMoodDetails,
     hasLoggedSession,
     isLogging,
+    manualSoftMode,
     maxSignalLevel,
-    moodOutcome,
     navigate,
+    prefersReducedMotion,
+    remoteCalmMode,
     staiAfterResponses,
+    staiAfterSummary,
     staiBeforeResponses,
+    staiBeforeSummary,
+    staiFeatureFlagEnabled,
     staiOptIn,
+    staiPreTensionDetected,
+    staiPostTensionDetected,
     staiSubmissionStatus.after,
     staiSubmissionStatus.before,
+    stai6Consent.hasConsented,
     suggestBreathing,
     toast,
   ]);
@@ -588,6 +810,11 @@ const NyveeCocon: React.FC = () => {
 
   return (
     <div className={`${backgroundClass} relative min-h-screen overflow-hidden p-4 transition-colors duration-700`}>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.45),_transparent_65%)] transition-opacity duration-700"
+        style={{ opacity: calmMode ? 0.18 : 0.36 }}
+      />
       {/* Halos respirants d'arrière-plan */}
       <div className="absolute inset-0">
         {Array.from({ length: haloConfig.count }).map((_, i) => (
@@ -613,8 +840,42 @@ const NyveeCocon: React.FC = () => {
         ))}
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-        {stai6Consent.shouldPrompt && (
+      <div className="relative z-10 mx-auto max-w-2xl space-y-6">
+        <div className="flex flex-wrap items-center justify-end gap-2 text-xs sm:text-sm">
+          <Badge
+            variant={calmMode ? 'secondary' : 'outline'}
+            className={calmMode ? 'border-indigo-400/60 bg-indigo-500/30 text-white' : 'border-indigo-300 text-indigo-100'}
+          >
+            Intensité {calmMode ? 'douce' : 'immersive'}
+          </Badge>
+          {staiBeforeSummary && (
+            <Badge
+              variant={staiPreTensionDetected ? 'destructive' : 'secondary'}
+              className={staiPreTensionDetected ? 'bg-red-500/70 text-white' : 'border-indigo-300/80 bg-indigo-500/20 text-indigo-50'}
+            >
+              {staiBeforeSummary.text}
+            </Badge>
+          )}
+          <Button
+            type="button"
+            size="sm"
+            variant={manualSoftMode ? 'secondary' : 'ghost'}
+            className={
+              manualSoftMode
+                ? 'border border-indigo-400/60 bg-indigo-500/40 text-white hover:bg-indigo-500/50'
+                : 'border border-indigo-400/40 text-indigo-100 hover:text-white'
+            }
+            onClick={() => setManualSoftMode(prev => !prev)}
+          >
+            Effets doux{manualSoftMode ? ' actifs' : ''}
+          </Button>
+        </div>
+        {prefersReducedMotion && (
+          <p className="text-right text-xs text-indigo-200/70">
+            Préférence motion-safe détectée : Nyvée limite automatiquement les mouvements.
+          </p>
+        )}
+        {staiFeatureFlagEnabled && stai6Consent.shouldPrompt && (
           <ClinicalOptIn
             title="Activer l'évaluation STAI-6"
             description="Ces quelques questions nous aident à déclencher le cocon quand l'anxiété monte. Votre choix est mémorisé et peut être changé plus tard."
@@ -666,11 +927,15 @@ const NyveeCocon: React.FC = () => {
                 <div className="mt-6 text-left">
                   <div className="rounded-xl border border-indigo-400/40 bg-indigo-900/40 p-4 text-indigo-100 shadow-lg shadow-indigo-900/40">
                     <p className="text-sm font-semibold text-white">
-                      Nyvée détecte un niveau de tension élevé.
+                      {staiPreTensionDetected
+                        ? `Résumé : ${staiBeforeSummary?.text ?? 'tension présente'}.`
+                        : 'Nyvée détecte un niveau de tension élevé.'}
                     </p>
                     <p className="mt-2 text-sm text-indigo-100/90">
                       {calmMode
-                        ? 'Mode apaisé activé : halos adoucis et respiration plus lente pour t’accompagner.'
+                        ? staiPreTensionDetected
+                          ? 'Halos adoucis, respiration ralentie et silences prolongés pour te ménager.'
+                          : 'Mode apaisé activé : halos adoucis et respiration plus lente pour t’accompagner.'
                         : 'Nyvée te suggère de commencer par 2 minutes de respiration guidée.'}
                     </p>
                     {maxSignalLevel > 0 && (
@@ -678,44 +943,74 @@ const NyveeCocon: React.FC = () => {
                         Signal intensité niveau {maxSignalLevel}.
                       </p>
                     )}
+                    {staiBeforeSummary && (
+                      <p className="mt-1 text-xs text-indigo-200/70">Score moyen : {staiBeforeSummary.average} / 4</p>
+                    )}
                   </div>
                 </div>
               )}
 
               {!suggestBreathing && calmMode && (
                 <p className="mt-6 text-sm text-indigo-200">
-                  Mode apaisé activé automatiquement : halos plus doux pour ménager tes sens.
+                  {staiPreTensionDetected
+                    ? 'Grâce à ton état du moment, Nyvée assouplit immédiatement halos, lumière et silences.'
+                    : 'Mode apaisé activé automatiquement : halos plus doux pour ménager tes sens.'}
                 </p>
               )}
 
-              <div className="mt-12 space-y-4 text-left">
-                <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-white">Check-in STAI-6 optionnel</CardTitle>
-                    <CardDescription className="text-indigo-100/80">
-                      Mesure ta tension avant/après. Les réponses restent invisibles.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between rounded-lg bg-slate-900/40 p-3">
-                      <div>
-                        <p className="text-sm font-medium text-indigo-100">Activer la mesure</p>
-                        <p className="text-xs text-indigo-200/80">
-                          Nyvée adaptera le cocon si tu partages tes ressentis.
-                        </p>
+              {staiFeatureFlagEnabled && (
+                <div className="mt-12 space-y-4 text-left">
+                  <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-white">État du moment ?</CardTitle>
+                      <CardDescription className="text-indigo-100/80">
+                        6 ressentis rapides pour calibrer silencieusement le cocon.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between rounded-lg bg-slate-900/40 p-3">
+                        <div>
+                          <p className="text-sm font-medium text-indigo-100">Mesure optionnelle</p>
+                          <p className="text-xs text-indigo-200/80">
+                            Tes réponses restent privées. Nyvée s’adapte seulement si tu partages.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={staiOptIn}
+                          onCheckedChange={handleStaiToggle}
+                          aria-label="Activer le suivi STAI-6"
+                          disabled={!stai6Consent.hasConsented || stai6Consent.isSaving}
+                        />
                       </div>
-                      <Switch checked={staiOptIn} onCheckedChange={setStaiOptIn} aria-label="Activer le suivi STAI-6" />
-                    </div>
-                    {staiOptIn ? (
-                      <StaiForm phase="before" />
-                    ) : (
-                      <p className="text-sm text-indigo-200">
-                        Active le check-in pour partager ton niveau de tension avant de commencer.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                      {staiOptIn ? (
+                        <>
+                          {staiBeforeSummary ? (
+                            <div className="rounded-lg border border-indigo-400/40 bg-indigo-950/40 p-3 text-indigo-100">
+                              <p className="text-xs uppercase tracking-wide text-indigo-200/70">Résumé pré-cocon</p>
+                              <p className="text-sm font-semibold text-white">{staiBeforeSummary.text}</p>
+                              <p className="text-xs text-indigo-200/80">Score moyen : {staiBeforeSummary.average} / 4</p>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-indigo-200">
+                              Réponds aux 6 items pour que Nyvée ajuste halos, silences et ambiance.
+                            </p>
+                          )}
+                          <StaiForm phase="before" />
+                        </>
+                      ) : (
+                        <p className="text-sm text-indigo-200">
+                          Active l’état du moment pour proposer une respiration adaptée et doser les effets visuels.
+                        </p>
+                      )}
+                      {!stai6Consent.hasConsented && (
+                        <p className="text-xs text-indigo-200/70">
+                          Accepte la mesure clinique ci-dessus pour activer cette option quand tu le souhaites.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -893,24 +1188,56 @@ const NyveeCocon: React.FC = () => {
                   </RadioGroup>
                 </div>
 
-                <p className="text-sm text-indigo-200">
-                  {MOOD_OUTCOMES.find(option => option.id === moodOutcome)?.journal}
-                </p>
+                <p className="text-sm text-indigo-200">{currentMoodDetails.journal}</p>
+                <p className="text-xs text-indigo-200/80">Résumé : {currentMoodDetails.summary}</p>
 
-                {staiOptIn && (
+                {staiOptIn && staiFeatureFlagEnabled && (
                   <Card className="border-white/10 bg-white/5 backdrop-blur-sm">
                     <CardHeader>
-                      <CardTitle className="text-lg text-white">Check-in STAI-6 (après cocon)</CardTitle>
+                      <CardTitle className="text-lg text-white">État du moment (après cocon)</CardTitle>
                       <CardDescription className="text-indigo-100/80">
-                        Quelques réponses pour suivre l’évolution de ta tension.
+                        Observe ton évolution et prépare une micro-respiration si besoin.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                      {staiAfterSummary ? (
+                        <div
+                          className={`rounded-lg border p-3 ${
+                            staiPostTensionDetected
+                              ? 'border-red-400/60 bg-red-500/15 text-red-50'
+                              : 'border-emerald-300/60 bg-emerald-500/10 text-emerald-100'
+                          }`}
+                        >
+                          <p className="text-xs uppercase tracking-wide">
+                            Résumé post-cocon : {staiAfterSummary.text}
+                          </p>
+                          <p className="text-xs opacity-80">Score moyen : {staiAfterSummary.average} / 4</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-indigo-200">
+                          Partage ton ressenti après le cocon pour voir comment il a bougé.
+                        </p>
+                      )}
                       <StaiForm phase="after" />
                       {staiSubmissionStatus.before !== 'submitted' && (
                         <p className="text-xs text-indigo-200/80">
                           Astuce : pense à enregistrer aussi ton check-in avant séance pour comparer.
                         </p>
+                      )}
+                      {staiAfterSummary && staiPostTensionDetected && (
+                        <div className="flex flex-col gap-2 rounded-lg border border-indigo-400/40 bg-indigo-900/40 p-3 text-left">
+                          <p className="text-sm text-indigo-100">
+                            Une tension persiste. Nyvée te propose une respiration 4-7-8 d’une minute.
+                          </p>
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="self-start bg-indigo-600 text-white hover:bg-indigo-700"
+                            onClick={handleQuickBreath}
+                          >
+                            Respirer 1 min
+                          </Button>
+                        </div>
                       )}
                     </CardContent>
                   </Card>

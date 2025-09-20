@@ -73,7 +73,7 @@ const STAI_SCALE = [
 
 const clampMinutes = (value: number): number => {
   if (!Number.isFinite(value)) return 5;
-  return Math.min(10, Math.max(3, Math.round(value)));
+  return Math.min(10, Math.max(1, Math.round(value)));
 };
 
 const formatMs = (value: number): string => {
@@ -188,6 +188,34 @@ export default function BreathPage() {
     const variant = COHERENCE_VARIANTS.find(option => option.id === coherenceVariant);
     return variant?.overrides;
   }, [protocol, coherenceVariant]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const protocolParam = (params.get('protocol') ?? params.get('pattern'))?.toLowerCase();
+
+    if (protocolParam === '478' || protocolParam === 'coherence') {
+      setProtocol(protocolParam as ProtocolPreset);
+    }
+
+    const minutesParam = params.get('minutes');
+    const secondsParam = params.get('seconds');
+
+    if (minutesParam) {
+      const parsed = Number.parseInt(minutesParam, 10);
+      if (Number.isFinite(parsed)) {
+        setMinutes(clampMinutes(parsed));
+      }
+    } else if (secondsParam) {
+      const parsedSeconds = Number.parseInt(secondsParam, 10);
+      if (Number.isFinite(parsedSeconds)) {
+        setMinutes(clampMinutes(parsedSeconds / 60));
+      }
+    }
+  }, []);
 
   const steps = useMemo(() => makeProtocol(protocol, { minutes, ...overrides }), [protocol, minutes, overrides]);
 
@@ -700,7 +728,7 @@ export default function BreathPage() {
                 <Input
                   id="minutes-input"
                   type="number"
-                  min={3}
+                  min={1}
                   max={10}
                   step={1}
                   value={minutes}
