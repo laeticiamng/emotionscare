@@ -2,9 +2,15 @@ import { addDays, addWeeks, differenceInCalendarDays, formatISO, getISOWeek, get
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 
+export type VibeIntensity = 'light' | 'medium' | 'deep';
 export type MoodPoint = { date: string; valence?: number; arousal?: number; vibe?: string };
 export type WeeklySessionPoint = { week: string } & Record<string, number | string>;
-export type VibePoint = { date: string; vibe?: string };
+export type VibePoint = {
+  date: string;
+  vibe?: string;
+  intensity?: VibeIntensity;
+  meta?: { count: number; total: number };
+};
 
 type EmotionScanRow = { created_at: string; payload: unknown };
 type SessionRow = { created_at: string; type: string | null };
@@ -151,8 +157,17 @@ export function buildHeatmap(days: EmotionScanRow[], totalDays = 7 * 8): VibePoi
     const current = addDays(start, offset);
     const key = formatISO(current, { representation: 'date' });
     const counts = byDay.get(key);
-    const vibe = counts ? selectDominantVibe(counts) : undefined;
-    points.push({ date: key, vibe });
+    if (counts) {
+      const { vibe, count, total } = selectDominantVibe(counts);
+      points.push({
+        date: key,
+        vibe,
+        intensity: deriveIntensity(count, total),
+        meta: { count, total },
+      });
+    } else {
+      points.push({ date: key, vibe: undefined, intensity: undefined, meta: { count: 0, total: 0 } });
+    }
   }
 
   return points;
@@ -247,11 +262,25 @@ function formatIsoWeek(date: Date): string {
   return `${year}-W${String(week).padStart(2, '0')}`;
 }
 
-function selectDominantVibe(counts: Record<string, number>): VibePoint['vibe'] {
-  return Object.entries(counts)
-    .sort(([, a], [, b]) => b - a)
-    .map(([vibe]) => vibe as VibePoint['vibe'])
-    .shift();
+function selectDominantVibe(counts: Record<string, number>): { vibe?: VibePoint['vibe']; count: number; total: number } {
+  const sorted = Object.entries(counts).sort(([, a], [, b]) => b - a);
+  const [topVibe, topCount] = sorted[0] ?? [undefined, 0];
+  const total = Object.values(counts).reduce((acc, value) => acc + value, 0);
+  return { vibe: topVibe as VibePoint['vibe'], count: topCount ?? 0, total };
+}
+
+function deriveIntensity(count: number, total: number): VibeIntensity | undefined {
+  if (!count || !total) {
+    return undefined;
+  }
+  const ratio = total === 0 ? 0 : count / total;
+  if (ratio >= 0.66) {
+    return 'deep';
+  }
+  if (ratio >= 0.33) {
+    return 'medium';
+  }
+  return 'light';
 }
 
 function clamp(value: number, min: number, max: number): number {

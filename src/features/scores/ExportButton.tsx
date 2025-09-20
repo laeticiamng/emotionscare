@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/react';
 import { Download } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { exportSvgToPng } from '@/lib/export/svgExport';
+import { exportElementToPng } from '@/lib/export/domExport';
 
 export interface ExportButtonProps {
   targetRef: RefObject<HTMLElement | null>;
@@ -25,12 +25,6 @@ export function ExportButton({ targetRef, fileName, label, className, onError, o
       return;
     }
 
-    const svg = container.querySelector('svg');
-    if (!svg || !(svg instanceof SVGSVGElement)) {
-      onError?.('Le graphique ne contient pas de rendu SVG exportable.');
-      return;
-    }
-
     try {
       setIsExporting(true);
       onStart?.();
@@ -40,7 +34,7 @@ export function ExportButton({ targetRef, fileName, label, className, onError, o
         data: { fileName },
         level: 'info',
       });
-      await exportSvgToPng(svg, {
+      await exportElementToPng(container, {
         fileName,
         backgroundColor: '#ffffff',
         padding: 24,

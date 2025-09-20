@@ -67,9 +67,24 @@ describe('buildHeatmap', () => {
     vi.setSystemTime(new Date('2024-05-03T00:00:00.000Z'));
 
     const result = buildHeatmap(rows as any, 3);
-    expect(result[0]).toMatchObject({ date: '2024-05-01', vibe: 'bright' });
-    expect(result[1]).toMatchObject({ date: '2024-05-02', vibe: 'focus' });
-    expect(result[2]).toMatchObject({ date: '2024-05-03', vibe: undefined });
+    expect(result[0]).toMatchObject({
+      date: '2024-05-01',
+      vibe: 'bright',
+      intensity: 'deep',
+      meta: { count: 2, total: 2 },
+    });
+    expect(result[1]).toMatchObject({
+      date: '2024-05-02',
+      vibe: 'focus',
+      intensity: 'deep',
+      meta: { count: 1, total: 1 },
+    });
+    expect(result[2]).toMatchObject({
+      date: '2024-05-03',
+      vibe: undefined,
+      intensity: undefined,
+      meta: { count: 0, total: 0 },
+    });
   });
 });
 

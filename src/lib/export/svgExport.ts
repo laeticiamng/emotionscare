@@ -1,3 +1,5 @@
+import { sanitizeFileName, triggerDownload } from './utils';
+
 export interface SvgExportOptions {
   fileName?: string;
   backgroundColor?: string;
@@ -90,16 +92,5 @@ function loadImage(url: string, width: number, height: number): Promise<HTMLImag
     };
     image.src = url;
   });
-}
-
-function triggerDownload(fileName: string, dataUrl: string) {
-  const link = document.createElement('a');
-  link.download = fileName;
-  link.href = dataUrl;
-  link.click();
-}
-
-function sanitizeFileName(value: string): string {
-  return value.replace(/[^a-z0-9-_]/gi, '-');
 }
 
