@@ -1,5 +1,6 @@
 @import './components.css';
 @import './premium-admin.css';
+@import './mood.css';
 
 @tailwind base;
 @tailwind components;

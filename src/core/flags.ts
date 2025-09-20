@@ -12,6 +12,7 @@ interface FeatureFlags {
   FF_MANAGER_DASH: boolean;
   FF_SCORES: boolean;
   FF_SCAN: boolean;
+  FF_SCAN_SAM: boolean;
   FF_B2B_RH: boolean;
   FF_B2B_AGGREGATES: boolean;
   FF_ASSESS_AGGREGATE: boolean;
@@ -55,6 +56,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_MANAGER_DASH: true,
   FF_SCORES: true,
   FF_SCAN: true,
+  FF_SCAN_SAM: true,
   FF_B2B_RH: true,
   FF_B2B_AGGREGATES: true,
   FF_ASSESS_AGGREGATE: true,
