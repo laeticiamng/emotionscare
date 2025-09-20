@@ -4,6 +4,7 @@ import { sha256, webCryptoUnavailableMessage } from './hash';
 
 describe('sha256 helper', () => {
   const originalCrypto = globalThis.crypto;
+  const originalWindowCrypto = typeof window !== 'undefined' ? window.crypto : undefined;
 
   afterEach(() => {
     if (originalCrypto) {
@@ -14,6 +15,18 @@ describe('sha256 helper', () => {
       });
     } else {
       delete (globalThis as Record<string, unknown>).crypto;
+    }
+    if (typeof window !== 'undefined') {
+      if (originalWindowCrypto) {
+        Object.defineProperty(window, 'crypto', {
+          value: originalWindowCrypto,
+          configurable: true,
+          writable: true,
+        });
+      } else {
+        delete (window as { crypto?: Crypto }).crypto;
+      }
+      delete (window as { msCrypto?: Crypto }).msCrypto;
     }
     vi.restoreAllMocks();
   });
@@ -36,6 +49,35 @@ describe('sha256 helper', () => {
 
     const digest = await sha256('fallback');
     expect(digest).toBe('1c10451d2f92b512202f86485f1213db15d13383ed669f428e22950a9cbe0172');
+    expect(subtleDigest).toHaveBeenCalledOnce();
+  });
+
+  it('supports legacy window.msCrypto implementations', async () => {
+    const subtleDigest = vi.fn((algorithm: AlgorithmIdentifier, data: BufferSource) =>
+      originalCrypto.subtle.digest(algorithm, data),
+    );
+
+    Object.defineProperty(globalThis, 'crypto', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
+
+    if (typeof window !== 'undefined') {
+      Object.defineProperty(window, 'crypto', {
+        value: undefined,
+        configurable: true,
+        writable: true,
+      });
+      Object.defineProperty(window as typeof window & { msCrypto?: Crypto }, 'msCrypto', {
+        value: { subtle: { digest: subtleDigest } },
+        configurable: true,
+        writable: true,
+      });
+    }
+
+    const digest = await sha256('legacy');
+    expect(digest).toBe('2fc01b4a8590f9d33fed461187f1bcdb2dbeffa0de1daa64f3ebd242c84f5f80');
     expect(subtleDigest).toHaveBeenCalledOnce();
   });
 

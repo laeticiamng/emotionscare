@@ -59,6 +59,7 @@ describe('clinicalScoringService.calculate', () => {
     );
   });
 
+  it('interprets elevated PSS-10 answers and surfaces load management hints', () => {
   it('maps PSS-10 stress into high load with soothing summary', () => {
     const computation = clinicalScoringService.calculate(
       'PSS10',
@@ -79,6 +80,31 @@ describe('clinicalScoringService.calculate', () => {
 
     expect(computation.level).toBe(4);
     expect(computation.summary).toBe('besoin de relâche');
+    expect(computation.hints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ action: 'limit_notifications' }),
+        expect.objectContaining({ action: 'prioritize_rest' }),
+      ]),
+    );
+  });
+
+  it('flags low WEMWBS totals and invites supportive actions', () => {
+    const answers = Object.fromEntries(
+      Array.from({ length: 14 }, (_, index) => [String(index + 1), 1]),
+    );
+
+    const computation = clinicalScoringService.calculate('WEMWBS', answers, 'fr');
+
+    expect(computation.level).toBe(0);
+    expect(computation.summary).toBe('élan à raviver');
+    expect(computation.hints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ action: 'offer_support_circle' }),
+      ]),
+    );
+  });
+
+  it('handles CBI reversed items and escalates when exhaustion peaks', () => {
   });
 
   it('flags elevated experiential avoidance on AAQ-II', () => {
@@ -130,6 +156,12 @@ describe('clinicalScoringService.calculate', () => {
 
     expect(computation.level).toBe(4);
     expect(computation.summary).toBe('besoin de recharge');
+    expect(computation.hints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ action: 'notify_coach' }),
+        expect.objectContaining({ action: 'protect_calendar' }),
+      ]),
+    );
   });
 });
 
