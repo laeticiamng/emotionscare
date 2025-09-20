@@ -9,16 +9,15 @@ export const SECURITY_HEADERS = {
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': [
-    'geolocation=(self)',
-    'microphone=(self)',
-    'camera=(self)',
-    'fullscreen=(self)',
-    'payment=()'
+    'geolocation=()',
+    'microphone=()',
+    'camera=()'
   ].join(', '),
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
   'Cross-Origin-Embedder-Policy': 'credentialless',
   'Cross-Origin-Opener-Policy': 'same-origin',
-  'Cross-Origin-Resource-Policy': 'same-origin'
+  'Cross-Origin-Resource-Policy': 'same-site',
+  'X-Robots-Tag': 'noindex'
 };
 
 /**
@@ -61,7 +60,10 @@ export const applySecurityMeta = (): void => {
     { httpEquiv: 'X-Content-Type-Options', content: 'nosniff' },
     { httpEquiv: 'X-Frame-Options', content: 'DENY' },
     { httpEquiv: 'X-XSS-Protection', content: '1; mode=block' },
-    { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' }
+    { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
+    { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=()' },
+    { httpEquiv: 'Cross-Origin-Resource-Policy', content: 'same-site' },
+    { httpEquiv: 'X-Robots-Tag', content: 'noindex' }
   ];
 
   metas.forEach(metaData => {

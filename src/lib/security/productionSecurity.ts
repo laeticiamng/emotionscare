@@ -68,7 +68,9 @@ const applySecurityHeaders = (): void => {
     { httpEquiv: 'X-Frame-Options', content: 'DENY' },
     { httpEquiv: 'X-XSS-Protection', content: '1; mode=block' },
     { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
-    { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=()' }
+    { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=()' },
+    { httpEquiv: 'Cross-Origin-Resource-Policy', content: 'same-site' },
+    { httpEquiv: 'X-Robots-Tag', content: 'noindex' }
   ];
 
   securityHeaders.forEach(({ httpEquiv, content }) => {
@@ -85,6 +87,9 @@ const cleanSensitiveData = (): void => {
     // Supprimer les clés sensibles qui pourraient être exposées
     delete (window as any).SUPABASE_SERVICE_ROLE_KEY;
     delete (window as any).DATABASE_PASSWORD;
+    delete (window as any).VITE_SUPABASE_SERVICE_ROLE_KEY;
+    delete (window as any).VITE_SUPABASE_SERVICE_ROLE;
+    delete (window as any).SUPABASE_SERVICE_ROLE;
   }
 };
 
@@ -130,9 +135,20 @@ export const validateEnvironment = (): boolean => {
   ];
 
   const missing = requiredEnvVars.filter(envVar => !import.meta.env[envVar]);
-  
+
+  const forbiddenEnvVars = ['VITE_SUPABASE_SERVICE_ROLE_KEY', 'VITE_SUPABASE_SERVICE_ROLE'];
+  const exposedForbidden = forbiddenEnvVars.filter((envVar) => {
+    const value = (import.meta.env as Record<string, string | undefined>)[envVar];
+    return typeof value === 'string' && value.trim().length > 0;
+  });
+
   if (missing.length > 0) {
     console.error('❌ Missing required environment variables:', missing);
+    return false;
+  }
+
+  if (exposedForbidden.length > 0) {
+    console.error('❌ Forbidden environment variables exposed in client build:', exposedForbidden);
     return false;
   }
 

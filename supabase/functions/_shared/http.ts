@@ -5,6 +5,9 @@ const DEFAULT_CACHE_CONTROL = 'private, max-age=60, must-revalidate';
 const SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'X-Robots-Tag': 'noindex',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Cross-Origin-Resource-Policy': 'same-site',
 };
 
 export function json(status: number, body: unknown) {

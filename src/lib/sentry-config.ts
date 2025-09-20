@@ -37,6 +37,7 @@ type FirstInputEntry = PerformanceEventTiming & {
 let sentryInitialized = false;
 let domMonitoringAttached = false;
 let webVitalsMonitoringAttached = false;
+let doNotTrackEnabled = false;
 
 type WebVitalName = 'CLS' | 'LCP' | 'FID';
 
@@ -48,6 +49,85 @@ const WEB_VITAL_UNITS: Record<WebVitalName, 'millisecond' | 'unitless'> = {
 
 const sensitiveKeyPattern = /(content|message|prompt|transcript|body|text|summary|entry|payload|answer|comment|note|journal|chat)/i;
 const sensitiveUrlPattern = /(journal|coach|chat|conversation)/i;
+const piiKeyPattern = /(email|phone|tel|mobile|supabase|token|authorization|apikey|api[_-]?key)/i;
+const userIdPrefixes = ['user', 'member', 'profile', 'supabase', 'session', 'customer', 'patient', 'account', 'contact'];
+const EMAIL_REGEX = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+const PHONE_REGEX = /\b(?:\+?\d[\d\s().-]{7,}\d)\b/g;
+const UUID_REGEX = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi;
+const JWT_REGEX = /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g;
+const BEARER_TOKEN_REGEX = /\bBearer\s+[A-Za-z0-9\-._~+/=]{10,}\b/gi;
+const BASIC_TOKEN_REGEX = /\bBasic\s+[A-Za-z0-9\-._~+/=]{6,}\b/gi;
+const TOKEN_QUERY_PARAM_REGEX = /([?&](?:token|access_token|refresh_token|api[_-]?key|auth|authorization)=)[^&#]+/gi;
+const SUPABASE_SERVICE_ROLE_VALUE_REGEX = /(supabase[_-]?service[_-]?role[_-]?key\s*[:=]\s*)([^&\s]+)/gi;
+
+const normalizeKey = (key: string): string =>
+  key
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/[^a-z0-9_]/gi, '_')
+    .toLowerCase();
+
+const isPiiKey = (key: string): boolean => {
+  const normalized = normalizeKey(key);
+  return piiKeyPattern.test(normalized) || normalized.includes('supabase_service_role_key');
+};
+
+const isUserIdentifierKey = (key: string): boolean => {
+  const normalized = normalizeKey(key);
+  if (normalized === 'id' || normalized === 'uid') {
+    return true;
+  }
+  if (normalized.includes('user_id') || normalized.includes('userid')) {
+    return true;
+  }
+  if (normalized.includes('supabase') && normalized.includes('id')) {
+    return true;
+  }
+  if (normalized.endsWith('_id')) {
+    const prefix = normalized.slice(0, -3).replace(/_+$/, '');
+    if (userIdPrefixes.some(candidate => prefix.endsWith(candidate))) {
+      return true;
+    }
+  }
+  if (normalized.endsWith('_uid')) {
+    return true;
+  }
+  return false;
+};
+
+const containsSensitiveString = (value: string): boolean => {
+  if (!value) {
+    return false;
+  }
+
+  const patterns = [EMAIL_REGEX, PHONE_REGEX, UUID_REGEX, JWT_REGEX, BEARER_TOKEN_REGEX, BASIC_TOKEN_REGEX];
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0;
+    if (pattern.test(value)) {
+      return true;
+    }
+  }
+
+  TOKEN_QUERY_PARAM_REGEX.lastIndex = 0;
+  if (TOKEN_QUERY_PARAM_REGEX.test(value)) {
+    return true;
+  }
+
+  SUPABASE_SERVICE_ROLE_VALUE_REGEX.lastIndex = 0;
+  return SUPABASE_SERVICE_ROLE_VALUE_REGEX.test(value);
+};
+
+const redactSensitiveString = (value: string): string => {
+  let sanitized = value;
+  sanitized = sanitized.replace(EMAIL_REGEX, '[redacted-email]');
+  sanitized = sanitized.replace(PHONE_REGEX, '[redacted-phone]');
+  sanitized = sanitized.replace(UUID_REGEX, '[redacted-id]');
+  sanitized = sanitized.replace(JWT_REGEX, '[redacted-token]');
+  sanitized = sanitized.replace(BEARER_TOKEN_REGEX, 'Bearer [redacted]');
+  sanitized = sanitized.replace(BASIC_TOKEN_REGEX, 'Basic [redacted]');
+  sanitized = sanitized.replace(TOKEN_QUERY_PARAM_REGEX, '$1[redacted]');
+  sanitized = sanitized.replace(SUPABASE_SERVICE_ROLE_VALUE_REGEX, '$1[redacted]');
+  return sanitized;
+};
 
 const resolveCommitSha = () => {
   if (typeof __APP_COMMIT_SHA__ === 'string' && __APP_COMMIT_SHA__.length > 0) {
@@ -64,27 +144,31 @@ const fallbackRelease = BUILD_INFO.release ?? `emotionscare@${commitSha}`;
 
 const sanitizeUrl = (value: string) => {
   if (!value) return value;
+  let cleaned: string;
   if (value.startsWith('/')) {
-    return value.split('?')[0];
+    cleaned = value.split('?')[0];
+  } else {
+    try {
+      const parsed = new URL(value);
+      parsed.search = '';
+      parsed.hash = '';
+      cleaned = parsed.toString();
+    } catch {
+      cleaned = value.split('?')[0];
+    }
   }
-  try {
-    const parsed = new URL(value);
-    parsed.search = '';
-    parsed.hash = '';
-    return parsed.toString();
-  } catch {
-    return value.split('?')[0];
-  }
+  return redactSensitiveString(cleaned);
 };
 
 const sanitizeString = (value: string) => {
-  if (sensitiveUrlPattern.test(value)) {
+  const cleaned = redactSensitiveString(value);
+  if (sensitiveUrlPattern.test(cleaned)) {
     return '[scrubbed]';
   }
-  if (value.length <= 140) {
-    return value;
+  if (cleaned.length <= 140) {
+    return cleaned;
   }
-  return `${value.slice(0, 70)}…${value.slice(-16)}`;
+  return `${cleaned.slice(0, 70)}…${cleaned.slice(-16)}`;
 };
 
 const sanitizeData = (input: unknown, depth = 0): unknown => {
@@ -100,14 +184,27 @@ const sanitizeData = (input: unknown, depth = 0): unknown => {
     return input.slice(0, 5).map(item => sanitizeData(item, depth + 1));
   }
 
+  if (input instanceof Date) {
+    return input.toISOString();
+  }
+
   if (typeof input === 'object') {
     const entries = Object.entries(input as Record<string, unknown>).map(([key, value]) => {
-      if (sensitiveKeyPattern.test(key)) {
-        return [key, '[scrubbed]'];
+      if (isPiiKey(key) || isUserIdentifierKey(key)) {
+        return [key, '[redacted]'];
       }
-      if (typeof value === 'string' && sensitiveKeyPattern.test(value)) {
-        return [key, '[scrubbed]'];
+
+      if (typeof value === 'number' && isUserIdentifierKey(key)) {
+        return [key, '[redacted]'];
       }
+
+      if (typeof value === 'string') {
+        if (sensitiveKeyPattern.test(key) || sensitiveKeyPattern.test(value)) {
+          return [key, '[scrubbed]'];
+        }
+        return [key, sanitizeString(value)];
+      }
+
       return [key, sanitizeData(value, depth + 1)];
     });
     return Object.fromEntries(entries);
@@ -117,14 +214,91 @@ const sanitizeData = (input: unknown, depth = 0): unknown => {
     return sanitizeString(input);
   }
 
+  if (typeof input === 'number' || typeof input === 'boolean') {
+    return input;
+  }
+
   return input;
 };
 
-const sanitizeBreadcrumb = (breadcrumb: Breadcrumb): Breadcrumb => ({
-  ...breadcrumb,
-  message: breadcrumb.message ? sanitizeString(breadcrumb.message) : breadcrumb.message,
-  data: breadcrumb.data ? (sanitizeData(breadcrumb.data) as Record<string, unknown>) : undefined,
-});
+const containsSensitiveValue = (value: unknown, depth = 0): boolean => {
+  if (value == null) {
+    return false;
+  }
+
+  if (typeof value === 'string') {
+    return containsSensitiveString(value);
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return false;
+  }
+
+  if (Array.isArray(value)) {
+    return value.some(item => containsSensitiveValue(item, depth + 1));
+  }
+
+  if (typeof value === 'object') {
+    if (depth > 3) {
+      return false;
+    }
+
+    return Object.entries(value as Record<string, unknown>).some(([key, nested]) => {
+      if (isPiiKey(key) || isUserIdentifierKey(key)) {
+        return true;
+      }
+      return containsSensitiveValue(nested, depth + 1);
+    });
+  }
+
+  return false;
+};
+
+const NETWORK_BREADCRUMB_CATEGORIES = new Set(['http', 'fetch', 'xhr']);
+
+const sanitizeBreadcrumb = (breadcrumb: Breadcrumb): Breadcrumb | null => {
+  const category = breadcrumb.category ?? '';
+
+  if (NETWORK_BREADCRUMB_CATEGORIES.has(category)) {
+    if (containsSensitiveValue(breadcrumb.data)) {
+      return null;
+    }
+    if (typeof breadcrumb.message === 'string' && containsSensitiveString(breadcrumb.message)) {
+      return null;
+    }
+  }
+
+  const sanitizedData = breadcrumb.data ? (sanitizeData(breadcrumb.data) as Record<string, unknown>) : undefined;
+
+  if (sanitizedData && NETWORK_BREADCRUMB_CATEGORIES.has(category) && typeof sanitizedData.url === 'string') {
+    sanitizedData.url = sanitizeUrl(sanitizedData.url);
+  }
+
+  return {
+    ...breadcrumb,
+    message: typeof breadcrumb.message === 'string' ? sanitizeString(breadcrumb.message) : breadcrumb.message,
+    data: sanitizedData,
+  };
+};
+
+const DO_NOT_TRACK_VALUES = new Set(['1', 'yes', 'true']);
+
+const resolveDoNotTrackPreference = (): boolean => {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
+
+  const rawPreference =
+    navigator.doNotTrack ??
+    (navigator as unknown as { msDoNotTrack?: string }).msDoNotTrack ??
+    (typeof window !== 'undefined' ? (window as unknown as { doNotTrack?: string }).doNotTrack : undefined);
+
+  if (typeof rawPreference === 'string') {
+    return DO_NOT_TRACK_VALUES.has(rawPreference);
+  }
+
+  return false;
+};
 
 const recordWebVital = (name: WebVitalName, value: number, extra: Record<string, unknown>): void => {
   if (!Number.isFinite(value)) {
@@ -155,6 +329,10 @@ const recordWebVital = (name: WebVitalName, value: number, extra: Record<string,
 };
 
 const sanitizeEvent = (event: SentryEvent): SentryEvent | null => {
+  if (doNotTrackEnabled && event.type === 'transaction') {
+    return null;
+  }
+
   if (event.request) {
     if (event.request.url) {
       const sanitizedUrl = sanitizeUrl(event.request.url);
@@ -183,10 +361,7 @@ const sanitizeEvent = (event: SentryEvent): SentryEvent | null => {
     }
   }
 
-  if (event.user) {
-    const { id, ip_address } = event.user;
-    event.user = id || ip_address ? { id, ip_address } : undefined;
-  }
+  event.user = undefined;
 
   if (event.contexts) {
     event.contexts = sanitizeData(event.contexts) as typeof event.contexts;
@@ -197,8 +372,22 @@ const sanitizeEvent = (event: SentryEvent): SentryEvent | null => {
   }
 
   if (event.breadcrumbs) {
-    event.breadcrumbs = event.breadcrumbs.slice(-50).map(sanitizeBreadcrumb);
+    const sanitizedBreadcrumbs = event.breadcrumbs
+      .slice(-50)
+      .map(sanitizeBreadcrumb)
+      .filter((breadcrumb): breadcrumb is Breadcrumb => breadcrumb !== null);
+    event.breadcrumbs = sanitizedBreadcrumbs.length ? sanitizedBreadcrumbs : undefined;
   }
+
+  if (containsSensitiveValue(event.extra) || containsSensitiveValue(event.contexts)) {
+    return null;
+  }
+
+  event.tags = {
+    ...event.tags,
+    pii_scrubbed: 'true',
+    dnt: doNotTrackEnabled ? 'true' : 'false',
+  };
 
   return event;
 };
@@ -220,27 +409,37 @@ export function initializeSentry(): void {
   }
 
   const environment = SENTRY_CONFIG.environment ?? import.meta.env.MODE ?? 'development';
-  const tracesSampleRate = Number.isFinite(SENTRY_CONFIG.tracesSampleRate)
+  const baseTracesSampleRate = Number.isFinite(SENTRY_CONFIG.tracesSampleRate)
     ? SENTRY_CONFIG.tracesSampleRate
     : 0.2;
-  const replaysSessionSampleRate = Number.isFinite(SENTRY_CONFIG.replaysSessionSampleRate)
+  const baseReplaysSessionSampleRate = Number.isFinite(SENTRY_CONFIG.replaysSessionSampleRate)
     ? SENTRY_CONFIG.replaysSessionSampleRate
     : 0;
-  const replaysOnErrorSampleRate = Number.isFinite(SENTRY_CONFIG.replaysOnErrorSampleRate)
+  const baseReplaysOnErrorSampleRate = Number.isFinite(SENTRY_CONFIG.replaysOnErrorSampleRate)
     ? SENTRY_CONFIG.replaysOnErrorSampleRate
     : 0;
 
-  const integrations = [
-    new BrowserTracing({
-      tracePropagationTargets: [
-        /^https?:\/\/localhost(?::\d+)?/,
-        /^https?:\/\/[^/]*supabase\.co/,
-        /^https?:\/\/api\.emotionscare\.com/,
-      ],
-    }),
-  ];
+  doNotTrackEnabled = resolveDoNotTrackPreference();
 
-  if (replaysSessionSampleRate > 0 || replaysOnErrorSampleRate > 0) {
+  const tracesSampleRate = doNotTrackEnabled ? 0 : baseTracesSampleRate;
+  const replaysSessionSampleRate = doNotTrackEnabled ? 0 : baseReplaysSessionSampleRate;
+  const replaysOnErrorSampleRate = doNotTrackEnabled ? 0 : baseReplaysOnErrorSampleRate;
+
+  const integrations = [] as NonNullable<Parameters<typeof Sentry.init>[0]['integrations']>;
+
+  if (tracesSampleRate > 0) {
+    integrations.push(
+      new BrowserTracing({
+        tracePropagationTargets: [
+          /^https?:\/\/localhost(?::\d+)?/,
+          /^https?:\/\/[^/]*supabase\.co/,
+          /^https?:\/\/api\.emotionscare\.com/,
+        ],
+      }),
+    );
+  }
+
+  if (!doNotTrackEnabled && (replaysSessionSampleRate > 0 || replaysOnErrorSampleRate > 0)) {
     integrations.push(
       new Replay({
         blockAllMedia: true,
@@ -262,6 +461,9 @@ export function initializeSentry(): void {
     beforeSend(event) {
       return sanitizeEvent(event);
     },
+    beforeBreadcrumb(breadcrumb) {
+      return sanitizeBreadcrumb(breadcrumb);
+    },
   });
 
   Sentry.configureScope(scope => {
@@ -270,10 +472,18 @@ export function initializeSentry(): void {
     scope.setTag('commit_sha', commitSha);
     scope.setTag('app_version', BUILD_INFO.version ?? 'unknown');
     scope.setTag('feature_flag_router_v2', 'enabled');
+    scope.setTag('dnt', doNotTrackEnabled ? 'true' : 'false');
+    if (doNotTrackEnabled) {
+      scope.setTag('telemetry_disabled', 'true');
+    }
     scope.setContext('build', {
       version: BUILD_INFO.version ?? 'unknown',
       commitSha,
       release: fallbackRelease,
+    });
+    scope.setContext('privacy', {
+      doNotTrack: doNotTrackEnabled,
+      pii_scrubbing: 'strict',
     });
   });
 
@@ -281,10 +491,13 @@ export function initializeSentry(): void {
 
   sentryInitialized = true;
 
-  monitorWebVitals();
+  if (!doNotTrackEnabled) {
+    monitorWebVitals();
+  }
 
   if (import.meta.env.DEV) {
-    console.log('[Sentry] Observabilité initialisée');
+    const dntMessage = doNotTrackEnabled ? ' (respect do-not-track activé)' : '';
+    console.log(`[Sentry] Observabilité initialisée${dntMessage}`);
   }
 }
 
