@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { 
+import {
   ArrowLeft,
   Flower,
   PenTool,
@@ -16,6 +16,8 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 interface JournalEntry {
   id: string;
@@ -34,20 +36,21 @@ const flowerColors = [
 
 const JournalPage: React.FC = () => {
   const { toast } = useToast();
-  
+
   // Get optimized universe config
   const universe = getOptimizedUniverse('journal');
-  
+
   // Universe state
   const [isEntering, setIsEntering] = useState(true);
   const [universeEntered, setUniverseEntered] = useState(false);
-  
+
   // Journal state
   const [currentText, setCurrentText] = useState('');
   const [isWriting, setIsWriting] = useState(false);
   const [showReward, setShowReward] = useState(false);
   const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(null);
   const [flowerGrowth, setFlowerGrowth] = useState(0);
+  const panasConsent = useClinicalConsent('PANAS');
 
   // Optimized animations
   const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
@@ -168,7 +171,20 @@ const JournalPage: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 container mx-auto px-6 py-12">
+      <main className="relative z-10 container mx-auto px-6 py-12 space-y-12">
+        {panasConsent.shouldPrompt && (
+          <ClinicalOptIn
+            title="Activer l'humeur PANAS"
+            description="Quelques mots sur vos émotions nous aident à nourrir le journal. Votre choix est mémorisé et reste modifiable dans les paramètres."
+            acceptLabel="Oui, me guider"
+            declineLabel="Non merci"
+            onAccept={panasConsent.grantConsent}
+            onDecline={panasConsent.declineConsent}
+            isProcessing={panasConsent.isSaving}
+            error={panasConsent.error}
+            className="bg-white/10 border-white/20 backdrop-blur-md"
+          />
+        )}
         <AnimatePresence mode="wait">
           {!isWriting ? (
             <motion.div
