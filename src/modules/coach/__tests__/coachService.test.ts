@@ -1,21 +1,21 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { sha256, webCryptoUnavailableMessage } from '@/lib/hash';
+import { sha256Hex, webCryptoUnavailableMessage } from '@/lib/hash';
 import { buildSystemPrompt, COACH_DISCLAIMERS } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 
 describe('coach utils', () => {
   it('produces deterministic sha256 hashes', async () => {
-    const value = await sha256('user-123');
+    const value = await sha256Hex('user-123');
     expect(value).toHaveLength(64);
-    expect(await sha256('user-123')).toBe(value);
-    expect(await sha256('user-124')).not.toBe(value);
+    expect(await sha256Hex('user-123')).toBe(value);
+    expect(await sha256Hex('user-124')).not.toBe(value);
   });
 
   it('throws a clear error when Web Crypto is missing', async () => {
     try {
       vi.stubGlobal('crypto', undefined as unknown as Crypto);
-      await expect(sha256('user-123')).rejects.toThrow(webCryptoUnavailableMessage);
+      await expect(sha256Hex('user-123')).rejects.toThrow(webCryptoUnavailableMessage);
     } finally {
       vi.unstubAllGlobals();
     }

@@ -24,6 +24,16 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
       ...extraPatterns.map((pattern) =>
         typeof pattern === "string" ? { group: [pattern] } : pattern
       )
+    ],
+    paths: [
+      {
+        name: "crypto",
+        message: "Utilise Web Crypto via '@/lib/hash' (sha256Hex).",
+      },
+      {
+        name: "node:crypto",
+        message: "Utilise Web Crypto via '@/lib/hash' (sha256Hex).",
+      },
     ]
   }
 ];
