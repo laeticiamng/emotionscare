@@ -138,16 +138,24 @@ const B2CSocialCoconPage: React.FC = () => {
     ? mspssHistory?.[0]?.level ?? mspssAssessment.state.lastComputation?.level
     : undefined;
 
+  const consented = Boolean(mspssAssessment.state.hasConsent);
+
   const socialHints = useMemo(
-    () => (orchestratorEnabled ? computeSocialCoconUIHints({ mspssLevel }) : []),
-    [mspssLevel, orchestratorEnabled],
+    () =>
+      orchestratorEnabled
+        ? computeSocialCoconUIHints({
+            mspssLevel: typeof mspssLevel === 'number' ? mspssLevel : undefined,
+            consented,
+          })
+        : [],
+    [consented, mspssLevel, orchestratorEnabled],
   );
 
   const shouldPrioritizeCta = socialHints.some(
-    (hint) => hint.action === 'prioritize_cta' && hint.key === 'plan_pause',
+    (hint) => hint.action === 'promote_cta' && hint.key === 'schedule_break',
   );
   const shouldPromoteRooms = socialHints.some(
-    (hint) => hint.action === 'promote_rooms_private' && hint.enabled,
+    (hint) => hint.action === 'highlight_rooms_private',
   );
 
   const serializedHints = useMemo(() => serializeHints(socialHints), [socialHints]);

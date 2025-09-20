@@ -4,7 +4,7 @@ import { communityOrchestrator } from './community.orchestrator';
 
 describe('communityOrchestrator', () => {
   it('returns banner and pinned card when UCLA level is high', () => {
-    const hints = communityOrchestrator({ ucla3Level: 3 });
+    const hints = communityOrchestrator({ uclaLevel: 3, consented: true });
     expect(hints).toEqual([
       { action: 'show_banner', key: 'listen_two_minutes' },
       { action: 'pin_card', key: 'social_cocon' },
@@ -12,21 +12,26 @@ describe('communityOrchestrator', () => {
   });
 
   it('returns empathic reply suggestions when MSPSS is low', () => {
-    const hints = communityOrchestrator({ mspssLevel: 1 });
-    expect(hints).toEqual([{ action: 'suggest_replies', key: 'empathic_templates' }]);
+    const hints = communityOrchestrator({ mspssLevel: 1, consented: true });
+    expect(hints).toEqual([{ action: 'show_empathic_replies' }]);
   });
 
   it('combines hints when both signals are present', () => {
-    const hints = communityOrchestrator({ ucla3Level: 4, mspssLevel: 0 });
+    const hints = communityOrchestrator({ uclaLevel: 4, mspssLevel: 0, consented: true });
     expect(hints).toEqual([
       { action: 'show_banner', key: 'listen_two_minutes' },
       { action: 'pin_card', key: 'social_cocon' },
-      { action: 'suggest_replies', key: 'empathic_templates' },
+      { action: 'show_empathic_replies' },
     ]);
   });
 
   it('ignores undefined levels', () => {
-    const hints = communityOrchestrator({});
-    expect(hints).toEqual([]);
+    const hints = communityOrchestrator({ consented: true });
+    expect(hints).toEqual([{ action: 'none' }]);
+  });
+
+  it('suppresses orchestration when consent is missing', () => {
+    const hints = communityOrchestrator({ uclaLevel: 4, mspssLevel: 0, consented: false });
+    expect(hints).toEqual([{ action: 'none' }]);
   });
 });
