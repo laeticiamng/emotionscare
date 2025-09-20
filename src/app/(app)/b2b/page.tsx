@@ -2,6 +2,9 @@ import Link from 'next/link';
 
 const CARDS = [
   {
+    href: '/b2b/reports',
+    title: 'Rapports mensuels',
+    description: 'Consulter un récit de trois phrases et une action douce, prêt à imprimer.',
     href: '/b2b/rh',
     title: 'Heatmap RH textuelle',
     description: 'Visualiser le climat d’équipe sans chiffres, avec redirection vers les rapports détaillés.',
