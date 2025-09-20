@@ -54,9 +54,82 @@ describe('clinicalScoringService.calculate', () => {
     expect(computation.summary).toBe('éclat vibrant');
     expect(computation.hints).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ action: 'invite_creativity' }),
-      ]),
+      expect.objectContaining({ action: 'invite_creativity' }),
+    ]),
     );
+  });
+
+  it('maps PSS-10 stress into high load with soothing summary', () => {
+    const computation = clinicalScoringService.calculate(
+      'PSS10',
+      {
+        '1': 4,
+        '2': 0,
+        '3': 0,
+        '4': 4,
+        '5': 0,
+        '6': 4,
+        '7': 0,
+        '8': 0,
+        '9': 4,
+        '10': 4,
+      },
+      'fr',
+    );
+
+    expect(computation.level).toBe(4);
+    expect(computation.summary).toBe('besoin de relâche');
+  });
+
+  it('flags elevated experiential avoidance on AAQ-II', () => {
+    const answers = Object.fromEntries(Array.from({ length: 7 }, (_, index) => [String(index + 1), 7]));
+
+    const computation = clinicalScoringService.calculate('AAQ2', answers, 'fr');
+
+    expect(computation.level).toBe(4);
+    expect(computation.summary).toBe('besoin de relâcher la prise');
+  });
+
+  it('captures POMS total mood disturbance signal', () => {
+    const answers: Record<string, number> = {};
+    for (let i = 1; i <= 20; i += 1) {
+      answers[String(i)] = 4;
+    }
+    for (let i = 21; i <= 24; i += 1) {
+      answers[String(i)] = 0;
+    }
+
+    const computation = clinicalScoringService.calculate('POMS', answers, 'fr');
+
+    expect(computation.level).toBe(4);
+    expect(computation.summary).toBe('humeur en surcharge');
+  });
+
+  it('returns flourishing message on WEMWBS high scores', () => {
+    const answers = Object.fromEntries(Array.from({ length: 14 }, (_, index) => [String(index + 1), 5]));
+
+    const computation = clinicalScoringService.calculate('WEMWBS', answers, 'fr');
+
+    expect(computation.level).toBe(4);
+    expect(computation.summary).toBe('vitalité rayonnante');
+  });
+
+  it('handles CBI reversal and detects fatigue saturation', () => {
+    const computation = clinicalScoringService.calculate(
+      'CBI',
+      {
+        '1': 5,
+        '2': 5,
+        '3': 5,
+        '4': 5,
+        '5': 5,
+        '6': 0,
+      },
+      'fr',
+    );
+
+    expect(computation.level).toBe(4);
+    expect(computation.summary).toBe('besoin de recharge');
   });
 });
 
