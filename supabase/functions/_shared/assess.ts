@@ -392,11 +392,12 @@ function determineLevel(instrument: InstrumentCode, total: number, itemCount: nu
 function generateSummary(instrument: InstrumentCode, level: number): string {
   const summaries: Record<InstrumentCode, Record<number, string>> = {
     'WHO5': {
-      0: 'bien-être fragile',
-      1: 'affect délicat',
-      2: 'affect équilibré',
-      3: 'bien-être solide',
-      4: 'affect lumineux'
+      0: 'bien-être fragile, besoin de douceur',
+      1: 'bien-être à renforcer',
+      2: 'bien-être stable',
+      3: 'bien-être élevé',
+      4: 'bien-être rayonnant'
+
     },
     'STAI6': {
       0: 'tension apaisée',
@@ -426,11 +427,12 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
 
 export function sanitizeAggregateText(text: string): string {
   // Remove any numerical data that might leak individual scores
-  const cleaned = text
-    .replace(/\d+(?:[.,]\d+)?\s*%?/g, '') // Remove all numbers (dot/comma decimals + optional %)
-    .replace(/%/g, '') // Remove any stray percentage symbols
+  return text
+    .replace(/\d+(?:\.\d+)?%?/g, '•') // Replace all numbers by bullet markers
     .replace(/score|niveau|points?/gi, '') // Remove scoring terms
+    .replace(/\s*•\s*/g, ' • ') // Normalize spacing around bullets
     .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/• (?=[\.,])/g, '•') // Avoid spaces before punctuation
     .trim();
 
   if (!cleaned) {

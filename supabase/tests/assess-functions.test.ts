@@ -30,6 +30,11 @@ vi.mock('../functions/_shared/sentry.ts', () => ({
   captureSentryException: (...args: unknown[]) => captureSentryExceptionMock(...args),
 }));
 
+const recordEdgeLatencyMetricMock = vi.fn();
+vi.mock('../functions/_shared/metrics.ts', () => ({
+  recordEdgeLatencyMetric: (...args: unknown[]) => recordEdgeLatencyMetricMock(...args),
+}));
+
 vi.mock('../functions/_shared/serve.ts', () => ({
   serve: (handler: (req: Request) => Promise<Response>) => {
     handlerRef.current = handler;
@@ -71,6 +76,7 @@ beforeEach(() => {
   supabaseClientMock.mockReset();
   addSentryBreadcrumbMock.mockReset();
   captureSentryExceptionMock.mockReset();
+  recordEdgeLatencyMetricMock.mockReset();
   resetEdgeRateLimits();
   envStore.SUPABASE_URL = 'https://example.supabase.co';
   envStore.SUPABASE_ANON_KEY = 'anon-key';
@@ -168,7 +174,12 @@ describe('assess-start function', () => {
       result: 'success',
     }));
     expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
-      category: 'assess:start',
+      category: 'assess',
+      message: 'assess:start:catalog_served',
+    }));
+    expect(recordEdgeLatencyMetricMock).toHaveBeenCalledWith(expect.objectContaining({
+      route: 'assess-start',
+      status: 200,
     }));
   });
 
@@ -263,10 +274,12 @@ describe('assess-submit function', () => {
       result: 'success',
     }));
     expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'storing sanitized summary',
+      category: 'assess',
+      message: 'assess:submit:summary_generated',
     }));
-    expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'assessment stored',
+    expect(recordEdgeLatencyMetricMock).toHaveBeenCalledWith(expect.objectContaining({
+      route: 'assess-submit',
+      status: 200,
     }));
   });
 
@@ -376,11 +389,16 @@ describe('assess-aggregate function', () => {
     expect(inMock).not.toHaveBeenCalled();
     expect(gteMock).toHaveBeenCalledWith('n', 5);
     expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
-      category: 'assess:aggregate',
+      category: 'assess',
+      message: 'assess:aggregate:summaries_served',
     }));
     expect(logAccessMock).toHaveBeenCalledWith(expect.objectContaining({
       route: 'assess-aggregate',
       action: 'assess:aggregate',
+    }));
+    expect(recordEdgeLatencyMetricMock).toHaveBeenCalledWith(expect.objectContaining({
+      route: 'assess-aggregate',
+      status: 200,
     }));
     expect(supabaseClientMock).toHaveBeenCalledWith('https://example.supabase.co', 'service-role-key');
     expect(fromMock).toHaveBeenCalledWith('org_assess_rollups');
