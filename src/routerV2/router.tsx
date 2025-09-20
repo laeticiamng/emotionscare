@@ -146,9 +146,9 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 
 // Pages système unifiées
-const Error401Page = lazy(() => import('@/pages/errors/401'));
-const Error403Page = lazy(() => import('@/pages/errors/403'));
-const Error404Page = lazy(() => import('@/pages/errors/404'));
+const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
+const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
+const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 
 
@@ -263,9 +263,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   LegalPrivacyPage,
   
   // System unifiées
-  Error401Page,
-  Error403Page,
-  Error404Page,
+  UnauthorizedPage,
+  ForbiddenPage,
+  UnifiedErrorPage,
   ServerErrorPage,
   
   // Import des nouveaux modules optimisés
