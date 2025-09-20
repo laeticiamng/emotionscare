@@ -33,6 +33,7 @@ const TABLE_EXPECTATIONS: TablePolicyExpectation[] = [
   { table: 'journal_entries', operations: ['SELECT', 'INSERT', 'UPDATE'] },
   { table: 'mood_presets', operations: ['SELECT', 'INSERT', 'UPDATE'] },
   { table: 'emotion_metrics', operations: ['SELECT', 'INSERT', 'UPDATE'] },
+  { table: 'consents', operations: ['SELECT', 'INSERT', 'UPDATE'] },
 ];
 
 const clauseContainsAuthUid = (clause: string | null): boolean =>
@@ -98,6 +99,16 @@ describe('RLS policy definitions (static analysis)', () => {
 
       expect(hasAuthInSql).toBe(true);
     });
+  });
+});
+
+describe('consents migration constraints', () => {
+  it('creates a partial unique index enforcing one active consent per user', () => {
+    const matched = migrationFiles.some((content) =>
+      content.includes('create unique index if not exists consents_one_active_per_user'),
+    );
+
+    expect(matched).toBe(true);
   });
 });
 

@@ -1,0 +1,175 @@
+openapi: 3.0.3
+info:
+  title: Clinical Consent Opt-in API
+  version: 1.0.0
+  description: API pour gérer le consentement clinique opt-in des utilisateurs.
+servers:
+  - url: https://api.emotions.care
+    description: Production
+  - url: https://staging-api.emotions.care
+    description: Staging
+paths:
+  /optin/accept:
+    post:
+      summary: Accepte un consentement clinique pour l'utilisateur courant
+      operationId: acceptConsent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptConsentInput'
+      responses:
+        '200':
+          description: Consentement actif confirmé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcceptConsentResponse'
+        '401':
+          description: Jeton d'authentification manquant ou invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Corps de requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Trop de requêtes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+        '500':
+          description: Erreur serveur lors de la création du consentement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /optin/revoke:
+    post:
+      summary: Révoque le consentement clinique actif de l'utilisateur
+      operationId: revokeConsent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevokeConsentInput'
+      responses:
+        '200':
+          description: Consentement révoqué
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevokeConsentResponse'
+        '401':
+          description: Jeton d'authentification manquant ou invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Corps de requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Trop de requêtes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+        '500':
+          description: Erreur serveur lors de la révocation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AcceptConsentInput:
+      type: object
+      required:
+        - version
+      properties:
+        version:
+          type: string
+          minLength: 1
+          description: Version du consentement
+        scope:
+          type: object
+          additionalProperties:
+            type: boolean
+          default: {}
+          description: Drapeaux de consentement supplémentaires
+    RevokeConsentInput:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Motif optionnel de révocation
+    AcceptConsentResponse:
+      type: object
+      required:
+        - status
+        - accepted_at
+        - version
+      properties:
+        status:
+          type: string
+          enum: [accepted]
+        accepted_at:
+          type: string
+          format: date-time
+        version:
+          type: string
+    RevokeConsentResponse:
+      type: object
+      required:
+        - status
+        - revoked_at
+      properties:
+        status:
+          type: string
+          enum: [revoked]
+        revoked_at:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+    RateLimitError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          required:
+            - message
+            - retry_after
+          properties:
+            message:
+              type: string
+            retry_after:
+              type: integer
+              format: int32
