@@ -18,6 +18,7 @@ export { usePerformanceOptimization, useConditionalLazyLoad } from './performanc
 
 // Toast system - compatible shadcn
 export { useToast, toast } from './use-toast';
+export { useClinicalHints } from './useClinicalHints';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
