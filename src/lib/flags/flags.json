@@ -6,5 +6,5 @@
   "new-audio-engine": false,
   "FF_FLASH": true,
   "FF_ASSESS_SUDS": true,
-  "FF_B2B_REPORTS": false
+  "FF_B2B_REPORTS": true
 }
