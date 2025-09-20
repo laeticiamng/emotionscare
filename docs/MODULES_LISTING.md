@@ -123,11 +123,12 @@
 ### 🩺 Observabilité — Endpoint `/health`
 - **Entrée** : service Fastify `services/api/server.ts` exposant `/health`, `/healthz` et `/api/healthz`.
 - **Vérifications effectuées** :
-  - Supabase (`auth` + requête REST légère) avec latence et statut (`ok|degraded|down`).
+  - Supabase (ping léger REST + latence) avec statut (`ok|degraded|down`).
   - Fonctions critiques (par défaut `ai-emotion-analysis`, `ai-coach`) pingées en `HEAD`.
   - Stockage public (URL configurable) via requête `HEAD`.
-- **Réponse JSON minifiée** : `{ status, timestamp, checks: { supabase, functions[], storage }, signature }`.
+- **Réponse JSON** : `{ status, version, runtime: { node, platform, environment }, uptime: { seconds, since }, timestamp, checks: { supabase, functions[], storage }, signature }`.
   - `signature` = SHA-256 du payload + `HEALTH_SIGNING_SECRET` pour détecter toute altération.
+  - Heartbeat Sentry optionnel via `SENTRY_HEARTBEAT_URL`/`SENTRY_CRON_HEARTBEAT_URL` après chaque succès.
   - Exposition contrôlée par CORS (`HEALTH_ALLOWED_ORIGINS`) et rate-limit mémoire (60 req/min/IP par défaut).
 - **Tests** : `services/api/tests/health.test.ts` simule succès + fonction en panne, vérifie latences et signature.
 

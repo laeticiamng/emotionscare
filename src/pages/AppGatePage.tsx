@@ -4,15 +4,25 @@
  */
 
 import React, { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { routes } from '@/routerV2';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import { stripUtmParams } from '@/lib/utm';
 
 const AppGatePage: React.FC = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: modeLoading } = useUserMode();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const cleanedSearch = stripUtmParams(location.search);
+    if (cleanedSearch !== null) {
+      navigate({ pathname: location.pathname, search: cleanedSearch, hash: location.hash }, { replace: true });
+    }
+  }, [location.hash, location.pathname, location.search, navigate]);
 
   // Chargement en cours
   if (authLoading || modeLoading) {

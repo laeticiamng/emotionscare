@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { routes } from '@/lib/routes';
 import type { Role, Segment } from './schema';
+import { stripUtmParams } from '@/lib/utm';
 
 type GuardChildren = { children: React.ReactNode };
 
@@ -117,7 +118,15 @@ interface ModeGuardProps extends GuardChildren {
 export const ModeGuard: React.FC<ModeGuardProps> = ({ children, segment }) => {
   const { userMode, setUserMode, isLoading } = useUserMode();
   const location = useLocation();
+  const navigate = useNavigate();
   const [synced, setSynced] = useState(false);
+
+  useEffect(() => {
+    const cleanedSearch = stripUtmParams(location.search);
+    if (cleanedSearch !== null) {
+      navigate({ pathname: location.pathname, search: cleanedSearch, hash: location.hash }, { replace: true });
+    }
+  }, [location.hash, location.pathname, location.search, navigate]);
 
   const desiredMode = useMemo<UserModeValue>(() => {
     const forced = new URLSearchParams(location.search).get('segment');

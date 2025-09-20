@@ -6,10 +6,7 @@ export type Segment = 'b2c' | 'b2b';
 
 export type UTMParams = {
   source?: string;
-  medium?: string;
   campaign?: string;
-  term?: string;
-  content?: string;
 };
 
 type MarketingState = {

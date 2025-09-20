@@ -1,6 +1,21 @@
 
 # Changelog
 
+## [1.2.0] - 2025-06-07
+
+### Added
+- ECC-910: Publication des notes de version produit dans [`RELEASE_NOTES.md`](RELEASE_NOTES.md) pour aligner produit, support et tech.
+
+### Changed
+- ECC-912: Endpoint `/health` enrichi avec version, runtime, uptime et heartbeat Sentry pour la surveillance post-déploiement ([`docs/MODULES_LISTING.md`](docs/MODULES_LISTING.md)).
+- ECC-915: CTAs landing ajoutent automatiquement `?utm_source=landing&utm_campaign=launch` et `/app` nettoie ces paramètres avant l'authentification.
+
+### Fixed
+- B2B-588: Store marketing ne conserve plus les paramètres UTM non pris en charge, évitant les propagations indésirables après connexion.
+
+### Security
+- SEC-274: Réponses `/health` signées couvrant les nouveaux métadonnées sans exposer de secrets et journalisation des échecs heartbeat Sentry.
+
 ## [1.1.17] - 2025-06-06
 
 ### Ajouté
