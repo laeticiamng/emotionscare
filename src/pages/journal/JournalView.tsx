@@ -7,6 +7,7 @@ import { useJournalComposer } from '@/modules/journal/useJournalComposer'
 import { listFeed } from '@/services/journal/journalApi'
 import type { SanitizedNote } from '@/modules/journal/types'
 import { JournalFeed } from './JournalFeed'
+import { PanasSuggestionsCard } from './PanasSuggestionsCard'
 
 const PAGE_SIZE = 10
 
@@ -80,6 +81,8 @@ export default function JournalView() {
           <JournalComposer composer={composer} />
         </CardContent>
       </Card>
+
+      <PanasSuggestionsCard composer={composer} />
 
       <JournalFeed
         search={search}

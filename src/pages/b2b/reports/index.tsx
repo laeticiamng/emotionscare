@@ -2,7 +2,6 @@ import React from 'react';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { B2BHeatmap } from '@/features/b2b/reports/B2BHeatmap';
@@ -59,26 +58,10 @@ export default function B2BReportsHeatmapPage() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  const query = useQuery<HeatmapCell[]>({
-    queryKey: ['b2b-heatmap', orgId, period, selectedInstrument],
-    enabled: Boolean(orgId && period),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    queryFn: async () => {
-      if (!orgId) {
-        return [];
-      }
-      const start = typeof performance !== 'undefined' ? performance.now() : null;
-      const cells = await getHeatmap({
-        orgId,
-        period,
-        instruments: selectedInstrument === INSTRUMENT_OPTION_ALL ? undefined : [selectedInstrument],
-      });
-      if (start != null && typeof performance !== 'undefined') {
-        performanceMonitor.recordMetric('b2b_reports.fetch_latency', performance.now() - start);
-      }
-      return cells;
-    },
+  const query = useHeatmap({
+    orgId,
+    period,
+    instruments: selectedInstrument === INSTRUMENT_OPTION_ALL ? undefined : [selectedInstrument],
   });
 
   const teamOptions = React.useMemo(() => {

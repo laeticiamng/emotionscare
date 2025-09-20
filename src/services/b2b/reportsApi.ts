@@ -1,8 +1,10 @@
 import * as Sentry from '@sentry/react';
+import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
 import { logger } from '@/lib/logger';
+import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import type { HeatmapCell, HeatmapCellInput } from '@/features/b2b/reports/utils';
 import { mapSummariesToCells } from '@/features/b2b/reports/utils';
 
@@ -27,7 +29,7 @@ interface GetHeatmapParams {
   instruments?: string[];
 }
 
-export async function getHeatmap({ orgId, period, instruments }: GetHeatmapParams): Promise<HeatmapCell[]> {
+async function fetchHeatmap({ orgId, period, instruments }: GetHeatmapParams): Promise<HeatmapCell[]> {
   const payload = {
     org_id: orgId,
     period,
@@ -92,6 +94,57 @@ export async function getHeatmap({ orgId, period, instruments }: GetHeatmapParam
     logger.error('Failed to load aggregate summaries', { error: error instanceof Error ? error.message : 'unknown' }, 'b2b.reports');
     throw error;
   }
+}
+
+export async function getHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[]> {
+  return fetchHeatmap(params);
+}
+
+type HeatmapQueryKey = [
+  'b2b-heatmap',
+  string | undefined,
+  string | undefined,
+  string,
+];
+
+type HeatmapQueryOptions = Omit<
+  UseQueryOptions<HeatmapCell[], Error, HeatmapCell[], HeatmapQueryKey>,
+  'queryKey' | 'queryFn'
+>;
+
+interface UseHeatmapParams {
+  orgId?: string;
+  period?: string;
+  instruments?: string[];
+}
+
+export function useHeatmap(
+  { orgId, period, instruments }: UseHeatmapParams,
+  options?: HeatmapQueryOptions,
+): UseQueryResult<HeatmapCell[], Error> {
+  const sortedInstruments = instruments && instruments.length > 0 ? [...instruments].sort() : undefined;
+  const instrumentsKey = sortedInstruments?.join('|') ?? 'all';
+  const isEnabled = Boolean(orgId && period) && (options?.enabled ?? true);
+
+  return useQuery<HeatmapCell[], Error, HeatmapCell[], HeatmapQueryKey>({
+    queryKey: ['b2b-heatmap', orgId, period, instrumentsKey],
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    ...(options ?? {}),
+    enabled: isEnabled,
+    queryFn: async () => {
+      if (!orgId || !period) {
+        return [];
+      }
+
+      const start = typeof performance !== 'undefined' ? performance.now() : null;
+      const cells = await fetchHeatmap({ orgId, period, instruments: sortedInstruments });
+      if (start != null && typeof performance !== 'undefined') {
+        performanceMonitor.recordMetric('b2b_reports.fetch_latency', performance.now() - start);
+      }
+      return cells;
+    },
+  });
 }
 
 export { DEFAULT_INSTRUMENTS };

@@ -26,6 +26,21 @@ where c.relname in ('assessments')
 group by c.relname
 order by c.relname;
 
+\echo '\n== Index coverage (assessments & rollups) =='
+select indexname, tablename
+from pg_indexes
+where schemaname = 'public'
+  and indexname in (
+    'idx_assessments_instrument_ts',
+    'idx_org_rollups_org_period_instrument'
+  )
+order by tablename, indexname;
+
+\echo '\n== RLS policy clauses (org_assess_rollups) =='
+select policyname, cmd, qual, with_check
+from pg_policies
+where schemaname = 'public' and tablename = 'org_assess_rollups';
+
 \echo '\n== Constraint definition (org_assess_rollups) =='
 select conname, pg_get_constraintdef(oid) as definition
 from pg_constraint

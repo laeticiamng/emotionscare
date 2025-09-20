@@ -9,6 +9,7 @@ import { hash } from '../_shared/hash_user.ts';
 import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
+import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 
 const requestSchema = z.object({
   instrument: instrumentSchema,
@@ -16,18 +17,37 @@ const requestSchema = z.object({
 });
 
 serve(async (req) => {
+  const startedAt = Date.now();
   const cors = resolveCors(req);
+  let hashedUserId: string | null = null;
+
+  const finalize = async (
+    response: Response,
+    metadata: { outcome?: 'success' | 'error' | 'denied'; stage?: string | null; error?: string | null } = {},
+  ) => {
+    await recordEdgeLatencyMetric({
+      route: 'assess-start',
+      durationMs: Date.now() - startedAt,
+      status: response.status,
+      hashedUserId,
+      outcome: metadata.outcome,
+      stage: metadata.stage ?? null,
+      error: metadata.error ?? null,
+    });
+    return response;
+  };
 
   if (req.method === 'OPTIONS') {
-    return preflightResponse(cors);
+    return finalize(preflightResponse(cors));
   }
 
   if (!cors.allowed) {
-    return rejectCors(cors);
+    return finalize(rejectCors(cors), { outcome: 'denied', error: 'origin_not_allowed' });
   }
 
   if (req.method !== 'POST') {
-    return appendCorsHeaders(new Response('Method Not Allowed', { status: 405 }), cors);
+    const response = appendCorsHeaders(new Response('Method Not Allowed', { status: 405 }), cors);
+    return finalize(response, { outcome: 'denied', error: 'method_not_allowed' });
   }
 
   try {
@@ -36,8 +56,11 @@ serve(async (req) => {
       if (auth.status === 401 || auth.status === 403) {
         await logUnauthorizedAccess(req, auth.error ?? 'unauthorized');
       }
-      return appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
+      const response = appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
+      return finalize(response, { outcome: 'denied', error: 'unauthorized' });
     }
+
+    hashedUserId = hash(auth.user.id);
 
     const rateDecision = await enforceEdgeRateLimit(req, {
       route: 'assess-start',
@@ -45,43 +68,74 @@ serve(async (req) => {
       description: 'start assessment instrument delivery',
     });
     if (!rateDecision.allowed) {
-      return buildRateLimitResponse(rateDecision, cors.headers);
+      const response = buildRateLimitResponse(rateDecision, cors.headers);
+      return finalize(response, { outcome: 'denied', error: 'rate_limited' });
     }
 
     const body = await req.json().catch(() => null);
     if (!body) {
-      return appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
+      const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
+      return finalize(response, { outcome: 'denied', error: 'invalid_body' });
     }
 
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
-      return appendCorsHeaders(json(422, { error: 'invalid_body', details: 'validation_failed' }), cors);
+      const response = appendCorsHeaders(json(422, { error: 'invalid_body', details: 'validation_failed' }), cors);
+      return finalize(response, { outcome: 'denied', error: 'validation_failed' });
     }
 
     const { instrument, locale } = parsed.data;
-    const catalog = getCatalog(instrument, locale ?? 'fr');
+    const resolvedLocale = locale ?? 'fr';
+
+    let catalog: ReturnType<typeof getCatalog>;
+    try {
+      catalog = getCatalog(instrument, resolvedLocale);
+    } catch (_error) {
+      return appendCorsHeaders(
+        json(422, { error: 'invalid_body', details: 'catalog_unavailable' }),
+        cors,
+      );
+    }
+
+    const payload = {
+      instrument,
+      locale: resolvedLocale,
+      name: catalog.name,
+      version: catalog.version,
+      expiry_minutes: catalog.expiry_minutes,
+      items: catalog.items.map((item) => ({
+        id: item.id,
+        prompt: item.prompt,
+        type: item.type,
+        options: item.options,
+        min: item.min,
+        max: item.max,
+      })),
+    };
 
     addSentryBreadcrumb({
-      category: 'assess:start',
-      message: 'catalog served',
-      data: { instrument },
+      category: 'assess',
+      message: 'assess:start:catalog_served',
+      data: { instrument, latency_ms: Date.now() - startedAt },
     });
 
     await logAccess({
-      user_id: hash(auth.user.id),
+      user_id: hashedUserId,
       role: auth.user.user_metadata?.role ?? null,
       route: 'assess-start',
       action: 'assess:start',
       result: 'success',
       user_agent: 'redacted',
-      details: `instrument=${instrument}`,
+      details: `instrument=${instrument} locale=${resolvedLocale}`,
     });
 
-    const response = json(200, catalog);
-    return appendCorsHeaders(response, cors);
+    const responsePayload = { instrument, locale: locale ?? 'fr', ...catalog };
+    const response = appendCorsHeaders(json(200, responsePayload), cors);
+    return finalize(response, { outcome: 'success', stage: 'catalog_served' });
   } catch (error) {
     captureSentryException(error, { route: 'assess-start' });
     console.error('[assess-start] unexpected error', { message: error instanceof Error ? error.message : 'unknown' });
-    return appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
+    const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
+    return finalize(response, { outcome: 'error', error: 'internal_error' });
   }
 });

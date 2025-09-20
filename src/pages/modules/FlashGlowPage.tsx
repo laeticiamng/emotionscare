@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Play, 
-  Pause, 
+import {
+  Play,
+  Pause,
   ArrowLeft,
   Zap,
   Timer
@@ -15,6 +15,8 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 interface FlashGlowSession {
   id: string;
@@ -50,20 +52,21 @@ const flashSessions: FlashGlowSession[] = [
 
 const FlashGlowPage: React.FC = () => {
   const { toast } = useToast();
-  
+
   // Get optimized universe config
   const universe = getOptimizedUniverse('flashGlow');
-  
+
   // Universe state
   const [isEntering, setIsEntering] = useState(true);
   const [universeEntered, setUniverseEntered] = useState(false);
-  
+
   // Session state
   const [selectedSession, setSelectedSession] = useState<FlashGlowSession | null>(null);
   const [isActive, setIsActive] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showReward, setShowReward] = useState(false);
   const [glowIntensity, setGlowIntensity] = useState(0);
+  const sudsConsent = useClinicalConsent('SUDS');
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const glowIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -223,6 +226,21 @@ const FlashGlowPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="relative z-10 container mx-auto px-6 py-12">
+        {sudsConsent.shouldPrompt && (
+          <div className="mb-10">
+            <ClinicalOptIn
+              title="Activer l'évaluation SUDS"
+              description="Ce score de stress nous aide à ajuster l'intensité des sessions FlashGlow. Votre décision est mémorisée et peut être changée ultérieurement."
+              acceptLabel="Oui, personnaliser"
+              declineLabel="Pas maintenant"
+              onAccept={sudsConsent.grantConsent}
+              onDecline={sudsConsent.declineConsent}
+              isProcessing={sudsConsent.isSaving}
+              error={sudsConsent.error}
+              className="bg-white/10 border-white/25 backdrop-blur-md"
+            />
+          </div>
+        )}
         <AnimatePresence mode="wait">
           {!selectedSession ? (
             <motion.div

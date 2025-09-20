@@ -2,11 +2,13 @@
 import React from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { mapMoodToVibe, type MoodVibe } from '@/utils/moodVibes';
 
 interface MoodState {
   valence: number; // -100 à +100 (négatif à positif)
   arousal: number; // 0 à 100 (calme à excité)
   timestamp: string;
+  vibe: MoodVibe;
   isLoading: boolean;
   error: string | null;
 }
@@ -28,21 +30,27 @@ export const useMoodStore = create<MoodStore>()(
       arousal: 50,
       timestamp: new Date().toISOString(),
       isLoading: false,
+      vibe: 'calm',
       error: null,
 
       // Actions
       updateMood: (valence: number, arousal: number) => {
+        const clampedValence = Math.max(-100, Math.min(100, valence));
+        const clampedArousal = Math.max(0, Math.min(100, arousal));
+        const vibe = mapMoodToVibe(clampedValence, clampedArousal);
+        const timestamp = new Date().toISOString();
         set({
-          valence: Math.max(-100, Math.min(100, valence)),
-          arousal: Math.max(0, Math.min(100, arousal)),
-          timestamp: new Date().toISOString(),
+          valence: clampedValence,
+          arousal: clampedArousal,
+          vibe,
+          timestamp,
           error: null
         });
 
         // Publier l'événement mood.updated (simulation)
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('mood.updated', {
-            detail: { valence, arousal, timestamp: new Date().toISOString() }
+            detail: { valence: clampedValence, arousal: clampedArousal, vibe, timestamp }
           }));
         }
       },
@@ -56,10 +64,14 @@ export const useMoodStore = create<MoodStore>()(
           await new Promise(resolve => setTimeout(resolve, 500));
           
           // Données mockées pour le développement
+          const mockValence = Math.floor(Math.random() * 201) - 100; // -100 à +100
+          const mockArousal = Math.floor(Math.random() * 101); // 0 à 100
+          const mockTimestamp = new Date().toISOString();
           const mockMood = {
-            valence: Math.floor(Math.random() * 201) - 100, // -100 à +100
-            arousal: Math.floor(Math.random() * 101), // 0 à 100
-            timestamp: new Date().toISOString()
+            valence: mockValence,
+            arousal: mockArousal,
+            timestamp: mockTimestamp,
+            vibe: mapMoodToVibe(mockValence, mockArousal),
           };
 
           set({
@@ -79,6 +91,7 @@ export const useMoodStore = create<MoodStore>()(
         set({
           valence: 0,
           arousal: 50,
+          vibe: 'calm',
           timestamp: new Date().toISOString(),
           error: null
         });
@@ -113,8 +126,20 @@ export const useMood = () => {
   // Écoute des événements mood.updated (WebSocket simulation)
   React.useEffect(() => {
     const handleMoodUpdate = (event: CustomEvent) => {
-      const { valence, arousal, timestamp } = event.detail;
-      useMoodStore.setState({ valence, arousal, timestamp });
+      const { valence, arousal, timestamp, vibe } = event.detail as {
+        valence: number;
+        arousal: number;
+        timestamp?: string;
+        vibe?: MoodVibe;
+      };
+
+      const nextVibe = vibe ?? mapMoodToVibe(valence, arousal);
+      useMoodStore.setState({
+        valence,
+        arousal,
+        timestamp: timestamp ?? new Date().toISOString(),
+        vibe: nextVibe,
+      });
     };
 
     window.addEventListener('mood.updated', handleMoodUpdate as EventListener);
