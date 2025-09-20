@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useAppStore } from '@/store/unified.store';
 import { toast } from '@/hooks/use-toast';
 import { 
   Download, 
@@ -37,7 +36,6 @@ interface DataExport {
 }
 
 export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid': testId }) => {
-  const { user } = useAppStore();
   const [isExporting, setIsExporting] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [exports, setExports] = React.useState<DataExport[]>([

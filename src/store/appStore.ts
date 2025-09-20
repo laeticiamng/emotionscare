@@ -1,313 +1,167 @@
+'use client';
+
 import { create } from 'zustand';
-import { shallow } from 'zustand/shallow';
+import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 
-import { persist, type PersistOptions } from './utils/createImmutableStore';
-import { createSelectors } from './utils/createSelectors';
+import {
+  createAuthInitialState,
+  createAuthSlice,
+  type AuthSlice,
+  type User,
+  type UserProfile,
+} from './slices/auth';
+import {
+  createUIInitialState,
+  createUISlice,
+  type ModuleKey,
+  type Theme,
+  type UISlice,
+} from './slices/ui';
+import {
+  createCacheInitialState,
+  createCacheSlice,
+  type CacheSlice,
+} from './slices/cache';
+import {
+  createPreferencesInitialState,
+  createPreferencesSlice,
+  type PreferencesSlice,
+} from './slices/preferences';
+import {
+  createModulesInitialState,
+  createModulesSlice,
+  type ModulesSlice,
+} from './slices/modules';
 
-// Types pour le store global
-export interface User {
-  id: string;
-  email: string;
-  role: 'b2c' | 'b2b_user' | 'b2b_admin';
-  profile?: {
-    display_name?: string;
-    avatar_url?: string;
+export type { User, UserProfile, Theme, ModuleKey };
+
+export type AppState = AuthSlice &
+  UISlice &
+  CacheSlice &
+  PreferencesSlice &
+  ModulesSlice & {
+    reset: () => void;
   };
-}
 
-export interface AppState {
-  // Authentification
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+const createInitialState = () => ({
+  ...createAuthInitialState(),
+  ...createUIInitialState(),
+  ...createCacheInitialState(),
+  ...createPreferencesInitialState(),
+  ...createModulesInitialState(),
+});
 
-  // UI State
-  theme: 'light' | 'dark' | 'system';
-  sidebarCollapsed: boolean;
-  activeModule: string | null;
+export const PERSIST_VERSION = 3;
 
-  // Cache
-  cache: Record<string, unknown>;
-  cacheTimestamps: Record<string, number>;
-
-  // Préférences utilisateur
-  preferences: {
-    language: 'fr' | 'en';
-    notifications: boolean;
-    autoSave: boolean;
-    analyticsEnabled: boolean;
-  };
-
-  // État des modules
+export const partialize = (state: AppState) => ({
+  user: state.user,
+  isAuthenticated: state.isAuthenticated,
+  theme: state.theme,
+  preferences: state.preferences,
   modules: {
-    music: {
-      currentTrack: unknown | null;
-      isPlaying: boolean;
-      volume: number;
-      playlist: unknown[];
-    };
-    emotion: {
-      currentMood: string | null;
-      lastScan: unknown | null;
-      history: unknown[];
-    };
-    journal: {
-      entries: unknown[];
-      currentEntry: unknown | null;
-      unsavedChanges: boolean;
-    };
-    coach: {
-      conversations: unknown[];
-      activeConversation: string | null;
-      suggestions: unknown[];
-    };
-  };
-}
-
-export interface AppActions {
-  setUser: (user: User | null) => void;
-  setAuthenticated: (isAuthenticated: boolean) => void;
-  setLoading: (isLoading: boolean) => void;
-  setTheme: (theme: 'light' | 'dark' | 'system') => void;
-  toggleSidebar: () => void;
-  setActiveModule: (module: string | null) => void;
-  setCache: (key: string, value: unknown) => void;
-  getCache: (key: string) => unknown;
-  clearCache: (key?: string) => void;
-  isCacheValid: (key: string, maxAge?: number) => boolean;
-  updatePreferences: (preferences: Partial<AppState['preferences']>) => void;
-  updateMusicState: (state: Partial<AppState['modules']['music']>) => void;
-  updateEmotionState: (state: Partial<AppState['modules']['emotion']>) => void;
-  updateJournalState: (state: Partial<AppState['modules']['journal']>) => void;
-  updateCoachState: (state: Partial<AppState['modules']['coach']>) => void;
-  reset: () => void;
-}
-
-export type AppStore = AppState & AppActions;
-
-const createDefaultState = (): AppState => ({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  theme: 'system',
-  sidebarCollapsed: false,
-  activeModule: null,
-  cache: {},
-  cacheTimestamps: {},
-  preferences: {
-    language: 'fr',
-    notifications: true,
-    autoSave: true,
-    analyticsEnabled: true,
-  },
-  modules: {
-    music: {
-      currentTrack: null,
-      isPlaying: false,
-      volume: 0.7,
-      playlist: [],
-    },
-    emotion: {
-      currentMood: null,
-      lastScan: null,
-      history: [],
-    },
-    journal: {
-      entries: [],
-      currentEntry: null,
-      unsavedChanges: false,
-    },
-    coach: {
-      conversations: [],
-      activeConversation: null,
-      suggestions: [],
-    },
+    music: state.modules.music,
   },
 });
 
-const appStorePersistOptions = {
-  name: 'ec-app-store',
-  storage: () => localStorage,
-  version: 1,
-  migrate: (persistedState: Partial<AppState> | undefined, _version: number) => {
-    const defaults = createDefaultState();
-    const state = (persistedState ?? {}) as Partial<AppState>;
+type PersistedStateShape =
+  | Record<string, unknown>
+  | { state: Record<string, unknown>; version?: number };
 
+export const migrate = (persistedState: unknown, fromVersion: number): PersistedStateShape | unknown => {
+  if (persistedState == null || typeof persistedState !== 'object') {
+    return persistedState;
+  }
+
+  if (fromVersion >= PERSIST_VERSION) {
+    return persistedState;
+  }
+
+  const base = createInitialState();
+  const next = Array.isArray(persistedState)
+    ? [...persistedState]
+    : { ...(persistedState as Record<string, unknown>) };
+
+  const mergePreferences = (partial: unknown) => ({
+    ...base.preferences,
+    ...(typeof partial === 'object' && partial !== null ? (partial as Record<string, unknown>) : {}),
+  });
+
+  const mergeMusic = (partial: unknown) => ({
+    ...base.modules.music,
+    ...(typeof partial === 'object' && partial !== null ? (partial as Record<string, unknown>) : {}),
+  });
+
+  if ('state' in (next as Record<string, unknown>)) {
+    const current = { ...((next as { state?: Record<string, unknown> }).state ?? {}) };
+    const musicState = (current.modules as { music?: unknown })?.music;
     return {
-      theme: state.theme ?? defaults.theme,
-      preferences: {
-        ...defaults.preferences,
-        ...(state.preferences ?? {}),
-      },
-      modules: {
-        music: {
-          ...defaults.modules.music,
-          ...(state.modules?.music ?? {}),
+      ...(next as Record<string, unknown>),
+      state: {
+        ...base,
+        ...current,
+        preferences: mergePreferences(current.preferences),
+        modules: {
+          ...base.modules,
+          ...(typeof current.modules === 'object' && current.modules !== null
+            ? (current.modules as Record<string, unknown>)
+            : {}),
+          music: mergeMusic(musicState),
         },
-        emotion: {
-          ...defaults.modules.emotion,
-          ...(state.modules?.emotion ?? {}),
-        },
+        cache: {},
+        cacheTimestamps: {},
       },
-    } as Partial<AppStore>;
-  },
-  partialize: (state: AppStore) => ({
-    theme: state.theme,
-    preferences: state.preferences,
+    };
+  }
+
+  const musicState = (next as { modules?: { music?: unknown } }).modules?.music;
+
+  return {
+    ...base,
+    ...(next as Record<string, unknown>),
+    preferences: mergePreferences((next as { preferences?: unknown }).preferences),
     modules: {
-      music: state.modules.music,
-      emotion: state.modules.emotion,
+      ...base.modules,
+      ...(typeof (next as { modules?: unknown }).modules === 'object' &&
+      (next as { modules?: Record<string, unknown> }).modules !== null
+        ? ((next as { modules?: Record<string, unknown> }).modules as Record<string, unknown>)
+        : {}),
+      music: mergeMusic(musicState),
     },
-  }),
-} satisfies PersistOptions<AppStore>;
+    cache: {},
+    cacheTimestamps: {},
+  };
+};
 
-const appStoreBase = create<AppStore>()(
-  persist(
-    (set, get) => ({
-      ...createDefaultState(),
+const persistConfig = {
+  name: 'ec.app.v3',
+  version: PERSIST_VERSION,
+  storage: createJSONStorage(() => localStorage),
+  partialize,
+  migrate,
+};
 
-      setUser: (user) =>
-        set((state) => ({
-          ...state,
-          user,
-        })),
-
-      setAuthenticated: (isAuthenticated) =>
-        set((state) => ({
-          ...state,
-          isAuthenticated,
-        })),
-
-      setLoading: (isLoading) =>
-        set((state) => ({
-          ...state,
-          isLoading,
-        })),
-
-      setTheme: (theme) =>
-        set((state) => ({
-          ...state,
-          theme,
-        })),
-
-      toggleSidebar: () =>
-        set((state) => ({
-          ...state,
-          sidebarCollapsed: !state.sidebarCollapsed,
-        })),
-
-      setActiveModule: (module) =>
-        set((state) => ({
-          ...state,
-          activeModule: module,
-        })),
-
-      setCache: (key, value) =>
-        set((state) => ({
-          ...state,
-          cache: { ...state.cache, [key]: value },
-          cacheTimestamps: { ...state.cacheTimestamps, [key]: Date.now() },
-        })),
-
-      getCache: (key) => get().cache[key],
-
-      clearCache: (key) =>
-        set((state) => {
-          if (!key) {
-            return {
-              ...state,
-              cache: {},
-              cacheTimestamps: {},
-            };
-          }
-
-          const { [key]: _, ...restCache } = state.cache;
-          const { [key]: __, ...restTimestamps } = state.cacheTimestamps;
-
-          return {
-            ...state,
-            cache: restCache,
-            cacheTimestamps: restTimestamps,
-          };
-        }),
-
-      isCacheValid: (key, maxAge = 5 * 60 * 1000) => {
-        const timestamp = get().cacheTimestamps[key];
-        return typeof timestamp === 'number' && Date.now() - timestamp < maxAge;
-      },
-
-      updatePreferences: (preferences) =>
-        set((state) => ({
-          ...state,
-          preferences: { ...state.preferences, ...preferences },
-        })),
-
-      updateMusicState: (musicState) =>
-        set((state) => ({
-          ...state,
-          modules: {
-            ...state.modules,
-            music: { ...state.modules.music, ...musicState },
-          },
-        })),
-
-      updateEmotionState: (emotionState) =>
-        set((state) => ({
-          ...state,
-          modules: {
-            ...state.modules,
-            emotion: { ...state.modules.emotion, ...emotionState },
-          },
-        })),
-
-      updateJournalState: (journalState) =>
-        set((state) => ({
-          ...state,
-          modules: {
-            ...state.modules,
-            journal: { ...state.modules.journal, ...journalState },
-          },
-        })),
-
-      updateCoachState: (coachState) =>
-        set((state) => ({
-          ...state,
-          modules: {
-            ...state.modules,
-            coach: { ...state.modules.coach, ...coachState },
-          },
-        })),
-
-      reset: () => set(() => createDefaultState()),
-    }),
-    appStorePersistOptions
+export const useAppStore = create<AppState>()(
+  devtools(
+    persist(
+      (set, get, api) => ({
+        ...createAuthSlice(set, get, api),
+        ...createUISlice(set, get, api),
+        ...createCacheSlice(set, get, api),
+        ...createPreferencesSlice(set, get, api),
+        ...createModulesSlice(set, get, api),
+        reset: () => set(() => createInitialState()),
+      }),
+      persistConfig
+    ),
+    { name: 'AppStore' }
   )
 );
 
-Object.defineProperty(appStoreBase, 'persist', {
+Object.defineProperty(useAppStore, 'persist', {
   configurable: false,
   enumerable: false,
   writable: false,
   value: {
-    getOptions: () => appStorePersistOptions,
+    getOptions: () => persistConfig,
   },
 });
-
-export const useAppStore = createSelectors(appStoreBase);
-export { shallow };
-
-// Sélecteurs pour optimiser les re-renders
-export const selectUser = (state: AppState) => state.user;
-export const selectAuthState = (state: AppState) => ({
-  user: state.user,
-  isAuthenticated: state.isAuthenticated,
-  isLoading: state.isLoading,
-});
-export const selectTheme = (state: AppState) => state.theme;
-export const selectPreferences = (state: AppState) => state.preferences;
-export const selectMusicModule = (state: AppState) => state.modules.music;
-export const selectEmotionModule = (state: AppState) => state.modules.emotion;
-export const selectJournalModule = (state: AppState) => state.modules.journal;
-export const selectCoachModule = (state: AppState) => state.modules.coach;
-export const selectUserRole = (state: AppState) => state.user?.role ?? null;
-export const selectCacheEntry = (key: string) => (state: AppState) => state.cache[key];

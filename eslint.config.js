@@ -7,10 +7,19 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
   "error",
   {
     patterns: [
-      {
+  {
         group: ["node:*"],
         message:
           "Interdit dans le bundle client. Utilise les APIs Web (crypto.subtle via '@/lib/hash', fetch, File API, etc.)."
+      },
+      {
+        group: ["zustand/middleware/immer"],
+        message: "Interdit: Zustand doit fonctionner sans immer."
+      },
+      {
+        group: ["immer"],
+        message:
+          "Interdit côté client: utilisez des mises à jour immutables (spread)!"
       },
       ...extraPatterns.map((pattern) =>
         typeof pattern === "string" ? { group: [pattern] } : pattern
