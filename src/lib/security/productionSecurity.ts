@@ -1,4 +1,6 @@
 
+import { APP_BASE_CSP } from './headers';
+
 /**
  * Sécurité renforcée pour la production
  */
@@ -45,22 +47,20 @@ const disableDevTools = (): void => {
 };
 
 const applySecurityHeaders = (): void => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   // Content Security Policy
-  const cspMeta = document.createElement('meta');
-  cspMeta.httpEquiv = 'Content-Security-Policy';
-  cspMeta.content = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://cdn.gpteng.co",
-    "style-src 'self' 'unsafe-inline' https://rsms.me",
-    "font-src 'self' https://rsms.me",
-    "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://yaincoxihiqdksxgrsrk.supabase.co wss://yaincoxihiqdksxgrsrk.supabase.co",
-    "media-src 'self' blob:",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'"
-  ].join('; ');
-  document.head.appendChild(cspMeta);
+  const existingCsp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+  if (existingCsp) {
+    existingCsp.setAttribute('content', APP_BASE_CSP);
+  } else {
+    const cspMeta = document.createElement('meta');
+    cspMeta.httpEquiv = 'Content-Security-Policy';
+    cspMeta.content = APP_BASE_CSP;
+    document.head.appendChild(cspMeta);
+  }
 
   // Autres en-têtes de sécurité
   const securityHeaders = [
@@ -74,6 +74,13 @@ const applySecurityHeaders = (): void => {
   ];
 
   securityHeaders.forEach(({ httpEquiv, content }) => {
+    const selector = `meta[http-equiv="${httpEquiv}"]`;
+    const existing = document.querySelector(selector);
+    if (existing) {
+      existing.setAttribute('content', content);
+      return;
+    }
+
     const meta = document.createElement('meta');
     meta.httpEquiv = httpEquiv;
     meta.content = content;
