@@ -35,6 +35,7 @@ const NEGATIVE_KEYWORDS = [
 
 type RawAssessment = {
   score_json: Record<string, unknown> | null
+  submitted_at: string | null
   ts: string | null
 }
 
@@ -255,8 +256,9 @@ export function usePanasSuggestions(options: UsePanasSuggestionsOptions = {}): U
     queryFn: async () => {
       const { data, error } = await supabase
         .from('assessments')
-        .select('score_json, ts')
+        .select('score_json, submitted_at, ts')
         .eq('instrument', 'PANAS')
+        .order('submitted_at', { ascending: false, nullsFirst: false })
         .order('ts', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -314,9 +316,9 @@ export function usePanasSuggestions(options: UsePanasSuggestionsOptions = {}): U
   const recencyLabel = useMemo(
     () =>
       featureEnabled
-        ? describeRecency(assessmentQuery.data?.ts ?? null)
+        ? describeRecency(assessmentQuery.data?.submitted_at ?? assessmentQuery.data?.ts ?? null)
         : 'Le suivi PANAS est désactivé.',
-    [featureEnabled, assessmentQuery.data?.ts],
+    [featureEnabled, assessmentQuery.data?.submitted_at, assessmentQuery.data?.ts],
   )
 
   const requestConsent = useCallback(async () => {

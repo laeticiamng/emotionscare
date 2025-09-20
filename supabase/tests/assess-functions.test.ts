@@ -49,6 +49,10 @@ const envStore: Record<string, string | undefined> = {
   SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
   CORS_ORIGINS: 'https://example.com',
   CSV_SIGNING_SECRET: 'test-signing-secret',
+  FF_ASSESS_WHO5: 'true',
+  FF_ASSESS_STAI6: 'true',
+  FF_ASSESS_SAM: 'true',
+  FF_ASSESS_SUDS: 'true',
 };
 
 function setDefaultAuthSuccess() {
@@ -92,6 +96,10 @@ beforeEach(() => {
   envStore.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
   envStore.CORS_ORIGINS = 'https://example.com';
   envStore.CSV_SIGNING_SECRET = 'test-signing-secret';
+  envStore.FF_ASSESS_WHO5 = 'true';
+  envStore.FF_ASSESS_STAI6 = 'true';
+  envStore.FF_ASSESS_SAM = 'true';
+  envStore.FF_ASSESS_SUDS = 'true';
   delete envStore.EDGE_RATE_LIMIT_ASSESS_START;
   delete envStore.EDGE_RATE_LIMIT_ASSESS_AGGREGATE;
   (globalThis as Record<string, unknown>).Deno = {
@@ -255,8 +263,27 @@ describe('assess-submit function', () => {
 
   it('stores a textual summary without raw answers', async () => {
     setDefaultAuthSuccess();
-    const insertMock = vi.fn().mockResolvedValue({ error: null });
-    const fromMock = vi.fn(() => ({ insert: insertMock }));
+    const assessmentInsertMock = vi.fn().mockResolvedValue({ error: null });
+    const signalInsertMock = vi.fn().mockResolvedValue({ error: null });
+    const consentBuilder = {
+      eq: vi.fn(() => consentBuilder),
+      order: vi.fn(() => consentBuilder),
+      limit: vi.fn(() => consentBuilder),
+      maybeSingle: vi.fn(async () => ({ data: { is_active: true, revoked_at: null }, error: null })),
+    };
+    const consentSelect = vi.fn(() => consentBuilder);
+    const fromMock = vi.fn((table: string) => {
+      if (table === 'assessments') {
+        return { insert: assessmentInsertMock };
+      }
+      if (table === 'clinical_signals') {
+        return { insert: signalInsertMock };
+      }
+      if (table === 'clinical_consents') {
+        return { select: consentSelect };
+      }
+      throw new Error(`unexpected table ${table}`);
+    });
     supabaseClientMock.mockReturnValue({ from: fromMock });
 
     const handler = await importEdgeHandler('../functions/assess-submit/index.ts');
@@ -268,17 +295,24 @@ describe('assess-submit function', () => {
         origin: 'https://example.com',
         authorization: 'Bearer token-123',
       },
-      body: JSON.stringify({ instrument: 'WHO5', answers: { w1: 4, w2: 'souvent' } }),
+      body: JSON.stringify({ instrument: 'WHO5', answers: { '1': 4, '2': 5, '3': 5, '4': 4, '5': 4 } }),
     }));
 
     expect(response.status).toBe(200);
-    expect(insertMock).toHaveBeenCalledTimes(1);
-    const payload = insertMock.mock.calls[0][0];
+    expect(assessmentInsertMock).toHaveBeenCalledTimes(1);
+    const payload = assessmentInsertMock.mock.calls[0][0];
     expect(payload.user_id).toBe('user-123');
     expect(payload.instrument).toBe('WHO5');
-    expect(payload.score_json.summary).toMatch(/bien-être|affect|tension/);
+    expect(typeof payload.score_json.summary).toBe('string');
     expect(payload.score_json.summary).not.toMatch(/\d/);
+    expect(payload.score_json.level).toBeGreaterThanOrEqual(0);
+    expect(payload.score_json.level).toBeLessThanOrEqual(4);
+    expect(payload.score_json.instrument_version).toBeTruthy();
     expect(payload.score_json).not.toHaveProperty('answers');
+    expect(payload.submitted_at).toEqual(payload.ts);
+    const body = await response.json();
+    expect(body.summary).toBe(payload.score_json.summary);
+    expect(consentSelect).toHaveBeenCalledWith('is_active, revoked_at');
     expect(logAccessMock).toHaveBeenCalledWith(expect.objectContaining({
       route: 'assess-submit',
       action: 'assess:submit',
@@ -296,8 +330,27 @@ describe('assess-submit function', () => {
 
   it('captures database errors', async () => {
     setDefaultAuthSuccess();
-    const insertMock = vi.fn().mockResolvedValue({ error: { message: 'db failure' } });
-    const fromMock = vi.fn(() => ({ insert: insertMock }));
+    const assessmentInsertMock = vi.fn().mockResolvedValue({ error: { message: 'db failure', code: '42P01' } });
+    const signalInsertMock = vi.fn().mockResolvedValue({ error: null });
+    const consentBuilder = {
+      eq: vi.fn(() => consentBuilder),
+      order: vi.fn(() => consentBuilder),
+      limit: vi.fn(() => consentBuilder),
+      maybeSingle: vi.fn(async () => ({ data: { is_active: true, revoked_at: null }, error: null })),
+    };
+    const consentSelect = vi.fn(() => consentBuilder);
+    const fromMock = vi.fn((table: string) => {
+      if (table === 'assessments') {
+        return { insert: assessmentInsertMock };
+      }
+      if (table === 'clinical_signals') {
+        return { insert: signalInsertMock };
+      }
+      if (table === 'clinical_consents') {
+        return { select: consentSelect };
+      }
+      throw new Error(`unexpected table ${table}`);
+    });
     supabaseClientMock.mockReturnValue({ from: fromMock });
 
     const handler = await importEdgeHandler('../functions/assess-submit/index.ts');
@@ -317,6 +370,67 @@ describe('assess-submit function', () => {
       route: 'assess-submit',
       stage: 'db_insert',
     }));
+    expect(assessmentInsertMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns 403 when clinical opt-in is absent', async () => {
+    setDefaultAuthSuccess();
+    const consentBuilder = {
+      eq: vi.fn(() => consentBuilder),
+      order: vi.fn(() => consentBuilder),
+      limit: vi.fn(() => consentBuilder),
+      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+    };
+    const consentSelect = vi.fn(() => consentBuilder);
+    const fromMock = vi.fn((table: string) => {
+      if (table === 'clinical_consents') {
+        return { select: consentSelect };
+      }
+      if (table === 'assessments') {
+        return { insert: vi.fn() };
+      }
+      if (table === 'clinical_signals') {
+        return { insert: vi.fn() };
+      }
+      throw new Error(`unexpected table ${table}`);
+    });
+    supabaseClientMock.mockReturnValue({ from: fromMock });
+
+    const handler = await importEdgeHandler('../functions/assess-submit/index.ts');
+
+    const response = await handler(new Request('https://edge/assess-submit', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://example.com',
+        authorization: 'Bearer token-123',
+      },
+      body: JSON.stringify({ instrument: 'WHO5', answers: { '1': 4 } }),
+    }));
+
+    expect(response.status).toBe(403);
+    const body = await response.json();
+    expect(body.error).toBe('optin_required');
+  });
+
+  it('returns 404 when instrument flag is disabled', async () => {
+    envStore.FF_ASSESS_WHO5 = 'false';
+    setDefaultAuthSuccess();
+    const handler = await importEdgeHandler('../functions/assess-submit/index.ts');
+
+    const response = await handler(new Request('https://edge/assess-submit', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://example.com',
+        authorization: 'Bearer token-123',
+      },
+      body: JSON.stringify({ instrument: 'WHO5', answers: { '1': 3 } }),
+    }));
+
+    expect(response.status).toBe(404);
+    const payload = await response.json();
+    expect(payload.error).toBe('instrument_disabled');
   });
 });
 

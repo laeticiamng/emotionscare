@@ -1,5 +1,4 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { z } from 'zod';
 
 type Handler = (req: Request) => Promise<Response>;
 
@@ -26,20 +25,6 @@ const authenticateRequest = vi.fn(async () => ({
   user: { id: 'user-456', user_metadata: { role: 'member' } },
 }));
 const logUnauthorizedAccess = vi.fn();
-const summarizeAssessment = vi.fn(() => ({
-  summary: 'Synthèse générée',
-  level: 3,
-  scores: { total: 18 },
-  focus: 'focus-zone',
-}));
-const getCatalog = vi.fn(() => ({
-  code: 'WHO5',
-  locale: 'fr',
-  name: 'Indice',
-  version: '2.0',
-  expiry_minutes: 30,
-  items: [],
-}));
 const resolveCors = vi.fn(() => ({ allowed: true, headers: {} }));
 const appendCorsHeaders = vi.fn((response: Response) => response);
 const preflightResponse = vi.fn(() => new Response(null, { status: 204 }));
@@ -58,6 +43,13 @@ const buildRateLimitResponse = vi.fn(() => new Response('rate', { status: 429 })
 const recordEdgeLatencyMetric = vi.fn(async () => {});
 const assessmentsInsert = vi.fn(async () => ({ error: null }));
 const signalsInsert = vi.fn(async () => ({ error: null }));
+const consentQueryBuilder = {
+  eq: vi.fn(() => consentQueryBuilder),
+  order: vi.fn(() => consentQueryBuilder),
+  limit: vi.fn(() => consentQueryBuilder),
+  maybeSingle: vi.fn(async () => ({ data: { is_active: true, revoked_at: null }, error: null })),
+};
+const consentSelect = vi.fn(() => consentQueryBuilder);
 const createClient = vi.fn(() => ({
   from: (table: string) => {
     if (table === 'assessments') {
@@ -66,8 +58,20 @@ const createClient = vi.fn(() => ({
     if (table === 'clinical_signals') {
       return { insert: signalsInsert };
     }
+    if (table === 'clinical_consents') {
+      return { select: consentSelect };
+    }
     throw new Error(`unexpected table ${table}`);
   },
+}));
+
+const computeLevel = vi.fn(() => 3 as 0 | 1 | 2 | 3 | 4);
+const scoreToJson = vi.fn(() => ({
+  level: 3 as const,
+  summary: 'bonne forme',
+  focus: 'calm_focus',
+  instrument_version: '1.0',
+  generated_at: '2025-01-01T00:00:00.000Z',
 }));
 
 vi.mock('../_shared/serve.ts', () => ({
@@ -80,12 +84,6 @@ vi.mock('../_shared/serve.ts', () => ({
 vi.mock('../_shared/auth-middleware.ts', () => ({
   authenticateRequest,
   logUnauthorizedAccess,
-}));
-
-vi.mock('../_shared/assess.ts', () => ({
-  instrumentSchema: z.enum(['WHO5']),
-  getCatalog,
-  summarizeAssessment,
 }));
 
 vi.mock('../_shared/cors.ts', () => ({
@@ -130,15 +128,22 @@ vi.mock('../_shared/supabase.ts', () => ({
   createClient,
 }));
 
+vi.mock('../../../src/lib/assess/scoring.ts', () => ({
+  computeLevel,
+  scoreToJson,
+}));
+
 beforeEach(() => {
   envValues.clear();
   envValues.set('CORS_ORIGINS', 'https://app.local');
   envValues.set('SUPABASE_URL', 'https://stub.supabase');
   envValues.set('SUPABASE_ANON_KEY', 'anon');
+  envValues.set('FF_ASSESS_WHO5', 'true');
+  envValues.set('FF_ASSESS_STAI6', 'true');
+  envValues.set('FF_ASSESS_SAM', 'true');
+  envValues.set('FF_ASSESS_SUDS', 'true');
   vi.resetModules();
   authenticateRequest.mockClear();
-  summarizeAssessment.mockClear();
-  getCatalog.mockClear();
   resolveCors.mockClear();
   appendCorsHeaders.mockClear();
   applySecurityHeaders.mockClear();
@@ -149,6 +154,20 @@ beforeEach(() => {
   signalsInsert.mockClear();
   createClient.mockClear();
   recordEdgeLatencyMetric.mockClear();
+  consentSelect.mockClear();
+  consentQueryBuilder.eq.mockClear();
+  consentQueryBuilder.order.mockClear();
+  consentQueryBuilder.limit.mockClear();
+  consentQueryBuilder.maybeSingle.mockResolvedValue({ data: { is_active: true, revoked_at: null }, error: null });
+  computeLevel.mockClear();
+  scoreToJson.mockClear();
+  scoreToJson.mockReturnValue({
+    level: 3,
+    summary: 'bonne forme',
+    focus: 'calm_focus',
+    instrument_version: '1.0',
+    generated_at: '2025-01-01T00:00:00.000Z',
+  });
   serveCapture.handler = null;
 });
 
@@ -185,13 +204,57 @@ describe('assess-submit edge handler', () => {
       user_id: 'user-456',
       instrument: 'WHO5',
       score_json: expect.objectContaining({
-        summary: 'Synthèse générée',
-        instrument_version: '2.0',
+        summary: 'bonne forme',
+        level: 3,
+        instrument_version: '1.0',
       }),
+      submitted_at: expect.any(String),
+      ts: expect.any(String),
     });
     expect(logAccess).toHaveBeenCalledWith(expect.objectContaining({ route: 'assess-submit', action: 'assess:submit' }));
     const body = await response.json();
-    expect(body).toEqual({ status: 'ok', stored: true, signal: true });
+    expect(body).toEqual({ status: 'ok', summary: 'bonne forme' });
+    expect(consentSelect).toHaveBeenCalledWith('is_active, revoked_at');
+  });
+
+  it('rejects submissions when clinical opt-in is missing', async () => {
+    consentQueryBuilder.maybeSingle.mockResolvedValueOnce({ data: null, error: null });
+    const handler = await getHandler();
+    const request = new Request('https://edge.dev/assess/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://app.local',
+        Authorization: 'Bearer token',
+      },
+      body: JSON.stringify({ instrument: 'WHO5', answers: { '1': 4 } }),
+    });
+
+    const response = await handler(request);
+    expect(response.status).toBe(403);
+    const body = await response.json();
+    expect(body).toEqual({ error: 'optin_required' });
+    expect(assessmentsInsert).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when feature flag disables the instrument', async () => {
+    envValues.set('FF_ASSESS_WHO5', 'false');
+    const handler = await getHandler();
+    const request = new Request('https://edge.dev/assess/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://app.local',
+        Authorization: 'Bearer token',
+      },
+      body: JSON.stringify({ instrument: 'WHO5', answers: { '1': 2 } }),
+    });
+
+    const response = await handler(request);
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body).toEqual({ error: 'instrument_disabled' });
+    expect(assessmentsInsert).not.toHaveBeenCalled();
   });
 
   it('fails early when Supabase configuration is missing', async () => {

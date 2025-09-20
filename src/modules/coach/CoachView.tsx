@@ -210,8 +210,9 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     try {
       const { data, error } = await supabase
         .from('assessments')
-        .select('score_json, ts')
+        .select('score_json, submitted_at, ts')
         .eq('instrument', 'AAQ2')
+        .order('submitted_at', { ascending: false, nullsFirst: false })
         .order('ts', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -229,7 +230,8 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
 
       setAaqSummary(summaryText);
       setAaqFlexHint(resolveFlexHint(summaryText, focusText));
-      setAaqUpdatedAt(data?.ts ? Date.parse(data.ts) : null);
+      const recordedAt = data?.submitted_at ?? data?.ts ?? null;
+      setAaqUpdatedAt(recordedAt ? Date.parse(recordedAt) : null);
     } catch (error) {
       console.warn('[coach] unable to load AAQ-II summary', error);
       setAaqSummary(null);
