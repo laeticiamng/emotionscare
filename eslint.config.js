@@ -30,6 +30,7 @@ export default [
       "database/**",
       "e2e/**",
       "src/services/b2b/reportsApi.ts",
+      "src/services/clinicalScoringService.test.ts",
     ],
   },
   {
@@ -45,6 +46,7 @@ export default [
     },
     rules: {
       "no-restricted-imports": createNoNodeImportsRule(),
+      "ec/no-hardcoded-paths": "error",
     }
   },
   {

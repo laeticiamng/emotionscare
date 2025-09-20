@@ -2,30 +2,47 @@
  * Routes helpers - source unique alignée sur RouterV2
  */
 
-import { ROUTES_REGISTRY } from '@/routerV2/registry';
+import { ROUTES, ROUTE_NAME_BY_PATH, ROUTES_BY_NAME } from './routerV2/routes.config';
 
-const routeLookup = new Map<string, string>();
+export type RouteName = (typeof ROUTES)[number]['name'];
 
-ROUTES_REGISTRY.forEach(route => {
-  routeLookup.set(route.name, route.path);
-});
+export const route = (name: RouteName, params?: Record<string, string | number>) => {
+  const def = ROUTES_BY_NAME.get(name);
+  if (!def) {
+    throw new Error(`Unknown route: ${name}`);
+  }
+
+  let path = def.path;
+
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      path = path.replace(`:${key}`, String(value));
+    });
+  }
+
+  return path;
+};
+
+export const routeByPath = (path: string): string => {
+  const name = ROUTE_NAME_BY_PATH.get(path);
+  if (!name) {
+    throw new Error(`Unknown path: ${path}`);
+  }
+  return route(name as RouteName);
+};
 
 function resolveRoutePath(name: string, fallback?: string): string {
-  const path = routeLookup.get(name);
-
-  if (path) {
-    return path;
+  try {
+    return route(name as RouteName);
+  } catch (error) {
+    if (fallback) {
+      return fallback;
+    }
+    if (typeof console !== 'undefined') {
+      console.error(`[routerV2] Route inconnue: "${name}"`, error);
+    }
+    return '/';
   }
-
-  if (fallback) {
-    return fallback;
-  }
-
-  if (typeof console !== 'undefined') {
-    console.error(`[routerV2] Route inconnue: "${name}"`);
-  }
-
-  return '/';
 }
 
 const loginPath = resolveRoutePath('login');

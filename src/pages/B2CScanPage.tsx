@@ -17,6 +17,7 @@ import type { EmotionResult } from '@/types/emotion';
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
 import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
+import { withGuard } from '@/routerV2/withGuard';
 
 const B2CScanPage: React.FC = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
@@ -314,4 +315,4 @@ const B2CScanPage: React.FC = () => {
   );
 };
 
-export default B2CScanPage;
+export default withGuard(B2CScanPage, [{ type: 'auth', required: true }]);

@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ff } from '@/lib/flags/ff';
 import { b2bRoutes } from '@/lib/routes';
 import '@/styles/print-b2b.css';
+import { withGuard } from '@/routerV2/withGuard';
 
 dayjs.locale('fr');
 
@@ -145,4 +146,7 @@ const B2BReportsPage: React.FC = () => {
   );
 };
 
-export default B2BReportsPage;
+export default withGuard(B2BReportsPage, [
+  { type: 'auth', required: true },
+  { type: 'role', roles: ['manager', 'org', 'admin'] },
+]);

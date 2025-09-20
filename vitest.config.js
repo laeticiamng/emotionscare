@@ -22,6 +22,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(process.cwd(), './src'),
+      '@/routes': path.resolve(process.cwd(), './src/lib/routes.ts'),
+      '@/routerV2': path.resolve(process.cwd(), './src/lib/routerV2'),
+      '@/routerV2/routes.config': path.resolve(process.cwd(), './src/lib/routerV2/routes.config.ts'),
+      '@/guards': path.resolve(process.cwd(), './src/lib/routerV2/guards.ts'),
     },
   },
   test: {
