@@ -68,6 +68,14 @@ export function MoodMixerView() {
     backgroundImage: gradient,
     transition: prefersReducedMotion ? 'none' : 'background-image 600ms ease, filter 600ms ease',
   }), [gradient, prefersReducedMotion]);
+  const busySpinnerClassName = useMemo(
+    () => cn('mr-2 h-4 w-4', !prefersReducedMotion && 'animate-spin'),
+    [prefersReducedMotion]
+  );
+  const inlineSpinnerClassName = useMemo(
+    () => cn('h-4 w-4', !prefersReducedMotion && 'animate-spin'),
+    [prefersReducedMotion]
+  );
 
   const fetchPresets = useCallback(async () => {
     if (!user?.id) {
@@ -333,7 +341,15 @@ export function MoodMixerView() {
   const isDeleting = isBusy && actionState.type === 'delete';
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10" data-testid="mood-mixer-root">
+      <div
+        aria-live="polite"
+        role="status"
+        className="sr-only"
+        data-testid="mood-mixer-live-summary"
+      >
+        {`Mélange ${name.trim() || 'sans nom'} : ${summary}`}
+      </div>
       <section className="rounded-3xl border bg-background/80 p-6 shadow-sm">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <div className="space-y-6">
@@ -341,11 +357,12 @@ export function MoodMixerView() {
               className="relative overflow-hidden rounded-3xl border text-white shadow-lg"
               style={gradientStyle}
               aria-label="Aperçu visuel du mélange"
+              data-testid="mood-mixer-gradient"
             >
               <div className="absolute inset-0 backdrop-blur-[2px]" aria-hidden="true" />
               <div className="relative space-y-3 p-6">
                 <span className="inline-flex items-center gap-2 rounded-full bg-black/20 px-3 py-1 text-xs uppercase tracking-wide">
-                  <Sparkles className="h-3.5 w-3.5" />
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                   Aperçu sensoriel
                 </span>
                 <p className="text-2xl font-semibold">
@@ -403,7 +420,11 @@ export function MoodMixerView() {
 
             <div className="flex flex-wrap gap-3">
               <Button onClick={handleSave} disabled={isSaving || actionState.busy}>
-                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                {isSaving ? (
+                  <Loader2 className={busySpinnerClassName} aria-hidden="true" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
+                )}
                 Sauvegarder
               </Button>
               <Button
@@ -411,11 +432,15 @@ export function MoodMixerView() {
                 onClick={handleUpdate}
                 disabled={!selectedPresetId || isUpdating || actionState.busy}
               >
-                {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                {isUpdating ? (
+                  <Loader2 className={busySpinnerClassName} aria-hidden="true" />
+                ) : (
+                  <Wand2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                )}
                 Rafraîchir
               </Button>
               <Button variant="ghost" onClick={handleReset} disabled={actionState.busy}>
-                <RotateCcw className="mr-2 h-4 w-4" />
+                <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
                 Repartir à zéro
               </Button>
               <Button
@@ -423,7 +448,11 @@ export function MoodMixerView() {
                 onClick={handleDelete}
                 disabled={!selectedPresetId || isDeleting || actionState.busy}
               >
-                {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                {isDeleting ? (
+                  <Loader2 className={busySpinnerClassName} aria-hidden="true" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                )}
                 Supprimer
               </Button>
             </div>
@@ -446,11 +475,7 @@ export function MoodMixerView() {
                   disabled={previewLoading}
                   aria-label="Lancer la pré-écoute"
                 >
-                  {previewLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    'Pré-écoute'
-                  )}
+                  {previewLoading ? <Loader2 className={inlineSpinnerClassName} aria-hidden="true" /> : 'Pré-écoute'}
                 </Button>
               </div>
               {previewUrl && (
