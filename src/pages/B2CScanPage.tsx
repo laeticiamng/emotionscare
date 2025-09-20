@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
 import EmotionScannerPremium from '@/components/emotion/EmotionScannerPremium';
 import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCareMusicPlayer';
+import SamInstantMood from '@/components/scan/SamInstantMood';
 import { useMusic } from '@/contexts/MusicContext';
 import type { EmotionResult } from '@/types/emotion';
 
@@ -76,6 +77,10 @@ const B2CScanPage: React.FC = () => {
                 </Button>
               </div>
             </div>
+          </div>
+
+          <div className="max-w-3xl mx-auto w-full">
+            <SamInstantMood />
           </div>
 
           {/* Enhanced Stats */}
