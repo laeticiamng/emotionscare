@@ -4,6 +4,7 @@ export interface SendCoachMessageOptions {
   mode?: 'b2c' | 'b2b';
   locale?: 'fr' | 'en';
   userHash?: string;
+  flexHint?: 'souple' | 'transition' | 'rigide';
   signal?: AbortSignal;
   onChunk?: (chunk: string) => void;
   onThread?: (threadId: string) => void;
@@ -26,6 +27,7 @@ function buildPayload(options: SendCoachMessageOptions) {
     mode: options.mode ?? 'b2c',
     locale: options.locale ?? 'fr',
     user_hash: options.userHash,
+    flex_hint: options.flexHint,
   };
 }
 

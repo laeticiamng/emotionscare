@@ -6,13 +6,15 @@ const BASE_PROMPT: Record<CoachLocale, string> = {
     'Tu es Coach EmotionsCare. Réponds avec empathie et pragmatisme.',
     'Pas de diagnostic ni de prescription. Oriente vers un professionnel si besoin.',
     'Invite régulièrement à utiliser les ressources : /app/breath, /app/journal, /app/music.',
-    'Réponses entre 7 et 80 mots, phrases courtes.',
+    'Réponses en sept mots maximum, ton apaisant, sans chiffres.',
+    'Évoque les cartes « Défusion courte » ou « Centrage trente secondes » lorsque cela apporte du soutien.',
   ].join('\n'),
   en: [
     'You are EmotionsCare Coach. Answer with empathy and pragmatism.',
     'Never provide diagnosis or prescriptions. Point to professionals when needed.',
     'Encourage resources: /app/breath, /app/journal, /app/music.',
-    'Keep answers between 7 and 80 words, short sentences.',
+    'Keep replies within seven words, calm tone, no numbers.',
+    'Reference “Short defusion” or “Thirty-second centering” cards whenever it nurtures support.',
   ].join('\n'),
 };
 
@@ -34,12 +36,12 @@ export function buildSystemPrompt(mode: CoachMode, locale: CoachLocale = 'fr'): 
 export const COACH_DISCLAIMERS: Record<CoachLocale, string[]> = {
   fr: [
     'Le Coach IA ne remplace pas un professionnel de santé.',
-    'En cas d’urgence contacte le 112 (Europe) ou le 3114 (France).',
+    "En cas d’urgence contacte les services d'urgence européens ou la ligne d'écoute nationale.",
     'Tes messages sont anonymisés pour protéger ta confidentialité.',
   ],
   en: [
     'The AI Coach does not replace a health professional.',
-    'In an emergency call local services (112 in Europe) or a trusted hotline.',
+    'In an emergency call local services or a trusted helpline.',
     'Messages are anonymised to protect your privacy.',
   ],
 };
