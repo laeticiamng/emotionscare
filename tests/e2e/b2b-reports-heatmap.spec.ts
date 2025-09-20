@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('B2B reports heatmap — chargement, filtres, export et impression', async ({ page }, testInfo) => {
+test('B2B heatmap — chargement textuel et navigation vers le rapport', async ({ page }, testInfo) => {
   if (!testInfo.project.name.includes('b2b_admin')) {
     test.skip();
   }
@@ -20,38 +20,57 @@ test('B2B reports heatmap — chargement, filtres, export et impression', async 
     HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,AAAA';
   });
 
-  await page.route('**/functions/v1/assess-aggregate', async (route) => {
+  await page.route('**/functions/v1/b2b-heatmap-periods', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ periods: ['2025-09', '2025-08'] }),
+    });
+  });
+
+  await page.route('**/functions/v1/b2b-heatmap**', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        summaries: [
-          { instrument: 'WEMWBS', period: '2024-W11', text: 'Ton collectif apaisé', team: 'Produit' },
-          { instrument: 'CBI', period: '2024-W11', text: 'Fatigue résiduelle mais partagée', team: 'Produit' },
-          { instrument: 'UWES', period: '2024-W11', text: 'Élan d’engagement constaté' },
+        period: '2025-09',
+        cells: [
+          {
+            team_id: null,
+            team_label: 'Organisation',
+            instrument: 'UWES',
+            summary: 'Implication sereine, envie collective intacte.',
+          },
+          {
+            team_id: 'team-a',
+            team_label: 'Équipe A',
+            instrument: 'WEMWBS',
+            summary: 'Ambiance apaisée, échanges fluides et attentifs.',
+          },
+          {
+            team_id: 'aggregated',
+            team_label: 'Autres (agrégé)',
+            instrument: 'CBI',
+            summary: 'Synthèse mutualisée : fatigue légère détectée.',
+          },
         ],
       }),
     });
   });
 
-  await page.goto('/b2b/reports');
+  await page.goto('/b2b/rh');
 
-  await expect(page.getByRole('heading', { name: /Heatmap RH/i })).toBeVisible();
-  await expect(page.getByTestId('heatmap-text').first()).toContainText('Ton collectif');
-  await expect(page.getByTestId('action-suggestion').first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Heatmap RH textuelle/i })).toBeVisible();
+  const firstCell = page.getByTestId('heatmap-card').first();
+  await expect(firstCell).toContainText('Implication sereine');
+  await expect(firstCell).not.toContainText(/\d/);
 
-  await page.getByLabel('Instrument').click();
-  await page.getByRole('option', { name: 'CBI' }).click();
-  await expect(page.getByTestId('heatmap-text').first()).toContainText('Fatigue');
+  const aggregatedCell = page.getByTestId('heatmap-card').filter({ hasText: 'fatigue' }).first();
+  await expect(aggregatedCell).toContainText('fatigue');
+  await expect(aggregatedCell).toContainText('Synthèse mutualisée');
 
-  await page.getByLabel('Équipe').click();
-  await page.getByRole('option', { name: 'Organisation complète' }).click();
-  await expect(page.getByTestId('heatmap-text').nth(0)).toContainText('Ton collectif');
-
-  await page.getByRole('button', { name: /Exporter en PNG/i }).click();
-  await page.getByRole('button', { name: /Imprimer/i }).click();
-  const printed = await page.evaluate(() => (window as unknown as { __printed?: boolean }).__printed ?? false);
-  expect(printed).toBeTruthy();
+  await firstCell.click();
+  await expect(page).toHaveURL(/\/b2b\/reports\?/);
 
   expect(consoleWarnings).toEqual([]);
 });

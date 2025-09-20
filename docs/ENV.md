@@ -22,4 +22,5 @@ Ce document résume les variables nécessaires pour activer les agrégations B2B
 | `FF_ASSESS_SUDS` | Active la diffusion du SUDS via l'Edge. | `true` |
 | `FF_ORCH_BREATH` | Active l’orchestration adaptative du module respiration. | `true` |
 | `FF_B2B_AGGREGATES` | `true` | Active l'endpoint `/assess/aggregate` et les vues B2B correspondantes. |
+| `FF_B2B_HEATMAP` | `true` | Débloque la heatmap RH textuelle côté suite B2B. |
 
