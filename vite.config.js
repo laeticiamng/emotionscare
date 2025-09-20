@@ -88,6 +88,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": resolve(process.cwd(), "./src"),
+        "@/routes": resolve(process.cwd(), "./src/lib/routes.ts"),
+        "@/routerV2": resolve(process.cwd(), "./src/lib/routerV2"),
+        "@/routerV2/routes.config": resolve(process.cwd(), "./src/lib/routerV2/routes.config.ts"),
+        "@/guards": resolve(process.cwd(), "./src/lib/routerV2/guards.ts"),
       },
     },
 

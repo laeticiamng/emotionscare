@@ -7,5 +7,6 @@ module.exports = {
     // optionnel, voir plus bas
     "no-alias-routes": require("./rules/no-alias-routes"),
     "no-clinical-score-terms": require("./rules/no-clinical-score-terms"),
+    "no-hardcoded-paths": require("./rules/no-hardcoded-paths"),
   }
 };

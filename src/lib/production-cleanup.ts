@@ -5,6 +5,7 @@
 
 import { logger } from '@/lib/logger';
 import { initProductionSecurity, validateEnvironment } from '@/lib/security/productionSecurity';
+import { route } from '@/routes';
 
 export interface CleanupStats {
   totalFiles: number;
@@ -84,11 +85,16 @@ const optimizePerformance = async (): Promise<boolean> => {
     });
 
     // Préchargement des routes critiques
-    const criticalRoutes = ['/', '/choose-mode', '/b2c/dashboard', '/b2b/dashboard'];
-    criticalRoutes.forEach(route => {
+    const criticalRoutes = [
+      route('home'),
+      route('choose-mode'),
+      route('consumer-home'),
+      route('b2b-selection'),
+    ];
+    criticalRoutes.forEach(prefetchRoute => {
       const link = document.createElement('link');
       link.rel = 'prefetch';
-      link.href = route;
+      link.href = prefetchRoute;
       document.head.appendChild(link);
     });
 
