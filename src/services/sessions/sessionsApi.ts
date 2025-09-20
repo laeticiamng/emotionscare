@@ -2,7 +2,15 @@ import * as Sentry from '@sentry/react'
 
 import { supabase } from '@/integrations/supabase/client'
 
-export type SessionType = 'flash_glow' | 'breath' | 'music' | 'scan' | 'custom'
+export type SessionType =
+  | 'flash_glow'
+  | 'breath'
+  | 'music'
+  | 'scan'
+  | 'ambition'
+  | 'grit'
+  | 'bubble'
+  | 'custom'
 
 export type SessionRecord = {
   id: string

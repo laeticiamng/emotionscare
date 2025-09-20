@@ -36,6 +36,9 @@ interface FeatureFlags {
   FF_ASSESS_CBI: boolean;
   FF_ASSESS_CVSQ: boolean;
   FF_ASSESS_SAM: boolean;
+  FF_ORCH_AMBITION: boolean;
+  FF_ORCH_GRIT: boolean;
+  FF_ORCH_BUBBLE: boolean;
 
   [key: string]: boolean;
 }
@@ -77,6 +80,9 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_CBI: true,
   FF_ASSESS_CVSQ: true,
   FF_ASSESS_SAM: true,
+  FF_ORCH_AMBITION: true,
+  FF_ORCH_GRIT: true,
+  FF_ORCH_BUBBLE: true,
 };
 
 let flagsCache: FeatureFlags | null = null;
