@@ -256,7 +256,6 @@ export function useSessionClock(options: Options = {}): Return {
     if (autoStart) {
       start()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const progress = useMemo(() => {

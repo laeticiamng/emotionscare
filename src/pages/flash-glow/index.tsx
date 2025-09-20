@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
@@ -16,6 +26,7 @@ import {
   logAndJournal,
   type MoodSnapshot,
 } from '@/modules/flash/sessionService';
+import { clinicalScoringService } from '@/services/clinicalScoring';
 
 const phaseThemes = {
   warmup: { theme: 'emerald' as const, intensity: 0.45, shape: 'ring' as const },
@@ -44,7 +55,25 @@ const primaryButtonLabels: Record<string, string> = {
   completed: 'Relancer',
 };
 
-const completionMessage = 'FlashGlow terminé. Respiration plus douce.';
+const completionMessage = 'ça vient';
+const BASE_DURATION_MS = 120_000;
+const EXTENSION_DURATION_MS = 60_000;
+const SUDS_THRESHOLD = 3;
+const SUDS_MIN = 0;
+const SUDS_MAX = 10;
+const SUDS_DESCRIPTIONS: Record<number, string> = {
+  0: 'Paisible',
+  1: 'Très calme',
+  2: 'Calme',
+  3: 'Tension légère',
+  4: 'Tension',
+  5: 'Stress présent',
+  6: 'Stress marqué',
+  7: 'Détresse forte',
+  8: 'Très intense',
+  9: 'Presque à saturation',
+  10: 'Maximum supportable',
+};
 
 const FlashGlowView: React.FC = () => {
   const { toast } = useToast();
@@ -52,8 +81,22 @@ const FlashGlowView: React.FC = () => {
   const beforeMoodRef = useRef<MoodSnapshot | null>(getCurrentMoodSnapshot());
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [sudsOptIn, setSudsOptIn] = useState(false);
+  const [preSuds, setPreSuds] = useState<number>(2);
+  const [postSuds, setPostSuds] = useState<number>(2);
+  const [postSudsValues, setPostSudsValues] = useState<number[]>([]);
+  const [preSudsRecorded, setPreSudsRecorded] = useState(false);
+  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [isSubmittingSud, setIsSubmittingSud] = useState(false);
+  const [pendingCompletionElapsed, setPendingCompletionElapsed] = useState<number | null>(null);
+  const [hasExtended, setHasExtended] = useState(false);
+  const [needsPostSuds, setNeedsPostSuds] = useState(false);
+  const [extraDurationMs, setExtraDurationMs] = useState(0);
+  const [extensionActive, setExtensionActive] = useState(false);
 
-  const { phases, snapshot, update, totalDuration } = useFlashPhases(undefined, {
+  const totalDuration = BASE_DURATION_MS + extraDurationMs;
+
+  const { phases, snapshot, update } = useFlashPhases(totalDuration, {
     onPhaseChange: (phase) => {
       Sentry.addBreadcrumb({
         category: 'flash',
@@ -78,6 +121,33 @@ const FlashGlowView: React.FC = () => {
 
   const currentTheme = phaseThemes[snapshot.phase.key];
 
+  useEffect(() => {
+    if (sudsOptIn && postSudsValues.length === 0) {
+      setPostSuds(preSuds);
+    }
+  }, [preSuds, sudsOptIn, postSudsValues.length]);
+
+  const submitSudsMeasurement = async (stage: 'pre' | 'post', value: number) => {
+    try {
+      await clinicalScoringService.submitResponse('SUDS', { '1': value }, {
+        stage,
+        module: 'flash_glow',
+        extended: hasExtended,
+        iteration: stage === 'post' ? postSudsValues.length + 1 : 0,
+        recorded_at: new Date().toISOString(),
+      });
+      return true;
+    } catch (error) {
+      console.error('Error submitting SUDS measure:', error);
+      toast({
+        title: 'Mesure SUDS indisponible',
+        description: "Impossible d'enregistrer la mesure pour le moment.",
+        variant: 'destructive',
+      });
+      return false;
+    }
+  };
+
   const handleStart = () => {
     beforeMoodRef.current = getCurrentMoodSnapshot();
     setFeedback(null);
@@ -92,6 +162,14 @@ const FlashGlowView: React.FC = () => {
     });
     update(0);
     session.start();
+
+    if (sudsOptIn && !preSudsRecorded) {
+      void submitSudsMeasurement('pre', preSuds).then((success) => {
+        if (success) {
+          setPreSudsRecorded(true);
+        }
+      });
+    }
   };
 
   const handlePause = () => {
@@ -121,17 +199,24 @@ const FlashGlowView: React.FC = () => {
   };
 
   const handleRestart = () => {
+    setExtraDurationMs(0);
+    setHasExtended(false);
+    setNeedsPostSuds(false);
+    setPostSudsValues([]);
+    setPendingCompletionElapsed(null);
+    setIsPostDialogOpen(false);
+    setExtensionActive(false);
+    setPreSudsRecorded(false);
+    setPostSuds(preSuds);
     session.reset();
     update(0);
     handleStart();
   };
 
-  const handleComplete = async () => {
+  const finalizeSession = async (finalElapsed: number, action: 'extend_session' | 'soft_exit') => {
     if (isSaving) {
       return;
     }
-
-    const finalElapsed = session.state === 'running' ? session.elapsedMs : session.elapsedMs;
 
     Sentry.addBreadcrumb({
       category: 'session',
@@ -140,6 +225,7 @@ const FlashGlowView: React.FC = () => {
       data: {
         module: 'flash-glow',
         elapsed_ms: finalElapsed,
+        action,
       },
     });
 
@@ -165,6 +251,15 @@ const FlashGlowView: React.FC = () => {
           elapsed_ms: finalElapsed,
           total_ms: totalDuration,
           phases: phases.map((phase) => ({ key: phase.key, ms: phase.ms })),
+          suds: sudsOptIn
+            ? {
+                opt_in: true,
+                pre: preSudsRecorded ? preSuds : null,
+                post_values: postSudsValues,
+                action,
+                extended_ms: extraDurationMs,
+              }
+            : { opt_in: false },
         },
       });
 
@@ -185,7 +280,81 @@ const FlashGlowView: React.FC = () => {
       });
     } finally {
       setIsSaving(false);
+      setExtensionActive(false);
+      setPendingCompletionElapsed(null);
     }
+  };
+
+  const handleComplete = () => {
+    if (isSaving) {
+      return;
+    }
+
+    const finalElapsed = session.elapsedMs;
+
+    if (sudsOptIn && (postSudsValues.length === 0 || needsPostSuds)) {
+      if (session.state === 'running') {
+        session.pause();
+      }
+      setPendingCompletionElapsed(finalElapsed);
+      setIsPostDialogOpen(true);
+      return;
+    }
+
+    void finalizeSession(finalElapsed, hasExtended ? 'extend_session' : 'soft_exit');
+  };
+
+  const handlePostDialogChange = (open: boolean) => {
+    setIsPostDialogOpen(open);
+    if (!open) {
+      setPendingCompletionElapsed(null);
+      if (session.state === 'paused') {
+        session.resume();
+      }
+    }
+  };
+
+  const handlePostSudsSubmit = async () => {
+    if (postSuds == null) {
+      return;
+    }
+
+    setIsSubmittingSud(true);
+    const value = Math.max(SUDS_MIN, Math.min(SUDS_MAX, Math.round(postSuds)));
+
+    const success = await submitSudsMeasurement('post', value);
+
+    if (!success) {
+      setIsSubmittingSud(false);
+      return;
+    }
+
+    setPostSudsValues((prev) => [...prev, value]);
+
+    if (value >= SUDS_THRESHOLD && !hasExtended) {
+      setHasExtended(true);
+      setNeedsPostSuds(true);
+      setIsPostDialogOpen(false);
+      setPendingCompletionElapsed(null);
+      setExtraDurationMs((prev) => prev + EXTENSION_DURATION_MS);
+      setExtensionActive(true);
+      setFeedback('Tension détectée, séance prolongée de 60 secondes.');
+      toast({
+        title: 'Encore 60 secondes',
+        description: 'Nous prolongeons la séance pour mieux vous accompagner.',
+      });
+      if (session.state === 'paused') {
+        session.resume();
+      }
+      setIsSubmittingSud(false);
+      return;
+    }
+
+    setNeedsPostSuds(false);
+    setIsPostDialogOpen(false);
+    const elapsedForCompletion = pendingCompletionElapsed ?? session.elapsedMs;
+    void finalizeSession(elapsedForCompletion, hasExtended ? 'extend_session' : 'soft_exit');
+    setIsSubmittingSud(false);
   };
 
   const handlePrimary = () => {
@@ -264,6 +433,55 @@ const FlashGlowView: React.FC = () => {
             )}
           </section>
 
+          <section className="rounded-lg border border-border/50 p-4 space-y-4" aria-live="polite">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium">Partager mon niveau SUDS</p>
+                <p className="text-xs text-muted-foreground">
+                  Optionnel&nbsp;: aide à adapter la fin de séance selon votre ressenti.
+                </p>
+              </div>
+              <Switch
+                id="suds-opt-in"
+                checked={sudsOptIn}
+                disabled={session.state !== 'idle'}
+                onCheckedChange={(checked) => {
+                  setSudsOptIn(checked);
+                  if (!checked) {
+                    setPreSudsRecorded(false);
+                    setPostSudsValues([]);
+                    setNeedsPostSuds(false);
+                    setHasExtended(false);
+                    setExtensionActive(false);
+                  }
+                }}
+                aria-label="Activer le suivi SUDS"
+              />
+            </div>
+
+            {sudsOptIn && (
+              <div className="space-y-3" aria-live="polite">
+                <div className="flex items-center justify-between text-sm">
+                  <label htmlFor="suds-pre-slider" className="font-medium">SUDS avant séance</label>
+                  <span className="text-muted-foreground">{preSuds}/10</span>
+                </div>
+                <Slider
+                  id="suds-pre-slider"
+                  value={[preSuds]}
+                  onValueChange={([value]) => setPreSuds(Math.max(SUDS_MIN, Math.min(SUDS_MAX, Math.round(value))))}
+                  min={SUDS_MIN}
+                  max={SUDS_MAX}
+                  step={1}
+                  aria-valuetext={`${preSuds} sur 10`}
+                  disabled={session.state !== 'idle'}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {SUDS_DESCRIPTIONS[preSuds]}
+                </p>
+              </div>
+            )}
+          </section>
+
           {surface}
 
           <div className="flex flex-wrap items-center gap-3" role="group" aria-label="Contrôles de séance">
@@ -279,6 +497,12 @@ const FlashGlowView: React.FC = () => {
             </Button>
           </div>
 
+          {extensionActive && (
+            <p className="rounded-md bg-amber-100/10 p-3 text-sm text-amber-600" aria-live="polite">
+              Extension active&nbsp;: 60 secondes supplémentaires en cours.
+            </p>
+          )}
+
           {feedback && (
             <p className="rounded-md bg-muted/30 p-3 text-sm text-muted-foreground" aria-live="polite">
               {feedback}
@@ -286,6 +510,52 @@ const FlashGlowView: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={isPostDialogOpen} onOpenChange={handlePostDialogChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Comment vous sentez-vous maintenant&nbsp;?</DialogTitle>
+            <DialogDescription>
+              Sélectionnez votre niveau SUDS pour décider si l’on prolonge la séance.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">SUDS après séance</span>
+              <span className="text-muted-foreground">{postSuds}/10</span>
+            </div>
+            <Slider
+              id="suds-post-slider"
+              value={[postSuds]}
+              onValueChange={([value]) => setPostSuds(Math.max(SUDS_MIN, Math.min(SUDS_MAX, Math.round(value))))}
+              min={SUDS_MIN}
+              max={SUDS_MAX}
+              step={1}
+              aria-valuetext={`${postSuds} sur 10`}
+            />
+            <p className="text-xs text-muted-foreground">
+              {SUDS_DESCRIPTIONS[postSuds]}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              0 = calme, {SUDS_THRESHOLD}+ = tension notable nécessitant un peu plus de temps.
+            </p>
+          </div>
+
+          <DialogFooter className="pt-4">
+            <Button
+              variant="outline"
+              onClick={() => handlePostDialogChange(false)}
+              type="button"
+            >
+              Continuer sans valider
+            </Button>
+            <Button onClick={handlePostSudsSubmit} disabled={isSubmittingSud}>
+              {isSubmittingSud ? 'Enregistrement...' : 'Valider'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };
