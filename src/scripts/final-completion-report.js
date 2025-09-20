@@ -22,7 +22,7 @@ console.log('  ✓ Routes de développement masquées en prod');
 console.log('\n✅ COMPOSANTS ET PAGES:');
 console.log('  ✓ 100% des pages ont leurs composants mappés');
 console.log('  ✓ Lazy loading optimisé pour tous les modules');
-console.log('  ✓ Pages système (404, 401, 403, 503) fonctionnelles');
+console.log('  ✓ Pages système (404, 401, 403, 500) fonctionnelles');
 console.log('  ✓ Tous les imports corrigés et vérifiés');
 
 console.log('\n✅ MODULES FONCTIONNELS:');

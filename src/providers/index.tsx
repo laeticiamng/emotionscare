@@ -7,8 +7,8 @@ import { NotificationProvider } from '@/components/ui/notification-system';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { ErrorBoundary } from '@/contexts/ErrorBoundary';
-import { ErrorProvider } from '@/contexts/ErrorContext';
+import RootErrorBoundary from '@/components/error/RootErrorBoundary';
+import { ErrorProvider } from '@/contexts';
 import { MoodProvider } from '@/contexts/MoodContext';
 import { SimpleAuthProvider } from '@/contexts/SimpleAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
@@ -74,7 +74,7 @@ export function RootProvider({ children }: RootProviderProps) {
 
   return (
     <HelmetProvider>
-      <ErrorBoundary>
+      <RootErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <ErrorProvider>
             <SimpleAuthProvider>
@@ -116,7 +116,7 @@ export function RootProvider({ children }: RootProviderProps) {
             </SimpleAuthProvider>
           </ErrorProvider>
         </QueryClientProvider>
-      </ErrorBoundary>
+      </RootErrorBoundary>
     </HelmetProvider>
   );
 }

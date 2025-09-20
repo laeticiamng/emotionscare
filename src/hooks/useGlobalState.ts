@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppStore, shallow } from '@/store/appStore';
-import { useErrorHandler } from '@/contexts/ErrorContext';
+import { useError } from '@/contexts';
 import { useCache } from '@/contexts/CacheContext';
 
 /**
@@ -45,7 +45,8 @@ export const useGlobalState = () => {
     }),
     shallow
   );
-  const errorHandler = useErrorHandler();
+  const errorApi = useError();
+  const { notify } = errorApi;
   const cache = useCache();
 
   // Actions combinées avec gestion d'erreurs
@@ -57,11 +58,15 @@ export const useGlobalState = () => {
       const result = await action();
       return result;
     } catch (error) {
-      errorHandler.addError({
-        message: errorMessage,
-        severity: 'medium',
-        context: { originalError: error },
-      });
+      notify(
+        {
+          code: 'UNKNOWN',
+          messageKey: 'errors.unexpectedError',
+          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+          context: { hint: errorMessage },
+        },
+        { source: 'useGlobalState.safeAction' },
+      );
       return null;
     }
   };
@@ -91,7 +96,7 @@ export const useGlobalState = () => {
     },
     
     // Gestion d'erreurs
-    errors: errorHandler,
+    errors: errorApi,
     
     // Cache
     cache,
@@ -183,7 +188,7 @@ export const useAsyncOperation = <T>(
   const [data, setData] = React.useState<T | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
-  const errorHandler = useErrorHandler();
+  const { notify } = useError();
 
   const execute = React.useCallback(async (attempt = 0): Promise<T | null> => {
     setLoading(true);
@@ -203,16 +208,20 @@ export const useAsyncOperation = <T>(
       
       setError(error);
       onError?.(error);
-      errorHandler.addError({
-        message: error.message,
-        severity: 'medium',
-        context: { attempt, retries },
-      });
+      notify(
+        {
+          code: 'UNKNOWN',
+          messageKey: 'errors.unexpectedError',
+          cause: { message: error.message, stack: error.stack },
+          context: { attempt, retries },
+        },
+        { source: 'useGlobalState.useAsyncOperation' },
+      );
       return null;
     } finally {
       setLoading(false);
     }
-  }, [operation, retries, retryDelay, onError, errorHandler]);
+  }, [operation, retries, retryDelay, onError, notify]);
 
   React.useEffect(() => {
     execute();

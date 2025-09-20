@@ -842,6 +842,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'ComprehensiveSystemAuditPage',
       guard: false,
     },
+    {
+      name: 'dev-error-boundary',
+      path: '/dev/error-boundary',
+      segment: 'public',
+      layout: 'marketing',
+      component: 'ErrorBoundaryTestPage',
+      guard: false,
+    },
   // Routes de debug supprimées (pages orphelines nettoyées)
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
@@ -874,7 +882,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   {
     name: 'server-error',
-    path: '/503',
+    path: '/500',
     segment: 'public',
     layout: 'marketing',
     component: 'ServerErrorPage',

@@ -108,7 +108,7 @@ const routesByCategory = {
     '✅ /navigation - Navigation complète organisée',
     '✅ /feature-matrix - Test et validation features',
     '✅ /system/api-monitoring - Monitoring système',
-    '✅ Routes systèmes (401, 403, 404, 503)'
+    '✅ Routes systèmes (401, 403, 404, 500)'
   ]
 };
 
