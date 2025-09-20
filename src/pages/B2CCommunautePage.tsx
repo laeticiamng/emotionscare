@@ -214,12 +214,15 @@ const B2CCommunautePage: React.FC = () => {
     ? latestMSPSS?.level ?? mspAssessment.state.lastComputation?.level
     : undefined;
 
+  const consented = Boolean(uclaAssessment.state.hasConsent && mspAssessment.state.hasConsent);
+
   const communityLevels = useMemo(
     () => ({
-      ucla3Level: typeof resolvedUclaLevel === 'number' ? resolvedUclaLevel : undefined,
+      uclaLevel: typeof resolvedUclaLevel === 'number' ? resolvedUclaLevel : undefined,
       mspssLevel: typeof resolvedMspssLevel === 'number' ? resolvedMspssLevel : undefined,
+      consented,
     }),
-    [resolvedUclaLevel, resolvedMspssLevel],
+    [consented, resolvedMspssLevel, resolvedUclaLevel],
   );
 
   const rawCommunityHints = useMemo(
@@ -244,7 +247,7 @@ const B2CCommunautePage: React.FC = () => {
     (hint) => hint.action === 'pin_card' && hint.key === 'social_cocon',
   );
   const shouldSuggestReplies = communityHints.some(
-    (hint) => hint.action === 'suggest_replies' && hint.key === 'empathic_templates',
+    (hint) => hint.action === 'show_empathic_replies',
   );
 
   const bannerTrapRef = useRef<HTMLDivElement | null>(null);

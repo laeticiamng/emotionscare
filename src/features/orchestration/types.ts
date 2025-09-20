@@ -58,21 +58,26 @@ export interface BossGritOrchestratorInput {
 export interface BubbleBeatOrchestratorInput {
   pss10Level: number;
 }
+export type AssessmentLevel = 0 | 1 | 2 | 3 | 4;
+
 export type UIHint =
   | { action: 'show_banner'; key: 'listen_two_minutes' }
   | { action: 'pin_card'; key: 'social_cocon' }
-  | { action: 'suggest_replies'; key: 'empathic_templates' }
-  | { action: 'prioritize_cta'; key: 'plan_pause' }
-  | { action: 'promote_rooms_private'; enabled: boolean }
+  | { action: 'show_empathic_replies' }
+  | { action: 'promote_cta'; key: 'schedule_break' }
+  | { action: 'highlight_rooms_private' }
+  | { action: 'none' }
   | { action: 'set_aura'; key: 'cool_gentle' | 'neutral' | 'warm_soft' };
 
 export interface CommunityLevels {
-  ucla3Level?: number;
+  uclaLevel?: number;
   mspssLevel?: number;
+  consented: boolean;
 }
 
 export interface SocialCoconLevels {
   mspssLevel?: number;
+  consented: boolean;
 }
 
 export interface AurasLevels {

@@ -44,6 +44,7 @@ interface FeatureFlags {
   FF_ORCH_AMBITION: boolean;
   FF_ORCH_GRIT: boolean;
   FF_ORCH_BUBBLE: boolean;
+  FF_ORCH_MIXER: boolean;
   FF_ZERO_NUMBERS?: boolean;
   FF_REQUIRE_CLINICAL_OPTIN: boolean;
 
@@ -95,6 +96,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ORCH_AMBITION: true,
   FF_ORCH_GRIT: true,
   FF_ORCH_BUBBLE: true,
+  FF_ORCH_MIXER: true,
   FF_ZERO_NUMBERS: true,
   FF_REQUIRE_CLINICAL_OPTIN: true,
 };

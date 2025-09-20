@@ -7,6 +7,8 @@ export type SessionType =
   | 'breath'
   | 'music'
   | 'scan'
+  | 'vr_breath'
+  | 'vr_galaxy'
   | 'ambition'
   | 'grit'
   | 'bubble'
@@ -14,6 +16,7 @@ export type SessionType =
   | 'community'
   | 'social_cocon'
   | 'auras'
+  | 'coach'
 
 export type SessionRecord = {
   id: string

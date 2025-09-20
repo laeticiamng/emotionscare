@@ -3,20 +3,24 @@ import { describe, expect, it } from 'vitest';
 import { socialCoconOrchestrator } from './socialCocon.orchestrator';
 
 describe('socialCoconOrchestrator', () => {
-  it('prioritises CTA and promotes rooms when MSPSS is low', () => {
-    const hints = socialCoconOrchestrator({ mspssLevel: 1 });
+  it('promotes planning and highlights rooms when MSPSS is low', () => {
+    const hints = socialCoconOrchestrator({ mspssLevel: 1, consented: true });
     expect(hints).toEqual([
-      { action: 'prioritize_cta', key: 'plan_pause' },
-      { action: 'promote_rooms_private', enabled: true },
+      { action: 'promote_cta', key: 'schedule_break' },
+      { action: 'highlight_rooms_private' },
     ]);
   });
 
   it('returns empty hints when MSPSS is not low', () => {
-    const hints = socialCoconOrchestrator({ mspssLevel: 3 });
-    expect(hints).toEqual([]);
+    const hints = socialCoconOrchestrator({ mspssLevel: 3, consented: true });
+    expect(hints).toEqual([{ action: 'none' }]);
   });
 
   it('ignores undefined level', () => {
-    expect(socialCoconOrchestrator({})).toEqual([]);
+    expect(socialCoconOrchestrator({ consented: true })).toEqual([{ action: 'none' }]);
+  });
+
+  it('suppresses orchestration when consent missing', () => {
+    expect(socialCoconOrchestrator({ mspssLevel: 0, consented: false })).toEqual([{ action: 'none' }]);
   });
 });

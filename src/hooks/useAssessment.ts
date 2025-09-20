@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dayjs from 'dayjs';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
@@ -71,6 +72,45 @@ const startResponseSchema = z.object({
   items: z.array(startItemSchema).min(1),
 });
 
+const normalizeSummary = (summary?: string | null): string => {
+  if (!summary) return '';
+  return summary
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+};
+
+const inferSubscaleLevelFromSummary = (
+  summary: string,
+  subscale: 'tension' | 'fatigue' | 'vigor',
+): number | undefined => {
+  const text = normalizeSummary(summary);
+  if (!text) return undefined;
+
+  if (subscale === 'tension') {
+    if (text.includes('surcharge')) return 4;
+    if (text.includes('tension marquee') || text.includes('tension presente')) return 3;
+    if (text.includes('humeur a surveiller')) return 2;
+    if (text.includes('nuances calmes') || text.includes('calme') || text.includes('detente')) return 1;
+    if (text.includes('horizon lumineux')) return 0;
+  }
+
+  if (subscale === 'fatigue') {
+    if (text.includes('fatigue forte') || text.includes('besoin de repos urgent')) return 4;
+    if (text.includes('fatigue presente') || text.includes('repos fragile')) return 3;
+    if (text.includes('stabilite') || text.includes('a surveiller')) return 2;
+    if (text.includes('energie douce') || text.includes('ressource')) return 1;
+  }
+
+  if (subscale === 'vigor') {
+    if (text.includes('elan faible') || text.includes('energie basse')) return 1;
+    if (text.includes('bonne forme') || text.includes('elan') || text.includes('energie')) return 3;
+    if (text.includes('radiant horizon') || text.includes('horizon lumineux')) return 4;
+  }
+
+  return undefined;
+};
+
 export type AnswerValue = string | number | boolean;
 
 export type AssessmentPhase = 'pre' | 'post';
@@ -118,6 +158,8 @@ export interface UseAssessmentResult {
   grantConsent: () => Promise<void>;
   declineConsent: () => Promise<void>;
   reset: () => void;
+  lastSubscaleLevel: (subscale: 'tension' | 'fatigue' | 'vigor') => number | undefined;
+  isDue: (phase: 'pre' | 'post', options?: { module?: string }) => boolean;
   lastLevel: number | null;
   lastSummary: string | null;
 }
@@ -415,6 +457,63 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
     callbacksRef.current = null;
   }, []);
 
+  const lastSubscaleLevel = useCallback(
+    (subscale: 'tension' | 'fatigue' | 'vigor') => {
+      const summary = state.lastComputation?.summary;
+      if (summary) {
+        const inferred = inferSubscaleLevelFromSummary(summary, subscale);
+        if (typeof inferred === 'number') {
+          return inferred;
+        }
+      }
+      return state.lastComputation?.level ?? undefined;
+    },
+    [state.lastComputation],
+  );
+
+  const isDue = useCallback<UseAssessmentResult['isDue']>(
+    (phase) => {
+      if (!state.canDisplay || !state.isFlagEnabled || !state.hasConsent) {
+        return false;
+      }
+
+      const lastCompletedAt = state.lastCompletedAt;
+      if (!lastCompletedAt) {
+        return true;
+      }
+
+      const last = dayjs(lastCompletedAt);
+      if (!last.isValid()) {
+        return true;
+      }
+
+      if (phase === 'pre') {
+        return dayjs().diff(last, 'hour', true) >= 6;
+      }
+
+      if (phase === 'post') {
+        return dayjs().diff(last, 'minute', true) >= 30;
+      }
+
+      return false;
+    },
+    [state.canDisplay, state.hasConsent, state.isFlagEnabled, state.lastCompletedAt],
+  );
+
+  return useMemo<UseAssessmentResult>(() => ({
+    instrument,
+    state,
+    isEligible: state.canDisplay,
+    start,
+    triggerAssessment,
+    submit,
+    submitResponse: submit,
+    grantConsent,
+    declineConsent,
+    reset,
+    lastSubscaleLevel,
+    isDue,
+  }), [declineConsent, grantConsent, instrument, start, state, submit, triggerAssessment, reset, lastSubscaleLevel, isDue]);
   const isDue = useCallback(
     (phase: AssessmentPhase) => {
       if (!state.canDisplay) {
