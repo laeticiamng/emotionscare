@@ -11,6 +11,9 @@ export type SessionType =
   | 'grit'
   | 'bubble'
   | 'custom'
+  | 'community'
+  | 'social_cocon'
+  | 'auras'
 
 export type SessionRecord = {
   id: string

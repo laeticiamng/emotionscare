@@ -51,23 +51,17 @@ test.describe('B2B monthly text-only reports', () => {
               period: '2024-03',
               text: 'Le collectif respire calmement. La coopération apaise les tensions. Quelques signaux de fatigue partagée.',
               action: 'Ouvrir un check-in calme pour déposer ce qui pèse.',
-              signature: 'hmac::demo:wemwbs',
-              n: 12,
             },
             {
               instrument: 'CBI',
               period: '2024-03',
               text: 'Les équipes évoquent une charge soutenable à surveiller. La fatigue reste diffuse mais gérable en duo.',
               action: 'Prévoir une pause respiration partagée en équipe.',
-              signature: 'hmac::demo:cbi',
-              n: 12,
             },
             {
               instrument: 'UWES',
               period: '2024-03',
               text: 'Un élan d’engagement demeure grâce aux rituels de soutien et aux temps d’écoute partagés.',
-              signature: 'hmac::demo:uwes',
-              n: 9,
             },
           ],
         }),
@@ -99,14 +93,14 @@ test.describe('B2B monthly text-only reports', () => {
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByRole('button', { name: /Exporter CSV signé/i }).click(),
+      page.getByRole('button', { name: /Exporter le récit \(texte\)/i }).click(),
     ]);
 
     const csvContent = await downloadToString(download);
-    expect(csvContent).toContain('period,instrument,text_summary,n,signature');
+    expect(csvContent).toContain('period,instrument,text_summary,action');
     expect(csvContent).toContain('"2024-03"');
-    expect(csvContent).toContain('"hmac::demo:cbi"');
-    expect(csvContent).not.toContain('Equipe');
+    expect(csvContent).toContain('"Prévoir une pause respiration partagée en équipe."');
+    expect(csvContent).not.toContain(',n,');
 
     expect(consoleWarnings).toEqual([]);
   });

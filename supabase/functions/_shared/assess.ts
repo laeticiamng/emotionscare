@@ -483,29 +483,6 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
   return summaries[instrument]?.[level] || 'état évalué';
 }
 
-export function sanitizeAggregateText(text: string): string {
-  const cleaned = text
-    // Replace numerical hints (with optional decimal separators and %)
-    .replace(/\d+(?:[.,]\d+)?\s*%?/g, '•')
-    // Remove explicit scoring vocabulary that could hint at raw values
-    .replace(/score|niveau|points?/gi, '')
-    // Normalise spacing around bullet markers
-    .replace(/\s*•\s*/g, ' • ')
-    // Collapse extraneous whitespace
-    .replace(/\s+/g, ' ')
-    // Avoid spaces before punctuation following bullets
-    .replace(/• (?=[\.,])/g, '•')
-    .trim();
-
-
-
-  if (!cleaned) {
-    return '';
-  }
-
-  return cleaned.startsWith('•') ? cleaned : `• ${cleaned}`;
-}
-
 export function sanitizeSummaryText(text: string): string {
   const cleaned = text
     .replace(/\d+(?:[.,]\d+)?%?/g, '')

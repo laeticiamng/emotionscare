@@ -8,7 +8,7 @@ Ce document synthétise les choix d'interface et de tonalité utilisés par la h
 - **Table** : `public.org_assess_rollups`
 - **Instruments agrégés** : `WEMWBS`, `SWEMWBS`, `CBI`, `UWES`
 - **Périodes** : mois courant + deux mois glissants précédents (format `YYYY-MM`)
-- **Seuil de confidentialité** : `n ≥ 5` côté base + filtrage front. Les cellules sous le seuil affichent le badge `Insuffisant`.
+- **Seuil de confidentialité** : `n ≥ 5` appliqué en base via RLS ; aucune donnée n’est renvoyée sous le seuil.
 
 ## Palette verbale et actions
 
@@ -29,19 +29,19 @@ Ce document synthétise les choix d'interface et de tonalité utilisés par la h
 - **Navigation** : grille clavier via `role="table"`, focus `focus-visible`.
 - **Réduction des animations** : respect de `prefers-reduced-motion`.
 - **Impression** : feuille `@media print` (`src/styles/print-b2b.css`) optimise marges, couleurs et titres pour un export A4/A3.
-- **Export** : bouton PNG uniquement (jamais de CSV).
+- **Export** : boutons PNG et CSV texte (uniquement des phrases, jamais de chiffres).
 
 ## Observabilité
 
 - Breadcrumbs Sentry :
   - `b2b:heatmap:view` lors de l’ouverture de la page.
   - `assess:aggregate:call` (start/success/error) pour chaque requête Edge.
-- Tag Sentry : `min_n_pass` défini à `true` si aucun agrégat sous le seuil n’est reçu, sinon `false`.
+- Tag Sentry : `b2b_text_only` fixé à `true` lorsque la réponse ne contient que des phrases (sans chiffres).
 
 ## Feature flags
 
 - `FF_B2B_RH` doit être actif pour afficher la heatmap.
-- `FF_ASSESS_AGGREGATE` doit être actif pour déclencher l’appel Edge.
+- `FF_B2B_AGGREGATES` doit être actif pour déclencher l’appel Edge.
 
 ## Bonnes pratiques
 

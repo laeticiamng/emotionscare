@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 const loadAssessModule = async () => {
-  return await import('../../supabase/functions/_shared/assess.ts');
+  const assess = await import('../../supabase/functions/_shared/assess.ts');
+  const clinicalText = await import('../../supabase/functions/_shared/clinical_text.ts');
+  return { ...assess, ...clinicalText };
 };
 
 test.describe('Clinical adaptation signals', () => {

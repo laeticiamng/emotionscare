@@ -8,8 +8,6 @@ const baseSummary = (text: string, overrides: Partial<AggregateSummary> = {}): A
   text,
   team: undefined,
   action: undefined,
-  n: 12,
-  signature: 'signed',
   ...overrides,
 });
 
