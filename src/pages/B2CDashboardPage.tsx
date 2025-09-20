@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import RecentEmotionScansWidget from '@/components/dashboard/widgets/RecentEmotionScansWidget';
 import JournalSummaryCard from '@/components/dashboard/widgets/JournalSummaryCard';
+import Who5WeeklyInvitation from '@/components/dashboard/widgets/Who5WeeklyInvitation';
 import { 
   Brain, 
   Music, 
@@ -98,6 +99,14 @@ export default function B2CDashboardPage() {
             Découvrez vos outils d'intelligence émotionnelle personnalisés
           </p>
         </header>
+
+        {/* Rituel hebdomadaire WHO-5 */}
+        <section aria-labelledby="who5-section" className="mb-8">
+          <h2 id="who5-section" className="sr-only">
+            Invitation hebdomadaire WHO-5
+          </h2>
+          <Who5WeeklyInvitation />
+        </section>
 
         {/* Statistiques rapides */}
         <section aria-labelledby="stats-title" className="mb-8">
