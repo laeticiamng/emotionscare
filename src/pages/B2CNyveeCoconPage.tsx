@@ -75,6 +75,8 @@ const MOOD_OUTCOMES: {
     journal: 'Je ressens encore de la tension après le cocon et je prendrai un autre temps pour moi.',
   },
 ];
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 const NyveeCocon: React.FC = () => {
   const navigate = useNavigate();
@@ -611,7 +613,20 @@ const NyveeCocon: React.FC = () => {
         ))}
       </div>
 
-      <div className="relative z-10 mx-auto max-w-2xl">
+      <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+        {stai6Consent.shouldPrompt && (
+          <ClinicalOptIn
+            title="Activer l'évaluation STAI-6"
+            description="Ces quelques questions nous aident à déclencher le cocon quand l'anxiété monte. Votre choix est mémorisé et peut être changé plus tard."
+            acceptLabel="Oui, personnaliser"
+            declineLabel="Non merci"
+            onAccept={stai6Consent.grantConsent}
+            onDecline={stai6Consent.declineConsent}
+            isProcessing={stai6Consent.isSaving}
+            error={stai6Consent.error}
+            className="bg-white/10 border-white/20 backdrop-blur-md"
+          />
+        )}
         <AnimatePresence mode="wait">
           {sessionState === 'intro' && (
             <motion.div
