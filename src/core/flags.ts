@@ -20,6 +20,7 @@ interface FeatureFlags {
   FF_ASSESS_MSPSS: boolean;
   FF_ASSESS_AAQ2: boolean;
   FF_ASSESS_POMS: boolean;
+  FF_ASSESS_POMS_TENSION: boolean;
   FF_ASSESS_SSQ: boolean;
   FF_ASSESS_ISI: boolean;
   FF_ASSESS_GAS: boolean;
@@ -55,6 +56,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_MSPSS: false,
   FF_ASSESS_AAQ2: false,
   FF_ASSESS_POMS: false,
+  FF_ASSESS_POMS_TENSION: false,
   FF_ASSESS_SSQ: false,
   FF_ASSESS_ISI: false,
   FF_ASSESS_GAS: false,

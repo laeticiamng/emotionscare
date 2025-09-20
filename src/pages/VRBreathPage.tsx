@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import * as Sentry from '@sentry/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Play, 
+import {
+  Play,
   Pause, 
   RotateCcw, 
   ArrowLeft,
@@ -21,7 +22,10 @@ import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { VRSafetyCheck } from '@/components/vr/VRSafetyCheck';
+import VRModeControls from '@/components/vr/VRModeControls';
+import { useVRPerformanceGuard } from '@/hooks/useVRPerformanceGuard';
 import { useVRSafetyStore } from '@/store/vrSafety.store';
+import { createSession } from '@/services/sessions/sessionsApi';
 
 interface CosmicBreathSession {
   id: string;
@@ -74,10 +78,97 @@ const cosmicSessions: CosmicBreathSession[] = [
 const VRBreathPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { play, pause } = useMusic();
-  const { particleMode, fallbackEnabled, prefersReducedMotion } = useVRSafetyStore();
+  const { play, pause, setVolume } = useMusic();
+  const particleMode = useVRSafetyStore((state) => state.particleMode);
+  const fallbackEnabled = useVRSafetyStore((state) => state.fallbackEnabled);
+  const prefersReducedMotion = useVRSafetyStore((state) => state.prefersReducedMotion);
+  const modePreference = useVRSafetyStore((state) => state.modePreference);
+  const nextAutoMode = useVRSafetyStore((state) => state.nextAutoMode);
+  const lowPerformance = useVRSafetyStore((state) => state.lowPerformance);
+  const lastPOMSTone = useVRSafetyStore((state) => state.lastPOMSTone);
+  const allowExtensionCTA = useVRSafetyStore((state) => state.allowExtensionCTA);
+  const lastSSQSummary = useVRSafetyStore((state) => state.lastSSQSummary);
+  const lastPOMSSummary = useVRSafetyStore((state) => state.lastPOMSSummary);
+  const ssqHintUsed = useVRSafetyStore((state) => state.ssqHintUsed);
+  const pomsHintUsed = useVRSafetyStore((state) => state.pomsHintUsed);
 
-  const allowMotion = !prefersReducedMotion && !fallbackEnabled;
+  useVRPerformanceGuard('vr_breath');
+
+  const [sessionStartedAt, setSessionStartedAt] = useState<number | null>(null);
+  const audioFadeTimeoutRef = useRef<number | null>(null);
+
+  const activeMode = useMemo(() => {
+    if (prefersReducedMotion) return 'vr_soft' as const;
+    if (modePreference === '2d') return '2d' as const;
+    if (modePreference === 'soft') return 'vr_soft' as const;
+    if (fallbackEnabled || lowPerformance || nextAutoMode === '2d') return '2d' as const;
+    if (nextAutoMode === 'vr_soft') return 'vr_soft' as const;
+    return 'vr' as const;
+  }, [prefersReducedMotion, modePreference, fallbackEnabled, lowPerformance, nextAutoMode]);
+
+  const allowMotion = activeMode === 'vr';
+  const visualParticleMode = activeMode === '2d'
+    ? 'minimal'
+    : lastPOMSTone === 'tense'
+      ? 'soft'
+      : particleMode;
+  const enableParticles = activeMode !== '2d' && visualParticleMode !== 'minimal';
+  const adaptiveSessions = useMemo(() => (
+    cosmicSessions.map((session) => {
+      if (lastPOMSTone === 'tense') {
+        const shortened = Math.max(90, Math.round(session.duration * 0.75));
+        return { ...session, duration: shortened };
+      }
+      return session;
+    })
+  ), [lastPOMSTone]);
+  const persistSession = useCallback((durationSec: number) => {
+    if (!Number.isFinite(durationSec) || durationSec <= 0) {
+      return;
+    }
+    const modeLabel = activeMode === '2d' ? '2D' : activeMode === 'vr_soft' ? 'VR_soft' : 'VR';
+    const meta = {
+      module: 'vr_breath',
+      mode: modeLabel,
+      motion_profile: activeMode === 'vr' ? 'immersif' : activeMode === 'vr_soft' ? 'doux' : '2d',
+      ssq_hint_text: lastSSQSummary ?? 'non communiqué',
+      mood_delta_text: lastPOMSSummary ?? 'ressenti neutre',
+    } as Record<string, string>;
+
+    void createSession({
+      type: 'vr_breath',
+      duration_sec: Math.max(1, Math.round(durationSec)),
+      mood_delta: null,
+      meta,
+    }).catch((error) => {
+      console.error('[VRBreath] unable to persist session', error);
+    });
+  }, [activeMode, lastPOMSSummary, lastSSQSummary]);
+
+  useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: 'vr',
+      message: 'vr:enter',
+      level: 'info',
+      data: { module: 'vr_breath' },
+    });
+    return () => {
+      Sentry.addBreadcrumb({
+        category: 'vr',
+        message: 'vr:exit',
+        level: 'info',
+        data: { module: 'vr_breath' },
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    Sentry.configureScope((scope) => {
+      scope.setTag('motion_safe', activeMode !== 'vr' ? 'enabled' : 'standard');
+      scope.setTag('ssq_hint_used', ssqHintUsed ? 'yes' : 'no');
+      scope.setTag('poms_hint_used', pomsHintUsed ? 'yes' : 'no');
+    });
+  }, [activeMode, ssqHintUsed, pomsHintUsed]);
   
   // Get optimized universe config
   const universe = getOptimizedUniverse('vrBreath');
@@ -100,9 +191,9 @@ const VRBreathPage: React.FC = () => {
   const phaseIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Optimized animations
-  const particleCountForAnimation = particleMode === 'standard' ? 6 : particleMode === 'soft' ? 3 : 0;
+  const particleCountForAnimation = visualParticleMode === 'standard' ? 6 : visualParticleMode === 'soft' ? 3 : 0;
   const { entranceVariants, breathingVariants, cleanupAnimation } = useOptimizedAnimation({
-    enableComplexAnimations: allowMotion && particleMode !== 'minimal',
+    enableComplexAnimations: allowMotion && visualParticleMode !== 'minimal',
     particleCount: particleCountForAnimation,
     useCSSAnimations: true,
   });
@@ -118,6 +209,10 @@ const VRBreathPage: React.FC = () => {
       cleanupAnimation();
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (phaseIntervalRef.current) clearInterval(phaseIntervalRef.current);
+      if (audioFadeTimeoutRef.current) {
+        clearTimeout(audioFadeTimeoutRef.current);
+        audioFadeTimeoutRef.current = null;
+      }
     };
   }, [cleanupAnimation]);
 
@@ -138,44 +233,81 @@ const VRBreathPage: React.FC = () => {
         if (intervalRef.current) clearInterval(intervalRef.current);
       };
     }
-  }, [isActive, selectedSession]);
+  }, [isActive, selectedSession, stopSession]);
 
   useEffect(() => {
     if (isActive && selectedSession && currentPhase !== 'idle') {
       runBreathingCycle();
     }
-  }, [isActive, selectedSession, currentCycle]);
+  }, [isActive, selectedSession, currentCycle, currentPhase, runBreathingCycle]);
 
   const startSession = (session: CosmicBreathSession) => {
-    setSelectedSession(session);
-    setTimeRemaining(session.duration);
+    const sessionToStart = { ...session };
+    setSelectedSession(sessionToStart);
+    setTimeRemaining(sessionToStart.duration);
     setCurrentCycle(0);
     setCurrentPhase('inhale');
-    setPhaseTimer(session.inhaleTime);
+    setPhaseTimer(sessionToStart.inhaleTime);
     setIsActive(true);
     setShowSafetyCheck(false);
+    setSessionStartedAt(Date.now());
+
+    if (audioFadeTimeoutRef.current) {
+      clearTimeout(audioFadeTimeoutRef.current);
+      audioFadeTimeoutRef.current = null;
+    }
 
     // Start ambient music
-    play();
-    
+    void play().then(() => {
+      if (typeof window === 'undefined') return;
+      if (lastPOMSTone === 'tense') {
+        setVolume(0.45);
+        audioFadeTimeoutRef.current = window.setTimeout(() => {
+          setVolume(0.65);
+          audioFadeTimeoutRef.current = null;
+        }, 5000);
+      } else if (lastPOMSTone === 'soothed') {
+        setVolume(0.75);
+      } else {
+        setVolume(0.7);
+      }
+    }).catch((error) => {
+      console.warn('[VRBreath] audio start skipped', error);
+    });
+
     toast({
       title: "Voyage cosmique commencé",
-      description: "Laisse ton souffle guider les étoiles",
+      description: activeMode === '2d'
+        ? 'Version douce activée pour préserver ton confort.'
+        : "Laisse ton souffle guider les étoiles",
     });
   };
 
-  const stopSession = () => {
+  const stopSession = useCallback(() => {
     setIsActive(false);
     setCurrentCycle(0);
     setCurrentPhase('idle');
     setPhaseTimer(0);
-    
+
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (phaseIntervalRef.current) clearInterval(phaseIntervalRef.current);
-    
+    if (audioFadeTimeoutRef.current) {
+      clearTimeout(audioFadeTimeoutRef.current);
+      audioFadeTimeoutRef.current = null;
+    }
+
+    if (sessionStartedAt) {
+      const elapsedMs = Date.now() - sessionStartedAt;
+      persistSession(elapsedMs / 1000);
+    }
+    setSessionStartedAt(null);
+
+    pause();
+    setVolume(0.7);
+
     // Show constellation reward
     setShowReward(true);
-  };
+  }, [pause, persistSession, sessionStartedAt, setVolume]);
 
   const pauseSession = () => {
     setIsActive(!isActive);
@@ -183,7 +315,7 @@ const VRBreathPage: React.FC = () => {
     if (phaseIntervalRef.current) clearInterval(phaseIntervalRef.current);
   };
 
-  const runBreathingCycle = () => {
+  const runBreathingCycle = useCallback(() => {
     if (!selectedSession || currentCycle >= selectedSession.cycles) {
       stopSession();
       return;
@@ -221,7 +353,7 @@ const VRBreathPage: React.FC = () => {
         return prev - 1;
       });
     }, 1000);
-  };
+  }, [currentCycle, selectedSession, stopSession]);
 
   const handleRewardComplete = () => {
     setShowReward(false);
@@ -268,14 +400,14 @@ const VRBreathPage: React.FC = () => {
       universe={universe}
       isEntering={isEntering}
       onEnterComplete={handleUniverseEnterComplete}
-      enableParticles={particleMode !== 'minimal' && !prefersReducedMotion}
+      enableParticles={enableParticles}
       enableAmbianceSound={false}
-      particleDensity={particleMode}
+      particleDensity={visualParticleMode}
       className="min-h-screen"
     >
       {/* Header - Optimized */}
       <header className="relative z-50 p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             to="/app"
             className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors"
@@ -284,14 +416,15 @@ const VRBreathPage: React.FC = () => {
             <span className="font-medium">Retour</span>
           </Link>
 
-          <div className="flex items-center space-x-2 text-white">
-            <Star className="h-6 w-6" />
-            <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
-            {fallbackEnabled && (
+          <div className="flex flex-col items-end gap-2 text-white">
+            <div className="flex items-center gap-2">
+              <Star className="h-6 w-6" />
+              <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
               <Badge variant="secondary" className="bg-white/10 text-white/70 border-white/20">
-                Mode doux actif
+                {activeMode === '2d' ? 'Version 2D' : activeMode === 'vr_soft' ? 'Mode doux' : 'Mode immersif'}
               </Badge>
-            )}
+            </div>
+            <VRModeControls className="justify-end" />
           </div>
         </div>
       </header>
@@ -319,15 +452,37 @@ const VRBreathPage: React.FC = () => {
                 >
                   <Sparkles className="h-10 w-10 text-white" />
                 </motion.div>
-                
+
                 <h2 className="text-4xl font-light text-white tracking-wide">
                   Voyages Respiratoires
                 </h2>
                 <p className="text-xl text-white/70 max-w-2xl mx-auto font-light">
-                  Ton souffle fait vibrer les étoiles. Choisis ton voyage cosmique et laisse 
+                  Ton souffle fait vibrer les étoiles. Choisis ton voyage cosmique et laisse
                   les constellations s'aligner avec ton rythme intérieur.
                 </p>
               </div>
+
+              {allowExtensionCTA && (
+                <div className="flex justify-center">
+                  <Button
+                    variant="outline"
+                    className="bg-white/10 text-white border-white/30 hover:bg-white/20"
+                    onClick={() => startSession({
+                      id: 'gentle-extension',
+                      name: 'Encore une minute',
+                      duration: 60,
+                      inhaleTime: 4,
+                      holdTime: 1,
+                      exhaleTime: 4,
+                      cycles: 6,
+                      description: 'Une minute supplémentaire très douce pour prolonger le calme.',
+                      constellation: 'Halo apaisé',
+                    })}
+                  >
+                    Encore 1 min
+                  </Button>
+                </div>
+              )}
 
               <VRSafetyCheck
                 open={showSafetyCheck}
@@ -338,7 +493,7 @@ const VRBreathPage: React.FC = () => {
 
               {/* Sessions Grid */}
               <div className="grid gap-8 md:grid-cols-3 max-w-6xl mx-auto">
-                {cosmicSessions.map((session, index) => (
+                {adaptiveSessions.map((session, index) => (
                   <motion.div
                     key={session.id}
                     initial={allowMotion ? { opacity: 0, y: 30 } : { opacity: 1 }}
