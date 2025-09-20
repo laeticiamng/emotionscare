@@ -420,6 +420,7 @@ describe('assess-aggregate function', () => {
       headers: {
         'content-type': 'application/json',
         origin: 'https://example.com',
+        authorization: 'Bearer token-123',
       },
       body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
     }));
@@ -447,7 +448,13 @@ describe('assess-aggregate function', () => {
       route: 'assess-aggregate',
       status: 200,
     }));
-    expect(supabaseClientMock).toHaveBeenCalledWith('https://example.supabase.co', 'service-role-key');
+    expect(supabaseClientMock).toHaveBeenCalledWith(
+      'https://example.supabase.co',
+      'anon-key',
+      expect.objectContaining({
+        global: { headers: { Authorization: 'Bearer token-123' } },
+      }),
+    );
     expect(fromMock).toHaveBeenCalledWith('org_assess_rollups');
   });
 
@@ -476,6 +483,7 @@ describe('assess-aggregate function', () => {
       headers: {
         'content-type': 'application/json',
         origin: 'https://example.com',
+        authorization: 'Bearer token-123',
       },
       body: JSON.stringify({ org_id: 'org-1', period: '2024-03', instruments: ['WHO5'] }),
     }));
@@ -485,6 +493,13 @@ describe('assess-aggregate function', () => {
       route: 'assess-aggregate',
       stage: 'db_read',
     }));
+    expect(supabaseClientMock).toHaveBeenCalledWith(
+      'https://example.supabase.co',
+      'anon-key',
+      expect.objectContaining({
+        global: { headers: { Authorization: 'Bearer token-123' } },
+      }),
+    );
   });
 
   it('enforces per-user rate limits', async () => {
@@ -518,6 +533,7 @@ describe('assess-aggregate function', () => {
       headers: {
         'content-type': 'application/json',
         origin: 'https://example.com',
+        authorization: 'Bearer token-123',
       },
       body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
     });
@@ -530,5 +546,12 @@ describe('assess-aggregate function', () => {
     const payload = await limited.json();
     expect(payload.error).toBe('rate_limited');
     expect(payload.retry_after).toBeGreaterThan(0);
+    expect(supabaseClientMock).toHaveBeenCalledWith(
+      'https://example.supabase.co',
+      'anon-key',
+      expect.objectContaining({
+        global: { headers: { Authorization: 'Bearer token-123' } },
+      }),
+    );
   });
 });

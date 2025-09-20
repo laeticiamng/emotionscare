@@ -22,7 +22,7 @@ const aggregateSchema = z.object({
 const ORG_ALLOWED_ROLES = ['b2b_admin', 'b2b_hr', 'b2b_user', 'admin'] as const;
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const CSV_SIGNING_SECRET = Deno.env.get('CSV_SIGNING_SECRET') ?? '';
 
 serve(async (req) => {
@@ -67,7 +67,7 @@ serve(async (req) => {
     );
   }
 
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.error('[assess-aggregate] missing Supabase configuration');
     const response = appendCorsHeaders(json(500, { error: 'configuration_error' }), cors);
     return finalize(
@@ -140,7 +140,13 @@ serve(async (req) => {
     }
 
     const { org_id: orgId, period, instruments } = parsed.data;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    const authHeader = req.headers.get('authorization');
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: {
+        headers: authHeader ? { Authorization: authHeader } : {},
+      },
+    });
 
     hashedOrgId = hash(orgId);
 
