@@ -16,8 +16,6 @@ const aggregateSummarySchema = z.object({
   text: z.string(),
   team: z.string().optional(),
   action: z.string().optional(),
-  n: z.number().optional(),
-  signature: z.string().nullable().optional(),
 });
 
 const aggregateResponseSchema = z.object({
@@ -36,8 +34,6 @@ export interface AggregateSummary {
   text: string;
   team?: string;
   action?: string;
-  n?: number;
-  signature?: string | null;
 }
 
 async function fetchAggregateSummaries({ orgId, period, instruments }: GetHeatmapParams): Promise<AggregateSummary[]> {
@@ -79,14 +75,13 @@ async function fetchAggregateSummaries({ orgId, period, instruments }: GetHeatma
       text: summary.text,
       team: summary.team,
       action: summary.action,
-      n: summary.n,
-      signature: summary.signature ?? null,
     }));
 
-    const hadBelowThreshold = summaries.some(entry => typeof entry.n === 'number' && entry.n < 5);
+    const textOnly = summaries.every(summary => typeof summary.text === 'string' && !/\d/.test(summary.text));
+    Sentry.setTag('b2b_text_only', textOnly ? 'true' : 'false');
+
     const cells = mapSummariesToCells(summaries);
 
-    Sentry.setTag('min_n_pass', hadBelowThreshold ? 'false' : 'true');
     Sentry.addBreadcrumb({
       category: 'assess:aggregate:call',
       message: 'success',
@@ -120,17 +115,16 @@ export async function getHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[
 }
 
 async function fetchHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[]> {
-  const summaries = await fetchAggregateSummaries(params);
-  return mapSummariesToCells(
-    summaries.map(summary => ({
-      instrument: summary.instrument,
-      period: summary.period,
-      text: summary.text,
-      team: summary.team,
-      action: summary.action,
-      n: summary.n,
-    })),
-  );
+    const summaries = await fetchAggregateSummaries(params);
+    return mapSummariesToCells(
+      summaries.map(summary => ({
+        instrument: summary.instrument,
+        period: summary.period,
+        text: summary.text,
+        team: summary.team,
+        action: summary.action,
+      })),
+    );
 }
 
 export async function getAggregateSummaries(params: GetHeatmapParams): Promise<AggregateSummary[]> {
