@@ -372,12 +372,23 @@ class ClinicalScoringService {
 
   async submitResponse(instrument: InstrumentCode, answers: Record<string, any>, metadata?: any): Promise<boolean> {
     try {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        throw userError;
+      }
+
+      const userId = userData?.user?.id;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
       const result = await this.calculateScore(instrument, answers);
-      
+
       // Store in assessments table
       const { error } = await supabase
         .from('assessments')
         .insert({
+          user_id: userId,
           instrument,
           score_json: {
             summary: result.summary_text,
@@ -394,12 +405,12 @@ class ClinicalScoringService {
         const { error: signalError } = await supabase
           .from('clinical_signals')
           .insert({
+            user_id: userId,
             source_instrument: instrument,
             domain: this.getDomain(instrument),
             level: result.level,
-            window_type: 'contextual',
             module_context: 'assessment_response',
-            metadata: { hints: result.orchestration_hints },
+            metadata: { hints: result.orchestration_hints, context: metadata },
             expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
           });
 

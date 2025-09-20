@@ -1431,7 +1431,6 @@ export type Database = {
           module_context: string
           source_instrument: string
           user_id: string
-          window_type: string
         }
         Insert: {
           created_at?: string | null
@@ -1443,7 +1442,6 @@ export type Database = {
           module_context: string
           source_instrument: string
           user_id: string
-          window_type: string
         }
         Update: {
           created_at?: string | null
@@ -1455,7 +1453,6 @@ export type Database = {
           module_context?: string
           source_instrument?: string
           user_id?: string
-          window_type?: string
         }
         Relationships: [
           {

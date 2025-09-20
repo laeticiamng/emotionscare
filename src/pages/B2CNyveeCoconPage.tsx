@@ -9,12 +9,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, Heart, Wind, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 const NyveeCocon: React.FC = () => {
   const navigate = useNavigate();
   const [sessionState, setSessionState] = useState<'intro' | 'breathing' | 'silence' | 'anchor' | 'complete'>('intro');
   const [timeRemaining, setTimeRemaining] = useState(360); // 6 minutes
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
+  const stai6Consent = useClinicalConsent('STAI6');
 
   // Protocole d'ancrage 5-4-3-2-1 pour l'agitation
   const anchorSteps = [
@@ -124,7 +127,20 @@ const NyveeCocon: React.FC = () => {
         ))}
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto">
+      <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+        {stai6Consent.shouldPrompt && (
+          <ClinicalOptIn
+            title="Activer l'évaluation STAI-6"
+            description="Ces quelques questions nous aident à déclencher le cocon quand l'anxiété monte. Votre choix est mémorisé et peut être changé plus tard."
+            acceptLabel="Oui, personnaliser"
+            declineLabel="Non merci"
+            onAccept={stai6Consent.grantConsent}
+            onDecline={stai6Consent.declineConsent}
+            isProcessing={stai6Consent.isSaving}
+            error={stai6Consent.error}
+            className="bg-white/10 border-white/20 backdrop-blur-md"
+          />
+        )}
         <AnimatePresence mode="wait">
           {sessionState === 'intro' && (
             <motion.div

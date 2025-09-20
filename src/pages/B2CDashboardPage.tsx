@@ -21,9 +21,11 @@ import {
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { useEffect } from 'react';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 export default function B2CDashboardPage() {
   const { runAudit } = useAccessibilityAudit();
+  const who5Consent = useClinicalConsent('WHO5');
 
   useEffect(() => {
     // Audit d'accessibilité en développement
@@ -107,6 +109,7 @@ export default function B2CDashboardPage() {
           </h2>
           <Who5WeeklyInvitation />
         </section>
+
 
         {/* Statistiques rapides */}
         <section aria-labelledby="stats-title" className="mb-8">
