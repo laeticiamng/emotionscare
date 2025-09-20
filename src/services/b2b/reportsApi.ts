@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
 import { logger } from '@/lib/logger';
 import { performanceMonitor } from '@/lib/performance/performanceMonitor';
-import type { HeatmapCell, HeatmapCellInput } from '@/features/b2b/reports/utils';
+import type { HeatmapCell } from '@/features/b2b/reports/utils';
 import { mapSummariesToCells } from '@/features/b2b/reports/utils';
 
 const DEFAULT_INSTRUMENTS = ['WEMWBS', 'SWEMWBS', 'CBI', 'UWES'] as const;
@@ -17,6 +17,7 @@ const aggregateSummarySchema = z.object({
   team: z.string().optional(),
   action: z.string().optional(),
   n: z.number().optional(),
+  signature: z.string().nullable().optional(),
 });
 
 const aggregateResponseSchema = z.object({
@@ -29,7 +30,17 @@ interface GetHeatmapParams {
   instruments?: string[];
 }
 
-async function fetchHeatmap({ orgId, period, instruments }: GetHeatmapParams): Promise<HeatmapCell[]> {
+export interface AggregateSummary {
+  instrument: string;
+  period: string;
+  text: string;
+  team?: string;
+  action?: string;
+  n?: number;
+  signature?: string | null;
+}
+
+async function fetchAggregateSummaries({ orgId, period, instruments }: GetHeatmapParams): Promise<AggregateSummary[]> {
   const payload = {
     org_id: orgId,
     period,
@@ -62,13 +73,14 @@ async function fetchHeatmap({ orgId, period, instruments }: GetHeatmapParams): P
       throw new Error('aggregate_payload_invalid');
     }
 
-    const summaries: HeatmapCellInput[] = parsed.data.summaries.map(summary => ({
+    const summaries: AggregateSummary[] = parsed.data.summaries.map(summary => ({
       instrument: summary.instrument,
       period: summary.period,
       text: summary.text,
       team: summary.team,
       action: summary.action,
       n: summary.n,
+      signature: summary.signature ?? null,
     }));
 
     const hadBelowThreshold = summaries.some(entry => typeof entry.n === 'number' && entry.n < 5);
@@ -80,9 +92,8 @@ async function fetchHeatmap({ orgId, period, instruments }: GetHeatmapParams): P
       message: 'success',
       level: 'info',
       data: {
-        instruments: cells.map(cell => cell.instrument),
-        teams: Array.from(new Set(cells.map(cell => cell.team ?? 'org'))),
-        period,
+        instruments: summaries.map(summary => summary.instrument),
+        teams: Array.from(new Set(summaries.map(summary => summary.team ?? 'org'))),
       },
     });
 
@@ -91,7 +102,7 @@ async function fetchHeatmap({ orgId, period, instruments }: GetHeatmapParams): P
       logger.debug('b2b_heatmap_fetch_latency', { duration }, 'b2b.reports');
     }
 
-    return cells;
+    return summaries;
   } catch (error) {
     Sentry.addBreadcrumb({
       category: 'assess:aggregate:call',
@@ -108,6 +119,22 @@ export async function getHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[
   return fetchHeatmap(params);
 }
 
+async function fetchHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[]> {
+  const summaries = await fetchAggregateSummaries(params);
+  return mapSummariesToCells(
+    summaries.map(summary => ({
+      instrument: summary.instrument,
+      period: summary.period,
+      text: summary.text,
+      team: summary.team,
+      action: summary.action,
+      n: summary.n,
+    })),
+  );
+}
+
+export async function getAggregateSummaries(params: GetHeatmapParams): Promise<AggregateSummary[]> {
+  return fetchAggregateSummaries(params);
 interface HeatmapMatrixParams extends UseHeatmapParams {
   periods: string[];
 }
@@ -194,5 +221,53 @@ export function useHeatmap(
   });
 }
 
+type AggregateSummaryQueryKey = [
+  'b2b-report-summaries',
+  string | undefined,
+  string | undefined,
+  string,
+];
+
+type AggregateSummaryQueryOptions = Omit<
+  UseQueryOptions<AggregateSummary[], Error, AggregateSummary[], AggregateSummaryQueryKey>,
+  'queryKey' | 'queryFn'
+>;
+
+interface UseAggregateSummariesParams {
+  orgId?: string;
+  period?: string;
+  instruments?: string[];
+}
+
+export function useAggregateSummaries(
+  { orgId, period, instruments }: UseAggregateSummariesParams,
+  options?: AggregateSummaryQueryOptions,
+): UseQueryResult<AggregateSummary[], Error> {
+  const sortedInstruments = instruments && instruments.length > 0 ? [...instruments].sort() : undefined;
+  const instrumentsKey = sortedInstruments?.join('|') ?? 'all';
+  const isEnabled = Boolean(orgId && period) && (options?.enabled ?? true);
+
+  return useQuery<AggregateSummary[], Error, AggregateSummary[], AggregateSummaryQueryKey>({
+    queryKey: ['b2b-report-summaries', orgId, period, instrumentsKey],
+    staleTime: 120_000,
+    refetchOnWindowFocus: false,
+    ...(options ?? {}),
+    enabled: isEnabled,
+    queryFn: async () => {
+      if (!orgId || !period) {
+        return [];
+      }
+
+      const start = typeof performance !== 'undefined' ? performance.now() : null;
+      const summaries = await fetchAggregateSummaries({ orgId, period, instruments: sortedInstruments });
+      if (start != null && typeof performance !== 'undefined') {
+        performanceMonitor.recordMetric('b2b_reports.fetch_latency', performance.now() - start);
+      }
+      return summaries;
+    },
+  });
+}
+
 export { DEFAULT_INSTRUMENTS };
 export type { HeatmapCell };
+export type { AggregateSummary };

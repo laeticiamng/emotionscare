@@ -741,6 +741,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/reports'],
   },
   {
+    name: 'admin-reports-period',
+    path: '/app/reports/:period',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BReportDetailPage',
+    guard: true,
+  },
+  {
     name: 'admin-events',
     path: '/app/events',
     segment: 'manager',

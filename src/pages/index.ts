@@ -57,6 +57,7 @@ export { default as B2BSelectionPage } from './B2BSelectionPage';
 export { default as B2BEntreprisePage } from './B2BEntreprisePage';
 export { default as B2BSocialCoconPage } from './B2BSocialCoconPage';
 export { default as B2BReportsPage } from './B2BReportsPage';
+export { default as B2BReportDetailPage } from './B2BReportDetailPage';
 export { default as B2BReportsHeatmapPage } from './b2b/reports';
 export { default as B2BEventsPage } from './B2BEventsPage';
 export { default as B2BUserCoachPage } from './b2b/user/CoachPage';

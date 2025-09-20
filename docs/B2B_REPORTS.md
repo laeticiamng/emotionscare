@@ -44,3 +44,18 @@
 - La philosophie « texte uniquement + min_n ≥ 5 » est matérialisée dans l’UI et rappelée dans le footer.
 - Aucun lien vers des vues individuelles ; pas de tri par équipe « meilleure/pire ».
 - Le bouton Export génère un PNG autonome respectant le thème impression (fond blanc). `window.print()` applique les styles CSS d’impression.
+
+## Récits mensuels (FF_B2B_REPORTS)
+
+- **Structure** : trois sections maximum — tendance douce, leviers ayant aidé, pistes à explorer (actions concrètes).
+- **Génération** : `generateMonthlyNarrative` transforme les agrégats WEMWBS/SWEMWBS, CBI, UWES en récit humain sans métriques, en s’appuyant sur des mots-clés positifs/attentifs.
+- **Actions** : deux recommandations maximum, vocabulaire sans chiffres, pensées comme micro-gestes accessibles.
+- **Observabilité** : breadcrumbs `b2b:reports:view` (list/detail) et `b2b:reports:export_csv` avec `signed=true`.
+- **Partage** : lien staff suffixé `?share=staff`, meta `noindex`, bouton copie/`navigator.share`.
+
+## Export CSV signé
+
+- **Colonnes** : `period`, `instrument`, `text_summary`, `n` (uniquement si ≥5), `signature` HMAC (Edge `CSV_SIGNING_SECRET`).
+- **Flux** : téléchargement direct côté front, pas de stockage persistant. Signature calculée avec l’ID organisation hashé.
+- **Rétention conseillée** : les CSV partagés en interne doivent être purgés sous 24 h (recommandation RGPD interne).
+- **Sûreté** : aucun identifiant utilisateur, texte déjà aseptisé (`sanitizeAggregateText`).

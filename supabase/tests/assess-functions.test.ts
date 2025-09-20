@@ -48,6 +48,7 @@ const envStore: Record<string, string | undefined> = {
   SUPABASE_ANON_KEY: 'anon-key',
   SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
   CORS_ORIGINS: 'https://example.com',
+  CSV_SIGNING_SECRET: 'test-signing-secret',
 };
 
 function setDefaultAuthSuccess() {
@@ -90,6 +91,7 @@ beforeEach(() => {
   envStore.SUPABASE_ANON_KEY = 'anon-key';
   envStore.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
   envStore.CORS_ORIGINS = 'https://example.com';
+  envStore.CSV_SIGNING_SECRET = 'test-signing-secret';
   delete envStore.EDGE_RATE_LIMIT_ASSESS_START;
   delete envStore.EDGE_RATE_LIMIT_ASSESS_AGGREGATE;
   (globalThis as Record<string, unknown>).Deno = {
@@ -429,6 +431,8 @@ describe('assess-aggregate function', () => {
     expect(payload.summaries[0].text).not.toMatch(/\d/);
     expect(payload.summaries[0].text).not.toContain('%');
     expect(payload.summaries[0].text).toContain('•');
+    expect(payload.summaries[0].n).toBe(7);
+    expect(payload.summaries[0].signature).toMatch(/^[A-Za-z0-9_-]{10,}$/);
     expect(inMock).not.toHaveBeenCalled();
     expect(gteMock).toHaveBeenCalledWith('n', 5);
     expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
