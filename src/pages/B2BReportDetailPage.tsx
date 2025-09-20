@@ -57,7 +57,7 @@ const B2BReportDetailPage: React.FC = () => {
   const { toast } = useToast();
   const orgId = user?.user_metadata?.org_id as string | undefined;
   const orgName = (user?.user_metadata?.org_name as string | undefined) ?? 'Votre organisation';
-  const query = useAggregateSummaries({ orgId, period });
+  const query = useAggregateSummaries({ orgId, period }, { enabled: reportsEnabled });
 
   React.useEffect(() => {
     if (!reportsEnabled || !period) {
@@ -117,6 +117,17 @@ const B2BReportDetailPage: React.FC = () => {
   const handleExportCsv = React.useCallback(() => {
     if (!query.data || query.data.length === 0) {
       toast({ description: 'Aucun agrégat disponible pour cette période.', variant: 'destructive' });
+      return;
+    }
+    const unsignedSummaries = query.data.filter(summary => !summary.signature);
+    if (unsignedSummaries.length > 0) {
+      Sentry.addBreadcrumb({
+        category: 'b2b:reports:export_csv',
+        message: 'blocked_missing_signature',
+        level: 'warning',
+        data: { period, signed: false, missing: unsignedSummaries.length },
+      });
+      toast({ description: 'Signature manquante pour un agrégat, export indisponible.', variant: 'destructive' });
       return;
     }
     const csv = buildCsvContent(period, query.data);
