@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { useMood } from "@/contexts/MoodContext";
 import { getVibeEmoji, getVibeLabel, type MoodVibe } from "@/utils/moodVibes";
+import type { MoodPalette } from "@/utils/moodSignals";
 
 interface MoodDescriptor {
   title: string;
@@ -47,6 +48,9 @@ export interface CurrentMoodSnapshot {
   updatedAt: string;
   isLoading: boolean;
   hasError: boolean;
+  summary: string;
+  microGesture: string;
+  palette: MoodPalette;
 }
 
 export const useCurrentMood = (): CurrentMoodSnapshot => {
@@ -106,6 +110,9 @@ export const useCurrentMood = (): CurrentMoodSnapshot => {
     updatedAt: currentMood.timestamp,
     isLoading: currentMood.isLoading,
     hasError: Boolean(currentMood.error),
+    summary: currentMood.summary,
+    microGesture: currentMood.microGesture,
+    palette: currentMood.palette,
   };
 };
 

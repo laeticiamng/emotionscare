@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useMoodStore } from '@/hooks/useMood';
+import type { MoodPalette } from '@/utils/moodSignals';
 import type { MoodVibe } from '@/utils/moodVibes';
 
 interface MoodContextType {
@@ -10,6 +11,9 @@ interface MoodContextType {
     vibe: MoodVibe;
     isLoading: boolean;
     error: string | null;
+    summary: string;
+    microGesture: string;
+    palette: MoodPalette;
   };
   updateMood: (valence: number, arousal: number) => void;
   fetchCurrentMood: () => Promise<void>;
@@ -35,6 +39,9 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
       vibe: moodStore.vibe,
       isLoading: moodStore.isLoading,
       error: moodStore.error,
+      summary: moodStore.summary,
+      microGesture: moodStore.microGesture,
+      palette: moodStore.palette,
     },
     updateMood: moodStore.updateMood,
     fetchCurrentMood: moodStore.fetchCurrentMood,
