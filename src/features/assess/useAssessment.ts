@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
+import { addBreadcrumb } from '@/lib/obs/breadcrumb';
+
 import { startAssessment, submitAssessment, type AssessmentStartResponse } from './api';
 
 export type AssessmentStage = 'pre' | 'post';
@@ -127,9 +129,7 @@ export function useAssessment(instrument: string): UseAssessmentResult {
         const response = await startAssessment(instrument, { locale: 'fr', stage });
         const startedAt = new Date().toISOString();
 
-        Sentry.addBreadcrumb({
-          category: 'assess',
-          level: 'info',
+        addBreadcrumb('assess', {
           message: 'assessment:start',
           data: { instrument, stage },
         });
@@ -175,9 +175,7 @@ export function useAssessment(instrument: string): UseAssessmentResult {
         const response = await submitAssessment(instrument, answers, options?.ts);
         const submittedAt = new Date().toISOString();
 
-        Sentry.addBreadcrumb({
-          category: 'assess',
-          level: 'info',
+        addBreadcrumb('assess', {
           message: 'assessment:submit',
           data: { instrument, stage },
         });

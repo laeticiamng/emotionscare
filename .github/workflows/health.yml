@@ -1,0 +1,83 @@
+name: Health Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'URL de prévisualisation à sonder (ex: https://preview.example.com)'
+        required: false
+  deployment_status:
+    types: [success]
+
+jobs:
+  health:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Résoudre l'URL de prévisualisation
+        id: resolve
+        env:
+          PREVIEW_URL: ${{ github.event.deployment_status.environment_url }}
+          INPUT_URL: ${{ inputs.base_url }}
+        run: |
+          set -euo pipefail
+          BASE_URL="${PREVIEW_URL:-}"
+          if [ -z "$BASE_URL" ]; then
+            BASE_URL="${INPUT_URL:-}"
+          fi
+          if [ -z "$BASE_URL" ]; then
+            echo "Aucune URL de prévisualisation disponible (deployment_status.environment_url ou input base_url)." >&2
+            exit 1
+          fi
+          echo "base_url=${BASE_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Appeler /api/health
+        id: call
+        env:
+          BASE_URL: ${{ steps.resolve.outputs.base_url }}
+          HEALTH_KEY: ${{ secrets.EC_HEALTH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          URL="${BASE_URL%/}/api/health"
+          if [ -n "$HEALTH_KEY" ]; then
+            curl -sSf "$URL" -H "X-EC-Health-Key: $HEALTH_KEY" -o artifacts/health-check.json
+          else
+            curl -sSf "$URL" -o artifacts/health-check.json
+          fi
+          cat artifacts/health-check.json
+
+      - name: Publier l'artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-check
+          path: artifacts/health-check.json
+
+      - name: Vérifier les seuils de latence
+        run: |
+          set -euo pipefail
+          node <<'JS'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/health-check.json', 'utf8'));
+          const thresholds = { supabase_ms: 800, edge_ms: 600, storage_ms: 600 };
+          const failures = [];
+          for (const [key, limit] of Object.entries(thresholds)) {
+            const value = report[key];
+            if (typeof value !== 'number') {
+              failures.push(`${key} absent`);
+              continue;
+            }
+            if (value > limit) {
+              failures.push(`${key}=${value}ms (limite ${limit}ms)`);
+            }
+          }
+          if (report.status && report.status !== 'ok') {
+            failures.push(`status=${report.status}`);
+          }
+          if (failures.length > 0) {
+            console.error('Health check en échec:', failures.join(', '));
+            process.exit(1);
+          }
+          JS

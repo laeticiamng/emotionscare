@@ -7,6 +7,7 @@ import { applySecurityHeaders, json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
 import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
+import { traced } from '../_shared/otel.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 import { createClient } from '../_shared/supabase.ts';
@@ -52,13 +53,24 @@ async function ensureClinicalOptIn(userId: string, instrument: InstrumentCode): 
   }
 
   const client = createClient(supabaseUrl, serviceRoleKey);
-  const { data, error } = await client
-    .from('clinical_consents')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('instrument_code', instrument)
-    .eq('is_active', true)
-    .maybeSingle();
+  const { data, error } = await traced(
+    'supabase.query',
+    () =>
+      client
+        .from('clinical_consents')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('instrument_code', instrument)
+        .eq('is_active', true)
+        .maybeSingle(),
+    {
+      attributes: {
+        table: 'clinical_consents',
+        operation: 'select',
+        route: 'assess-start',
+      },
+    },
+  );
 
   if (error) {
     console.error('[assess-start] clinical consent lookup failed', { message: error.message });
