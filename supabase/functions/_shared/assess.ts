@@ -286,7 +286,38 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   'PSS10': {} as any,
   'UCLA3': {} as any,
   'MSPSS': {} as any,
-  'AAQ2': {} as any,
+  'AAQ2': {
+    'fr': {
+      code: 'AAQ2',
+      name: "Questionnaire d'acceptation et d'action", 
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: "Mes pensées difficiles m'empêchent d'avancer", type: 'scale', min: 1, max: 7 },
+        { id: '2', prompt: 'Je lutte contre mes sentiments désagréables', type: 'scale', min: 1, max: 7 },
+        { id: '3', prompt: 'Je suis dominé(e) par des souvenirs pénibles', type: 'scale', min: 1, max: 7 },
+        { id: '4', prompt: 'Je fais tout pour éviter mes émotions inconfortables', type: 'scale', min: 1, max: 7 },
+        { id: '5', prompt: 'Mes inquiétudes prennent toute la place', type: 'scale', min: 1, max: 7 },
+        { id: '6', prompt: 'Je me sens piégé(e) par mes émotions', type: 'scale', min: 1, max: 7 },
+        { id: '7', prompt: 'Je reste bloqué(e) dans des pensées douloureuses', type: 'scale', min: 1, max: 7 },
+      ],
+    },
+    'en': {
+      code: 'AAQ2',
+      name: 'Acceptance and Action Questionnaire II',
+      version: '1.0',
+      expiry_minutes: 30,
+      items: [
+        { id: '1', prompt: 'My difficult thoughts keep me from moving forward', type: 'scale', min: 1, max: 7 },
+        { id: '2', prompt: 'I struggle against unpleasant feelings', type: 'scale', min: 1, max: 7 },
+        { id: '3', prompt: 'Painful memories dominate my attention', type: 'scale', min: 1, max: 7 },
+        { id: '4', prompt: 'I do everything to avoid uncomfortable emotions', type: 'scale', min: 1, max: 7 },
+        { id: '5', prompt: 'My worries take up all the space', type: 'scale', min: 1, max: 7 },
+        { id: '6', prompt: 'I feel trapped by my emotions', type: 'scale', min: 1, max: 7 },
+        { id: '7', prompt: 'I stay stuck in painful thoughts', type: 'scale', min: 1, max: 7 },
+      ],
+    },
+  },
   'POMS': {} as any,
   'SSQ': {} as any,
   'ISI': {} as any,
@@ -347,11 +378,19 @@ export function summarizeAssessment(instrument: InstrumentCode, answers: Record<
   // Generate level and summary
   const level = determineLevel(instrument, totalScore, itemCount, subscaleScores);
   const summary = generateSummary(instrument, level);
+  const focus = instrument === 'AAQ2'
+    ? level >= 3
+      ? 'flexibility_rigide'
+      : level <= 1
+        ? 'flexibility_souple'
+        : 'flexibility_transition'
+    : undefined;
 
   return {
     summary,
     level,
-    scores: { total: totalScore, ...subscaleScores }
+    scores: { total: totalScore, ...subscaleScores },
+    ...(focus ? { focus } : {}),
   };
 }
 
@@ -383,6 +422,18 @@ function determineLevel(instrument: InstrumentCode, total: number, itemCount: nu
       if (valence >= 4) return 2; // Neutre
       if (valence >= 3) return 1; // Négatif
       return 0; // Très négatif
+
+    case 'AAQ2': {
+      if (!itemCount) {
+        return 2;
+      }
+      const average = total / itemCount;
+      if (average <= 2.5) return 0;
+      if (average <= 3.5) return 1;
+      if (average <= 4.5) return 2;
+      if (average <= 5.5) return 3;
+      return 4;
+    }
 
     default:
       return 2; // Neutral fallback
@@ -419,6 +470,13 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
       2: 'affect neutre',
       3: 'affect positif',
       4: 'affect rayonnant'
+    },
+    'AAQ2': {
+      0: 'plus de souplesse ressentie',
+      1: 'souplesse en progression',
+      2: 'souplesse fluctuante',
+      3: 'moment plus rigide',
+      4: 'rigidité marquée, soutien renforcé'
     }
   };
 

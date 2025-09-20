@@ -23,6 +23,7 @@ interface CoachPayload {
   mode: CoachMode;
   locale: CoachLocale;
   user_hash?: string;
+  flex_hint?: 'souple' | 'transition' | 'rigide';
 }
 
 interface ModelResult {
@@ -33,12 +34,46 @@ interface ModelResult {
 const encoder = new TextEncoder();
 const MAX_BODY_SIZE = 4000;
 
+async function hashIdentifier(value: string): Promise<string> {
+  if (!value) {
+    return '';
+  }
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(value);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest))
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function sanitizeCoachReply(text: string, locale: CoachLocale, hint?: CoachPayload['flex_hint']): string {
+  const withoutLineBreaks = typeof text === 'string' ? text.replace(/\s+/g, ' ') : '';
+  const withoutDigits = withoutLineBreaks.replace(/\d+/g, '').trim();
+  const words = withoutDigits.split(' ').filter(Boolean).slice(0, 7);
+  let result = words.join(' ').trim();
+
+  if (!result) {
+    if (locale === 'fr') {
+      result = hint === 'rigide' ? 'Je reste tout près de toi.' : 'Je t’écoute avec douceur.';
+    } else {
+      result = hint === 'rigide' ? 'I stay close with calm.' : 'I listen with warmth.';
+    }
+  }
+
+  if (!/[.!?]$/.test(result)) {
+    result = `${result}${locale === 'fr' ? '.' : '.'}`;
+  }
+
+  return result;
+}
+
 const payloadSchema = z.object({
   thread_id: z.string().min(6).max(120).optional(),
   message: z.string().min(1).max(2000),
   mode: z.enum(["b2c", "b2b"]).default("b2c"),
   locale: z.enum(["fr", "en"]).default("fr"),
   user_hash: z.string().min(32).max(128).optional(),
+  flex_hint: z.enum(["souple", "transition", "rigide"]).optional(),
 });
 
 const SELF_HARM_PATTERN = /(suicide|me tuer|me faire du mal|en finir|plus envie de vivre|kill myself|end my life)/i;
@@ -90,61 +125,113 @@ async function runModeration(message: string): Promise<boolean> {
   }
 }
 
-async function generateModelReply(payload: CoachPayload): Promise<ModelResult> {
-  const apiKey = Deno.env.get("OPENAI_API_KEY");
-  if (!apiKey) {
-    return { text: buildGenericFallback(payload.locale), model: "fallback" };
-  }
+async function generateAssistantReply(payload: CoachPayload): Promise<ModelResult> {
+  const fallback = sanitizeCoachReply(buildGenericFallback(payload.locale), payload.locale, payload.flex_hint);
 
   try {
-    const systemPrompt = buildSystemPrompt(payload.mode, payload.locale);
-    const userPrompt = buildUserPrompt(payload.message, payload.locale);
+    const systemPrompt = buildSystemPrompt(payload.mode, payload.locale, payload.flex_hint);
+    const userPrompt = buildUserPrompt(payload.message, payload.locale, payload.flex_hint);
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        temperature: 0.4,
-        max_output_tokens: 320,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
+    const { data: assistantData, error: assistantError } = await supabase.functions.invoke('assistant-api', {
+      body: { action: 'create_assistant', instructions: systemPrompt },
     });
 
-    if (!response.ok) {
-      console.warn("[ai-coach] model error", await response.text());
-      return { text: buildGenericFallback(payload.locale), model: "fallback" };
+    if (assistantError) {
+      throw assistantError;
     }
 
-    const data = await response.json();
-    const candidate = data?.choices?.[0]?.message?.content;
-    if (typeof candidate === "string" && candidate.trim().length > 0) {
-      return { text: candidate.trim(), model: data?.model ?? "gpt-4o-mini" };
+    const assistantId = assistantData?.assistant?.id as string | undefined;
+    if (!assistantId) {
+      throw new Error('assistant-id-missing');
     }
-    return { text: buildGenericFallback(payload.locale), model: "fallback" };
+
+    const { data: threadData, error: threadError } = await supabase.functions.invoke('assistant-api', {
+      body: { action: 'create_thread' },
+    });
+
+    if (threadError) {
+      throw threadError;
+    }
+
+    const threadId = threadData?.thread?.id as string | undefined;
+    if (!threadId) {
+      throw new Error('thread-id-missing');
+    }
+
+    const { error: messageError } = await supabase.functions.invoke('assistant-api', {
+      body: { action: 'create_message', threadId, content: userPrompt },
+    });
+
+    if (messageError) {
+      throw messageError;
+    }
+
+    const { data: runData, error: runError } = await supabase.functions.invoke('assistant-api', {
+      body: { action: 'run_assistant', threadId, assistantId },
+    });
+
+    if (runError) {
+      throw runError;
+    }
+
+    let status = runData?.run?.status as string | undefined;
+    const runId = runData?.run?.id as string | undefined;
+
+    if (!runId) {
+      throw new Error('run-id-missing');
+    }
+
+    let safetyCounter = 0;
+    while ((status === 'queued' || status === 'in_progress') && safetyCounter < 8) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const { data: checkData, error: checkError } = await supabase.functions.invoke('assistant-api', {
+        body: { action: 'check_run', threadId, content: runId },
+      });
+
+      if (checkError) {
+        throw checkError;
+      }
+
+      status = checkData?.run?.status as string | undefined;
+      safetyCounter += 1;
+    }
+
+    const { data: messagesData, error: messagesError } = await supabase.functions.invoke('assistant-api', {
+      body: { action: 'get_messages', threadId },
+    });
+
+    if (messagesError) {
+      throw messagesError;
+    }
+
+    const records = (messagesData?.messages?.data ?? []) as Array<{
+      role?: string;
+      content?: Array<{ text?: { value?: string } }>;
+    }>;
+
+    const assistantMessage = records.find(entry => entry.role === 'assistant');
+    const rawText = assistantMessage?.content?.[0]?.text?.value ?? '';
+    const sanitized = sanitizeCoachReply(rawText, payload.locale, payload.flex_hint);
+
+    return { text: sanitized, model: 'assistant-api' };
   } catch (error) {
-    console.warn("[ai-coach] model exception", error);
-    return { text: buildGenericFallback(payload.locale), model: "fallback" };
+    console.warn('[ai-coach] assistant-api failure', error);
+    return { text: fallback, model: 'fallback' };
   }
 }
 
 async function persistLog(userId: string, threadId: string, text: string, mode: CoachMode) {
   if (!userId) return;
   try {
-    await supabase.from("coach_logs").insert({
-      user_id: userId,
+    const hashedUser = await hashIdentifier(userId);
+    await supabase.from('coach_logs').insert({
+      user_id: hashedUser,
       thread_id: threadId,
       summary_text: redactSensitive(text),
       mode,
     });
   } catch (error) {
-    console.warn("[ai-coach] coach_logs insert failed", error);
+    console.warn('[ai-coach] coach_logs insert failed', error);
   }
 }
 
@@ -282,9 +369,11 @@ serve(async (req) => {
     const flagged = await runModeration(payload.message);
     const triggered = guardrail ?? (flagged ? "crisis" : null);
 
-    const finalText = triggered
-      ? guardrailResponse(triggered, payload.locale)
-      : (await generateModelReply(payload)).text;
+    const assistantResult = triggered
+      ? { text: sanitizeCoachReply(guardrailResponse(triggered, payload.locale), payload.locale, payload.flex_hint), model: 'guardrail' as const }
+      : await generateAssistantReply(payload);
+
+    const finalText = assistantResult.text;
 
     await persistLog(user.id, threadId, finalText, payload.mode);
 

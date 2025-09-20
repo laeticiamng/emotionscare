@@ -108,6 +108,17 @@ function buildOrchestrationHints(
         hints.push({ action: 'soft_exit', intensity: 'low', context: 'session_completion' });
       }
       break;
+
+    case 'AAQ2':
+      if (level >= 3) {
+        hints.push(
+          { action: 'coach_defusion_cards', intensity: 'high', context: 'coach_ui' },
+          { action: 'coach_centering_cards', intensity: 'medium', context: 'coach_ui' },
+        );
+      } else if (level <= 1) {
+        hints.push({ action: 'coach_celebrate_flexibility', intensity: 'low', context: 'coach_ui' });
+      }
+      break;
   }
 
   return hints;

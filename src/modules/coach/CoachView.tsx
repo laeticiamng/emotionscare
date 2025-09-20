@@ -7,6 +7,22 @@ import { CoachConsent } from '@/modules/coach/CoachConsent';
 import { sha256 } from '@/lib/hash';
 import { COACH_DISCLAIMERS, CoachMode } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
+import { useFlags } from '@/core/flags';
+import { useAssessment, type AssessmentCatalog } from '@/hooks/useAssessment';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 interface ChatMessage {
   id: string;
@@ -17,6 +33,64 @@ interface ChatMessage {
 }
 
 const CONSENT_STORAGE_KEY = 'coach:consent:v1';
+const AAQ_SKIP_STORAGE_KEY = 'coach:aaq2:skip-until:v1';
+const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
+
+const AAQ_SCALE_OPTIONS: Array<{ value: string; label: string; helper: string }> = [
+  { value: '1', label: 'Jamais vrai', helper: 'Aucune accroche sur cette pensée' },
+  { value: '2', label: 'Très rarement vrai', helper: 'Quasi aucune accroche ressentie' },
+  { value: '3', label: 'Plutôt rarement vrai', helper: 'Tension légère, vite relâchée' },
+  { value: '4', label: 'Parfois vrai', helper: 'Accroche ponctuelle mais gérable' },
+  { value: '5', label: 'Souvent vrai', helper: 'Accroche sensible à adoucir' },
+  { value: '6', label: 'Très souvent vrai', helper: 'Accroche marquée nécessitant douceur' },
+  { value: '7', label: 'Toujours vrai', helper: 'Accroche constante, soutien recommandé' },
+];
+
+type FlexHint = 'souple' | 'transition' | 'rigide' | 'unknown';
+
+function readSkipUntil(): number {
+  if (typeof window === 'undefined') {
+    return 0;
+  }
+  const raw = window.localStorage.getItem(AAQ_SKIP_STORAGE_KEY);
+  if (!raw) {
+    return 0;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function persistSkipUntil(timestamp: number) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.setItem(AAQ_SKIP_STORAGE_KEY, String(timestamp));
+}
+
+function resolveFlexHint(summary?: string | null, focus?: string | null): FlexHint {
+  const normalizedFocus = focus?.toLowerCase() ?? '';
+  if (normalizedFocus.includes('rigid')) {
+    return 'rigide';
+  }
+  if (normalizedFocus.includes('souple')) {
+    return 'souple';
+  }
+  if (normalizedFocus.includes('transition')) {
+    return 'transition';
+  }
+
+  const normalizedSummary = summary?.toLowerCase() ?? '';
+  if (normalizedSummary.includes('rigide')) {
+    return 'rigide';
+  }
+  if (normalizedSummary.includes('souplesse')) {
+    return 'souple';
+  }
+  if (normalizedSummary.includes('transition')) {
+    return 'transition';
+  }
+  return 'unknown';
+}
 
 function createMessage(role: ChatMessage['role'], content: string): ChatMessage {
   return {
@@ -28,6 +102,9 @@ function createMessage(role: ChatMessage['role'], content: string): ChatMessage 
 }
 
 export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) {
+  const { toast } = useToast();
+  const { flags } = useFlags();
+  const aaqAssessment = useAssessment('AAQ2');
   const [mode, setMode] = useState<CoachMode>(initialMode);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -39,9 +116,20 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   const [userHash, setUserHash] = useState<string | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [locale] = useState<'fr' | 'en'>('fr');
+  const [aaqCatalog, setAaqCatalog] = useState<AssessmentCatalog | null>(null);
+  const [isAaqDialogOpen, setIsAaqDialogOpen] = useState(false);
+  const [aaqAnswers, setAaqAnswers] = useState<Record<string, string>>({});
+  const [aaqSummary, setAaqSummary] = useState<string | null>(null);
+  const [aaqFlexHint, setAaqFlexHint] = useState<FlexHint>('unknown');
+  const [aaqUpdatedAt, setAaqUpdatedAt] = useState<number | null>(null);
+  const [skipUntil, setSkipUntil] = useState<number>(() => readSkipUntil());
+  const [isAaqStarting, setIsAaqStarting] = useState(false);
+  const [isAaqSubmitting, setIsAaqSubmitting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const controllerRef = useRef<AbortController | null>(null);
+  const featureAaqEnabled = flags.FF_ASSESS_AAQ2 !== false;
+  const isRigidityHigh = aaqFlexHint === 'rigide';
 
   useEffect(() => {
     const consentFlag = typeof window !== 'undefined' ? window.localStorage.getItem(CONSENT_STORAGE_KEY) : null;
@@ -108,6 +196,49 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     }
   }, [mode]);
 
+  const refreshFlexSummary = useCallback(async () => {
+    if (!featureAaqEnabled) {
+      setAaqSummary(null);
+      setAaqFlexHint('unknown');
+      setAaqUpdatedAt(null);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('assessments')
+        .select('score_json, ts')
+        .eq('instrument', 'AAQ2')
+        .order('ts', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('[coach] unable to load AAQ-II summary', error);
+        setAaqSummary(null);
+        setAaqFlexHint('unknown');
+        setAaqUpdatedAt(null);
+        return;
+      }
+
+      const summaryText = typeof data?.score_json?.summary === 'string' ? data.score_json.summary : null;
+      const focusText = typeof data?.score_json?.focus === 'string' ? data.score_json.focus : null;
+
+      setAaqSummary(summaryText);
+      setAaqFlexHint(resolveFlexHint(summaryText, focusText));
+      setAaqUpdatedAt(data?.ts ? Date.parse(data.ts) : null);
+    } catch (error) {
+      console.warn('[coach] unable to load AAQ-II summary', error);
+      setAaqSummary(null);
+      setAaqFlexHint('unknown');
+      setAaqUpdatedAt(null);
+    }
+  }, [featureAaqEnabled]);
+
+  useEffect(() => {
+    refreshFlexSummary();
+  }, [refreshFlexSummary]);
+
   const scrollToBottom = useCallback(() => {
     if (!containerRef.current) return;
     const behavior = prefersReducedMotion ? 'auto' : 'smooth';
@@ -115,6 +246,134 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       containerRef.current?.scrollTo({ top: containerRef.current.scrollHeight, behavior });
     });
   }, [prefersReducedMotion]);
+
+  const shouldPromptAaq = useMemo(() => {
+    if (!featureAaqEnabled) {
+      return false;
+    }
+    const now = Date.now();
+    if (skipUntil && skipUntil > now) {
+      return false;
+    }
+    if (aaqUpdatedAt && now - aaqUpdatedAt < WEEK_IN_MS) {
+      return false;
+    }
+    return !isAaqDialogOpen;
+  }, [featureAaqEnabled, skipUntil, aaqUpdatedAt, isAaqDialogOpen]);
+
+  const supportCards = useMemo(() => {
+    const cards: Array<{ id: string; title: string; description: string; to: string; tone: 'gentle' | 'highlight' }> = [
+      {
+        id: 'defusion',
+        title: 'Défusion courte',
+        description: 'Visualiser la pensée comme un nuage et la laisser filer doucement.',
+        to: '/app/journal',
+        tone: isRigidityHigh ? 'highlight' : 'gentle',
+      },
+    ];
+
+    if (isRigidityHigh || aaqFlexHint === 'transition') {
+      cards.push({
+        id: 'centrage',
+        title: 'Centrage trente secondes',
+        description: 'Respiration guidée apaisante pour t’ancrer dans le corps.',
+        to: '/app/breath',
+        tone: isRigidityHigh ? 'highlight' : 'gentle',
+      });
+    }
+
+    return cards;
+  }, [aaqFlexHint, isRigidityHigh]);
+
+  const handleAnswerChange = useCallback((itemId: string, value: string) => {
+    setAaqAnswers(prev => ({ ...prev, [itemId]: value }));
+  }, []);
+
+  const handleOpenAaq = useCallback(async () => {
+    if (isAaqDialogOpen) {
+      return;
+    }
+    setIsAaqStarting(true);
+    try {
+      const catalog = await aaqAssessment.start('fr');
+      if (catalog) {
+        setAaqCatalog(catalog);
+        setAaqAnswers({});
+        setIsAaqDialogOpen(true);
+      }
+    } catch (error) {
+      console.warn('[coach] unable to start AAQ-II', error);
+    } finally {
+      setIsAaqStarting(false);
+    }
+  }, [aaqAssessment, isAaqDialogOpen]);
+
+  const handleCloseAaqDialog = useCallback(() => {
+    setIsAaqDialogOpen(false);
+    setAaqCatalog(null);
+  }, []);
+
+  const handleSkipAaq = useCallback(() => {
+    const next = Date.now() + WEEK_IN_MS;
+    persistSkipUntil(next);
+    setSkipUntil(next);
+    handleCloseAaqDialog();
+    toast({
+      title: 'Invitation reportée',
+      description: 'Tu pourras réaliser cette auto-évaluation quand tu en ressentiras l’élan.',
+    });
+  }, [handleCloseAaqDialog, toast]);
+
+  const handleSubmitAaq = useCallback(async () => {
+    if (!aaqCatalog) {
+      return;
+    }
+
+    const missing = aaqCatalog.items.some(item => !aaqAnswers[item.id]);
+    if (missing) {
+      toast({
+        title: 'Quelques réponses manquent',
+        description: 'Prends un instant pour répondre à chaque affirmation avant de valider.',
+        variant: 'warning',
+      });
+      return;
+    }
+
+    setIsAaqSubmitting(true);
+    try {
+      const formatted = Object.fromEntries(
+        Object.entries(aaqAnswers).map(([key, value]) => [key, Number(value)]),
+      );
+      const submitted = await aaqAssessment.submit(formatted);
+      if (submitted) {
+        toast({
+          title: 'Merci pour ton partage',
+          description: 'Nous ajustons discrètement le coach selon ta souplesse actuelle.',
+        });
+        const next = Date.now() + WEEK_IN_MS;
+        persistSkipUntil(next);
+        setSkipUntil(next);
+        handleCloseAaqDialog();
+        setAaqAnswers({});
+        await refreshFlexSummary();
+      } else {
+        toast({
+          title: 'Envoi interrompu',
+          description: 'Tu peux réessayer plus tard, à ton rythme.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('[coach] AAQ-II submission failed', error);
+      toast({
+        title: 'Envoi interrompu',
+        description: 'Tu peux réessayer plus tard, à ton rythme.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAaqSubmitting(false);
+    }
+  }, [aaqAssessment, aaqAnswers, aaqCatalog, handleCloseAaqDialog, refreshFlexSummary, toast]);
 
   useEffect(() => {
     scrollToBottom();
@@ -146,6 +405,11 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     const controller = new AbortController();
     controllerRef.current = controller;
 
+    const hintActive = isRigidityHigh;
+    Sentry.configureScope(scope => {
+      scope.setTag('aaq2_hint_used', hintActive ? 'true' : 'false');
+    });
+
     const userMessage = createMessage('user', trimmed);
     const assistantId = `assistant-${crypto.randomUUID()}`;
     const assistantMessage: ChatMessage = {
@@ -174,6 +438,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         mode,
         locale,
         userHash: userHash ?? undefined,
+        flexHint: aaqFlexHint === 'unknown' ? undefined : aaqFlexHint,
         signal: controller.signal,
         onThread: id => {
           setThreadId(id);
@@ -187,7 +452,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
             return { ...message, content: `${message.content}${chunk}` };
           }));
           if (firstChunk) {
-            Sentry.addBreadcrumb({ category: 'coach', message: 'coach:receive', data: { mode } });
+            Sentry.addBreadcrumb({ category: 'coach', message: 'coach:reply', data: { mode, aaq2_hint_used: hintActive } });
             firstChunk = false;
           }
         },
@@ -227,7 +492,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       controllerRef.current = null;
       textareaRef.current?.focus();
     }
-  }, [disableSend, input, mode, threadId, userHash, locale]);
+  }, [aaqFlexHint, disableSend, input, isRigidityHigh, locale, mode, threadId, userHash]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
@@ -241,9 +506,9 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   }, []);
 
   const quickActions = useMemo(() => ([
-    { label: 'Respirer 1 min', to: '/app/breath' },
+    { label: 'Respirer une minute', to: '/app/breath' },
     { label: 'Journal rapide', to: '/app/journal' },
-    { label: 'Musique douce', to: '/app/music' },
+    { label: 'Musique apaisante', to: '/app/music' },
   ]), []);
 
   return (
@@ -262,6 +527,14 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         <p className="text-sm text-slate-600 dark:text-slate-300">
           Conversations confidentielles, réponses courtes et bienveillantes. Aucun contenu sensible n’est conservé.
         </p>
+        {featureAaqEnabled && aaqSummary && (
+          <Badge
+            variant="outline"
+            className="w-fit bg-blue-50/70 text-blue-800 dark:bg-blue-900/40 dark:text-blue-100"
+          >
+            Souplesse actuelle : {aaqSummary}
+          </Badge>
+        )}
         <div className="flex items-center gap-2 text-sm">
           <label className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
             <input
@@ -285,6 +558,50 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           </label>
         </div>
       </header>
+
+      {featureAaqEnabled && shouldPromptAaq && (
+        <Card className="border border-slate-200 bg-white/80 shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold text-slate-900 dark:text-slate-50">
+              Prendre un instant AAQ-II
+            </CardTitle>
+            <CardDescription className="text-sm text-slate-600 dark:text-slate-300">
+              Quelques affirmations pour observer ta flexibilité psychologique. Tes réponses sont anonymisées et tu peux arrêter
+              librement.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button type="button" onClick={handleOpenAaq} disabled={isAaqStarting}>
+              {isAaqStarting ? 'Préparation…' : 'Oui, je participe'}
+            </Button>
+            <Button type="button" variant="ghost" onClick={handleSkipAaq}>
+              Passer
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {featureAaqEnabled && supportCards.length > 0 && (
+        <section aria-label="Soutiens sur mesure" className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Soutiens sur mesure</h2>
+          <div className="flex flex-col gap-2 md:flex-row">
+            {supportCards.map(card => (
+              <Link
+                key={card.id}
+                to={card.to}
+                className={`flex-1 rounded-2xl border p-4 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  card.tone === 'highlight'
+                    ? 'border-amber-300 bg-amber-50/80 text-amber-900 shadow-sm focus-visible:outline-amber-400 dark:border-amber-500/70 dark:bg-amber-900/30 dark:text-amber-100'
+                    : 'border-slate-200 bg-white/70 text-slate-700 shadow-sm focus-visible:outline-slate-400 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-200'
+                }`}
+              >
+                <p className="font-semibold">{card.title}</p>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">{card.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section
         ref={containerRef}
@@ -360,6 +677,59 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           <p key={item}>{item}</p>
         ))}
       </footer>
+
+      {featureAaqEnabled && (
+        <Dialog open={isAaqDialogOpen} onOpenChange={open => (open ? setIsAaqDialogOpen(true) : handleCloseAaqDialog())}>
+          <DialogContent className="max-w-xl border border-slate-200 bg-white/90 text-slate-900 shadow-xl dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-100">
+          <DialogHeader>
+            <DialogTitle>Souplesse intérieure du moment</DialogTitle>
+            <DialogDescription className="text-sm text-slate-600 dark:text-slate-300">
+              Réponds selon ton ressenti présent. Chaque affirmation nourrit l’adaptation du coach, sans jamais afficher de score.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-1">
+            {aaqCatalog?.items.map(item => (
+              <div key={item.id} className="space-y-2">
+                <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{item.prompt}</p>
+                <RadioGroup
+                  value={aaqAnswers[item.id] ?? ''}
+                  onValueChange={value => handleAnswerChange(item.id, value)}
+                  className="space-y-2"
+                >
+                  {AAQ_SCALE_OPTIONS.map(option => (
+                    <label
+                      key={option.value}
+                      className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white/70 p-3 text-sm leading-snug transition dark:border-slate-700 dark:bg-slate-900/40"
+                    >
+                      <RadioGroupItem value={option.value} className="mt-1" />
+                      <span>
+                        <span className="font-medium text-slate-800 dark:text-slate-100">{option.label}</span>
+                        <span className="block text-xs text-slate-600 dark:text-slate-300">{option.helper}</span>
+                      </span>
+                    </label>
+                  ))}
+                </RadioGroup>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="flex flex-col gap-2 pt-4 sm:flex-row sm:justify-between">
+            <Button type="button" variant="ghost" onClick={handleSkipAaq}>
+              Passer
+            </Button>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleCloseAaqDialog}>
+                Fermer
+              </Button>
+              <Button type="button" onClick={handleSubmitAaq} disabled={isAaqSubmitting}>
+                {isAaqSubmitting ? 'Enregistrement…' : 'Valider'}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
