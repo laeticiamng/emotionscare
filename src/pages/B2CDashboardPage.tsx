@@ -26,6 +26,7 @@ import { useFlags } from '@/core/flags';
 import { useAdaptivePlayback } from '@/hooks/music/useAdaptivePlayback';
 import { PRESET_DETAILS } from '@/services/music/presetMetadata';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useClinicalHints } from '@/hooks/useClinicalHints';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -133,6 +134,9 @@ export default function B2CDashboardPage() {
   const setEphemeralSignal = useDashboardStore((state) => state.setEphemeralSignal);
   const [activeTone, setActiveTone] = useState(summaryTone);
   const shouldReduceMotion = useReducedMotion();
+  const clinicalHints = useClinicalHints();
+  const clinicalTone = clinicalHints.moduleCues.dashboard?.tone ?? clinicalHints.tone;
+  const dashboardCta = clinicalHints.moduleCues.dashboard?.cta ?? null;
 
   const musicSnapshot = playback.snapshot;
   const presetLabel = musicSnapshot?.presetId && musicSnapshot.presetId in PRESET_DETAILS
@@ -150,10 +154,16 @@ export default function B2CDashboardPage() {
       return;
     }
 
-    if (summaryTone !== activeTone) {
+    if (summaryTone && summaryTone !== activeTone) {
       setActiveTone(summaryTone);
     }
   }, [activeTone, ephemeralSignal, setEphemeralSignal, summaryTone]);
+
+  useEffect(() => {
+    if (clinicalTone && clinicalTone !== activeTone) {
+      setActiveTone(clinicalTone);
+    }
+  }, [activeTone, clinicalTone]);
 
   const orderedQuickActions = useMemo(
     () => orderQuickActions(QUICK_ACTIONS, activeTone ?? undefined).slice(0, 4),
@@ -358,6 +368,18 @@ export default function B2CDashboardPage() {
           <h2 id="actions-title" className="text-xl font-semibold mb-4">
             Actions rapides adaptées
           </h2>
+          {dashboardCta && (
+            <div className="mb-4">
+              <Button asChild variant="outline" className="w-full md:w-auto">
+                <Link to={dashboardCta.to}>{dashboardCta.label}</Link>
+              </Button>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {clinicalHints.summaries.wellbeing
+                  ? `${clinicalHints.summaries.wellbeing} — prenons une minute pour respirer ensemble.`
+                  : 'Une respiration guidée est disponible pour adoucir le rythme.'}
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {orderedQuickActions.map((action) => {
               const ActionIcon = action.icon;

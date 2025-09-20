@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -27,6 +28,7 @@ import {
 import { clinicalScoringService } from '@/services/clinicalScoringService';
 import useCurrentMood from '@/hooks/useCurrentMood';
 import { ff } from '@/lib/flags/ff';
+import { useClinicalHints } from '@/hooks/useClinicalHints';
 
 const completionToastMessage = 'ça vient';
 const BASE_DURATION_MS = 90_000;
@@ -204,6 +206,8 @@ const FlashGlowView: React.FC = () => {
   const { toast } = useToast();
   const motion = useMotionPrefs();
   const currentMood = useCurrentMood();
+  const clinicalHints = useClinicalHints();
+  const flashHints = clinicalHints.moduleCues.flashGlow;
   const [softEffects, setSoftEffects] = useState(motion.prefersReducedMotion);
 
   const beforeMoodRef = useRef<MoodSnapshot | null>(getCurrentMoodSnapshot());
@@ -213,6 +217,24 @@ const FlashGlowView: React.FC = () => {
   const [extraDurationMs, setExtraDurationMs] = useState(0);
   const [hasExtended, setHasExtended] = useState(false);
   const [extensionActive, setExtensionActive] = useState(false);
+  useEffect(() => {
+    const shouldExtend = flashHints?.extendDuration ?? false;
+    if (!shouldExtend && !hasExtended) {
+      return;
+    }
+
+    if (shouldExtend && !hasExtended) {
+      setExtraDurationMs(EXTENSION_DURATION_MS);
+      setHasExtended(true);
+      setExtensionActive(true);
+    }
+
+    if (!shouldExtend && hasExtended) {
+      setExtraDurationMs(0);
+      setHasExtended(false);
+      setExtensionActive(false);
+    }
+  }, [flashHints?.extendDuration, hasExtended]);
 
   const [showSudsCard, setShowSudsCard] = useState(false);
   const [sudsOptIn, setSudsOptIn] = useState(false);
@@ -809,6 +831,11 @@ const FlashGlowView: React.FC = () => {
             >
               Effets doux
             </Button>
+            {flashHints?.exitMode === 'soft' && (
+              <Button asChild variant="ghost" type="button">
+                <Link to={flashHints.companionPath}>Screen Silk</Link>
+              </Button>
+            )}
           </div>
 
           {extensionActive && (
