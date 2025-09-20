@@ -47,7 +47,18 @@ test.describe('Ambition arcade orchestration', () => {
 
     await expect(page.getByRole('heading', { name: 'Presque au point d’étincelle' })).toBeVisible();
     await expect(page.getByText('Micro-leviers du jour')).toBeVisible();
-    await expect(page.getByText('respirer 1 minute')).toBeVisible();
+
+    const expectedMicroLevers = ['un geste simple', 'quelques pas de marche', 'respirer calmement'];
+    for (const lever of expectedMicroLevers) {
+      await expect(page.getByRole('checkbox', { name: lever })).toBeVisible();
+    }
+
+    const leverLabels = await page
+      .locator('form[aria-label="Liste de micro-leviers"] label')
+      .allTextContents();
+    for (const label of leverLabels) {
+      expect(label).not.toMatch(/\d/);
+    }
 
     const mainCopy = await page.locator('main').innerText();
     expect(mainCopy).not.toMatch(/\d/);
