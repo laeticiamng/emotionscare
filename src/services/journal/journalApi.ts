@@ -12,6 +12,7 @@ import {
 } from '@/modules/journal/types'
 
 const TAG_PATTERN = /[^\p{L}\p{N}_-]+/gu
+const HASH_TAG_REGEX = /#([\p{L}\p{N}_-]{1,24})/gu
 
 type JournalRow = {
   id: string
@@ -30,7 +31,15 @@ const sanitizePlainText = (value: string) =>
   sanitizeHtml(value, {
     allowedTags: [],
     allowedAttributes: {},
-  }).trim()
+  })
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const sanitizeSummary = (value: string | null | undefined) => {
+  if (!value) return undefined
+  const cleaned = sanitizePlainText(value)
+  return cleaned || undefined
+}
 
 const sanitizeTags = (tags: string[] | null | undefined): string[] => {
   if (!Array.isArray(tags)) return []
@@ -44,6 +53,17 @@ const sanitizeTags = (tags: string[] | null | undefined): string[] => {
   ).slice(0, 8)
 }
 
+const extractHashtags = (value: string): string[] => {
+  const matches = value.matchAll(HASH_TAG_REGEX)
+  const tags: string[] = []
+  for (const match of matches) {
+    if (match[1]) {
+      tags.push(match[1])
+    }
+  }
+  return tags
+}
+
 const mapRowToNote = (row: JournalRow): SanitizedNote => {
   const rawText =
     row.content ?? row.text_content ?? row.transcript ?? ''
@@ -54,7 +74,7 @@ const mapRowToNote = (row: JournalRow): SanitizedNote => {
     id: row.id,
     text,
     created_at: row.created_at ?? new Date().toISOString(),
-    summary: row.summary ?? undefined,
+    summary: sanitizeSummary(row.summary),
     tags,
     mode,
   })
@@ -68,7 +88,8 @@ const redactErrorScope = (scope: Sentry.Scope, context: Record<string, unknown>)
 export async function insertText(input: { text: string; tags?: string[] }): Promise<string> {
   const parsed = InsertTextSchema.parse(input)
   const sanitizedText = sanitizePlainText(parsed.text)
-  const sanitizedTags = sanitizeTags(parsed.tags)
+  const extractedTags = sanitizeTags(extractHashtags(parsed.text))
+  const sanitizedTags = Array.from(new Set([...sanitizeTags(parsed.tags), ...extractedTags])).slice(0, 8)
 
   Sentry.addBreadcrumb({
     category: 'journal',
@@ -186,16 +207,19 @@ export async function listFeed(query: Partial<FeedQuery> = {}): Promise<Sanitize
     .from('journal_entries')
     .select('id, content, text_content, transcript, summary, tags, created_at, mode, is_voice')
     .order('created_at', { ascending: false })
-    .range(q.offset, q.offset + q.limit - 1)
 
   if (q.q) {
-    request = request.ilike('content', `%${q.q}%`)
+    const safeQuery = q.q.replace(/[%_]/g, match => `\\${match}`)
+    const pattern = `%${safeQuery}%`
+    request = request.or(
+      `content.ilike.${pattern},text_content.ilike.${pattern},transcript.ilike.${pattern},summary.ilike.${pattern}`,
+    )
   }
   if (q.tags?.length) {
     request = request.contains('tags', q.tags)
   }
 
-  const { data, error } = await request
+  const { data, error } = await request.range(q.offset, q.offset + q.limit - 1)
 
   if (error) {
     Sentry.captureException(error, scope =>
@@ -273,5 +297,5 @@ export async function createCoachDraft(note: Pick<SanitizedNote, 'id'> | { id: s
 }
 
 export function __testUtils__() {
-  return { sanitizePlainText, sanitizeTags, mapRowToNote }
+  return { sanitizePlainText, sanitizeTags, sanitizeSummary, extractHashtags, mapRowToNote }
 }

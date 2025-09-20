@@ -208,6 +208,10 @@ function translateError(code: string): string {
       return "Impossible d'enregistrer la note. Réessayez plus tard."
     case 'voice_transcription_unavailable':
       return 'La transcription vocale est momentanément indisponible.'
+    case 'audio_too_large':
+      return 'Le fichier audio dépasse la limite de 15 Mo. Réduisez la durée avant de réessayer.'
+    case 'voice_memo_saved_offline':
+      return 'Connexion instable : ton mémo vocal est sauvegardé localement et sera proposé à l’envoi plus tard.'
     case 'empty_text':
       return 'Ajoutez du contenu avant de publier.'
     default:

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface FeatureFlags {
+  FF_JOURNAL: boolean;
   FF_NYVEE: boolean;
   FF_DASHBOARD: boolean;
   FF_COACH: boolean;
@@ -36,6 +37,7 @@ interface FeatureFlags {
 
 // Default flags - can be overridden by API
 const DEFAULT_FLAGS: FeatureFlags = {
+  FF_JOURNAL: true,
   FF_NYVEE: false,
   FF_DASHBOARD: true,
   FF_COACH: false,
@@ -49,7 +51,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   // Clinical assessments – disabled by default, opt-in via remote config
   FF_ASSESS_WHO5: false,
   FF_ASSESS_STAI6: false,
-  FF_ASSESS_PANAS: false,
+  FF_ASSESS_PANAS: true,
   FF_ASSESS_PSS10: false,
   FF_ASSESS_UCLA3: false,
   FF_ASSESS_MSPSS: false,

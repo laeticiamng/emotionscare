@@ -58,6 +58,8 @@ type UseJournalComposerReturn = {
 }
 
 const FEED_QUERY_KEY = ['journal', 'feed'] as const
+const MAX_AUDIO_SIZE_BYTES = 15 * 1024 * 1024 // 15 Mo
+const PENDING_MEMOS_KEY = 'journal.pending_voice_memos'
 
 const normalizeTag = (value: string) =>
   value
@@ -188,17 +190,68 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
     })
   }, [tags, text, textMutation])
 
+  const persistVoiceMemoOffline = useCallback(
+    async (blob: Blob, meta: { lang: string; tags: string[] }) => {
+      if (typeof window === 'undefined') return false
+      try {
+        const reader = new FileReader()
+        const base64 = await new Promise<string>((resolve, reject) => {
+          reader.onerror = () => reject(reader.error ?? new Error('voice_memo_read_failed'))
+          reader.onload = () => {
+            const result = reader.result
+            if (typeof result === 'string') {
+              const [, payload = result] = result.split(',')
+              resolve(payload)
+            } else {
+              reject(new Error('voice_memo_invalid_payload'))
+            }
+          }
+          reader.readAsDataURL(blob)
+        })
+
+        const raw = window.localStorage.getItem(PENDING_MEMOS_KEY)
+        const existing: Array<Record<string, unknown>> = raw ? JSON.parse(raw) : []
+        const memo = {
+          id: `memo-${Date.now()}`,
+          created_at: new Date().toISOString(),
+          lang: meta.lang,
+          tags: meta.tags,
+          base64,
+        }
+        const next = [...existing.slice(-2), memo]
+        window.localStorage.setItem(PENDING_MEMOS_KEY, JSON.stringify(next))
+        return true
+      } catch (offlineError) {
+        console.warn('voice memo offline persistence failed', offlineError)
+        return false
+      }
+    },
+    [],
+  )
+
   const uploadVoice = useCallback(
     async (file: Blob, customLang?: string) => {
       const blob = file instanceof Blob ? file : new Blob([file])
-      return voiceMutation
-        .mutateAsync({ audioBlob: blob, lang: customLang ?? lang, tags })
-        .catch(err => {
-          setError(err instanceof Error ? err.message : 'voice_transcription_unavailable')
-          return undefined
+      if (blob.size > MAX_AUDIO_SIZE_BYTES) {
+        setError('audio_too_large')
+        return undefined
+      }
+      try {
+        return await voiceMutation.mutateAsync({ audioBlob: blob, lang: customLang ?? lang, tags })
+      } catch (err) {
+        const savedOffline = await persistVoiceMemoOffline(blob, {
+          lang: customLang ?? lang,
+          tags,
         })
+        if (savedOffline) {
+          setError('voice_memo_saved_offline')
+        } else {
+          setError(err instanceof Error ? err.message : 'voice_transcription_unavailable')
+        }
+        return undefined
+      }
     },
-    [lang, tags, voiceMutation],
+    [lang, persistVoiceMemoOffline, tags, voiceMutation],
   )
 
   const startDictation = useCallback(() => {

@@ -57,15 +57,15 @@ const SUGGESTIONS: SuggestionSet = {
       id: 'soothing-anchor',
       title: 'Ancrage apaisant',
       description:
-        "Décris un lieu, un geste ou une sensation qui t'aide à retrouver un <em>sentiment de sécurité</em> immédiat.",
-      prompt: "Quel rituel ou endroit te permet de souffler et de te sentir en sécurité ?",
+        "Décris un lieu, un geste ou ta respiration d’endormissement qui t'aide à retrouver un <em>sentiment de sécurité</em> immédiat.",
+      prompt: "Quel rituel apaisant ou respiration d’endormissement te permet de souffler et de te sentir en sécurité ?",
     },
     {
       id: 'micro-kindness',
       title: 'Micro-attention douce',
       description:
-        "Liste trois attentions délicates que tu pourrais t'offrir aujourd'hui pour <em>adoucir la journée</em>.",
-      prompt: "Quelles petites attentions peux-tu t'accorder pour rendre cette journée plus douce ?",
+        "Liste trois attentions délicates que tu pourrais t'offrir aujourd'hui (Nyvée doux, chaleur, pause) pour <em>adoucir la journée</em>.",
+      prompt: "Quelles petites attentions ou ressources Nyvée douces peux-tu t'accorder pour rendre cette journée plus douce ?",
     },
     {
       id: 'compassion-letter',
@@ -87,8 +87,8 @@ const SUGGESTIONS: SuggestionSet = {
       id: 'share-light',
       title: 'Partager la lumière',
       description:
-        "Imagine une façon simple de <em>transmettre cette énergie</em> à quelqu'un aujourd'hui (un mot, un geste, une idée).",
-      prompt: "Comment pourrais-tu partager un peu de ton élan positif autour de toi aujourd'hui ?",
+        "Imagine une façon simple de <em>transmettre cette énergie</em> à quelqu'un aujourd'hui (un mot, un geste, une idée) en partageant un petit highlight privé.",
+      prompt: "Quel petit highlight as-tu envie de partager en douceur aujourd'hui, même juste pour toi ?",
     },
     {
       id: 'future-self',
@@ -205,6 +205,10 @@ const describeRecency = (isoDate?: string | null): string => {
   return 'La prochaine auto-évaluation rapprochera le suivi.'
 }
 
+export type UsePanasSuggestionsOptions = {
+  enabled?: boolean
+}
+
 export type UsePanasSuggestionsResult = {
   orientation: AffectOrientation
   suggestions: PanasSuggestion[]
@@ -217,10 +221,11 @@ export type UsePanasSuggestionsResult = {
   hasConsent: boolean
 }
 
-export function usePanasSuggestions(): UsePanasSuggestionsResult {
+export function usePanasSuggestions(options: UsePanasSuggestionsOptions = {}): UsePanasSuggestionsResult {
   const { user } = useAuth()
   const { toast } = useToast()
   const assessment = useAssessment('PANAS')
+  const featureEnabled = options.enabled ?? true
 
   const [lastPromptTs, setLastPromptTs] = useState<StoredPrompt>(() => getStoredPromptTimestamp())
   const [promptVisible, setPromptVisible] = useState(false)
@@ -228,7 +233,7 @@ export function usePanasSuggestions(): UsePanasSuggestionsResult {
 
   const consentQuery = useQuery({
     queryKey: ['panas', 'consent', user?.id],
-    enabled: Boolean(user?.id),
+    enabled: featureEnabled && Boolean(user?.id),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clinical_consents')
@@ -246,7 +251,7 @@ export function usePanasSuggestions(): UsePanasSuggestionsResult {
 
   const assessmentQuery = useQuery<RawAssessment | null>({
     queryKey: ['panas', 'latest', user?.id],
-    enabled: Boolean(user?.id),
+    enabled: featureEnabled && Boolean(user?.id),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('assessments')
@@ -264,20 +269,25 @@ export function usePanasSuggestions(): UsePanasSuggestionsResult {
 
   const hasConsent = useMemo(
     () =>
-      assessment.state.hasConsent ||
+      (featureEnabled && assessment.state.hasConsent) ||
       Boolean(consentQuery.data?.is_active),
-    [assessment.state.hasConsent, consentQuery.data?.is_active],
+    [featureEnabled, assessment.state.hasConsent, consentQuery.data?.is_active],
   )
 
   const canPrompt = useMemo(() => {
+    if (!featureEnabled) return false
     if (!user?.id) return false
     if (consentQuery.isLoading) return false
     if (hasConsent) return false
     if (!lastPromptTs) return true
     return Date.now() - lastPromptTs >= PROMPT_INTERVAL_MS
-  }, [user?.id, consentQuery.isLoading, hasConsent, lastPromptTs])
+  }, [featureEnabled, user?.id, consentQuery.isLoading, hasConsent, lastPromptTs])
 
   useEffect(() => {
+    if (!featureEnabled) {
+      setPromptVisible(false)
+      return
+    }
     if (canPrompt && !promptVisible) {
       const now = Date.now()
       setPromptVisible(true)
@@ -287,23 +297,30 @@ export function usePanasSuggestions(): UsePanasSuggestionsResult {
     if (!canPrompt && promptVisible) {
       setPromptVisible(false)
     }
-  }, [canPrompt, promptVisible])
+  }, [featureEnabled, canPrompt, promptVisible])
 
   const orientation = useMemo<AffectOrientation>(() => {
+    if (!featureEnabled) {
+      return 'balanced'
+    }
     if (!assessmentQuery.data?.score_json) {
       return 'balanced'
     }
     return resolveOrientation(
       assessmentQuery.data.score_json as Record<string, unknown>,
     )
-  }, [assessmentQuery.data?.score_json])
+  }, [featureEnabled, assessmentQuery.data?.score_json])
 
   const recencyLabel = useMemo(
-    () => describeRecency(assessmentQuery.data?.ts ?? null),
-    [assessmentQuery.data?.ts],
+    () =>
+      featureEnabled
+        ? describeRecency(assessmentQuery.data?.ts ?? null)
+        : 'Le suivi PANAS est désactivé.',
+    [featureEnabled, assessmentQuery.data?.ts],
   )
 
   const requestConsent = useCallback(async () => {
+    if (!featureEnabled) return
     try {
       setIsRequestingConsent(true)
       await assessment.grantConsent()
@@ -329,23 +346,27 @@ export function usePanasSuggestions(): UsePanasSuggestionsResult {
   }, [assessment, toast])
 
   const skipPrompt = useCallback(() => {
+    if (!featureEnabled) return
     setPromptVisible(false)
     const now = Date.now()
     setLastPromptTs(now)
     persistPromptTimestamp(now)
-  }, [])
+  }, [featureEnabled])
 
-  const suggestions = useMemo(() => SUGGESTIONS[orientation], [orientation])
+  const suggestions = useMemo(
+    () => (featureEnabled ? SUGGESTIONS[orientation] : SUGGESTIONS.balanced),
+    [featureEnabled, orientation],
+  )
 
   return {
     orientation,
     suggestions,
     recencyLabel,
-    promptVisible,
+    promptVisible: featureEnabled && promptVisible,
     isRequestingConsent,
     requestConsent,
     skipPrompt,
-    isLoading: consentQuery.isLoading || assessmentQuery.isLoading,
+    isLoading: featureEnabled && (consentQuery.isLoading || assessmentQuery.isLoading),
     hasConsent,
   }
 }
