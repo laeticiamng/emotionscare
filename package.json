@@ -103,6 +103,7 @@
     "@react-three/drei": "^9.59.0",
     "@react-three/fiber": "^8.13.5",
     "@react-three/xr": "^6.6.25",
+    "@sentry/nextjs": "^7.120.3",
     "@sentry/react": "^7.120.3",
     "@sentry/replay": "^7.120.3",
     "@sentry/tracing": "^7.120.3",

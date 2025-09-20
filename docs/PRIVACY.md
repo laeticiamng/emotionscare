@@ -9,7 +9,7 @@ Ce module premium a été revu pour respecter les attentes cliniques et B2B. Voi
 - ❌ Aucun stockage local du transcript complet ; la conversation reste en mémoire temps-réel.
 
 ## Fonction Edge `ai-coach`
-- ✅ Authentification obligatoire (JWT Supabase) + CORS strict (`CORS_ORIGINS`) + rate-limit (30 req/min/user).
+- ✅ Authentification obligatoire (JWT Supabase) + CORS strict (`ALLOWED_ORIGINS`) + rate-limit (30 req/min/user).
 - ✅ Modération hybride : regex de crise + appel OpenAI Moderation (si clef présente). En cas de contenu sensible → réponse sécurisée + orientation ressources (respiration, journal, aide).
 - ✅ Journalisation Supabase : table `public.coach_logs`
   - colonnes : `user_id`, `thread_id`, `summary_text` (≤ 280 caractères, PII masquée), `mode`, `created_at`.

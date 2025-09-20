@@ -56,7 +56,7 @@ export default [
     files: ["src/**/*.{ts,tsx,js,jsx}"],
     languageOptions: {
       parser: tsParser,
-      parserOptions: { ecmaVersion: "latest", sourceType: "module" }
+      parserOptions: { ecmaVersion: "latest", sourceType: "module", ecmaFeatures: { jsx: true } }
     },
     plugins: {
       "@typescript-eslint": tsEslintPlugin,
@@ -65,6 +65,7 @@ export default [
     },
     rules: {
       "no-restricted-imports": createNoNodeImportsRule(),
+      "ec/no-node-builtins-client": "error",
       "ec/no-hardcoded-paths": "error",
     }
   },
@@ -81,6 +82,7 @@ export default [
     files: ["services/**/*.{ts,tsx,js,jsx,mjs,cjs}", "supabase/functions/**/*.{ts,tsx,js,jsx,mjs,cjs}"],
     rules: {
       "no-restricted-imports": "off",
+      "ec/no-node-builtins-client": "off",
     }
   },
   {

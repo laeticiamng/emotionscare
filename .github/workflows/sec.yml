@@ -1,0 +1,137 @@
+name: security-hardening
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: eslint guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  headers-check:
+    name: security headers
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: validate headers configuration
+        run: |
+          node - <<'NODE'
+          const config = require('./next.config.js');
+          const requiredKeys = [
+            'Content-Security-Policy',
+            'Strict-Transport-Security',
+            'X-Content-Type-Options',
+            'X-Frame-Options',
+            'Referrer-Policy',
+            'Permissions-Policy',
+            'Cross-Origin-Opener-Policy',
+            'Cross-Origin-Embedder-Policy',
+          ];
+
+          const requiredChecks = new Map([
+            ['Content-Security-Policy', (value) => value.includes("default-src 'self'")],
+            ['Cross-Origin-Opener-Policy', (value) => value === 'same-origin'],
+            ['Cross-Origin-Embedder-Policy', (value) => value === 'require-corp'],
+            ['Strict-Transport-Security', (value) => /max-age=63072000/.test(value)],
+          ]);
+
+          (async () => {
+            const entries = await config.headers();
+            const globalRule = entries.find((entry) => entry.source === '/:path*');
+            if (!globalRule) {
+              throw new Error('Global security headers rule missing');
+            }
+            const map = new Map(globalRule.headers.map((header) => [header.key, header.value]));
+            for (const key of requiredKeys) {
+              if (!map.has(key)) {
+                throw new Error(`Required header ${key} not configured`);
+              }
+              const check = requiredChecks.get(key);
+              if (check && !check(map.get(key))) {
+                throw new Error(`Header ${key} does not satisfy policy`);
+              }
+            }
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+
+  supabase-rls-test:
+    name: supabase rls coverage
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: emotionscare
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: install client tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: prepare schema for checks
+        run: |
+          psql postgresql://postgres:postgres@localhost:5432/emotionscare <<'SQL'
+          create schema if not exists auth;
+          create or replace function auth.uid() returns uuid as $$ select '00000000-0000-0000-0000-000000000000'::uuid $$ language sql stable;
+          create or replace function auth.jwt() returns jsonb as $$ select '{}'::jsonb $$ language sql stable;
+
+          create table if not exists public.consents (id uuid, user_id uuid);
+          create table if not exists public.assessments (id uuid, user_id uuid);
+          create table if not exists public.org_assess_rollups (id uuid, org_id uuid, n integer default 0);
+          create table if not exists public.orgs (id uuid primary key);
+          create table if not exists public.org_members (id uuid, org_id uuid, user_id uuid);
+          create table if not exists public.org_invites (id uuid, org_id uuid);
+          create table if not exists public.org_events (id uuid, org_id uuid);
+          create table if not exists public.org_event_rsvps (id uuid, org_id uuid);
+          create table if not exists public.org_audit_logs (id uuid, org_id uuid);
+          SQL
+      - name: apply RLS migration
+        run: psql postgresql://postgres:postgres@localhost:5432/emotionscare -v ON_ERROR_STOP=1 -f supabase/migrations/202507150000_rls_hardening.sql
+      - name: verify RLS enabled everywhere
+        run: |
+          RESULT=$(psql postgresql://postgres:postgres@localhost:5432/emotionscare -At -f supabase/tests/rls_check.sql)
+          if [ -n "$RESULT" ]; then
+            echo "$RESULT"
+            exit 1
+          fi
+
+  secrets-scan:
+    name: secrets scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source=. --no-banner
