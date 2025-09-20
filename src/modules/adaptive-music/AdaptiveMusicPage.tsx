@@ -2,881 +2,824 @@
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import * as Sentry from "@sentry/react";
 import {
   PageHeader,
   Card,
   Button,
-  AudioPlayer,
 } from "@/COMPONENTS.reg";
 import {
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardContent,
 } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Heart, Music2, Sparkles } from "lucide-react";
+
+import { useFlags } from "@/core/flags";
+import { useAssessment } from "@/hooks/useAssessment";
+import useCurrentMood from "@/hooks/useCurrentMood";
+import useMusicFavorites from "@/hooks/useMusicFavorites";
+import { useAdaptivePlayback } from "@/hooks/music/useAdaptivePlayback";
 import {
   requestMoodPlaylist,
-  MoodPlaylistResult,
-  MoodPlaylistTrack,
+  type MoodPlaylistResult,
+  type MoodPlaylistTrack,
+  type MoodPlaylistEnergyFocus,
 } from "@/services/moodPlaylist.service";
 import {
-  ADAPTIVE_MUSIC_FAVORITES_EVENT,
-  ADAPTIVE_MUSIC_PLAYBACK_EVENT,
-  AudioPlayerFavoriteEntry,
-} from "@/ui/AudioPlayer";
-import { useMood } from "@/contexts/MoodContext";
-import type { MoodVibe } from "@/utils/moodVibes";
-import { recordEvent } from "@/lib/scores/events";
-import {
-  Clock,
-  Heart,
-  Music2,
-  PlayCircle,
-  RefreshCw,
-  Sparkles,
-} from "lucide-react";
+  mapStateToPreset,
+  type PomsTrendSummary,
+  type AdaptivePresetId,
+} from "@/services/music/presetMapper";
+import { AudioPlayer, type PlaybackSnapshot } from "@/ui/AudioPlayer";
 
-type PlaybackSnapshot = {
-  trackId: string;
-  position: number;
-  updatedAt: number;
-  title?: string;
-  src?: string;
-  wasPlaying?: boolean;
+const PRESET_DETAILS: Record<AdaptivePresetId, { label: string; tone: string; accent: string }> = {
+  calm_very_low: {
+    label: "Cocon feutré",
+    tone: "Texture presque immobile pour s'abandonner totalement.",
+    accent: "Les transitions restent aériennes et enveloppantes.",
+  },
+  ambient_soft: {
+    label: "Brume velours",
+    tone: "Ambiance souple qui chuchote et laisse respirer.",
+    accent: "Le flux reste régulier, sans heurt.",
+  },
+  focus_light: {
+    label: "Fil de clarté",
+    tone: "Trame précise mais tendre pour guider les pensées.",
+    accent: "La pulsation reste légère et stable.",
+  },
+  bright_mist: {
+    label: "Halo lumineux",
+    tone: "Éclat doux pour prolonger la joie sans agitation.",
+    accent: "L'énergie reste radieuse et fluide.",
+  },
 };
 
-const PLAYBACK_STORAGE_PREFIX = "adaptive-music:playback:";
-const FAVORITES_STORAGE_KEY = "adaptive-music:favorites";
-
-const formatDuration = (totalSeconds: number): string => {
-  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) {
-    return "0:00";
-  }
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+const PRESET_TO_MOOD: Record<AdaptivePresetId, string> = {
+  calm_very_low: "relaxed",
+  ambient_soft: "relaxed",
+  focus_light: "focus",
+  bright_mist: "joyful",
 };
 
-const translateFocus = (focus: string): string => {
-  switch (focus) {
-    case "breathing":
-      return "Respiration";
-    case "flow":
-      return "Concentration";
-    case "release":
-      return "Décharge émotionnelle";
-    case "recovery":
-      return "Récupération";
-    case "uplift":
-      return "Élévation";
-    case "reset":
-      return "Réinitialisation";
-    default:
-      return focus;
-  }
+const PRESET_TO_INTENSITY: Record<string, number> = {
+  feather: 0.25,
+  soft: 0.4,
+  balanced: 0.55,
+  glow: 0.68,
 };
 
-const deriveMoodFromProfile = (valence?: number, arousal?: number): string => {
-  if (typeof valence !== "number" || typeof arousal !== "number") {
-    return "relaxed";
-  }
-
-  if (valence > 45 && arousal > 55) {
-    return "joyful";
-  }
-
-  if (valence > 35) {
-    return arousal > 60 ? "joyful" : "relaxed";
-  }
-
-  if (valence < -40 && arousal > 55) {
-    return "anxious";
-  }
-
-  if (valence < -40) {
-    return "sleep";
-  }
-
-  if (arousal > 75) {
-    return "energetic";
-  }
-
-  if (arousal > 55) {
-    return "focus";
-  }
-
-  if (arousal < 35) {
-    return "sleep";
-  }
-
-  return "relaxed";
+const FOCUS_LABELS: Record<MoodPlaylistEnergyFocus, string> = {
+  breathing: "Respiration guidée",
+  flow: "Flux créatif",
+  release: "Décharge douce",
+  recovery: "Récupération soyeuse",
+  uplift: "Élévation délicate",
+  reset: "Ré-ancrage serein",
 };
 
-const deriveIntensity = (arousal?: number): number => {
-  if (typeof arousal !== "number") {
-    return 0.5;
-  }
-  return Number(Math.min(1, Math.max(0, arousal / 100)).toFixed(2));
+type PomsTensionLevel = "relachee" | "ouverte" | "vigilante";
+type PomsFatigueLevel = "ressourcee" | "stable" | "alourdie";
+
+type PomsFormValues = {
+  tension: PomsTensionLevel;
+  fatigue: PomsFatigueLevel;
 };
 
-const VIBE_TO_MUSIC_MOOD: Record<MoodVibe, string> = {
-  calm: "relaxed",
-  bright: "joyful",
-  focus: "focus",
-  reset: "sleep",
-};
-
-const MOOD_OPTIONS: Array<{
-  value: string;
-  label: string;
-  helper: string;
-  emoji: string;
-}> = [
-  {
-    value: "relaxed",
-    label: "Apaisement",
-    helper: "Texturé et doux pour relâcher la pression",
-    emoji: "😌",
-  },
-  {
-    value: "focus",
-    label: "Concentration",
-    helper: "Ambiances régulières pour les tâches cognitives",
-    emoji: "🎯",
-  },
-  {
-    value: "joyful",
-    label: "Élan positif",
-    helper: "Textures lumineuses pour amplifier la joie",
-    emoji: "✨",
-  },
-  {
-    value: "anxious",
-    label: "Décharge du stress",
-    helper: "Progression calmante pour apaiser l'anxiété",
-    emoji: "🌿",
-  },
-  {
-    value: "sleep",
-    label: "Préparer le repos",
-    helper: "Berceuses minimalistes pour le soir",
-    emoji: "🌙",
-  },
-  {
-    value: "energetic",
-    label: "Recharge",
-    helper: "Pistes motivantes pour retrouver de l'énergie",
-    emoji: "⚡",
-  },
+const TENSION_OPTIONS: Array<{ value: PomsTensionLevel; label: string; helper: string; score: number }> = [
+  { value: "relachee", label: "Épaules très souples", helper: "La respiration est ample", score: 1 },
+  { value: "ouverte", label: "Tonus tranquille", helper: "Présence stable et sereine", score: 2 },
+  { value: "vigilante", label: "Encore un peu de tension", helper: "Envie de relâcher davantage", score: 3 },
 ];
 
-const useAdaptiveMusicLocalState = () => {
-  const readFavorites = React.useCallback((): AudioPlayerFavoriteEntry[] => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = window.localStorage.getItem(FAVORITES_STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return [];
-      const seen = new Set<string>();
-      const entries: AudioPlayerFavoriteEntry[] = [];
-      for (const entry of parsed) {
-        if (!entry || typeof entry !== "object") continue;
-        const id = typeof entry.id === "string" ? entry.id : undefined;
-        const src = typeof entry.src === "string" ? entry.src : undefined;
-        if (!id || !src || seen.has(id)) continue;
-        seen.add(id);
-        entries.push({
-          id,
-          src,
-          title: typeof entry.title === "string" ? entry.title : undefined,
-          addedAt:
-            typeof entry.addedAt === "string"
-              ? entry.addedAt
-              : new Date().toISOString(),
-        });
-      }
-      return entries;
-    } catch (error) {
-      console.warn("Unable to read adaptive favorites", error);
-      return [];
-    }
-  }, []);
+const FATIGUE_OPTIONS: Array<{ value: PomsFatigueLevel; label: string; helper: string; score: number }> = [
+  { value: "ressourcee", label: "Énergie douce", helper: "L'élan intérieur est disponible", score: 1 },
+  { value: "stable", label: "Présence constante", helper: "Le corps reste confortable", score: 2 },
+  { value: "alourdie", label: "Besoin de repos", helper: "Une pause bienvenue serait aidante", score: 3 },
+];
 
-  const readPlayback = React.useCallback((): PlaybackSnapshot | null => {
-    if (typeof window === "undefined") return null;
-    let latest: PlaybackSnapshot | null = null;
-    for (let index = 0; index < window.localStorage.length; index += 1) {
-      const key = window.localStorage.key(index);
-      if (!key || !key.startsWith(PLAYBACK_STORAGE_PREFIX)) continue;
-      const raw = window.localStorage.getItem(key);
-      if (!raw) continue;
-      try {
-        const parsed = JSON.parse(raw);
-        const updatedAt =
-          typeof parsed?.updatedAt === "number" ? parsed.updatedAt : 0;
-        if (!latest || updatedAt > latest.updatedAt) {
-          const trackId = key.slice(PLAYBACK_STORAGE_PREFIX.length);
-          latest = {
-            trackId,
-            position:
-              typeof parsed?.position === "number"
-                ? Math.max(0, parsed.position)
-                : 0,
-            updatedAt,
-            title: typeof parsed?.trackTitle === "string" ? parsed.trackTitle : undefined,
-            src: typeof parsed?.trackSrc === "string" ? parsed.trackSrc : undefined,
-            wasPlaying: typeof parsed?.wasPlaying === "boolean" ? parsed.wasPlaying : false,
-          };
-        }
-      } catch (error) {
-        console.warn("Unable to parse playback snapshot", error);
-      }
-    }
-    return latest;
-  }, []);
+const scoreTension = (value: PomsTensionLevel) =>
+  TENSION_OPTIONS.find(option => option.value === value)?.score ?? 2;
+const scoreFatigue = (value: PomsFatigueLevel) =>
+  FATIGUE_OPTIONS.find(option => option.value === value)?.score ?? 2;
 
-  const [favorites, setFavorites] = React.useState<AudioPlayerFavoriteEntry[]>([]);
-  const [playback, setPlayback] = React.useState<PlaybackSnapshot | null>(null);
+const buildSummary = (pre: PomsFormValues, post: PomsFormValues): PomsTrendSummary => {
+  const tensionDelta = scoreTension(post.tension) - scoreTension(pre.tension);
+  const fatigueDelta = scoreFatigue(post.fatigue) - scoreFatigue(pre.fatigue);
 
-  const refresh = React.useCallback(() => {
-    setFavorites(readFavorites());
-    setPlayback(readPlayback());
-  }, [readFavorites, readPlayback]);
+  const summary: PomsTrendSummary = {
+    tensionTrend: tensionDelta < 0 ? "down" : tensionDelta > 0 ? "up" : "steady",
+    fatigueTrend: fatigueDelta > 0 ? "up" : fatigueDelta < 0 ? "down" : "steady",
+    note: null,
+    completed: true,
+  };
 
-  React.useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const notes: string[] = [];
+  if (summary.tensionTrend === "down") {
+    notes.push("Belle détente repérée, on prolonge cette douceur.");
+  } else if (summary.tensionTrend === "up") {
+    notes.push("On garde une présence très enveloppante pour relâcher.");
+  }
 
-  React.useEffect(() => {
-    const handleFavorites = (event: Event) => {
-      const detail = (event as CustomEvent<AudioPlayerFavoriteEntry[]>).detail;
-      if (Array.isArray(detail)) {
-        setFavorites(detail);
-        return;
-      }
-      refresh();
-    };
+  if (summary.fatigueTrend === "up") {
+    notes.push("On adoucit le tempo pour soutenir la récupération.");
+  } else if (summary.fatigueTrend === "down") {
+    notes.push("Un regain d'élan se dessine, on peut colorer légèrement la texture.");
+  }
 
-    const handlePlayback = (event: Event) => {
-      const detail = (event as CustomEvent<{
-        trackId: string;
-        title?: string;
-        src?: string;
-        state: { position?: number; updatedAt?: number; wasPlaying?: boolean };
-      }>).detail;
-      if (!detail) return;
-      setPlayback({
-        trackId: detail.trackId,
-        position:
-          typeof detail.state.position === "number"
-            ? Math.max(0, detail.state.position)
-            : 0,
-        updatedAt:
-          typeof detail.state.updatedAt === "number"
-            ? detail.state.updatedAt
-            : Date.now(),
-        title: detail.title,
-        src: detail.src,
-        wasPlaying: typeof detail.state.wasPlaying === "boolean" ? detail.state.wasPlaying : false,
-      });
-    };
-
-    window.addEventListener(
-      ADAPTIVE_MUSIC_FAVORITES_EVENT,
-      handleFavorites as EventListener,
-    );
-    window.addEventListener(
-      ADAPTIVE_MUSIC_PLAYBACK_EVENT,
-      handlePlayback as EventListener,
-    );
-
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === FAVORITES_STORAGE_KEY) {
-        setFavorites(readFavorites());
-      }
-      if (event.key && event.key.startsWith(PLAYBACK_STORAGE_PREFIX)) {
-        setPlayback(readPlayback());
-      }
-    };
-
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
-        refresh();
-      }
-    };
-
-    window.addEventListener("storage", handleStorage);
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () => {
-      window.removeEventListener(
-        ADAPTIVE_MUSIC_FAVORITES_EVENT,
-        handleFavorites as EventListener,
-      );
-      window.removeEventListener(
-        ADAPTIVE_MUSIC_PLAYBACK_EVENT,
-        handlePlayback as EventListener,
-      );
-      window.removeEventListener("storage", handleStorage);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [readFavorites, readPlayback, refresh]);
-
-  return { favorites, playback, refresh };
+  summary.note = notes.length ? notes.join(" ") : null;
+  return summary;
 };
 
-const buildPlaylistContext = (mood: string) => {
-  switch (mood) {
-    case "focus":
-      return { activity: "focus" as const };
-    case "energetic":
-      return { activity: "mood-boost" as const };
-    case "sleep":
-      return { activity: "sleep" as const, timeOfDay: "evening" as const };
-    case "anxious":
-      return { activity: "relaxation" as const };
-    default:
-      return { activity: "relaxation" as const };
+const describeTrend = (summary: PomsTrendSummary | null): string => {
+  if (!summary) {
+    return "Partage ton ressenti quand tu le souhaites pour affiner encore la texture.";
   }
+
+  if (summary.tensionTrend === "down" && summary.fatigueTrend !== "up") {
+    return "La tension décroît nettement, savourons cette bulle qui se prolonge.";
+  }
+
+  if (summary.fatigueTrend === "up") {
+    return "Une légère fatigue s'installe, nous allons choyer la suite.";
+  }
+
+  if (summary.tensionTrend === "up") {
+    return "Un peu de tension subsiste, la musique reste toute en délicatesse.";
+  }
+
+  return "Le ressenti reste stable, la sélection conserve cette caresse sonore.";
+};
+
+const TrackCard: React.FC<{
+  track: MoodPlaylistTrack;
+  active: boolean;
+  onSelect: () => void;
+}> = ({ track, active, onSelect }) => {
+  return (
+    <li className="flex flex-col gap-3 rounded-lg border border-muted/60 bg-background/50 p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-semibold">{track.title}</p>
+          <p className="text-xs text-muted-foreground">{track.artist}</p>
+        </div>
+        {active && <Badge variant="secondary">En écoute</Badge>}
+      </div>
+      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+        <span className="rounded-full bg-muted px-2 py-1">{FOCUS_LABELS[track.focus]}</span>
+        {track.instrumentation.slice(0, 2).map(item => (
+          <span key={item} className="rounded-full border px-2 py-1">
+            {item}
+          </span>
+        ))}
+        {track.tags.slice(0, 1).map(tag => (
+          <span key={tag} className="rounded-full border px-2 py-1">
+            {tag}
+          </span>
+        ))}
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={active ? "secondary" : "outline"}
+          onClick={onSelect}
+        >
+          {active ? "En cours" : "Goûter"}
+        </Button>
+      </div>
+    </li>
+  );
 };
 
 const AdaptiveMusicPage: React.FC = () => {
-  const { currentMood } = useMood();
-  const { favorites, playback } = useAdaptiveMusicLocalState();
+  const { has } = useFlags();
+  const mood = useCurrentMood();
+  const playback = useAdaptivePlayback();
+  const favorites = useMusicFavorites();
+  const pomsAssessment = useAssessment("POMS");
 
-  const [hasManualSelection, setHasManualSelection] = React.useState(false);
-  const [sessionDuration, setSessionDuration] = React.useState(20);
-  const [instrumentalOnly, setInstrumentalOnly] = React.useState(true);
+  const [pomsOptIn, setPomsOptIn] = React.useState<boolean | null>(has("FF_ASSESS_POMS") ? null : false);
+  const [prePoms, setPrePoms] = React.useState<PomsFormValues | null>(null);
+  const [postPoms, setPostPoms] = React.useState<PomsFormValues | null>(null);
+  const [pomsSummary, setPomsSummary] = React.useState<PomsTrendSummary | null>(null);
+  const [ctaAcknowledged, setCtaAcknowledged] = React.useState(false);
+  const [resumePromptDismissed, setResumePromptDismissed] = React.useState(false);
 
-  const suggestedMood = React.useMemo(() => {
-    const vibe = currentMood.vibe;
-    if (vibe && VIBE_TO_MUSIC_MOOD[vibe]) {
-      return VIBE_TO_MUSIC_MOOD[vibe];
-    }
-    return deriveMoodFromProfile(currentMood.valence, currentMood.arousal);
-  }, [currentMood.arousal, currentMood.valence, currentMood.vibe]);
-
-  const [selectedMood, setSelectedMood] = React.useState(suggestedMood);
-
-  React.useEffect(() => {
-    if (!hasManualSelection) {
-      setSelectedMood(suggestedMood);
-    }
-  }, [hasManualSelection, suggestedMood]);
-
-  const intensity = React.useMemo(
-    () => deriveIntensity(currentMood.arousal),
-    [currentMood.arousal]
+  const recommendation = React.useMemo(
+    () =>
+      mapStateToPreset(
+        {
+          valence: mood.valence ?? 0,
+          arousal: mood.normalized.arousal,
+        },
+        pomsSummary,
+      ),
+    [mood.valence, mood.normalized.arousal, pomsSummary],
   );
 
-  const query = useQuery<MoodPlaylistResult, Error>({
+  const intensityValue = PRESET_TO_INTENSITY[recommendation.intensity] ?? 0.4;
+  const playlistMood = PRESET_TO_MOOD[recommendation.presetId];
+  const sessionDuration = pomsSummary?.fatigueTrend === "up" ? 15 : 20;
+
+  const playlistQuery = useQuery<MoodPlaylistResult, Error>({
     queryKey: [
       "adaptive-music",
-      selectedMood,
+      playlistMood,
+      intensityValue,
       sessionDuration,
-      instrumentalOnly,
-      intensity,
+      recommendation.presetId,
+      pomsSummary?.tensionTrend ?? "none",
+      pomsSummary?.fatigueTrend ?? "none",
     ],
-    enabled: Boolean(selectedMood),
+    enabled: has("FF_MUSIC") && Boolean(playlistMood),
     staleTime: 1000 * 60 * 5,
     queryFn: () =>
       requestMoodPlaylist({
-        mood: selectedMood,
-        intensity,
+        mood: playlistMood,
+        intensity: intensityValue,
         durationMinutes: sessionDuration,
-        preferences: {
-          includeInstrumental: true,
-          includeVocals: instrumentalOnly ? false : undefined,
-        },
-        context: buildPlaylistContext(selectedMood),
+        preferences: { includeInstrumental: true },
+        context:
+          recommendation.presetId === "focus_light"
+            ? { activity: "focus" }
+            : recommendation.presetId === "bright_mist"
+              ? { activity: "mood-boost" }
+              : { activity: "relaxation", timeOfDay: "evening" },
       }),
-    onSuccess: result => {
-      const client = Sentry.getCurrentHub().getClient();
-      if (!client) {
-        return;
-      }
-      Sentry.addBreadcrumb({
-        category: "music",
-        level: "info",
-        message: "music:playlist_success",
-        data: {
-          mood: result.mood,
-          trackCount: result.tracks.length,
-          intensity,
-        },
-      });
-      Sentry.configureScope(scope => {
-        scope.setContext("music:last_playlist", {
-          mood: result.mood,
-          trackCount: result.tracks.length,
-          durationMinutes: sessionDuration,
-          instrumentalOnly,
-        });
-      });
-    },
-    onError: error => {
-      const client = Sentry.getCurrentHub().getClient();
-      if (!client) {
-        return;
-      }
-      Sentry.addBreadcrumb({
-        category: "music",
-        level: "error",
-        message: "music:playlist_error",
-        data: {
-          reason: error.name,
-        },
-      });
-    },
   });
 
-  const [activeTrack, setActiveTrack] = React.useState<MoodPlaylistTrack | null>(null);
+  const playlist = playlistQuery.data;
+  const [selectedTrackId, setSelectedTrackId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const tracks = query.data?.tracks ?? [];
-    if (!tracks.length) {
-      setActiveTrack(null);
-      return;
+    if (!playback.snapshot) {
+      setResumePromptDismissed(false);
     }
-    setActiveTrack(prev => {
-      if (prev) {
-        const matching = tracks.find(track => track.id === prev.id);
-        if (matching) {
-          return matching;
-        }
-      }
-      return tracks[0];
-    });
-  }, [query.data]);
+  }, [playback.snapshot?.trackId]);
 
-  const favoriteIds = React.useMemo(() => {
-    return new Set(favorites.map(entry => entry.id));
-  }, [favorites]);
+  React.useEffect(() => {
+    if (!playlist) return;
+    if (selectedTrackId) return;
 
-  const resumeTrackInfo = React.useMemo(() => {
-    if (!playback) return null;
-    const matching = query.data?.tracks.find(track => track.id === playback.trackId);
-    if (matching) {
-      return {
-        title: matching.title,
-        description: matching.description,
-        position: playback.position,
-      };
+    const resumeTrackId = playback.snapshot?.trackId;
+    const resumeTrack = resumeTrackId
+      ? playlist.tracks.find(track => track.id === resumeTrackId)
+      : null;
+
+    if (resumeTrack) {
+      setSelectedTrackId(resumeTrack.id);
+    } else if (playlist.tracks.length > 0) {
+      setSelectedTrackId(playlist.tracks[0].id);
     }
+  }, [playlist, playback.snapshot, selectedTrackId]);
+
+  const selectedTrack = React.useMemo<MoodPlaylistTrack | null>(() => {
+    if (!playlist || !selectedTrackId) return null;
+    return playlist.tracks.find(track => track.id === selectedTrackId) ?? null;
+  }, [playlist, selectedTrackId]);
+
+  const resumeControls = React.useMemo(() => {
+    if (!selectedTrack || !playback.snapshot) return undefined;
+    if (playback.snapshot.trackId !== selectedTrack.id) return undefined;
     return {
-      title: playback.title ?? "Lecture précédente",
-      description: "Reprenez où vous vous étiez arrêté(e).",
-      position: playback.position,
-    };
-  }, [playback, query.data]);
-
-  const handleSelectMood = (value: string) => {
-    setHasManualSelection(true);
-    setSelectedMood(value);
-    const client = Sentry.getCurrentHub().getClient();
-    if (client) {
-      Sentry.addBreadcrumb({
-        category: "music",
-        level: "info",
-        message: "music:mood_change",
-        data: { mood: value },
-      });
-    }
-  };
-
-  const handleSelectTrack = (track: MoodPlaylistTrack) => {
-    setActiveTrack(track);
-    const client = Sentry.getCurrentHub().getClient();
-    if (client) {
-      Sentry.addBreadcrumb({
-        category: "music",
-        level: "info",
-        message: "music:track_select",
-        data: {
-          trackId: track.id,
-          energy: Number(track.energy.toFixed(2)),
-        },
-      });
-    }
-    recordEvent?.({
-      module: "adaptive-music",
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      durationSec: track.duration,
-      score: Math.round((query.data?.energyProfile.alignment ?? 0) * 100),
-      meta: {
-        action: "select-track",
-        trackId: track.id,
-        mood: query.data?.mood,
-        energy: track.energy,
+      position: playback.snapshot.position,
+      allow: true,
+      onResume: async () => {
+        playback.update({
+          trackId: selectedTrack.id,
+          position: playback.snapshot?.position ?? 0,
+          presetId: recommendation.presetId,
+          title: selectedTrack.title,
+          url: selectedTrack.url,
+        });
       },
-    });
-  };
+    };
+  }, [playback, recommendation.presetId, selectedTrack]);
 
-  const queryError = query.error?.message ?? null;
+  const handleProgress = React.useCallback(
+    (snapshot: PlaybackSnapshot) => {
+      playback.update({
+        trackId: snapshot.trackId,
+        position: snapshot.position,
+        volume: snapshot.volume,
+        wasPlaying: snapshot.wasPlaying,
+        presetId: recommendation.presetId,
+        title: snapshot.title ?? selectedTrack?.title,
+        url: snapshot.src ?? selectedTrack?.url,
+      });
+    },
+    [playback, recommendation.presetId, selectedTrack],
+  );
+
+  const favoriteControls = React.useMemo(() => {
+    if (!selectedTrack) return undefined;
+    return {
+      active: favorites.isFavorite(selectedTrack.id),
+      onToggle: () =>
+        favorites.toggleFavorite(selectedTrack.id, recommendation.presetId, {
+          title: selectedTrack.title,
+          url: selectedTrack.url,
+        }),
+      busy: favorites.isToggling,
+      addLabel: "Garder cette bulle",
+      removeLabel: "Retirer de mes bulles",
+    };
+  }, [favorites, recommendation.presetId, selectedTrack]);
+
+  React.useEffect(() => {
+    if (!pomsOptIn) return;
+    pomsAssessment.start().catch(() => {
+      /* ignore network errors */
+    });
+  }, [pomsOptIn, pomsAssessment]);
+
+  const handlePreSubmit = React.useCallback(
+    async (values: PomsFormValues) => {
+      setPrePoms(values);
+      setPostPoms(null);
+      setPomsSummary(null);
+      setCtaAcknowledged(false);
+      try {
+        await pomsAssessment.submit({ moment: "pre", tension: values.tension, fatigue: values.fatigue });
+      } catch (error) {
+        console.warn("[adaptive-music] unable to store pre POMS", error);
+      }
+    },
+    [pomsAssessment],
+  );
+
+  const handlePostSubmit = React.useCallback(
+    async (values: PomsFormValues) => {
+      if (!prePoms) return;
+      setPostPoms(values);
+      const summary = buildSummary(prePoms, values);
+      setPomsSummary(summary);
+      setCtaAcknowledged(false);
+      try {
+        await pomsAssessment.submit({ moment: "post", tension: values.tension, fatigue: values.fatigue });
+      } catch (error) {
+        console.warn("[adaptive-music] unable to store post POMS", error);
+      }
+    },
+    [pomsAssessment, prePoms],
+  );
+
+  const presetDetail = PRESET_DETAILS[recommendation.presetId];
+
+  if (!has("FF_MUSIC")) {
+    return (
+      <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6" data-testid="adaptive-music-page">
+        <PageHeader
+          title="Adaptive Music"
+          subtitle="La musicothérapie adaptative est momentanément endormie."
+        />
+        <Alert>
+          <AlertDescription>
+            L'accès musical est désactivé pour le moment. Revenez bientôt pour retrouver vos ambiances.
+          </AlertDescription>
+        </Alert>
+      </main>
+    );
+  }
+
+  const favoriteEntries = favorites.favorites.slice(0, 3);
+  const resumeTrack = playback.snapshot && playlist?.tracks.find(track => track.id === playback.snapshot?.trackId);
 
   return (
     <main
-      aria-label="Adaptive Music"
       className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:px-8"
+      aria-label="Adaptive Music"
+      data-testid="adaptive-music-page"
     >
       <PageHeader
         title="Adaptive Music"
-        subtitle="Une playlist générée pour soutenir votre état émotionnel actuel."
+        subtitle="Une bulle sonore qui se cale sur ton souffle et tes ressentis du moment."
       />
 
       <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
         <Card>
-          <CardHeader className="space-y-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <CardTitle>Playlist adaptative</CardTitle>
-                <CardDescription>
-                  Ajustez les paramètres pour générer une session ciblée et reprendre où
-                  vous voulez.
-                </CardDescription>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => query.refetch()}
-                disabled={query.isFetching}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
-                Actualiser
-              </Button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="adaptive-mood">Humeur cible</Label>
-                <Select
-                  value={selectedMood}
-                  onValueChange={handleSelectMood}
-                  disabled={query.isFetching}
-                >
-                  <SelectTrigger id="adaptive-mood">
-                    <SelectValue placeholder="Choisir une humeur" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MOOD_OPTIONS.map(option => (
-                      <SelectItem key={option.value} value={option.value}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">
-                            {option.emoji} {option.label}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {option.helper}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="adaptive-duration">Durée de session</Label>
-                <Select
-                  value={String(sessionDuration)}
-                  onValueChange={value => setSessionDuration(Number(value))}
-                  disabled={query.isFetching}
-                >
-                  <SelectTrigger id="adaptive-duration">
-                    <SelectValue placeholder="20 minutes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[15, 20, 25, 30, 40].map(value => (
-                      <SelectItem key={value} value={String(value)}>
-                        {value} minutes
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="md:col-span-2 flex items-center justify-between rounded-md border px-3 py-2">
-                <div className="space-y-1">
-                  <Label htmlFor="adaptive-instrumental" className="text-sm font-medium">
-                    Instrumental uniquement
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Supprime les pistes avec voix pour favoriser la concentration ou la relaxation profonde.
+          <CardHeader>
+            <CardTitle>Horizon sonore du moment</CardTitle>
+            <CardDescription>
+              {mood.headline}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-muted/60 bg-muted/20 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{mood.description}</p>
+                  <p className="text-lg font-semibold">
+                    {mood.emoji} {presetDetail.label}
                   </p>
                 </div>
-                <Switch
-                  id="adaptive-instrumental"
-                  checked={instrumentalOnly}
-                  onCheckedChange={setInstrumentalOnly}
-                  disabled={query.isFetching}
-                  aria-label="Activer uniquement les pistes instrumentales"
-                />
+                <Badge variant="secondary">{mood.label}</Badge>
               </div>
+              <p className="mt-3 text-sm text-muted-foreground">{presetDetail.tone}</p>
+              <p className="text-xs text-muted-foreground">{presetDetail.accent}</p>
             </div>
-          </CardHeader>
 
-          <CardContent className="space-y-4">
-            {query.isLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-32 w-full" />
+            <div className="rounded-lg border border-muted/60 bg-muted/10 p-4">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Sparkles className="h-4 w-4" aria-hidden />
+                {describeTrend(pomsSummary)}
               </div>
-            ) : (
-              <>
-                {queryError && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {queryError}
-                    </AlertDescription>
-                  </Alert>
-                )}
+              {pomsSummary?.note && (
+                <p className="mt-2 text-xs text-muted-foreground">{pomsSummary.note}</p>
+              )}
+            </div>
 
-                {query.data && activeTrack ? (
-                  <div className="space-y-6">
-                    <div className="rounded-lg border bg-muted/30 p-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Sparkles className="h-4 w-4" aria-hidden />
-                        {query.data.title}
-                      </div>
-                      <h3 className="mt-2 text-lg font-semibold">{activeTrack.title}</h3>
-                      <p className="text-sm text-muted-foreground">{activeTrack.description}</p>
-                      <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" aria-hidden />
-                          {formatDuration(activeTrack.duration)}
-                        </span>
-                        <span>{Math.round(activeTrack.energy * 100)}% énergie</span>
-                        <span>Focus&nbsp;: {translateFocus(activeTrack.focus)}</span>
-                        <span>Artiste&nbsp;: {activeTrack.artist}</span>
-                      </div>
-                    </div>
-
-                    <AudioPlayer
-                      src={activeTrack.url}
-                      trackId={activeTrack.id}
-                      title={activeTrack.title}
-                      loop={false}
-                      defaultVolume={0.75}
-                    />
-                  </div>
-                ) : (
-                  <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-                    Configurez vos paramètres pour générer une playlist personnalisée.
-                  </div>
-                )}
-              </>
+            {playlistQuery.isError && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  La playlist tarde à répondre. On réessaie dès que possible.
+                </AlertDescription>
+              </Alert>
             )}
           </CardContent>
         </Card>
 
-        <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Favoris & reprise</CardTitle>
-              <CardDescription>
-                Accédez rapidement à vos pistes sauvegardées et reprenez vos écoutes en cours.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-md border bg-muted/20 p-3">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <Music2 className="h-4 w-4" aria-hidden />
-                  Dernière lecture
-                </div>
-                {resumeTrackInfo ? (
-                  <div className="mt-2 text-sm">
-                    <p className="font-semibold">{resumeTrackInfo.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Reprise à {formatDuration(resumeTrackInfo.position)}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Lancez une piste pour activer la reprise automatique.
-                  </p>
-                )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Favoris & reprise</CardTitle>
+            <CardDescription>
+              Retrouve ton cocon et tes bulles gardées précieusement.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-md border bg-muted/20 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <Music2 className="h-4 w-4" aria-hidden />
+                Ton dernier cocon
               </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <Heart className="h-4 w-4" aria-hidden />
-                  Favoris récents
+              {resumeTrack ? (
+                <div className="mt-2 text-sm">
+                  <p className="font-medium">{resumeTrack.title}</p>
+                  <p className="text-xs text-muted-foreground">{resumeTrack.artist}</p>
+                  <div className="mt-3 flex gap-2">
+                    {!resumePromptDismissed && (
+                      <>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedTrackId(resumeTrack.id);
+                            setResumePromptDismissed(true);
+                          }}
+                        >
+                          Reprendre ma bulle
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setResumePromptDismissed(true);
+                            playback.clear();
+                          }}
+                        >
+                          Nouvelle ambiance
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
-                {favorites.length ? (
-                  <ul className="space-y-2 text-sm">
-                    {favorites
-                      .slice(-3)
-                      .reverse()
-                      .map(entry => (
-                        <li key={entry.id} className="flex items-center justify-between rounded-md border bg-background px-3 py-2">
-                          <div className="flex flex-col">
-                            <span className="font-medium">
-                              {entry.title ?? "Piste personnalisée"}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              Ajouté le {new Date(entry.addedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <Badge variant="secondary">#{entry.id.slice(0, 6)}</Badge>
-                        </li>
-                      ))}
-                  </ul>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    Utilisez le bouton «&nbsp;Ajouter aux favoris&nbsp;» du lecteur pour retrouver rapidement vos pistes préférées.
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Guidance de la session</CardTitle>
-              <CardDescription>
-                Suggestions d'utilisation basées sur l'énergie recommandée.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-              {query.data ? (
-                <>
-                  <div className="rounded-md border bg-muted/20 p-3">
-                    <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden />
-                      Energie recommandée
-                    </div>
-                    <p className="mt-2 text-sm font-medium">
-                      Alignement {Math.round((query.data.energyProfile.alignment ?? 0) * 100)}%
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Énergie cible {Math.round((query.data.energyProfile.recommended ?? 0) * 100)}% — baseline {Math.round((query.data.energyProfile.baseline ?? 0) * 100)}%
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold">Recommandations</h4>
-                    <ul className="mt-2 space-y-2 text-xs text-muted-foreground">
-                      {query.data.recommendations.map((item, index) => (
-                        <li key={`${item}-${index}`}>• {item}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold">Activités suggérées</h4>
-                    <ul className="mt-2 flex flex-wrap gap-2">
-                      {query.data.guidance.activities.map(activity => (
-                        <Badge key={activity} variant="outline">
-                          {activity}
-                        </Badge>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground">
-                    {query.data.guidance.focus}
-                  </p>
-                </>
               ) : (
-                <p className="text-xs text-muted-foreground">
-                  Générez une playlist pour afficher les conseils associés.
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Lance une piste et nous garderons la reprise pour toi.
                 </p>
               )}
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <Heart className="h-4 w-4" aria-hidden />
+                Tes bulles gardées
+              </div>
+              {favoriteEntries.length ? (
+                <ul className="mt-2 space-y-2 text-sm">
+                  {favoriteEntries.map(entry => (
+                    <li
+                      key={entry.trackId}
+                      className="rounded-md border bg-background px-3 py-2 text-xs text-muted-foreground"
+                    >
+                      <span className="block font-medium text-foreground">
+                        {entry.title ?? "Ambiance personnalisée"}
+                      </span>
+                      <span className="text-muted-foreground">
+                        Conservée comme repère doux
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Ajoute une bulle pour la retrouver ici à chaque visite.
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       <Card>
         <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle>Composition de la playlist</CardTitle>
+            <CardTitle>Plaisir d'écoute</CardTitle>
             <CardDescription>
-              Parcourez les pistes générées et lancez-les instantanément.
+              Lance la piste qui résonne avec ton état du moment.
             </CardDescription>
           </div>
-          {query.data?.metadata.datasetVersion && (
-            <Badge variant="secondary">
-              Jeu de données {query.data.metadata.datasetVersion}
-            </Badge>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => playlistQuery.refetch()}>
+              Régénérer la sélection
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {selectedTrack ? (
+            <div className="space-y-4">
+              <div className="rounded-lg border border-muted/60 bg-muted/10 p-4">
+                <p className="text-sm font-semibold">{selectedTrack.title}</p>
+                <p className="text-xs text-muted-foreground">{selectedTrack.artist}</p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {selectedTrack.description || "Ambiance taillée pour accompagner doucement la respiration."}
+                </p>
+              </div>
+
+              {recommendation.cta === "encore_2_min" && !ctaAcknowledged && (
+                <div className="flex flex-wrap items-center gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4">
+                  <span className="text-sm font-medium text-primary">Tension en baisse 🎉</span>
+                  <Button type="button" size="sm" onClick={() => setCtaAcknowledged(true)}>
+                    Encore 2 min
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Prolonge ce relâchement, la transition reste longue et tendre.
+                  </p>
+                </div>
+              )}
+
+              <AudioPlayer
+                src={selectedTrack.url}
+                title={selectedTrack.title}
+                trackId={selectedTrack.id}
+                presetId={recommendation.presetId}
+                crossfadeMs={recommendation.crossfadeMs}
+                favorite={favoriteControls}
+                resume={resumeControls}
+                onProgress={handleProgress}
+              />
+            </div>
+          ) : playlistQuery.isLoading ? (
+            <p className="text-sm text-muted-foreground">Nous préparons une ambiance sur mesure…</p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Générez une playlist pour découvrir les pistes adaptées à votre état.
+            </p>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Affiner avec POMS (optionnel)</CardTitle>
+          <CardDescription>
+            Un micro check-in avant et après permet d'ajuster encore plus finement la texture.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {pomsOptIn === null ? (
+            <div className="flex flex-col gap-3 rounded-lg border border-muted/60 bg-muted/10 p-4">
+              <p className="text-sm font-medium">Envie de partager ton ressenti en quelques souffles ?</p>
+              <p className="text-xs text-muted-foreground">
+                Deux mini questions avant/après pour que la musique colle à ton état.
+              </p>
+              <div className="flex gap-2">
+                <Button type="button" size="sm" onClick={() => setPomsOptIn(true)}>
+                  Oui, allons-y
+                </Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setPomsOptIn(false)}>
+                  Pas maintenant
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-lg border border-muted/60 bg-muted/10 p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold">Avant l'écoute</p>
+                  <Switch
+                    checked={Boolean(prePoms)}
+                    onCheckedChange={checked => {
+                      if (!checked) {
+                        setPrePoms(null);
+                        setPostPoms(null);
+                        setPomsSummary(null);
+                        setCtaAcknowledged(false);
+                        return;
+                      }
+                    }}
+                  />
+                </div>
+                {!prePoms && (
+                  <form
+                    className="mt-4 space-y-3 text-sm"
+                    onSubmit={event => {
+                      event.preventDefault();
+                      const data = new FormData(event.currentTarget);
+                      const tension = (data.get("pre-tension") as PomsTensionLevel) ?? "relachee";
+                      const fatigue = (data.get("pre-fatigue") as PomsFatigueLevel) ?? "stable";
+                      handlePreSubmit({ tension, fatigue });
+                    }}
+                  >
+                    <fieldset className="space-y-2">
+                      <legend className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Tension
+                      </legend>
+                      {TENSION_OPTIONS.map(option => (
+                        <Label key={option.value} className="flex items-center gap-2 text-xs">
+                          <input
+                            type="radio"
+                            name="pre-tension"
+                            value={option.value}
+                            defaultChecked={option.value === "relachee"}
+                            className="h-3 w-3"
+                          />
+                          <span>
+                            {option.label}
+                            <span className="block text-[11px] text-muted-foreground">
+                              {option.helper}
+                            </span>
+                          </span>
+                        </Label>
+                      ))}
+                    </fieldset>
+                    <fieldset className="space-y-2">
+                      <legend className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Fatigue
+                      </legend>
+                      {FATIGUE_OPTIONS.map(option => (
+                        <Label key={option.value} className="flex items-center gap-2 text-xs">
+                          <input
+                            type="radio"
+                            name="pre-fatigue"
+                            value={option.value}
+                            defaultChecked={option.value === "stable"}
+                            className="h-3 w-3"
+                          />
+                          <span>
+                            {option.label}
+                            <span className="block text-[11px] text-muted-foreground">
+                              {option.helper}
+                            </span>
+                          </span>
+                        </Label>
+                      ))}
+                    </fieldset>
+                    <Button type="submit" size="sm">
+                      Enregistrer ce ressenti
+                    </Button>
+                  </form>
+                )}
+                {prePoms && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Ton ressenti de départ est bien pris en compte.
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-lg border border-muted/60 bg-muted/10 p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold">Après l'écoute</p>
+                  <Switch
+                    checked={Boolean(postPoms)}
+                    disabled={!prePoms}
+                    onCheckedChange={checked => {
+                      if (!checked) {
+                        setPostPoms(null);
+                        setPomsSummary(null);
+                        setCtaAcknowledged(false);
+                        return;
+                      }
+                    }}
+                  />
+                </div>
+                {!postPoms && prePoms && (
+                  <form
+                    className="mt-4 space-y-3 text-sm"
+                    onSubmit={event => {
+                      event.preventDefault();
+                      const data = new FormData(event.currentTarget);
+                      const tension = (data.get("post-tension") as PomsTensionLevel) ?? "relachee";
+                      const fatigue = (data.get("post-fatigue") as PomsFatigueLevel) ?? "stable";
+                      handlePostSubmit({ tension, fatigue });
+                    }}
+                  >
+                    <fieldset className="space-y-2">
+                      <legend className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Tension actuelle
+                      </legend>
+                      {TENSION_OPTIONS.map(option => (
+                        <Label key={option.value} className="flex items-center gap-2 text-xs">
+                          <input
+                            type="radio"
+                            name="post-tension"
+                            value={option.value}
+                            defaultChecked={option.value === "relachee"}
+                            className="h-3 w-3"
+                          />
+                          <span>
+                            {option.label}
+                            <span className="block text-[11px] text-muted-foreground">
+                              {option.helper}
+                            </span>
+                          </span>
+                        </Label>
+                      ))}
+                    </fieldset>
+                    <fieldset className="space-y-2">
+                      <legend className="text-xs uppercase tracking-wide text-muted-foreground">
+                        Niveau d'énergie
+                      </legend>
+                      {FATIGUE_OPTIONS.map(option => (
+                        <Label key={option.value} className="flex items-center gap-2 text-xs">
+                          <input
+                            type="radio"
+                            name="post-fatigue"
+                            value={option.value}
+                            defaultChecked={option.value === "stable"}
+                            className="h-3 w-3"
+                          />
+                          <span>
+                            {option.label}
+                            <span className="block text-[11px] text-muted-foreground">
+                              {option.helper}
+                            </span>
+                          </span>
+                        </Label>
+                      ))}
+                    </fieldset>
+                    <Button type="submit" size="sm">
+                      Partager ce ressenti
+                    </Button>
+                  </form>
+                )}
+                {!prePoms && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Active d'abord le mini point d'entrée pour comparer les ressentis.
+                  </p>
+                )}
+                {postPoms && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Merci pour ce partage, la sélection s'ajuste instantanément.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Les textures proposées</CardTitle>
+          <CardDescription>
+            Choisis librement la piste qui résonne avec toi, elles restent toutes douces et accueillantes.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {query.isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-16 w-full" />
-              ))}
-            </div>
-          ) : query.data && query.data.tracks.length ? (
-            <ul className="space-y-4">
-              {query.data.tracks.map(track => (
-                <li
+          {playlistQuery.isLoading ? (
+            <p className="text-sm text-muted-foreground">Préparation de la bulle sonore…</p>
+          ) : playlist && playlist.tracks.length > 0 ? (
+            <ul className="space-y-3">
+              {playlist.tracks.map(track => (
+                <TrackCard
                   key={track.id}
-                  className="flex flex-col gap-3 rounded-md border bg-background p-4 md:flex-row md:items-center md:justify-between"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{track.title}</span>
-                      {favoriteIds.has(track.id) && (
-                        <Heart className="h-4 w-4 text-rose-500" aria-label="Favori" />
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{track.artist}</p>
-                    <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" aria-hidden />
-                        {formatDuration(track.duration)}
-                      </span>
-                      <span>{Math.round(track.energy * 100)}% énergie</span>
-                      <span>Focus&nbsp;: {translateFocus(track.focus)}</span>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {track.tags.slice(0, 3).map(tag => (
-                        <Badge key={tag} variant="outline">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant={activeTrack?.id === track.id ? "secondary" : "outline"}
-                      onClick={() => handleSelectTrack(track)}
-                    >
-                      {activeTrack?.id === track.id ? (
-                        <Music2 className="mr-2 h-4 w-4" aria-hidden />
-                      ) : (
-                        <PlayCircle className="mr-2 h-4 w-4" aria-hidden />
-                      )}
-                      {activeTrack?.id === track.id ? "En cours" : "Écouter"}
-                    </Button>
-                  </div>
-                </li>
+                  track={track}
+                  active={track.id === selectedTrack?.id}
+                  onSelect={() => {
+                    setSelectedTrackId(track.id);
+                    playback.update({
+                      trackId: track.id,
+                      position: 0,
+                      presetId: recommendation.presetId,
+                      title: track.title,
+                      url: track.url,
+                    });
+                  }}
+                />
               ))}
             </ul>
           ) : (
-            <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
-              La playlist apparaîtra ici après génération.
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Lance une génération pour afficher les propositions musicales.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -885,4 +828,3 @@ const AdaptiveMusicPage: React.FC = () => {
 };
 
 export default AdaptiveMusicPage;
-

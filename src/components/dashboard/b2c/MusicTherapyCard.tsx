@@ -1,55 +1,50 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, SkipForward, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { Music2 } from 'lucide-react';
+
+import useMusicFavorites from '@/hooks/useMusicFavorites';
 
 interface MusicTherapyCardProps {
   className?: string;
 }
 
 const MusicTherapyCard: React.FC<MusicTherapyCardProps> = ({ className = '' }) => {
-  const handlePlay = () => {
-    toast('Lancement de la thérapie musicale');
-  };
+  const navigate = useNavigate();
+  const { favorites } = useMusicFavorites();
+  const mainFavorite = favorites[0];
 
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle>Thérapie musicale</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-md p-4 mb-4 flex items-center">
-          <div className="bg-primary/10 p-3 rounded-full mr-4">
-            <Volume2 className="h-8 w-8 text-primary" />
+      <CardContent className="space-y-4">
+        <div className="flex items-start gap-3 rounded-md border border-primary/30 bg-primary/5 p-4">
+          <div className="rounded-full bg-primary/10 p-3">
+            <Music2 className="h-6 w-6 text-primary" aria-hidden />
           </div>
-          <div>
-            <h3 className="font-medium">Méditation guidée</h3>
-            <p className="text-sm text-muted-foreground">12 minutes</p>
+          <div className="space-y-1 text-sm">
+            <p className="font-medium">Ta piste repère</p>
+            {mainFavorite ? (
+              <>
+                <p>{mainFavorite.title ?? 'Ambiance personnalisée'}</p>
+                <p className="text-xs text-muted-foreground">Toujours prête à être relancée en douceur.</p>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Garde une bulle depuis le module Adaptive Music pour la retrouver ici.
+              </p>
+            )}
           </div>
         </div>
-        
-        <div className="flex justify-center space-x-4 mt-4">
-          <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-            <SkipForward className="h-4 w-4" />
+
+        <div className="flex justify-center">
+          <Button type="button" onClick={() => navigate('/app/music')}>
+            Ouvrir ma bulle sonore
           </Button>
-          <Button 
-            size="icon" 
-            className="rounded-full h-12 w-12 bg-primary"
-            onClick={handlePlay}
-          >
-            <Play className="h-6 w-6 text-primary-foreground" />
-          </Button>
-          <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-            <SkipForward className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        <div className="mt-4">
-          <p className="text-sm text-muted-foreground text-center">
-            Musique adaptée à votre état émotionnel actuel
-          </p>
         </div>
       </CardContent>
     </Card>
