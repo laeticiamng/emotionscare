@@ -87,13 +87,10 @@ export { default as LegalTermsPage } from './LegalTermsPage';
 export { default as LegalPrivacyPage } from './LegalPrivacyPage';
 
 // System & Error pages
-export { default as UnauthorizedPage } from './UnauthorizedPage';
-export { default as ForbiddenPage } from './ForbiddenPage';
-export { default as UnifiedErrorPage } from './unified/UnifiedErrorPage';
-export { default as Error401Page } from './errors/401';
-export { default as Error403Page } from './errors/403';
-export { default as Error404Page } from './errors/404';
-export { default as ServerErrorPage } from './ServerErrorPage';
+export { default as UnauthorizedPage } from './errors/401/page';
+export { default as ForbiddenPage } from './errors/403/page';
+export { default as UnifiedErrorPage } from './errors/404/page';
+export { default as ServerErrorPage } from './errors/500/page';
 
 // Development pages
 export { default as ValidationPage } from './ValidationPage';
