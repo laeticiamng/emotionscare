@@ -14,6 +14,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
+import { useConsent } from '@/features/clinical-optin/ConsentProvider';
+import { useAssessment } from '@/features/assess/useAssessment';
+import { computeFlashGlowActions } from '@/features/orchestration/flashGlow.orchestrator';
 import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
@@ -25,7 +28,6 @@ import {
   logAndJournal,
   type MoodSnapshot,
 } from '@/modules/flash/sessionService';
-import { clinicalScoringService } from '@/services/clinicalScoringService';
 import useCurrentMood from '@/hooks/useCurrentMood';
 import { ff } from '@/lib/flags/ff';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
@@ -101,6 +103,7 @@ type SudsRecord = {
   stage: SudsStage;
   entry: typeof SUDS_LEVELS[number];
   recordedAt: string;
+  levelIndex: number;
   decision?: 'extend' | 'complete';
 };
 
@@ -202,12 +205,15 @@ const readOptIn = (): boolean | null => {
 const FlashGlowView: React.FC = () => {
   const flashEnabled = ff('FF_FLASH');
   const sudsEnabled = ff('FF_ASSESS_SUDS');
+  const orchestratorEnabled = ff('FF_ORCH_FLASHGLOW');
 
   const { toast } = useToast();
   const motion = useMotionPrefs();
   const currentMood = useCurrentMood();
   const clinicalHints = useClinicalHints();
   const flashHints = clinicalHints.moduleCues.flashGlow;
+  const consent = useConsent();
+  const { start: startSudsStage, submit: submitSudsStage } = useAssessment('SUDS');
   const [softEffects, setSoftEffects] = useState(motion.prefersReducedMotion);
 
   const beforeMoodRef = useRef<MoodSnapshot | null>(getCurrentMoodSnapshot());
@@ -247,6 +253,11 @@ const FlashGlowView: React.FC = () => {
   const [postDialogOpen, setPostDialogOpen] = useState(false);
   const [pendingCompletionElapsed, setPendingCompletionElapsed] = useState<number | null>(null);
   const [isSubmittingSud, setIsSubmittingSud] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'extend_60s' | 'soft_exit' | 'cta_screen_silk' | null>(null);
+  const [intendedVisuals, setIntendedVisuals] = useState<'baseline' | 'lowered'>('baseline');
+  const [intendedBreath, setIntendedBreath] = useState<'steady' | 'exhale_longer'>('steady');
+  const [intendedAudio, setIntendedAudio] = useState<'gentle' | 'slow'>('gentle');
+  const [intendedHaptics, setIntendedHaptics] = useState<'default' | 'calm' | 'off'>('default');
 
   const totalDuration = BASE_DURATION_MS + extraDurationMs;
 
@@ -280,11 +291,19 @@ const FlashGlowView: React.FC = () => {
   useEffect(() => {
     if (motion.prefersReducedMotion) {
       setSoftEffects(true);
+      setIntendedVisuals('lowered');
+      setIntendedHaptics('off');
     }
   }, [motion.prefersReducedMotion]);
 
   useEffect(() => {
     if (!sudsEnabled) {
+      return;
+    }
+
+    if (!consent.clinicalAccepted) {
+      setShowSudsCard(false);
+      setSudsOptIn(false);
       return;
     }
 
@@ -303,27 +322,77 @@ const FlashGlowView: React.FC = () => {
     }
 
     setShowSudsCard(true);
-  }, [sudsEnabled]);
+  }, [sudsEnabled, consent.clinicalAccepted]);
 
-  const submitSudsMeasurement = async (stage: SudsStage, entry: typeof SUDS_LEVELS[number], decision?: 'extend' | 'complete') => {
-    if (!sudsEnabled) {
+  useEffect(() => {
+    if (sudsEnabled && showSudsCard && consent.clinicalAccepted) {
+      Sentry.addBreadcrumb({
+        category: 'orchestration',
+        level: 'info',
+        message: 'orch:flash_glow:pre_shown',
+      });
+    }
+  }, [sudsEnabled, showSudsCard, consent.clinicalAccepted]);
+
+  useEffect(() => {
+    if (postDialogOpen && sudsEnabled && sudsOptIn && consent.clinicalAccepted) {
+      Sentry.addBreadcrumb({
+        category: 'orchestration',
+        level: 'info',
+        message: 'orch:flash_glow:post_shown',
+      });
+      void startSudsStage('post');
+    }
+  }, [postDialogOpen, sudsEnabled, sudsOptIn, consent.clinicalAccepted, startSudsStage]);
+
+  const submitSudsMeasurement = async (
+    stage: SudsStage,
+    entry: typeof SUDS_LEVELS[number],
+    levelIndex: number,
+    decision?: 'extend' | 'complete',
+  ) => {
+    if (!sudsEnabled || !sudsOptIn || !consent.clinicalAccepted) {
       return true;
     }
 
     try {
-      const payload = {
+      await startSudsStage(stage);
+      const result = await submitSudsStage(
         stage,
-        module: 'flash_glow',
-        level: entry.id,
-        label: entry.label,
-        decision: decision ?? 'complete',
-        recorded_at: new Date().toISOString(),
-        extended: hasExtended,
-        iteration: stage === 'post' ? postRecords.length + 1 : 0,
+        { '1': entry.score },
+        { ts: new Date().toISOString() },
+      );
+
+      if (!result) {
+        return false;
+      }
+
+      Sentry.addBreadcrumb({
+        category: 'orchestration',
+        level: 'info',
+        message: stage === 'pre' ? 'orch:flash_glow:pre_submitted' : 'orch:flash_glow:post_submitted',
+        data: {
+          stage,
+          decision: stage === 'post' ? decision ?? 'complete' : 'pre_measure',
+          level: entry.id,
+        },
+      });
+
+      const record: SudsRecord = {
+        stage,
+        entry,
+        recordedAt: new Date().toISOString(),
+        levelIndex,
+        decision,
       };
 
-      const result = await clinicalScoringService.submitResponse('SUDS', { '1': entry.score }, { metadata: payload });
-      return result.success;
+      if (stage === 'pre') {
+        preSudsRecordRef.current = record;
+      } else {
+        setPostRecords((prev) => [...prev, record]);
+      }
+
+      return true;
     } catch (error) {
       console.error('Error submitting SUDS measure:', error);
       toast({
@@ -332,6 +401,40 @@ const FlashGlowView: React.FC = () => {
         variant: 'destructive',
       });
       return false;
+    }
+  };
+
+  const applyOrchestratorIntent = (postLevelIndex: number) => {
+    if (!orchestratorEnabled) {
+      return;
+    }
+
+    const actions = computeFlashGlowActions({
+      preLevel: preSudsRecordRef.current?.levelIndex ?? null,
+      postLevel: postLevelIndex,
+      prefersReducedMotion: motion.prefersReducedMotion,
+      optedIn: sudsOptIn && consent.clinicalAccepted,
+    });
+
+    if (actions.extend_session) {
+      setPendingAction('extend_60s');
+    } else if (actions.soft_exit) {
+      setPendingAction('soft_exit');
+    } else if (actions.post_cta === 'screen_silk') {
+      setPendingAction('cta_screen_silk');
+    } else {
+      setPendingAction(null);
+    }
+
+    setIntendedVisuals(
+      actions.set_visuals_intensity ?? (motion.prefersReducedMotion ? 'lowered' : 'baseline'),
+    );
+    setIntendedBreath(actions.set_breath_pattern ?? 'steady');
+    setIntendedAudio(actions.set_audio_fade ?? 'gentle');
+    setIntendedHaptics(actions.set_haptics ?? (motion.prefersReducedMotion ? 'off' : 'default'));
+
+    if (actions.toast_text === 'gratitude') {
+      setFeedback('Merci pour ce partage, sortie douce préparée.');
     }
   };
 
@@ -344,6 +447,11 @@ const FlashGlowView: React.FC = () => {
     setPostRecords([]);
     setPendingCompletionElapsed(null);
     setExtraDurationMs(0);
+    setPendingAction(null);
+    setIntendedVisuals(motion.prefersReducedMotion ? 'lowered' : 'baseline');
+    setIntendedBreath('steady');
+    setIntendedAudio('gentle');
+    setIntendedHaptics(motion.prefersReducedMotion ? 'off' : 'default');
     Sentry.addBreadcrumb({
       category: 'session',
       level: 'info',
@@ -356,16 +464,11 @@ const FlashGlowView: React.FC = () => {
     update(0);
     session.start();
 
-    if (sudsEnabled && sudsOptIn) {
+    if (sudsEnabled && sudsOptIn && consent.clinicalAccepted) {
       const entry = getSudsEntry(preSudsLevel);
-      void submitSudsMeasurement('pre', entry).then((success) => {
+      void submitSudsMeasurement('pre', entry, preSudsLevel).then((success) => {
         if (success) {
           setPreSudsRecorded(true);
-          preSudsRecordRef.current = {
-            stage: 'pre',
-            entry,
-            recordedAt: new Date().toISOString(),
-          };
         }
       });
     }
@@ -409,6 +512,11 @@ const FlashGlowView: React.FC = () => {
     setPostSudsLevel(preSudsLevel);
     session.reset();
     update(0);
+    setPendingAction(null);
+    setIntendedVisuals(motion.prefersReducedMotion ? 'lowered' : 'baseline');
+    setIntendedBreath('steady');
+    setIntendedAudio('gentle');
+    setIntendedHaptics(motion.prefersReducedMotion ? 'off' : 'default');
     handleStart();
   };
 
@@ -540,6 +648,11 @@ const FlashGlowView: React.FC = () => {
     setNeedsPostSuds(false);
     storeOptIn(false);
     storeCooldown(Date.now());
+    setPendingAction(null);
+    setIntendedVisuals(motion.prefersReducedMotion ? 'lowered' : 'baseline');
+    setIntendedBreath('steady');
+    setIntendedAudio('gentle');
+    setIntendedHaptics(motion.prefersReducedMotion ? 'off' : 'default');
   };
 
   const handleSudsOptIn = () => {
@@ -551,6 +664,11 @@ const FlashGlowView: React.FC = () => {
     setNeedsPostSuds(false);
     setPostSudsLevel(preSudsLevel);
     storeOptIn(true);
+    setPendingAction(null);
+    setIntendedVisuals(motion.prefersReducedMotion ? 'lowered' : 'baseline');
+    setIntendedBreath('steady');
+    setIntendedAudio('gentle');
+    setIntendedHaptics(motion.prefersReducedMotion ? 'off' : 'default');
     try {
       window.localStorage.removeItem('flash_glow_suds_cooldown');
     } catch (error) {
@@ -573,6 +691,9 @@ const FlashGlowView: React.FC = () => {
     const elapsedForCompletion = pendingCompletionElapsed ?? session.elapsedMs;
     setPendingCompletionElapsed(null);
     setNeedsPostSuds(false);
+    if (orchestratorEnabled) {
+      setPendingAction('soft_exit');
+    }
     void finalizeSession(elapsedForCompletion, hasExtended ? 'extend_session' : 'soft_exit');
   };
 
@@ -585,21 +706,17 @@ const FlashGlowView: React.FC = () => {
     setIsSubmittingSud(true);
 
     const entry = getSudsEntry(postSudsLevel);
-    const success = await submitSudsMeasurement('post', entry, decision === 'extend' ? 'extend' : 'complete');
+    const success = await submitSudsMeasurement(
+      'post',
+      entry,
+      postSudsLevel,
+      decision === 'extend' ? 'extend' : 'complete',
+    );
 
     if (!success) {
       setIsSubmittingSud(false);
       return;
     }
-
-    const record: SudsRecord = {
-      stage: 'post',
-      entry,
-      recordedAt: new Date().toISOString(),
-      decision: decision === 'extend' ? 'extend' : 'complete',
-    };
-
-    setPostRecords((prev) => [...prev, record]);
 
     if (decision === 'extend') {
       setHasExtended(true);
@@ -610,12 +727,13 @@ const FlashGlowView: React.FC = () => {
       setExtensionActive(true);
       setFeedback('Encore un peu de lumière pour accompagner la tension.');
       toast({
-        title: 'Encore 60 s',
-        description: 'On reste ensemble un moment supplémentaire.',
+        title: 'On prolonge un instant',
+        description: 'La bulle reste ouverte un court moment.',
       });
       if (session.state === 'paused') {
         session.resume();
       }
+      applyOrchestratorIntent(postSudsLevel);
       setIsSubmittingSud(false);
       return;
     }
@@ -623,13 +741,21 @@ const FlashGlowView: React.FC = () => {
     setNeedsPostSuds(false);
     setPostDialogOpen(false);
     const elapsedForCompletion = pendingCompletionElapsed ?? session.elapsedMs;
+    applyOrchestratorIntent(postSudsLevel);
     void finalizeSession(elapsedForCompletion, hasExtended ? 'extend_session' : 'soft_exit');
     setIsSubmittingSud(false);
   };
 
   if (!flashEnabled) {
     return (
-      <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
+      <main
+        className="mx-auto max-w-3xl space-y-6 p-6"
+        data-testid="flash-glow-view"
+        data-visuals-intent={intendedVisuals}
+        data-breath-intent={intendedBreath}
+        data-audio-intent={intendedAudio}
+        data-haptics-intent={intendedHaptics}
+      >
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl font-semibold">Flash Glow</CardTitle>
@@ -675,7 +801,14 @@ const FlashGlowView: React.FC = () => {
   const stateLabel = statusLabels[session.state] ?? statusLabels.idle;
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
+    <main
+      className="mx-auto max-w-3xl space-y-6 p-6"
+      data-testid="flash-glow-view"
+      data-visuals-intent={intendedVisuals}
+      data-breath-intent={intendedBreath}
+      data-audio-intent={intendedAudio}
+      data-haptics-intent={intendedHaptics}
+    >
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-semibold">Flash Glow apaisant</CardTitle>
@@ -684,6 +817,11 @@ const FlashGlowView: React.FC = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
+          {motion.prefersReducedMotion && (
+            <p className="text-xs text-muted-foreground" aria-live="polite">
+              Indice accessibilité : mode « réduire le mouvement » actif, la lueur reste douce.
+            </p>
+          )}
           <section
             aria-live="polite"
             className="rounded-lg border p-4"
@@ -744,10 +882,10 @@ const FlashGlowView: React.FC = () => {
             <p className="text-muted-foreground">{phaseNarrative}</p>
           </section>
 
-          {sudsEnabled && (showSudsCard || sudsOptIn) && (
+          {sudsEnabled && consent.clinicalAccepted && (showSudsCard || sudsOptIn) && (
             <section className="rounded-lg border border-border/50 p-4 space-y-4" aria-live="polite">
               <div>
-                <p className="text-sm font-medium">Partager mon ressenti SUDS</p>
+                <p className="text-sm font-medium">Partager mon ressenti intérieur</p>
                 <p className="text-xs text-muted-foreground">
                   Optionnel : aide à ajuster la sortie douce selon votre tension.
                 </p>
@@ -782,14 +920,14 @@ const FlashGlowView: React.FC = () => {
                   </>
                 ) : (
                   <Button variant="ghost" onClick={handleSudsDecline} type="button">
-                    Désactiver le suivi SUDS
+                    Désactiver ce suivi
                   </Button>
                 )}
               </div>
             </section>
           )}
 
-          {sudsEnabled && !sudsOptIn && !showSudsCard && (
+          {sudsEnabled && consent.clinicalAccepted && !sudsOptIn && !showSudsCard && (
             <div className="flex justify-end">
               <Button
                 variant="outline"
@@ -804,12 +942,32 @@ const FlashGlowView: React.FC = () => {
                   }
                 }}
               >
-                Activer le partage SUDS
+                Activer le partage du ressenti
               </Button>
             </div>
           )}
 
           {phaseSurface}
+
+          {orchestratorEnabled && (
+            <section className="space-y-1 rounded-lg bg-muted/30 p-3" aria-live="polite">
+              <p className="text-sm font-medium">Actions cliniques prévues</p>
+              <p className="text-xs text-muted-foreground">
+                {pendingAction === 'extend_60s'
+                  ? 'Intention : prolonger la bulle lumineuse.'
+                  : pendingAction === 'soft_exit'
+                    ? 'Intention : guider vers une sortie très douce.'
+                    : pendingAction === 'cta_screen_silk'
+                      ? 'Intention : suggérer un passage vers Screen Silk.'
+                      : 'Intention : en attente de votre ressenti final.'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Halo : {intendedVisuals === 'lowered' ? 'adouci' : 'neutre'} · Souffle : {intendedBreath === 'exhale_longer' ? 'allongé' : 'stable'} · Audio : {intendedAudio === 'slow' ? 'fondu prolongé' : 'fondu léger'} · Toucher : {
+                  intendedHaptics === 'off' ? 'désactivé' : intendedHaptics === 'calm' ? 'calmé' : 'standard'
+                }.
+              </p>
+            </section>
+          )}
 
           <div className="flex flex-wrap items-center gap-3" role="group" aria-label="Contrôles de séance">
             <Button onClick={handlePrimary} disabled={isSaving} type="button">
@@ -896,7 +1054,7 @@ const FlashGlowView: React.FC = () => {
                 disabled={isSubmittingSud}
                 type="button"
               >
-                Encore 60 s
+                Prolonger un instant
               </Button>
             )}
           </DialogFooter>
