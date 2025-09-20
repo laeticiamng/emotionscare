@@ -136,6 +136,7 @@ async function fetchHeatmap(params: GetHeatmapParams): Promise<HeatmapCell[]> {
 export async function getAggregateSummaries(params: GetHeatmapParams): Promise<AggregateSummary[]> {
   return fetchAggregateSummaries(params);
 }
+
 interface HeatmapMatrixParams extends UseHeatmapParams {
   periods: string[];
 }
@@ -270,5 +271,3 @@ export function useAggregateSummaries(
 }
 
 export { DEFAULT_INSTRUMENTS };
-export type { HeatmapCell };
-export type { AggregateSummary };

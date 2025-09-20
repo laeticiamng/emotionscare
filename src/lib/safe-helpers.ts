@@ -177,7 +177,7 @@ export function safeDOM<T>(
  * Type guard pour vérifier qu'un objet a une méthode add
  */
 export function hasAddMethod<T>(obj: any): obj is { add: (item: T) => any } {
-  return obj && typeof obj.add === 'function';
+  return Boolean(obj && typeof obj.add === 'function');
 }
 
 /**
