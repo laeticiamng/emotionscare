@@ -22,3 +22,26 @@ values
   (:'demo_org_id'::uuid, '2025-W38', 'WEMWBS', 7, 'semaine plutôt posée'),
   (:'demo_org_id'::uuid, '2025-W38', 'UWES', 6, 'engagement stable')
 on conflict do nothing;
+
+insert into public.clinical_signals (
+  user_id,
+  source_instrument,
+  domain,
+  level,
+  window_type,
+  module_context,
+  metadata,
+  expires_at
+)
+values
+  (
+    :'demo_uid'::uuid,
+    'WHO5',
+    'wellbeing',
+    3,
+    'weekly',
+    'spotlight',
+    '{"note":"signal e2e"}',
+    now() + interval '7 days'
+  )
+on conflict do nothing;
