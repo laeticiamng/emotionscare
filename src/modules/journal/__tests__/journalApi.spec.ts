@@ -6,21 +6,20 @@ const insertMock = vi.fn()
 const updateMock = vi.fn()
 const selectBuilder = {
   order: vi.fn().mockReturnThis(),
-  range: vi.fn().mockReturnThis(),
-  ilike: vi.fn().mockReturnThis(),
+  or: vi.fn().mockReturnThis(),
   contains: vi.fn().mockReturnThis(),
-  then: (resolve: (value: { data: SanitizedNote[]; error: null }) => void) => {
+  range: vi.fn().mockImplementation(() => {
     const rows = [
       {
         id: '00000000-0000-0000-0000-000000000001',
-        content: 'Hello <b>world</b>',
+        content: 'Hello <b>world</b> avec #Calme',
         created_at: '2024-02-10T10:00:00.000Z',
         tags: ['focus', 'Calme'],
-        summary: 'Résumé',
+        summary: '<script>alert(1)</script>Résumé',
       } as any,
     ]
-    return Promise.resolve(resolve({ data: rows as unknown as SanitizedNote[], error: null }))
-  },
+    return Promise.resolve({ data: rows as unknown as SanitizedNote[], error: null })
+  }),
 } as const
 
 const singleResponse = () => Promise.resolve({ data: { id: 'note-uuid' }, error: null })
@@ -90,12 +89,12 @@ describe('journalApi', () => {
   it('sanitizes text and tags on insertText', async () => {
     const { insertText } = await import('@/services/journal/journalApi')
 
-    await insertText({ text: 'Hello<script>alert(1)</script>!', tags: ['Focus', '  '] })
+    await insertText({ text: 'Hello<script>alert(1)</script>! #Calme', tags: ['Focus', '  '] })
 
     expect(insertMock).toHaveBeenCalledTimes(1)
     const payload = insertMock.mock.calls[0]?.[0] as Record<string, unknown>
-    expect(payload?.content).toBe('Hello!')
-    expect(payload?.tags).toEqual(['focus'])
+    expect(payload?.content).toBe('Hello! #Calme')
+    expect(payload?.tags).toEqual(['focus', 'calme'])
     expect(payload?.mode).toBe('text')
     expect(payload?.user_id).toBe('user-1')
   })
@@ -106,8 +105,9 @@ describe('journalApi', () => {
     const notes = await listFeed({ limit: 5 })
 
     expect(notes).toHaveLength(1)
-    expect(notes[0]?.text).toBe('Hello world')
+    expect(notes[0]?.text).toBe('Hello world avec #Calme')
     expect(notes[0]?.tags).toEqual(['focus', 'calme'])
+    expect(notes[0]?.summary).toBe('Résumé')
   })
 
   it('creates a coach draft without exposing content', async () => {
@@ -120,7 +120,9 @@ describe('journalApi', () => {
   })
 
   it('sanitizes plain text helper', () => {
-    const { sanitizePlainText } = __testUtils__()
+    const { sanitizePlainText, sanitizeSummary, extractHashtags } = __testUtils__()
     expect(sanitizePlainText('<img src=x onerror=alert(1)>Bonjour')).toBe('Bonjour')
+    expect(sanitizeSummary('<em>Résumé</em> <script>alert(1)</script>')).toBe('Résumé')
+    expect(extractHashtags('Note #Zen et #Calme!')).toEqual(['Zen', 'Calme'])
   })
 })

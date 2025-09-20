@@ -9,6 +9,7 @@ import { usePanasSuggestions } from '@/modules/journal/usePanasSuggestions'
 import type { useJournalComposer } from '@/modules/journal/useJournalComposer'
 import type { PanasSuggestion } from '@/modules/journal/usePanasSuggestions'
 import { cn } from '@/lib/utils'
+import { useFlags } from '@/core/flags'
 
 type JournalComposerRef = ReturnType<typeof useJournalComposer>
 
@@ -32,6 +33,8 @@ const suggestionToPlainText = (suggestion: PanasSuggestion) => suggestion.prompt
 
 export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
   const { toast } = useToast()
+  const { has } = useFlags()
+  const assessEnabled = has('FF_ASSESS_PANAS')
   const {
     orientation,
     suggestions,
@@ -42,7 +45,11 @@ export function PanasSuggestionsCard({ composer }: PanasSuggestionsCardProps) {
     isRequestingConsent,
     isLoading,
     hasConsent,
-  } = usePanasSuggestions()
+  } = usePanasSuggestions({ enabled: assessEnabled })
+
+  if (!assessEnabled) {
+    return null
+  }
 
   const sanitizedSuggestions = useMemo(
     () =>

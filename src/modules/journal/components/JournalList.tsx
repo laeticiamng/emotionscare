@@ -119,11 +119,75 @@ export function JournalList({
   )
 }
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+const applyInlineMarkdown = (value: string) => {
+  let next = value
+  next = next.replace(/\[(.+?)]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+  next = next.replace(/(?<!\\)\*\*(.+?)(?<!\\)\*\*/g, '<strong>$1</strong>')
+  next = next.replace(/(?<!\\)\*(.+?)(?<!\\)\*/g, '<em>$1</em>')
+  next = next.replace(/(?<!\\)`(.+?)(?<!\\)`/g, '<code>$1</code>')
+  next = next.replace(/(https?:\/\/[^\s<]+)(?![^<]*>)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+  return next.replace(/\\(\*|`)/g, '$1')
+}
+
+const renderMarkdown = (input: string) => {
+  const lines = escapeHtml(input).split(/\r?\n/)
+  const htmlParts: string[] = []
+  let buffer: string[] = []
+  let inList = false
+
+  const flushParagraph = () => {
+    if (!buffer.length) return
+    const paragraph = buffer.join(' ')
+    htmlParts.push(`<p>${applyInlineMarkdown(paragraph)}</p>`)
+    buffer = []
+  }
+
+  const closeList = () => {
+    if (!inList) return
+    htmlParts.push('</ul>')
+    inList = false
+  }
+
+  for (const rawLine of lines) {
+    const trimmed = rawLine.trim()
+    if (!trimmed) {
+      flushParagraph()
+      closeList()
+      continue
+    }
+
+    const listMatch = /^[-*]\s+(.*)$/.exec(trimmed)
+    if (listMatch) {
+      if (!inList) {
+        flushParagraph()
+        htmlParts.push('<ul>')
+        inList = true
+      }
+      htmlParts.push(`<li>${applyInlineMarkdown(listMatch[1])}</li>`)
+      continue
+    }
+
+    closeList()
+    buffer.push(trimmed)
+  }
+
+  flushParagraph()
+  closeList()
+
+  return htmlParts.join('')
+}
+
 export function SafeNote({ text }: { text: string }) {
   const html = useMemo(() => {
-    const escaped = text.replace(/\n/g, '<br />')
-    return DOMPurify.sanitize(escaped, {
-      ALLOWED_TAGS: ['br', 'em', 'strong', 'a', 'ul', 'ol', 'li'],
+    const rendered = renderMarkdown(text)
+    return DOMPurify.sanitize(rendered, {
+      ALLOWED_TAGS: ['p', 'em', 'strong', 'a', 'ul', 'li', 'code'],
       ALLOWED_ATTR: { a: ['href', 'target', 'rel'] },
       ADD_ATTR: ['rel'],
     })
