@@ -14,21 +14,12 @@ Ce document résume les variables nécessaires pour activer les agrégations B2B
 
 | Variable | Valeur recommandée | Description |
 | --- | --- | --- |
+| `CORS_ORIGINS` | Liste des origines autorisées pour les Edge Functions cliniques (`/functions/v1/assess-start`). | `https://app.prod.tld,https://staging.app.tld,http://localhost:5173` |
+| `FF_ASSESS_WHO5` | Active la diffusion du WHO-5 via l'Edge. | `true` |
+| `FF_ASSESS_STAI6` | Active la diffusion du STAI-6 via l'Edge. | `true` |
+| `FF_ASSESS_ISI` | Active la diffusion de l'ISI hebdomadaire via l'Edge. | `true` |
+| `FF_ASSESS_SAM` | Active la diffusion du SAM via l'Edge. | `true` |
+| `FF_ASSESS_SUDS` | Active la diffusion du SUDS via l'Edge. | `true` |
+| `FF_ORCH_BREATH` | Active l’orchestration adaptative du module respiration. | `true` |
 | `FF_B2B_AGGREGATES` | `true` | Active l'endpoint `/assess/aggregate` et les vues B2B correspondantes. |
-
-> Pour un environnement local, copiez `.env.example` vers `.env.local`, renseignez les variables ci-dessus puis redémarrez les fonctions Edge.
-# 🌱 Variables d'environnement clés
-
-## Edge Function `assess-submit`
-
-| Variable | Description |
-| --- | --- |
-| `CORS_ORIGINS` | Liste des origines autorisées pour les requêtes CORS (séparées par une virgule). |
-| `FF_ASSESS_WHO5` | Active l'instrument WHO-5 côté Edge (`true` par défaut). |
-| `FF_ASSESS_STAI6` | Active l'instrument STAI-6 (`true` par défaut). |
-| `FF_ASSESS_SAM` | Active l'instrument SAM (`true` par défaut). |
-| `FF_ASSESS_SUDS` | Active l'instrument SUDS (`true` par défaut). |
-
-> ℹ️  Positionnez ces variables dans l'environnement Supabase Edge (`supabase env set …`).
-
 
