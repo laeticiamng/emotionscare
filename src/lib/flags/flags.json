@@ -8,5 +8,6 @@
   "FF_ASSESS_SUDS": true,
   "FF_ORCH_FLASHGLOW": true,
   "FF_B2B_REPORTS": true,
+  "FF_B2B_HEATMAP": true,
   "FF_B2B_AGGREGATES": true
 }

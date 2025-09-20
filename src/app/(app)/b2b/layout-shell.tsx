@@ -8,6 +8,7 @@ import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 
 const NAV_ITEMS = [
   { href: '/b2b', label: 'Accueil' },
+  { href: '/b2b/rh', label: 'Climat RH' },
   { href: '/b2b/teams', label: 'Équipes' },
   { href: '/b2b/events', label: 'Événements' },
   { href: '/b2b/optimisation', label: 'Optimisation' },
