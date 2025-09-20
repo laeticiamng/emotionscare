@@ -4,7 +4,8 @@ import { create } from 'zustand';
 
 import { persist } from '@/store/utils/createImmutableStore';
 import { createSelectors } from '@/store/utils/createSelectors';
-import { mapMoodToVibe, type MoodVibe } from '@/utils/moodVibes';
+import { type MoodVibe } from '@/utils/moodVibes';
+import { buildMoodSignals, type MoodEventDetail, type MoodPalette } from '@/utils/moodSignals';
 
 interface MoodState {
   valence: number; // -100 à +100 (négatif à positif)
@@ -13,6 +14,9 @@ interface MoodState {
   vibe: MoodVibe;
   isLoading: boolean;
   error: string | null;
+  summary: string;
+  microGesture: string;
+  palette: MoodPalette;
 }
 
 interface MoodStore extends MoodState {
@@ -23,33 +27,48 @@ interface MoodStore extends MoodState {
   setError: (error: string | null) => void;
 }
 
+const baselineSignals = buildMoodSignals(0, 50);
+
 const moodStoreBase = create<MoodStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       valence: 0,
       arousal: 50,
       timestamp: new Date().toISOString(),
       isLoading: false,
-      vibe: 'calm',
+      vibe: baselineSignals.vibe,
       error: null,
+      summary: baselineSignals.summary,
+      microGesture: baselineSignals.microGesture,
+      palette: { ...baselineSignals.palette },
 
       updateMood: (valence: number, arousal: number) => {
         const clampedValence = Math.max(-100, Math.min(100, valence));
         const clampedArousal = Math.max(0, Math.min(100, arousal));
-        const vibe = mapMoodToVibe(clampedValence, clampedArousal);
+        const signals = buildMoodSignals(clampedValence, clampedArousal);
         const timestamp = new Date().toISOString();
         set({
           valence: clampedValence,
           arousal: clampedArousal,
-          vibe,
+          vibe: signals.vibe,
           timestamp,
+          summary: signals.summary,
+          microGesture: signals.microGesture,
+          palette: signals.palette,
           error: null,
         });
 
         if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('mood.updated', {
-            detail: { valence: clampedValence, arousal: clampedArousal, vibe, timestamp },
-          }));
+          const detail: MoodEventDetail = {
+            valence: clampedValence,
+            arousal: clampedArousal,
+            timestamp,
+            summary: signals.summary,
+            microGesture: signals.microGesture,
+            palette: signals.palette,
+            vibe: signals.vibe,
+          };
+          window.dispatchEvent(new CustomEvent('mood.updated', { detail }));
         }
       },
 
@@ -62,11 +81,15 @@ const moodStoreBase = create<MoodStore>()(
           const mockValence = Math.floor(Math.random() * 201) - 100;
           const mockArousal = Math.floor(Math.random() * 101);
           const mockTimestamp = new Date().toISOString();
+          const signals = buildMoodSignals(mockValence, mockArousal);
           const mockMood = {
             valence: mockValence,
             arousal: mockArousal,
             timestamp: mockTimestamp,
-            vibe: mapMoodToVibe(mockValence, mockArousal),
+            vibe: signals.vibe,
+            summary: signals.summary,
+            microGesture: signals.microGesture,
+            palette: signals.palette,
           };
 
           set({
@@ -83,12 +106,16 @@ const moodStoreBase = create<MoodStore>()(
       },
 
       resetMood: () => {
+        const baseline = buildMoodSignals(0, 50);
         set({
           valence: 0,
           arousal: 50,
-          vibe: 'calm',
+          vibe: baseline.vibe,
           timestamp: new Date().toISOString(),
           error: null,
+          summary: baseline.summary,
+          microGesture: baseline.microGesture,
+          palette: baseline.palette,
         });
       },
 
@@ -119,19 +146,33 @@ export const useMood = () => {
 
   React.useEffect(() => {
     const handleMoodUpdate = (event: CustomEvent) => {
-      const { valence, arousal, timestamp, vibe } = event.detail as {
-        valence: number;
-        arousal: number;
-        timestamp?: string;
-        vibe?: MoodVibe;
-      };
+      const detail = event.detail as Partial<MoodEventDetail> | undefined;
+      if (!detail) {
+        return;
+      }
 
-      const nextVibe = vibe ?? mapMoodToVibe(valence, arousal);
+      const currentState = useMoodStore.getState();
+
+      const parsedValence = Number(detail.valence);
+      const parsedArousal = Number(detail.arousal);
+
+      const valence = Number.isFinite(parsedValence)
+        ? Math.max(-100, Math.min(100, parsedValence))
+        : currentState.valence;
+      const arousal = Number.isFinite(parsedArousal)
+        ? Math.max(0, Math.min(100, parsedArousal))
+        : currentState.arousal;
+
+      const computed = buildMoodSignals(valence, arousal);
+
       useMoodStore.setState({
         valence,
         arousal,
-        timestamp: timestamp ?? new Date().toISOString(),
-        vibe: nextVibe,
+        timestamp: detail.timestamp ?? new Date().toISOString(),
+        vibe: detail.vibe ?? computed.vibe,
+        summary: detail.summary ?? computed.summary,
+        microGesture: detail.microGesture ?? computed.microGesture,
+        palette: detail.palette ?? computed.palette,
       });
     };
 

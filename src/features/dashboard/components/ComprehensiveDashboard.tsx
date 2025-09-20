@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { Sparkline } from '@/COMPONENTS.reg';
 import { LastJournalEntriesCard } from './LastJournalEntriesCard';
+import useCurrentMood from '@/hooks/useCurrentMood';
 import {
   getEmotionScanHistory,
   deriveScore10,
@@ -66,6 +67,23 @@ interface ScanResult {
  */
 export function ComprehensiveDashboard() {
   const { user, isAuthenticated } = useAuth();
+  const currentMood = useCurrentMood();
+  const moodSecondaryText = React.useMemo(() => {
+    const normalized = currentMood.palette.text.toLowerCase();
+    if (normalized === '#f8fafc' || normalized === '#ffffff') {
+      return 'rgba(248, 250, 252, 0.78)';
+    }
+    return 'rgba(15, 23, 42, 0.68)';
+  }, [currentMood.palette.text]);
+
+  const moodCardStyle = React.useMemo(
+    () => ({
+      background: `linear-gradient(135deg, ${currentMood.palette.surface}, ${currentMood.palette.glow})`,
+      borderColor: currentMood.palette.border,
+      color: currentMood.palette.text,
+    }),
+    [currentMood.palette.surface, currentMood.palette.glow, currentMood.palette.border, currentMood.palette.text],
+  );
 
   // Requêtes pour les données du dashboard
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -183,6 +201,46 @@ export function ComprehensiveDashboard() {
           Voici un aperçu de votre parcours bien-être aujourd'hui.
         </p>
       </motion.div>
+
+      <section aria-label="Ambiance du moment">
+        <Card className="border" style={moodCardStyle}>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <div className="space-y-2">
+              <CardTitle style={{ color: currentMood.palette.text }}>Ambiance du moment</CardTitle>
+              <p className="text-sm" style={{ color: moodSecondaryText }}>
+                {currentMood.summary}
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <span
+                aria-label={`Vibe ${currentMood.label}`}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full shadow-lg"
+                style={{ background: currentMood.palette.base, color: currentMood.palette.text }}
+              >
+                <span aria-hidden="true" className="text-xl">
+                  {currentMood.emoji}
+                </span>
+              </span>
+              <Badge
+                variant="secondary"
+                className="border-0 text-xs font-semibold"
+                style={{ background: currentMood.palette.base, color: currentMood.palette.text }}
+              >
+                {currentMood.label}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm" style={{ color: moodSecondaryText }}>
+            <p>{currentMood.headline}</p>
+            <p>
+              Micro-geste suggéré&nbsp;:
+              <span className="ml-1 font-medium" style={{ color: currentMood.palette.text }}>
+                {currentMood.microGesture}
+              </span>
+            </p>
+          </CardContent>
+        </Card>
+      </section>
 
       {/* Statistiques principales */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

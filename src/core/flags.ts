@@ -7,7 +7,8 @@ interface FeatureFlags {
   FF_COMMUNITY: boolean;
   FF_MANAGER_DASH: boolean;
   FF_SCORES: boolean;
-  
+  FF_SCAN: boolean;
+
   // Clinical Assessment Feature Flags
   FF_ASSESS_WHO5: boolean;
   FF_ASSESS_STAI6: boolean;
@@ -26,7 +27,8 @@ interface FeatureFlags {
   FF_ASSESS_UWES: boolean;
   FF_ASSESS_CBI: boolean;
   FF_ASSESS_CVSQ: boolean;
-  
+  FF_ASSESS_SAM: boolean;
+
   [key: string]: boolean;
 }
 
@@ -38,7 +40,8 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_COMMUNITY: true,
   FF_MANAGER_DASH: true,
   FF_SCORES: true,
-  
+  FF_SCAN: true,
+
   // Clinical assessments – disabled by default, opt-in via remote config
   FF_ASSESS_WHO5: false,
   FF_ASSESS_STAI6: false,
@@ -57,6 +60,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_UWES: false,
   FF_ASSESS_CBI: false,
   FF_ASSESS_CVSQ: false,
+  FF_ASSESS_SAM: true,
 };
 
 let flagsCache: FeatureFlags | null = null;

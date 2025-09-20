@@ -27,6 +27,7 @@ import {
   type MoodSnapshot,
 } from '@/modules/flash/sessionService';
 import { clinicalScoringService } from '@/services/clinicalScoringService';
+import useCurrentMood from '@/hooks/useCurrentMood';
 
 const phaseThemes = {
   warmup: { theme: 'emerald' as const, intensity: 0.45, shape: 'ring' as const },
@@ -94,6 +95,48 @@ const FlashGlowView: React.FC = () => {
   const [extraDurationMs, setExtraDurationMs] = useState(0);
   const [extensionActive, setExtensionActive] = useState(false);
 
+  const currentMood = useCurrentMood();
+  const moodHintSecondary = React.useMemo(() => {
+    const normalized = currentMood.palette.text.toLowerCase();
+    if (normalized === '#f8fafc' || normalized === '#ffffff') {
+      return 'rgba(248, 250, 252, 0.75)';
+    }
+    return 'rgba(15, 23, 42, 0.65)';
+  }, [currentMood.palette.text]);
+
+  const moodTuning = React.useMemo((): {
+    theme?: 'cyan' | 'violet' | 'amber' | 'emerald';
+    delta: number;
+    guidance: string;
+  } => {
+    switch (currentMood.vibe) {
+      case 'bright':
+        return {
+          theme: 'amber',
+          delta: 0.1,
+          guidance: "On diffuse un halo festif pour prolonger cette énergie.",
+        };
+      case 'focus':
+        return {
+          theme: 'emerald',
+          delta: 0.05,
+          guidance: "L'éclat se resserre pour soutenir la clarté.",
+        };
+      case 'reset':
+        return {
+          theme: 'violet',
+          delta: -0.12,
+          guidance: "La lumière s'adoucit pour envelopper la tonalité plus basse.",
+        };
+      default:
+        return {
+          theme: undefined,
+          delta: -0.04,
+          guidance: "Un halo apaisé stabilise la respiration.",
+        };
+    }
+  }, [currentMood.vibe]);
+
   const totalDuration = BASE_DURATION_MS + extraDurationMs;
 
   const { phases, snapshot, update } = useFlashPhases(totalDuration, {
@@ -107,6 +150,21 @@ const FlashGlowView: React.FC = () => {
     },
   });
 
+  const adaptiveTheme = React.useMemo(() => {
+    const base = phaseThemes[snapshot.phase.key];
+    const arousalAdjustment = currentMood.normalized.arousal > 65
+      ? 0.08
+      : currentMood.normalized.arousal < 35
+        ? -0.06
+        : 0;
+    const intensity = Math.max(0.2, Math.min(1, base.intensity + moodTuning.delta + arousalAdjustment));
+    return {
+      theme: (moodTuning.theme ?? base.theme) as 'cyan' | 'violet' | 'amber' | 'emerald',
+      intensity,
+      shape: base.shape,
+    };
+  }, [snapshot.phase.key, moodTuning, currentMood.normalized.arousal]);
+
   const session = useSessionClock({
     durationMs: totalDuration,
     tickMs: 1000,
@@ -119,7 +177,6 @@ const FlashGlowView: React.FC = () => {
   const stateLabel = statusLabels[session.state] ?? statusLabels.idle;
   const primaryLabel = primaryButtonLabels[session.state] ?? primaryButtonLabels.idle;
 
-  const currentTheme = phaseThemes[snapshot.phase.key];
 
   useEffect(() => {
     if (sudsOptIn && postSudsValues.length === 0) {
@@ -381,9 +438,10 @@ const FlashGlowView: React.FC = () => {
   const surface = motion.prefersReducedMotion ? (
     <div
       aria-label="Surface lumineuse douce"
-      className="h-64 w-full rounded-2xl border border-white/5"
+      className="h-64 w-full rounded-2xl border"
       style={{
-        background: 'radial-gradient(circle at 50% 30%, rgba(255,255,255,0.16), transparent 70%)',
+        background: `radial-gradient(circle at 50% 30%, ${currentMood.palette.surface}, transparent 70%)`,
+        borderColor: currentMood.palette.border,
         transition: 'opacity 240ms ease-in-out',
         opacity: 0.6 + snapshot.progress * 0.3,
       }}
@@ -391,9 +449,9 @@ const FlashGlowView: React.FC = () => {
   ) : (
     <GlowSurface
       phase01={snapshot.progress}
-      theme={currentTheme.theme}
-      intensity={currentTheme.intensity}
-      shape={currentTheme.shape}
+      theme={adaptiveTheme.theme}
+      intensity={adaptiveTheme.intensity}
+      shape={adaptiveTheme.shape}
     />
   );
 
@@ -407,6 +465,49 @@ const FlashGlowView: React.FC = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
+          <section
+            aria-live="polite"
+            className="rounded-lg border p-4"
+            style={{
+              background: `linear-gradient(135deg, ${currentMood.palette.surface}, ${currentMood.palette.glow})`,
+              borderColor: currentMood.palette.border,
+              color: currentMood.palette.text,
+            }}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-2 text-sm">
+                <p className="text-xs uppercase tracking-wide" style={{ color: moodHintSecondary }}>
+                  Aligné sur votre humeur
+                </p>
+                <p className="text-lg font-semibold">{currentMood.summary}</p>
+                <p style={{ color: moodHintSecondary }}>{moodTuning.guidance}</p>
+                <p style={{ color: moodHintSecondary }}>
+                  Suggestion douceur&nbsp;:
+                  <span className="ml-1 font-medium" style={{ color: currentMood.palette.text }}>
+                    {currentMood.microGesture}
+                  </span>
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <span
+                  aria-label={`Vibe ${currentMood.label}`}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full shadow-lg"
+                  style={{ background: currentMood.palette.base, color: currentMood.palette.text }}
+                >
+                  <span aria-hidden="true" className="text-2xl">
+                    {currentMood.emoji}
+                  </span>
+                </span>
+                <span
+                  className="text-xs font-medium uppercase tracking-wide"
+                  style={{ color: moodHintSecondary }}
+                >
+                  {currentMood.label}
+                </span>
+              </div>
+            </div>
+          </section>
+
           <section aria-live="polite" className="rounded-lg bg-muted/40 p-4">
             <p className="text-sm text-muted-foreground">Statut de la séance</p>
             <p className="text-lg font-medium">{stateLabel}</p>
