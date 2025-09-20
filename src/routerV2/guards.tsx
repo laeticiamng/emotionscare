@@ -156,3 +156,50 @@ function normalizeRole(role?: string | null): Role {
       return 'consumer';
   }
 }
+
+interface RouteGuardProps extends GuardChildren {
+  requiredRole?: Role;
+  requireAuth?: boolean;
+}
+
+export const RouteGuard: React.FC<RouteGuardProps> = ({
+  children,
+  requiredRole,
+  requireAuth = false,
+}) => {
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { userMode, isLoading: modeLoading } = useUserMode();
+  const location = useLocation();
+
+  if (authLoading || modeLoading) {
+    return <LoadingFallback />;
+  }
+
+  // Check authentication requirement
+  if (requireAuth && !isAuthenticated) {
+    return (
+      <Navigate
+        to={routes.auth.login()}
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
+  }
+
+  // Check role requirement (only if authenticated or no auth required)
+  if (requiredRole && isAuthenticated) {
+    const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
+    
+    if (currentRole !== requiredRole) {
+      return (
+        <Navigate
+          to={routes.special.forbidden()}
+          state={{ from: location.pathname, role: currentRole, requiredRole }}
+          replace
+        />
+      );
+    }
+  }
+
+  return <>{children}</>;
+};
