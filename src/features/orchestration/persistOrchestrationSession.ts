@@ -2,7 +2,13 @@ import * as Sentry from '@sentry/react';
 
 import { supabase } from '@/integrations/supabase/client';
 
-export type OrchestrationModule = 'community' | 'social_cocon';
+export type OrchestrationModule =
+  | 'community'
+  | 'social_cocon'
+  | 'story_synth'
+  | 'activity_jardin'
+  | 'screen_silk'
+  | 'weekly_bars';
 export type OrchestrationMetadata = Record<string, string | undefined>;
 
 const TABLE = 'session_text_logs';

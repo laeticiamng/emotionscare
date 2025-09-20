@@ -5,3 +5,7 @@ export * from './leaderboardAuras.orchestrator';
 export * from './journal.orchestrator';
 export * from './moodMixer.orchestrator';
 export * from './persistOrchestrationSession';
+export * from './storySynth.orchestrator';
+export * from './activityJardin.orchestrator';
+export * from './screenSilk.orchestrator';
+export * from './weeklyBars.orchestrator';

@@ -60,6 +60,8 @@ export interface BubbleBeatOrchestratorInput {
 }
 export type AssessmentLevel = 0 | 1 | 2 | 3 | 4;
 
+export type PostCtaKey = 'nyvee_suggest' | 'screen_silk' | 'flash_glow';
+
 export type UIHint =
   | { action: 'show_banner'; key: 'listen_two_minutes' }
   | { action: 'pin_card'; key: 'social_cocon' }
@@ -67,7 +69,15 @@ export type UIHint =
   | { action: 'promote_cta'; key: 'schedule_break' }
   | { action: 'highlight_rooms_private' }
   | { action: 'none' }
-  | { action: 'set_aura'; key: 'cool_gentle' | 'neutral' | 'warm_soft' };
+  | { action: 'set_aura'; key: 'cool_gentle' | 'neutral' | 'warm_soft' }
+  | { action: 'set_story_bed'; key: 'cocon' }
+  | { action: 'set_story_voice'; key: 'slow' }
+  | { action: 'shorten_scene'; ms: number }
+  | { action: 'show_highlights'; items: string[] }
+  | { action: 'set_blink_reminder'; key: 'gentle' }
+  | { action: 'set_blur_opacity'; key: 'low' | 'very_low' }
+  | { action: 'post_cta'; key: PostCtaKey }
+  | { action: 'show_bars_text'; items: string[] };
 
 export interface CommunityLevels {
   uclaLevel?: number;
