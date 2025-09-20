@@ -12,7 +12,7 @@ import React, { lazy, Suspense } from 'react';
 import * as Sentry from '@sentry/react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
-import { ROUTE_ALIASES } from './aliases';
+import { ROUTE_ALIAS_ENTRIES } from './aliases';
 import { RouteGuard } from './guards';
 import { withErrorBoundary } from '@/contexts/ErrorContext';
 import PageErrorFallback from '@/components/error/PageErrorFallback';
@@ -387,7 +387,7 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 
 // Export des routes helpers et du router
 export { routes } from './routes';
-export { ROUTE_ALIASES } from './aliases';
+export { ROUTE_ALIAS_ENTRIES } from './aliases';
 export type { RouteAlias } from './aliases';
 const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
 
@@ -400,7 +400,7 @@ export const routerV2 = createBrowserRouter([
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
   ...(FF_ROUTER_V2
-    ? ROUTE_ALIASES.map(alias => ({
+    ? ROUTE_ALIAS_ENTRIES.map(alias => ({
         path: alias.from,
         element: <AliasRedirect from={alias.from} to={alias.to} />,
       }))
