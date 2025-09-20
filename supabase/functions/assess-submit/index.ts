@@ -171,6 +171,12 @@ serve(async (req) => {
       data: { instrument },
     });
 
+    addSentryBreadcrumb({
+      category: 'assess:submit',
+      message: 'storing sanitized summary',
+      data: { instrument },
+    });
+
     const authHeader = req.headers.get('authorization') ?? '';
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
@@ -228,6 +234,12 @@ serve(async (req) => {
     });
 
     const response = json(200, { status: 'ok', stored: true, signal: true });
+    addSentryBreadcrumb({
+      category: 'assess:submit',
+      message: 'assessment stored',
+      data: { instrument },
+    });
+
     return appendCorsHeaders(response, cors);
   } catch (error) {
     captureSentryException(error, { route: 'assess-submit' });

@@ -252,6 +252,7 @@ describe('assess-submit function', () => {
     expect(response.status).toBe(200);
     expect(insertMock).toHaveBeenCalledTimes(1);
     const payload = insertMock.mock.calls[0][0];
+    expect(payload.user_id).toBe('user-123');
     expect(payload.instrument).toBe('WHO5');
     expect(payload.score_json.summary).toMatch(/bien-être|affect|tension/);
     expect(payload.score_json.summary).not.toMatch(/\d/);
@@ -260,6 +261,12 @@ describe('assess-submit function', () => {
       route: 'assess-submit',
       action: 'assess:submit',
       result: 'success',
+    }));
+    expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'storing sanitized summary',
+    }));
+    expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'assessment stored',
     }));
   });
 
@@ -328,20 +335,23 @@ describe('assess-aggregate function', () => {
     const selectMock = vi.fn();
     const eqMock = vi.fn();
     const inMock = vi.fn();
+    const gteMock = vi.fn();
     const result = { data: [
-      { instrument: 'WHO5', period: '2024-Q1', n: 7, text_summary: 'Équipe sereine et 12 initiatives positives.' },
+      { instrument: 'WHO5', period: '2024-Q1', n: 7, text_summary: 'Équipe sereine et 12,5 % initiatives positives.' },
       { instrument: 'STAI6', period: '2024-Q1', n: 3, text_summary: 'Sensibilité ponctuelle.' },
     ], error: null };
     const builder: any = {
       select: selectMock,
       eq: eqMock,
       in: inMock,
+      gte: gteMock,
       then: (onFulfilled: (value: unknown) => unknown, onRejected?: (reason: unknown) => unknown) =>
         Promise.resolve(result).then(onFulfilled, onRejected),
     };
     selectMock.mockReturnValue(builder);
     eqMock.mockReturnValue(builder);
     inMock.mockReturnValue(builder);
+    gteMock.mockReturnValue(builder);
     const fromMock = vi.fn(() => builder);
     supabaseClientMock.mockReturnValue({ from: fromMock });
 
@@ -361,8 +371,10 @@ describe('assess-aggregate function', () => {
     expect(payload.summaries).toHaveLength(1);
     expect(payload.summaries[0].instrument).toBe('WHO5');
     expect(payload.summaries[0].text).not.toMatch(/\d/);
+    expect(payload.summaries[0].text).not.toContain('%');
     expect(payload.summaries[0].text).toContain('•');
     expect(inMock).not.toHaveBeenCalled();
+    expect(gteMock).toHaveBeenCalledWith('n', 5);
     expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
       category: 'assess:aggregate',
     }));
@@ -381,12 +393,14 @@ describe('assess-aggregate function', () => {
       select: vi.fn(),
       eq: vi.fn(),
       in: vi.fn(),
+      gte: vi.fn(),
       then: (onFulfilled: (value: unknown) => unknown, onRejected?: (reason: unknown) => unknown) =>
         Promise.resolve({ data: null, error }).then(onFulfilled, onRejected),
     };
     builder.select.mockReturnValue(builder);
     builder.eq.mockReturnValue(builder);
     builder.in.mockReturnValue(builder);
+    builder.gte.mockReturnValue(builder);
     const fromMock = vi.fn(() => builder);
     supabaseClientMock.mockReturnValue({ from: fromMock });
 
