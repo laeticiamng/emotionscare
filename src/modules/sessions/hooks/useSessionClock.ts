@@ -253,9 +253,10 @@ export function useSessionClock(options: Options = {}): Return {
   }, [])
 
   useEffect(() => {
-    if (autoStart) {
-      start()
+    if (!autoStart) {
+      return
     }
+    start()
   }, [])
   }, [autoStart, start])
 
