@@ -66,7 +66,7 @@ export function computeLevel(
       return 4;
     }
     case 'STAI6': {
-      const total = sumLikert(answers, { min: 1, max: 4 }, { reversed: ['1', '4'] });
+      const total = sumLikert(answers, { min: 1, max: 4 }, { reversed: ['1', '4', '5'] });
       if (total <= 10) return 0;
       if (total <= 15) return 1;
       if (total <= 20) return 2;
