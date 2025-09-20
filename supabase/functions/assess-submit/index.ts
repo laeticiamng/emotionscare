@@ -10,6 +10,7 @@ import { hash } from '../_shared/hash_user.ts';
 import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
+import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 
 const answerValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 
@@ -26,23 +27,43 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 
 serve(async (req) => {
+  const startedAt = Date.now();
   const cors = resolveCors(req);
+  let hashedUserId: string | null = null;
+
+  const finalize = async (
+    response: Response,
+    metadata: { outcome?: 'success' | 'error' | 'denied'; stage?: string | null; error?: string | null } = {},
+  ) => {
+    await recordEdgeLatencyMetric({
+      route: 'assess-submit',
+      durationMs: Date.now() - startedAt,
+      status: response.status,
+      hashedUserId,
+      outcome: metadata.outcome,
+      stage: metadata.stage ?? null,
+      error: metadata.error ?? null,
+    });
+    return response;
+  };
 
   if (req.method === 'OPTIONS') {
-    return preflightResponse(cors);
+    return finalize(preflightResponse(cors));
   }
 
   if (!cors.allowed) {
-    return rejectCors(cors);
+    return finalize(rejectCors(cors), { outcome: 'denied', error: 'origin_not_allowed' });
   }
 
   if (req.method !== 'POST') {
-    return appendCorsHeaders(new Response('Method Not Allowed', { status: 405 }), cors);
+    const response = appendCorsHeaders(new Response('Method Not Allowed', { status: 405 }), cors);
+    return finalize(response, { outcome: 'denied', error: 'method_not_allowed' });
   }
 
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.error('[assess-submit] missing Supabase configuration');
-    return appendCorsHeaders(json(500, { error: 'configuration_error' }), cors);
+    const response = appendCorsHeaders(json(500, { error: 'configuration_error' }), cors);
+    return finalize(response, { outcome: 'error', error: 'configuration_error' });
   }
 
   try {
@@ -51,8 +72,11 @@ serve(async (req) => {
       if (auth.status === 401 || auth.status === 403) {
         await logUnauthorizedAccess(req, auth.error ?? 'unauthorized');
       }
-      return appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
+      const response = appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
+      return finalize(response, { outcome: 'denied', error: 'unauthorized' });
     }
+
+    hashedUserId = hash(auth.user.id);
 
     const rateDecision = await enforceEdgeRateLimit(req, {
       route: 'assess-submit',
@@ -60,17 +84,20 @@ serve(async (req) => {
       description: 'submit assessment answers',
     });
     if (!rateDecision.allowed) {
-      return buildRateLimitResponse(rateDecision, cors.headers);
+      const response = buildRateLimitResponse(rateDecision, cors.headers);
+      return finalize(response, { outcome: 'denied', error: 'rate_limited' });
     }
 
     const body = await req.json().catch(() => null);
     if (!body) {
-      return appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
+      const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
+      return finalize(response, { outcome: 'denied', error: 'invalid_body' });
     }
 
     const parsed = submitSchema.safeParse(body);
     if (!parsed.success) {
-      return appendCorsHeaders(json(422, { error: 'invalid_body', details: 'validation_failed' }), cors);
+      const response = appendCorsHeaders(json(422, { error: 'invalid_body', details: 'validation_failed' }), cors);
+      return finalize(response, { outcome: 'denied', error: 'validation_failed' });
     }
 
     const { instrument, answers, ts } = parsed.data;
@@ -78,9 +105,9 @@ serve(async (req) => {
     const catalog = getCatalog(instrument, 'fr');
 
     addSentryBreadcrumb({
-      category: 'assess:submit',
-      message: 'summary generated',
-      data: { instrument },
+      category: 'assess',
+      message: 'assess:submit:summary_generated',
+      data: { instrument, latency_ms: Date.now() - startedAt },
     });
 
     const authHeader = req.headers.get('authorization') ?? '';
@@ -103,11 +130,12 @@ serve(async (req) => {
     if (error) {
       captureSentryException(error, { route: 'assess-submit', stage: 'db_insert' });
       console.error('[assess-submit] failed to store summary', { message: error.message });
-      return appendCorsHeaders(json(500, { error: 'storage_failed' }), cors);
+      const response = appendCorsHeaders(json(500, { error: 'storage_failed' }), cors);
+      return finalize(response, { outcome: 'error', error: 'storage_failed', stage: 'db_insert' });
     }
 
     await logAccess({
-      user_id: hash(auth.user.id),
+      user_id: hashedUserId,
       role: auth.user.user_metadata?.role ?? null,
       route: 'assess-submit',
       action: 'assess:submit',
@@ -116,11 +144,12 @@ serve(async (req) => {
       details: `instrument=${instrument}`,
     });
 
-    const response = json(200, { status: 'ok', stored: true });
-    return appendCorsHeaders(response, cors);
+    const response = appendCorsHeaders(json(200, { status: 'ok', stored: true }), cors);
+    return finalize(response, { outcome: 'success', stage: 'summary_stored' });
   } catch (error) {
     captureSentryException(error, { route: 'assess-submit' });
     console.error('[assess-submit] unexpected error', { message: error instanceof Error ? error.message : 'unknown' });
-    return appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
+    const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
+    return finalize(response, { outcome: 'error', error: 'internal_error' });
   }
 });

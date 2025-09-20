@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -207,7 +208,7 @@ export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHoo
 
   const processOrchestration = async (instrument: InstrumentCode, answers: Record<string, any>) => {
     const actions: OrchestrationAction[] = [];
-    
+
     switch (instrument) {
       case 'WHO5':
         const who5Score = Object.values(answers).reduce((sum: number, val: any) => sum + Number(val), 0);
@@ -240,8 +241,22 @@ export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHoo
         break;
     }
 
+    Sentry.addBreadcrumb({
+      category: 'orchestration',
+      level: 'info',
+      message: 'orchestration:actions:computed',
+      data: { instrument, actions_count: actions.length },
+    });
+
     // Store orchestration signals in database (invisible to UI)
     if (actions.length > 0) {
+      Sentry.addBreadcrumb({
+        category: 'orchestration',
+        level: 'info',
+        message: 'orchestration:signals:store',
+        data: { instrument, actions },
+      });
+
       const { error } = await supabase
         .from('clinical_signals')
         .insert({
@@ -256,6 +271,17 @@ export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHoo
 
       if (error) {
         console.error('Error storing orchestration signals:', error);
+        Sentry.captureException(error, {
+          route: 'clinical-orchestration',
+          stage: 'signals_store',
+        });
+      } else {
+        Sentry.addBreadcrumb({
+          category: 'orchestration',
+          level: 'info',
+          message: 'orchestration:signals:stored',
+          data: { instrument, actions_count: actions.length },
+        });
       }
     }
 
@@ -263,6 +289,15 @@ export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHoo
       ...prev,
       orchestrationActions: actions
     }));
+
+    if (actions.length > 0) {
+      Sentry.addBreadcrumb({
+        category: 'orchestration',
+        level: 'info',
+        message: 'orchestration:actions:applied',
+        data: { instrument, actions },
+      });
+    }
   };
 
   const getOrchestrationActions = useCallback(() => {
