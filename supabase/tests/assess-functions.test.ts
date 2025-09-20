@@ -46,10 +46,11 @@ vi.mock('../functions/_shared/zod.ts', () => ({ z: require('zod') }));
 const envStore: Record<string, string | undefined> = {
   SUPABASE_URL: 'https://example.supabase.co',
   SUPABASE_ANON_KEY: 'anon-key',
-  SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
   CORS_ORIGINS: 'https://example.com',
-  CSV_SIGNING_SECRET: 'test-signing-secret',
 };
+
+const ORG_ONE = '11111111-1111-1111-1111-111111111111';
+const ORG_TWO = '22222222-2222-2222-2222-222222222222';
 
 function setDefaultAuthSuccess() {
   authenticateRequestMock.mockResolvedValue({
@@ -59,7 +60,7 @@ function setDefaultAuthSuccess() {
 }
 
 function setOrgAuthSuccess(options: { role?: string; orgs?: string[] } = {}) {
-  const { role = 'b2b_admin', orgs = ['org-1'] } = options;
+  const { role = 'b2b_admin', orgs = [ORG_ONE] } = options;
   authenticateRequestMock.mockResolvedValue({
     status: 200,
     user: { id: 'user-123', user_metadata: { role, org_ids: orgs } },
@@ -89,9 +90,7 @@ beforeEach(() => {
   resetEdgeRateLimits();
   envStore.SUPABASE_URL = 'https://example.supabase.co';
   envStore.SUPABASE_ANON_KEY = 'anon-key';
-  envStore.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
   envStore.CORS_ORIGINS = 'https://example.com';
-  envStore.CSV_SIGNING_SECRET = 'test-signing-secret';
   delete envStore.EDGE_RATE_LIMIT_ASSESS_START;
   delete envStore.EDGE_RATE_LIMIT_ASSESS_AGGREGATE;
   (globalThis as Record<string, unknown>).Deno = {
@@ -331,7 +330,7 @@ describe('assess-aggregate function', () => {
         'content-type': 'application/json',
         origin: 'https://example.com',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03' }),
     }));
 
     expect(response.status).toBe(401);
@@ -364,7 +363,7 @@ describe('assess-aggregate function', () => {
         'content-type': 'application/json',
         origin: 'https://example.com',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03' }),
     }));
 
     expect(response.status).toBe(403);
@@ -372,7 +371,7 @@ describe('assess-aggregate function', () => {
   });
 
   it('rejects users outside the requested organisation scope', async () => {
-    setOrgAuthSuccess({ orgs: ['org-2'] });
+    setOrgAuthSuccess({ orgs: [ORG_TWO] });
     const handler = await importEdgeHandler('../functions/assess-aggregate/index.ts');
 
     const response = await handler(new Request('https://edge/assess-aggregate', {
@@ -381,11 +380,31 @@ describe('assess-aggregate function', () => {
         'content-type': 'application/json',
         origin: 'https://example.com',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03' }),
     }));
 
     expect(response.status).toBe(403);
     expect(logUnauthorizedAccessMock).toHaveBeenCalledWith(expect.anything(), 'forbidden_org_scope');
+  });
+
+  it('rejects requests without organisation claim', async () => {
+    authenticateRequestMock.mockResolvedValue({
+      status: 200,
+      user: { id: 'user-123', user_metadata: { role: 'b2b_admin' } },
+    });
+    const handler = await importEdgeHandler('../functions/assess-aggregate/index.ts');
+
+    const response = await handler(new Request('https://edge/assess-aggregate', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://example.com',
+      },
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03' }),
+    }));
+
+    expect(response.status).toBe(403);
+    expect(logUnauthorizedAccessMock).toHaveBeenCalledWith(expect.anything(), 'missing_org_claim');
   });
 
   it('returns sanitized summaries filtered on n >= 5', async () => {
@@ -422,7 +441,7 @@ describe('assess-aggregate function', () => {
         origin: 'https://example.com',
         authorization: 'Bearer token-123',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03' }),
     }));
 
     expect(response.status).toBe(200);
@@ -431,9 +450,9 @@ describe('assess-aggregate function', () => {
     expect(payload.summaries[0].instrument).toBe('WHO5');
     expect(payload.summaries[0].text).not.toMatch(/\d/);
     expect(payload.summaries[0].text).not.toContain('%');
-    expect(payload.summaries[0].text).toContain('•');
-    expect(payload.summaries[0].n).toBe(7);
-    expect(payload.summaries[0].signature).toMatch(/^[A-Za-z0-9_-]{10,}$/);
+    expect(payload.summaries[0].text.length).toBeGreaterThan(0);
+    expect(payload.summaries[0]).not.toHaveProperty('n');
+    expect(payload.summaries[0]).not.toHaveProperty('signature');
     expect(inMock).not.toHaveBeenCalled();
     expect(gteMock).toHaveBeenCalledWith('n', 5);
     expect(addSentryBreadcrumbMock).toHaveBeenCalledWith(expect.objectContaining({
@@ -485,7 +504,7 @@ describe('assess-aggregate function', () => {
         origin: 'https://example.com',
         authorization: 'Bearer token-123',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-03', instruments: ['WHO5'] }),
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03', instruments: ['WHO5'] }),
     }));
 
     expect(response.status).toBe(500);
@@ -535,7 +554,7 @@ describe('assess-aggregate function', () => {
         origin: 'https://example.com',
         authorization: 'Bearer token-123',
       },
-      body: JSON.stringify({ org_id: 'org-1', period: '2024-03' }),
+      body: JSON.stringify({ org_id: ORG_ONE, period: '2024-03' }),
     });
 
     const ok = await handler(makeRequest());

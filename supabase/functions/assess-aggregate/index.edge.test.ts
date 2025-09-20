@@ -21,12 +21,13 @@ afterAll(() => {
 });
 
 const serveCapture: { handler: Handler | null } = { handler: null };
+const TEST_ORG_ID = '11111111-1111-1111-1111-111111111111';
 const authenticateRequest = vi.fn(async () => ({
   status: 200,
-  user: { id: 'admin-1', user_metadata: { role: 'b2b_admin', org_ids: ['org-42'] } },
+  user: { id: 'admin-1', user_metadata: { role: 'b2b_admin', org_ids: [TEST_ORG_ID] } },
 }));
 const logUnauthorizedAccess = vi.fn();
-const sanitizeAggregateText = vi.fn((text: string) => text.replace(/%/g, ' pct '));
+const sanitizeAggregateText = vi.fn((text: string) => text.replace(/\d+%?/g, '').replace(/\s+/g, ' ').trim());
 const resolveCors = vi.fn(() => ({ allowed: true, headers: {} }));
 const appendCorsHeaders = vi.fn((response: Response) => response);
 const preflightResponse = vi.fn(() => new Response(null, { status: 204 }));
@@ -43,8 +44,6 @@ const enforceEdgeRateLimit = vi.fn(async () => ({
 }));
 const buildRateLimitResponse = vi.fn(() => new Response('rate', { status: 429 }));
 const recordEdgeLatencyMetric = vi.fn(async () => {});
-const signJsonPayload = vi.fn(async (_secret: string, payload: Record<string, unknown>) => `sig-${payload.instrument}`);
-
 interface QueryResult {
   data: Array<{ instrument: string; period: string; n: number; text_summary: string | null }>;
   error: { message: string } | null;
@@ -87,6 +86,9 @@ vi.mock('../_shared/auth-middleware.ts', () => ({
 
 vi.mock('../_shared/assess.ts', () => ({
   instrumentSchema: z.enum(['WHO5', 'STAI6']),
+}));
+
+vi.mock('../_shared/clinical_text.ts', () => ({
   sanitizeAggregateText,
 }));
 
@@ -128,10 +130,6 @@ vi.mock('../_shared/metrics.ts', () => ({
   recordEdgeLatencyMetric,
 }));
 
-vi.mock('../_shared/signature.ts', () => ({
-  signJsonPayload,
-}));
-
 vi.mock('../_shared/supabase.ts', () => ({
   createClient,
 }));
@@ -140,8 +138,7 @@ beforeEach(() => {
   envValues.clear();
   envValues.set('CORS_ORIGINS', 'https://app.local');
   envValues.set('SUPABASE_URL', 'https://stub.supabase');
-  envValues.set('SUPABASE_SERVICE_ROLE_KEY', 'service-key');
-  envValues.set('CSV_SIGNING_SECRET', 'secret');
+  envValues.set('SUPABASE_ANON_KEY', 'anon-key');
   vi.resetModules();
   authenticateRequest.mockClear();
   logUnauthorizedAccess.mockClear();
@@ -153,7 +150,6 @@ beforeEach(() => {
   logAccess.mockClear();
   enforceEdgeRateLimit.mockClear();
   recordEdgeLatencyMetric.mockClear();
-  signJsonPayload.mockClear();
   createClient.mockClear();
   serveCapture.handler = null;
   currentResult = {
@@ -177,7 +173,7 @@ describe('assess-aggregate edge handler', () => {
     return handler;
   };
 
-  it('returns sanitized summaries with signatures', async () => {
+  it('returns sanitized summaries with text-only payload', async () => {
     const handler = await getHandler();
     const request = new Request('https://edge.dev/assess/aggregate', {
       method: 'POST',
@@ -185,23 +181,24 @@ describe('assess-aggregate edge handler', () => {
         'Content-Type': 'application/json',
         Origin: 'https://app.local',
       },
-      body: JSON.stringify({ org_id: 'org-42', period: '2025-03', instruments: ['WHO5'] }),
+      body: JSON.stringify({ org_id: TEST_ORG_ID, period: '2025-03', instruments: ['WHO5'] }),
     });
 
     const response = await handler(request);
     expect(response.status).toBe(200);
-    expect(createClient).toHaveBeenCalledWith('https://stub.supabase', 'service-key');
+    expect(createClient).toHaveBeenCalledWith(
+      'https://stub.supabase',
+      'anon-key',
+      expect.objectContaining({ global: { headers: {} } }),
+    );
     const body = await response.json();
     expect(body.summaries).toEqual([
       {
         instrument: 'WHO5',
         period: '2025-03',
-        text: 'Cohorte à 72 pct ',
-        n: 9,
-        signature: 'sig-WHO5',
+        text: 'Cohorte à',
       },
     ]);
-    expect(signJsonPayload).toHaveBeenCalledWith('secret', expect.objectContaining({ instrument: 'WHO5' }));
     expect(logAccess).toHaveBeenCalledWith(expect.objectContaining({ route: 'assess-aggregate', action: 'assess:aggregate' }));
   });
 
@@ -218,7 +215,7 @@ describe('assess-aggregate edge handler', () => {
         'Content-Type': 'application/json',
         Origin: 'https://app.local',
       },
-      body: JSON.stringify({ org_id: 'org-42', period: '2025-03' }),
+      body: JSON.stringify({ org_id: TEST_ORG_ID, period: '2025-03' }),
     });
 
     const response = await handler(request);

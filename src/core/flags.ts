@@ -13,6 +13,7 @@ interface FeatureFlags {
   FF_SCORES: boolean;
   FF_SCAN: boolean;
   FF_B2B_RH: boolean;
+  FF_B2B_AGGREGATES: boolean;
   FF_ASSESS_AGGREGATE: boolean;
 
   // Clinical Assessment Feature Flags
@@ -54,6 +55,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_SCORES: true,
   FF_SCAN: true,
   FF_B2B_RH: true,
+  FF_B2B_AGGREGATES: true,
   FF_ASSESS_AGGREGATE: true,
 
   // Clinical assessments – disabled by default, opt-in via remote config
