@@ -1,242 +1,355 @@
 /**
- * Clinical Assessment Hook - Opt-in invisible evaluations
- * Provides orchestration callbacks without UI display
+ * Clinical assessment hook - fetches instrument catalogues and submits responses
+ * Uses React Query caching with expiry-based staleness and gentle UX feedback.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryFunctionContext,
+} from '@tanstack/react-query';
+import { z } from 'zod';
+
 import { supabase } from '@/integrations/supabase/client';
+import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
 import { useToast } from '@/hooks/use-toast';
 
-export type InstrumentCode = 
-  | 'WHO5' | 'STAI6' | 'PANAS' | 'PSS10' | 'UCLA3' | 'MSPSS' 
-  | 'AAQ2' | 'POMS' | 'SSQ' | 'ISI' | 'GAS' | 'GRITS' 
-  | 'BRS' | 'WEMWBS' | 'UWES' | 'CBI' | 'CVSQ';
+const instrumentCodes = [
+  'WHO5',
+  'STAI6',
+  'PANAS',
+  'PSS10',
+  'UCLA3',
+  'MSPSS',
+  'AAQ2',
+  'POMS',
+  'SSQ',
+  'ISI',
+  'GAS',
+  'GRITS',
+  'BRS',
+  'WEMWBS',
+  'UWES',
+  'CBI',
+  'CVSQ',
+  'SAM',
+  'SUDS',
+] as const;
 
-export type OrchestrationAction = 
-  | 'gentle_tone' | 'suggest_breathing' | 'reduce_intensity' 
-  | 'encourage_movement' | 'offer_social' | 'extend_session'
-  | 'soft_exit' | 'increase_support' | 'quiet_mode';
+const instrumentSchema = z.enum(instrumentCodes);
+const localeSchema = z.enum(['fr', 'en', 'es', 'de', 'it']);
+const answerValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 
-export interface OrchestrationCallbacks {
-  onLowWellbeing?: () => void;
-  onHighAnxiety?: () => void;
-  onLowPositiveAffect?: () => void;
-  onHighStress?: () => void;
-  onSocialNeed?: () => void;
-  onFatigueDetected?: () => void;
-  onOptimalState?: () => void;
-}
+const assessmentItemSchema = z.object({
+  id: z.string(),
+  prompt: z.string(),
+  type: z.enum(['scale', 'choice', 'slider']),
+  options: z.array(z.string()).optional(),
+  min: z.number().optional(),
+  max: z.number().optional(),
+  reversed: z.boolean().optional(),
+  subscale: z.string().optional(),
+});
 
-export interface AssessmentState {
-  isActive: boolean;
-  currentInstrument: InstrumentCode | null;
-  hasConsent: boolean;
-  lastResponse?: Date;
-  orchestrationActions: OrchestrationAction[];
-}
-
-export interface AssessmentHook {
-  state: AssessmentState;
-  triggerAssessment: ( 
-    instrument: InstrumentCode, 
-    callbacks?: OrchestrationCallbacks
-  ) => Promise<void>;
-  submitResponse: (answers: Record<string, any>) => Promise<boolean>;
-  grantConsent: (instrument: InstrumentCode) => Promise<void>;
-  revokeConsent: (instrument: InstrumentCode) => Promise<void>;
-  getOrchestrationActions: () => OrchestrationAction[];
-  clearActions: () => void;
-}
-
-export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHook => {
-  const { toast } = useToast();
-  const [state, setState] = useState<AssessmentState>({
-    isActive: false,
-    currentInstrument: defaultInstrument || null,
-    hasConsent: false,
-    orchestrationActions: []
+const startResponseSchema = z
+  .object({
+    code: instrumentSchema.optional(),
+    instrument: instrumentSchema.optional(),
+    name: z.string(),
+    version: z.string(),
+    expiry_minutes: z.number().int().positive(),
+    items: z.array(assessmentItemSchema).min(1),
+  })
+  .refine(data => Boolean(data.code ?? data.instrument), 'missing_instrument_code')
+  .transform(data => {
+    const resolved = (data.code ?? data.instrument)!;
+    return {
+      code: resolved,
+      instrument: resolved,
+      name: data.name,
+      version: data.version,
+      expiry_minutes: data.expiry_minutes,
+      items: data.items,
+    } as const;
   });
 
-  const [currentCallbacks, setCurrentCallbacks] = useState<OrchestrationCallbacks>({});
+const submitRequestSchema = z.object({
+  instrument: instrumentSchema,
+  answers: z
+    .record(answerValueSchema)
+    .refine(value => Object.keys(value).length > 0, 'answers_required'),
+  ts: z.string().datetime().optional(),
+});
 
-  // Check consent status
-  useEffect(() => {
-    if (state.currentInstrument) {
-      checkConsent(state.currentInstrument);
-    }
-  }, [state.currentInstrument]);
+const submitResponseSchema = z.object({
+  status: z.literal('ok'),
+  stored: z.boolean().optional(),
+});
 
-  const checkConsent = async (instrument: InstrumentCode) => {
-    try {
-      const { data } = await supabase
-        .from('clinical_consents')
-        .select('is_active')
-        .eq('instrument_code', instrument)
-        .eq('is_active', true)
-        .maybeSingle();
+export type InstrumentCode = (typeof instrumentCodes)[number];
+export type LocaleCode = z.infer<typeof localeSchema>;
+export type AssessmentItem = z.infer<typeof assessmentItemSchema>;
+export type AssessmentCatalog = z.infer<typeof startResponseSchema>;
+export type AnswerValue = z.infer<typeof answerValueSchema>;
 
-      setState(prev => ({
-        ...prev,
-        hasConsent: !!data?.is_active
-      }));
-    } catch (error) {
-      console.error('Error checking consent:', error);
-    }
-  };
+interface SubmitArgs {
+  answers: Record<string, AnswerValue>;
+  timestamp?: string;
+}
 
-  const grantConsent = async (instrument: InstrumentCode) => {
-    try {
-      const { error } = await supabase
-        .from('clinical_consents')
-        .insert({
-          instrument_code: instrument,
-          is_active: true
+interface SubmitResult {
+  status: 'ok';
+  stored?: boolean;
+}
+
+type AssessmentQueryKey = ['assessment', InstrumentCode, LocaleCode];
+
+type StartQueryContext = QueryFunctionContext<AssessmentQueryKey>;
+
+class AssessmentAuthError extends Error {
+  constructor(message = 'auth_required') {
+    super(message);
+    this.name = 'AssessmentAuthError';
+  }
+}
+
+const minutesToMs = (minutes?: number) => {
+  if (!minutes || minutes <= 0) {
+    return 0;
+  }
+  return minutes * 60_000;
+};
+
+const staleTimeFromQuery = (query: { state: { data?: AssessmentCatalog } }) => {
+  return minutesToMs(query.state.data?.expiry_minutes);
+};
+
+const gcTimeFromQuery = (query: { state: { data?: AssessmentCatalog } }) => {
+  const ms = minutesToMs(query.state.data?.expiry_minutes);
+  return ms > 0 ? ms : undefined;
+};
+
+const resolveSessionToken = async (): Promise<string> => {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    throw new Error(error.message ?? 'session_unavailable');
+  }
+
+  const token = data.session?.access_token;
+  if (!token) {
+    throw new AssessmentAuthError();
+  }
+
+  return token;
+};
+
+const fetchCatalog = async ({ queryKey, signal }: StartQueryContext): Promise<AssessmentCatalog> => {
+  const [, instrument, locale] = queryKey;
+  const accessToken = await resolveSessionToken();
+
+  const payload = { instrument, locale } as const;
+  const raw = await invokeSupabaseEdge<typeof payload, unknown>('assess-start', {
+    payload,
+    accessToken,
+    signal,
+  });
+
+  const parsed = startResponseSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error('invalid_catalog_payload');
+  }
+
+  return parsed.data;
+};
+
+const submitAssessment = async (
+  variables: SubmitArgs & { instrument: InstrumentCode },
+): Promise<SubmitResult> => {
+  const { instrument, answers, timestamp } = variables;
+  const accessToken = await resolveSessionToken();
+
+  const payload = {
+    instrument,
+    answers,
+    ...(timestamp ? { ts: timestamp } : {}),
+  } as const;
+
+  const response = await invokeSupabaseEdge<typeof payload, unknown>('assess-submit', {
+    payload,
+    schema: submitRequestSchema,
+    accessToken,
+  });
+
+  const parsed = submitResponseSchema.safeParse(response);
+  if (!parsed.success) {
+    throw new Error('invalid_submit_response');
+  }
+
+  return parsed.data;
+};
+
+const isUnauthorizedError = (error: unknown) => {
+  if (error instanceof AssessmentAuthError) {
+    return true;
+  }
+  if (error instanceof Error) {
+    return /401/.test(error.message);
+  }
+  return false;
+};
+
+export interface UseAssessmentResult {
+  instrument: InstrumentCode;
+  locale: LocaleCode;
+  catalog?: AssessmentCatalog;
+  start: (locale?: LocaleCode) => Promise<AssessmentCatalog | undefined>;
+  submit: (answers: Record<string, AnswerValue>) => Promise<boolean>;
+  isStarting: boolean;
+  isSubmitting: boolean;
+  startError: Error | null;
+  submitError: Error | null;
+}
+
+export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [currentLocale, setCurrentLocale] = useState<LocaleCode>('fr');
+
+  const queryKey = useMemo<AssessmentQueryKey>(
+    () => ['assessment', instrument, currentLocale],
+    [instrument, currentLocale],
+  );
+
+  const handleStartError = useCallback(
+    (error: unknown) => {
+      console.error('[useAssessment] unable to start assessment', error);
+
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: 'Connexion requise',
+          description: 'Connecte-toi pour accéder au questionnaire clinique.',
+          variant: 'warning',
         });
-
-      if (error) throw error;
-
-      setState(prev => ({
-        ...prev,
-        hasConsent: true
-      }));
-
-      toast({
-        title: "Évaluation activée",
-        description: "L'évaluation clinique a été activée pour personnaliser votre expérience.",
-      });
-    } catch (error) {
-      console.error('Error granting consent:', error);
-    }
-  };
-
-  const revokeConsent = async (instrument: InstrumentCode) => {
-    try {
-      const { error } = await supabase
-        .from('clinical_consents')
-        .update({ 
-          is_active: false,
-          revoked_at: new Date().toISOString()
-        })
-        .eq('instrument_code', instrument);
-
-      if (error) throw error;
-
-      setState(prev => ({
-        ...prev,
-        hasConsent: false,
-        isActive: false
-      }));
-    } catch (error) {
-      console.error('Error revoking consent:', error);
-    }
-  };
-
-  const triggerAssessment = async (
-    instrument: InstrumentCode,
-    callbacks: OrchestrationCallbacks = {}
-  ) => {
-    if (!state.hasConsent) {
-      console.log(`Assessment ${instrument} skipped - no consent`);
-      return;
-    }
-
-    try {
-      // Check if feature flag is enabled
-      const { data: flag } = await supabase
-        .from('clinical_feature_flags')
-        .select('is_enabled')
-        .eq('flag_name', `FF_ASSESS_${instrument}`)
-        .maybeSingle();
-
-      if (!flag?.is_enabled) {
-        console.log(`Assessment ${instrument} skipped - feature disabled`);
         return;
       }
 
-      // Get instrument catalog
-      const response = await supabase.functions.invoke('assess-start', {
-        body: { instrument }
+      toast({
+        title: 'Évaluation indisponible',
+        description: 'Nous n’avons pas pu préparer le questionnaire. Réessaie dans quelques instants.',
+        variant: 'warning',
       });
+    },
+    [toast],
+  );
 
-      if (response.error) throw response.error;
+  const handleSubmitError = useCallback(
+    (error: unknown) => {
+      console.error('[useAssessment] unable to submit responses', error);
 
-      setState(prev => ({
-        ...prev,
-        isActive: true,
-        currentInstrument: instrument
-      }));
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: 'Session expirée',
+          description: 'Reconnecte-toi pour enregistrer tes réponses.',
+          variant: 'warning',
+        });
+        return;
+      }
 
-      setCurrentCallbacks(callbacks);
-
-      console.log(`Assessment ${instrument} ready for opt-in collection`);
-    } catch (error) {
-      console.error('Error triggering assessment:', error);
-    }
-  };
-
-  const submitResponse = async (answers: Record<string, any>): Promise<boolean> => {
-    if (!state.currentInstrument || !state.hasConsent) {
-      return false;
-    }
-
-    try {
-      const response = await supabase.functions.invoke('assess-submit', {
-        body: {
-          instrument: state.currentInstrument,
-          answers
-        }
+      toast({
+        title: 'Réponses non enregistrées',
+        description: 'Une erreur est survenue. Vérifie ta connexion puis réessaie.',
+        variant: 'warning',
       });
+    },
+    [toast],
+  );
 
-      if (response.error) throw response.error;
+  const startQuery = useQuery<AssessmentCatalog, Error, AssessmentCatalog, AssessmentQueryKey>({
+    queryKey,
+    queryFn: fetchCatalog,
+    enabled: false,
+    staleTime: staleTimeFromQuery,
+    gcTime: gcTimeFromQuery,
+  });
 
-      // Process orchestration based on results
-      await processOrchestration(state.currentInstrument, answers);
+  const start = useCallback<UseAssessmentResult['start']>(
+    async (locale?: LocaleCode) => {
+      const nextLocale = locale ?? currentLocale;
+      if (nextLocale !== currentLocale) {
+        setCurrentLocale(nextLocale);
+      }
 
-      setState(prev => ({
-        ...prev,
-        isActive: false,
-        lastResponse: new Date()
-      }));
+      try {
+        const data = await queryClient.fetchQuery({
+          queryKey: ['assessment', instrument, nextLocale] as AssessmentQueryKey,
+          queryFn: fetchCatalog,
+          staleTime: staleTimeFromQuery,
+          gcTime: gcTimeFromQuery,
+        });
+        return data;
+      } catch (error) {
+        handleStartError(error);
+        return undefined;
+      }
+    },
+    [currentLocale, handleStartError, instrument, queryClient],
+  );
 
-      return true;
-    } catch (error) {
-      console.error('Error submitting assessment:', error);
-      return false;
-    }
-  };
+  const submitMutation = useMutation<SubmitResult, Error, SubmitArgs>({
+    mutationKey: ['assessment', instrument, 'submit'],
+    mutationFn: async variables => {
+      const sanitizedEntries = Object.entries(variables.answers).filter(([, value]) =>
+        value !== undefined && value !== null,
+      );
 
-  const processOrchestration = async (instrument: InstrumentCode, answers: Record<string, any>) => {
-    const actions: OrchestrationAction[] = [];
-    
-    switch (instrument) {
-      case 'WHO5':
-        const who5Score = Object.values(answers).reduce((sum: number, val: any) => sum + Number(val), 0);
-        if (who5Score < 13) {
-          actions.push('gentle_tone', 'increase_support');
-          currentCallbacks.onLowWellbeing?.();
-        } else {
-          actions.push('encourage_movement');
-          currentCallbacks.onOptimalState?.();
+      if (!sanitizedEntries.length) {
+        toast({
+          title: 'Réponses requises',
+          description: 'Merci de répondre à chaque question avant de valider.',
+          variant: 'info',
+        });
+        throw new Error('answers_required');
+      }
+
+      const sanitizedAnswers = sanitizedEntries.reduce<Record<string, AnswerValue>>((acc, [key, value]) => {
+        acc[key] = value as AnswerValue;
+        return acc;
+      }, {});
+
+      return submitAssessment({
+        instrument,
+        answers: sanitizedAnswers,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    onError: error => {
+      const message = (error as Error).message;
+      if (message === 'submit_in_progress' || message === 'answers_required') {
+        return;
+      }
+      handleSubmitError(error);
+    },
+  });
+
+  const submit = useCallback<UseAssessmentResult['submit']>(
+    async answers => {
+      if (submitMutation.isPending) {
+        return false;
+      }
+
+      try {
+        const result = await submitMutation.mutateAsync({ answers });
+        return result.status === 'ok';
+      } catch (error) {
+        const message = (error as Error).message;
+        if (message === 'answers_required' || message === 'submit_in_progress') {
+          return false;
         }
-        break;
 
-      case 'STAI6':
-        const staiScore = Object.values(answers).reduce((sum: number, val: any) => sum + Number(val), 0);
-        if (staiScore > 16) {
-          actions.push('suggest_breathing', 'reduce_intensity');
-          currentCallbacks.onHighAnxiety?.();
-        }
-        break;
-
-      case 'PANAS':
-        const positiveItems = Object.entries(answers)
-          .filter(([key]) => Number(key) <= 10)
-          .reduce((sum, [, val]) => sum + Number(val), 0);
-        
-        if (positiveItems < 30) {
-          actions.push('gentle_tone', 'offer_social');
-          currentCallbacks.onLowPositiveAffect?.();
-        }
+        return false;
         break;
     }
 
@@ -265,32 +378,20 @@ export const useAssessment = (defaultInstrument?: InstrumentCode): AssessmentHoo
           console.error('Error storing orchestration signals:', error);
         }
       }
-    }
-
-    setState(prev => ({
-      ...prev,
-      orchestrationActions: actions
-    }));
-  };
-
-  const getOrchestrationActions = useCallback(() => {
-    return state.orchestrationActions;
-  }, [state.orchestrationActions]);
-
-  const clearActions = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      orchestrationActions: []
-    }));
-  }, []);
+    },
+    [submitMutation],
+  );
 
   return {
-    state,
-    triggerAssessment,
-    submitResponse,
-    grantConsent,
-    revokeConsent,
-    getOrchestrationActions,
-    clearActions
+    instrument,
+    locale: currentLocale,
+    catalog: startQuery.data,
+    start,
+    submit,
+    isStarting: startQuery.fetchStatus === 'fetching',
+    isSubmitting: submitMutation.isPending,
+    startError: startQuery.error ?? null,
+    submitError: (submitMutation.error as Error | null) ?? null,
   };
 };
+
