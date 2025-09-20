@@ -13,8 +13,38 @@ type SentryContextOptions = {
   attempted?: string;
 };
 
+type LayoutShiftEntry = PerformanceEntry & {
+  value: number;
+  hadRecentInput: boolean;
+};
+
+type LargestContentfulPaintEntry = PerformanceEntry & {
+  renderTime?: number;
+  loadTime?: number;
+  startTime: number;
+  size?: number;
+  id?: string;
+  url?: string;
+  element?: Element;
+};
+
+type FirstInputEntry = PerformanceEventTiming & {
+  processingStart: number;
+  startTime: number;
+  name: string;
+};
+
 let sentryInitialized = false;
 let domMonitoringAttached = false;
+let webVitalsMonitoringAttached = false;
+
+type WebVitalName = 'CLS' | 'LCP' | 'FID';
+
+const WEB_VITAL_UNITS: Record<WebVitalName, 'millisecond' | 'unitless'> = {
+  CLS: 'unitless',
+  LCP: 'millisecond',
+  FID: 'millisecond',
+};
 
 const sensitiveKeyPattern = /(content|message|prompt|transcript|body|text|summary|entry|payload|answer|comment|note|journal|chat)/i;
 const sensitiveUrlPattern = /(journal|coach|chat|conversation)/i;
@@ -95,6 +125,34 @@ const sanitizeBreadcrumb = (breadcrumb: Breadcrumb): Breadcrumb => ({
   message: breadcrumb.message ? sanitizeString(breadcrumb.message) : breadcrumb.message,
   data: breadcrumb.data ? (sanitizeData(breadcrumb.data) as Record<string, unknown>) : undefined,
 });
+
+const recordWebVital = (name: WebVitalName, value: number, extra: Record<string, unknown>): void => {
+  if (!Number.isFinite(value)) {
+    return;
+  }
+
+  const rounded = name === 'CLS' ? Number(value.toFixed(4)) : Math.round(value);
+  const unit = WEB_VITAL_UNITS[name];
+
+  const scope = Sentry.getCurrentHub().getScope();
+  const transaction = scope?.getTransaction();
+  if (transaction) {
+    transaction.setMeasurement(name, rounded, unit);
+  }
+
+  Sentry.configureScope(activeScope => {
+    activeScope.setExtra(`web-vital:${name}`, {
+      value: rounded,
+      unit,
+      ...extra,
+    });
+  });
+
+  if (import.meta.env.DEV) {
+    const suffix = unit === 'unitless' ? '' : 'ms';
+    console.debug(`[Sentry][Vitals] ${name}: ${rounded}${suffix}`);
+  }
+};
 
 const sanitizeEvent = (event: SentryEvent): SentryEvent | null => {
   if (event.request) {
@@ -223,6 +281,8 @@ export function initializeSentry(): void {
 
   sentryInitialized = true;
 
+  monitorWebVitals();
+
   if (import.meta.env.DEV) {
     console.log('[Sentry] Observabilité initialisée');
   }
@@ -292,5 +352,124 @@ export function monitorDOMErrors(): void {
 
   if (import.meta.env.DEV) {
     console.log('[Sentry] Surveillance DOM activée');
+  }
+}
+
+function monitorWebVitals(): void {
+  if (webVitalsMonitoringAttached || typeof window === 'undefined') {
+    return;
+  }
+
+  if (typeof PerformanceObserver === 'undefined') {
+    return;
+  }
+
+  webVitalsMonitoringAttached = true;
+
+  const clsState = {
+    value: 0,
+    lastReported: 0,
+  };
+  const clsSamples: Array<{ startTime: number; value: number }> = [];
+
+  const clsObserver = new PerformanceObserver(list => {
+    for (const entry of list.getEntries() as LayoutShiftEntry[]) {
+      if ('hadRecentInput' in entry && entry.hadRecentInput) {
+        continue;
+      }
+      const shift = entry as LayoutShiftEntry;
+      clsState.value += shift.value;
+      clsSamples.push({ startTime: shift.startTime, value: shift.value });
+    }
+
+    if (clsState.value - clsState.lastReported > 0.001) {
+      recordWebVital('CLS', clsState.value, {
+        samples: clsSamples.slice(-5),
+      });
+      clsState.lastReported = clsState.value;
+    }
+  });
+
+  try {
+    clsObserver.observe({ type: 'layout-shift', buffered: true });
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.debug('[Sentry][Vitals] Impossible d\'observer CLS', error);
+    }
+  }
+
+  let latestLcp: LargestContentfulPaintEntry | null = null;
+  const lcpObserver = new PerformanceObserver(list => {
+    const entries = list.getEntries() as LargestContentfulPaintEntry[];
+    const last = entries[entries.length - 1];
+    if (last) {
+      latestLcp = last;
+    }
+  });
+
+  let vitalsFinalized = false;
+  const finalizeLcp = () => {
+    if (!latestLcp) {
+      return;
+    }
+    const value = Math.max(latestLcp.renderTime ?? 0, latestLcp.loadTime ?? 0, latestLcp.startTime);
+    recordWebVital('LCP', value, {
+      id: latestLcp.id,
+      url: latestLcp.url,
+      size: latestLcp.size,
+      element: latestLcp.element?.tagName?.toLowerCase?.(),
+    });
+    lcpObserver.disconnect();
+  };
+
+  const handleVisibilityHidden = () => {
+    if (vitalsFinalized) {
+      return;
+    }
+    vitalsFinalized = true;
+    finalizeLcp();
+    clsObserver.takeRecords();
+    clsObserver.disconnect();
+    lcpObserver.disconnect();
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    window.removeEventListener('pagehide', handleVisibilityHidden, true);
+  };
+
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      handleVisibilityHidden();
+    }
+  };
+
+  try {
+    lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide', handleVisibilityHidden, { once: true, capture: true });
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.debug('[Sentry][Vitals] Impossible d\'observer LCP', error);
+    }
+  }
+
+  const fidObserver = new PerformanceObserver(list => {
+    const entries = list.getEntries() as FirstInputEntry[];
+    const first = entries[0];
+    if (!first) {
+      return;
+    }
+    const fid = first.processingStart - first.startTime;
+    recordWebVital('FID', fid, {
+      name: first.name,
+      startTime: first.startTime,
+    });
+    fidObserver.disconnect();
+  });
+
+  try {
+    fidObserver.observe({ type: 'first-input', buffered: true });
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.debug('[Sentry][Vitals] Impossible d\'observer FID', error);
+    }
   }
 }
