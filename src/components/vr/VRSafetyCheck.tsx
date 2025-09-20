@@ -55,6 +55,12 @@ const levelToSignal: Record<VRSafetyLevel, number> = {
   alert: 3,
 };
 
+const SSQ_ANSWER_TEMPLATES: Record<SafetyOption['id'], Record<string, number>> = {
+  steady: { '1': 3, '2': 0, '3': 0, '4': 0 },
+  uneasy: { '1': 1, '2': 2, '3': 1, '4': 1 },
+  grounded: { '1': 0, '2': 3, '3': 3, '4': 3 },
+};
+
 export const VRSafetyCheck: React.FC<VRSafetyCheckProps> = ({
   open,
   moduleContext,
@@ -117,7 +123,7 @@ export const VRSafetyCheck: React.FC<VRSafetyCheckProps> = ({
   const handleOptIn = async () => {
     try {
       if (!assessment.state.hasConsent) {
-        await assessment.grantConsent('SSQ');
+        await assessment.grantConsent();
       }
       await assessment.triggerAssessment('SSQ');
       setHasTriggeredAssessment(true);
@@ -192,11 +198,8 @@ export const VRSafetyCheck: React.FC<VRSafetyCheckProps> = ({
         await assessment.triggerAssessment('SSQ');
       }
 
-      await assessment.submitResponse({
-        comfort_state: selected.id,
-        comfort_level: selected.level,
-        comfort_notes: selected.description,
-      });
+      const ssqAnswers = SSQ_ANSWER_TEMPLATES[selected.id];
+      await assessment.submitResponse(ssqAnswers);
 
       await storeSafetySignal(selected);
 

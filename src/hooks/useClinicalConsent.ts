@@ -8,7 +8,12 @@ export type ClinicalInstrumentCode =
   | 'STAI6'
   | 'PANAS'
   | 'SUDS'
-  | 'SAM';
+  | 'SAM'
+  | 'PSS10'
+  | 'WEMWBS'
+  | 'CBI'
+  | 'UWES'
+  | 'SSQ';
 
 interface ClinicalConsentState {
   decision: ClinicalConsentDecision | null;
