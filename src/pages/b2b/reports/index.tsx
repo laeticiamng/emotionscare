@@ -6,7 +6,8 @@ import { Printer } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { B2BHeatmap } from '@/features/b2b/reports/B2BHeatmap';
 import { ExportButton } from '@/features/b2b/reports/ExportButton';
-import { DEFAULT_INSTRUMENTS, useHeatmap } from '@/services/b2b/reportsApi';
+import { DEFAULT_INSTRUMENTS, getHeatmap } from '@/services/b2b/reportsApi';
+import { groupCellsByInstrument, labelInstrument, type HeatmapCell } from '@/features/b2b/reports/utils';
 import { performanceMonitor } from '@/lib/performance/performanceMonitor';
 import { Button } from '@/components/ui/button';
 import {
@@ -86,6 +87,28 @@ export default function B2BReportsHeatmapPage() {
   React.useEffect(() => {
     performanceMonitor.recordMetric('b2b_reports.visible_cells', filteredCells.length);
   }, [filteredCells.length]);
+
+  const textualSummaries = React.useMemo(() => {
+    if (filteredCells.length === 0) {
+      return [];
+    }
+    const grouped = groupCellsByInstrument(filteredCells);
+    return Object.entries(grouped).map(([instrumentKey, instrumentCells]) => {
+      const instrumentLabel = labelInstrument(instrumentKey);
+      const segments = Array.from(new Set(instrumentCells.map((cell) => cell.team ?? 'Organisation')));
+      const highlights = instrumentCells
+        .map((cell) => (cell.team ? `${cell.team} : ${cell.text}` : cell.text))
+        .filter(Boolean)
+        .slice(0, 2);
+      return {
+        instrument: instrumentLabel,
+        total: instrumentCells.length,
+        segments,
+        highlights,
+        hasMore: instrumentCells.length > highlights.length,
+      };
+    });
+  }, [filteredCells]);
 
   const handlePrint = React.useCallback(() => {
     Sentry.addBreadcrumb({ category: 'b2b:print', message: 'trigger', level: 'info' });
@@ -214,7 +237,40 @@ export default function B2BReportsHeatmapPage() {
           <div className="h-24 rounded-xl bg-slate-100" />
         </div>
       ) : (
-        <B2BHeatmap ref={heatmapRef} cells={filteredCells} reducedMotion={prefersReducedMotion} />
+        <>
+          <B2BHeatmap ref={heatmapRef} cells={filteredCells} reducedMotion={prefersReducedMotion} />
+          {textualSummaries.length > 0 && (
+            <section
+              aria-label="Synthèse textuelle des tendances"
+              aria-live="polite"
+              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+            >
+              <h2 className="text-base font-semibold text-slate-800">Résumé textuel accessible</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Aperçu lisible des constats clés pour les lecteurs d’écran et l’impression.
+              </p>
+              <ul className="mt-3 space-y-3 text-sm text-slate-700">
+                {textualSummaries.map((summary) => (
+                  <li key={summary.instrument} className="space-y-1">
+                    <p className="font-semibold text-slate-800">
+                      {summary.instrument} · {summary.total}{' '}
+                      {summary.total > 1 ? 'segments analysés' : 'segment analysé'}
+                    </p>
+                    <p>
+                      Équipes couvertes : {summary.segments.join(', ')}.
+                    </p>
+                    {summary.highlights.length > 0 && (
+                      <p>
+                        Points clés : {summary.highlights.join(' · ')}
+                        {summary.hasMore ? '…' : ''}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
       )}
 
       <footer className="border-t border-dashed border-slate-200 pt-4 text-xs text-slate-500">

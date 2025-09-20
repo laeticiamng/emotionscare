@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { PageHeader, Button } from '@/COMPONENTS.reg';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,14 @@ import { computeMoodDelta, sanitizeMoodScore } from '@/modules/breath/mood';
 import { useSound } from '@/COMPONENTS.reg';
 import { useFlags } from '@/core/flags';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const STEP_LABELS: Record<Step['kind'], string> = {
   in: 'Inspire',
@@ -162,6 +170,11 @@ export default function BreathPage() {
     before: 'idle',
     after: 'idle',
   });
+  const [showStaiOptInDialog, setShowStaiOptInDialog] = useState(false);
+
+  const staiToggleLabelId = useId();
+  const staiToggleHintId = useId();
+  const staiDialogDescriptionId = useId();
 
   const sound = useSound?.('/sounds/click.mp3', { volume: 0.4 });
   const hasCompletedRef = useRef(false);
@@ -556,6 +569,24 @@ export default function BreathPage() {
     setMinutes(clampMinutes(Number.parseInt(event.target.value, 10)));
   };
 
+  const handleStaiSwitchChange = (value: boolean) => {
+    if (value) {
+      setShowStaiOptInDialog(true);
+      return;
+    }
+    setStaiOptIn(false);
+  };
+
+  const confirmStaiOptIn = () => {
+    setStaiOptIn(true);
+    setShowStaiOptInDialog(false);
+  };
+
+  const cancelStaiOptIn = () => {
+    setShowStaiOptInDialog(false);
+    setStaiOptIn(false);
+  };
+
   const renderStaiForm = (phase: StaiPhase) => {
     if (!staiOptIn) return null;
     const responses = phase === 'before' ? staiBeforeResponses : staiAfterResponses;
@@ -881,16 +912,46 @@ export default function BreathPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
               <div>
-                <p className="text-sm font-medium text-slate-900">Activer STAI-6</p>
-                <p className="text-xs text-muted-foreground">Renseigne des réponses qualitatives avant et après la séance.</p>
+                <p id={staiToggleLabelId} className="text-sm font-medium text-slate-900">Activer STAI-6</p>
+                <p id={staiToggleHintId} className="text-xs text-muted-foreground">
+                  Renseigne des réponses qualitatives avant et après la séance.
+                </p>
               </div>
-              <Switch checked={staiOptIn} onCheckedChange={setStaiOptIn} />
+              <Switch
+                checked={staiOptIn}
+                onCheckedChange={handleStaiSwitchChange}
+                aria-labelledby={staiToggleLabelId}
+                aria-describedby={staiToggleHintId}
+              />
             </div>
             {staiOptIn && renderStaiForm('before')}
             {staiOptIn && sessionClock.state === 'completed' && renderStaiForm('after')}
           </CardContent>
         </Card>
       </section>
+      <Dialog open={showStaiOptInDialog} onOpenChange={setShowStaiOptInDialog}>
+        <DialogContent aria-describedby={staiDialogDescriptionId} role="dialog">
+          <DialogHeader>
+            <DialogTitle>Confirmer l’activation de STAI-6</DialogTitle>
+            <DialogDescription id={staiDialogDescriptionId}>
+              Les réponses restent invisibles et servent uniquement à ajuster les recommandations de respiration et de suivi.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-2 text-sm text-slate-700">
+            <li>• Six items avant/après, jamais de score affiché.</li>
+            <li>• Données stockées de façon chiffrée côté clinique.</li>
+            <li>• Retirable à tout moment depuis cette carte.</li>
+          </ul>
+          <DialogFooter className="gap-2 sm:justify-end">
+            <Button variant="outline" onClick={cancelStaiOptIn}>
+              Annuler
+            </Button>
+            <Button onClick={confirmStaiOptIn}>
+              Activer STAI-6
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
