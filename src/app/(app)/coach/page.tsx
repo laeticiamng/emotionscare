@@ -1,8 +1,9 @@
 'use client';
 
+import '@/lib/obs/sentry.web';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import * as Sentry from '@sentry/react';
+import { addBreadcrumb } from '@/lib/obs/breadcrumb';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -159,12 +160,7 @@ function CoachPageInner() {
     const nextMode = actions.find((act) => act.action === 'set_response_mode');
     if (nextMode && 'key' in nextMode) {
       setMode(nextMode.key);
-      Sentry.addBreadcrumb({
-        category: 'coach',
-        message: 'coach:mode',
-        level: 'info',
-        data: { mode: nextMode.key },
-      });
+      addBreadcrumb('coach', { mode: nextMode.key }, 'coach:mode');
     }
 
     const queueAction = actions.find((act) => act.action === 'queue_microcards');
@@ -199,11 +195,7 @@ function CoachPageInner() {
 
   useEffect(() => {
     if (flagsEnabled.aaq && !assessment.state.stage && !assessment.state.summary) {
-      Sentry.addBreadcrumb({
-        category: 'assess',
-        message: 'assess:aaq2:due',
-        level: 'info',
-      });
+      addBreadcrumb('assess', undefined, 'assess:aaq2:due');
     }
   }, [assessment.state.stage, assessment.state.summary, flagsEnabled.aaq]);
 
@@ -217,24 +209,14 @@ function CoachPageInner() {
       const userMessage = sanitizeDisplay(input.trim());
       setInput('');
       setMessages((prev) => [...prev, createMessage('user', userMessage)]);
-      Sentry.addBreadcrumb({
-        category: 'coach',
-        message: 'coach:msg:user',
-        level: 'info',
-        data: { length: userMessage.length },
-      });
+      addBreadcrumb('coach', { length: userMessage.length }, 'coach:msg:user');
 
       setIsSending(true);
       try {
         const reply = await generateCoachReply(userMessage, mode, contextHints);
         const safeReply = sanitizeDisplay(reply);
         setMessages((prev) => [...prev, createMessage('assistant', safeReply)]);
-        Sentry.addBreadcrumb({
-          category: 'coach',
-          message: 'coach:msg:assistant',
-          level: 'info',
-          data: { mode },
-        });
+        addBreadcrumb('coach', { mode }, 'coach:msg:assistant');
 
         if (safeReply.includes('Parlons sécurité')) {
           setSecurityRedirect(true);
@@ -276,12 +258,7 @@ function CoachPageInner() {
 
       setMicroFeedback(detail.description);
       setMicrocardsUsed((prev) => (prev.includes(key) ? prev : [...prev, key]));
-      Sentry.addBreadcrumb({
-        category: 'coach',
-        message: 'coach:microcard',
-        level: 'info',
-        data: { key },
-      });
+      addBreadcrumb('coach', { key }, 'coach:microcard');
     },
     [],
   );

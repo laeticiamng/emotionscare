@@ -6,7 +6,10 @@ const SENTRY_RELEASE = Deno.env.get('SENTRY_RELEASE');
 const TRACES_SAMPLE_RATE = Number.parseFloat(Deno.env.get('SENTRY_TRACES_SAMPLE_RATE') ?? '');
 const IS_NODE_RUNTIME = typeof process !== 'undefined' && Boolean(process.versions?.node);
 
-let sentry: typeof import('https://esm.sh/@sentry/deno@8.22.0') | null = null;
+type SentryModule = typeof import('https://esm.sh/@sentry/deno@8.22.0');
+type SentryLike = Pick<SentryModule, 'captureException' | 'addBreadcrumb' | 'withScope' | 'configureScope'>;
+
+let sentry: SentryLike | null = null;
 
 const EMAIL_REGEX = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_REGEX = /(?:\+?\d[\s-.]?)?(?:\(?\d{2,3}\)?[\s-.]?)?\d{2,4}[\s-.]?\d{2,4}[\s-.]?\d{2,4}/g;
@@ -153,6 +156,23 @@ if (SENTRY_DSN && !IS_NODE_RUNTIME) {
 }
 
 type SentryScope = { setContext: (key: string, value: Record<string, unknown>) => void };
+
+const noopSentry: SentryLike = {
+  captureException: () => {},
+  addBreadcrumb: () => {},
+  withScope: (callback: (scope: SentryScope) => void) => {
+    try {
+      callback({ setContext: () => {} });
+    } catch {
+      // ignore
+    }
+  },
+  configureScope: () => {},
+};
+
+export function initSentry(): SentryLike {
+  return sentry ?? noopSentry;
+}
 
 function withSentryScope(callback: (scope: SentryScope) => void) {
   if (!sentry) {

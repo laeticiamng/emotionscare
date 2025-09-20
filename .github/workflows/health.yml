@@ -1,0 +1,74 @@
+name: Health check
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview-url:
+        description: 'URL du déploiement (https://preview.example.com)'
+        required: true
+  workflow_call:
+    inputs:
+      preview-url:
+        type: string
+        required: true
+    secrets:
+      health-access-key:
+        required: false
+
+jobs:
+  health:
+    name: Verify /api/health
+    runs-on: ubuntu-latest
+    env:
+      PREVIEW_URL: ${{ inputs.preview-url || github.event.inputs.preview-url || secrets.HEALTH_PREVIEW_URL }}
+      HEALTH_ACCESS_KEY: ${{ inputs.health-access-key || secrets.health-access-key || secrets.HEALTH_ACCESS_KEY }}
+    steps:
+      - name: Ensure preview URL is provided
+        run: |
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "::error::Aucune URL de prévisualisation fournie (inputs.preview-url ou secret HEALTH_PREVIEW_URL)."
+            exit 1
+          fi
+
+      - name: Call /api/health
+        id: health
+        run: |
+          HEADERS=()
+          if [ -n "$HEALTH_ACCESS_KEY" ]; then
+            HEADERS+=(-H "X-EC-Health-Key: $HEALTH_ACCESS_KEY")
+          fi
+
+          RESPONSE=$(curl --fail --silent --show-error "${HEADERS[@]}" "$PREVIEW_URL/api/health")
+          echo "$RESPONSE" > health.json
+          echo "response=$RESPONSE" >> "$GITHUB_OUTPUT"
+
+      - name: Assert latency thresholds
+        run: |
+          SUPA=$(jq '.supabase_ms // 0' health.json)
+          EDGE=$(jq '.edge_ms // 0' health.json)
+          STORAGE=$(jq '.storage_ms // 0' health.json)
+          STATUS=$(jq -r '.status' health.json)
+
+          echo "Supabase: ${SUPA}ms"
+          echo "Edge: ${EDGE}ms"
+          echo "Storage: ${STORAGE}ms"
+          echo "Status: ${STATUS}"
+
+          if [ "$SUPA" -gt 800 ]; then
+            echo "::error::Latence Supabase supérieure à 800ms ($SUPA)."
+            exit 1
+          fi
+          if [ "$EDGE" -gt 600 ]; then
+            echo "::error::Latence Edge supérieure à 600ms ($EDGE)."
+            exit 1
+          fi
+          if [ "$STORAGE" -gt 600 ]; then
+            echo "::error::Latence Storage supérieure à 600ms ($STORAGE)."
+            exit 1
+          fi
+
+      - name: Upload health payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-health
+          path: health.json
