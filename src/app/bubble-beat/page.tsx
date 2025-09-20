@@ -4,18 +4,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import * as Sentry from '@sentry/react';
 
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { bubbleBeatOrchestrator } from '@/features/orchestration/bubbleBeat.orchestrator';
 import type { PathVariantKey } from '@/features/orchestration/types';
 
 const DEFAULT_DURATION_MS = 300_000;
 const CALM_DURATION_MS = 120_000;
-const CTA_LINK = '/app/coach';
+const CTA_NYVEE_LINK = '/app/coach';
+const CTA_FLASH_LINK = '/flash-glow';
+type CTAKey = 'nyvee' | 'flash_glow';
 
 const variantDetails: Record<PathVariantKey, { title: string; description: string; breathingCue: string }> = {
   default: {
@@ -37,7 +41,7 @@ export default function BubbleBeatPage(): JSX.Element {
 
   const [variant, setVariant] = useState<PathVariantKey>('default');
   const [durationMs, setDurationMs] = useState(DEFAULT_DURATION_MS);
-  const [ctaKey, setCtaKey] = useState<string | null>(null);
+  const [ctaKey, setCtaKey] = useState<CTAKey>('flash_glow');
   const [sessionState, setSessionState] = useState<'idle' | 'running' | 'completed'>('idle');
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false);
@@ -58,43 +62,35 @@ export default function BubbleBeatPage(): JSX.Element {
     if (!flags.FF_ORCH_BUBBLE || !flags.FF_ASSESS_PSS10) {
       return;
     }
-    if (!assessment.isEligible || typeof level !== 'number') {
+    if (!assessment.isEligible) {
       return;
     }
 
-    const actions = bubbleBeatOrchestrator({ pss10Level: level });
+    const actions = bubbleBeatOrchestrator({
+      pssLevel: typeof level === 'number' ? level : undefined,
+    });
     const variantAction = actions.find((action) => action.action === 'set_path_variant');
     const durationAction = actions.find((action) => action.action === 'set_path_duration');
     const ctaAction = actions.find((action) => action.action === 'post_cta');
 
+    const resolvedVariant = variantAction && 'key' in variantAction ? variantAction.key : 'default';
+    const resolvedDuration = durationAction && 'ms' in durationAction ? durationAction.ms : DEFAULT_DURATION_MS;
+    const resolvedCta: CTAKey = ctaAction && 'key' in ctaAction ? ctaAction.key : 'flash_glow';
+    const breadcrumbMessage = resolvedVariant === 'hr' ? 'orch:bubble:hr' : 'orch:bubble:flash';
+
     Sentry.addBreadcrumb({
       category: 'orch',
-      message: 'orch:bubble:apply',
+      message: breadcrumbMessage,
       level: 'info',
       data: {
-        variant: variantAction && 'key' in variantAction ? variantAction.key : 'default',
-        has_cta: Boolean(ctaAction),
+        variant: resolvedVariant,
+        cta: resolvedCta,
       },
     });
 
-    if (variantAction && 'key' in variantAction) {
-      setVariant(variantAction.key);
-    } else {
-      setVariant('default');
-    }
-
-    if (durationAction && 'ms' in durationAction) {
-      setDurationMs(durationAction.ms);
-    } else {
-      setDurationMs(DEFAULT_DURATION_MS);
-    }
-
-    if (ctaAction && 'key' in ctaAction) {
-      setCtaKey(ctaAction.key);
-    } else {
-      setCtaKey(null);
-    }
-
+    setVariant(resolvedVariant);
+    setDurationMs(resolvedDuration);
+    setCtaKey(resolvedCta);
     setSessionState('idle');
     setSessionSaved(false);
     setSaveError(null);
@@ -126,8 +122,8 @@ export default function BubbleBeatPage(): JSX.Element {
         meta: {
           module: 'bubble',
           variant,
-          duration_label: durationMs <= CALM_DURATION_MS ? 'court' : 'standard',
-          cta: ctaKey ?? 'none',
+          duration: durationMs <= CALM_DURATION_MS ? 'short' : 'standard',
+          post: ctaKey,
         },
       });
       setSessionState('completed');
@@ -144,8 +140,31 @@ export default function BubbleBeatPage(): JSX.Element {
   const variantInfo = variantDetails[variant];
   const durationHint = durationMs <= CALM_DURATION_MS ? 'Environ deux minutes' : 'Environ cinq minutes';
 
-  return (
-    <main className="min-h-screen bg-muted/20 px-4 py-10">
+  const consentFallback = (
+    <main className="px-4 py-10">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+        <header className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">Bubble Beat</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Libération musicale anti-stress</h1>
+          <p className="text-base text-muted-foreground">
+            Accepte l’écoute clinique douce pour débloquer un parcours sonore ajusté à ton ressenti.
+          </p>
+        </header>
+
+        <Card role="region" aria-label="Consentement Bubble Beat">
+          <CardHeader>
+            <CardTitle>Activer Bubble Beat</CardTitle>
+            <CardDescription>
+              Après consentement, la bulle choisit automatiquement la variante la plus apaisante sans afficher de scores.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    </main>
+  );
+
+  const pageContent = (
+    <main className="px-4 py-10">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <header className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Bubble Beat</p>
@@ -160,7 +179,7 @@ export default function BubbleBeatPage(): JSX.Element {
             <CardHeader>
               <CardTitle>Activer le suivi du stress</CardTitle>
               <CardDescription>
-                Dès que tu autorises l’évaluation douce PSS-10, Bubble Beat prépare un parcours adapté et plus léger en cas de pic de stress.
+                Dès que tu autorises l’évaluation douce PSS, Bubble Beat prépare un parcours adapté et plus léger en cas de pic de stress.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -206,9 +225,14 @@ export default function BubbleBeatPage(): JSX.Element {
                   <p className="text-sm text-muted-foreground">
                     Séance enregistrée. Respire un instant avant de poursuivre ta journée.
                   </p>
-                  {ctaKey === 'nyvee_suggest' && (
+                  {ctaKey === 'nyvee' && (
                     <Button asChild variant="secondary">
-                      <Link href={CTA_LINK}>Parler à Nyvée</Link>
+                      <Link href={CTA_NYVEE_LINK}>Parler à Nyvée</Link>
+                    </Button>
+                  )}
+                  {ctaKey === 'flash_glow' && (
+                    <Button asChild variant="secondary">
+                      <Link href={CTA_FLASH_LINK}>Ouvrir Flash Glow</Link>
                     </Button>
                   )}
                 </div>
@@ -224,5 +248,11 @@ export default function BubbleBeatPage(): JSX.Element {
         )}
       </div>
     </main>
+  );
+
+  return (
+    <ZeroNumberBoundary className="min-h-screen bg-muted/20">
+      <ConsentGate fallback={consentFallback}>{pageContent}</ConsentGate>
+    </ZeroNumberBoundary>
   );
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
+import ZeroNumberBoundary from '@/components/accessibility/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -11,16 +12,24 @@ import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { createSession } from '@/services/sessions/sessionsApi';
-import { ambitionOrchestrator } from '@/features/orchestration/ambitionArcade.orchestrator';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
+import { ambitionArcadeOrchestrator } from '@/features/orchestration/ambitionArcade.orchestrator';
 import type { TextProgressKey } from '@/features/orchestration/types';
 
 interface MicroLeverState {
   id: string;
-  label: string;
+  raw: string;
+  display: string;
   checked: boolean;
 }
 
 const DEFAULT_MICRO_LEVERS = ['1 geste simple', '2 minutes de marche', 'respirer 1 minute'];
+
+const HUMANIZED_LEVERS: Record<string, string> = {
+  '1 geste simple': 'Un geste simple',
+  '2 minutes de marche': 'Deux minutes de marche',
+  'respirer 1 minute': 'Respirer une minute',
+};
 
 const PROGRESS_LABELS: Record<TextProgressKey, { title: string; helper: string }> = {
   doucement: {
@@ -44,20 +53,15 @@ const slugify = (value: string, index: number) =>
     .replace(/^-+|-+$/g, '')
     .toLowerCase()}-${index}`;
 
+const humanizeLever = (label: string): string => HUMANIZED_LEVERS[label] ?? label;
+
 const toLeverState = (items: string[]): MicroLeverState[] =>
   items.map((label, index) => ({
     id: slugify(label, index),
-    label,
+    raw: label,
+    display: humanizeLever(label),
     checked: false,
   }));
-
-const progressSlug = (key: TextProgressKey) =>
-  key
-    .normalize('NFD')
-    .replace(/[^\p{Letter}\p{Number}]+/gu, '_')
-    .replace(/_+/g, '_')
-    .replace(/_$/g, '')
-    .toLowerCase();
 
 const AMBITION_DURATION_SEC = 180;
 
@@ -89,32 +93,34 @@ export default function AmbitionArcadePage(): JSX.Element {
     if (!flags.FF_ORCH_AMBITION || !flags.FF_ASSESS_GAS) {
       return;
     }
-    if (!assessment.isEligible || typeof latestLevel !== 'number') {
+    if (!assessment.isEligible) {
       return;
     }
 
-    const actions = ambitionOrchestrator({ gasLevel: latestLevel });
-    const textAction = actions.find((action) => action.action === 'set_text_progress');
+    const actions = ambitionArcadeOrchestrator({
+      gasLevel: typeof latestLevel === 'number' ? latestLevel : undefined,
+    });
+    const textAction = actions.find((action) => action.action === 'set_progress_text');
     const leversAction = actions.find((action) => action.action === 'inject_micro_levers');
+
+    const resolvedProgress: TextProgressKey =
+      textAction && 'key' in textAction ? textAction.key : 'sur la bonne voie';
+    const resolvedLevers =
+      leversAction && 'items' in leversAction ? [...leversAction.items] : [...DEFAULT_MICRO_LEVERS];
 
     Sentry.addBreadcrumb({
       category: 'orch',
-      message: 'orch:ambition:apply',
+      message: 'orch:ambition:levers',
       level: 'info',
       data: {
-        progress: textAction?.key ?? null,
-        micro_levers: leversAction && 'items' in leversAction ? leversAction.items : [],
+        progress: resolvedProgress,
+        levers: resolvedLevers.map(humanizeLever),
       },
     });
 
-    if (textAction && 'key' in textAction) {
-      setTextProgress(textAction.key);
-    }
-
-    if (leversAction && 'items' in leversAction) {
-      setMicroLevers(toLeverState(leversAction.items));
-      setSessionSaved(false);
-    }
+    setTextProgress(resolvedProgress);
+    setMicroLevers(toLeverState(resolvedLevers));
+    setSessionSaved(false);
   }, [assessment.isEligible, flags.FF_ASSESS_GAS, flags.FF_ORCH_AMBITION, latestLevel]);
 
   const toggleLever = useCallback((id: string) => {
@@ -146,9 +152,8 @@ export default function AmbitionArcadePage(): JSX.Element {
         duration_sec: AMBITION_DURATION_SEC,
         meta: {
           module: 'ambition',
-          progress_label: textProgress,
-          progress_slug: progressSlug(textProgress),
-          micro_levers: microLevers.map((lever) => lever.label),
+          progress: textProgress,
+          levers: microLevers.map((lever) => lever.raw),
         },
       });
       setSessionSaved(true);
@@ -162,8 +167,31 @@ export default function AmbitionArcadePage(): JSX.Element {
 
   const progressContent = PROGRESS_LABELS[textProgress];
 
-  return (
-    <main className="min-h-screen bg-muted/20 px-4 py-10">
+  const consentFallback = (
+    <main className="px-4 py-10">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <header className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">Ambition Arcade</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Cap sur l’élan tout en douceur</h1>
+          <p className="text-base text-muted-foreground">
+            Accepte le suivi clinique doux pour débloquer les micro-leviers adaptés à ton rythme.
+          </p>
+        </header>
+
+        <Card role="region" aria-label="Consentement Ambition Arcade">
+          <CardHeader>
+            <CardTitle>Activer Ambition Arcade</CardTitle>
+            <CardDescription>
+              Le consentement clinique ouvre l’accès aux encouragements personnalisés, sans jamais afficher de chiffres.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    </main>
+  );
+
+  const pageContent = (
+    <main className="px-4 py-10">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
         <header className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Ambition Arcade</p>
@@ -205,7 +233,7 @@ export default function AmbitionArcadePage(): JSX.Element {
                       />
                       <div className="flex-1">
                         <Label htmlFor={lever.id} className="text-sm font-medium text-foreground">
-                          {lever.label}
+                          {lever.display}
                         </Label>
                         <p id={`${lever.id}-description`} className="text-sm text-muted-foreground">
                           Coche pour ancrer ce geste dans ta journée.
@@ -237,5 +265,11 @@ export default function AmbitionArcadePage(): JSX.Element {
         )}
       </div>
     </main>
+  );
+
+  return (
+    <ZeroNumberBoundary className="min-h-screen bg-muted/20">
+      <ConsentGate fallback={consentFallback}>{pageContent}</ConsentGate>
+    </ZeroNumberBoundary>
   );
 }
