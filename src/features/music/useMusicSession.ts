@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import * as Sentry from '@sentry/react';
+
+import { addBreadcrumb } from '@/lib/obs/breadcrumb';
 
 import { computeMusicActions, type MusicAction } from '@/features/orchestration/music.orchestrator';
 import type { UseMusicEngine } from '@/features/music/useMusicEngine';
@@ -20,9 +21,7 @@ type PostCta = 'nyvee' | 'encore_2min' | 'none';
 type VisualizerMode = 'reduced' | 'standard';
 
 const logBreadcrumb = (message: string, data?: Record<string, unknown>) => {
-  const client = Sentry.getCurrentHub().getClient();
-  if (!client) return;
-  Sentry.addBreadcrumb({ category: 'music', level: 'info', message, data });
+  addBreadcrumb('music', { message, data });
 };
 
 export interface MusicSessionState {

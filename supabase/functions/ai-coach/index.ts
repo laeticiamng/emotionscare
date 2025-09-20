@@ -5,6 +5,7 @@ import { enforceEdgeRateLimit, buildRateLimitResponse } from "../_shared/rate-li
 import { z } from "../_shared/zod.ts";
 import { supabase } from "../_shared/supa_client.ts";
 import { addSentryBreadcrumb, captureSentryException } from "../_shared/sentry.ts";
+import { traced } from "../_shared/otel.ts";
 import {
   COACH_DISCLAIMERS,
   buildCrisisReply,
@@ -224,12 +225,24 @@ async function persistLog(userId: string, threadId: string, text: string, mode: 
   if (!userId) return;
   try {
     const hashedUser = await hashIdentifier(userId);
-    await supabase.from('coach_logs').insert({
-      user_id: hashedUser,
-      thread_id: threadId,
-      summary_text: redactSensitive(text),
-      mode,
-    });
+    await traced(
+      'supabase.query',
+      () =>
+        supabase.from('coach_logs').insert({
+          user_id: hashedUser,
+          thread_id: threadId,
+          summary_text: redactSensitive(text),
+          mode,
+        }),
+      {
+        attributes: {
+          table: 'coach_logs',
+          operation: 'insert',
+          route: 'ai-coach',
+          mode,
+        },
+      },
+    );
   } catch (error) {
     console.warn('[ai-coach] coach_logs insert failed', error);
   }

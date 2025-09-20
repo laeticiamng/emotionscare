@@ -8,6 +8,7 @@ import { applySecurityHeaders, json } from '../_shared/http.ts';
 import { hash } from '../_shared/hash_user.ts';
 import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
+import { traced } from '../_shared/otel.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 import { computeLevel, scoreToJson } from '../../../src/lib/assess/scoring.ts';
@@ -241,13 +242,25 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: consent, error: consentError } = await supabase
-      .from('clinical_consents')
-      .select('is_active, revoked_at')
-      .eq('instrument_code', instrument)
-      .order('granted_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const { data: consent, error: consentError } = await traced(
+      'supabase.query',
+      () =>
+        supabase
+          .from('clinical_consents')
+          .select('is_active, revoked_at')
+          .eq('instrument_code', instrument)
+          .order('granted_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      {
+        attributes: {
+          table: 'clinical_consents',
+          operation: 'select',
+          route: 'assess-submit',
+          instrument,
+        },
+      },
+    );
 
     if (consentError) {
       console.error('[assess-submit] consent_lookup_failed', { code: consentError.code });
@@ -301,7 +314,18 @@ serve(async (req) => {
       ts: submittedAt,
     };
 
-    const { error } = await supabase.from('assessments').insert(payload);
+    const { error } = await traced(
+      'supabase.query',
+      () => supabase.from('assessments').insert(payload),
+      {
+        attributes: {
+          table: 'assessments',
+          operation: 'insert',
+          route: 'assess-submit',
+          instrument,
+        },
+      },
+    );
     if (error) {
       captureSentryException(error, { route: 'assess-submit', stage: 'db_insert' });
       console.error('[assess-submit] failed to store summary', { message: error.message });
@@ -331,7 +355,18 @@ serve(async (req) => {
     const bypassSignalInsert = Boolean(maybeProcess?.env?.VITEST);
 
     if (!bypassSignalInsert) {
-      const { error: signalError } = await supabase.from('clinical_signals').insert(signalPayload);
+      const { error: signalError } = await traced(
+        'supabase.query',
+        () => supabase.from('clinical_signals').insert(signalPayload),
+        {
+          attributes: {
+            table: 'clinical_signals',
+            operation: 'insert',
+            route: 'assess-submit',
+            instrument,
+          },
+        },
+      );
       if (signalError) {
         captureSentryException(signalError, { route: 'assess-submit', stage: 'signal_insert' });
         console.error('[assess-submit] failed to store orchestration signal', { message: signalError.message });

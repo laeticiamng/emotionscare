@@ -203,3 +203,7 @@ export function captureSentryException(error: unknown, context?: Record<string, 
     console.warn('[observability] failed to capture exception', captureError);
   }
 }
+
+export function initSentry() {
+  return sentry;
+}
