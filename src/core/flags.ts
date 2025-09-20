@@ -46,6 +46,10 @@ interface FeatureFlags {
   FF_ORCH_GRIT: boolean;
   FF_ORCH_BUBBLE: boolean;
   FF_ORCH_MIXER: boolean;
+  FF_ORCH_STORY: boolean;
+  FF_ORCH_ACTIVITY: boolean;
+  FF_ORCH_SCREENSILK: boolean;
+  FF_ORCH_WEEKLYBARS: boolean;
   FF_ZERO_NUMBERS?: boolean;
   FF_REQUIRE_CLINICAL_OPTIN: boolean;
 
@@ -99,6 +103,10 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ORCH_GRIT: true,
   FF_ORCH_BUBBLE: true,
   FF_ORCH_MIXER: true,
+  FF_ORCH_STORY: true,
+  FF_ORCH_ACTIVITY: true,
+  FF_ORCH_SCREENSILK: true,
+  FF_ORCH_WEEKLYBARS: true,
   FF_ZERO_NUMBERS: true,
   FF_REQUIRE_CLINICAL_OPTIN: true,
 };

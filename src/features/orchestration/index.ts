@@ -4,4 +4,8 @@ export * from './socialCocon.orchestrator';
 export * from './auras.orchestrator';
 export * from './journal.orchestrator';
 export * from './moodMixer.orchestrator';
+export * from './storySynth.orchestrator';
+export * from './activityJardin.orchestrator';
+export * from './screenSilk.orchestrator';
+export * from './weeklyBars.orchestrator';
 export * from './persistOrchestrationSession';
