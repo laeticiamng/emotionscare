@@ -6,5 +6,6 @@ module.exports = {
     "no-legacy-routes-helpers": require("./rules/no-legacy-routes-helpers"),
     // optionnel, voir plus bas
     "no-alias-routes": require("./rules/no-alias-routes"),
+    "no-clinical-score-terms": require("./rules/no-clinical-score-terms"),
   }
 };
