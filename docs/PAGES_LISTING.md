@@ -25,7 +25,7 @@
 | SignupPage | `/signup` | 🟢 | Inscription progressive avec consentements explicites. | `src/pages/SignupPage.tsx` |
 | ChooseModePage | `/choose-mode` | 🟢 | Sélecteur de mode B2C/B2B avant création de compte. | `src/pages/ChooseModePage.tsx` |
 | AppGatePage | `/app` | 🟢 | Dispatcher post-authentification : route l'utilisateur selon rôle et consentement. | `src/pages/AppGatePage.tsx` |
-| Error pages | `/401`, `/403`, `/404`, `*` | 🟢 | Pages d'état homogènes (CTA retour, i18n) branchées dans RouterV2. | `src/pages/errors/401.tsx` etc. |
+| Error pages | `/401`, `/403`, `/404`, `*` | 🟢 | Pages d'état homogènes (CTA retour, i18n) branchées dans RouterV2. | `src/pages/errors/401/page.tsx` etc. |
 
 ## 🧭 Dashboards & navigation authentifiée
 | Page | Route(s) | Statut | Description | Fichier principal |

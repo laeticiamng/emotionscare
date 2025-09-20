@@ -1,4 +1,6 @@
 import React from 'react';
+import { useAppStore, shallow } from '@/store/appStore';
+import { useError } from '@/contexts';
 import { useStoreActions, useGlobalStateSlice } from '@/store/hooks';
 import { useErrorHandler } from '@/contexts/ErrorContext';
 import { useCache } from '@/contexts/CacheContext';
@@ -10,8 +12,29 @@ import { useCache } from '@/contexts/CacheContext';
 export const useGlobalState = () => {
   const stateSlice = useGlobalStateSlice();
 
-  const actions = useStoreActions();
-  const errorHandler = useErrorHandler();
+  const actions = useAppStore(
+    (state) => ({
+      setUser: state.setUser,
+      setTheme: state.setTheme,
+      setAuthenticated: state.setAuthenticated,
+      setLoading: state.setLoading,
+      toggleSidebar: state.toggleSidebar,
+      setActiveModule: state.setActiveModule,
+      updatePreferences: state.updatePreferences,
+      updateMusicState: state.updateMusicState,
+      updateEmotionState: state.updateEmotionState,
+      updateJournalState: state.updateJournalState,
+      updateCoachState: state.updateCoachState,
+      setCache: state.setCache,
+      getCache: state.getCache,
+      clearCache: state.clearCache,
+      isCacheValid: state.isCacheValid,
+      reset: state.reset,
+    }),
+    shallow
+  );
+  const errorApi = useError();
+  const { notify } = errorApi;
   const cache = useCache();
 
   // Actions combinées avec gestion d'erreurs
@@ -23,11 +46,15 @@ export const useGlobalState = () => {
       const result = await action();
       return result;
     } catch (error) {
-      errorHandler.addError({
-        message: errorMessage,
-        severity: 'medium',
-        context: { originalError: error },
-      });
+      notify(
+        {
+          code: 'UNKNOWN',
+          messageKey: 'errors.unexpectedError',
+          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+          context: { hint: errorMessage },
+        },
+        { source: 'useGlobalState.safeAction' },
+      );
       return null;
     }
   };
@@ -57,7 +84,7 @@ export const useGlobalState = () => {
     },
     
     // Gestion d'erreurs
-    errors: errorHandler,
+    errors: errorApi,
     
     // Cache
     cache,
@@ -149,7 +176,7 @@ export const useAsyncOperation = <T>(
   const [data, setData] = React.useState<T | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
-  const errorHandler = useErrorHandler();
+  const { notify } = useError();
 
   const execute = React.useCallback(async (attempt = 0): Promise<T | null> => {
     setLoading(true);
@@ -169,16 +196,20 @@ export const useAsyncOperation = <T>(
       
       setError(error);
       onError?.(error);
-      errorHandler.addError({
-        message: error.message,
-        severity: 'medium',
-        context: { attempt, retries },
-      });
+      notify(
+        {
+          code: 'UNKNOWN',
+          messageKey: 'errors.unexpectedError',
+          cause: { message: error.message, stack: error.stack },
+          context: { attempt, retries },
+        },
+        { source: 'useGlobalState.useAsyncOperation' },
+      );
       return null;
     } finally {
       setLoading(false);
     }
-  }, [operation, retries, retryDelay, onError, errorHandler]);
+  }, [operation, retries, retryDelay, onError, notify]);
 
   React.useEffect(() => {
     execute();

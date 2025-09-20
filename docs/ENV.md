@@ -11,3 +11,5 @@
 | `FF_ASSESS_SUDS` | Active l'instrument SUDS (`true` par défaut). |
 
 > ℹ️  Positionnez ces variables dans l'environnement Supabase Edge (`supabase env set …`).
+
+

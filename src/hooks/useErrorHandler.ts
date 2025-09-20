@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useError } from '@/contexts';
 
 interface ErrorHandlerOptions {
   showToast?: boolean;
@@ -9,7 +9,7 @@ interface ErrorHandlerOptions {
 }
 
 export const useErrorHandler = () => {
-  const { toast } = useToast();
+  const { notify } = useError();
 
   const handleError = useCallback((
     error: Error | unknown,
@@ -29,13 +29,18 @@ export const useErrorHandler = () => {
       console.error(fullContext, error);
     }
 
-    if (showToast) {
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
+    notify(
+      {
+        code: 'UNKNOWN',
+        messageKey: 'errors.unexpectedError',
+        cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+        context: { label: context },
+      },
+      {
+        source: context,
+        suppressToast: !showToast,
+      },
+    );
 
     if (reportToService && process.env.NODE_ENV === 'production') {
       // Ici on pourrait intégrer Sentry ou un autre service de monitoring
@@ -47,7 +52,7 @@ export const useErrorHandler = () => {
       context: fullContext,
       timestamp: new Date().toISOString()
     };
-  }, [toast]);
+  }, [notify]);
 
   const handleAsyncError = useCallback(async (
     asyncFn: () => Promise<any>,

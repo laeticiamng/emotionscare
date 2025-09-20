@@ -7,6 +7,20 @@ export interface ScoringResult {
   focus?: string;
   instrument_version: string;
   generated_at: string;
+
+export type InstrumentCode = 'WHO5' | 'STAI6' | 'SAM' | 'SUDS';
+
+export type ItemType = 'scale' | 'choice' | 'slider';
+
+export interface InstrumentItem {
+  id: string;
+  prompt: string;
+  type: ItemType;
+  options?: string[];
+  min?: number;
+  max?: number;
+  reversed?: boolean;
+  subscale?: string;
 }
 
 export interface InstrumentCatalog {
@@ -14,4 +28,13 @@ export interface InstrumentCatalog {
   locale: LocaleCode;
   name: string;
   version: string;
+  name: string;
+  version: string;
+  items: InstrumentItem[];
+  expiry_minutes: number;
+}
+
+export interface StartRequest {
+  instrument: InstrumentCode;
+  locale?: LocaleCode;
 }

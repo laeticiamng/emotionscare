@@ -94,7 +94,7 @@ function generateReport() {
         '/401 (UnauthorizedPage)',
         '/403 (ForbiddenPage)',
         '/404 (UnifiedErrorPage)',
-        '/503 (ServerErrorPage)'
+        '/500 (ServerErrorPage)'
       ]
     },
     features: {

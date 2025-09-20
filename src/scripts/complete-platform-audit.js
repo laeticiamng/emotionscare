@@ -64,7 +64,7 @@ const mockRegistry = [
   { name: 'not-found', path: '/404', segment: 'public', component: 'UnifiedErrorPage' },
   { name: 'unauthorized', path: '/401', segment: 'public', component: 'UnauthorizedPage' },
   { name: 'forbidden', path: '/403', segment: 'public', component: 'ForbiddenPage' },
-  { name: 'server-error', path: '/503', segment: 'public', component: 'ServerErrorPage' },
+  { name: 'server-error', path: '/500', segment: 'public', component: 'ServerErrorPage' },
   
   // Redirections
   { name: 'emotion-scan-redirect', path: '/app/emotion-scan', segment: 'consumer', component: 'RedirectToScan', deprecated: true },
