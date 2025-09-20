@@ -59,12 +59,38 @@ serve(async (req) => {
     }
 
     const { instrument, locale } = parsed.data;
-    const catalog = getCatalog(instrument, locale ?? 'fr');
+    const resolvedLocale = locale ?? 'fr';
+
+    let catalog: ReturnType<typeof getCatalog>;
+    try {
+      catalog = getCatalog(instrument, resolvedLocale);
+    } catch (_error) {
+      return appendCorsHeaders(
+        json(422, { error: 'invalid_body', details: 'catalog_unavailable' }),
+        cors,
+      );
+    }
+
+    const payload = {
+      instrument,
+      locale: resolvedLocale,
+      name: catalog.name,
+      version: catalog.version,
+      expiry_minutes: catalog.expiry_minutes,
+      items: catalog.items.map((item) => ({
+        id: item.id,
+        prompt: item.prompt,
+        type: item.type,
+        options: item.options,
+        min: item.min,
+        max: item.max,
+      })),
+    };
 
     addSentryBreadcrumb({
       category: 'assess:start',
       message: 'catalog served',
-      data: { instrument },
+      data: { instrument, locale: resolvedLocale },
     });
 
     await logAccess({
@@ -74,7 +100,7 @@ serve(async (req) => {
       action: 'assess:start',
       result: 'success',
       user_agent: 'redacted',
-      details: `instrument=${instrument}`,
+      details: `instrument=${instrument} locale=${resolvedLocale}`,
     });
 
     const response = json(200, { ...catalog, instrument: catalog.code });

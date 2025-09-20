@@ -6,11 +6,12 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import RecentEmotionScansWidget from '@/components/dashboard/widgets/RecentEmotionScansWidget';
 import JournalSummaryCard from '@/components/dashboard/widgets/JournalSummaryCard';
-import { 
-  Brain, 
-  Music, 
-  BookOpen, 
-  Headphones, 
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import {
+  Brain,
+  Music,
+  BookOpen,
+  Headphones,
   Target, 
   TrendingUp, 
   Calendar,
@@ -20,9 +21,11 @@ import {
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { useEffect } from 'react';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 export default function B2CDashboardPage() {
   const { runAudit } = useAccessibilityAudit();
+  const who5Consent = useClinicalConsent('WHO5');
 
   useEffect(() => {
     // Audit d'accessibilité en développement
@@ -98,6 +101,19 @@ export default function B2CDashboardPage() {
             Découvrez vos outils d'intelligence émotionnelle personnalisés
           </p>
         </header>
+
+        {who5Consent.shouldPrompt && (
+          <div className="mb-8">
+            <ClinicalOptIn
+              title="Activer le suivi bien-être WHO-5"
+              description="Ce mini questionnaire nous aide à ajuster votre tableau de bord. Votre choix est mémorisé et peut être modifié dans les réglages."
+              onAccept={who5Consent.grantConsent}
+              onDecline={who5Consent.declineConsent}
+              isProcessing={who5Consent.isSaving}
+              error={who5Consent.error}
+            />
+          </div>
+        )}
 
         {/* Statistiques rapides */}
         <section aria-labelledby="stats-title" className="mb-8">
