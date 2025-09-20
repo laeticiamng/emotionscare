@@ -131,7 +131,7 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ order, tone }) =
               </CardContent>
             </Card>
           );
-        })
+        })}
       </div>
     </section>
   );

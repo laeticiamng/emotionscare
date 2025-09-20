@@ -1,268 +1,281 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import "https://deno.land/x/xhr@0.1.0/mod.ts"
-import { supabase } from "../_shared/supa_client.ts"
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { supabase } from "../_shared/supa_client.ts";
 
-const allowedOriginEnv = Deno.env.get('EMOTION_SCAN_ALLOWED_ORIGINS')?.split(',')
-  .map((value) => value.trim())
-  .filter(Boolean)
+const rawOrigins = Deno.env.get('HUME_ALLOWED_ORIGINS') ?? Deno.env.get('CORS_ORIGINS') ?? '';
+const allowedOrigins = rawOrigins
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter((origin) => origin.length > 0);
 
-function resolveAllowedOrigin(request: Request): string {
-  const origin = request.headers.get('origin') ?? request.headers.get('Origin') ?? ''
+const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
 
-  if (!allowedOriginEnv || allowedOriginEnv.length === 0) {
-    return origin || '*'
+interface EmotionAnalysisRequest {
+  audioBase64?: string;
+  audioUrl?: string;
+  locale?: string;
+  context?: string;
+}
+
+interface HumeEmotionScore {
+  name: string;
+  score: number;
+}
+
+function resolveOrigin(request: Request) {
+  const origin = request.headers.get('origin') ?? request.headers.get('Origin') ?? '';
+  if (allowedOrigins.length === 0) {
+    return origin || '*';
   }
-
-  if (allowedOriginEnv.includes('*')) {
-    return origin || '*'
+  if (allowedOrigins.includes('*')) {
+    return origin || '*';
   }
-
-  if (origin && allowedOriginEnv.includes(origin)) {
-    return origin
-  }
-
-  return allowedOriginEnv[0]
+  return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 }
 
 function createCorsHeaders(request: Request) {
-  const allowOrigin = resolveAllowedOrigin(request)
-
+  const allowOrigin = resolveOrigin(request);
   return {
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST,OPTIONS',
     'Access-Control-Max-Age': '86400',
-    'Vary': 'Origin',
+    Vary: 'Origin'
+  } as const;
+}
+
+function isFeatureEnabled() {
+  return (Deno.env.get('FF_HUME_ANALYSIS') ?? 'false').toLowerCase() === 'true';
+}
+
+function decodeBase64Size(base64?: string) {
+  if (!base64) {
+    return 0;
   }
+  const padding = (base64.match(/=+$/) ?? [''])[0].length;
+  return (base64.length * 3) / 4 - padding;
 }
 
-interface EmotionAnalysisRequest {
-  text: string;
-  context?: string;
-  previousEmotions?: Record<string, number>;
+async function authenticate(request: Request) {
+  const authHeader = request.headers.get('authorization') ?? request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+  const token = authHeader.replace('Bearer ', '');
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user) {
+    console.warn('Hume analysis: échec auth', { reason: error?.message ?? 'no-user' });
+    return null;
+  }
+  return data.user.id;
 }
 
-interface EmotionAnalysisResponse {
-  emotions: Record<string, number>;
-  dominantEmotion: string;
-  confidence: number;
-  insights: string[];
-  recommendations: string[];
+function mapEmotionToSignal(emotions: HumeEmotionScore[]): {
+  label: string;
+  signal: string;
+  cues: string[];
+} {
+  if (emotions.length === 0) {
+    return {
+      label: 'Ambiance équilibrée détectée',
+      signal: 'keep_current_mix',
+      cues: ['Maintenir un fond doux', 'Inviter une respiration calme']
+    };
+  }
+
+  const sorted = emotions
+    .filter((item) => typeof item.name === 'string' && typeof item.score === 'number')
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+  const dominant = sorted[0];
+  const score = dominant?.score ?? 0;
+  const name = dominant?.name?.toLowerCase() ?? 'balanced';
+
+  if (['frustrated', 'anger', 'tense'].includes(name) && score > 0.3) {
+    return {
+      label: 'Tension repérée, on adoucit l’ambiance',
+      signal: 'long_exhale',
+      cues: ['Allonger l’expiration', 'Apaiser la lumière sonore']
+    };
+  }
+
+  if (['calm', 'relaxed', 'serene'].includes(name) && score > 0.3) {
+    return {
+      label: 'Climat apaisé confirmé',
+      signal: 'soften_audio',
+      cues: ['Renforcer la nappe chaleureuse', 'Inviter à savourer le calme']
+    };
+  }
+
+  if (['sad', 'low_energy', 'melancholy'].includes(name) && score > 0.3) {
+    return {
+      label: 'Besoin de réconfort identifié',
+      signal: 'warm_palette',
+      cues: ['Ajouter des textures chaleureuses', 'Suggérer une respiration enveloppante']
+    };
+  }
+
+  if (['excited', 'joy', 'anticipation'].includes(name) && score > 0.3) {
+    return {
+      label: 'Élan positif à canaliser',
+      signal: 'smooth_anchor',
+      cues: ['Proposer un ancrage doux', 'Maintenir un tempo stable']
+    };
+  }
+
+  return {
+    label: 'Énergie mixte, soutien équilibré',
+    signal: 'balanced_support',
+    cues: ['Stabiliser la scène sonore', 'Guider vers une respiration régulière']
+  };
+}
+
+function extractEmotionScores(humePayload: unknown): HumeEmotionScore[] {
+  if (!humePayload || typeof humePayload !== 'object') {
+    return [];
+  }
+  const predictions = (humePayload as { predictions?: unknown[] }).predictions;
+  if (!Array.isArray(predictions)) {
+    return [];
+  }
+
+  const scores: HumeEmotionScore[] = [];
+
+  for (const prediction of predictions) {
+    const results = (prediction as { results?: Record<string, unknown> }).results;
+    if (!results) continue;
+
+    const voiceEntries = Object.values(results);
+    for (const entry of voiceEntries) {
+      const prosody = (entry as { predictions?: Array<{ emotions?: HumeEmotionScore[] }> }).predictions;
+      if (!Array.isArray(prosody)) continue;
+      for (const item of prosody) {
+        if (Array.isArray(item.emotions)) {
+          for (const emotion of item.emotions) {
+            if (emotion && typeof emotion.name === 'string' && typeof emotion.score === 'number') {
+              scores.push({ name: emotion.name, score: emotion.score });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return scores;
 }
 
 serve(async (req) => {
-  const corsHeaders = createCorsHeaders(req)
+  const corsHeaders = createCorsHeaders(req);
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
+  if (!isFeatureEnabled()) {
+    return new Response(JSON.stringify({ error: 'Analyse émotionnelle désactivée' }), {
+      status: 503,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const userId = await authenticate(req);
+  if (!userId) {
+    return new Response(JSON.stringify({ error: 'Authentification requise' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  let payload: EmotionAnalysisRequest;
   try {
-    const { text, context, previousEmotions }: EmotionAnalysisRequest = await req.json()
+    payload = await req.json();
+  } catch (_error) {
+    return new Response(JSON.stringify({ error: 'Corps JSON invalide' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 
-    const authHeader = req.headers.get("Authorization") || req.headers.get("authorization")
-    let userId: string | null = null
+  if (!payload.audioBase64 && !payload.audioUrl) {
+    return new Response(JSON.stringify({ error: 'Audio requis (base64 ou URL signée)' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 
-    if (authHeader?.startsWith("Bearer ")) {
-      const token = authHeader.replace("Bearer ", "")
-      const { data, error: authError } = await supabase.auth.getUser(token)
+  const approxBytes = decodeBase64Size(payload.audioBase64);
+  if (approxBytes > MAX_AUDIO_BYTES) {
+    return new Response(JSON.stringify({ error: 'Le segment audio dépasse la taille autorisée' }), {
+      status: 413,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 
-      if (authError) {
-        console.error("❌ Erreur authentification:", authError)
-      } else if (data?.user) {
-        userId = data.user.id
-      }
-    }
-    
-    if (!text?.trim()) {
-      throw new Error('Texte requis pour l\'analyse')
-    }
+  const humeApiKey = Deno.env.get('HUME_API_KEY');
+  if (!humeApiKey) {
+    return new Response(JSON.stringify({ error: 'Intégration Hume indisponible' }), {
+      status: 503,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 
-    console.log('🧠 Analyse d\'émotion:', { text: text.substring(0, 50), context })
+  const requestBody = payload.audioUrl
+    ? { url: payload.audioUrl, context: payload.context, language: payload.locale }
+    : { data: payload.audioBase64, context: payload.context, language: payload.locale };
 
-    // Configuration OpenAI
-    const openAIKey = Deno.env.get('OPENAI_API_KEY')
-    if (!openAIKey) {
-      throw new Error('Clé OpenAI manquante')
-    }
-
-    // Prompt d'analyse émotionnelle avancée
-    const analysisPrompt = `
-Analyse les émotions dans ce texte avec précision et nuance.
-
-Texte à analyser: "${text}"
-${context ? `Contexte: ${context}` : ''}
-${previousEmotions ? `Émotions précédentes: ${JSON.stringify(previousEmotions)}` : ''}
-
-Retourne une analyse JSON avec:
-1. emotions: Scores 0-10 pour joie, tristesse, colère, peur, surprise, dégoût, anticipation, confiance
-2. dominantEmotion: L'émotion principale détectée
-3. confidence: Niveau de confiance de l'analyse (0-1)
-4. insights: 3 observations psychologiques sur l'état émotionnel
-5. recommendations: 3 conseils personnalisés pour améliorer le bien-être
-
-Sois précis, empathique et constructif. Base-toi sur la psychologie positive.
-`
-
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+  let humeResponse: Response;
+  try {
+    humeResponse = await fetch('https://api.hume.ai/v0/emotions/voice', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIKey}`,
         'Content-Type': 'application/json',
+        'X-Hume-Api-Key': humeApiKey,
+        'User-Agent': 'emotionscare-edge/1.0'
       },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert en analyse émotionnelle et psychologie positive. Réponds uniquement en JSON valide.'
-          },
-          {
-            role: 'user',
-            content: analysisPrompt
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 1000
-      }),
-    })
-
-    if (!openAIResponse.ok) {
-      const error = await openAIResponse.text()
-      console.error('❌ Erreur OpenAI:', error)
-      throw new Error('Échec de l\'analyse OpenAI')
-    }
-
-    const openAIResult = await openAIResponse.json()
-    const analysis = JSON.parse(openAIResult.choices[0].message.content)
-
-    // Validation et enrichissement de l'analyse
-    const emotions = {
-      joie: Math.max(0, Math.min(10, analysis.emotions?.joie || 5)),
-      tristesse: Math.max(0, Math.min(10, analysis.emotions?.tristesse || 3)),
-      colere: Math.max(0, Math.min(10, analysis.emotions?.colere || 2)),
-      peur: Math.max(0, Math.min(10, analysis.emotions?.peur || 3)),
-      surprise: Math.max(0, Math.min(10, analysis.emotions?.surprise || 4)),
-      degout: Math.max(0, Math.min(10, analysis.emotions?.degout || 1)),
-      anticipation: Math.max(0, Math.min(10, analysis.emotions?.anticipation || 6)),
-      confiance: Math.max(0, Math.min(10, analysis.emotions?.confiance || 5))
-    }
-
-    // Trouver l'émotion dominante
-    const dominantEmotion = Object.entries(emotions)
-      .reduce((a, b) => emotions[a[0]] > emotions[b[0]] ? a : b)[0]
-
-    // Calcul de la confiance basé sur la clarté émotionnelle
-    const emotionVariance = Object.values(emotions)
-      .reduce((sum, val, _, arr) => {
-        const mean = arr.reduce((a, b) => a + b, 0) / arr.length
-        return sum + Math.pow(val - mean, 2)
-      }, 0) / Object.values(emotions).length
-
-    const confidence = Math.min(1, Math.max(0.3, emotionVariance / 20))
-
-    // Insights et recommandations par défaut si manquants
-    const insights = analysis.insights?.length > 0 ? analysis.insights : [
-      `L'émotion dominante détectée est ${dominantEmotion}`,
-      `Niveau de complexité émotionnelle: ${Object.values(emotions).filter(v => v > 5).length > 3 ? 'Élevé' : 'Modéré'}`,
-      `Équilibre émotionnel: ${emotions.joie + emotions.confiance > emotions.tristesse + emotions.peur ? 'Positif' : 'Négatif'}`
-    ]
-
-    const recommendations = analysis.recommendations?.length > 0 ? analysis.recommendations : [
-      emotions.joie < 5 ? "Pratiquez la gratitude quotidienne pour cultiver la joie" : "Maintenez votre état positif avec des activités plaisantes",
-      emotions.confiance < 5 ? "Renforcez votre confiance par des petits succès quotidiens" : "Partagez votre confiance en aidant les autres",
-      emotions.tristesse > 7 ? "Accordez-vous du temps pour exprimer et accepter vos émotions" : "Utilisez la méditation pour maintenir votre équilibre émotionnel"
-    ]
-
-    const normalizedConfidence = Math.round(confidence * 100) / 100
-    const confidencePercent = Math.round(normalizedConfidence * 100)
-
-    const positiveScore = (emotions.joie || 0) + (emotions.confiance || 0) + (emotions.anticipation || 0) + (emotions.surprise || 0)
-    const negativeScore = (emotions.tristesse || 0) + (emotions.colere || 0) + (emotions.peur || 0) + (emotions.degout || 0)
-    const emotionalBalance = Math.round(Math.max(0, Math.min(100, ((positiveScore - negativeScore + 40) / 80) * 100)))
-
-    const summary = [
-      `Émotion dominante: ${dominantEmotion}`,
-      `Confiance: ${confidencePercent}%`,
-      `Équilibre émotionnel estimé: ${emotionalBalance}/100`
-    ].join(' · ')
-
-    const result: EmotionAnalysisResponse = {
-      emotions,
-      dominantEmotion,
-      confidence: normalizedConfidence,
-      insights: insights.slice(0, 3),
-      recommendations: recommendations.slice(0, 3),
-    }
-
-    const persistedPayload = {
-      scores: emotions,
-      insights: result.insights,
-      context: context || null,
-      previousEmotions: previousEmotions || null
-    }
-
-    let persisted = false
-    let scanId: string | null = null
-
-    if (userId) {
-      const { data: inserted, error: insertError } = await supabase
-        .from("emotion_scans")
-        .insert({
-          user_id: userId,
-          scan_type: "text",
-          mood: dominantEmotion,
-          confidence: confidencePercent,
-          summary,
-          recommendations: result.recommendations,
-          insights: result.insights,
-          emotions: persistedPayload,
-          emotional_balance: emotionalBalance
-        })
-        .select('id')
-        .single()
-
-      if (insertError) {
-        console.error("❌ Erreur enregistrement emotion_scans:", insertError)
-      } else {
-        persisted = true
-        scanId = inserted?.id ?? null
-        console.log("🗄️ Emotion scan enregistré", { userId, mood: dominantEmotion, scanId })
-      }
-    } else {
-      console.log("ℹ️ Aucun utilisateur authentifié, saut de l'enregistrement")
-    }
-
-    console.log('✅ Analyse terminée:', { dominantEmotion, confidence: normalizedConfidence, emotionalBalance })
-
-    return new Response(JSON.stringify({
-      ...result,
-      emotionalBalance,
-      confidence: normalizedConfidence,
-      persisted,
-      scanId,
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-
+      body: JSON.stringify(requestBody)
+    });
   } catch (error) {
-    console.error('❌ Erreur analyse émotion:', error)
-
-    return new Response(JSON.stringify({
-      error: error.message,
-      emotions: {
-        joie: 5, tristesse: 3, colere: 2, peur: 3,
-        surprise: 4, degout: 1, anticipation: 6, confiance: 5
-      },
-      dominantEmotion: 'neutral',
-      confidence: 0.5,
-      insights: ['Analyse indisponible temporairement'],
-      recommendations: ['Réessayez dans quelques instants'],
-      persisted: false,
-      scanId: null
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    console.error('Hume fetch error', { message: (error as Error).message });
+    return new Response(JSON.stringify({ error: 'Service émotionnel indisponible' }), {
+      status: 502,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
-})
+
+  if (!humeResponse.ok) {
+    const safeBody = await humeResponse.text();
+    console.error('Hume API a renvoyé une erreur', { status: humeResponse.status, message: safeBody.slice(0, 160) });
+    return new Response(JSON.stringify({ error: 'Analyse indisponible' }), {
+      status: 502,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  let humePayload: unknown;
+  try {
+    humePayload = await humeResponse.json();
+  } catch (error) {
+    console.error('Impossible de décoder la réponse Hume', { message: (error as Error).message });
+    return new Response(JSON.stringify({ error: 'Réponse Hume illisible' }), {
+      status: 502,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const scores = extractEmotionScores(humePayload);
+  const mapped = mapEmotionToSignal(scores);
+
+  const narrative = {
+    label: mapped.label,
+    signal: mapped.signal,
+    cues: mapped.cues,
+    meta: {
+      source: 'hume_voice'
+    }
+  };
+
+  return new Response(JSON.stringify(narrative), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'private, max-age=0, s-maxage=0' }
+  });
+});

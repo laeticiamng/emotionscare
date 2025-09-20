@@ -55,17 +55,22 @@ npm run test        # Tests unitaires
 
 ## 📚 Guides & Documentation
 
-- **[Configuration développement](./docs/DEVELOPMENT_SETUP.md)** - Guide détaillé
-- **[Contribution](./CONTRIBUTING.md)** - Standards de code
-- **[Contrat clinique Assess](./docs/ASSESS_CONTRACT.md)** - Spécification front ↔ Edge ↔ DB
-- **[Déploiement](./docs/deploy.md)** - Checklist déploiement
+- **[Architecture](./docs/ARCHITECTURE.md)** – Vue Edge ↔ Supabase ↔ App
+- **[Variables d’environnement](./docs/ENV.md)** – Supabase, flags, intégrations IA
+- **[Consentements](./docs/CONSENT.md)** – Versioning, révocation, portée par module
+- **[Sécurité](./docs/SECURITY.md)** – RLS, CSP/HSTS, exports anonymes
+- **[Accessibilité](./docs/ACCESSIBILITY.md)** – Checklist AA et patterns modaux/forms/charts
+- **[OpenAPI](./docs/OPENAPI.md)** – Process de génération des types & tests contrats
+- **[Contribution](./CONTRIBUTING.md)** – Standards de code & design system
+- **[Pages](./docs/PAGES_LISTING.md)** et **[Modules](./docs/MODULES_LISTING.md)** – Cartographie produit
+- **[Déploiement](./docs/deploy.md)** – Checklist déploiement
 
 ## 🎯 Fonctionnalités principales
 
 - **Interface moderne** - React 18 + TypeScript
 - **Backend intégré** - Supabase (auth, base de données, stockage)
 - **IA émotionnelle** - Analyse et recommandations personnalisées
-- **Design system** - Composants cohérents avec Tailwind CSS
+- **Design system** - Composants premium (`src/ui`) + Storybook a11y intégré
 - **Performance** - Code splitting, lazy loading, optimisations
 
 ## 🔧 Configuration avancée
@@ -76,6 +81,7 @@ npm run test        # Tests unitaires
 VITE_API_URL=https://votre-api.com           # URL API custom
 VITE_FIREBASE_API_KEY=votre_cle              # Intégration Firebase
 VITE_UPLOAD_MAX_SIZE=10485760               # Limite upload (10MB)
+FF_HUME_ANALYSIS=false                      # Active l’analyse Hume côté Edge
 ```
 
 ### Ajout de composants
