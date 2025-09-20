@@ -31,6 +31,7 @@ interface FeatureFlags {
   FF_ASSESS_GRITS: boolean;
   FF_ASSESS_BRS: boolean;
   FF_ASSESS_WEMWBS: boolean;
+  FF_ASSESS_SWEMWBS: boolean;
   FF_ASSESS_UWES: boolean;
   FF_ASSESS_CBI: boolean;
   FF_ASSESS_CVSQ: boolean;
@@ -56,24 +57,25 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_AGGREGATE: true,
 
   // Clinical assessments – disabled by default, opt-in via remote config
-  FF_ASSESS_WHO5: false,
-  FF_ASSESS_STAI6: false,
+  FF_ASSESS_WHO5: true,
+  FF_ASSESS_STAI6: true,
   FF_ASSESS_PANAS: true,
-  FF_ASSESS_PSS10: false,
-  FF_ASSESS_UCLA3: false,
-  FF_ASSESS_MSPSS: false,
-  FF_ASSESS_AAQ2: false,
-  FF_ASSESS_POMS: false,
-  FF_ASSESS_POMS_TENSION: false,
-  FF_ASSESS_SSQ: false,
-  FF_ASSESS_ISI: false,
-  FF_ASSESS_GAS: false,
-  FF_ASSESS_GRITS: false,
-  FF_ASSESS_BRS: false,
-  FF_ASSESS_WEMWBS: false,
-  FF_ASSESS_UWES: false,
-  FF_ASSESS_CBI: false,
-  FF_ASSESS_CVSQ: false,
+  FF_ASSESS_PSS10: true,
+  FF_ASSESS_UCLA3: true,
+  FF_ASSESS_MSPSS: true,
+  FF_ASSESS_AAQ2: true,
+  FF_ASSESS_POMS: true,
+  FF_ASSESS_POMS_TENSION: true,
+  FF_ASSESS_SSQ: true,
+  FF_ASSESS_ISI: true,
+  FF_ASSESS_GAS: true,
+  FF_ASSESS_GRITS: true,
+  FF_ASSESS_BRS: true,
+  FF_ASSESS_WEMWBS: true,
+  FF_ASSESS_SWEMWBS: true,
+  FF_ASSESS_UWES: true,
+  FF_ASSESS_CBI: true,
+  FF_ASSESS_CVSQ: true,
   FF_ASSESS_SAM: true,
 };
 

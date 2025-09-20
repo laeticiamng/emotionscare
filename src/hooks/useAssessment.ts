@@ -21,6 +21,7 @@ export const instrumentCodes = [
   'PANAS',
   'PSS10',
   'WEMWBS',
+  'SWEMWBS',
   'CBI',
   'UWES',
   'SAM',

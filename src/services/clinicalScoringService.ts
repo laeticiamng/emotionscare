@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
 
+import { ADDITIONAL_CATALOGS } from './clinical/catalogs';
+
 export type LocaleCode = 'fr' | 'en' | 'es' | 'de' | 'it';
 
 export type InstrumentCode =
@@ -9,11 +11,21 @@ export type InstrumentCode =
   | 'PANAS'
   | 'PSS10'
   | 'WEMWBS'
+  | 'SWEMWBS'
   | 'CBI'
   | 'UWES'
   | 'SAM'
   | 'SUDS'
-  | 'SSQ';
+  | 'SSQ'
+  | 'UCLA3'
+  | 'MSPSS'
+  | 'AAQ2'
+  | 'POMS'
+  | 'ISI'
+  | 'GAS'
+  | 'GRITS'
+  | 'BRS'
+  | 'CVSQ';
 
 export type AssessmentItemType = 'scale' | 'choice' | 'slider';
 
@@ -79,9 +91,12 @@ type ScoringDefinition =
       thresholds: Record<0 | 1 | 2 | 3 | 4, LevelBoundaries>;
     };
 
-type LocaleCatalogs = Record<LocaleCode, InstrumentCatalog>;
+type LocaleCatalogs = Partial<Record<LocaleCode, InstrumentCatalog>>;
 
-type SummaryDictionary = Record<InstrumentCode, Record<LocaleCode, Record<0 | 1 | 2 | 3 | 4, string>>>;
+type SummaryDictionary = Record<
+  InstrumentCode,
+  Partial<Record<LocaleCode, Record<0 | 1 | 2 | 3 | 4, string>>>
+>;
 
 type HintDictionary = Record<InstrumentCode, Partial<Record<0 | 1 | 2 | 3 | 4, OrchestrationHint[]>>>;
 
@@ -1047,6 +1062,7 @@ const CATALOGS: Record<InstrumentCode, LocaleCatalogs> = deepFreeze({
       ],
     },
   },
+  ...ADDITIONAL_CATALOGS,
 });
 
 const SUPPORTED_INSTRUMENTS = Object.freeze(Object.keys(CATALOGS) as InstrumentCode[]);
@@ -1057,25 +1073,87 @@ export const isSupportedInstrument = (value: string): value is InstrumentCode =>
   SUPPORTED_INSTRUMENT_SET.has(value as InstrumentCode);
 
 const SCORING_DEFINITIONS: Record<InstrumentCode, ScoringDefinition> = deepFreeze({
-  WHO5: {
+  AAQ2: {
     strategy: 'sum',
     thresholds: {
-      0: [0, 12],
-      1: [13, 16],
-      2: [17, 20],
-      3: [21, 23],
-      4: [24, 25],
+      0: [7, 16],
+      1: [17, 23],
+      2: [24, 30],
+      3: [31, 36],
+      4: [37, 49],
     },
   },
-  STAI6: {
-    strategy: 'sum',
-    reversedItems: ['1', '4'],
+  BRS: {
+    strategy: 'average',
+    reversedItems: ['2', '4', '6'],
     thresholds: {
-      0: [6, 10],
-      1: [11, 15],
-      2: [16, 20],
-      3: [21, 23],
-      4: [24, 24],
+      0: [1, 2],
+      1: [2.01, 2.9],
+      2: [2.91, 3.7],
+      3: [3.71, 4.3],
+      4: [4.31, 5],
+    },
+  },
+  CBI: {
+    strategy: 'sum',
+    reversedItems: ['6'],
+    thresholds: {
+      0: [0, 9],
+      1: [10, 14],
+      2: [15, 20],
+      3: [21, 25],
+      4: [26, 30],
+    },
+  },
+  CVSQ: {
+    strategy: 'sum',
+    thresholds: {
+      0: [0, 3],
+      1: [4, 7],
+      2: [8, 12],
+      3: [13, 17],
+      4: [18, 24],
+    },
+  },
+  GAS: {
+    strategy: 'sum',
+    thresholds: {
+      0: [0, 5],
+      1: [6, 9],
+      2: [10, 13],
+      3: [14, 17],
+      4: [18, 20],
+    },
+  },
+  GRITS: {
+    strategy: 'average',
+    reversedItems: ['1', '3', '5', '6'],
+    thresholds: {
+      0: [1, 2.2],
+      1: [2.21, 2.9],
+      2: [2.91, 3.6],
+      3: [3.61, 4.3],
+      4: [4.31, 5],
+    },
+  },
+  ISI: {
+    strategy: 'sum',
+    thresholds: {
+      0: [0, 7],
+      1: [8, 14],
+      2: [15, 18],
+      3: [19, 21],
+      4: [22, 28],
+    },
+  },
+  MSPSS: {
+    strategy: 'average',
+    thresholds: {
+      0: [1, 2.9],
+      1: [3, 3.9],
+      2: [4, 4.9],
+      3: [5, 5.9],
+      4: [6, 7],
     },
   },
   PANAS: {
@@ -1092,6 +1170,24 @@ const SCORING_DEFINITIONS: Record<InstrumentCode, ScoringDefinition> = deepFreez
       4: [10, Infinity],
     },
   },
+  POMS: {
+    strategy: 'subscales',
+    subscales: {
+      tension: ['1', '2', '3', '4'],
+      depression: ['5', '6', '7', '8'],
+      anger: ['9', '10', '11', '12'],
+      fatigue: ['13', '14', '15', '16'],
+      confusion: ['17', '18', '19', '20'],
+      vigor: ['21', '22', '23', '24'],
+    },
+    thresholds: {
+      0: [-16, -5],
+      1: [-4, 9],
+      2: [10, 24],
+      3: [25, 39],
+      4: [40, 80],
+    },
+  },
   PSS10: {
     strategy: 'sum',
     reversedItems: ['2', '3', '5', '7', '8'],
@@ -1101,37 +1197,6 @@ const SCORING_DEFINITIONS: Record<InstrumentCode, ScoringDefinition> = deepFreez
       2: [19, 23],
       3: [24, 28],
       4: [29, 40],
-    },
-  },
-  WEMWBS: {
-    strategy: 'sum',
-    thresholds: {
-      0: [14, 35],
-      1: [36, 45],
-      2: [46, 55],
-      3: [56, 62],
-      4: [63, 70],
-    },
-  },
-  CBI: {
-    strategy: 'sum',
-    reversedItems: ['6'],
-    thresholds: {
-      0: [0, 9],
-      1: [10, 14],
-      2: [15, 20],
-      3: [21, 25],
-      4: [26, 30],
-    },
-  },
-  UWES: {
-    strategy: 'sum',
-    thresholds: {
-      0: [0, 18],
-      1: [19, 27],
-      2: [28, 36],
-      3: [37, 45],
-      4: [46, 54],
     },
   },
   SAM: {
@@ -1148,6 +1213,27 @@ const SCORING_DEFINITIONS: Record<InstrumentCode, ScoringDefinition> = deepFreez
       4: [8, 9],
     },
   },
+  SSQ: {
+    strategy: 'sum',
+    thresholds: {
+      0: [0, 2],
+      1: [3, 5],
+      2: [6, 8],
+      3: [9, 10],
+      4: [11, 12],
+    },
+  },
+  STAI6: {
+    strategy: 'sum',
+    reversedItems: ['1', '4'],
+    thresholds: {
+      0: [6, 10],
+      1: [11, 15],
+      2: [16, 20],
+      3: [21, 23],
+      4: [24, 24],
+    },
+  },
   SUDS: {
     strategy: 'sum',
     thresholds: {
@@ -1158,14 +1244,14 @@ const SCORING_DEFINITIONS: Record<InstrumentCode, ScoringDefinition> = deepFreez
       4: [9, 10],
     },
   },
-  SSQ: {
+  SWEMWBS: {
     strategy: 'sum',
     thresholds: {
-      0: [0, 2],
-      1: [3, 5],
-      2: [6, 8],
-      3: [9, 10],
-      4: [11, 12],
+      0: [7, 17],
+      1: [18, 22],
+      2: [23, 26],
+      3: [27, 30],
+      4: [31, 35],
     },
   },
   UCLA3: {
@@ -1178,14 +1264,34 @@ const SCORING_DEFINITIONS: Record<InstrumentCode, ScoringDefinition> = deepFreez
       4: [9, 9],
     },
   },
-  MSPSS: {
-    strategy: 'average',
+  UWES: {
+    strategy: 'sum',
     thresholds: {
-      0: [1, 2.9],
-      1: [3, 3.9],
-      2: [4, 4.9],
-      3: [5, 5.9],
-      4: [6, 7],
+      0: [0, 18],
+      1: [19, 27],
+      2: [28, 36],
+      3: [37, 45],
+      4: [46, 54],
+    },
+  },
+  WEMWBS: {
+    strategy: 'sum',
+    thresholds: {
+      0: [14, 35],
+      1: [36, 45],
+      2: [46, 55],
+      3: [56, 62],
+      4: [63, 70],
+    },
+  },
+  WHO5: {
+    strategy: 'sum',
+    thresholds: {
+      0: [0, 12],
+      1: [13, 16],
+      2: [17, 20],
+      3: [21, 23],
+      4: [24, 25],
     },
   },
 });
@@ -1634,6 +1740,134 @@ const SUMMARY_TEXTS: SummaryDictionary = deepFreeze({
       4: 'cerchia molto presente',
     },
   },
+  AAQ2: {
+    fr: {
+      0: 'souplesse fluide',
+      1: 'ancrage malléable',
+      2: 'cap à ajuster',
+      3: 'prise intérieure',
+      4: 'besoin de relâcher la prise',
+    },
+    en: {
+      0: 'fluid flexibility',
+      1: 'softly anchored',
+      2: 'course to adjust',
+      3: 'inner grip tight',
+      4: 'needs to loosen grip',
+    },
+  },
+  POMS: {
+    fr: {
+      0: 'horizon lumineux',
+      1: 'nuances calmes',
+      2: 'humeur à surveiller',
+      3: 'tension marquée',
+      4: 'humeur en surcharge',
+    },
+    en: {
+      0: 'radiant horizon',
+      1: 'calm hues',
+      2: 'mood to monitor',
+      3: 'pronounced strain',
+      4: 'mood overloaded',
+    },
+  },
+  ISI: {
+    fr: {
+      0: 'nuit apaisée',
+      1: 'sommeil à harmoniser',
+      2: 'repos fragile',
+      3: 'veille persistante',
+      4: 'soutien sommeil urgent',
+    },
+    en: {
+      0: 'restful nights',
+      1: 'sleep to harmonize',
+      2: 'rest a bit fragile',
+      3: 'persistent wakefulness',
+      4: 'sleep support urgent',
+    },
+  },
+  GAS: {
+    fr: {
+      0: 'cap à clarifier',
+      1: 'progression naissante',
+      2: 'chemin engagé',
+      3: 'dynamique solide',
+      4: 'objectif rayonnant',
+    },
+    en: {
+      0: 'goal to clarify',
+      1: 'nascent progress',
+      2: 'path engaged',
+      3: 'steady momentum',
+      4: 'goal glowing',
+    },
+  },
+  GRITS: {
+    fr: {
+      0: 'élan épars',
+      1: 'persévérance naissante',
+      2: 'tenue constante',
+      3: 'persévérance affirmée',
+      4: 'constance remarquable',
+    },
+    en: {
+      0: 'scattered drive',
+      1: 'grit emerging',
+      2: 'steady holding',
+      3: 'grit affirmed',
+      4: 'remarkable consistency',
+    },
+  },
+  BRS: {
+    fr: {
+      0: 'rebond fragile',
+      1: 'ressort en éveil',
+      2: 'souplesse présente',
+      3: 'rebond solide',
+      4: 'élasticité rayonnante',
+    },
+    en: {
+      0: 'fragile rebound',
+      1: 'spring awakening',
+      2: 'resilience present',
+      3: 'solid rebound',
+      4: 'radiant elasticity',
+    },
+  },
+  CVSQ: {
+    fr: {
+      0: 'regard confortable',
+      1: 'vigilance visuelle légère',
+      2: 'fatigue oculaire sensible',
+      3: 'inconfort marqué',
+      4: 'repos visuel prioritaire',
+    },
+    en: {
+      0: 'eyes at ease',
+      1: 'light visual vigilance',
+      2: 'notable eye fatigue',
+      3: 'marked discomfort',
+      4: 'visual rest urgent',
+    },
+  },
+  SWEMWBS: {
+    fr: {
+      0: 'étincelle discrète',
+      1: 'bien-être en germination',
+      2: 'équilibre vivant',
+      3: 'élan confiant',
+      4: 'rayonnement essentiel',
+    },
+    en: {
+      0: 'quiet spark',
+      1: 'wellbeing budding',
+      2: 'living balance',
+      3: 'confident lift',
+      4: 'essential radiance',
+    },
+  },
 });
 
 const ORCHESTRATION_HINTS: HintDictionary = deepFreeze({
@@ -1972,6 +2206,17 @@ class ClinicalScoringService {
     if (instrument === 'PANAS') {
       const balance = subscaleScores.balance ?? 0;
       return this.resolveLevel(balance, definition.thresholds);
+    }
+
+    if (instrument === 'POMS') {
+      const tension = subscaleScores.tension ?? 0;
+      const depression = subscaleScores.depression ?? 0;
+      const anger = subscaleScores.anger ?? 0;
+      const fatigue = subscaleScores.fatigue ?? 0;
+      const confusion = subscaleScores.confusion ?? 0;
+      const vigor = subscaleScores.vigor ?? 0;
+      const totalMoodDisturbance = tension + depression + anger + fatigue + confusion - vigor;
+      return this.resolveLevel(totalMoodDisturbance, definition.thresholds);
     }
 
     if (instrument === 'SAM') {
