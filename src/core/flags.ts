@@ -36,6 +36,7 @@ interface FeatureFlags {
   FF_ASSESS_CBI: boolean;
   FF_ASSESS_CVSQ: boolean;
   FF_ASSESS_SAM: boolean;
+  FF_ZERO_NUMBERS?: boolean;
 
   [key: string]: boolean;
 }
@@ -77,6 +78,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_CBI: true,
   FF_ASSESS_CVSQ: true,
   FF_ASSESS_SAM: true,
+  FF_ZERO_NUMBERS: true,
 };
 
 let flagsCache: FeatureFlags | null = null;
