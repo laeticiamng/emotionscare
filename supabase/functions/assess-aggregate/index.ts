@@ -11,6 +11,7 @@ import { logAccess } from '../_shared/logging.ts';
 import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
+import { signJsonPayload } from '../_shared/signature.ts';
 
 const aggregateSchema = z.object({
   org_id: z.string().min(1),
@@ -22,6 +23,7 @@ const ORG_ALLOWED_ROLES = ['b2b_admin', 'b2b_hr', 'b2b_user', 'admin'] as const;
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const CSV_SIGNING_SECRET = Deno.env.get('CSV_SIGNING_SECRET') ?? '';
 
 serve(async (req) => {
   const startedAt = Date.now();
@@ -179,13 +181,31 @@ serve(async (req) => {
       );
     }
 
-    const summaries = (data ?? [])
+    const sanitizedRows = (data ?? [])
       .filter((row) => typeof row.n === 'number' && row.n >= 5)
-      .map((row) => ({
-        instrument: row.instrument,
-        period: row.period,
-        text: sanitizeAggregateText(row.text_summary ?? ''),
-      }));
+      .map((row) => {
+        const sanitizedText = sanitizeAggregateText(row.text_summary ?? '');
+        const nValue = typeof row.n === 'number' ? row.n : null;
+        return {
+          instrument: row.instrument,
+          period: row.period,
+          text: sanitizedText,
+          n: nValue,
+        };
+      });
+
+    const summaries = await Promise.all(
+      sanitizedRows.map(async (entry) => ({
+        ...entry,
+        signature: await signJsonPayload(CSV_SIGNING_SECRET, {
+          org: hashedOrgId,
+          instrument: entry.instrument,
+          period: entry.period,
+          text: entry.text,
+          n: entry.n,
+        }),
+      })),
+    );
 
     addSentryBreadcrumb({
       category: 'assess',

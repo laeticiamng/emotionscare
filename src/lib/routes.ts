@@ -136,6 +136,7 @@ export const b2bRoutes = {
   home: () => resolveRoutePath('b2b-landing'),
   teams: () => resolveRoutePath('teams'),
   reports: () => resolveRoutePath('admin-reports'),
+  reportDetail: (period: string) => `${resolveRoutePath('admin-reports')}/${encodeURIComponent(period)}`,
   events: () => resolveRoutePath('admin-events'),
   socialCocon: () => resolveRoutePath('social-cocon-b2b'),
   optimization: () => resolveRoutePath('admin-optimization'),
