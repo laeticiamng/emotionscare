@@ -392,32 +392,32 @@ function determineLevel(instrument: InstrumentCode, total: number, itemCount: nu
 function generateSummary(instrument: InstrumentCode, level: number): string {
   const summaries: Record<InstrumentCode, Record<number, string>> = {
     'WHO5': {
-      0: 'besoin de douceur',
-      1: 'moment plus délicat',
-      2: 'équilibre stable',
-      3: 'bonne forme',
-      4: 'très belle énergie'
+      0: 'bien-être fragile',
+      1: 'affect délicat',
+      2: 'affect équilibré',
+      3: 'bien-être solide',
+      4: 'affect lumineux'
     },
     'STAI6': {
-      0: 'grande sérénité',
-      1: 'calme ressenti',
-      2: 'état équilibré',
-      3: 'tension présente',
-      4: 'besoin d\'apaisement'
+      0: 'tension apaisée',
+      1: 'tension douce',
+      2: 'tension modérée',
+      3: 'tension élevée',
+      4: 'tension intense'
     },
     'SUDS': {
-      0: 'grande tranquillité',
-      1: 'sérénité',
-      2: 'état neutre',
-      3: 'tension élevée',
-      4: 'détresse importante'
+      0: 'tension très basse',
+      1: 'tension apaisée',
+      2: 'tension équilibrée',
+      3: 'tension forte',
+      4: 'tension critique'
     },
     'SAM': {
-      0: 'humeur difficile',
-      1: 'tonalité plus basse',
-      2: 'état mixte',
-      3: 'bonne humeur',
-      4: 'excellente forme'
+      0: 'affect à soutenir',
+      1: 'affect en hausse',
+      2: 'affect neutre',
+      3: 'affect positif',
+      4: 'affect rayonnant'
     }
   };
 
@@ -426,9 +426,25 @@ function generateSummary(instrument: InstrumentCode, level: number): string {
 
 export function sanitizeAggregateText(text: string): string {
   // Remove any numerical data that might leak individual scores
-  return text
-    .replace(/\d+(\.\d+)?%?/g, '') // Remove all numbers
+  const cleaned = text
+    .replace(/\d+(?:[.,]\d+)?\s*%?/g, '') // Remove all numbers (dot/comma decimals + optional %)
+    .replace(/%/g, '') // Remove any stray percentage symbols
     .replace(/score|niveau|points?/gi, '') // Remove scoring terms
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
+
+  if (!cleaned) {
+    return '';
+  }
+
+  return cleaned.startsWith('•') ? cleaned : `• ${cleaned}`;
+}
+
+export function sanitizeSummaryText(text: string): string {
+  const cleaned = text
+    .replace(/\d+(?:[.,]\d+)?%?/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned.length > 0 ? cleaned : 'résumé disponible';
 }

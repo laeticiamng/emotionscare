@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, History, Download, Settings, TrendingUp, 
+import {
+  Brain, History, Download, Settings, TrendingUp,
   Activity, Heart, Sparkles, Music
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -14,12 +14,15 @@ import EmotionsCareMusicPlayer from '@/components/music/emotionscare/EmotionsCar
 import SamInstantMood from '@/components/scan/SamInstantMood';
 import { useMusic } from '@/contexts/MusicContext';
 import type { EmotionResult } from '@/types/emotion';
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
 const B2CScanPage: React.FC = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
   const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const { state: musicState, generateEmotionPlaylist } = useMusic();
   const { toast } = useToast();
+  const samConsent = useClinicalConsent('SAM');
 
   const handleEmotionDetected = async (result: EmotionResult) => {
     setScanHistory(prev => [result, ...prev.slice(0, 9)]);
@@ -66,7 +69,7 @@ const B2CScanPage: React.FC = () => {
                   Analysez vos émotions en temps réel avec l'intelligence artificielle avancée
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" disabled={scanHistory.length === 0}>
                   <Download className="w-4 h-4 mr-2" />
@@ -82,6 +85,18 @@ const B2CScanPage: React.FC = () => {
           <div className="max-w-3xl mx-auto w-full">
             <SamInstantMood />
           </div>
+          {samConsent.shouldPrompt && (
+            <ClinicalOptIn
+              title="Activer l'évaluation SAM"
+              description="Le suivi de votre intensité émotionnelle améliore les recommandations du scanner. Votre décision est mémorisée."
+              acceptLabel="Oui, activer"
+              declineLabel="Non merci"
+              onAccept={samConsent.grantConsent}
+              onDecline={samConsent.declineConsent}
+              isProcessing={samConsent.isSaving}
+              error={samConsent.error}
+            />
+          )}
 
           {/* Enhanced Stats */}
           {scanHistory.length > 0 && (
