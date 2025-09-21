@@ -12,7 +12,7 @@ export function ensureI18n(locale: AppLocale = 'fr') {
   if (!initialized) {
     const isProduction = import.meta.env.PROD;
 
-    i18n
+    void i18n
       .use(initReactI18next)
       .init({
         resources,
@@ -36,6 +36,17 @@ export function ensureI18n(locale: AppLocale = 'fr') {
         interpolation: { escapeValue: false },
         react: { useSuspense: false },
         returnNull: false,
+      })
+      .then(() => {
+        // Ensure i18n is marked as initialized
+        if (!i18n.isInitialized) {
+          (i18n as any).isInitialized = true;
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to initialize i18n:', error);
+        // Fallback: mark as initialized anyway to prevent infinite loading
+        (i18n as any).isInitialized = true;
       });
 
     const i18nWithMarker = i18n as typeof i18n & { __missingKeyListenerRegistered?: boolean };

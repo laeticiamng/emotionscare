@@ -33,26 +33,44 @@ interface RootProviderProps {
 }
 
 const useI18nReady = () => {
-  const [ready, setReady] = React.useState(() => i18n.isInitialized);
+  const [ready, setReady] = React.useState(() => {
+    // Try to determine if i18n is ready immediately
+    return i18n.isInitialized || i18n.language !== undefined;
+  });
 
   React.useEffect(() => {
     if (ready) {
       return;
     }
 
+    // Set a timeout to prevent infinite waiting
+    const timeout = setTimeout(() => {
+      console.warn('[i18n] Initialization timeout, proceeding anyway');
+      setReady(true);
+    }, 3000); // 3 seconds timeout
+
     const handleInitialized = () => {
+      clearTimeout(timeout);
       setReady(true);
     };
 
-    if (i18n.isInitialized) {
+    // Check if already initialized
+    if (i18n.isInitialized || i18n.language !== undefined) {
+      clearTimeout(timeout);
       setReady(true);
       return;
     }
 
+    // Listen for initialization
     i18n.on('initialized', handleInitialized);
+    i18n.on('loaded', handleInitialized);
+    i18n.on('languageChanged', handleInitialized);
 
     return () => {
+      clearTimeout(timeout);
       i18n.off('initialized', handleInitialized);
+      i18n.off('loaded', handleInitialized);
+      i18n.off('languageChanged', handleInitialized);
     };
   }, [ready]);
 
