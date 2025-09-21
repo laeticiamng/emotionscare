@@ -244,9 +244,14 @@ const NyveeFlowController = ({
         />
       )}
     </div>
-import type { FC, ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
-import * as Sentry from '@sentry/react';
+  );
+};
+
+export interface NyveeFlowControllerProps {
+  profile: 'silent_anchor';
+}
+
+export default function NyveeFlowController({ profile }: NyveeFlowControllerProps) {
 
 import type { CalmProfile, Guidance } from '@/features/orchestration/useStai6Orchestration';
 import { cn } from '@/lib/utils';

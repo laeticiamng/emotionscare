@@ -822,12 +822,11 @@ const FlashGlowView: React.FC = () => {
 
   return (
     <ConsentGate>
-      <main className="mx-auto max-w-3xl space-y-6 p-6" data-testid="flash-glow-view">
-    <main
-      className="mx-auto max-w-3xl space-y-6 p-6"
-      data-testid="flash-glow-view"
-      data-visuals-intent={intendedVisuals}
-      data-breath-intent={intendedBreath}
+      <main
+        className="mx-auto max-w-3xl space-y-6 p-6"
+        data-testid="flash-glow-view"
+        data-visuals-intent={intendedVisuals}
+        data-breath-intent={intendedBreath}
       data-audio-intent={intendedAudio}
       data-haptics-intent={intendedHaptics}
     >

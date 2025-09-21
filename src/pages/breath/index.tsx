@@ -226,7 +226,7 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({ assessment, kind, l
             {staiSubmissionStatus[phase] === 'submitted' && (
               <span className="text-sm text-emerald-600">Merci ! Tes réponses ont été prises en compte.</span>
             )}
-          </div>
+          </DialogFooter>
         </CardContent>
       </Card>
     );
