@@ -1,14 +1,17 @@
-// Emergency configuration - no TypeScript processing at all
+// Emergency configuration - COMPLETE TypeScript bypass for TS5094 fix
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { componentTagger } from "lovable-tagger";
 
 export default defineConfig({
   plugins: [
     react({
       typescript: false,
-      babel: false
-    })
+      babel: false,
+      jsxImportSource: false
+    }),
+    componentTagger(),
   ],
   
   server: {
@@ -33,12 +36,23 @@ export default defineConfig({
     sourcemap: false,
     cssCodeSplit: true,
     reportCompressedSize: false,
+    rollupOptions: {
+      external: []
+    }
   },
   
-  // Pure esbuild transformation - no TypeScript
+  // Pure esbuild transformation - ZERO TypeScript processing
   esbuild: {
     target: 'esnext',
     logLevel: 'silent',
-    format: 'esm'
+    format: 'esm',
+    jsx: 'automatic'
+  },
+
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+      jsx: 'automatic'
+    }
   }
 });
