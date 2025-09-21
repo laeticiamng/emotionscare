@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 
 import { PageHeader, Button } from '@/COMPONENTS.reg';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+// Dialog components imported below at line 23-30
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/useToast';

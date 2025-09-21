@@ -763,6 +763,11 @@ const FlashGlowView: React.FC = () => {
           </Card>
         </main>
       </ConsentGate>
+    );
+  }
+
+  return (
+    <ConsentGate>
       <main
         className="mx-auto max-w-3xl space-y-6 p-6"
         data-testid="flash-glow-view"
