@@ -787,8 +787,8 @@ const FlashGlowView: React.FC = () => {
           </CardContent>
         </Card>
       </main>
-    );
-  }
+    </ConsentGate>
+  );
 
   const appearance = PHASE_APPEARANCE[snapshot.phase.key] ?? PHASE_APPEARANCE.warmup;
 

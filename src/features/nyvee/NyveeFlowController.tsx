@@ -252,22 +252,9 @@ export interface NyveeFlowControllerProps {
 }
 
 export default function NyveeFlowController({ profile }: NyveeFlowControllerProps) {
-
-import type { CalmProfile, Guidance } from '@/features/orchestration/useStai6Orchestration';
-import { cn } from '@/lib/utils';
-
-interface NyveeFlowControllerProps {
-  sceneProfile: CalmProfile;
-  guidance: Guidance;
-  prefersReducedMotion?: boolean;
-  summaryLabel: string;
-  children?: ReactNode;
-}
-
-const profileClasses: Record<CalmProfile, string> = {
-  silent_anchor: 'bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-indigo-50',
-  soft_guided: 'bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 text-violet-50',
-  standard: 'bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-800 text-indigo-100',
+  const { toast } = useToast();
+  const orchestration = useStai6Orchestration();
+  const sessionRef = useRef<string | null>(null);
 };
 
 const guidanceMessage: Record<Guidance, string> = {
