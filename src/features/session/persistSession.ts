@@ -1,7 +1,9 @@
 import * as Sentry from '@sentry/react';
-
+import { supabase } from '@/integrations/supabase/client';
 import { createSession } from '@/services/sessions/sessionsApi';
+import type { BreathProfile, Mode, Next } from '@/features/orchestration/useBreathworkOrchestration';
 
+// Music session types and function
 interface MusicSessionMetadata {
   texture: 'ambient_very_low' | 'calm_low' | 'warm_soft' | 'neutral';
   intensity: 'very_low' | 'low' | 'medium';
@@ -16,7 +18,7 @@ interface PersistMusicSessionInput {
   durationSec?: number;
 }
 
-export async function persistSession(input: PersistMusicSessionInput): Promise<void> {
+export async function persistMusicSession(input: PersistMusicSessionInput): Promise<void> {
   const { module, metadata, durationSec = 0 } = input;
   try {
     Sentry.addBreadcrumb({ category: 'session', message: 'session:persist:music', level: 'info', data: { module } });
@@ -35,11 +37,7 @@ export async function persistSession(input: PersistMusicSessionInput): Promise<v
   }
 }
 
-export type { MusicSessionMetadata, PersistMusicSessionInput };
-import { supabase } from '@/integrations/supabase/client';
-
-type PersistableModule = 'flash_glow';
-
+// Flash Glow session types and function
 type FlashGlowSessionMetadata = {
   variant: 'default' | 'hr';
   visuals_intensity: 'low' | 'medium' | 'lowered';
@@ -49,14 +47,12 @@ type FlashGlowSessionMetadata = {
   post_cta: 'screen_silk' | 'none';
 };
 
-type PersistablePayload = FlashGlowSessionMetadata;
-
 type PersistSessionResult = {
   success: boolean;
   id?: string;
 };
 
-const sanitizePayload = (payload: PersistablePayload) => ({
+const sanitizeFlashGlowPayload = (payload: FlashGlowSessionMetadata) => ({
   variant: payload.variant,
   visuals_intensity: payload.visuals_intensity,
   breath: payload.breath,
@@ -67,8 +63,8 @@ const sanitizePayload = (payload: PersistablePayload) => ({
   post_cta: payload.post_cta,
 });
 
-export async function persistSession(module: PersistableModule, payload: PersistablePayload): Promise<PersistSessionResult> {
-  const sanitized = sanitizePayload(payload);
+export async function persistFlashGlowSession(module: 'flash_glow', payload: FlashGlowSessionMetadata): Promise<PersistSessionResult> {
+  const sanitized = sanitizeFlashGlowPayload(payload);
 
   Sentry.addBreadcrumb({
     category: 'session',
@@ -106,11 +102,7 @@ export async function persistSession(module: PersistableModule, payload: Persist
   }
 }
 
-export type { FlashGlowSessionMetadata };
-import { createSession } from '@/services/sessions/sessionsApi';
-
-import type { BreathProfile, Mode, Next } from '@/features/orchestration/useBreathworkOrchestration';
-
+// Breath session types and function
 interface PersistBreathPayload {
   profile: BreathProfile;
   mode: Mode;
@@ -120,7 +112,7 @@ interface PersistBreathPayload {
   durationSec?: number;
 }
 
-export const persistSession = async (module: 'breath', payload: PersistBreathPayload) => {
+export const persistBreathSession = async (module: 'breath', payload: PersistBreathPayload) => {
   const duration = Math.max(1, Math.round(payload.durationSec ?? 300));
   const meta = {
     module,
@@ -151,7 +143,7 @@ export const persistSession = async (module: 'breath', payload: PersistBreathPay
   }
 };
 
-export default persistSession;
+// Nyvee session types and function
 export type NyveePersistPayload = {
   profile: string;
   next: 'anchor' | '54321';
@@ -165,7 +157,7 @@ type PersistSessionOptions = {
   endpoint?: string;
 };
 
-export async function persistSession(
+export async function persistNyveeSession(
   module: 'nyvee',
   payload: NyveePersistPayload,
   options: PersistSessionOptions = {}
@@ -191,3 +183,12 @@ export async function persistSession(
     throw new Error(`persist_session_failed:${response.status}`);
   }
 }
+
+// Export all types
+export type { 
+  MusicSessionMetadata, 
+  PersistMusicSessionInput, 
+  FlashGlowSessionMetadata, 
+  PersistBreathPayload,
+  PersistSessionResult 
+};
