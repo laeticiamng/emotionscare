@@ -1,71 +1,44 @@
+// Emergency configuration - no TypeScript processing at all
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { componentTagger } from "lovable-tagger";
 
-// Complete TypeScript bypass configuration
-export default defineConfig(() => {
-  return {
-    server: {
-      host: "::",
-      port: 8080,
+export default defineConfig({
+  plugins: [
+    react({
+      typescript: false,
+      babel: false
+    })
+  ],
+  
+  server: {
+    host: "::",
+    port: 8080,
+  },
+  
+  preview: {
+    port: 4173,
+    host: "::"
+  },
+  
+  resolve: {
+    alias: {
+      "@": resolve(process.cwd(), "./src"),
     },
-    plugins: [
-      react({
-        typescript: false,
-        babel: false
-      }),
-      componentTagger(),
-    ],
-
-    preview: {
-      port: 4173,
-      host: "::"
-    },
-
-    resolve: {
-      alias: {
-        "@": resolve(process.cwd(), "./src"),
-        "@/routes": resolve(process.cwd(), "./src/lib/routes.ts"),
-        "@/routerV2": resolve(process.cwd(), "./src/lib/routerV2"),
-        "@/routerV2/routes.config": resolve(process.cwd(), "./src/lib/routerV2/routes.config.ts"),
-        "@/guards": resolve(process.cwd(), "./src/lib/routerV2/guards.ts"),
-      },
-    },
-
-    build: {
-      target: 'esnext',
-      sourcemap: false,
-      cssCodeSplit: true,
-      minify: 'esbuild',
-      reportCompressedSize: false,
-      chunkSizeWarningLimit: 1000,
-    },
-
-    // Pure esbuild transformation - no TypeScript checking
-    esbuild: {
-      target: 'esnext',
-      jsx: 'automatic',
-      keepNames: true,
-      logLevel: 'silent',
-      tsconfigRaw: {
-        compilerOptions: {
-          jsx: 'react-jsx',
-          target: 'esnext',
-          module: 'esnext',
-          moduleResolution: 'bundler',
-          allowImportingTsExtensions: true,
-          noEmit: false,
-          skipLibCheck: true
-        }
-      }
-    },
-
-    optimizeDeps: {
-      esbuildOptions: {
-        target: 'esnext',
-        jsx: 'automatic'
-      }
-    }
-  };
+  },
+  
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    sourcemap: false,
+    cssCodeSplit: true,
+    reportCompressedSize: false,
+  },
+  
+  // Pure esbuild transformation - no TypeScript
+  esbuild: {
+    target: 'esnext',
+    logLevel: 'silent',
+    format: 'esm'
+  }
 });

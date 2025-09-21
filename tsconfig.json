@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -9,24 +8,13 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": false,
     "skipLibCheck": true,
-    "outDir": "dist",
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@types/*": ["types/*"],
-      "cross-fetch": ["tests/polyfills/cross-fetch.ts"],
-      "@/routes": ["src/lib/routes.ts"],
-      "@/routerV2": ["src/lib/routerV2/index.ts"],
-      "@/routerV2/*": ["src/lib/routerV2/*"],
-      "@/guards": ["src/lib/routerV2/guards.ts"]
-    },
-    "jsx": "react-jsx"
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["src/types.ts", "src/types/**/*", "types"],
-  "exclude": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
