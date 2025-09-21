@@ -41,12 +41,12 @@ const anchorHoldCopy = {
 
 const groundingCopy = {
   title: 'Exploration sensorielle',
-  description: 'Une courte carte d'ancrage peut t'aider à revenir dans le présent.',
+  description: "Une courte carte d'ancrage peut t'aider à revenir dans le présent.",
 };
 
 const softExitCopy = {
   title: 'Sortie sereine',
-  description: 'La transition est lancée. Prends encore quelques respirations avant de quitter.',
+  description: "La transition est lancée. Prends encore quelques respirations avant de quitter.",
 };
 
 const DEFAULT_ANCHOR_DURATION = 60_000;
