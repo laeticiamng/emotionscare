@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@sentry/react';
 import type { Breadcrumb } from '@sentry/types';
 
 import { redact } from '@/lib/obs/redact';
@@ -17,7 +17,7 @@ const resolveSampleRate = (raw: string | undefined, fallback: number): number =>
 };
 
 const ensureSentryClient = () => {
-  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  const dsn = import.meta.env.VITE_SENTRY_DSN;
   if (!dsn) {
     return;
   }
@@ -26,14 +26,14 @@ const ensureSentryClient = () => {
     return;
   }
 
-  const tracesSampleRate = resolveSampleRate(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE, 0.2);
-  const replaysSampleRate = resolveSampleRate(process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE, 0);
-  const replaysOnErrorSampleRate = resolveSampleRate(process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE, 0);
+  const tracesSampleRate = resolveSampleRate(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE, 0.2);
+  const replaysSampleRate = resolveSampleRate(import.meta.env.VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE, 0);
+  const replaysOnErrorSampleRate = resolveSampleRate(import.meta.env.VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE, 0);
 
   Sentry.init({
     dsn,
-    environment: process.env.SENTRY_ENVIRONMENT,
-    release: process.env.SENTRY_RELEASE,
+    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT,
+    release: import.meta.env.VITE_SENTRY_RELEASE,
     tracesSampleRate,
     replaysSessionSampleRate: replaysSampleRate,
     replaysOnErrorSampleRate,

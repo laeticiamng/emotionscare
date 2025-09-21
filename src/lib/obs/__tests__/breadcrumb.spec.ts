@@ -4,7 +4,7 @@ const addBreadcrumbMock = vi.fn();
 const initMock = vi.fn();
 const getClientMock = vi.fn();
 
-vi.mock('@sentry/nextjs', () => ({
+vi.mock('@sentry/react', () => ({
   __esModule: true,
   addBreadcrumb: addBreadcrumbMock,
   init: initMock,
@@ -17,7 +17,7 @@ describe('addBreadcrumb helper', () => {
     addBreadcrumbMock.mockReset();
     initMock.mockReset();
     getClientMock.mockReset();
-    process.env.NEXT_PUBLIC_SENTRY_DSN = '';
+    process.env.VITE_SENTRY_DSN = '';
   });
 
   it('redacts sensitive breadcrumb data before forwarding to Sentry', async () => {
