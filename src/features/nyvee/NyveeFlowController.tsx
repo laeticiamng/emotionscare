@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import FiveFourThreeTwoOneCard from '@/features/grounding/FiveFourThreeTwoOneCard';
 import { useStai6Orchestration } from '@/features/orchestration/useStai6Orchestration';
-import { persistSession } from '@/features/session/persistSession';
+import { persistNyveeSession } from '@/features/session/persistSession';
 
 export type NyveeNextStep = 'repeat_soft_anchor' | 'offer_54321';
 
@@ -117,7 +117,7 @@ const NyveeFlowController = ({
       });
 
       try {
-        await persistSession('nyvee', {
+        await persistNyveeSession('nyvee', {
           profile,
           next: nextStep === 'repeat_soft_anchor' ? 'anchor' : '54321',
           exit: 'soft',

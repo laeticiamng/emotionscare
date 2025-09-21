@@ -24,7 +24,7 @@ import ZeroNumberBoundary from '@/components/a11y/ZeroNumberBoundary';
 import BreathFlowController from '@/features/breath/BreathFlowController';
 import SleepPreset from '@/features/breath/sleep/SleepPreset';
 import useBreathworkOrchestration from '@/features/orchestration/useBreathworkOrchestration';
-import persistSession from '@/features/session/persistSession';
+import { persistBreathSession } from '@/features/session/persistSession';
 import type { AnswerValue, UseAssessmentResult } from '@/hooks/useAssessment';
 
 const STAI_OPTIONS = ['Jamais', 'Parfois', 'Souvent', 'Toujours'] as const;
@@ -225,7 +225,7 @@ const BreathPage: React.FC = () => {
         level: 'info',
         data: { mode: sleepMode ? 'sleep_preset' : 'default', profile: orchestration.profile },
       });
-      void persistSession('breath', {
+      void persistBreathSession('breath', {
         profile: orchestration.profile,
         mode: sleepMode ? 'sleep_preset' : orchestration.mode,
         next: orchestration.next,

@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlashGlowSession, type FlashGlowAction } from '@/features/flash-glow/hooks/useFlashGlowSession';
-import { persistSession } from '@/features/session/persistSession';
+import { persistFlashGlowSession } from '@/features/session/persistSession';
 import { useToast } from '@/hooks/use-toast';
 import { useClinicalHints, type ClinicalHintsSnapshot } from '@/hooks/useClinicalHints';
 import { ff } from '@/lib/flags/ff';
@@ -136,7 +136,7 @@ const FlashGlowRuntimePage: React.FC = () => {
       post_cta: postCta?.target === 'screen_silk' ? 'screen_silk' : 'none' as const,
     };
 
-    void persistSession('flash_glow', payload).then((result) => {
+    void persistFlashGlowSession('flash_glow', payload).then((result) => {
       if (result.success) {
         persistedRef.current = true;
       }

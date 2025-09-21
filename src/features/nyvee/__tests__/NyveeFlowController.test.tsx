@@ -20,9 +20,9 @@ vi.mock('@/hooks/use-toast', () => ({
   }),
 }));
 
-const persistSessionMock = vi.fn(() => Promise.resolve());
+const persistNyveeSessionMock = vi.fn(() => Promise.resolve());
 vi.mock('@/features/session/persistSession', () => ({
-  persistSession: (...args: unknown[]) => persistSessionMock(...args),
+  persistNyveeSession: (...args: unknown[]) => persistNyveeSessionMock(...args),
 }));
 
 vi.mock('@/features/orchestration/useStai6Orchestration', () => ({
@@ -37,7 +37,7 @@ vi.mock('@/features/orchestration/useStai6Orchestration', () => ({
 describe('NyveeFlowController', () => {
   beforeEach(() => {
     deltaMock.mockReset();
-    persistSessionMock.mockClear();
+    persistNyveeSessionMock.mockClear();
     snapshots.pre = { level: 2, summary: 'pre', generatedAt: new Date().toISOString() };
     snapshots.post = { level: 2, summary: 'post', generatedAt: new Date().toISOString() };
   });
@@ -53,7 +53,7 @@ describe('NyveeFlowController', () => {
 
     await Promise.resolve();
 
-    expect(persistSessionMock).toHaveBeenCalledWith('nyvee', {
+    expect(persistNyveeSessionMock).toHaveBeenCalledWith('nyvee', {
       profile: 'silent_anchor',
       next: 'anchor',
       exit: 'soft',
@@ -80,7 +80,7 @@ describe('NyveeFlowController', () => {
 
     await Promise.resolve();
 
-    expect(persistSessionMock).toHaveBeenCalledWith('nyvee', {
+    expect(persistNyveeSessionMock).toHaveBeenCalledWith('nyvee', {
       profile: 'silent_anchor',
       next: '54321',
       exit: 'soft',

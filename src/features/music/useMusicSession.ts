@@ -4,7 +4,7 @@ import { addBreadcrumb } from '@/lib/obs/breadcrumb';
 
 import { computeMusicActions, type MusicAction } from '@/features/orchestration/music.orchestrator';
 import type { UseMusicEngine } from '@/features/music/useMusicEngine';
-import { persistSession } from '@/features/session/persistSession';
+import { persistMusicSession } from '@/features/session/persistSession';
 
 interface ApplyInputs {
   tensionLevel?: number;
@@ -115,7 +115,7 @@ export function useMusicSession(engine: UseMusicEngine): MusicSessionControls {
       };
 
       try {
-        await persistSession(payload);
+        await persistMusicSession(payload);
         setStatus('completed');
       } catch (error) {
         // Already reported in persistSession
