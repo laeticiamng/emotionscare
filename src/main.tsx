@@ -9,7 +9,7 @@ import './theme/theme.css';
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import { RootProvider } from '@/providers';
-import { routerV2 } from '@/routerV2';
+import { router } from '@/routerV2/router';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -89,7 +89,7 @@ createRoot(rootElement).render(
   <React.StrictMode>
     <RootProvider>
       <AccessibilitySkipLinks />
-      <RouterProvider router={routerV2} />
+      <RouterProvider router={router} />
     </RootProvider>
   </React.StrictMode>
 );
