@@ -11,9 +11,13 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, User } from 'lucide-react';
 
 const HomePage: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  console.log('[HomePage] Component starting to render');
+  
+  try {
+    const { isAuthenticated, user } = useAuth();
+    console.log('[HomePage] Auth state:', { isAuthenticated, user: user?.email });
 
-  return (
+    return (
     <div className="relative">
       {/* Bannière utilisateur connecté */}
       {isAuthenticated && user && (
@@ -37,6 +41,15 @@ const HomePage: React.FC = () => {
       <UnifiedHomePage variant="full" />
     </div>
   );
+  } catch (error) {
+    console.error('[HomePage] Error during render:', error);
+    return (
+      <div style={{ padding: '20px', backgroundColor: '#ffebee' }}>
+        <h1>❌ Erreur dans HomePage</h1>
+        <p>Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+      </div>
+    );
+  }
 };
 
 export default HomePage;

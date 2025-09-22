@@ -47,17 +47,23 @@ interface UnifiedHomePageProps {
 }
 
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
-  const [searchParams] = useSearchParams();
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [statsVisible, setStatsVisible] = useState(false);
-  const statsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-  const featuresSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-  const useCasesSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-  const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-  const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  console.log('[UnifiedHomePage] Starting render with variant:', variant);
   
-  // Détection automatique du variant depuis les params
-  const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
+  try {
+    const [searchParams] = useSearchParams();
+    const [currentTestimonial, setCurrentTestimonial] = useState(0);
+    const [statsVisible, setStatsVisible] = useState(false);
+    const statsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+    const featuresSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+    const useCasesSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+    const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+    const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+    
+    console.log('[UnifiedHomePage] Hooks initialized successfully');
+    
+    // Détection automatique du variant depuis les params
+    const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
+    console.log('[UnifiedHomePage] Detected variant:', detectedVariant);
 
   // Auto-rotate testimonials
   useEffect(() => {
@@ -194,8 +200,19 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     }
   ];
 
+  } catch (error) {
+    console.error('[UnifiedHomePage] Error during initialization:', error);
+    return (
+      <div style={{ padding: '20px', backgroundColor: '#ffebee' }}>
+        <h1>❌ Erreur dans UnifiedHomePage</h1>
+        <p>Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+      </div>
+    );
+  }
+
   // Version B2C Simple (comme HomeB2CPage)
   if (detectedVariant === 'b2c-simple') {
+    console.log('[UnifiedHomePage] Rendering B2C simple variant');
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50" data-testid="page-root">
         {/* Header */}
@@ -349,6 +366,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   }
 
   // Version Full Marketing (comme HomePage original)
+  console.log('[UnifiedHomePage] Rendering full marketing variant');
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
       <Header />
