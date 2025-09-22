@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ThemeProvider as BaseThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider as BaseThemeProvider, useTheme } from '@/components/theme-provider';
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -22,3 +22,5 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     </BaseThemeProvider>
   );
 };
+
+export { useTheme };

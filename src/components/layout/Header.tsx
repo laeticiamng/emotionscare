@@ -48,7 +48,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/ThemeProvider';
 
 interface HeaderProps {
   className?: string;
