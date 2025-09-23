@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
+import ConsentBanner from '@/components/ConsentBanner';
 import { NotificationProvider } from '@/components/ui/notification-system';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -64,6 +65,7 @@ export function RootProvider({ children, locale = 'fr' }: RootProviderProps) {
                                         },
                                       }}
                                     />
+                                    <ConsentBanner />
                                   </ConsentProvider>
                                 </MusicProvider>
                               </MoodProvider>

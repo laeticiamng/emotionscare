@@ -199,3 +199,29 @@ jobs:
             .lighthouseci
             preview.log
           retention-days: 7
+      - run: pnpm run scan:no-clinical-terms
+      - run: pnpm run scan:no-raw-numbers
+
+  e2e-smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Start preview server
+        run: |
+          pnpm preview -- --port 4173 --host 0.0.0.0 &
+          pnpm dlx wait-on http://127.0.0.1:4173
+      - name: Run smoke Playwright tests
+        env:
+          PW_BASE_URL: http://127.0.0.1:4173
+        run: pnpm exec playwright test --config=playwright.smoke.config.ts

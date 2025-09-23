@@ -150,6 +150,7 @@ const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPa
 const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
 const ForbiddenPage = lazy(() => import('@/pages/errors/403/page'));
 const UnifiedErrorPage = lazy(() => import('@/pages/errors/404/page'));
+const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 const ServerErrorPage = lazy(() => import('@/pages/errors/500/page'));
 
 
@@ -268,6 +269,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   UnauthorizedPage,
   ForbiddenPage,
   UnifiedErrorPage,
+  NotFoundPage,
   ServerErrorPage,
   
   // Import des nouveaux modules optimisés
@@ -403,7 +405,11 @@ export const router = createBrowserRouter([
   // Fallback 404 pour toutes les autres routes
   {
     path: '*',
-    element: <Navigate to="/404" replace />,
+    element: (
+      <SuspenseWrapper>
+        <NotFoundPage />
+      </SuspenseWrapper>
+    ),
   },
 ], {
   basename: import.meta.env.BASE_URL ?? '/',

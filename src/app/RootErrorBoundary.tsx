@@ -60,22 +60,27 @@ export default class RootErrorBoundary extends React.Component<
         <main
           role="alert"
           aria-live="assertive"
-          className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16 text-center"
+          className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background via-background to-muted px-6 py-24 text-center"
         >
-          <div className="flex w-full max-w-md flex-col items-center gap-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-              <AlertTriangle aria-hidden className="h-8 w-8 text-destructive" />
+          <div className="flex w-full max-w-xl flex-col items-center gap-8">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10">
+              <AlertTriangle aria-hidden className="h-10 w-10 text-destructive" />
             </div>
-            <div className="space-y-2">
-              <h1 className="text-2xl font-semibold text-foreground">
-                Oups ! Une erreur est survenue
+
+            <div className="space-y-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-destructive/70">
+                EmotionsCare
+              </p>
+              <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
+                Un petit nuage s'est invité
               </h1>
-              <p className="text-sm text-muted-foreground">
-                Quelque chose s'est mal passé. Vous pouvez tenter de recharger la page pour continuer.
+              <p className="text-base leading-relaxed text-muted-foreground">
+                Notre équipe est déjà prévenue et travaille à rétablir l'harmonie. Essayez de recharger la page pour reprendre votre parcours.
               </p>
             </div>
-            <Button onClick={this.handleReload} size="lg">
-              Recharger
+
+            <Button size="lg" onClick={this.handleReload} className="w-full sm:w-auto">
+              Recharger l'expérience
             </Button>
           </div>
         </main>
