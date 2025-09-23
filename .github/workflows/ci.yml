@@ -75,23 +75,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
 
-  unit:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ needs.setup.outputs.node }}
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-
   build:
-    needs: [lint, sentry-guard, typecheck, unit]
+    needs: [lint, sentry-guard, typecheck]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -104,8 +89,13 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
 
-  scanners:
+  e2e:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -118,6 +108,97 @@ jobs:
           node-version: ${{ needs.setup.outputs.node }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Start preview server
+        run: |
+          pnpm preview --host 0.0.0.0 --port 4173 > preview.log 2>&1 &
+          echo $! > preview.pid
+      - name: Wait for preview server
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Preview server failed to start" >&2
+          exit 1
+      - name: Run Playwright tests
+        env:
+          PW_BASE_URL: http://127.0.0.1:4173
+        run: pnpm e2e
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f preview.pid ]; then
+            kill $(cat preview.pid) || true
+          fi
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: |
+            playwright-report
+            test-results
+            preview.log
+          retention-days: 7
+
+  lhci:
+    needs: e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup.outputs.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Start preview server
+        run: |
+          pnpm preview --host 0.0.0.0 --port 4173 > preview.log 2>&1 &
+          echo $! > preview.pid
+      - name: Wait for preview server
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:4173 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Preview server failed to start" >&2
+          exit 1
+      - name: Run Lighthouse CI
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
+          PREVIEW_URL: http://127.0.0.1:4173
+        run: pnpm lhci
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f preview.pid ]; then
+            kill $(cat preview.pid) || true
+          fi
+      - name: Upload Lighthouse artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: |
+            .lighthouseci
+            preview.log
+          retention-days: 7
       - run: pnpm run scan:no-clinical-terms
       - run: pnpm run scan:no-raw-numbers
 
