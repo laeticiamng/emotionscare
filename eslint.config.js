@@ -5,11 +5,11 @@ import tsEslintPlugin from "@typescript-eslint/eslint-plugin";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import importPlugin from "eslint-plugin-import";
 
-const createNoNodeImportsRule = (extraPatterns = []) => [
+const createNoNodeImportsRule = ({ patterns = [], paths = [] } = {}) => [
   "error",
   {
     patterns: [
-  {
+      {
         group: ["node:*"],
         message:
           "Interdit dans le bundle client. Utilise les APIs Web (crypto.subtle via '@/lib/hash', fetch, File API, etc.)."
@@ -23,9 +23,9 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
         message:
           "Interdit côté client: utilisez des mises à jour immutables (spread)!"
       },
-      ...extraPatterns.map((pattern) =>
+      ...patterns.map((pattern) =>
         typeof pattern === "string" ? { group: [pattern] } : pattern
-      )
+      ),
     ],
     paths: [
       {
@@ -36,8 +36,22 @@ const createNoNodeImportsRule = (extraPatterns = []) => [
         name: "node:crypto",
         message: "Utilise Web Crypto via '@/lib/hash' (sha256Hex).",
       },
+      ...paths,
     ]
   }
+];
+
+const routerImportRestrictions = [
+  {
+    name: "@/routerV2/router",
+    importNames: ["routerV2"],
+    message: "Importe `router` depuis '@/routerV2/router' plutôt que `routerV2`."
+  },
+  {
+    name: "@/routerV2",
+    importNames: ["routerV2"],
+    message: "Importe `router` depuis '@/routerV2' plutôt que `routerV2`."
+  },
 ];
 
 export default [
@@ -83,8 +97,9 @@ export default [
       },
     },
     rules: {
-      "no-restricted-imports": createNoNodeImportsRule(),
-      "import/no-cycle": ["error", { ignoreExternal: false }],
+      "no-restricted-imports": createNoNodeImportsRule({
+        paths: routerImportRestrictions,
+      }),
       "ec/no-node-builtins-client": "error",
       "ec/no-hardcoded-paths": "error",
     }
@@ -120,7 +135,9 @@ export default [
     rules: {
       "ec/no-next-imports": "error",
       "ec/no-legacy-routes-helpers": "error",
-      "no-restricted-imports": createNoNodeImportsRule(["../**/ui/*", "../../**/*"]),
+      "no-restricted-imports": createNoNodeImportsRule({
+        patterns: ["../**/ui/*", "../../**/*"],
+      }),
       // "ec/no-alias-routes": "warn",
     }
   }

@@ -410,6 +410,7 @@ export const router = createBrowserRouter([
 });
 
 export const routerV2 = router;
+export default router;
 export type AppRouter = typeof router;
 
 // ═══════════════════════════════════════════════════════════
