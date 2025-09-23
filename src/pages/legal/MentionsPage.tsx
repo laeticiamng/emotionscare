@@ -14,7 +14,14 @@ import {
   Users,
 } from 'lucide-react';
 
-const sections = [
+type Section = {
+  id: string;
+  icon: React.ElementType;
+  title: string;
+  content: React.ReactNode;
+};
+
+const sections: Section[] = [
   {
     id: 'editor',
     icon: Building,
@@ -174,30 +181,40 @@ const MentionsPage: React.FC = () => {
             <CardTitle>Sommaire</CardTitle>
           </CardHeader>
           <CardContent>
-            <nav className="grid gap-2 md:grid-cols-2" aria-label="Sommaire des mentions légales">
-              {sections.map((section) => (
-                <a key={section.id} href={`#${section.id}`} className="text-primary hover:underline">
-                  {section.title}
-                </a>
-              ))}
+            <nav aria-label="Sommaire des mentions légales">
+              <ol className="grid gap-2 md:grid-cols-2">
+                {sections.map((section) => (
+                  <li key={section.id}>
+                    <a href={`#${section.id}`} className="text-primary hover:underline">
+                      {section.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
             </nav>
           </CardContent>
         </Card>
 
         <div className="space-y-8">
-          {sections.map((section) => (
-            <Card key={section.id} id={section.id}>
-              <CardHeader className="flex flex-row items-start gap-3">
-                <section.icon className="h-6 w-6 text-primary mt-1" aria-hidden="true" />
-                <div>
-                  <CardTitle>{section.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="prose max-w-none dark:prose-invert">
-                {section.content}
-              </CardContent>
-            </Card>
-          ))}
+          {sections.map((section) => {
+            const Icon = section.icon;
+            const headingId = `${section.id}-title`;
+            return (
+              <section key={section.id} id={section.id} aria-labelledby={headingId}>
+                <Card>
+                  <CardHeader className="flex flex-row items-start gap-3">
+                    <Icon className="h-6 w-6 text-primary mt-1" aria-hidden="true" />
+                    <div>
+                      <CardTitle id={headingId}>{section.title}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="prose max-w-none dark:prose-invert">
+                    {section.content}
+                  </CardContent>
+                </Card>
+              </section>
+            );
+          })}
         </div>
       </div>
     </main>
