@@ -48,6 +48,7 @@
     "clean:install": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps",
     "front:ci-install": "npm ci --prefer-offline --audit=false --omit=dev && npm run build",
     "ci:verify-assets": "bash ci/verify-assets.sh",
+    "check:env": "node scripts/check-env.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "struct:snapshot": "ts-node scripts/lock-structure.ts",
     "struct:verify": "ts-node scripts/verify-structure.ts",

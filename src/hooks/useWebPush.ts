@@ -279,7 +279,7 @@ export const useWellnessReminders = () => {
     }
 
     // Configuration push pour rappels
-    const vapidKey = process.env.NEXT_PUBLIC_VAPID_KEY || '';
+    const vapidKey = process.env.VITE_VAPID_PUBLIC_KEY || '';
     await subscribe(vapidKey);
     
     // Configurer les rappels côté serveur

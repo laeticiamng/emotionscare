@@ -22,7 +22,6 @@ const rawEnv = {
   VITE_SUPABASE_ANON_KEY:
     import.meta.env.VITE_SUPABASE_ANON_KEY ??
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-    import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
     import.meta.env.SUPABASE_ANON_KEY ??
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU',
   VITE_API_URL: import.meta.env.VITE_API_URL,
@@ -46,10 +45,10 @@ const rawEnv = {
   VITE_ALLOWED_IMAGE_TYPES: import.meta.env.VITE_ALLOWED_IMAGE_TYPES,
   VITE_ALLOWED_AUDIO_TYPES: import.meta.env.VITE_ALLOWED_AUDIO_TYPES,
   VITE_OPENAI_API_KEY:
-    import.meta.env.VITE_OPENAI_API_KEY ?? import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY,
+    import.meta.env.VITE_OPENAI_API_KEY,
   VITE_OPENAI_BASE_URL: import.meta.env.VITE_OPENAI_BASE_URL,
   VITE_HUME_API_KEY:
-    import.meta.env.VITE_HUME_API_KEY ?? import.meta.env.NEXT_PUBLIC_HUME_API_KEY,
+    import.meta.env.VITE_HUME_API_KEY,
 };
 
 const envSchema = z.object({

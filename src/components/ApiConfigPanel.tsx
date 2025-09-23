@@ -23,10 +23,10 @@ interface ApiConfigPanelProps {
 
 const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdate }) => {
   // Configuration actuelle
-  const [apiKeys, setApiKeys] = useState<Record<string, string>>({
-    openai: env.NEXT_PUBLIC_OPENAI_API_KEY || '',
-    humeai: env.NEXT_PUBLIC_HUME_API_KEY || '',
-  });
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>(() => ({
+    openai: import.meta.env.VITE_OPENAI_API_KEY ?? '',
+    humeai: import.meta.env.VITE_HUME_API_KEY ?? '',
+  }));
   
   // État de chargement
   const [isLoading, setIsLoading] = useState(false);
