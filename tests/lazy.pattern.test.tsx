@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Suspense } from 'react';
 
 describe('lazyDefault', () => {
-  it('rend correctement un composant exporté par défaut', async () => {
+  it('renders default exported component correctly', async () => {
     const LazyComponent = lazyDefault(() =>
       Promise.resolve({
         default: () => <div>Default Export</div>
