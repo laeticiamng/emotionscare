@@ -121,19 +121,43 @@ const FooterLinks: React.FC = () => {
                 </button>
               </li>
               <li>
-                <button 
-                  onClick={() => navigate('/privacy')}
+                <button
+                  onClick={() => navigate('/legal/mentions')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Confidentialité
+                  Mentions légales
                 </button>
               </li>
               <li>
-                <button 
-                  onClick={() => navigate('/terms')}
+                <button
+                  onClick={() => navigate('/legal/terms')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Conditions d'utilisation
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate('/legal/sales')}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Conditions de vente
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate('/legal/privacy')}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Politique de confidentialité
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate('/legal/cookies')}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Cookies
                 </button>
               </li>
             </ul>
