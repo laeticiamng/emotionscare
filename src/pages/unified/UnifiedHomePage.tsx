@@ -49,36 +49,23 @@ interface UnifiedHomePageProps {
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
   console.log('[UnifiedHomePage] Starting render with variant:', variant);
   
-  try {
-    const [searchParams] = useSearchParams();
-    const [currentTestimonial, setCurrentTestimonial] = useState(0);
-    const [statsVisible, setStatsVisible] = useState(false);
-    const statsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-    const featuresSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-    const useCasesSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-    const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-    const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
-    
-    console.log('[UnifiedHomePage] Hooks initialized successfully');
-    
-    // Détection automatique du variant depuis les params
-    const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
-    console.log('[UnifiedHomePage] Detected variant:', detectedVariant);
+  // Initialiser les hooks et variables en dehors du try-catch
+  const [searchParams] = useSearchParams();
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const featuresSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const useCasesSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
+  
+  console.log('[UnifiedHomePage] Hooks initialized successfully');
+  
+  // Détection automatique du variant depuis les params
+  const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
+  console.log('[UnifiedHomePage] Detected variant:', detectedVariant);
 
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (statsSection.isVisible) {
-      setStatsVisible(true);
-    }
-  }, [statsSection.isVisible]);
-
+  // Définir les données statiques
   const features = [
     {
       icon: Brain,
@@ -200,15 +187,19 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     }
   ];
 
-  } catch (error) {
-    console.error('[UnifiedHomePage] Error during initialization:', error);
-    return (
-      <div style={{ padding: '20px', backgroundColor: '#ffebee' }}>
-        <h1>❌ Erreur dans UnifiedHomePage</h1>
-        <p>Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
-      </div>
-    );
-  }
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (statsSection.isVisible) {
+      setStatsVisible(true);
+    }
+  }, [statsSection.isVisible]);
 
   // Version B2C Simple (comme HomeB2CPage)
   if (detectedVariant === 'b2c-simple') {
