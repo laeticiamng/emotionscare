@@ -71,7 +71,7 @@ export default class RootErrorBoundary extends React.Component<
                 Oups ! Une erreur est survenue
               </h1>
               <p className="text-sm text-muted-foreground">
-                Quelque chose s\'est mal passé. Vous pouvez tenter de recharger la page pour continuer.
+                Quelque chose s'est mal passé. Vous pouvez tenter de recharger la page pour continuer.
               </p>
             </div>
             <Button onClick={this.handleReload} size="lg">
