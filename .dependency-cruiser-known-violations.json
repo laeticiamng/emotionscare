@@ -1,0 +1,2155 @@
+[
+  {
+    "type": "cycle",
+    "from": "src/components/debug/AccessDiagnostic.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/pages/NavigationPage.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "dynamic-import"
+        ]
+      },
+      {
+        "name": "src/components/debug/AccessDiagnostic.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "src/components/layout/EnhancedFooter.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/components/layout/EnhancedShell.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/components/layout/EnhancedFooter.tsx",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "src/components/layout/EnhancedHeader.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/components/layout/EnhancedShell.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/components/layout/EnhancedHeader.tsx",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "src/components/layout/FloatingActionMenu.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/components/layout/FloatingActionMenu.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "src/pages/AppGatePage.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/pages/AppGatePage.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "dynamic-import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "src/pages/DemoPage.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/pages/DemoPage.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "dynamic-import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "cycle",
+    "from": "src/pages/NavigationPage.tsx",
+    "to": "src/routerV2/index.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-circular"
+    },
+    "cycle": [
+      {
+        "name": "src/routerV2/index.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "import"
+        ]
+      },
+      {
+        "name": "src/routerV2/router.tsx",
+        "dependencyTypes": [
+          "local",
+          "export"
+        ]
+      },
+      {
+        "name": "src/pages/NavigationPage.tsx",
+        "dependencyTypes": [
+          "aliased",
+          "aliased-tsconfig",
+          "aliased-tsconfig-paths",
+          "local",
+          "dynamic-import"
+        ]
+      }
+    ]
+  },
+  {
+    "type": "module",
+    "from": "src/components/admin/tabs/activity-logs/types.ts",
+    "to": "src/components/admin/tabs/activity-logs/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/components/dashboard/admin/data/mockData.ts",
+    "to": "src/components/dashboard/admin/data/mockData.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/components/dashboard/admin/draggable/types.ts",
+    "to": "src/components/dashboard/admin/draggable/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/components/dashboard/admin/tabs/activity-logs/types.ts",
+    "to": "src/components/dashboard/admin/tabs/activity-logs/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/components/dashboard/admin/tabs/overview/types.ts",
+    "to": "src/components/dashboard/admin/tabs/overview/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/components/dashboard/admin/types/tableTypes.ts",
+    "to": "src/components/dashboard/admin/types/tableTypes.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/components/navigation/SidebarNav.tsx",
+    "to": "src/components/navigation/SidebarNav.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/constants/enums.ts",
+    "to": "src/constants/enums.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/contexts/coach/types.ts",
+    "to": "src/contexts/coach/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/contexts/music/mockMusicData.ts",
+    "to": "src/contexts/music/mockMusicData.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/core/metricsQueue.ts",
+    "to": "src/core/metricsQueue.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/emotionPlaylists.ts",
+    "to": "src/data/emotionPlaylists.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/emotions.ts",
+    "to": "src/data/emotions.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/mockBadges.ts",
+    "to": "src/data/mockBadges.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/mockReports.ts",
+    "to": "src/data/mockReports.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/mockVRTemplates.ts",
+    "to": "src/data/mockVRTemplates.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/music.ts",
+    "to": "src/data/music.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/musicData.ts",
+    "to": "src/data/musicData.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/data/musicPlaylists.ts",
+    "to": "src/data/musicPlaylists.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/audio/audioPlayerUtils.ts",
+    "to": "src/hooks/audio/audioPlayerUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/audio/audioPlayerUtils.tsx",
+    "to": "src/hooks/audio/audioPlayerUtils.tsx",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/chat/types/conversation.ts",
+    "to": "src/hooks/chat/types/conversation.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/chat/types/useChatHistoryResult.ts",
+    "to": "src/hooks/chat/types/useChatHistoryResult.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/chat/useChatIntents.ts",
+    "to": "src/hooks/chat/useChatIntents.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/coach/types.ts",
+    "to": "src/hooks/coach/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/community-gamification/types.ts",
+    "to": "src/hooks/community-gamification/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/types/index.ts",
+    "to": "src/hooks/types/index.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/hooks/useHaptics.ts",
+    "to": "src/hooks/useHaptics.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/integrations/supabase/types.ts",
+    "to": "src/integrations/supabase/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/activity/mockActivityData.ts",
+    "to": "src/lib/activity/mockActivityData.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/ai/journal-service.ts",
+    "to": "src/lib/ai/journal-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/animation.ts",
+    "to": "src/lib/animation.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/ar/speechRecognition.ts",
+    "to": "src/lib/ar/speechRecognition.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/ar/voiceCommandMatcher.ts",
+    "to": "src/lib/ar/voiceCommandMatcher.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/assess/types.ts",
+    "to": "src/lib/assess/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/audio/audioUtils.ts",
+    "to": "src/lib/audio/audioUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/audioVad.ts",
+    "to": "src/lib/audioVad.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/b2b/reporting.ts",
+    "to": "src/lib/b2b/reporting.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/badgeUtils.ts",
+    "to": "src/lib/badgeUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/action-executor.ts",
+    "to": "src/lib/coach/action-executor.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/AI_MODEL_CONFIG.ts",
+    "to": "src/lib/coach/AI_MODEL_CONFIG.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/aiModels.ts",
+    "to": "src/lib/coach/aiModels.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/analyzer.ts",
+    "to": "src/lib/coach/analyzer.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/coach-service.ts",
+    "to": "src/lib/coach/coach-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/engine.ts",
+    "to": "src/lib/coach/engine.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/notification-service.ts",
+    "to": "src/lib/coach/notification-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/coach/routines.ts",
+    "to": "src/lib/coach/routines.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/dashboardService.ts",
+    "to": "src/lib/dashboardService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/db.ts",
+    "to": "src/lib/db.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/emotional-data-service.ts",
+    "to": "src/lib/emotional-data-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/errors/types.ts",
+    "to": "src/lib/errors/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/formatting.ts",
+    "to": "src/lib/formatting.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/badge-service.ts",
+    "to": "src/lib/gamification/badge-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/emotion-processor.ts",
+    "to": "src/lib/gamification/emotion-processor.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/leaderboard-service.ts",
+    "to": "src/lib/gamification/leaderboard-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/level-service.ts",
+    "to": "src/lib/gamification/level-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/points-service.ts",
+    "to": "src/lib/gamification/points-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/stats-service.ts",
+    "to": "src/lib/gamification/stats-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamification/utils.ts",
+    "to": "src/lib/gamification/utils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/gamificationService.ts",
+    "to": "src/lib/gamificationService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/i18n/dictionaries.ts",
+    "to": "src/lib/i18n/dictionaries.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/journal/store.ts",
+    "to": "src/lib/journal/store.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/mockDataGenerator.ts",
+    "to": "src/lib/mockDataGenerator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/net/idempotency.ts",
+    "to": "src/lib/net/idempotency.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/performance/performanceOptimizer.ts",
+    "to": "src/lib/performance/performanceOptimizer.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/polyfills.ts",
+    "to": "src/lib/polyfills.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/pwa/pwaManager.ts",
+    "to": "src/lib/pwa/pwaManager.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/scan/analyzeService.ts",
+    "to": "src/lib/scan/analyzeService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/scan/emotionService.ts",
+    "to": "src/lib/scan/emotionService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/scan/emotionUtilService.ts",
+    "to": "src/lib/scan/emotionUtilService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/scan/mockEmotionService.ts",
+    "to": "src/lib/scan/mockEmotionService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/security/csp.ts",
+    "to": "src/lib/security/csp.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/security/rateLimit.ts",
+    "to": "src/lib/security/rateLimit.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/lib/toast-variants.ts",
+    "to": "src/lib/toast-variants.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/mocks/aiFallback.ts",
+    "to": "src/mocks/aiFallback.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/mocks/emotionResults.ts",
+    "to": "src/mocks/emotionResults.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/mocks/musicTracks.ts",
+    "to": "src/mocks/musicTracks.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/cleanup-duplicates.ts",
+    "to": "src/scripts/cleanup-duplicates.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/complete-platform-audit.js",
+    "to": "src/scripts/complete-platform-audit.js",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/final-complete-report.js",
+    "to": "src/scripts/final-complete-report.js",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/final-completion-report.js",
+    "to": "src/scripts/final-completion-report.js",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/final-completion-status.js",
+    "to": "src/scripts/final-completion-status.js",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/final-validation-report.js",
+    "to": "src/scripts/final-validation-report.js",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/scripts/final-validation.js",
+    "to": "src/scripts/final-validation.js",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/clinical/catalogs/index.ts",
+    "to": "src/services/clinical/catalogs/index.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/invitationService.ts",
+    "to": "src/services/invitationService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/music/emotion-music-mapping.ts",
+    "to": "src/services/music/emotion-music-mapping.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/music/music-generator-service.ts",
+    "to": "src/services/music/music-generator-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/music/playlist-data.ts",
+    "to": "src/services/music/playlist-data.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/music/session-service.ts",
+    "to": "src/services/music/session-service.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/music/types.ts",
+    "to": "src/services/music/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/optimizationService.ts",
+    "to": "src/services/optimizationService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/pushNotifications.ts",
+    "to": "src/services/pushNotifications.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/scanService.ts",
+    "to": "src/services/scanService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/serviceWorker.ts",
+    "to": "src/services/serviceWorker.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/teamAnalyticsService.ts",
+    "to": "src/services/teamAnalyticsService.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/types.ts",
+    "to": "src/services/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/services/whisper.ts",
+    "to": "src/services/whisper.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/themes/theme.ts",
+    "to": "src/themes/theme.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/activity.ts",
+    "to": "src/types/activity.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/ai.ts",
+    "to": "src/types/ai.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/analytics.ts",
+    "to": "src/types/analytics.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/audio.ts",
+    "to": "src/types/audio.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/auth.ts",
+    "to": "src/types/auth.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/auth/index.ts",
+    "to": "src/types/auth/index.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/badge.ts",
+    "to": "src/types/badge.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/boss-level-grit.ts",
+    "to": "src/types/boss-level-grit.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/branding.ts",
+    "to": "src/types/branding.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/calendar.ts",
+    "to": "src/types/calendar.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/challenge.ts",
+    "to": "src/types/challenge.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/chart.ts",
+    "to": "src/types/chart.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/coach/CoachEvent.ts",
+    "to": "src/types/coach/CoachEvent.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/community.ts",
+    "to": "src/types/community.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/dashboard.ts",
+    "to": "src/types/dashboard.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/emotional-data.d.ts",
+    "to": "src/types/emotional-data.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/emotional-data.ts",
+    "to": "src/types/emotional-data.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/extensions.ts",
+    "to": "src/types/extensions.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/feedback.ts",
+    "to": "src/types/feedback.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/gamification.d.ts",
+    "to": "src/types/gamification.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/gamification.ts",
+    "to": "src/types/gamification.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/gamification/stats.ts",
+    "to": "src/types/gamification/stats.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/glow.ts",
+    "to": "src/types/glow.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/group.ts",
+    "to": "src/types/group.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/hooks.d.ts",
+    "to": "src/types/hooks.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/index.ts",
+    "to": "src/types/index.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/innovation.ts",
+    "to": "src/types/innovation.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/invitation.ts",
+    "to": "src/types/invitation.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/invitations.ts",
+    "to": "src/types/invitations.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/journal.d.ts",
+    "to": "src/types/journal.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/journal.ts",
+    "to": "src/types/journal.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/kpi.ts",
+    "to": "src/types/kpi.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/layout.ts",
+    "to": "src/types/layout.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/modules.ts",
+    "to": "src/types/modules.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/mood-mixer.ts",
+    "to": "src/types/mood-mixer.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/nav.ts",
+    "to": "src/types/nav.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/notification.d.ts",
+    "to": "src/types/notification.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/notification.ts",
+    "to": "src/types/notification.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/notifications.ts",
+    "to": "src/types/notifications.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/onboarding.ts",
+    "to": "src/types/onboarding.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/openai.ts",
+    "to": "src/types/openai.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/orchestration.ts",
+    "to": "src/types/orchestration.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/other.ts",
+    "to": "src/types/other.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/prediction.ts",
+    "to": "src/types/prediction.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/privacy.ts",
+    "to": "src/types/privacy.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/progress-bar.ts",
+    "to": "src/types/progress-bar.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/recommendation.ts",
+    "to": "src/types/recommendation.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/recommendations.ts",
+    "to": "src/types/recommendations.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/report.ts",
+    "to": "src/types/report.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/rewards.ts",
+    "to": "src/types/rewards.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/segment.ts",
+    "to": "src/types/segment.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/sidebar.d.ts",
+    "to": "src/types/sidebar.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/sidebar.ts",
+    "to": "src/types/sidebar.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/social.ts",
+    "to": "src/types/social.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/soundscape.ts",
+    "to": "src/types/soundscape.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/speech.d.ts",
+    "to": "src/types/speech.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/speechRecognition.d.ts",
+    "to": "src/types/speechRecognition.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/story.ts",
+    "to": "src/types/story.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/storytelling.ts",
+    "to": "src/types/storytelling.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/support.ts",
+    "to": "src/types/support.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/theme.d.ts",
+    "to": "src/types/theme.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/theme.ts",
+    "to": "src/types/theme.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/toast.d.ts",
+    "to": "src/types/toast.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/toast.ts",
+    "to": "src/types/toast.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/track-info.ts",
+    "to": "src/types/track-info.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/types.ts",
+    "to": "src/types/types.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/ui.ts",
+    "to": "src/types/ui.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/universes.ts",
+    "to": "src/types/universes.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/user-context.ts",
+    "to": "src/types/user-context.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/user.ts",
+    "to": "src/types/user.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/vr-session-music.ts",
+    "to": "src/types/vr-session-music.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/vr.d.ts",
+    "to": "src/types/vr.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/vr.ts",
+    "to": "src/types/vr.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/VRSessionHistoryProps.ts",
+    "to": "src/types/VRSessionHistoryProps.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/widgets.d.ts",
+    "to": "src/types/widgets.d.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/types/widgets.ts",
+    "to": "src/types/widgets.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/array-polyfills.ts",
+    "to": "src/utils/array-polyfills.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/badgeUtils.ts",
+    "to": "src/utils/badgeUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/challengeUtils.ts",
+    "to": "src/utils/challengeUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/chartHelpers.ts",
+    "to": "src/utils/chartHelpers.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/codeCleanup.ts",
+    "to": "src/utils/codeCleanup.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/compatibility.ts",
+    "to": "src/utils/compatibility.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/contrastOptimizer.ts",
+    "to": "src/utils/contrastOptimizer.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/debugHelper.ts",
+    "to": "src/utils/debugHelper.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/duplicateChecker.ts",
+    "to": "src/utils/duplicateChecker.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/emotionUtils.ts",
+    "to": "src/utils/emotionUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/formatters.ts",
+    "to": "src/utils/formatters.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/formatTime.ts",
+    "to": "src/utils/formatTime.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/formatUtils.ts",
+    "to": "src/utils/formatUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/gamificationUtils.ts",
+    "to": "src/utils/gamificationUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/getUserModeDisplayName.ts",
+    "to": "src/utils/getUserModeDisplayName.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/loadComponent.ts",
+    "to": "src/utils/loadComponent.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/musicCompatibilityUtils.ts",
+    "to": "src/utils/musicCompatibilityUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/normalizeUserMode.ts",
+    "to": "src/utils/normalizeUserMode.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/pagePerformanceMonitor.ts",
+    "to": "src/utils/pagePerformanceMonitor.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/preferencesMapper.ts",
+    "to": "src/utils/preferencesMapper.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/privacyHelpers.ts",
+    "to": "src/utils/privacyHelpers.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/productionCheck.ts",
+    "to": "src/utils/productionCheck.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/productionSecurity.ts",
+    "to": "src/utils/productionSecurity.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/productionValidator.ts",
+    "to": "src/utils/productionValidator.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/securityValidation.ts",
+    "to": "src/utils/securityValidation.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/sortUtils.ts",
+    "to": "src/utils/sortUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/startupCheck.ts",
+    "to": "src/utils/startupCheck.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/systemHealth.ts",
+    "to": "src/utils/systemHealth.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/timeUtils.ts",
+    "to": "src/utils/timeUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/trialHelpers.ts",
+    "to": "src/utils/trialHelpers.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/userHelpers.ts",
+    "to": "src/utils/userHelpers.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  },
+  {
+    "type": "module",
+    "from": "src/utils/userUtils.ts",
+    "to": "src/utils/userUtils.ts",
+    "rule": {
+      "severity": "error",
+      "name": "no-orphan"
+    }
+  }
+]

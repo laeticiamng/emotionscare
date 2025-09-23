@@ -2,11 +2,14 @@
 
 import React from "react";
 import * as Sentry from "@sentry/react";
-import { PageHeader, Card, Button, ProgressBar } from "@/COMPONENTS.reg";
-import { GlowSurface } from "@/COMPONENTS.reg";
-import { usePulseClock } from "@/COMPONENTS.reg";
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ProgressBar } from "@/ui/ProgressBar";
+import { GlowSurface } from "@/ui/GlowSurface";
+import { usePulseClock } from "@/ui/hooks/usePulseClock";
 import { ff } from "@/lib/flags/ff";
-import { useSound } from "@/COMPONENTS.reg"; // si P5 dispo
+import { useSound } from "@/ui/hooks/useSound"; // si P5 dispo
 import { recordEvent } from "@/lib/scores/events"; // si P6 dispo
 import { createFlashGlowJournalEntry } from "@/modules/flash-glow/journal";
 import type { JournalEntry } from "@/modules/journal/journalService";

@@ -2,7 +2,11 @@
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
-import { PageHeader, Card, Button, ProgressBar, Sparkline } from "@/COMPONENTS.reg"; // ProgressBar/Sparkline ajoutés en P6
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ProgressBar } from "@/ui/ProgressBar";
+import { Sparkline } from "@/ui/Sparkline"; // ProgressBar/Sparkline ajoutés en P6
 import { recordEvent } from "@/lib/scores/events"; // si P6 non intégré, cet import peut être ignoré (no-op)
 import { logger } from "@/lib/logger";
 import { useAuth } from "@/contexts/AuthContext";

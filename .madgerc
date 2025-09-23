@@ -1,0 +1,13 @@
+{
+  "tsConfig": "./tsconfig.madge.json",
+  "alias": {
+    "@": "./src",
+    "@types": "./types"
+  },
+  "excludeRegExp": ["node_modules", "dist", "^tests?", "^reports"],
+  "detectiveOptions": {
+    "es6": {
+      "mixedImports": true
+    }
+  }
+}

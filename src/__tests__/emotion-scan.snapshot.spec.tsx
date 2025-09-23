@@ -2,12 +2,24 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
+vi.mock("@/components/ui/PageHeader", () => ({
+  default: ({ title }: any) => <div>{title}</div>,
+}));
+
+vi.mock("@/components/ui/button", () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+}));
+
+vi.mock("@/components/ui/card", () => ({
   Card: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock("@/ui/ProgressBar", () => ({
   ProgressBar: ({ value }: any) => <div>progress {value}</div>,
-  Sparkline: ({ values }: any) => <div>{values.join(',')}</div>
+}));
+
+vi.mock("@/ui/Sparkline", () => ({
+  Sparkline: ({ values }: any) => <div>{values.join(',')}</div>,
 }));
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({ user: null, isAuthenticated: false }),

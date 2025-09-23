@@ -1,6 +1,9 @@
 "use client";
 import React from "react";
-import { PageHeader, Card, Button, AudioPlayer } from "@/COMPONENTS.reg"; // AudioPlayer (P5) si dispo
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AudioPlayer } from "@/ui/AudioPlayer"; // AudioPlayer (P5) si dispo
 import { synthParagraphs } from "@/lib/story-synth/templates";
 import { addStory, loadStories } from "@/lib/story-synth/store";
 import { downloadText } from "@/lib/story-synth/export";

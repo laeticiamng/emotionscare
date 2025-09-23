@@ -3,7 +3,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
-import { FadeIn, SeoHead } from '@/COMPONENTS.reg';
+import { FadeIn } from '@/ui/motion/FadeIn';
+import { SeoHead } from '@/lib/seo/SeoHead';
 import { MoodMixerView } from '@/modules/mood-mixer/MoodMixerView';
 
 const B2CMoodMixerPage: React.FC = () => {
