@@ -39,50 +39,16 @@
 /* Skip Links */
 .skip-link {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
+  top: -40px;
+  left: 6px;
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  font-weight: 600;
-  transform: translateY(-200%);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 0 0 2px hsl(var(--primary-foreground) / 0.2);
+  padding: 8px 16px;
   z-index: 9999;
 }
 
-.skip-link:focus,
-.skip-link:focus-visible {
-  transform: translateY(0);
-  box-shadow: 0 0 0 4px hsl(var(--primary-foreground) / 0.4);
-  outline: none;
-}
-
-/* Focus visibility */
-:where(a,
-  button,
-  input,
-  select,
-  textarea,
-  summary,
-  [role="button"],
-  [tabindex]:not([tabindex="-1"])):focus-visible {
-  outline: var(--accessibility-focus-outline);
-  outline-offset: var(--accessibility-focus-offset);
-  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.35);
-}
-
-:where(a,
-  button,
-  input,
-  select,
-  textarea,
-  summary,
-  [role="button"],
-  [tabindex]:not([tabindex="-1"])):focus:not(:focus-visible) {
-  outline: none;
-  box-shadow: none;
+.skip-link:focus {
+  top: 6px;
 }
 
 /* Screen Reader Only */
