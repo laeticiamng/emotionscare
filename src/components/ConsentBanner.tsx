@@ -33,7 +33,7 @@ const ConsentBanner: React.FC = () => {
   const persistChoice = (analytics: boolean) => {
     setIsSaving(true);
     try {
-      setConsentPreferences({ analytics, functional: true });
+      setConsentPreferences({ analytics });
       setAnalyticsEnabled(analytics);
       setIsVisible(false);
       setShowPreferences(false);
