@@ -747,7 +747,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 </p>
               </motion.div>
 
-              <div className="max-w-4xl mx-auto" role="group" aria-live="polite" aria-atomic="true">
+              <div className="max-w-4xl mx-auto" role="group" aria-live="polite" aria-atomic="true" aria-label="Carousel de témoignages">
                 <motion.div
                   key={currentTestimonial}
                   initial={{ opacity: 0, scale: 0.95 }}
