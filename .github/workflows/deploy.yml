@@ -30,7 +30,7 @@ jobs:
           echo "Sonde de la page hors-ligne (${BASE_URL}/offline.html)"
           curl -fsSL "${BASE_URL}/offline.html" | grep -F "Mode hors ligne"
 
-          echo "Sonde de la route de santé (${BASE_URL}/healthz)"
-          curl -fsSL "${BASE_URL}/healthz" | grep -F "EMOTIONSCARE_HEALTHCHECK_OK"
+          echo "Sonde de la route de santé (${BASE_URL}/healthz.html)"
+          curl -fsSL "${BASE_URL}/healthz.html" | grep -F "EMOTIONSCARE_HEALTHCHECK_OK"
 
           echo "Toutes les sondes HTTP sont passées avec succès."
