@@ -16,7 +16,7 @@ const resolveSampleRate = (raw: string | undefined, fallback: number): number =>
   return Math.max(0, Math.min(1, parsed));
 };
 
-const ensureSentryClient = () => {
+const ensureSentryClient = (): void => {
   const dsn = import.meta.env.VITE_SENTRY_DSN;
   if (!dsn) {
     return;
@@ -41,19 +41,11 @@ const ensureSentryClient = () => {
       return event ? (redact(event) as typeof event) : event;
     },
     beforeBreadcrumb(breadcrumb) {
-      if (!breadcrumb) {
-        return breadcrumb;
-      }
-
-      const sanitizedData = breadcrumb.data ? (redact(breadcrumb.data) as Breadcrumb['data']) : breadcrumb.data;
-      return {
-        ...breadcrumb,
-        data: sanitizedData,
-      };
+      return breadcrumb ? (redact(breadcrumb) as Breadcrumb) : breadcrumb;
     },
   });
 };
 
 ensureSentryClient();
 
-export { Sentry };
+export { Sentry, ensureSentryClient };
