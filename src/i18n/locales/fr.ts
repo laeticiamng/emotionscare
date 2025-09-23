@@ -13,5 +13,4 @@ const fr = {
   },
 } satisfies LocaleResources;
 
-export type { LocaleResources };
 export default fr;
