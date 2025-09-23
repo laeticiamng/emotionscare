@@ -50,8 +50,11 @@ export const COMPLETE_ROUTES_AUDIT: RouteAuditData[] = [
   { route: '/settings', name: 'settings', requiresAuth: true, category: 'Admin', description: 'Paramètres système' },
   
   // Routes légales
-  { route: '/terms', name: 'terms', requiresAuth: false, category: 'Legal', description: 'Conditions d\'utilisation' },
-  { route: '/privacy', name: 'privacy', requiresAuth: false, category: 'Legal', description: 'Politique de confidentialité' },
+  { route: '/legal/mentions', name: 'mentions', requiresAuth: false, category: 'Legal', description: 'Mentions légales' },
+  { route: '/legal/terms', name: 'terms', requiresAuth: false, category: 'Legal', description: 'Conditions d\'utilisation' },
+  { route: '/legal/sales', name: 'sales', requiresAuth: false, category: 'Legal', description: 'Conditions de vente' },
+  { route: '/legal/privacy', name: 'privacy', requiresAuth: false, category: 'Legal', description: 'Politique de confidentialité' },
+  { route: '/legal/cookies', name: 'cookies', requiresAuth: false, category: 'Legal', description: 'Politique cookies' },
   { route: '/contact', name: 'contact', requiresAuth: false, category: 'Legal', description: 'Contact' },
   { route: '/about', name: 'about', requiresAuth: false, category: 'Legal', description: 'À propos' },
   { route: '/pricing', name: 'pricing', requiresAuth: false, category: 'Legal', description: 'Tarification' },

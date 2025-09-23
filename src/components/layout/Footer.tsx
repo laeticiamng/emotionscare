@@ -69,11 +69,11 @@ const footerSections: FooterSection[] = [
   {
     title: 'Légal',
     links: [
-      { name: 'Confidentialité', href: '/privacy', icon: Shield },
-      { name: 'Conditions d\'utilisation', href: '/terms', icon: FileText },
-      { name: 'Mentions légales', href: '/legal' },
-      { name: 'Cookies', href: '/cookies' },
-      { name: 'RGPD', href: '/gdpr' },
+      { name: 'Mentions légales', href: '/legal/mentions', icon: FileText },
+      { name: 'Conditions d\'utilisation', href: '/legal/terms', icon: FileText },
+      { name: 'Conditions de vente', href: '/legal/sales', icon: FileText },
+      { name: 'Politique de confidentialité', href: '/legal/privacy', icon: Shield },
+      { name: 'Cookies', href: '/legal/cookies' },
     ]
   }
 ];

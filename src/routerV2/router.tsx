@@ -106,6 +106,9 @@ const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 // Legal pages
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
+const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
+const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
 
 // Pages nouvellement créées
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
@@ -264,6 +267,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Legal pages
   LegalTermsPage,
   LegalPrivacyPage,
+  LegalMentionsPage,
+  LegalSalesPage,
+  LegalCookiesPage,
   
   // System unifiées
   UnauthorizedPage,

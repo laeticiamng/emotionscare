@@ -85,6 +85,9 @@ export { default as DemoPage } from './DemoPage';
 // Legal pages
 export { default as LegalTermsPage } from './LegalTermsPage';
 export { default as LegalPrivacyPage } from './LegalPrivacyPage';
+export { default as LegalMentionsPage } from './LegalMentionsPage';
+export { default as LegalSalesPage } from './LegalSalesPage';
+export { default as LegalCookiesPage } from './LegalCookiesPage';
 
 // System & Error pages
 export { default as UnauthorizedPage } from './errors/401/page';

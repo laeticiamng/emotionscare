@@ -104,23 +104,28 @@ const PremiumFooter: React.FC<PremiumFooterProps> = ({ className }) => {
               <h3 className="text-sm font-medium mb-4">Informations légales</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
+                  <Link to="/legal/mentions" className="hover:text-foreground transition-colors">
                     Mentions légales
                   </Link>
                 </li>
                 <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
-                    Politique de confidentialité
-                  </Link>
-                </li>
-                <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
+                  <Link to="/legal/terms" className="hover:text-foreground transition-colors">
                     Conditions d'utilisation
                   </Link>
                 </li>
                 <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
-                    Gestion des cookies
+                  <Link to="/legal/sales" className="hover:text-foreground transition-colors">
+                    Conditions de vente
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/legal/privacy" className="hover:text-foreground transition-colors">
+                    Politique de confidentialité
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/legal/cookies" className="hover:text-foreground transition-colors">
+                    Politique cookies
                   </Link>
                 </li>
               </ul>

@@ -907,6 +907,30 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'LegalPrivacyPage',
     aliases: ['/privacy-policy'],
   },
+  {
+    name: 'legal-mentions',
+    path: '/legal/mentions',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalMentionsPage',
+    aliases: ['/mentions-legales', '/legal'],
+  },
+  {
+    name: 'legal-sales',
+    path: '/legal/sales',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalSalesPage',
+    aliases: ['/cgv', '/conditions-ventes'],
+  },
+  {
+    name: 'legal-cookies',
+    path: '/legal/cookies',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalCookiesPage',
+    aliases: ['/cookies-policy', '/cookies'],
+  },
   
   // ═══════════════════════════════════════════════════════════
   // BILLING & SUBSCRIPTION

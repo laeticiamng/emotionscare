@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -102,10 +103,21 @@ const LegalPrivacyPage: React.FC = () => {
               </section>
 
               <section>
-                <h2 className="text-xl font-semibold mb-3">7. Cookies et tracking</h2>
+                <h2 className="text-xl font-semibold mb-3">7. Cookies et traceurs</h2>
                 <p className="text-muted-foreground leading-7">
-                  Nous utilisons uniquement des cookies essentiels pour le fonctionnement de l'application. 
-                  Aucun tracking publicitaire ou analytique sans votre consentement.
+                  Conformément au référentiel ECC-RGPD-01, les cookies essentiels sont déposés pour sécuriser votre session
+                  et mémoriser vos préférences d'accessibilité. Les cookies de mesure d'audience (Matomo) et de
+                  personnalisation sont proposés en opt-in et restent désactivés tant que vous n'avez pas donné votre
+                  consentement.
+                </p>
+                <p className="text-muted-foreground leading-7 mt-3">
+                  Vous pouvez modifier vos choix à tout moment depuis le bandeau cookies ou dans Paramètres &gt; Confidentialité
+                  &gt; Préférences cookies. Pour connaître la liste exhaustive des traceurs, leurs durées de conservation et les
+                  modalités de gestion, consultez notre{' '}
+                  <Link to="/legal/cookies" className="text-primary underline underline-offset-4">
+                    Politique relative aux cookies
+                  </Link>
+                  .
                 </p>
               </section>
 
