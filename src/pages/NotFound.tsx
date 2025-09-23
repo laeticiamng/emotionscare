@@ -29,7 +29,17 @@ export default function NotFound() {
         </div>
 
         <div className="flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate(-1)}>
+          <Button
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/');
+              }
+            }}
+          >
             <ArrowLeft aria-hidden className="mr-2 h-5 w-5" />
             Retour
           </Button>
