@@ -80,8 +80,21 @@ const useI18nReady = () => {
 const I18nBootstrap: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const ready = useI18nReady();
 
+  // Temporairement, on force le rendu même si i18n n'est pas prêt
+  // pour éviter l'écran blanc 
   if (!ready) {
-    return null;
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#1a1a1a',
+        color: '#fff'
+      }}>
+        <div>Chargement de l'application...</div>
+      </div>
+    );
   }
 
   return <I18nProvider>{children}</I18nProvider>;
