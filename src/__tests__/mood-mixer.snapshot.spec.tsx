@@ -1,7 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
+vi.mock("@/components/ui/PageHeader", () => ({
+  default: ({ title }: any) => <div>{title}</div>,
+}));
+
+vi.mock("@/components/ui/button", () => ({
   Button: ({ children }: any) => <button>{children}</button>,
 }));
 import Page from "@/app/modules/mood-mixer/page";

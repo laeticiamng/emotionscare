@@ -13,22 +13,40 @@ const clockControls: {
   reset: () => {},
 };
 
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title, subtitle }: any) => (
+vi.mock("@/components/ui/PageHeader", () => ({
+  default: ({ title, subtitle }: any) => (
     <header>
       <h1>{title}</h1>
       {subtitle ? <p>{subtitle}</p> : null}
     </header>
   ),
+}));
+
+vi.mock("@/components/ui/card", () => ({
   Card: ({ children }: any) => <section>{children}</section>,
+}));
+
+vi.mock("@/components/ui/button", () => ({
   Button: React.forwardRef<HTMLButtonElement, any>(({ children, ...props }, ref) => (
     <button ref={ref} {...props}>
       {children}
     </button>
   )),
+}));
+
+vi.mock("@/ui/GlowSurface", () => ({
   GlowSurface: () => <div data-testid="glow-surface" />,
+}));
+
+vi.mock("@/ui/ProgressBar", () => ({
   ProgressBar: ({ value }: any) => <div data-testid="progress">{value}</div>,
+}));
+
+vi.mock("@/ui/hooks/usePulseClock", () => ({
   usePulseClock: () => 0,
+}));
+
+vi.mock("@/ui/hooks/useSound", () => ({
   useSound: () => null,
 }));
 

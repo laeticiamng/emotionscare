@@ -12,7 +12,7 @@ import { NavButton } from '@/components/navigation/NavButton';
 import { NAV_SCHEMA, findNavNode } from '@/lib/nav-schema';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { Sparkline } from '@/COMPONENTS.reg';
+import { Sparkline } from '@/ui/Sparkline';
 import { LastJournalEntriesCard } from './LastJournalEntriesCard';
 import useCurrentMood from '@/hooks/useCurrentMood';
 import {

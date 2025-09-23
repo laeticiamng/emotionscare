@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
-import { useRaf } from "@/COMPONENTS.reg";
+import { useRaf } from "@/ui/hooks/useRaf";
 
 type Props = {
   phase: "inhale" | "exhale" | "hold" | "hold2";

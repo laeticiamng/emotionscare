@@ -1,5 +1,6 @@
 import React from 'react';
-import { FadeIn, PageHeader } from '@/COMPONENTS.reg';
+import { FadeIn } from '@/ui/motion/FadeIn';
+import PageHeader from '@/components/ui/PageHeader';
 import { useFlags } from '@/core/flags';
 import ScoresV2Panel from '@/modules/scores/ScoresV2Panel';
 

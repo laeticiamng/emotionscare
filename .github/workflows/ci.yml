@@ -27,6 +27,22 @@ jobs:
       - id: versions
         run: echo "node=20" >> "$GITHUB_OUTPUT"
 
+  sentry-guard:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure web Sentry client does not use Next.js SDK or env vars
+        run: |
+          if rg --files-with-matches '@sentry/nextjs' src/lib/obs; then
+            echo "Do not use @sentry/nextjs in web Sentry code." >&2
+            exit 1
+          fi
+          if rg --files-with-matches 'process\\.env\\.NEXT_' src/lib/obs; then
+            echo "Do not use process.env.NEXT_* in web Sentry code." >&2
+            exit 1
+          fi
+
   lint:
     needs: setup
     runs-on: ubuntu-latest
@@ -41,6 +57,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm lint:imports
 
   typecheck:
     needs: setup
@@ -73,7 +90,7 @@ jobs:
       - run: pnpm test
 
   build:
-    needs: [lint, typecheck, unit]
+    needs: [lint, sentry-guard, typecheck, unit]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

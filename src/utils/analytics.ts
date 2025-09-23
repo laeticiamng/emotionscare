@@ -1,5 +1,5 @@
 
-import { hasConsent } from "@/COMPONENTS.reg";
+import { hasConsent } from "@/ui/CookieConsent";
 
 interface TrackEventOptions {
   properties?: Record<string, any>;

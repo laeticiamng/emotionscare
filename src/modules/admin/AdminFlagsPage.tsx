@@ -1,7 +1,9 @@
 "use client";
 import React from "react";
-import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
-import { getOverrides, setOverride, clearOverride } from "@/COMPONENTS.reg";
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { getOverrides, setOverride, clearOverride } from "@/lib/flags/rollout";
 
 const KNOWN = ["scores-v2", "new-audio-engine", "telemetry-opt-in"] as const;
 
