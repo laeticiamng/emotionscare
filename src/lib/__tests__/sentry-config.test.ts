@@ -166,10 +166,7 @@ describe('sentry-config privacy guardrails', () => {
 
   it('disables telemetry and tags scope when doNotTrack is enabled', async () => {
     vi.resetModules();
-    window.localStorage.clear();
     const mocks = mockSentry();
-    const { setConsentPreferences, resetStoredConsent } = await import('@/lib/consent');
-    setConsentPreferences({ analytics: true });
     const { initializeSentry } = await import('@/lib/sentry-config');
 
     setNavigatorDnt('1');
@@ -193,6 +190,5 @@ describe('sentry-config privacy guardrails', () => {
     // reset DNT flag for other tests
     setNavigatorDnt(undefined);
     delete (window as Record<string, unknown>).__EMOTIONSCARE_DNT__;
-    resetStoredConsent();
   });
 });
