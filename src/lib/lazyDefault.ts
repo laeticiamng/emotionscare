@@ -1,20 +1,13 @@
 import { lazy } from 'react';
 import type { ComponentType, LazyExoticComponent } from 'react';
+import { isValidElementType } from 'react-is';
 
 type LazyModule<T> = {
   default?: T;
 } & Record<string, unknown>;
 
 const isComponent = <T>(value: unknown): value is T => {
-  if (typeof value === 'function') {
-    return true;
-  }
-
-  if (typeof value === 'object' && value !== null) {
-    return 'render' in (value as Record<string, unknown>);
-  }
-
-  return false;
+  return isValidElementType(value);
 };
 
 export function lazyDefault<T extends ComponentType<any>>( // eslint-disable-line @typescript-eslint/no-explicit-any
