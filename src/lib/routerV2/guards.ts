@@ -25,12 +25,11 @@ const getEnvFlag = (key: string): string | undefined => {
   const normalized = key.toUpperCase();
   const processValue =
     typeof process !== 'undefined'
-      ? process.env?.[`NEXT_PUBLIC_${normalized}`] ?? process.env?.[`VITE_${normalized}`]
+      ? process.env?.[`VITE_${normalized}`]
       : undefined;
   const importMetaValue =
     typeof import.meta !== 'undefined' && typeof import.meta.env !== 'undefined'
-      ? (import.meta.env as Record<string, string | undefined>)[`NEXT_PUBLIC_${normalized}`] ??
-        (import.meta.env as Record<string, string | undefined>)[`VITE_${normalized}`]
+      ? (import.meta.env as Record<string, string | undefined>)[`VITE_${normalized}`]
       : undefined;
   return processValue ?? importMetaValue;
 };

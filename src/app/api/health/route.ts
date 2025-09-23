@@ -26,9 +26,15 @@ const responseHeaders = {
 
 const softFail = toBoolean(process.env.HEALTH_SOFT_FAIL);
 
-const readBaseUrl = (): string | null => process.env.NEXT_PUBLIC_BASE_URL ?? null;
+const readBaseUrl = (): string | null =>
+  process.env.VITE_WEB_URL ??
+  process.env.WEB_URL ??
+  null;
 
-const readSupabaseUrl = (): string | null => process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? null;
+const readSupabaseUrl = (): string | null =>
+  process.env.VITE_SUPABASE_URL ??
+  process.env.SUPABASE_URL ??
+  null;
 
 const readServiceRoleKey = (): string | null => process.env.SUPABASE_SERVICE_ROLE_KEY ?? null;
 

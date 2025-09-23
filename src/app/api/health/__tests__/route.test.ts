@@ -22,9 +22,9 @@ describe('GET /api/health', () => {
     createClientMock.mockClear();
 
     process.env = { ...originalEnv };
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
+    process.env.VITE_SUPABASE_URL = 'https://example.supabase.co';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role';
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://app.example.com';
+    process.env.VITE_WEB_URL = 'https://app.example.com';
     process.env.SENTRY_RELEASE = '1.2.3';
     process.env.SENTRY_ENVIRONMENT = 'test';
 
