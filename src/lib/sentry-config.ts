@@ -3,6 +3,7 @@ import { BrowserTracing } from '@sentry/react';
 import { Replay } from '@sentry/replay';
 import type { Breadcrumb, Event as SentryEvent } from '@sentry/types';
 import { BUILD_INFO, SENTRY_CONFIG } from '@/lib/env';
+import { hasConsent } from '@/lib/consent';
 
 declare const __APP_COMMIT_SHA__: string | undefined;
 
@@ -454,9 +455,20 @@ export const SENTRY_PRIVACY_GUARDS = {
   containsSensitiveValue,
 };
 
-export function initializeSentry(): void {
-  if (sentryInitialized || typeof window === 'undefined') {
-    return;
+export function initializeSentry(): boolean {
+  if (sentryInitialized) {
+    return true;
+  }
+
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  if (!hasConsent('analytics')) {
+    if (import.meta.env.DEV) {
+      console.info('[Sentry] Initialisation différée : consentement analytics absent.');
+    }
+    return false;
   }
 
   const dsn = SENTRY_CONFIG.dsn;
@@ -465,7 +477,7 @@ export function initializeSentry(): void {
     if (import.meta.env.DEV) {
       console.info('[Sentry] DSN non configuré, instrumentation désactivée.');
     }
-    return;
+    return false;
   }
 
   const environment = SENTRY_CONFIG.environment ?? import.meta.env.MODE ?? 'development';
@@ -563,6 +575,8 @@ export function initializeSentry(): void {
     const dntMessage = doNotTrackEnabled ? ' (respect do-not-track activé)' : '';
     console.log(`[Sentry] Observabilité initialisée${dntMessage}`);
   }
+
+  return true;
 }
 
 export function reportReadingAddError(error: Error, context: SentryContextOptions): void {
