@@ -143,4 +143,4 @@ jobs:
       - name: Run smoke Playwright tests
         env:
           PW_BASE_URL: http://127.0.0.1:4173
-        run: pnpm e2e -- e2e
+        run: pnpm exec playwright test --config=playwright.smoke.config.ts
