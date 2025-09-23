@@ -4,7 +4,7 @@
 // ============================================================================
 
 // --- Layout & marketing -----------------------------------------------------
-export { default as PageHeader } from './components/ui/PageHeader.tsx';
+export { default as PageHeader } from './components/ui/PageHeader';
 export { LoadingSpinner } from './components/ui/LoadingSpinner.tsx';
 export { NavBar } from '@/ui/NavBar';
 export { Footer } from '@/ui/Footer';

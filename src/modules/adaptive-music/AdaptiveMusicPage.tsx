@@ -1,18 +1,14 @@
-"use client";
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
+import PageHeader from "@/components/ui/PageHeader";
 import {
-  PageHeader,
   Card,
-  Button,
-} from "@/COMPONENTS.reg";
-import {
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
