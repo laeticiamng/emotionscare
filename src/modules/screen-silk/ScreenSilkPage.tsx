@@ -16,12 +16,9 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  useScreenSilkMachine, 
-  SilkOverlay, 
-  BlinkGuide,
-  ScreenSilkConfig 
-} from './index';
+import { useScreenSilkMachine, type ScreenSilkConfig } from './useScreenSilkMachine';
+import { SilkOverlay } from './ui/SilkOverlay';
+import { BlinkGuide } from './ui/BlinkGuide';
 
 export const ScreenSilkPage: React.FC = () => {
   const navigate = useNavigate();
