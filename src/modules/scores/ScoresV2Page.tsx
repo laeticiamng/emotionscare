@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
-import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import ScoresV2Panel from "@/modules/scores/ScoresV2Panel";
 
 export default function ScoresV2Page() {

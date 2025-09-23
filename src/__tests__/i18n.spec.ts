@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { t } from '@/COMPONENTS.reg';
+import { t } from '@/lib/i18n';
 
 describe('i18n t()', () => {
   it('returns translations based on stored lang', () => {

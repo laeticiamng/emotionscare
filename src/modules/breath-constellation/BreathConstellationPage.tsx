@@ -3,10 +3,12 @@
 import React from "react";
 import * as Sentry from "@sentry/react";
 import { useReducedMotion } from "framer-motion";
-import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
-import { ConstellationCanvas } from "@/COMPONENTS.reg";
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ConstellationCanvas } from "@/ui/ConstellationCanvas";
 import { useBreathPattern, type Pattern, type Phase } from "@/ui/hooks/useBreathPattern";
-import { useSound } from "@/COMPONENTS.reg";
+import { useSound } from "@/ui/hooks/useSound";
 import { ff } from "@/lib/flags/ff";
 import { recordEvent } from "@/lib/scores/events";
 import {

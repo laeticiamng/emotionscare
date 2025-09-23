@@ -1,7 +1,9 @@
+import { existsSync } from "node:fs";
 import tsParser from "@typescript-eslint/parser";
 import ec from "./tools/eslint-plugin-ec/index.js";
 import tsEslintPlugin from "@typescript-eslint/eslint-plugin";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
+import importPlugin from "eslint-plugin-import";
 
 const createNoNodeImportsRule = (extraPatterns = []) => [
   "error",
@@ -61,10 +63,28 @@ export default [
     plugins: {
       "@typescript-eslint": tsEslintPlugin,
       "react-hooks": reactHooksPlugin,
-      ec
+      ec,
+      import: importPlugin,
+    },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          project: [
+            "tsconfig.json",
+            "tsconfig.json.disabled",
+            "tsconfig.json.problematic",
+            "tsconfig.json.temp-disabled",
+          ].filter((configPath) => existsSync(configPath)),
+          alwaysTryTypes: true,
+        },
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      },
     },
     rules: {
       "no-restricted-imports": createNoNodeImportsRule(),
+      "import/no-cycle": ["error", { ignoreExternal: false }],
       "ec/no-node-builtins-client": "error",
       "ec/no-hardcoded-paths": "error",
     }

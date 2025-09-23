@@ -1,7 +1,7 @@
 "use client";
-import { ThemeToggle } from "@/COMPONENTS.reg";
-import { useI18n } from "@/COMPONENTS.reg";
-import { usePrefetchOnHover } from "@/COMPONENTS.reg";
+import { ThemeToggle } from "@/theme/ThemeProvider";
+import { useI18n } from "@/lib/i18n";
+import { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 
 export function NavBar() {
   const preMods = usePrefetchOnHover?.("/modules") ?? {};

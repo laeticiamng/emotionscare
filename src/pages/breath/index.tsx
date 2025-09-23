@@ -4,7 +4,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { Loader2 } from 'lucide-react';
 
-import { PageHeader, Button } from '@/COMPONENTS.reg';
+import PageHeader from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
