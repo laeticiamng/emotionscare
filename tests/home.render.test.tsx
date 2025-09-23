@@ -45,7 +45,7 @@ describe('HomePage', () => {
       takeRecords = vi.fn(() => []);
     }
 
-    (globalThis as any).IntersectionObserver = IntersectionObserverMock;
+    (globalThis as typeof globalThis & { IntersectionObserver: typeof IntersectionObserverMock }).IntersectionObserver = IntersectionObserverMock;
   });
 
   beforeEach(() => {
