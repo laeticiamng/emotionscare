@@ -27,7 +27,7 @@ export function CookieConsent() {
         Nous déposons uniquement des cookies essentiels par défaut. Les mesures d’audience anonymisées et la personnalisation
         sont activées si vous l’acceptez, conformément à ECC-RGPD-01.
       </p>
-      <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+      <div className="flex gap-2 mt-2 flex-wrap">
         <button onClick={essentialsOnly}>Essentiels uniquement</button>
         <button onClick={acceptAll}>Tout accepter</button>
         <a href="/legal/cookies">Configurer</a>
