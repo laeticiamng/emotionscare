@@ -70,13 +70,16 @@ const sections: Section[] = [
         </p>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm border border-border">
+            <caption className="text-left p-3 font-medium">
+              Synthèse des cookies et traceurs utilisés sur le site
+            </caption>
             <thead className="bg-muted text-muted-foreground">
               <tr>
-                <th className="p-3 text-left font-semibold">Nom / type</th>
-                <th className="p-3 text-left font-semibold">Fournisseur</th>
-                <th className="p-3 text-left font-semibold">Finalité</th>
-                <th className="p-3 text-left font-semibold">Durée</th>
-                <th className="p-3 text-left font-semibold">Consentement</th>
+                <th scope="col" className="p-3 text-left font-semibold">Nom / type</th>
+                <th scope="col" className="p-3 text-left font-semibold">Fournisseur</th>
+                <th scope="col" className="p-3 text-left font-semibold">Finalité</th>
+                <th scope="col" className="p-3 text-left font-semibold">Durée</th>
+                <th scope="col" className="p-3 text-left font-semibold">Consentement</th>
               </tr>
             </thead>
             <tbody>
