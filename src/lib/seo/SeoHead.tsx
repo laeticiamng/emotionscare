@@ -41,7 +41,7 @@ export function SeoHead({
   const pageDescription = description ?? DEFAULT_DESCRIPTION;
   const sanitizedUrl = url?.trim();
   const canonicalUrl = sanitizedUrl && sanitizedUrl.length > 0 ? resolveAbsoluteUrl(sanitizedUrl) : BASE_URL;
-  const openGraphImage = resolveAbsoluteUrl((image && image.trim().length > 0 ? image.trim() : DEFAULT_IMAGE_PATH));
+  const openGraphImage = resolveAbsoluteUrl(image?.trim() || DEFAULT_IMAGE_PATH);
 
   return (
     <Helmet>
