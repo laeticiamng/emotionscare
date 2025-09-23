@@ -107,4 +107,3 @@ export function getCurrentLocale(): AppLocale {
 
 export { useTranslation };
 
-void initI18n();
