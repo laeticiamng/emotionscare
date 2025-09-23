@@ -5,8 +5,8 @@ const options = {
     dependencyTypes: ["npm", "npm-dev", "npm-optional", "npm-peer", "npm-bundled", "npm-no-pkg"],
   },
 };
-if (existsSync("./tsconfig.madge.json")) {
-  options.tsConfig = { fileName: "./tsconfig.madge.json" };
+if (existsSync("./tsconfig.json")) {
+  options.tsConfig = { fileName: "./tsconfig.json" };
 }
 if (existsSync("./.dependency-cruiser-known-violations.json")) {
   options.knownViolations = require("./.dependency-cruiser-known-violations.json");

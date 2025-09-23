@@ -83,12 +83,7 @@ export default [
     settings: {
       "import/resolver": {
         typescript: {
-          project: [
-            "tsconfig.json",
-            "tsconfig.json.disabled",
-            "tsconfig.json.problematic",
-            "tsconfig.json.temp-disabled",
-          ].filter((configPath) => existsSync(configPath)),
+          project: ["tsconfig.json"].filter((configPath) => existsSync(configPath)),
           alwaysTryTypes: true,
         },
         node: {
