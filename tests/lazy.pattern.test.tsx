@@ -19,7 +19,7 @@ describe('lazyDefault', () => {
     expect(await screen.findByText('Default Export')).toBeInTheDocument();
   });
 
-  it('rend correctement un composant exporté nominativement', async () => {
+  it('renders named exported component correctly', async () => {
     const NamedComponent = () => <div>Named Export</div>;
     const LazyComponent = lazyDefault(() =>
       Promise.resolve({
