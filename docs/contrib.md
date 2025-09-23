@@ -1,20 +1,13 @@
-# Guide de contribution — Imports locaux
+# Contribution Guide — Local Imports
 
-## Anti-barrel : règle `no-index-barrel`
+## Anti-barrel: `no-index-barrel` rule
 
-Pour limiter les cycles et les dépendances implicites, nous bannissons les imports locaux via `index.ts` / `index.tsx`.
+To limit cycles and implicit dependencies, we ban local imports via `index.ts` / `index.tsx`.
 
-- ✅ Importer directement le fichier dont vous avez besoin (`import { useFoo } from './useFoo'`).
-- ❌ Importer un dossier ou un fichier `index` (`import { useFoo } from './index'`, `import * from '../index'`).
+- ✅ Import the specific file you need directly (`import { useFoo } from './useFoo'`).
+- ❌ Do not import a folder or an `index` file (`import { useFoo } from './index'`, `import * from '../index'`).
 
-Une règle dependency-cruiser `no-index-barrel` fait échouer la CI dès qu'un import relatif vers `index` est détecté.
+A dependency-cruiser rule `no-index-barrel` will cause the CI to fail as soon as a relative import to `index` is detected.
 
 ```bash
 npx dependency-cruiser --config .dependency-cruiser.js src
-```
-
-Utilisez la commande ci-dessus pour vérifier localement avant de pousser vos changements.
-
-### Besoin d'une exception ?
-
-Les exceptions doivent rester rares et motivées (cas de compatibilité historique). Documentez-les et préférez lister explicitement les exports nécessaires plutôt que de réintroduire un `index.ts` massif.
