@@ -1,1 +1,31 @@
-{}
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "sb-yaincoxihiqdksxgrsrk-auth-token",
+          "value": "{\"access_token\":\"test-access-token-b2b-user\",\"refresh_token\":\"test-refresh-token-b2b-user\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":4102444800,\"user\":{\"id\":\"user-b2b\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"b2b_user@example.com\",\"email_confirmed_at\":\"2024-01-01T00:00:00Z\",\"created_at\":\"2024-01-01T00:00:00Z\",\"updated_at\":\"2024-01-01T00:00:00Z\",\"last_sign_in_at\":\"2024-01-01T00:00:00Z\",\"app_metadata\":{\"provider\":\"email\",\"providers\":[\"email\"]},\"user_metadata\":{\"role\":\"b2b_user\",\"full_name\":\"B2B User Demo\"},\"identities\":[],\"factors\":[]}}"
+        },
+        {
+          "name": "supabase.auth.token",
+          "value": "test-access-token-b2b-user"
+        }
+      ]
+    },
+    {
+      "origin": "http://localhost:3001",
+      "localStorage": [
+        {
+          "name": "sb-yaincoxihiqdksxgrsrk-auth-token",
+          "value": "{\"access_token\":\"test-access-token-b2b-user\",\"refresh_token\":\"test-refresh-token-b2b-user\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":4102444800,\"user\":{\"id\":\"user-b2b\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"b2b_user@example.com\",\"email_confirmed_at\":\"2024-01-01T00:00:00Z\",\"created_at\":\"2024-01-01T00:00:00Z\",\"updated_at\":\"2024-01-01T00:00:00Z\",\"last_sign_in_at\":\"2024-01-01T00:00:00Z\",\"app_metadata\":{\"provider\":\"email\",\"providers\":[\"email\"]},\"user_metadata\":{\"role\":\"b2b_user\",\"full_name\":\"B2B User Demo\"},\"identities\":[],\"factors\":[]}}"
+        },
+        {
+          "name": "supabase.auth.token",
+          "value": "test-access-token-b2b-user"
+        }
+      ]
+    }
+  ]
+}

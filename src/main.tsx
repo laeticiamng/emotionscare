@@ -104,9 +104,9 @@ createRoot(rootElement).render(
       >
         <RootProvider>
           <AccessibilitySkipLinks />
-          <RouterProvider router={router} />
-        </RootProvider>
-      </React.Suspense>
-    </RootErrorBoundary>
+          <RouterProvider router={routerV2} />
+        </I18nProvider>
+      </AccessibilityProvider>
+    </RootProvider>
   </React.StrictMode>
 );

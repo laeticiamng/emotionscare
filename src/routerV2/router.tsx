@@ -136,6 +136,7 @@ const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const FlashGlowPage = lazy(() => import('@/pages/modules/FlashGlowPage'));
 const JournalPage = lazy(() => import('@/pages/modules/JournalPage'));
 const ScanPage = lazy(() => import('@/pages/modules/ScanPage'));
+const ScanHistoryPage = lazy(() => import('@/pages/scan/ScanHistory'));
 const CoachPage = lazy(() => import('@/pages/modules/CoachPage'));
 const MoodMixerPage = lazy(() => import('@/pages/modules/MoodMixerPage'));
 const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
@@ -282,6 +283,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   FlashGlowPage,
   JournalPage: JournalPage,
   ScanPage,
+  ScanHistoryPage,
   CoachPage,
   MoodMixerPage,
   BossGritPage,
