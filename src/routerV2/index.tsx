@@ -416,7 +416,7 @@ export const routerV2 = createBrowserRouter([
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
   ...(FF_ROUTER_V2
-    ? Object.entries(ROUTE_ALIASES).map(([from, to]) => ({
+    ? ROUTE_ALIASES.map(({ from, to }) => ({
         path: from,
         element: <AliasRedirect from={from} to={to} />,
       }))
