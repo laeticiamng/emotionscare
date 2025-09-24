@@ -8,14 +8,15 @@
 ## Modules livrés
 
 ### 🧠 Emotion Scan — 🟢 Livré
-- **Entrée** : `src/modules/emotion-scan/EmotionScanPage.tsx` routé via `/app/scan`.
-- **Services** : `invokeEmotionScan`, `getEmotionScanHistory` dans `src/services/emotionScan.service.ts`.
-- **Persistance Supabase** : table `public.emotion_scans` (payload JSONB + `mood_score`), RLS stricte (policies owner-only), indexes `user_id` + `created_at desc`.
+- **Entrée** : `src/pages/scan/ScanView.tsx` routé via `/app/scan` (historique dans `src/pages/scan/ScanHistory.tsx`).
+- **Services** : `analyzeEmotion`, `persistScan`, `fetchRecentScans` dans `src/services/scan/scanApi.ts` (validation Zod stricte).
+- **Persistance Supabase** : table `public.emotion_scans` (JSONB `payload` + `mood_score`), RLS owner-only, indexes `user_id` & `created_at desc`.
 - **Fonctionnalités clés** :
-  - Questionnaire I-PANAS-SF complet avec calcul immédiat du score et libellé d'équilibre.
-  - Mutation React Query vers la fonction edge Supabase (historique distant) et fallback local (`localStorage`) hors ligne.
-  - Rafraîchissement automatique des widgets « recent-scans » et enregistrement analytics optionnels via `recordEvent`.
-  - ✅ QA 06/2025 : scénario e2e `emotion-scan-dashboard.spec.ts` (parcours scan → historique) + suite unitaire `useMoodStore` (7 tests).
+  - Saisie libre + champ micro optionnel, skeleton respectant `prefers-reduced-motion`, feedback vocal via `aria-live`.
+  - Appel Supabase Edge `ai-emotion-analysis` avec timeout 15s, retries, abort controller et breadcrumbs Sentry (`scan:start|success|error`).
+  - Persistance côté client (`persistScan`) puis diffusion `mood.updated` (store + `window.dispatchEvent`) pour synchroniser modules.
+  - Widget Dashboard `LastEmotionScansCard` (React Query) + timeline `/app/scan/history` filtrable (10 derniers scans).
+  - ✅ QA 06/2025 : scénario e2e `emotion-scan-flow.spec.ts` (scan → dashboard → timeline) + tests unitaires `scanApi`/`useEmotionScan`.
 
 ### 🎚️ Mood Mixer — 🟢 Livré
 - **Entrée** : `src/pages/B2CMoodMixerPage.tsx` sur `/app/mood-mixer`.

@@ -1,5 +1,4 @@
 export { router } from './router';
-export { router as routerV2 } from './router';
 export type { AppRouter } from './router';
 
 // Type pour éviter les logs répétés
@@ -14,7 +13,7 @@ import * as Sentry from '@sentry/react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES } from './aliases';
-import { RouteGuard } from './guards';
+import { AuthGuard, ModeGuard, RoleGuard } from './guards';
 import { withErrorBoundary } from '@/contexts/ErrorContext';
 import PageErrorFallback from '@/components/error/PageErrorFallback';
 import { LoadingState } from '@/components/loading/LoadingState';
@@ -45,6 +44,7 @@ const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
 const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
 const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
+const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
@@ -134,6 +134,7 @@ const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const FlashGlowPage = lazy(() => import('@/pages/modules/FlashGlowPage'));
 const JournalPage = lazy(() => import('@/pages/modules/JournalPage'));
 const ScanPage = lazy(() => import('@/pages/modules/ScanPage'));
+const ScanHistoryPage = lazy(() => import('@/pages/scan/ScanHistory'));
 const CoachPage = lazy(() => import('@/pages/modules/CoachPage'));
 const MoodMixerPage = lazy(() => import('@/pages/modules/MoodMixerPage'));
 const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
@@ -147,8 +148,8 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 
 // Pages système unifiées
-const UnauthorizedPage = lazy(() => import('@/pages/UnauthorizedPage'));
-const ForbiddenPage = lazy(() => import('@/pages/ForbiddenPage'));
+const UnauthorizedPage = lazy(() => import('@/pages/errors/401'));
+const ForbiddenPage = lazy(() => import('@/pages/errors/403'));
 const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 
@@ -168,6 +169,7 @@ const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusi
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
   HomePage,
+  B2CDashboardPage,
   HomeB2CPage: SimpleB2CPage,
   AboutPage,
   ContactPage,
@@ -272,6 +274,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   FlashGlowPage,
   JournalPage: JournalPage,
   ScanPage,
+  ScanHistoryPage,
   CoachPage,
   MoodMixerPage,
   BossGritPage,
@@ -348,6 +351,32 @@ const LayoutWrapper: React.FC<{
 // GÉNÉRATION DES ROUTES
 // ═══════════════════════════════════════════════════════════
 
+const applyRouteGuards = (element: React.ReactNode, routeMeta: typeof ROUTES_REGISTRY[0]) => {
+  let guardedElement = element;
+
+  if (routeMeta.segment && routeMeta.segment !== 'public') {
+    guardedElement = (
+      <ModeGuard segment={routeMeta.segment}>
+        {guardedElement}
+      </ModeGuard>
+    );
+  }
+
+  if (routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0)) {
+    guardedElement = (
+      <RoleGuard requiredRole={routeMeta.role} allowedRoles={routeMeta.allowedRoles}>
+        {guardedElement}
+      </RoleGuard>
+    );
+  }
+
+  if (routeMeta.guard || routeMeta.requireAuth || routeMeta.role || (routeMeta.allowedRoles && routeMeta.allowedRoles.length > 0)) {
+    guardedElement = <AuthGuard>{guardedElement}</AuthGuard>;
+  }
+
+  return guardedElement;
+};
+
 function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
   const Component = componentMap[routeMeta.component];
 
@@ -365,19 +394,7 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
     </SuspenseWrapper>
   );
 
-  // Appliquer les guards si nécessaire
-  if (routeMeta.guard || routeMeta.role) {
-    return (
-      <RouteGuard 
-        requiredRole={routeMeta.role} 
-        requireAuth={routeMeta.guard}
-      >
-        {element}
-      </RouteGuard>
-    );
-  }
-
-  return element;
+  return applyRouteGuards(element, routeMeta);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -399,9 +416,9 @@ export const routerV2 = createBrowserRouter([
 
   // Aliases de compatibilité (seulement si FF_ROUTER_V2 est activé)
   ...(FF_ROUTER_V2
-    ? ROUTE_ALIASES.map(alias => ({
-        path: alias.from,
-        element: <AliasRedirect from={alias.from} to={alias.to} />,
+    ? Object.entries(ROUTE_ALIASES).map(([from, to]) => ({
+        path: from,
+        element: <AliasRedirect from={from} to={to} />,
       }))
     : []),
 

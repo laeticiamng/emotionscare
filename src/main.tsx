@@ -94,7 +94,7 @@ createRoot(rootElement).render(
       <AccessibilityProvider>
         <I18nProvider>
           <AccessibilitySkipLinks />
-          <RouterProvider router={router} />
+          <RouterProvider router={routerV2} />
         </I18nProvider>
       </AccessibilityProvider>
     </RootProvider>
