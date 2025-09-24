@@ -10,11 +10,16 @@ const DALLE_API_ENDPOINT = 'https://api.openai.com/v1/images/generations';
 
 const generateImage = async (prompt: string, options: DALLEOptions = {}): Promise<string> => {
   try {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('VITE_OPENAI_API_KEY is not configured');
+    }
+
     const response = await fetch(DALLE_API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         prompt,

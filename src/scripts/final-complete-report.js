@@ -82,7 +82,7 @@ const routesByCategory = {
     '✅ /app/social-cocon - Espaces privés sécurisés',
     '✅ /app/leaderboard - Gamification complète',
     '✅ /app/activity - Analytics de progression',
-    '✅ /app/heatmap - Cartographie émotionnelle',
+    '✅ /app/scores - Scores & heatmap émotions',
     '✅ /app/voice-journal - Journal vocal IA',
     '✅ /app/emotion-scan - Analyse faciale multi-angle'
   ],
@@ -108,7 +108,7 @@ const routesByCategory = {
     '✅ /navigation - Navigation complète organisée',
     '✅ /feature-matrix - Test et validation features',
     '✅ /system/api-monitoring - Monitoring système',
-    '✅ Routes systèmes (401, 403, 404, 503)'
+    '✅ Routes systèmes (401, 403, 404, 500)'
   ]
 };
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   Brain, Music, Heart, TrendingUp, Calendar, Clock,
-  Zap, Target, Users, BookOpen, Activity, Award
+  Zap, Target, Users, BookOpen, Activity, Award, Sparkles, Loader2
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -12,12 +12,17 @@ import { NavButton } from '@/components/navigation/NavButton';
 import { NAV_SCHEMA, findNavNode } from '@/lib/nav-schema';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { Sparkline } from '@/COMPONENTS.reg';
+import { Sparkline } from '@/ui/Sparkline';
+import { LastJournalEntriesCard } from './LastJournalEntriesCard';
+import useCurrentMood from '@/hooks/useCurrentMood';
 import {
   getEmotionScanHistory,
   deriveScore10,
   type EmotionScanHistoryEntry,
 } from '@/services/emotionScan.service';
+import { listMyPresets } from '@/services/mixer/moodPresetsApi';
+import { buildMoodSummary, computeGradient, presetEmoji } from '@/modules/mood-mixer/utils';
+import type { Preset } from '@/modules/mood-mixer/types';
 
 interface DashboardStats {
   totalSessions: number;
@@ -62,6 +67,23 @@ interface ScanResult {
  */
 export function ComprehensiveDashboard() {
   const { user, isAuthenticated } = useAuth();
+  const currentMood = useCurrentMood();
+  const moodSecondaryText = React.useMemo(() => {
+    const normalized = currentMood.palette.text.toLowerCase();
+    if (normalized === '#f8fafc' || normalized === '#ffffff') {
+      return 'rgba(248, 250, 252, 0.78)';
+    }
+    return 'rgba(15, 23, 42, 0.68)';
+  }, [currentMood.palette.text]);
+
+  const moodCardStyle = React.useMemo(
+    () => ({
+      background: `linear-gradient(135deg, ${currentMood.palette.surface}, ${currentMood.palette.glow})`,
+      borderColor: currentMood.palette.border,
+      color: currentMood.palette.text,
+    }),
+    [currentMood.palette.surface, currentMood.palette.glow, currentMood.palette.border, currentMood.palette.text],
+  );
 
   // Requêtes pour les données du dashboard
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -89,6 +111,15 @@ export function ComprehensiveDashboard() {
     enabled: isAuthenticated,
     staleTime: 60 * 1000,
   });
+
+  const { data: moodPresets, isLoading: presetsLoading } = useQuery({
+    queryKey: ['mood-mixer-presets', user?.id],
+    queryFn: () => listMyPresets(),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
+  });
+
+  const topPresets = React.useMemo(() => (moodPresets ?? []).slice(0, 3), [moodPresets]);
 
   const scanTimeline = React.useMemo(
     () => (recentScans ?? []).slice().reverse().map(scan => Math.round(scan.score * 10)),
@@ -170,6 +201,46 @@ export function ComprehensiveDashboard() {
           Voici un aperçu de votre parcours bien-être aujourd'hui.
         </p>
       </motion.div>
+
+      <section aria-label="Ambiance du moment">
+        <Card className="border" style={moodCardStyle}>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <div className="space-y-2">
+              <CardTitle style={{ color: currentMood.palette.text }}>Ambiance du moment</CardTitle>
+              <p className="text-sm" style={{ color: moodSecondaryText }}>
+                {currentMood.summary}
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <span
+                aria-label={`Vibe ${currentMood.label}`}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full shadow-lg"
+                style={{ background: currentMood.palette.base, color: currentMood.palette.text }}
+              >
+                <span aria-hidden="true" className="text-xl">
+                  {currentMood.emoji}
+                </span>
+              </span>
+              <Badge
+                variant="secondary"
+                className="border-0 text-xs font-semibold"
+                style={{ background: currentMood.palette.base, color: currentMood.palette.text }}
+              >
+                {currentMood.label}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm" style={{ color: moodSecondaryText }}>
+            <p>{currentMood.headline}</p>
+            <p>
+              Micro-geste suggéré&nbsp;:
+              <span className="ml-1 font-medium" style={{ color: currentMood.palette.text }}>
+                {currentMood.microGesture}
+              </span>
+            </p>
+          </CardContent>
+        </Card>
+      </section>
 
       {/* Statistiques principales */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -458,6 +529,67 @@ export function ComprehensiveDashboard() {
               </div>
             )}
           </CardContent>
+        </Card>
+
+        <LastJournalEntriesCard />
+        {/* Mes presets */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              Mes presets
+            </CardTitle>
+            <CardDescription>Vos trois ambiances les plus récentes</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {presetsLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`preset-loading-${index}`}
+                    className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3"
+                  >
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    <div className="h-3 w-2/3 rounded bg-muted" />
+                  </div>
+                ))}
+              </div>
+            ) : topPresets.length ? (
+              <ul className="space-y-3">
+                {topPresets.map((preset: Preset) => (
+                  <li
+                    key={preset.id}
+                    className="flex items-center gap-3 rounded-xl border bg-background/80 p-3"
+                  >
+                    <span className="text-2xl" aria-hidden="true">{presetEmoji(preset.name)}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{preset.name}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {buildMoodSummary(preset.sliders)}
+                      </p>
+                    </div>
+                    <span
+                      className="h-10 w-10 flex-none rounded-full border"
+                      style={{ backgroundImage: computeGradient(preset.sliders) }}
+                      aria-hidden="true"
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Aucun preset enregistré pour l’instant. Ouvrez le Mood Mixer pour composer votre première douceur.
+              </p>
+            )}
+          </CardContent>
+          <CardFooter>
+            <Button asChild variant="outline" className="w-full justify-center gap-2">
+              <Link to="/app/mood-mixer">
+                <Sparkles className="h-4 w-4" />
+                Ouvrir le Mood Mixer
+              </Link>
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>

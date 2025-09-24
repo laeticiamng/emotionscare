@@ -1,13 +1,19 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useMoodStore } from '@/hooks/useMood';
+import type { MoodPalette } from '@/utils/moodSignals';
+import type { MoodVibe } from '@/utils/moodVibes';
 
 interface MoodContextType {
   currentMood: {
     valence: number;
     arousal: number;
     timestamp: string;
+    vibe: MoodVibe;
     isLoading: boolean;
     error: string | null;
+    summary: string;
+    microGesture: string;
+    palette: MoodPalette;
   };
   updateMood: (valence: number, arousal: number) => void;
   fetchCurrentMood: () => Promise<void>;
@@ -30,8 +36,12 @@ export const MoodProvider: React.FC<MoodProviderProps> = ({ children }) => {
       valence: moodStore.valence,
       arousal: moodStore.arousal,
       timestamp: moodStore.timestamp,
+      vibe: moodStore.vibe,
       isLoading: moodStore.isLoading,
       error: moodStore.error,
+      summary: moodStore.summary,
+      microGesture: moodStore.microGesture,
+      palette: moodStore.palette,
     },
     updateMood: moodStore.updateMood,
     fetchCurrentMood: moodStore.fetchCurrentMood,

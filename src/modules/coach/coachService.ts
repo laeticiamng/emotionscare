@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { sha256Hex } from "@/lib/hash";
 
 export const COACH_DISCLAIMERS = [
   "Le coach IA ne remplace pas un professionnel de santé ou de santé mentale.",
@@ -117,27 +118,7 @@ function truncateForSummary(text: string, maxLength = HASH_TRUNCATE): string {
   return `${text.slice(0, maxLength - 1)}…`;
 }
 
-async function hashText(value: string): Promise<string> {
-  if (typeof value !== "string" || !value.length) {
-    return "";
-  }
-
-  const cryptoCandidate =
-    typeof globalThis !== "undefined"
-      ? (globalThis.crypto as Crypto | undefined) ?? (globalThis as unknown as { msCrypto?: Crypto }).msCrypto
-      : undefined;
-
-  if (!cryptoCandidate?.subtle) {
-    throw new Error("web-crypto-unavailable");
-  }
-
-  const encoder = new TextEncoder();
-  const data = encoder.encode(value);
-  const hashBuffer = await cryptoCandidate.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("");
-}
+const hashText = sha256Hex;
 
 async function summarizeConversation(history: CoachHistoryItem[]): Promise<string | null> {
   try {

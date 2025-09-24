@@ -37,6 +37,7 @@ import {
 import { Link, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { withLandingUtm } from "@/lib/utm";
 import { useLazyRender } from "@/hooks/useLazyRender";
 
 const Footer = lazy(() => import("@/components/layout/Footer"));
@@ -46,6 +47,9 @@ interface UnifiedHomePageProps {
 }
 
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
+  console.log('[UnifiedHomePage] Starting render with variant:', variant);
+  
+  // Initialiser les hooks et variables en dehors du try-catch
   const [searchParams] = useSearchParams();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
@@ -55,23 +59,15 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   
+  console.log('[UnifiedHomePage] Hooks initialized successfully');
+  
   // Détection automatique du variant depuis les params
   const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
+  console.log('[UnifiedHomePage] Detected variant:', detectedVariant);
 
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const heroHeadingId = detectedVariant === 'b2c-simple' ? 'b2c-home-hero-title' : 'homepage-hero-title';
 
-  useEffect(() => {
-    if (statsSection.isVisible) {
-      setStatsVisible(true);
-    }
-  }, [statsSection.isVisible]);
-
+  // Définir les données statiques
   const features = [
     {
       icon: Brain,
@@ -193,15 +189,34 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     }
   ];
 
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (statsSection.isVisible) {
+      setStatsVisible(true);
+    }
+  }, [statsSection.isVisible]);
+
   // Version B2C Simple (comme HomeB2CPage)
   if (detectedVariant === 'b2c-simple') {
+    console.log('[UnifiedHomePage] Rendering B2C simple variant');
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50" data-testid="page-root">
         {/* Header */}
-        <header className="bg-white shadow-sm">
+        <header
+          className="bg-white shadow-sm"
+          role="banner"
+          aria-label="En-tête principal EmotionsCare"
+        >
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <Heart className="h-8 w-8 text-primary" />
+              <Heart className="h-8 w-8 text-primary" aria-hidden="true" />
               <span className="text-2xl font-bold text-gray-900">EmotionsCare</span>
             </div>
             <div className="flex space-x-4">
@@ -215,12 +230,17 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
           </div>
         </header>
 
-        {/* Hero Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Prenez soin de votre bien-être émotionnel
-            </h1>
+        <main
+          id="main-content"
+          tabIndex={-1}
+          aria-labelledby={heroHeadingId}
+        >
+          {/* Hero Section */}
+          <section className="py-20" aria-labelledby={heroHeadingId}>
+            <div className="container mx-auto px-4 text-center">
+              <h1 id={heroHeadingId} className="text-5xl font-bold text-gray-900 mb-6">
+                Prenez soin de votre bien-être émotionnel
+              </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Découvrez une approche innovante du bien-être mental avec nos outils 
               d'analyse émotionnelle, de méditation guidée et de coaching personnalisé.
@@ -238,19 +258,22 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
               </Link>
             </div>
           </div>
-        </section>
+          </section>
 
-        {/* Features */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Nos fonctionnalités phares
-            </h2>
+          {/* Features */}
+          <section className="py-16 bg-white" aria-labelledby="b2c-features-heading">
+            <div className="container mx-auto px-4">
+              <h2
+                id="b2c-features-heading"
+                className="text-3xl font-bold text-center text-gray-900 mb-12"
+              >
+                Nos fonctionnalités phares
+              </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Brain className="h-12 w-12 text-primary mx-auto mb-4" />
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <Brain className="h-12 w-12 text-primary mx-auto mb-4" aria-hidden="true" />
                   <h3 className="text-xl font-semibold mb-3">Scan émotionnel IA</h3>
                   <p className="text-gray-600">
                     Analysez vos émotions en temps réel grâce à notre intelligence artificielle
@@ -258,9 +281,9 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Smile className="h-12 w-12 text-primary mx-auto mb-4" />
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <Smile className="h-12 w-12 text-primary mx-auto mb-4" aria-hidden="true" />
                   <h3 className="text-xl font-semibold mb-3">Modules Fun-First</h3>
                   <p className="text-gray-600">
                     Des expériences ludiques et immersives pour améliorer votre humeur
@@ -268,9 +291,9 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Zap className="h-12 w-12 text-primary mx-auto mb-4" />
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6 text-center">
+                    <Zap className="h-12 w-12 text-primary mx-auto mb-4" aria-hidden="true" />
                   <h3 className="text-xl font-semibold mb-3">Coach personnel IA</h3>
                   <p className="text-gray-600">
                     Un accompagnement personnalisé pour votre développement personnel
@@ -279,14 +302,14 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
               </Card>
             </div>
           </div>
-        </section>
+          </section>
 
-        {/* CTA Section */}
-        <section className="py-16 bg-primary text-primary-foreground">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-6">
-              Prêt à transformer votre bien-être ?
-            </h2>
+          {/* CTA Section */}
+          <section className="py-16 bg-primary text-primary-foreground" aria-labelledby="b2c-cta-heading">
+            <div className="container mx-auto px-4 text-center">
+              <h2 id="b2c-cta-heading" className="text-3xl font-bold mb-6">
+                Prêt à transformer votre bien-être ?
+              </h2>
             <p className="text-xl mb-8 opacity-90">
               Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie
             </p>
@@ -296,15 +319,16 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
               </Button>
             </Link>
           </div>
-        </section>
+          </section>
+        </main>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-12">
+        <footer className="bg-gray-900 text-white py-12" role="contentinfo">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center space-x-2 mb-4">
-                  <Heart className="h-6 w-6" />
+                  <Heart className="h-6 w-6" aria-hidden="true" />
                   <span className="text-xl font-bold">EmotionsCare</span>
                 </div>
                 <p className="text-gray-400">
@@ -348,11 +372,17 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   }
 
   // Version Full Marketing (comme HomePage original)
+  console.log('[UnifiedHomePage] Rendering full marketing variant');
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
       <Header />
-      
-      <main role="main">
+
+      <main
+        id="main-content"
+        tabIndex={-1}
+        aria-labelledby="homepage-hero-title"
+        role="main"
+      >
         {/* Hero Section Enhanced */}
         <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-br from-background via-background/80 to-primary/5">
           <div className="container relative z-10">
@@ -373,7 +403,10 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   </Badge>
                 </motion.div>
                 
-                <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
+                <h1
+                  id="homepage-hero-title"
+                  className="text-5xl lg:text-7xl font-bold leading-tight"
+                >
                   <span className="bg-gradient-to-r from-primary via-primary to-primary/60 bg-clip-text text-transparent">
                     EmotionsCare
                   </span>
@@ -407,15 +440,15 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
 
               <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <CheckCircle className="h-4 w-4 text-green-500" aria-hidden="true" />
                   <span>Aucune carte requise</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <CheckCircle className="h-4 w-4 text-green-500" aria-hidden="true" />
                   <span>Installation instantanée</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Shield className="h-4 w-4 text-blue-500" />
+                  <Shield className="h-4 w-4 text-blue-500" aria-hidden="true" />
                   <span>100% sécurisé RGPD</span>
                 </div>
               </div>
@@ -431,7 +464,12 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
         </section>
 
         {/* Stats Section Enhanced */}
-        <motion.section ref={statsSection.ref} className="py-16 bg-muted/20">
+        <motion.section
+          ref={statsSection.ref}
+          className="py-16 bg-muted/20"
+          role="region"
+          aria-labelledby="stats-section-heading"
+        >
           {statsSection.isVisible ? (
             <div className="container">
               <motion.div
@@ -442,7 +480,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 className="text-center space-y-4 mb-12"
               >
                 <Badge variant="outline" className="mb-2">Performance en temps réel</Badge>
-                <h2 className="text-3xl lg:text-4xl font-bold">
+                <h2 id="stats-section-heading" className="text-3xl lg:text-4xl font-bold">
                   Des résultats qui parlent d'eux-mêmes
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -504,7 +542,12 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
         </motion.section>
 
         {/* Features Section Enhanced */}
-        <section ref={featuresSection.ref} className="py-20 bg-background">
+        <section
+          ref={featuresSection.ref}
+          className="py-20 bg-background"
+          role="region"
+          aria-labelledby="features-section-heading"
+        >
           {featuresSection.isVisible ? (
             <div className="container">
               <motion.div
@@ -515,7 +558,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 className="text-center space-y-4 mb-16"
               >
                 <Badge variant="secondary" className="mb-2">Intelligence Artificielle</Badge>
-                <h2 className="text-4xl lg:text-5xl font-bold">
+                <h2 id="features-section-heading" className="text-4xl lg:text-5xl font-bold">
                   Fonctionnalités de
                   <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"> Nouvelle Génération</span>
                 </h2>
@@ -541,7 +584,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                           "w-16 h-16 rounded-2xl mb-4 flex items-center justify-center",
                           `bg-gradient-to-br ${feature.gradient} shadow-lg group-hover:shadow-xl transition-all duration-300`
                         )}>
-                          <feature.icon className="h-8 w-8 text-white" />
+                          <feature.icon className="h-8 w-8 text-white" aria-hidden="true" />
                         </div>
                         <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors">
                           {feature.title}
@@ -555,7 +598,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                         <div className="space-y-2">
                           {feature.benefits.map((benefit, i) => (
                             <div key={i} className="flex items-center space-x-2 text-sm">
-                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" aria-hidden="true" />
                               <span className="text-muted-foreground">{benefit}</span>
                             </div>
                           ))}
@@ -564,7 +607,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                         <Separator className="my-4" />
 
                         <Button variant="ghost" className="w-full group-hover:bg-primary/10 group-hover:text-primary transition-all" asChild>
-                          <Link to={feature.demo}>
+                          <Link to={withLandingUtm(feature.demo)}>
                             <span>Essayer maintenant</span>
                             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Link>
@@ -627,7 +670,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                     <Card className="h-full hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-background to-muted/50 group-hover:from-primary/5">
                       <CardHeader className="text-center pb-4">
                         <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mb-4">
-                          <useCase.icon className="h-10 w-10 text-primary" />
+                          <useCase.icon className="h-10 w-10 text-primary" aria-hidden="true" />
                         </div>
                         <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors">
                           {useCase.title}
@@ -641,7 +684,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                         <div className="space-y-3">
                           {useCase.features.map((feature, i) => (
                             <div key={i} className="flex items-center space-x-3 text-sm">
-                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" aria-hidden="true" />
                               <span className="text-muted-foreground text-left">{feature}</span>
                             </div>
                           ))}
@@ -680,7 +723,12 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
           )}
         </section>
         {/* Testimonials Section */}
-        <section ref={testimonialsSection.ref} className="py-20 bg-background">
+        <section
+          ref={testimonialsSection.ref}
+          className="py-20 bg-background"
+          role="region"
+          aria-labelledby="testimonials-heading"
+        >
           {testimonialsSection.isVisible ? (
             <div className="container">
               <motion.div
@@ -691,7 +739,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 className="text-center space-y-4 mb-16"
               >
                 <Badge variant="secondary" className="mb-2">Témoignages</Badge>
-                <h2 className="text-4xl lg:text-5xl font-bold">
+                <h2 id="testimonials-heading" className="text-4xl lg:text-5xl font-bold">
                   Ce que disent nos utilisateurs
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -699,7 +747,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                 </p>
               </motion.div>
 
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-4xl mx-auto" role="group" aria-live="polite" aria-atomic="true" aria-label="Carousel de témoignages">
                 <motion.div
                   key={currentTestimonial}
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -728,14 +776,19 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   </div>
                 </motion.div>
 
-                <div className="flex justify-center space-x-2 mt-8">
+                <div className="flex justify-center space-x-2 mt-8" role="tablist" aria-label="Sélection de témoignage">
                   {testimonials.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentTestimonial(index)}
+                      type="button"
+                      role="tab"
+                      aria-label={`Afficher le témoignage ${index + 1}`}
+                      aria-selected={index === currentTestimonial}
                       className={cn(
                         "w-3 h-3 rounded-full transition-all duration-300",
-                        index === currentTestimonial ? "bg-primary" : "bg-muted"
+                        index === currentTestimonial ? "bg-primary" : "bg-muted",
+                        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       )}
                     />
                   ))}
@@ -794,15 +847,15 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
 
                 <div className="flex items-center justify-center space-x-8 text-sm opacity-80">
                   <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4" />
+                    <CheckCircle className="h-4 w-4" aria-hidden="true" />
                     <span>Essai gratuit 30 jours</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Shield className="h-4 w-4" />
+                    <Shield className="h-4 w-4" aria-hidden="true" />
                     <span>Sécurisé & Confidentiel</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Heart className="h-4 w-4" />
+                    <Heart className="h-4 w-4" aria-hidden="true" />
                     <span>Support premium</span>
                   </div>
                 </div>

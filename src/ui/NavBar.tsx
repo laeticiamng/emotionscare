@@ -1,7 +1,7 @@
 "use client";
-import { ThemeToggle } from "@/COMPONENTS.reg";
-import { useI18n } from "@/COMPONENTS.reg";
-import { usePrefetchOnHover } from "@/COMPONENTS.reg";
+import { ThemeToggle } from "@/theme/ThemeProvider";
+import { useI18n } from "@/lib/i18n";
+import { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 
 export function NavBar() {
   const preMods = usePrefetchOnHover?.("/modules") ?? {};
@@ -11,8 +11,11 @@ export function NavBar() {
       <a href="/" aria-label="Accueil">EmotionsCare</a>
       <nav style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
         <a {...preMods} href="/modules">Modules</a>
+        <a href="/legal/mentions">Mentions légales</a>
+        <a href="/legal/terms">Conditions d'utilisation</a>
+        <a href="/legal/sales">CGV</a>
         <a href="/legal/privacy">Confidentialité</a>
-        <a href="/legal/terms">Conditions</a>
+        <a href="/legal/cookies">Cookies</a>
         <button onClick={() => setLang?.(lang === "fr" ? "en" : "fr")} aria-label="Changer de langue">🌐</button>
         <ThemeToggle />
       </nav>

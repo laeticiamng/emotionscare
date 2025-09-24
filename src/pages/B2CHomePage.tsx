@@ -1,12 +1,13 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout";
 import { useNavigate } from "react-router-dom";
-import { 
-  Scan, 
-  Music, 
+import { useMemo } from "react";
+import {
+  Scan,
+  Music,
   MessageCircle, 
   PenTool, 
   Eye, 
@@ -27,6 +28,7 @@ import {
   Monitor
 } from "lucide-react";
 import { CopyBadge } from "@/components/transverse";
+import { withLandingUtm } from "@/lib/utm";
 
 /**
  * B2C HOME PAGE - EMOTIONSCARE  
@@ -34,8 +36,10 @@ import { CopyBadge } from "@/components/transverse";
  */
 export default function B2CHomePage() {
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
+  const goTo = (path: string) => navigate(withLandingUtm(path));
 
-  const moduleCategories = [
+  const moduleCategories = useMemo(() => [
     {
       title: "Mesure & Analyse",
       description: "Comprendre vos émotions",
@@ -222,7 +226,19 @@ export default function B2CHomePage() {
         }
       ]
     }
-  ];
+  ], []);
+
+  const getFadeInProps = (delay = 0, duration = 0.5) =>
+    shouldReduceMotion
+      ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+      : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration, delay } };
+
+  const getScaleInProps = (delay = 0, duration = 0.3) =>
+    shouldReduceMotion
+      ? { initial: { opacity: 1, scale: 1 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0 } }
+      : { initial: { opacity: 0, scale: 0.95 }, animate: { opacity: 1, scale: 1 }, transition: { duration, delay } };
+
+  const hoverEffect = shouldReduceMotion ? undefined : { scale: 1.02 };
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
@@ -245,12 +261,7 @@ export default function B2CHomePage() {
       <Header />
       
       <main id="main-content" role="main" className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-8"
-        >
+        <motion.div {...getFadeInProps()} className="space-y-8">
           {/* Welcome Section */}
           <header className="text-center space-y-4">
             <h1 className="text-3xl lg:text-4xl font-bold">
@@ -266,9 +277,7 @@ export default function B2CHomePage() {
           {moduleCategories.map((category, categoryIndex) => (
             <motion.section
               key={category.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
+              {...getFadeInProps(categoryIndex * 0.1)}
               className="space-y-4"
               aria-labelledby={`category-${categoryIndex}`}
             >
@@ -281,22 +290,17 @@ export default function B2CHomePage() {
                 {category.modules.map((module, moduleIndex) => (
                   <motion.div
                     key={module.name}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ 
-                      duration: 0.3, 
-                      delay: categoryIndex * 0.1 + moduleIndex * 0.05 
-                    }}
-                    whileHover={{ scale: 1.02 }}
+                    {...getScaleInProps(categoryIndex * 0.1 + moduleIndex * 0.05)}
+                    whileHover={hoverEffect}
                     className="cursor-pointer"
-                    onClick={() => navigate(module.path)}
+                    onClick={() => goTo(module.path)}
                   >
-                     <Card 
-                       className="h-full hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary"
-                       tabIndex={0}
-                       role="button"
-                       aria-describedby={`module-desc-${moduleIndex}`}
-                     >
+                    <Card
+                      className="h-full hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary"
+                      tabIndex={0}
+                      role="button"
+                      aria-describedby={`module-desc-${categoryIndex}-${moduleIndex}`}
+                    >
                        <CardHeader className="pb-3">
                          <div className="flex items-start justify-between">
                            <div className="flex items-center space-x-3">
@@ -315,8 +319,8 @@ export default function B2CHomePage() {
                          </div>
                        </CardHeader>
                        <CardContent>
-                         <CardDescription 
-                           id={`module-desc-${moduleIndex}`}
+                         <CardDescription
+                           id={`module-desc-${categoryIndex}-${moduleIndex}`}
                            className="text-sm leading-relaxed"
                          >
                            {module.description}
@@ -355,7 +359,7 @@ export default function B2CHomePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/scan')}
+                  onClick={() => goTo('/app/scan')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Scanner mes émotions - Analyse faciale en temps réel"
                 >
@@ -364,7 +368,7 @@ export default function B2CHomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/flash-glow')}
+                  onClick={() => goTo('/app/flash-glow')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Flash Glow - Session de thérapie lumière de 2 minutes"
                 >
@@ -373,7 +377,7 @@ export default function B2CHomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/music')}
+                  onClick={() => goTo('/app/music')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Musique thérapeutique - Sons adaptatifs personnalisés"
                 >
@@ -382,7 +386,7 @@ export default function B2CHomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/app/journal')}
+                  onClick={() => goTo('/app/journal')}
                   className="flex flex-col h-20 space-y-2"
                   aria-label="Journal émotionnel - Consignez vos ressentis"
                 >

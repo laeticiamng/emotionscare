@@ -84,7 +84,7 @@ const navigationCategories: NavigationCategory[] = [
     color: 'from-blue-500 to-cyan-500',
     routes: [
       { name: 'Activité', path: '/app/activity', icon: BarChart3, description: 'Historique détaillé' },
-      { name: 'Heatmap Vibes', path: '/app/heatmap', icon: Filter, description: 'Cartographie émotionnelle' },
+      { name: 'Scores & Vibes', path: '/app/scores', icon: Filter, description: 'Courbes et heatmap émotionnelle' },
       { name: 'Journal Vocal', path: '/app/journal', icon: Headphones, description: 'Journal vocal IA' },
     ]
   },

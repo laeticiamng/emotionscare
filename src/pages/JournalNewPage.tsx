@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Smile, Calendar, Clock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+import { cn } from '@/lib/utils';
 
 const JournalNewPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,9 @@ const JournalNewPage: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPrivate, setIsPrivate] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const { prefersReducedMotion } = useMotionPrefs();
+  const [moodAnnouncement, setMoodAnnouncement] = useState('Aucune humeur sélectionnée pour le moment');
+  const [journalAnnouncement, setJournalAnnouncement] = useState('Contenu du journal vide');
 
   const moodOptions = [
     { value: 'happy', label: '😊 Joyeux', color: 'bg-yellow-100 text-yellow-800' },
@@ -77,16 +81,37 @@ const JournalNewPage: React.FC = () => {
 
   const selectedMoodData = moodOptions.find(m => m.value === mood);
 
+  useEffect(() => {
+    if (selectedMoodData) {
+      setMoodAnnouncement(`Humeur sélectionnée : ${selectedMoodData.label.replace(/^[^A-Za-zÀ-ÿ0-9\s]*/u, '').trim()}`);
+    } else {
+      setMoodAnnouncement('Aucune humeur sélectionnée pour le moment');
+    }
+  }, [selectedMoodData]);
+
+  useEffect(() => {
+    if (content.trim().length === 0) {
+      setJournalAnnouncement('Contenu du journal vide');
+    } else {
+      setJournalAnnouncement(`Contenu du journal mis à jour, ${content.length} caractères saisis`);
+    }
+  }, [content]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
+      <div aria-live="polite" role="status" className="sr-only" data-testid="journal-live-region">
+        <span>{moodAnnouncement}</span>
+        <span>{journalAnnouncement}</span>
+      </div>
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
+              aria-label="Retourner à la page précédente"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
@@ -109,21 +134,26 @@ const JournalNewPage: React.FC = () => {
         <Card className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Date</label>
+              <label className="text-sm font-medium mb-2 block" htmlFor="journal-date">
+                Date
+              </label>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <Input
+                  id="journal-date"
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                 />
               </div>
             </div>
-            
+
             <div>
-              <label className="text-sm font-medium mb-2 block">Humeur</label>
+              <label className="text-sm font-medium mb-2 block" htmlFor="journal-mood">
+                Humeur
+              </label>
               <Select value={mood} onValueChange={setMood}>
-                <SelectTrigger>
+                <SelectTrigger id="journal-mood" aria-describedby="journal-mood-help">
                   <SelectValue placeholder="Comment vous sentez-vous ?" />
                 </SelectTrigger>
                 <SelectContent>
@@ -134,12 +164,17 @@ const JournalNewPage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <p id="journal-mood-help" className="sr-only">
+                Sélectionnez une humeur pour contextualiser votre entrée de journal.
+              </p>
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">Visibilité</label>
+              <label className="text-sm font-medium mb-2 block" htmlFor="journal-visibility">
+                Visibilité
+              </label>
               <Select value={isPrivate ? 'private' : 'public'} onValueChange={(value) => setIsPrivate(value === 'private')}>
-                <SelectTrigger>
+                <SelectTrigger id="journal-visibility">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,7 +187,7 @@ const JournalNewPage: React.FC = () => {
 
           {selectedMoodData && (
             <div className="mt-4">
-              <Badge className={selectedMoodData.color}>
+              <Badge className={selectedMoodData.color} aria-live="polite">
                 {selectedMoodData.label}
               </Badge>
             </div>
@@ -172,32 +207,37 @@ const JournalNewPage: React.FC = () => {
             </div>
 
             <div className="relative">
-              <Textarea
-                placeholder="Que s'est-il passé aujourd'hui ? Comment vous sentez-vous ? Qu'avez-vous appris ?"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="min-h-[300px] resize-none"
-              />
-              
+                <Textarea
+                  placeholder="Que s'est-il passé aujourd'hui ? Comment vous sentez-vous ? Qu'avez-vous appris ?"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="min-h-[300px] resize-none"
+                />
+
               <div className="absolute bottom-3 right-3 flex items-center gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={toggleRecording}
-                  className={isRecording ? 'bg-red-100 text-red-700 animate-pulse' : ''}
+                  aria-pressed={isRecording}
+                  aria-label={isRecording ? 'Arrêter la dictée vocale' : 'Commencer la dictée vocale'}
+                  className={cn(
+                    isRecording ? 'bg-red-100 text-red-700' : '',
+                    isRecording && !prefersReducedMotion ? 'animate-pulse' : ''
+                  )}
                 >
-                  {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  {isRecording ? <MicOff className="w-4 h-4" aria-hidden="true" /> : <Mic className="w-4 h-4" aria-hidden="true" />}
                 </Button>
-                <Button variant="ghost" size="sm">
-                  <Camera className="w-4 h-4" />
+                <Button variant="ghost" size="sm" aria-label="Ajouter une photo au journal">
+                  <Camera className="w-4 h-4" aria-hidden="true" />
                 </Button>
-                <Button variant="ghost" size="sm">
-                  <Image className="w-4 h-4" />
+                <Button variant="ghost" size="sm" aria-label="Ajouter une image au journal">
+                  <Image className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             </div>
 
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground" aria-live="polite">
               {content.length} caractères • ~{Math.ceil(content.split(' ').length / 200)} min de lecture
             </div>
           </div>
@@ -210,11 +250,20 @@ const JournalNewPage: React.FC = () => {
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {tags.map((tag) => (
-                <Badge 
-                  key={tag} 
-                  variant="secondary" 
+                <Badge
+                  key={tag}
+                  variant="secondary"
                   className="cursor-pointer"
                   onClick={() => removeTag(tag)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      removeTag(tag);
+                    }
+                  }}
+                  aria-label={`Retirer le tag ${tag}`}
                 >
                   {tag} ×
                 </Badge>
@@ -229,11 +278,20 @@ const JournalNewPage: React.FC = () => {
                 .filter(tag => !tags.includes(tag))
                 .slice(0, 8)
                 .map((tag) => (
-                <Badge 
+                <Badge
                   key={tag}
-                  variant="outline" 
+                  variant="outline"
                   className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                   onClick={() => addTag(tag)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      addTag(tag);
+                    }
+                  }}
+                  aria-label={`Ajouter le tag ${tag}`}
                 >
                   + {tag}
                 </Badge>

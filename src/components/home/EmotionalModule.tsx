@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, TrendingUp, BookOpen } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { routes } from '@/routerV2';
+import { withLandingUtm } from '@/lib/utm';
 
 interface EmotionalModuleProps {
   className?: string;
@@ -61,7 +62,7 @@ const EmotionalModule: React.FC<EmotionalModuleProps> = ({ className }) => {
           Voir le détail
         </Button>
         <Button size="sm" asChild>
-          <Link to={routes.consumer.scan()}>
+          <Link to={withLandingUtm(routes.consumer.scan())}>
             Commencer
           </Link>
         </Button>

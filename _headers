@@ -13,8 +13,15 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-site
   Cross-Origin-Embedder-Policy: require-corp
+
+/app/*
+  X-Robots-Tag: noindex
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  Cross-Origin-Resource-Policy: same-site
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; script-src 'self' https://cdn.gpteng.co; connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.emotionscare.com https://api.openai.com https://cdn.gpteng.co https://api.hume.ai https://*.sentry.io https://*.ingest.sentry.io wss://*.supabase.co wss://*.supabase.in; media-src 'self' blob: https://*.supabase.co https://storage.googleapis.com; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'
 
 # Assets avec cache long terme
 /assets/*

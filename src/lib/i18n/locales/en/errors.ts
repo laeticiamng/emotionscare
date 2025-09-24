@@ -12,6 +12,7 @@ export const errors = {
   serverError: 'Server error',
   timeoutError: 'Timeout error',
   connectionLost: 'Connection lost',
+  operationAborted: 'Operation cancelled',
   
   // Authentication errors
   authError: 'Authentication error',

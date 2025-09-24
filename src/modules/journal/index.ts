@@ -16,4 +16,3 @@ export type {
   JournalState 
 } from './journalService';
 export type { JournalConfig as JournalMachineConfig } from './useJournalMachine';
-export { default as JournalPage } from './JournalPage';

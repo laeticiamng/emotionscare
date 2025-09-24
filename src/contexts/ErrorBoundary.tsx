@@ -1,5 +1,4 @@
 import React from 'react';
-import { ErrorBoundary as ReactErrorBoundary, type FallbackProps } from 'react-error-boundary';
 import * as Sentry from '@sentry/react';
 
 interface ErrorBoundaryProps {
@@ -30,7 +29,12 @@ const handleReload = () => {
   }
 };
 
-const GlobalErrorFallback: React.FC<FallbackProps> = ({ error }) => {
+interface ErrorFallbackProps {
+  error: Error;
+  resetError: () => void;
+}
+
+const GlobalErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
   React.useEffect(() => {
     if (error) {
       Sentry.addBreadcrumb({
@@ -57,20 +61,43 @@ const GlobalErrorFallback: React.FC<FallbackProps> = ({ error }) => {
           Une erreur inattendue est survenue. Notre équipe a été notifiée — vous pouvez tenter de recharger
           la page pour continuer votre expérience.
         </p>
-        <button
-          type="button"
-          onClick={handleReload}
-          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        >
-          Recharger
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={resetError}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Réessayer
+          </button>
+          <button
+            type="button"
+            onClick={handleReload}
+            className="inline-flex items-center justify-center rounded-md border border-input px-4 py-2 text-sm font-medium shadow transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Recharger
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export function ErrorBoundary({ children }: ErrorBoundaryProps) {
-  const handleError = React.useCallback((error: Error, info: { componentStack: string }) => {
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logErrorBreadcrumb(error);
 
     Sentry.captureException(error, {
@@ -78,26 +105,25 @@ export function ErrorBoundary({ children }: ErrorBoundaryProps) {
         origin: 'app-error-boundary',
       },
       extra: {
-        componentStack: info.componentStack,
+        componentStack: errorInfo.componentStack,
       },
     });
-  }, []);
+  }
 
-  const handleReset = React.useCallback(() => {
+  resetError = () => {
     Sentry.addBreadcrumb({
       category: 'error-boundary',
       level: 'info',
       message: 'user:reset',
     });
-  }, []);
+    this.setState({ hasError: false, error: null });
+  };
 
-  return (
-    <ReactErrorBoundary
-      FallbackComponent={GlobalErrorFallback}
-      onError={handleError}
-      onReset={handleReset}
-    >
-      {children}
-    </ReactErrorBoundary>
-  );
+  render() {
+    if (this.state.hasError && this.state.error) {
+      return <GlobalErrorFallback error={this.state.error} resetError={this.resetError} />;
+    }
+
+    return this.props.children;
+  }
 }

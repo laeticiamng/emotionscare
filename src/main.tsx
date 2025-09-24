@@ -6,13 +6,11 @@ import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import './styles/accessibility.css';
 import './theme/theme.css';
-import { I18nProvider } from '@/COMPONENTS.reg';
-import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
-import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
+import { Loader2 } from 'lucide-react';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
+import RootErrorBoundary from '@/app/RootErrorBoundary';
 import { RootProvider } from '@/providers';
-import { routerV2 } from '@/routerV2';
-
+import { router } from '@/routerV2/router';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -90,14 +88,25 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <React.StrictMode>
-    <RootProvider>
-      <AccessibilityProvider>
-        <I18nProvider>
+    <RootErrorBoundary>
+      <React.Suspense
+        fallback={
+          <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16 text-center">
+            <Loader2 aria-hidden className="mb-6 h-12 w-12 animate-spin text-primary" />
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-foreground">Chargement de l'application…</p>
+              <p className="text-sm text-muted-foreground">
+                Nous préparons votre espace émotionnel, merci de patienter.
+              </p>
+            </div>
+          </div>
+        }
+      >
+        <RootProvider>
           <AccessibilitySkipLinks />
           <RouterProvider router={routerV2} />
         </I18nProvider>
       </AccessibilityProvider>
     </RootProvider>
   </React.StrictMode>
-
 );

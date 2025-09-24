@@ -1,6 +1,9 @@
+import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
 
 import { useAppStore } from '@/store/appStore';
+import { useThemeValue } from '@/store/hooks';
+import { selectMusicModule } from '@/store/selectors';
 
 describe('appStore actions', () => {
   beforeEach(() => {
@@ -97,5 +100,56 @@ describe('appStore actions', () => {
     vi.advanceTimersByTime(2500);
 
     expect(useAppStore.getState().isCacheValid('report', 2000)).toBe(false);
+  });
+
+  it('conserve la référence utilisateur lors du changement de thème', () => {
+    useAppStore.getState().setUser({
+      id: 'user-42',
+      email: 'user42@example.com',
+      role: 'b2c',
+    });
+
+    const before = useAppStore.getState().user;
+
+    useAppStore.getState().setTheme('dark');
+
+    expect(useAppStore.getState().user).toBe(before);
+  });
+
+  it('le sélecteur musique renvoie la même référence si inchangé', () => {
+    const first = selectMusicModule(useAppStore.getState());
+
+    useAppStore.getState().setTheme('dark');
+
+    const second = selectMusicModule(useAppStore.getState());
+
+    expect(second).toBe(first);
+  });
+
+  it('les abonnés au thème ne re-rendent pas lorsque seul l\'utilisateur change', () => {
+    const renders: number[] = [];
+
+    const { result } = renderHook(() => {
+      renders.push(1);
+      return useThemeValue();
+    });
+
+    expect(renders).toHaveLength(1);
+
+    act(() => {
+      useAppStore.getState().setUser({
+        id: 'user-99',
+        email: 'user99@example.com',
+        role: 'b2c',
+      });
+    });
+
+    expect(renders).toHaveLength(1);
+
+    act(() => {
+      useAppStore.getState().setTheme(result.current === 'dark' ? 'light' : 'dark');
+    });
+
+    expect(renders).toHaveLength(2);
   });
 });

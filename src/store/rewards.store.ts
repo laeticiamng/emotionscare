@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type RewardType = 'aura' | 'constellation' | 'flower' | 'flame' | 'pearl' | 'lantern' | 'crystal' | 'bubble' | 'sticker';
 
@@ -36,7 +37,7 @@ interface RewardsState {
   getNewRewardsCount: () => number;
 }
 
-export const useRewardsStore = create<RewardsState>()(
+const useRewardsStoreBase = create<RewardsState>()(
   persist(
     (set, get) => ({
       rewards: [],
@@ -103,3 +104,5 @@ export const useRewardsStore = create<RewardsState>()(
     }
   )
 );
+
+export const useRewardsStore = createSelectors(useRewardsStoreBase);

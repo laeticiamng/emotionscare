@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import PageRoot from '@/components/common/PageRoot';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface PremiumTrack {
   id: string;
@@ -64,63 +65,65 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
     }
   };
 
-  return (
-    <PageRoot>
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Crown className="h-8 w-8 text-yellow-400" />
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                Music Therapy Premium
-              </h1>
-              <Crown className="h-8 w-8 text-yellow-400" />
-            </div>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Thérapie musicale avancée avec fréquences binaurales et compositions exclusives
-            </p>
-          </div>
-
-          <div className="grid gap-6">
-            {PREMIUM_TRACKS.map((track) => (
-              <div key={track.id} className="bg-black/20 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => handlePlayPause(track)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                      selectedTrack?.id === track.id && isPlaying
-                        ? 'bg-yellow-400 text-black'
-                        : 'bg-white/20 hover:bg-white/30 text-white'
-                    }`}
-                  >
-                    {selectedTrack?.id === track.id && isPlaying ? (
-                      <Pause className="h-5 w-5" />
-                    ) : (
-                      <Play className="h-5 w-5 ml-0.5" />
-                    )}
-                  </button>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-white">{track.title}</h3>
-                      <Crown className="h-4 w-4 text-yellow-400" />
-                    </div>
-                    <p className="text-gray-400 mb-1">{track.artist}</p>
-                    <p className="text-sm text-gray-500">{track.description}</p>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-yellow-400 font-bold">{track.frequency}</div>
-                    <div className="text-gray-400 text-sm">{track.duration}</div>
-                  </div>
+    return (
+      <ConsentGate>
+        <PageRoot>
+          <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
+            <div className="container mx-auto px-4 py-16">
+              <div className="mb-12 text-center">
+                <div className="mb-4 flex items-center justify-center gap-3">
+                  <Crown className="h-8 w-8 text-yellow-400" />
+                  <h1 className="text-4xl font-bold text-transparent md:text-6xl bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text">
+                    Music Therapy Premium
+                  </h1>
+                  <Crown className="h-8 w-8 text-yellow-400" />
                 </div>
+                <p className="mx-auto mb-8 max-w-3xl text-xl text-gray-300">
+                  Thérapie musicale avancée avec fréquences binaurales et compositions exclusives
+                </p>
               </div>
-            ))}
+
+              <div className="grid gap-6">
+                {PREMIUM_TRACKS.map(track => (
+                  <div key={track.id} className="rounded-xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => handlePlayPause(track)}
+                        className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
+                          selectedTrack?.id === track.id && isPlaying
+                            ? 'bg-yellow-400 text-black'
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                      >
+                        {selectedTrack?.id === track.id && isPlaying ? (
+                          <Pause className="h-5 w-5" />
+                        ) : (
+                          <Play className="ml-0.5 h-5 w-5" />
+                        )}
+                      </button>
+
+                      <div className="flex-1">
+                        <div className="mb-2 flex items-center gap-3">
+                          <h3 className="text-lg font-semibold text-white">{track.title}</h3>
+                          <Crown className="h-4 w-4 text-yellow-400" />
+                        </div>
+                        <p className="mb-1 text-gray-400">{track.artist}</p>
+                        <p className="text-sm text-gray-500">{track.description}</p>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="font-bold text-yellow-400">{track.frequency}</div>
+                        <div className="text-sm text-gray-400">{track.duration}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </PageRoot>
-  );
+        </PageRoot>
+      </ConsentGate>
+    );
 };
 
 export default B2CMusicTherapyPremiumPage;

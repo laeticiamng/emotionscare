@@ -1,14 +1,22 @@
 
 import React from 'react';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+
+import { persist } from '@/store/utils/createImmutableStore';
+import { createSelectors } from '@/store/utils/createSelectors';
+import { type MoodVibe } from '@/utils/moodVibes';
+import { buildMoodSignals, type MoodEventDetail, type MoodPalette } from '@/utils/moodSignals';
 
 interface MoodState {
   valence: number; // -100 à +100 (négatif à positif)
   arousal: number; // 0 à 100 (calme à excité)
   timestamp: string;
+  vibe: MoodVibe;
   isLoading: boolean;
   error: string | null;
+  summary: string;
+  microGesture: string;
+  palette: MoodPalette;
 }
 
 interface MoodStore extends MoodState {
@@ -19,73 +27,100 @@ interface MoodStore extends MoodState {
   setError: (error: string | null) => void;
 }
 
-// Store Zustand avec persistance
-export const useMoodStore = create<MoodStore>()(
+const baselineSignals = buildMoodSignals(0, 50);
+
+const moodStoreBase = create<MoodStore>()(
   persist(
-    (set, get) => ({
-      // État initial
+    (set) => ({
       valence: 0,
       arousal: 50,
       timestamp: new Date().toISOString(),
       isLoading: false,
+      vibe: baselineSignals.vibe,
       error: null,
+      summary: baselineSignals.summary,
+      microGesture: baselineSignals.microGesture,
+      palette: { ...baselineSignals.palette },
 
-      // Actions
       updateMood: (valence: number, arousal: number) => {
+        const clampedValence = Math.max(-100, Math.min(100, valence));
+        const clampedArousal = Math.max(0, Math.min(100, arousal));
+        const signals = buildMoodSignals(clampedValence, clampedArousal);
+        const timestamp = new Date().toISOString();
         set({
-          valence: Math.max(-100, Math.min(100, valence)),
-          arousal: Math.max(0, Math.min(100, arousal)),
-          timestamp: new Date().toISOString(),
-          error: null
+          valence: clampedValence,
+          arousal: clampedArousal,
+          vibe: signals.vibe,
+          timestamp,
+          summary: signals.summary,
+          microGesture: signals.microGesture,
+          palette: signals.palette,
+          error: null,
         });
 
-        // Publier l'événement mood.updated (simulation)
         if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('mood.updated', {
-            detail: { valence, arousal, timestamp: new Date().toISOString() }
-          }));
+          const detail: MoodEventDetail = {
+            valence: clampedValence,
+            arousal: clampedArousal,
+            timestamp,
+            summary: signals.summary,
+            microGesture: signals.microGesture,
+            palette: signals.palette,
+            vibe: signals.vibe,
+          };
+          window.dispatchEvent(new CustomEvent('mood.updated', { detail }));
         }
       },
 
       fetchCurrentMood: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
-          // Simulation de l'appel API
-          // En production: const response = await fetch('/edge/humeur/current?user_id=' + userId);
           await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // Données mockées pour le développement
+
+          const mockValence = Math.floor(Math.random() * 201) - 100;
+          const mockArousal = Math.floor(Math.random() * 101);
+          const mockTimestamp = new Date().toISOString();
+          const signals = buildMoodSignals(mockValence, mockArousal);
           const mockMood = {
-            valence: Math.floor(Math.random() * 201) - 100, // -100 à +100
-            arousal: Math.floor(Math.random() * 101), // 0 à 100
-            timestamp: new Date().toISOString()
+            valence: mockValence,
+            arousal: mockArousal,
+            timestamp: mockTimestamp,
+            vibe: signals.vibe,
+            summary: signals.summary,
+            microGesture: signals.microGesture,
+            palette: signals.palette,
           };
 
           set({
             ...mockMood,
             isLoading: false,
-            error: null
+            error: null,
           });
         } catch (error) {
           set({
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Erreur inconnue'
+            error: error instanceof Error ? error.message : 'Erreur inconnue',
           });
         }
       },
 
       resetMood: () => {
+        const baseline = buildMoodSignals(0, 50);
         set({
           valence: 0,
           arousal: 50,
+          vibe: baseline.vibe,
           timestamp: new Date().toISOString(),
-          error: null
+          error: null,
+          summary: baseline.summary,
+          microGesture: baseline.microGesture,
+          palette: baseline.palette,
         });
       },
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
-      setError: (error: string | null) => set({ error })
+      setError: (error: string | null) => set({ error }),
     }),
     {
       name: 'emotions-care-mood',
@@ -94,31 +129,55 @@ export const useMoodStore = create<MoodStore>()(
   )
 );
 
-// Hook principal pour utiliser le mood
+export const useMoodStore = createSelectors(moodStoreBase);
+
 export const useMood = () => {
   const store = useMoodStore();
 
-  // Auto-fetch au premier montage si pas de données récentes
   React.useEffect(() => {
     const lastUpdate = new Date(store.timestamp);
     const now = new Date();
     const diffMinutes = (now.getTime() - lastUpdate.getTime()) / (1000 * 60);
 
-    // Refresh si les données ont plus de 30 minutes
     if (diffMinutes > 30) {
       store.fetchCurrentMood();
     }
   }, []);
 
-  // Écoute des événements mood.updated (WebSocket simulation)
   React.useEffect(() => {
     const handleMoodUpdate = (event: CustomEvent) => {
-      const { valence, arousal, timestamp } = event.detail;
-      useMoodStore.setState({ valence, arousal, timestamp });
+      const detail = event.detail as Partial<MoodEventDetail> | undefined;
+      if (!detail) {
+        return;
+      }
+
+      const currentState = useMoodStore.getState();
+
+      const parsedValence = Number(detail.valence);
+      const parsedArousal = Number(detail.arousal);
+
+      const valence = Number.isFinite(parsedValence)
+        ? Math.max(-100, Math.min(100, parsedValence))
+        : currentState.valence;
+      const arousal = Number.isFinite(parsedArousal)
+        ? Math.max(0, Math.min(100, parsedArousal))
+        : currentState.arousal;
+
+      const computed = buildMoodSignals(valence, arousal);
+
+      useMoodStore.setState({
+        valence,
+        arousal,
+        timestamp: detail.timestamp ?? new Date().toISOString(),
+        vibe: detail.vibe ?? computed.vibe,
+        summary: detail.summary ?? computed.summary,
+        microGesture: detail.microGesture ?? computed.microGesture,
+        palette: detail.palette ?? computed.palette,
+      });
     };
 
     window.addEventListener('mood.updated', handleMoodUpdate as EventListener);
-    
+
     return () => {
       window.removeEventListener('mood.updated', handleMoodUpdate as EventListener);
     };
@@ -127,13 +186,12 @@ export const useMood = () => {
   return store;
 };
 
-// Helpers pour adapter l'UI selon l'humeur
 export const getMoodColor = (valence: number, arousal: number): string => {
-  if (valence > 50 && arousal > 70) return '#10b981'; // Vert énergique
-  if (valence > 50 && arousal < 30) return '#3b82f6'; // Bleu calme positif
-  if (valence < -50 && arousal > 70) return '#ef4444'; // Rouge agité
-  if (valence < -50 && arousal < 30) return '#6b7280'; // Gris triste
-  return '#8b5cf6'; // Violet neutre
+  if (valence > 50 && arousal > 70) return '#10b981';
+  if (valence > 50 && arousal < 30) return '#3b82f6';
+  if (valence < -50 && arousal > 70) return '#ef4444';
+  if (valence < -50 && arousal < 30) return '#6b7280';
+  return '#8b5cf6';
 };
 
 export const getMoodEmoji = (valence: number, arousal: number): string => {

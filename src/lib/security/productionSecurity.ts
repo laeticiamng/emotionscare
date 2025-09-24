@@ -1,4 +1,6 @@
 
+import { APP_BASE_CSP } from './headers';
+
 /**
  * Sécurité renforcée pour la production
  */
@@ -45,22 +47,20 @@ const disableDevTools = (): void => {
 };
 
 const applySecurityHeaders = (): void => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   // Content Security Policy
-  const cspMeta = document.createElement('meta');
-  cspMeta.httpEquiv = 'Content-Security-Policy';
-  cspMeta.content = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://cdn.gpteng.co",
-    "style-src 'self' 'unsafe-inline' https://rsms.me",
-    "font-src 'self' https://rsms.me",
-    "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://yaincoxihiqdksxgrsrk.supabase.co wss://yaincoxihiqdksxgrsrk.supabase.co",
-    "media-src 'self' blob:",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'"
-  ].join('; ');
-  document.head.appendChild(cspMeta);
+  const existingCsp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+  if (existingCsp) {
+    existingCsp.setAttribute('content', APP_BASE_CSP);
+  } else {
+    const cspMeta = document.createElement('meta');
+    cspMeta.httpEquiv = 'Content-Security-Policy';
+    cspMeta.content = APP_BASE_CSP;
+    document.head.appendChild(cspMeta);
+  }
 
   // Autres en-têtes de sécurité
   const securityHeaders = [
@@ -68,10 +68,19 @@ const applySecurityHeaders = (): void => {
     { httpEquiv: 'X-Frame-Options', content: 'DENY' },
     { httpEquiv: 'X-XSS-Protection', content: '1; mode=block' },
     { httpEquiv: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
-    { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=()' }
+    { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=()' },
+    { httpEquiv: 'Cross-Origin-Resource-Policy', content: 'same-site' },
+    { httpEquiv: 'X-Robots-Tag', content: 'noindex' }
   ];
 
   securityHeaders.forEach(({ httpEquiv, content }) => {
+    const selector = `meta[http-equiv="${httpEquiv}"]`;
+    const existing = document.querySelector(selector);
+    if (existing) {
+      existing.setAttribute('content', content);
+      return;
+    }
+
     const meta = document.createElement('meta');
     meta.httpEquiv = httpEquiv;
     meta.content = content;
@@ -85,6 +94,9 @@ const cleanSensitiveData = (): void => {
     // Supprimer les clés sensibles qui pourraient être exposées
     delete (window as any).SUPABASE_SERVICE_ROLE_KEY;
     delete (window as any).DATABASE_PASSWORD;
+    delete (window as any).VITE_SUPABASE_SERVICE_ROLE_KEY;
+    delete (window as any).VITE_SUPABASE_SERVICE_ROLE;
+    delete (window as any).SUPABASE_SERVICE_ROLE;
   }
 };
 
@@ -130,9 +142,20 @@ export const validateEnvironment = (): boolean => {
   ];
 
   const missing = requiredEnvVars.filter(envVar => !import.meta.env[envVar]);
-  
+
+  const forbiddenEnvVars = ['VITE_SUPABASE_SERVICE_ROLE_KEY', 'VITE_SUPABASE_SERVICE_ROLE'];
+  const exposedForbidden = forbiddenEnvVars.filter((envVar) => {
+    const value = (import.meta.env as Record<string, string | undefined>)[envVar];
+    return typeof value === 'string' && value.trim().length > 0;
+  });
+
   if (missing.length > 0) {
     console.error('❌ Missing required environment variables:', missing);
+    return false;
+  }
+
+  if (exposedForbidden.length > 0) {
+    console.error('❌ Forbidden environment variables exposed in client build:', exposedForbidden);
     return false;
   }
 

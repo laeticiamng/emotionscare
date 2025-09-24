@@ -25,7 +25,7 @@ const JournalInterface: React.FC = () => {
   const [isWriting, setIsWriting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { addError } = useError();
+  const { notify } = useError();
 
   useEffect(() => {
     loadEntries();
@@ -52,15 +52,17 @@ const JournalInterface: React.FC = () => {
       setEntries(journalEntries);
     } catch (error) {
       console.error('Erreur chargement journal:', error);
-      const message = error instanceof Error ? error.message : 'Impossible de charger les entrées du journal';
-      addError({
-        message,
-        severity: 'medium',
-        stack: error instanceof Error ? error.stack : undefined,
-        context: {
-          scope: 'journal-load-entries',
+      notify(
+        {
+          code: 'SERVER',
+          messageKey: 'errors.journalError',
+          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+          context: {
+            scope: 'journal-load-entries',
+          },
         },
-      });
+        { route: '/app/journal', feature: 'journal-load' },
+      );
     } finally {
       setIsLoading(false);
     }
@@ -108,15 +110,20 @@ const JournalInterface: React.FC = () => {
         }
       } catch (analysisError) {
         console.error('Erreur analyse IA:', analysisError);
-        const message = analysisError instanceof Error ? analysisError.message : 'Analyse IA indisponible';
-        addError({
-          message,
-          severity: 'medium',
-          stack: analysisError instanceof Error ? analysisError.stack : undefined,
-          context: {
-            scope: 'journal-ai-analysis',
+        notify(
+          {
+            code: 'SERVER',
+            messageKey: 'errors.journalError',
+            cause:
+              analysisError instanceof Error
+                ? { message: analysisError.message, stack: analysisError.stack }
+                : analysisError,
+            context: {
+              scope: 'journal-ai-analysis',
+            },
           },
-        });
+          { route: '/app/journal', feature: 'journal-ai-analysis' },
+        );
       }
 
       // Recharger les entrées
@@ -125,15 +132,17 @@ const JournalInterface: React.FC = () => {
       setIsWriting(false);
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
-      const message = error instanceof Error ? error.message : 'Impossible de sauvegarder votre entrée';
-      addError({
-        message,
-        severity: 'high',
-        stack: error instanceof Error ? error.stack : undefined,
-        context: {
-          scope: 'journal-save-entry',
+      notify(
+        {
+          code: 'SERVER',
+          messageKey: 'errors.journalError',
+          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+          context: {
+            scope: 'journal-save-entry',
+          },
         },
-      });
+        { route: '/app/journal', feature: 'journal-save' },
+      );
     } finally {
       setIsAnalyzing(false);
     }

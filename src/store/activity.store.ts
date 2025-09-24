@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 type ModuleId =
   | 'boss_grit'|'mood_mixer'|'ambition_arcade'|'bounce_back'|'story_synth'
@@ -50,7 +51,7 @@ const initialFilters: ActivityFilters = {
   search: ''
 };
 
-export const useActivityStore = create<ActivityState>()(
+const useActivityStoreBase = create<ActivityState>()(
   persist(
     (set) => ({
       filters: initialFilters,
@@ -93,3 +94,5 @@ export const useActivityStore = create<ActivityState>()(
     }
   )
 );
+
+export const useActivityStore = createSelectors(useActivityStoreBase);

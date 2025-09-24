@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Universe } from '@/types/universes';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { useRewardsStore } from '@/store/rewards.store';
@@ -13,6 +13,7 @@ interface UniverseEngineProps {
   className?: string;
   enableParticles?: boolean;
   enableAmbianceSound?: boolean;
+  particleDensity?: 'standard' | 'soft' | 'minimal';
 }
 
 export const UniverseEngine: React.FC<UniverseEngineProps> = ({
@@ -24,26 +25,41 @@ export const UniverseEngine: React.FC<UniverseEngineProps> = ({
   className = "",
   enableParticles = true,
   enableAmbianceSound = false,
+  particleDensity = 'standard',
 }) => {
   const [phase, setPhase] = useState<'entering' | 'active' | 'exiting'>('entering');
   const [isReady, setIsReady] = useState(false);
 
-  const { 
-    entranceVariants, 
-    generateParticles, 
+  const motionPreferences = useReducedMotion();
+
+  const effectiveDensity = motionPreferences ? 'minimal' : particleDensity;
+  const particleCount = useMemo(() => {
+    switch (effectiveDensity) {
+      case 'soft':
+        return 3;
+      case 'minimal':
+        return 0;
+      default:
+        return 6;
+    }
+  }, [effectiveDensity]);
+
+  const {
+    entranceVariants,
+    generateParticles,
     cssAnimationClasses,
-    cleanupAnimation 
+    cleanupAnimation
   } = useOptimizedAnimation({
-    enableComplexAnimations: true,
-    particleCount: 6, // Reduced for performance
+    enableComplexAnimations: !motionPreferences && effectiveDensity !== 'minimal',
+    particleCount,
     useCSSAnimations: true,
   });
 
   // Optimized particles with reduced count
   const particles = useMemo(() => {
-    if (!enableParticles) return [];
-    return generateParticles(6);
-  }, [enableParticles, generateParticles]);
+    if (!enableParticles || effectiveDensity === 'minimal') return [];
+    return generateParticles(particleCount);
+  }, [enableParticles, effectiveDensity, generateParticles, particleCount]);
 
   // Handle universe entrance
   useEffect(() => {
@@ -86,7 +102,7 @@ export const UniverseEngine: React.FC<UniverseEngineProps> = ({
       style={universeStyle}
     >
       {/* Optimized ambient particles */}
-      {enableParticles && isReady && (
+      {enableParticles && effectiveDensity !== 'minimal' && isReady && (
         <div className="absolute inset-0 pointer-events-none">
           {particles.map((particle) => (
             <div

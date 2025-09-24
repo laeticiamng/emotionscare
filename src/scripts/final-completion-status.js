@@ -46,7 +46,7 @@ console.log('    • Social Cocon (/app/social-cocon) ✓');
 console.log('\n  📊 ANALYTICS (3 modules):');
 console.log('    • Gamification (/app/leaderboard) ✓');
 console.log('    • Historique Activité (/app/activity) ✓');
-console.log('    • Heatmap Vibes (/app/heatmap) ✓');
+console.log('    • Scores & Vibes (/app/scores) ✓');
 
 console.log('\n  ⚙️ PARAMÈTRES (5 sections):');
 console.log('    • Général (/settings/general) ✓');
@@ -105,7 +105,7 @@ console.log('  ✓ Protection par rôle (consumer/employee/manager)');
 console.log('  ✓ Routes authentifiées sécurisées');
 console.log('  ✓ Guards automatiques selon configuration');
 console.log('  ✓ Redirections automatiques selon le rôle');
-console.log('  ✓ Pages système (401, 403, 404, 503) fonctionnelles');
+console.log('  ✓ Pages système (401, 403, 404, 500) fonctionnelles');
 
 console.log('\n✅ EXPÉRIENCE UTILISATEUR OPTIMISÉE:');
 console.log('====================================');

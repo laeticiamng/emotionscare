@@ -99,11 +99,11 @@ export function AppSidebar() {
           description: "Analysez vos émotions en temps réel"
         },
         {
-          title: "Heatmap Vibes",
-          url: routes.b2c.activity(),
+          title: "Scores & vibes",
+          url: routes.b2c.heatmap(),
           icon: BarChart3,
           gradient: "from-orange-500 to-red-500",
-          description: "Visualisez vos patterns émotionnels"
+          description: "Courbes d’humeur et heatmap quotidienne"
         }
       ]
     },

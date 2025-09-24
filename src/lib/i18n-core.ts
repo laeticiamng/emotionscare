@@ -105,8 +105,13 @@ const translations = {
     'confirm.delete': 'Êtes-vous sûr de vouloir supprimer cet élément ?',
     'confirm.leave': 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?',
     'confirm.reset': 'Cette action réinitialisera toutes vos données. Continuer ?',
+    'b2b.report.title': 'Rapport {{team}} — {{period}}',
+    'b2b.report.summary.title': 'En bref',
+    'b2b.report.action.title': 'Action faisable',
+    'b2b.report.export.csv': 'Exporter (CSV)',
+    'b2b.print.hint': 'Version prête à imprimer — chiffres masqués par design.',
   },
-  
+
   en: {
     // Navigation et layout
     'nav.home': 'Home',
@@ -189,6 +194,11 @@ const translations = {
     'confirm.delete': 'Are you sure you want to delete this item?',
     'confirm.leave': 'You have unsaved changes. Do you really want to leave?',
     'confirm.reset': 'This action will reset all your data. Continue?',
+    'b2b.report.title': 'Report {{team}} — {{period}}',
+    'b2b.report.summary.title': 'At a glance',
+    'b2b.report.action.title': 'Suggested action',
+    'b2b.report.export.csv': 'Export (CSV)',
+    'b2b.print.hint': 'Print-ready version — numbers intentionally hidden.',
   },
 } as const;
 

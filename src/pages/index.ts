@@ -57,6 +57,8 @@ export { default as B2BSelectionPage } from './B2BSelectionPage';
 export { default as B2BEntreprisePage } from './B2BEntreprisePage';
 export { default as B2BSocialCoconPage } from './B2BSocialCoconPage';
 export { default as B2BReportsPage } from './B2BReportsPage';
+export { default as B2BReportDetailPage } from './B2BReportDetailPage';
+export { default as B2BReportsHeatmapPage } from './b2b/reports';
 export { default as B2BEventsPage } from './B2BEventsPage';
 export { default as B2BUserCoachPage } from './b2b/user/CoachPage';
 
@@ -83,12 +85,15 @@ export { default as DemoPage } from './DemoPage';
 // Legal pages
 export { default as LegalTermsPage } from './LegalTermsPage';
 export { default as LegalPrivacyPage } from './LegalPrivacyPage';
+export { default as LegalMentionsPage } from './LegalMentionsPage';
+export { default as LegalSalesPage } from './LegalSalesPage';
+export { default as LegalCookiesPage } from './LegalCookiesPage';
 
 // System & Error pages
-export { default as Error401Page } from './errors/401';
-export { default as Error403Page } from './errors/403';
-export { default as Error404Page } from './errors/404';
-export { default as ServerErrorPage } from './ServerErrorPage';
+export { default as UnauthorizedPage } from './errors/401/page';
+export { default as ForbiddenPage } from './errors/403/page';
+export { default as UnifiedErrorPage } from './errors/404/page';
+export { default as ServerErrorPage } from './errors/500/page';
 
 // Development pages
 export { default as ValidationPage } from './ValidationPage';
@@ -103,9 +108,8 @@ export { default as ReportingPage } from './ReportingPage';
 export { default as ExportPage } from './ExportPage';
 export { default as NavigationPage } from './NavigationPage';
 export { default as LeaderboardPage } from './LeaderboardPage';
-export { default as HeatmapPage } from './HeatmapPage';
+export { default as ScoresPage } from './ScoresPage';
 export { default as MoodPresetsAdminPage } from './MoodPresetsAdminPage';
 export { default as GamificationPage } from './GamificationPage';
 export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
-export { default as JournalPage } from "@/modules/journal/JournalPage";

@@ -1,9 +1,18 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
-vi.mock("@/COMPONENTS.reg", () => ({
-  PageHeader: ({ title }: any) => <div>{title}</div>,
+vi.mock("@/components/ui/PageHeader", () => ({
+  default: ({ title }: any) => <div>{title}</div>,
+}));
+
+vi.mock("@/components/ui/card", () => ({
   Card: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock("@/components/ui/button", () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+}));
+
+vi.mock("@/ui/ProgressBar", () => ({
   ProgressBar: ({ value }: any) => <div data-progress={value} />,
 }));
 import BossGritPage from "@/modules/boss-grit/BossGritPage";

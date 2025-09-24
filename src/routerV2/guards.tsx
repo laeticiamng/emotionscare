@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { routes } from '@/lib/routes';
 import type { Role, Segment } from './schema';
+import { stripUtmParams } from '@/lib/utm';
 
 type GuardChildren = { children: React.ReactNode };
 
@@ -117,7 +118,15 @@ interface ModeGuardProps extends GuardChildren {
 export const ModeGuard: React.FC<ModeGuardProps> = ({ children, segment }) => {
   const { userMode, setUserMode, isLoading } = useUserMode();
   const location = useLocation();
+  const navigate = useNavigate();
   const [synced, setSynced] = useState(false);
+
+  useEffect(() => {
+    const cleanedSearch = stripUtmParams(location.search);
+    if (cleanedSearch !== null) {
+      navigate({ pathname: location.pathname, search: cleanedSearch, hash: location.hash }, { replace: true });
+    }
+  }, [location.hash, location.pathname, location.search, navigate]);
 
   const desiredMode = useMemo<UserModeValue>(() => {
     const forced = new URLSearchParams(location.search).get('segment');
@@ -151,8 +160,58 @@ function normalizeRole(role?: string | null): Role {
       return 'employee';
     case 'b2b_admin':
     case 'manager':
+    case 'org_admin':
+    case 'org_owner':
+    case 'owner':
       return 'manager';
     default:
       return 'consumer';
   }
 }
+
+interface RouteGuardProps extends GuardChildren {
+  requiredRole?: Role;
+  requireAuth?: boolean;
+}
+
+export const RouteGuard: React.FC<RouteGuardProps> = ({
+  children,
+  requiredRole,
+  requireAuth = false,
+}) => {
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { userMode, isLoading: modeLoading } = useUserMode();
+  const location = useLocation();
+
+  if (authLoading || modeLoading) {
+    return <LoadingFallback />;
+  }
+
+  // Check authentication requirement
+  if (requireAuth && !isAuthenticated) {
+    return (
+      <Navigate
+        to={routes.auth.login()}
+        state={{ from: location.pathname }}
+        replace
+      />
+    );
+  }
+
+  // Check role requirement (only if authenticated or no auth required)
+  if (requiredRole && isAuthenticated) {
+    const currentRole = normalizeRole(user?.role || user?.user_metadata?.role || userMode);
+    
+    if (currentRole !== requiredRole) {
+      return (
+        <Navigate
+          to={routes.special.forbidden()}
+          state={{ from: location.pathname, role: currentRole, requiredRole }}
+          replace
+        />
+      );
+    }
+  }
+
+  return <>{children}</>;
+};

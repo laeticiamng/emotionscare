@@ -2,7 +2,11 @@
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Sentry from "@sentry/react";
-import { PageHeader, Card, Button, ProgressBar, Sparkline } from "@/COMPONENTS.reg"; // ProgressBar/Sparkline ajoutés en P6
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ProgressBar } from "@/ui/ProgressBar";
+import { Sparkline } from "@/ui/Sparkline"; // ProgressBar/Sparkline ajoutés en P6
 import { recordEvent } from "@/lib/scores/events"; // si P6 non intégré, cet import peut être ignoré (no-op)
 import { logger } from "@/lib/logger";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,7 +83,7 @@ export default function EmotionScanPage() {
 
   const { user, session } = useAuth();
   const queryClient = useQueryClient();
-  const { addError } = useError();
+  const { notify } = useError();
 
   React.useEffect(() => {
     if (!user?.id) {
@@ -93,16 +97,18 @@ export default function EmotionScanPage() {
     enabled: Boolean(user?.id),
     staleTime: 60 * 1000,
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Impossible de charger l'historique des scans";
-      addError({
-        message,
-        severity: "medium",
-        stack: error instanceof Error ? error.stack : undefined,
-        context: {
-          scope: "emotion-scan-history",
-          userId: user?.id ?? "anonymous",
+      notify(
+        {
+          code: 'SERVER',
+          messageKey: 'errors.emotionScanError',
+          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+          context: {
+            scope: 'emotion-scan-history',
+            userId: user?.id ?? 'anonymous',
+          },
         },
-      });
+        { route: '/app/scan', feature: 'emotion-scan-history' },
+      );
     },
   });
 
@@ -204,19 +210,21 @@ export default function EmotionScanPage() {
             });
           } catch (persistError) {
             logger.error("Failed to persist emotion scan result", persistError, "emotion-scan.ui");
-            const message =
-              persistError instanceof Error
-                ? persistError.message
-                : "Impossible d'enregistrer le résultat du scan émotionnel";
-            addError({
-              message,
-              severity: "medium",
-              stack: persistError instanceof Error ? persistError.stack : undefined,
-              context: {
-                scope: "emotion-scan-persist",
-                userId: user?.id ?? "anonymous",
+            notify(
+              {
+                code: 'SERVER',
+                messageKey: 'errors.emotionScanError',
+                cause:
+                  persistError instanceof Error
+                    ? { message: persistError.message, stack: persistError.stack }
+                    : persistError,
+                context: {
+                  scope: 'emotion-scan-persist',
+                  userId: user?.id ?? 'anonymous',
+                },
               },
-            });
+              { route: '/app/scan', feature: 'emotion-scan-persist' },
+            );
           }
         }
 
@@ -248,15 +256,18 @@ export default function EmotionScanPage() {
           },
         });
       }
-      addError({
-        message,
-        severity: "high",
-        stack: error instanceof Error ? error.stack : undefined,
-        context: {
-          scope: "emotion-scan-analyze",
-          userId: user?.id ?? "anonymous",
+      notify(
+        {
+          code: 'SERVER',
+          messageKey: 'errors.emotionScanError',
+          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
+          context: {
+            scope: 'emotion-scan-analyze',
+            userId: user?.id ?? 'anonymous',
+          },
         },
-      });
+        { route: '/app/scan', feature: 'emotion-scan-analysis' },
+      );
     },
   });
 

@@ -19,11 +19,18 @@ import {
   unifiedRegisterSchema,
   type UnifiedRegisterFormData
 } from '@/lib/validations/auth';
+import { B2CLoginPage } from '@/pages/b2c/login';
 
 const UnifiedLoginPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const segment = (searchParams.get('segment') as 'b2c' | 'b2b' | null) ?? 'b2c';
+
+  if (segment === 'b2c') {
+    return <B2CLoginPage />;
+  }
+
   const navigate = useNavigate();
-  
+
   // État pour les formulaires
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [isLoading, setIsLoading] = useState(false);
@@ -48,9 +55,6 @@ const UnifiedLoginPage: React.FC = () => {
       fullName: ''
     }
   });
-
-  // Détection du segment (B2C/B2B)
-  const segment = searchParams.get('segment') || 'b2c';
 
   const onLoginSubmit = async (values: LoginFormData) => {
     setIsLoading(true);

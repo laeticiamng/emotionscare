@@ -52,7 +52,10 @@ git checkout -b docs/api-documentation
 - Suivez les [standards de code](#standards-de-code)
 - Ajoutez des tests pour vos modifications
 - Vérifiez l'accessibilité (WCAG 2.1 AA)
-- Testez localement avec `npm run test` et `npm run build`
+- Testez localement :
+  - `npm run lint`
+  - `npm run test`
+  - `npm run preview` (ou `npm run build` + `npm run preview`)
 
 ### 4. Commit
 Utilisez le format [Conventional Commits](https://www.conventionalcommits.org/) :
@@ -85,11 +88,16 @@ chore(deps): met à jour dépendances sécurité
 git push origin votre-branche
 ```
 
-Puis créez la PR sur GitHub avec :
+Avant de créer la PR, vérifiez :
+- `npm run lint`
+- `npm run test`
+- `npm run preview`
+
+Dans la PR GitHub :
 - **Titre clair** : `type(scope): Description`
 - **Description détaillée** : Que fait votre changement ? Pourquoi ?
 - **Screenshots** : Pour les changements visuels
-- **Tests** : Comment avez-vous testé ?
+- **Tests** : Résumé des commandes exécutées (lint/test/preview)
 - **Breaking changes** : Y a-t-il des changements cassants ?
 
 ## ⚙️ Configuration développement
@@ -134,17 +142,18 @@ npm run storybook        # Interface composants
 
 ### Modules & exports
 - Chaque dossier applicatif dispose d'un `index.ts` (ou `index.tsx`) qui ré-exporte l'API publique du domaine.
-- Les nouveaux composants UI partagés doivent être exposés via les barrels existants (`src/components/ui` et `src/COMPONENTS.reg.tsx`).
-- `COMPONENTS.reg.tsx` reste limité à des wrappers providers & composants purement UI (pas de stores, hooks métier ou accès réseau).
+- Exposez les composants UI partagés dans `src/components/ui/**/*` **et** dans le registre global `src/COMPONENTS.reg.ts` (UI pur uniquement).
+- Exécutez `npm run generate:ui-registry` après toute modification du registre afin de mettre à jour `docs/UI_COMPONENTS_REGISTRY.md`.
+- Les barrels métier (`index.ts`) ne doivent pas ré-exporter de secrets (service-role, clés) ni de stores privés.
 
 ### Imports Node & bundling
-- **Interdiction d'utiliser les imports `node:*`** côté front : privilégier les modules standards (`fs`, `path`…) lorsqu'ils sont bundlés côté Node/scripts.
+- **Interdiction d'utiliser les imports `node:*`** côté front : privilégier les APIs Web (`crypto.subtle`, `File`, `Blob`, etc.).
 - Les scripts Node conservent l'import classique (`import fs from 'fs'`) pour compatibilité tooling.
 - Tout import non tree-shaké doit être justifié dans la PR (bundle size).
 
 #### 🚫 Interdiction `node:*` côté client (ECC-SEC-01)
 - Tout fichier client sous `src/**` ne peut plus importer `node:*`. Le lint (`pnpm lint`) et la CI bloquent immédiatement si la règle est violée.
-- Préférez les APIs Web : `crypto.subtle`, `fetch`, `FileReader`, `Blob`, `URL`, etc. Un utilitaire `sha256` basé sur `crypto.subtle` est déjà disponible dans `src/lib/hash.ts`.
+- Préférez les APIs Web : `crypto.subtle`, `fetch`, `FileReader`, `Blob`, `URL`, etc. Un utilitaire `sha256Hex` basé sur `crypto.subtle` est déjà disponible dans `src/lib/hash.ts`.
 - Les seuls dossiers autorisés à utiliser `node:*` sont les services strictement serveur (`/services/**`) et les fonctions Supabase (`/supabase/functions/**`).
 
 ```ts
@@ -173,6 +182,11 @@ const digest = await crypto.subtle.digest('SHA-256', data);
 - **Design system** défini dans index.css
 - **Composants shadcn/ui** comme base
 - **Pas de CSS inline** ou styles custom
+
+### Terminologie & contenu UI
+- Interdiction des termes cliniques explicites en UI (`dépression`, `diagnostic`, etc.) → utiliser un vocabulaire bien-être.
+- Pas de scores chiffrés dans les pages B2C (scans, communauté, social). Préférer des messages qualitatifs.
+- Respecter `docs/COMMUNITY_SAFETY.md`, `docs/SOCIAL_ROOMS.md`, `docs/VR_SAFETY.md` pour tout nouveau contenu sensible.
 
 ### Accessibilité
 - **WCAG 2.1 AA** minimum requis
@@ -219,6 +233,12 @@ Avant de soumettre, vérifiez :
 - [ ] Tests unitaires pour nouvelle logique
 - [ ] Tests E2E pour nouveaux workflows
 - [ ] Edge cases considérés
+
+#### ✅ Performance & QA
+- [ ] `npm run preview` vérifié (no console error)
+- [ ] Audit Lighthouse ou Web Vitals (si changement UI majeur)
+- [ ] Axe-core / outils a11y passés sur les pages modifiées
+- [ ] Temps de chargement / bundle monitoré (`npm run build` + analyse si besoin)
 
 ### Révision automatique
 Notre CI vérifie automatiquement :

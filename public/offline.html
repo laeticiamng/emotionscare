@@ -1,71 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hors ligne - EmotionsCare</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .container {
-            text-align: center;
-            max-width: 500px;
-            padding: 2rem;
-        }
-        .icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-        .btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hors Ligne - EmotionsCare</title>
+  <style>
+    body { font-family: system-ui; text-align: center; padding: 2rem; }
+    .container { max-width: 400px; margin: 0 auto; }
+    h1 { color: #8B5CF6; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="icon">📱</div>
-        <h1>Mode hors ligne</h1>
-        <p>Vous n'êtes pas connecté à Internet. Certaines fonctionnalités restent disponibles en mode hors ligne.</p>
-        <a href="/" class="btn">Réessayer</a>
-    </div>
-    
-    <script>
-        // Auto refresh when back online
-        window.addEventListener('online', () => {
-            window.location.reload();
-        });
-    </script>
+  <div class="container">
+    <h1>🧠 EmotionsCare</h1>
+    <p>Vous êtes hors ligne. Reconnectez-vous pour accéder à la plateforme.</p>
+    <button onclick="location.reload()">Réessayer</button>
+  </div>
 </body>
 </html>
-

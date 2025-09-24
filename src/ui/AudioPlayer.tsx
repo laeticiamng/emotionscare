@@ -1,73 +1,70 @@
 "use client";
+
 import React from "react";
 import * as Sentry from "@sentry/react";
-import { useSound } from "@/ui/hooks/useSound";
+
+import { useMotionPrefs } from "@/hooks/useMotionPrefs";
 import { clamp01 } from "@/lib/audio/utils";
+import { useSound } from "@/ui/hooks/useSound";
 
-export const ADAPTIVE_MUSIC_FAVORITES_EVENT = "adaptive-music:favorites-changed";
-export const ADAPTIVE_MUSIC_PLAYBACK_EVENT = "adaptive-music:playback-changed";
-
-type FavoriteEntry = {
-  id: string;
-  title?: string;
-  src: string;
-  addedAt: string;
+export type FavoriteControls = {
+  active: boolean;
+  onToggle: () => Promise<void> | void;
+  busy?: boolean;
+  addLabel?: string;
+  removeLabel?: string;
 };
 
-export type AudioPlayerFavoriteEntry = FavoriteEntry;
+export type ResumeControls = {
+  position: number;
+  onResume: () => Promise<void> | void;
+  label?: string;
+  allow?: boolean;
+};
 
-type PlaybackPersistedState = {
+export interface PlaybackSnapshot {
+  trackId: string;
   position: number;
   volume: number;
   wasPlaying: boolean;
   updatedAt: number;
-  trackTitle?: string;
-  trackSrc?: string;
-};
+  presetId?: string;
+  title?: string;
+  src: string;
+}
 
-const FAVORITES_STORAGE_KEY = "adaptive-music:favorites";
-
-const formatTime = (totalSeconds: number) => {
-  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return "0:00";
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-};
-
-type Props = {
+type AudioPlayerProps = {
   src: string;
   title?: string;
   trackId?: string;
   loop?: boolean;
-  defaultVolume?: number; // 0..1
-  haptics?: boolean;
+  defaultVolume?: number;
+  presetId?: string;
+  crossfadeMs?: number;
+  favorite?: FavoriteControls;
+  resume?: ResumeControls;
+  onProgress?: (snapshot: PlaybackSnapshot) => void;
+  onPause?: () => void;
 };
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function AudioPlayer({
   src,
   title,
   trackId,
   loop,
-  defaultVolume = 0.8,
-  haptics = false
-}: Props) {
-  const safeDefaultVolume = clamp01(defaultVolume);
+  defaultVolume = 0.75,
+  presetId,
+  crossfadeMs,
+  favorite,
+  resume,
+  onProgress,
+  onPause,
+}: AudioPlayerProps) {
   const trackKey = React.useMemo(() => trackId ?? src, [trackId, src]);
-  const playbackStorageKey = React.useMemo(
-    () => `adaptive-music:playback:${trackKey}`,
-    [trackKey]
-  );
-  const defaultPlaybackState = React.useMemo<PlaybackPersistedState>(
-    () => ({
-      position: 0,
-      volume: safeDefaultVolume,
-      wasPlaying: false,
-      updatedAt: Date.now(),
-      trackSrc: src,
-      trackTitle: title,
-    }),
-    [safeDefaultVolume, src, title]
-  );
+  const safeDefaultVolume = clamp01(defaultVolume);
+  const { prefersReducedMotion } = useMotionPrefs();
 
   const {
     ready,
@@ -76,34 +73,86 @@ export function AudioPlayer({
     setVolume: setSoundVolume,
     seek,
     getTime,
-    onEnded
+    onEnded,
   } = useSound(src, { loop, volume: safeDefaultVolume });
 
   const [playing, setPlaying] = React.useState(false);
   const [volume, setVolume] = React.useState(safeDefaultVolume);
-  const [favorites, setFavorites] = React.useState<FavoriteEntry[]>([]);
-  const [resumePosition, setResumePosition] = React.useState(0);
+  const [statusMessage, setStatusMessage] = React.useState("Lecteur prêt à diffuser ta bulle sonore.");
 
-  const playbackRef = React.useRef<PlaybackPersistedState>(defaultPlaybackState);
+  const fadingRef = React.useRef(false);
+  const currentVolumeRef = React.useRef(safeDefaultVolume);
 
-  const logPlaybackBreadcrumb = React.useCallback(
-    (message: string, level: 'info' | 'error' = 'info', data?: Record<string, unknown>) => {
-      const client = Sentry.getCurrentHub().getClient();
-      if (!client) {
+  const updateAudioVolume = React.useCallback(
+    (next: number) => {
+      const clamped = clamp01(next);
+      currentVolumeRef.current = clamped;
+      setSoundVolume?.(clamped);
+    },
+    [setSoundVolume],
+  );
+
+  React.useEffect(() => {
+    if (fadingRef.current) return;
+    updateAudioVolume(volume);
+  }, [volume, updateAudioVolume]);
+
+  const fadeToVolume = React.useCallback(
+    async (target: number, durationMs: number) => {
+      if (!setSoundVolume || durationMs <= 0) {
+        updateAudioVolume(target);
         return;
       }
+
+      fadingRef.current = true;
+      const start = currentVolumeRef.current;
+      const duration = Math.max(80, durationMs);
+      const steps = Math.max(1, Math.round(duration / 80));
+      for (let index = 1; index <= steps; index += 1) {
+        const ratio = index / steps;
+        const value = start + (target - start) * ratio;
+        updateAudioVolume(value);
+        await wait(duration / steps);
+      }
+      updateAudioVolume(target);
+      fadingRef.current = false;
+    },
+    [setSoundVolume, updateAudioVolume],
+  );
+
+  const logBreadcrumb = React.useCallback(
+    (message: string, data?: Record<string, unknown>) => {
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) return;
       Sentry.addBreadcrumb({
-        category: 'music',
-        level,
+        category: "music",
+        level: "info",
         message,
-        data: { trackId: trackKey, ...(data ?? {}) },
+        data: { trackId: trackKey, presetId, ...(data ?? {}) },
       });
     },
-    [trackKey],
+    [trackKey, presetId],
+  );
+
+  const persist = React.useCallback(
+    (update: Partial<PlaybackSnapshot>) => {
+      const payload: PlaybackSnapshot = {
+        trackId: trackKey,
+        position: typeof update.position === "number" ? Math.max(0, update.position) : getTime?.() ?? 0,
+        volume: typeof update.volume === "number" ? clamp01(update.volume) : volume,
+        wasPlaying: typeof update.wasPlaying === "boolean" ? update.wasPlaying : playing,
+        updatedAt: Date.now(),
+        presetId,
+        title,
+        src,
+      };
+
+      onProgress?.(payload);
+    },
+    [getTime, onProgress, playing, presetId, src, title, trackKey, volume],
   );
 
   const applyHaptics = React.useCallback(() => {
-    if (!haptics) return;
     if (typeof window === "undefined" || typeof navigator === "undefined") return;
     const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (!prefersReduced && "vibrate" in navigator) {
@@ -113,353 +162,224 @@ export function AudioPlayer({
         console.warn("Haptics unavailable", error);
       }
     }
-  }, [haptics]);
-
-  const dispatchFavoritesChanged = React.useCallback((entries: FavoriteEntry[]) => {
-    if (typeof window === "undefined") return;
-    try {
-      window.dispatchEvent(new CustomEvent(ADAPTIVE_MUSIC_FAVORITES_EVENT, { detail: entries }));
-    } catch (error) {
-      console.warn("Unable to broadcast favorites", error);
-    }
   }, []);
 
-  const dispatchPlaybackChanged = React.useCallback(
-    (state: PlaybackPersistedState) => {
-      if (typeof window === "undefined") return;
-      try {
-        window.dispatchEvent(
-          new CustomEvent(ADAPTIVE_MUSIC_PLAYBACK_EVENT, {
-            detail: {
-              trackId: trackKey,
-              title,
-              src,
-              state,
-            },
-          })
-        );
-      } catch (error) {
-        console.warn("Unable to broadcast playback", error);
-      }
-    },
-    [trackKey, title, src]
-  );
-
-  const persistPlayback = React.useCallback(
-    (update: Partial<PlaybackPersistedState>, options?: { skipState?: boolean }) => {
-      const nextPosition =
-        typeof update.position === "number"
-          ? Math.max(0, update.position)
-          : playbackRef.current.position;
-      const nextVolume =
-        typeof update.volume === "number"
-          ? clamp01(update.volume)
-          : playbackRef.current.volume;
-      const nextWasPlaying =
-        typeof update.wasPlaying === "boolean"
-          ? update.wasPlaying
-          : playbackRef.current.wasPlaying;
-
-      const nextState: PlaybackPersistedState = {
-        position: nextPosition,
-        volume: nextVolume,
-        wasPlaying: nextWasPlaying,
-        updatedAt: Date.now(),
-        trackSrc: src,
-        trackTitle: title,
-      };
-
-      playbackRef.current = nextState;
-
-      if (typeof window !== "undefined") {
-        try {
-          window.localStorage.setItem(playbackStorageKey, JSON.stringify(nextState));
-        } catch (error) {
-          console.warn("Unable to persist playback state", error);
-        }
+  const startPlayback = React.useCallback(
+    async (targetPosition?: number) => {
+      if (typeof targetPosition === "number") {
+        seek?.(targetPosition);
       }
 
-      dispatchPlaybackChanged(nextState);
+      await playSound?.();
+      setPlaying(true);
+      applyHaptics();
+      logBreadcrumb("music:play", { resume: targetPosition ?? 0 });
 
-      if (!options?.skipState && typeof update.position === "number") {
-        const safePosition = Math.max(0, update.position);
-        setResumePosition(prev =>
-          Math.abs(prev - safePosition) < 0.01 ? prev : safePosition
-        );
+      const fadeDuration = prefersReducedMotion ? 0 : crossfadeMs ?? 0;
+      if (fadeDuration > 0) {
+        updateAudioVolume(0);
+        await fadeToVolume(volume, fadeDuration);
+      } else {
+        updateAudioVolume(volume);
       }
+
+      const position = typeof targetPosition === "number" ? targetPosition : getTime?.() ?? 0;
+      persist({ wasPlaying: true, position });
+      setStatusMessage("Lecture en cours, laisse-toi envelopper.");
     },
-    [playbackStorageKey, dispatchPlaybackChanged, src, title]
+    [applyHaptics, crossfadeMs, fadeToVolume, getTime, logBreadcrumb, persist, playSound, prefersReducedMotion, seek, updateAudioVolume, volume],
   );
 
-  const updateFavorites = React.useCallback(
-    (updater: (prev: FavoriteEntry[]) => FavoriteEntry[]) => {
-      setFavorites(prev => {
-        const next = updater(prev);
-        if (typeof window !== "undefined") {
-          try {
-            window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(next));
-          } catch (error) {
-            console.warn("Unable to persist favorites", error);
-          }
-        }
-        dispatchFavoritesChanged(next);
-        return next;
-      });
-    },
-    [dispatchFavoritesChanged]
-  );
+  const stopPlayback = React.useCallback(async () => {
+    const fadeDuration = prefersReducedMotion ? 0 : (crossfadeMs ?? 0) * 0.6;
+    if (fadeDuration > 0 && playing) {
+      await fadeToVolume(0, fadeDuration);
+    }
 
-  React.useEffect(() => {
+    pauseSound?.();
     setPlaying(false);
-  }, [trackKey]);
+    logBreadcrumb("music:pause");
 
-  React.useEffect(() => {
-    if (typeof window === "undefined") {
-      playbackRef.current = defaultPlaybackState;
-      setResumePosition(defaultPlaybackState.position);
-      setVolume(defaultPlaybackState.volume);
-      return;
-    }
+    updateAudioVolume(volume);
+    const position = getTime?.() ?? 0;
+    persist({ wasPlaying: false, position });
+    onPause?.();
+    setStatusMessage("Lecture en pause, la bulle reste disponible.");
+  }, [crossfadeMs, fadeToVolume, getTime, logBreadcrumb, onPause, pauseSound, persist, playing, prefersReducedMotion, updateAudioVolume, volume]);
 
+  const onTogglePlay = React.useCallback(async () => {
     try {
-      const raw = window.localStorage.getItem(playbackStorageKey);
-      if (!raw) {
-        playbackRef.current = defaultPlaybackState;
-        setResumePosition(defaultPlaybackState.position);
-        setVolume(current =>
-          Math.abs(current - defaultPlaybackState.volume) < 0.001
-            ? current
-            : defaultPlaybackState.volume
-        );
-        return;
-      }
-
-      const parsed = JSON.parse(raw);
-      const normalized: PlaybackPersistedState = {
-        position:
-          typeof parsed?.position === "number"
-            ? Math.max(0, parsed.position)
-            : defaultPlaybackState.position,
-        volume:
-          typeof parsed?.volume === "number"
-            ? clamp01(parsed.volume)
-            : defaultPlaybackState.volume,
-        wasPlaying: typeof parsed?.wasPlaying === "boolean" ? parsed.wasPlaying : false,
-        updatedAt: typeof parsed?.updatedAt === "number" ? parsed.updatedAt : Date.now(),
-        trackSrc: typeof parsed?.trackSrc === "string" ? parsed.trackSrc : src,
-        trackTitle: typeof parsed?.trackTitle === "string" ? parsed.trackTitle : title,
-      };
-
-      playbackRef.current = normalized;
-      setResumePosition(normalized.position);
-      setVolume(current =>
-        Math.abs(current - normalized.volume) < 0.001 ? current : normalized.volume
-      );
-      dispatchPlaybackChanged(normalized);
-    } catch (error) {
-      console.warn("Unable to restore playback state", error);
-      playbackRef.current = defaultPlaybackState;
-      setResumePosition(defaultPlaybackState.position);
-      setVolume(defaultPlaybackState.volume);
-    }
-  }, [playbackStorageKey, defaultPlaybackState, dispatchPlaybackChanged, src, title]);
-
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    try {
-      const raw = window.localStorage.getItem(FAVORITES_STORAGE_KEY);
-      if (!raw) return;
-
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return;
-
-      const seen = new Set<string>();
-      const entries: FavoriteEntry[] = [];
-
-      for (const entry of parsed) {
-        if (!entry || typeof entry !== "object") continue;
-        const id = typeof entry.id === "string" ? entry.id : undefined;
-        const storedSrc = typeof entry.src === "string" ? entry.src : undefined;
-        if (!id || !storedSrc || seen.has(id)) continue;
-        seen.add(id);
-        entries.push({
-          id,
-          src: storedSrc,
-          title: typeof entry.title === "string" ? entry.title : undefined,
-          addedAt:
-            typeof entry.addedAt === "string" ? entry.addedAt : new Date().toISOString()
-        });
-      }
-
-      if (entries.length) {
-        updateFavorites(() => entries.slice(-50));
+      if (!playing) {
+        await startPlayback();
+      } else {
+        await stopPlayback();
       }
     } catch (error) {
-      console.warn("Unable to restore favorites", error);
+      console.warn("Audio toggle error", error);
+      Sentry.captureException(error);
     }
-  }, [updateFavorites]);
+  }, [playing, startPlayback, stopPlayback]);
 
-  React.useEffect(() => {
-    setSoundVolume?.(volume);
-  }, [setSoundVolume, volume]);
-
-  React.useEffect(() => {
-    if (Math.abs(playbackRef.current.volume - volume) < 0.001) return;
-    persistPlayback({ volume });
-  }, [volume, persistPlayback]);
+  const handleResume = React.useCallback(async () => {
+    if (!resume || resume.position <= 0 || resume.allow === false) return;
+    await startPlayback(resume.position);
+    await resume.onResume?.();
+    setStatusMessage("Reprise au bon endroit, respire à ton rythme.");
+  }, [resume, startPlayback]);
 
   React.useEffect(() => {
     if (!onEnded) return;
     onEnded(() => {
       setPlaying(false);
-      persistPlayback({ wasPlaying: false, position: 0 });
+      persist({ wasPlaying: false, position: 0 });
+      if (loop) {
+        logBreadcrumb("music:loop_restart");
+      }
     });
-  }, [onEnded, persistPlayback]);
+  }, [loop, onEnded, persist, logBreadcrumb]);
 
   React.useEffect(() => {
     if (!playing) return;
     const interval = window.setInterval(() => {
       const position = getTime?.() ?? 0;
-      persistPlayback({ position });
+      persist({ position, wasPlaying: true });
     }, 2000);
     return () => window.clearInterval(interval);
-  }, [playing, getTime, persistPlayback]);
+  }, [getTime, persist, playing]);
 
   React.useEffect(() => {
     return () => {
       const position = getTime?.() ?? 0;
-      persistPlayback({ position, wasPlaying: false }, { skipState: true });
+      persist({ position, wasPlaying: false });
     };
-  }, [getTime, persistPlayback]);
+  }, [getTime, persist]);
 
-  const isFavorite = React.useMemo(
-    () => favorites.some(entry => entry.id === trackKey),
-    [favorites, trackKey]
-  );
+  const hasResume = resume && resume.allow !== false && resume.position > 1 && !playing;
+  const resumeButtonLabel = resume?.label ?? "Reprendre";
 
-  const toggleFavorite = React.useCallback(() => {
-    updateFavorites(prev => {
-      const exists = prev.some(entry => entry.id === trackKey);
-      if (exists) {
-        logPlaybackBreadcrumb('music:favourite_toggle', 'info', { state: 'removed' });
-        return prev.filter(entry => entry.id !== trackKey);
+  const favoriteActive = favorite?.active ?? false;
+  const favoriteAdd = favorite?.addLabel ?? "Ajouter aux favoris";
+  const favoriteRemove = favorite?.removeLabel ?? "Retirer des favoris";
+
+  React.useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const tagName = target.tagName;
+        if (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(tagName)) {
+          return;
+        }
       }
 
-      const sanitized = prev.filter(entry => entry.id !== trackKey);
-      const nextEntry: FavoriteEntry = {
-        id: trackKey,
-        title,
-        src,
-        addedAt: new Date().toISOString()
-      };
-
-      const next = [...sanitized, nextEntry];
-      logPlaybackBreadcrumb('music:favourite_toggle', 'info', { state: 'added' });
-      return next.slice(-50);
-    });
-  }, [trackKey, title, src, updateFavorites, logPlaybackBreadcrumb]);
-
-  const handleResume = React.useCallback(async () => {
-    if (resumePosition <= 0.01) return;
-    seek?.(resumePosition);
-    await playSound?.();
-    setPlaying(true);
-    applyHaptics();
-    persistPlayback({ wasPlaying: true, position: resumePosition });
-    logPlaybackBreadcrumb('music:resume', 'info', {
-      position: Number(resumePosition.toFixed(1)),
-    });
-  }, [resumePosition, seek, playSound, applyHaptics, persistPlayback, logPlaybackBreadcrumb]);
-
-  const hasResume = resumePosition > 0.5 && !playing;
-
-  const onTogglePlay = React.useCallback(async () => {
-    try {
-      if (!playing) {
-        await playSound?.();
-        setPlaying(true);
-        applyHaptics();
-        const position = getTime?.() ?? 0;
-        persistPlayback({ wasPlaying: true, position });
-        logPlaybackBreadcrumb('music:play', 'info', {
-          position: Number(position.toFixed(1)),
-        });
-      } else {
-        pauseSound?.();
-        const position = getTime?.() ?? 0;
-        setPlaying(false);
-        persistPlayback({ wasPlaying: false, position });
-        logPlaybackBreadcrumb('music:pause', 'info', {
-          position: Number(position.toFixed(1)),
-        });
+      const key = event.key;
+      if (key === " " || key === "Spacebar" || key.toLowerCase() === "k") {
+        event.preventDefault();
+        onTogglePlay();
+        return;
       }
-    } catch (error) {
-      console.warn("Audio toggle error", error);
-      logPlaybackBreadcrumb('music:play_error', 'error', {
-        reason: error instanceof Error ? error.name : 'unknown',
-      });
-    }
-  }, [playing, playSound, pauseSound, getTime, applyHaptics, persistPlayback, logPlaybackBreadcrumb]);
+
+      if (key === "ArrowUp") {
+        event.preventDefault();
+        setVolume(current => clamp01(current + 0.05));
+        setStatusMessage("Volume un peu plus présent, toujours en douceur.");
+        return;
+      }
+
+      if (key === "ArrowDown") {
+        event.preventDefault();
+        setVolume(current => clamp01(current - 0.05));
+        setStatusMessage("Volume encore plus feutré.");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, [onTogglePlay]);
+
+  React.useEffect(() => {
+    if (!hasResume) return;
+    setStatusMessage("Reprise disponible exactement là où tu t'étais arrêtée.");
+  }, [hasResume]);
 
   return (
-    <div aria-label={title ?? "Lecteur audio"} style={{ display: "grid", gap: 8 }}>
-      <div style={{ display: "grid", gap: 6 }}>
-        {title && <strong>{title}</strong>}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+    <div aria-label={title ?? "Lecteur audio"} className="grid gap-3" role="group">
+      <div aria-live="polite" className="sr-only">
+        {statusMessage}
+      </div>
+      <div className="grid gap-2">
+        {title && <strong className="text-base font-semibold">{title}</strong>}
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={onTogglePlay}
             aria-pressed={playing}
-            data-ui="primary-cta"
+            className="rounded-full bg-primary px-4 py-2 text-primary-foreground"
+            data-ui="primary-toggle"
           >
-            {playing ? "Pause" : "Lecture"}
+            {playing ? "Pause" : ready ? "Lecture" : "Chargement"}
           </button>
+
           {hasResume && (
             <button
               type="button"
               onClick={handleResume}
-              disabled={!ready}
+              className="rounded-full border border-primary/40 px-3 py-2 text-sm"
               data-ui="resume-button"
             >
-              Reprendre ({formatTime(resumePosition)})
+              {resumeButtonLabel}
             </button>
           )}
+
           <button
             type="button"
-            onClick={toggleFavorite}
-            aria-pressed={isFavorite}
+            onClick={async () => {
+              if (favorite?.busy) return;
+              try {
+                await favorite?.onToggle?.();
+              } catch (error) {
+                console.warn("Favorite toggle failed", error);
+              }
+            }}
+            aria-pressed={favoriteActive}
+            className="rounded-full border border-muted px-3 py-2 text-sm"
+            disabled={!favorite}
             data-ui="favorite-toggle"
           >
-            {isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+            {favoriteActive ? `★ ${favoriteRemove}` : `☆ ${favoriteAdd}`}
           </button>
         </div>
       </div>
 
-      <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <label className="flex items-center gap-3 text-sm" htmlFor={`${trackKey}-volume`}>
         Volume
         <input
+          id={`${trackKey}-volume`}
           type="range"
           min={0}
           max={1}
           step={0.01}
           value={volume}
           onChange={event => setVolume(clamp01(parseFloat(event.target.value)))}
-          data-ui="volume-slider"
         />
       </label>
 
       {hasResume && (
-        <small aria-live="polite" style={{ opacity: 0.75 }}>
-          Dernière écoute sauvegardée à {formatTime(resumePosition)}.
+        <small className="text-sm text-muted-foreground">
+          Dernière écoute sauvegardée, prête à reprendre quand tu le souhaites.
         </small>
       )}
 
-      {isFavorite && (
-        <small style={{ opacity: 0.75 }}>
-          Sauvegardé dans vos favoris locaux.
-        </small>
-      )}
+      <p className="text-xs text-muted-foreground" role="note">
+        Astuce clavier : barre espace ou lettre K pour lecture ou pause, flèches haut et bas pour doser le volume.
+      </p>
+
+      <audio
+        aria-hidden
+        src={src}
+        preload="auto"
+        className="hidden"
+        data-playing={playing}
+      />
     </div>
   );
 }

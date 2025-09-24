@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'URL de l\'environnement à valider avant déploiement (ex: https://preview.example.com)'
+        required: true
+
+jobs:
+  pre-deploy-smoke:
+    name: Vérifications pré-déploiement (sans JS)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lancer les sondes HTTP
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_URL:-}" ]; then
+            echo "L'URL de base est obligatoire pour exécuter les tests pré-déploiement." >&2
+            exit 1
+          fi
+
+          BASE_URL="${BASE_URL%/}"
+
+          echo "Sonde de la page d'accueil (${BASE_URL}/)"
+          curl -fsSL "${BASE_URL}/" | grep -F "Chargement d'EmotionsCare..."
+
+          echo "Sonde de la page hors-ligne (${BASE_URL}/offline.html)"
+          curl -fsSL "${BASE_URL}/offline.html" | grep -F "Mode hors ligne"
+
+          echo "Sonde de la route de santé (${BASE_URL}/healthz.html)"
+          curl -fsSL "${BASE_URL}/healthz.html" | grep -F "EMOTIONSCARE_HEALTHCHECK_OK"
+
+          echo "Toutes les sondes HTTP sont passées avec succès."

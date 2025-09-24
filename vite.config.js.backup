@@ -1,0 +1,59 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+import { componentTagger } from "lovable-tagger";
+
+// Complete TypeScript bypass configuration
+export default defineConfig(() => {
+  return {
+    server: {
+      host: "::",
+      port: 8080,
+    },
+    plugins: [
+      react({
+        typescript: false,
+        babel: false
+      }),
+      componentTagger(),
+    ],
+
+    preview: {
+      port: 4173,
+      host: "::"
+    },
+
+    resolve: {
+      alias: {
+        "@": resolve(process.cwd(), "./src"),
+        "@/routes": resolve(process.cwd(), "./src/lib/routes.ts"),
+        "@/routerV2": resolve(process.cwd(), "./src/lib/routerV2"),
+        "@/routerV2/routes.config": resolve(process.cwd(), "./src/lib/routerV2/routes.config.ts"),
+        "@/guards": resolve(process.cwd(), "./src/lib/routerV2/guards.ts"),
+      },
+    },
+
+    build: {
+      target: 'esnext',
+      sourcemap: false,
+      cssCodeSplit: true,
+      minify: 'esbuild',
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: 1000,
+    },
+
+    // Pure esbuild transformation - no TypeScript at all
+    esbuild: {
+      target: 'esnext',
+      jsx: 'automatic',
+      logLevel: 'silent'
+    },
+
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'esnext',
+        jsx: 'automatic'
+      }
+    }
+  };
+});

@@ -4,11 +4,19 @@
  * Boucle cœur : Démarrage → constellations qui se tissent si tu tiens la cadence → sortie en mots.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import * as Sentry from '@sentry/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Eye, EyeOff, Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
+import { Star, Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { VRSafetyCheck } from '@/components/vr/VRSafetyCheck';
+import { useVRSafetyStore } from '@/store/vrSafety.store';
+import VRModeControls from '@/components/vr/VRModeControls';
+import { useVRPerformanceGuard } from '@/hooks/useVRPerformanceGuard';
+import { createSession } from '@/services/sessions/sessionsApi';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface Constellation {
   id: string;
@@ -57,8 +65,35 @@ const ConstellationTemplates: Constellation[] = [
   }
 ];
 
+const describeGalaxyOutcome = (durationSeconds: number, breaths: number) => {
+  const breathDescriptor = breaths >= 6
+    ? 'souffles profonds'
+    : breaths >= 3
+      ? 'souffles réguliers'
+      : 'souffles légers';
+  const durationDescriptor = durationSeconds >= 240
+    ? 'immersion prolongée'
+    : durationSeconds >= 120
+      ? 'immersion apaisante'
+      : 'immersion brève';
+
+  return `${durationDescriptor}, ${breathDescriptor}.`;
+};
+
 export default function B2CVRGalaxyPage() {
-  const [isVRMode, setIsVRMode] = useState(false);
+  const particleMode = useVRSafetyStore((state) => state.particleMode);
+  const fallbackEnabled = useVRSafetyStore((state) => state.fallbackEnabled);
+  const prefersReducedMotion = useVRSafetyStore((state) => state.prefersReducedMotion);
+  const modePreference = useVRSafetyStore((state) => state.modePreference);
+  const nextAutoMode = useVRSafetyStore((state) => state.nextAutoMode);
+  const lowPerformance = useVRSafetyStore((state) => state.lowPerformance);
+  const lastPOMSTone = useVRSafetyStore((state) => state.lastPOMSTone);
+  const allowExtensionCTA = useVRSafetyStore((state) => state.allowExtensionCTA);
+  const lastSSQSummary = useVRSafetyStore((state) => state.lastSSQSummary);
+  const lastPOMSSummary = useVRSafetyStore((state) => state.lastPOMSSummary);
+  const ssqHintUsed = useVRSafetyStore((state) => state.ssqHintUsed);
+  const pomsHintUsed = useVRSafetyStore((state) => state.pomsHintUsed);
+  useVRPerformanceGuard('vr_galaxy');
   const [isActive, setIsActive] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [constellations, setConstellations] = useState<Constellation[]>(ConstellationTemplates);
@@ -66,32 +101,83 @@ export default function B2CVRGalaxyPage() {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [mantra, setMantra] = useState('');
   const [showMantra, setShowMantra] = useState(false);
+  const [showSafetyCheck, setShowSafetyCheck] = useState(false);
+  const [isExtensionSession, setIsExtensionSession] = useState(false);
+  const [sessionStartedAt, setSessionStartedAt] = useState<number | null>(null);
 
-  // Session timer
-  useEffect(() => {
-    let timer: number;
-    
-    if (isActive && !sessionComplete) {
-      timer = window.setInterval(() => {
-        setSessionTime(prev => {
-          const newTime = prev + 1;
-          
-          // Chaque 30 secondes de respiration calme = 1 nouveau souffle
-          if (newTime % 30 === 0) {
-            setCurrentBreaths(prevBreaths => {
-              const newBreaths = prevBreaths + 1;
-              checkConstellationUnlock(newBreaths);
-              return newBreaths;
-            });
-          }
-          
-          return newTime;
-        });
-      }, 1000);
+  const activeMode = useMemo(() => {
+    if (prefersReducedMotion) return 'vr_soft' as const;
+    if (modePreference === '2d') return '2d' as const;
+    if (modePreference === 'soft') return 'vr_soft' as const;
+    if (fallbackEnabled || lowPerformance || nextAutoMode === '2d') return '2d' as const;
+    if (nextAutoMode === 'vr_soft') return 'vr_soft' as const;
+    return 'vr' as const;
+  }, [prefersReducedMotion, modePreference, fallbackEnabled, lowPerformance, nextAutoMode]);
+
+  const allowMotion = activeMode === 'vr';
+  const allowGentleMotion = activeMode !== '2d';
+  const visualParticleMode = activeMode === '2d'
+    ? 'minimal'
+    : lastPOMSTone === 'tense'
+      ? 'soft'
+      : particleMode;
+
+  const starCount = useMemo(() => {
+    if (visualParticleMode === 'minimal') return 8;
+    if (visualParticleMode === 'soft') return 20;
+    return 36;
+  }, [visualParticleMode]);
+  const maxSessionDuration = lastPOMSTone === 'tense' ? 180 : 360;
+  const modeBadgeLabel = activeMode === '2d' ? 'Version 2D' : activeMode === 'vr_soft' ? 'Mode doux' : 'Mode immersif';
+
+  const persistSession = useCallback((durationSec: number, outcomeSummary: string) => {
+    if (!Number.isFinite(durationSec) || durationSec <= 0) {
+      return;
     }
-    
-    return () => clearInterval(timer);
-  }, [isActive, sessionComplete]);
+    const modeLabel = activeMode === '2d' ? '2D' : activeMode === 'vr_soft' ? 'VR_soft' : 'VR';
+    const meta = {
+      module: 'vr_galaxy',
+      mode: modeLabel,
+      motion_profile: activeMode === 'vr' ? 'immersif' : activeMode === 'vr_soft' ? 'doux' : '2d',
+      journey_summary: outcomeSummary,
+      ssq_hint_text: lastSSQSummary ?? 'non communiqué',
+      mood_delta_text: lastPOMSSummary ?? 'ressenti neutre',
+    } as Record<string, string>;
+
+    void createSession({
+      type: 'vr_galaxy',
+      duration_sec: Math.max(1, Math.round(durationSec)),
+      mood_delta: null,
+      meta,
+    }).catch((error) => {
+      console.error('[VRGalaxy] unable to persist session', error);
+    });
+  }, [activeMode, lastPOMSSummary, lastSSQSummary]);
+
+  useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: 'vr',
+      message: 'vr:enter',
+      level: 'info',
+      data: { module: 'vr_galaxy' },
+    });
+    return () => {
+      Sentry.addBreadcrumb({
+        category: 'vr',
+        message: 'vr:exit',
+        level: 'info',
+        data: { module: 'vr_galaxy' },
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    Sentry.configureScope((scope) => {
+      scope.setTag('motion_safe', activeMode !== 'vr' ? 'enabled' : 'standard');
+      scope.setTag('ssq_hint_used', ssqHintUsed ? 'yes' : 'no');
+      scope.setTag('poms_hint_used', pomsHintUsed ? 'yes' : 'no');
+    });
+  }, [activeMode, ssqHintUsed, pomsHintUsed]);
 
   const checkConstellationUnlock = (breaths: number) => {
     setConstellations(prev => prev.map((constellation, index) => {
@@ -110,23 +196,26 @@ export default function B2CVRGalaxyPage() {
     }));
   };
 
-  const handleStart = () => {
+  const handleStart = useCallback((mode: 'standard' | 'extension' = 'standard') => {
     setIsActive(true);
     setSessionTime(0);
     setCurrentBreaths(0);
     setSessionComplete(false);
     setShowMantra(false);
-  };
+    setShowSafetyCheck(false);
+    setSessionStartedAt(Date.now());
+    setIsExtensionSession(mode === 'extension');
+  }, []);
 
   const handlePause = () => {
     setIsActive(false);
   };
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(() => {
+    if (sessionComplete) return;
     setIsActive(false);
     setSessionComplete(true);
-    
-    // Générer un mantra basé sur les constellations débloquées
+
     const unlockedCount = constellations.filter(c => c.unlocked).length;
     const mantras = [
       "Je respire avec l'univers",
@@ -134,16 +223,42 @@ export default function B2CVRGalaxyPage() {
       "Je suis connecté(e) à l'infini en moi",
       "Ma paix rayonne comme les étoiles"
     ];
-    setMantra(mantras[Math.min(unlockedCount - 1, mantras.length - 1)] || mantras[0]);
+    const selectedMantra = mantras[Math.min(unlockedCount - 1, mantras.length - 1)] || mantras[0];
+    setMantra(selectedMantra);
     setShowMantra(true);
-  };
+    setShowSafetyCheck(true);
+
+    const durationSeconds = sessionStartedAt
+      ? Math.max(1, Math.round((Date.now() - sessionStartedAt) / 1000))
+      : sessionTime;
+    const baseSummary = describeGalaxyOutcome(durationSeconds, currentBreaths);
+    const outcomeSummary = isExtensionSession
+      ? `${baseSummary} Extension brève.`
+      : baseSummary;
+    persistSession(durationSeconds, outcomeSummary);
+    setIsExtensionSession(false);
+    setSessionStartedAt(null);
+  }, [constellations, currentBreaths, isExtensionSession, persistSession, sessionComplete, sessionStartedAt, sessionTime]);
 
   const handleReset = () => {
+    const elapsedSeconds = sessionStartedAt
+      ? Math.max(0, Math.round((Date.now() - sessionStartedAt) / 1000))
+      : sessionTime;
+    const shouldLogInterruption = !sessionComplete && elapsedSeconds > 0;
+
+    if (shouldLogInterruption) {
+      const baseSummary = describeGalaxyOutcome(elapsedSeconds, currentBreaths);
+      persistSession(elapsedSeconds, `${baseSummary} Sortie anticipée.`);
+    }
+
     setIsActive(false);
     setSessionTime(0);
     setCurrentBreaths(0);
     setSessionComplete(false);
     setShowMantra(false);
+    setShowSafetyCheck(false);
+    setSessionStartedAt(null);
+    setIsExtensionSession(false);
     setConstellations(ConstellationTemplates.map(c => ({
       ...c,
       unlocked: false,
@@ -151,20 +266,58 @@ export default function B2CVRGalaxyPage() {
     })));
   };
 
-  const generateStarField = () => {
-    return [...Array(50)].map((_, i) => ({
-      id: i,
+  // Session timer
+  useEffect(() => {
+    let timer: number | null = null;
+
+    if (isActive && !sessionComplete) {
+      timer = window.setInterval(() => {
+        setSessionTime(prev => {
+          const newTime = prev + 1;
+
+          if (newTime % 30 === 0) {
+            setCurrentBreaths(prevBreaths => {
+              const newBreaths = prevBreaths + 1;
+              checkConstellationUnlock(newBreaths);
+              return newBreaths;
+            });
+          }
+
+          const sessionLimit = isExtensionSession ? 60 : maxSessionDuration;
+
+          if (newTime >= sessionLimit) {
+            handleComplete();
+          }
+
+          return newTime;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) window.clearInterval(timer);
+    };
+  }, [handleComplete, isActive, isExtensionSession, maxSessionDuration, sessionComplete]);
+
+  const generateStarField = (count: number) => {
+    return Array.from({ length: count }, (_, index) => ({
+      id: index,
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 3 + 1,
-      opacity: Math.random() * 0.7 + 0.3
+      opacity: Math.random() * 0.7 + 0.3,
     }));
   };
 
-  const [backgroundStars] = useState(generateStarField());
+  const [backgroundStars, setBackgroundStars] = useState(() => generateStarField(starCount));
+
+  useEffect(() => {
+    setBackgroundStars(generateStarField(starCount));
+  }, [starCount]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
+    <ConsentGate>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
       {/* Background Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {backgroundStars.map((star) => (
@@ -176,15 +329,29 @@ export default function B2CVRGalaxyPage() {
               top: `${star.y}%`,
               opacity: star.opacity
             }}
-            animate={{
-              opacity: [star.opacity, star.opacity * 0.5, star.opacity],
-              scale: [star.size, star.size * 1.2, star.size]
-            }}
-            transition={{
-              duration: 2 + Math.random() * 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            animate={allowMotion
+              ? {
+                  opacity: [star.opacity, star.opacity * 0.5, star.opacity],
+                  scale: [star.size, star.size * 1.2, star.size],
+                }
+              : allowGentleMotion
+                ? {
+                    opacity: [star.opacity, star.opacity * 0.8, star.opacity],
+                  }
+                : { opacity: star.opacity }}
+            transition={allowMotion
+              ? {
+                  duration: 2 + Math.random() * 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }
+              : allowGentleMotion
+                ? {
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+                : undefined}
           />
         ))}
       </div>
@@ -192,28 +359,28 @@ export default function B2CVRGalaxyPage() {
       <div className="max-w-md mx-auto pt-8 relative z-10">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          initial={allowMotion ? { opacity: 0, y: -20 } : { opacity: 1 }}
+          animate={allowMotion ? { opacity: 1, y: 0 } : { opacity: 1 }}
+          className="mb-8 text-center"
         >
-          <h1 className="text-2xl font-semibold text-white mb-2">
-            VR Galaxy
-          </h1>
-          <p className="text-blue-200 text-sm">
-            Cathédrale cosmique sous les étoiles
-          </p>
-          
-          {/* VR Toggle */}
-          <div className="flex items-center justify-center mt-4 space-x-2">
-            <Button
-              onClick={() => setIsVRMode(!isVRMode)}
-              variant="outline"
-              size="sm"
-              className={`${isVRMode ? 'bg-blue-500/20 border-blue-400 text-blue-200' : 'text-white border-white/30'}`}
-            >
-              {isVRMode ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
-              {isVRMode ? 'VR Immersion' : 'Vue 2D'}
-            </Button>
+          <div className="flex flex-col items-center gap-3 text-white">
+            <div className="flex items-center gap-2">
+              <Star className="h-6 w-6" />
+              <h1 className="text-2xl font-semibold">VR Galaxy</h1>
+              <Badge variant="secondary" className="bg-white/10 text-white/80 border-white/20">
+                {modeBadgeLabel}
+              </Badge>
+            </div>
+            <p className="text-blue-200 text-sm">
+              Cathédrale cosmique sous les étoiles
+            </p>
+            {(lastSSQSummary || lastPOMSSummary) && (
+              <div className="space-y-1 text-xs text-white/60">
+                {lastSSQSummary && <p>{lastSSQSummary}</p>}
+                {lastPOMSSummary && <p>{lastPOMSSummary}</p>}
+              </div>
+            )}
+            <VRModeControls className="justify-center" />
           </div>
         </motion.div>
 
@@ -233,13 +400,24 @@ export default function B2CVRGalaxyPage() {
                 <p className="text-slate-300 text-sm">
                   Respire calmement et regarde les constellations naître
                 </p>
-                
-                <Button onClick={handleStart} className="w-full h-12 mt-6 bg-blue-600 hover:bg-blue-700">
+
+                <Button onClick={() => handleStart()} className="w-full h-12 mt-6 bg-blue-600 hover:bg-blue-700">
                   <Play className="w-5 h-5 mr-2" />
                   Commencer le voyage
                 </Button>
               </div>
             </Card>
+            {allowExtensionCTA && (
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  className="bg-white/10 text-white border-white/30 hover:bg-white/20"
+                  onClick={() => handleStart('extension')}
+                >
+                  Encore 1 min
+                </Button>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -267,25 +445,57 @@ export default function B2CVRGalaxyPage() {
                           left: `${star.x}%`,
                           top: `${star.y}%`
                         }}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={constellation.unlocked ? {
-                          scale: [0, 1.5, 1],
-                          opacity: [0, 1, 0.8],
-                        } : { scale: 0, opacity: 0 }}
-                        transition={{
-                          duration: 2,
-                          delay: index * 0.5
-                        }}
+                        initial={allowGentleMotion ? { scale: 0, opacity: 0 } : undefined}
+                        animate={constellation.unlocked
+                          ? allowMotion
+                            ? {
+                                scale: [0, 1.5, 1],
+                                opacity: [0, 1, 0.8],
+                              }
+                            : allowGentleMotion
+                              ? {
+                                  scale: [0.8, 1, 0.95],
+                                  opacity: [0.6, 0.9, 0.8],
+                                }
+                              : { scale: 1, opacity: 0.85 }
+                          : { scale: 0, opacity: 0 }}
+                        transition={allowMotion
+                          ? {
+                              duration: 2,
+                              delay: index * 0.5,
+                            }
+                          : allowGentleMotion
+                            ? {
+                                duration: 2.5,
+                                delay: index * 0.3,
+                                ease: 'easeOut',
+                              }
+                            : undefined}
                       />
                     ))}
-                    
+
                     {/* Star Connections */}
                     {constellation.unlocked && constellation.stars.length > 1 && (
                       <svg className="absolute inset-0 w-full h-full pointer-events-none">
                         {constellation.stars.slice(0, -1).map((star, index) => {
                           const nextStar = constellation.stars[index + 1];
                           if (!star.connected || !nextStar.connected) return null;
-                          
+
+                          if (!allowGentleMotion) {
+                            return (
+                              <line
+                                key={index}
+                                x1={`${star.x}%`}
+                                y1={`${star.y}%`}
+                                x2={`${nextStar.x}%`}
+                                y2={`${nextStar.y}%`}
+                                stroke="rgb(96, 165, 250)"
+                                strokeWidth="1"
+                                opacity="0.5"
+                              />
+                            );
+                          }
+
                           return (
                             <motion.line
                               key={index}
@@ -296,9 +506,11 @@ export default function B2CVRGalaxyPage() {
                               stroke="rgb(96, 165, 250)"
                               strokeWidth="1"
                               opacity="0.6"
-                              initial={{ pathLength: 0 }}
+                              initial={allowMotion ? { pathLength: 0 } : { pathLength: 0 }}
                               animate={{ pathLength: 1 }}
-                              transition={{ duration: 2, delay: (index + 1) * 0.5 }}
+                              transition={allowMotion
+                                ? { duration: 2, delay: (index + 1) * 0.5 }
+                                : { duration: 2.5, delay: (index + 1) * 0.4 }}
                             />
                           );
                         })}
@@ -311,15 +523,30 @@ export default function B2CVRGalaxyPage() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
                     className="w-8 h-8 bg-white/80 rounded-full"
-                    animate={{
-                      scale: [1, 1.3, 1],
-                      opacity: [0.8, 1, 0.8]
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
+                    animate={allowMotion
+                      ? {
+                          scale: [1, 1.3, 1],
+                          opacity: [0.8, 1, 0.8],
+                        }
+                      : allowGentleMotion
+                        ? {
+                            scale: [1, 1.1, 1],
+                            opacity: [0.85, 0.95, 0.85],
+                          }
+                        : { scale: 1, opacity: 0.8 }}
+                    transition={allowMotion
+                      ? {
+                          duration: 4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }
+                      : allowGentleMotion
+                        ? {
+                            duration: 6,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }
+                        : undefined}
                   />
                 </div>
               </div>
@@ -340,13 +567,13 @@ export default function B2CVRGalaxyPage() {
                     <motion.div
                       key={constellation.id}
                       className={`text-xs px-3 py-1 rounded-full ${
-                        constellation.unlocked 
-                          ? 'bg-blue-500/20 text-blue-200 border border-blue-500/30' 
+                        constellation.unlocked
+                          ? 'bg-blue-500/20 text-blue-200 border border-blue-500/30'
                           : 'bg-slate-600/20 text-slate-400 border border-slate-600/30'
                       }`}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: constellation.unlocked ? 0.5 : 0 }}
+                      initial={allowGentleMotion ? { opacity: 0, scale: 0.8 } : undefined}
+                      animate={allowGentleMotion ? { opacity: 1, scale: 1 } : { opacity: 1 }}
+                      transition={allowGentleMotion ? { delay: constellation.unlocked ? 0.5 : 0 } : undefined}
                     >
                       {constellation.unlocked ? `✨ ${constellation.name}` : `⭐ ${constellation.name}`}
                     </motion.div>
@@ -389,8 +616,8 @@ export default function B2CVRGalaxyPage() {
         <AnimatePresence>
           {sessionComplete && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={allowMotion ? { opacity: 0, y: 20 } : { opacity: 1 }}
+              animate={allowMotion ? { opacity: 1, y: 0 } : { opacity: 1 }}
               className="space-y-6"
             >
               <Card className="p-6 bg-slate-800/50 border-slate-600 text-center">
@@ -418,15 +645,29 @@ export default function B2CVRGalaxyPage() {
                   <Button onClick={handleReset} className="w-full bg-blue-600 hover:bg-blue-700">
                     Nouveau voyage
                   </Button>
-                  <Button variant="outline" className="w-full border-slate-600 text-slate-300">
-                    2 min de plus
-                  </Button>
+                  {allowExtensionCTA && (
+                    <Button
+                      variant="outline"
+                      className="w-full border-slate-600 text-slate-300"
+                      onClick={() => handleStart('extension')}
+                    >
+                      Encore 1 min
+                    </Button>
+                  )}
                 </div>
+
+                <VRSafetyCheck
+                  open={showSafetyCheck}
+                  moduleContext="vr_galaxy"
+                  onClose={() => setShowSafetyCheck(false)}
+                  className="mt-6"
+                />
               </Card>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </div>
+    </ConsentGate>
   );
 }

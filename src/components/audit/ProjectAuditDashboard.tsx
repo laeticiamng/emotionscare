@@ -30,7 +30,7 @@ const ProjectAuditDashboard: React.FC = () => {
     { name: 'VR Galactique', status: 'missing', priority: 'medium' },
     { name: 'Instant Glow Widget', status: 'complete', priority: 'high', component: 'InstantGlowWidget' },
     { name: 'Weekly Bars', status: 'implemented', priority: 'medium', component: 'WeeklyBars' },
-    { name: 'Heatmap Vibes', status: 'partial', priority: 'medium', component: 'DashboardRH' },
+    { name: 'Scores & Vibes', status: 'partial', priority: 'medium', component: 'DashboardRH' },
     { name: 'Journal Voix/Texte', status: 'implemented', priority: 'high', component: 'JournalPage' },
     { name: 'Musicothérapie', status: 'missing', priority: 'medium' },
     { name: 'Scan Émotionnel', status: 'implemented', priority: 'high', component: 'EmotionSelector' },

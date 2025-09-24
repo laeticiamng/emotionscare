@@ -45,18 +45,23 @@ const MainFooter: React.FC<MainFooterProps> = ({ className }) => {
                   </Link>
                 </li>
                 <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
+                  <Link to="/legal/mentions" className="hover:text-foreground transition-colors">
                     Mentions légales
                   </Link>
                 </li>
                 <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
+                  <Link to="/legal/privacy" className="hover:text-foreground transition-colors">
                     Politique de confidentialité
                   </Link>
                 </li>
                 <li>
-                  <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
+                  <Link to="/legal/terms" className="hover:text-foreground transition-colors">
                     Conditions d'utilisation
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/legal/cookies" className="hover:text-foreground transition-colors">
+                    Cookies
                   </Link>
                 </li>
               </ul>

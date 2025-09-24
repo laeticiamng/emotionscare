@@ -68,7 +68,7 @@ function generateReport() {
         '/app/social-cocon (B2CSocialCoconPage)',
         '/app/leaderboard (B2CGamificationPage)',
         '/app/activity (B2CWeeklyBarsPage)',
-        '/app/heatmap (B2CHeatmapVibesPage)',
+        '/app/scores (ScoresPage)',
         '/settings/general (B2CSettingsPage)',
         '/settings/profile (B2CProfileSettingsPage)',
         '/settings/privacy (B2CPrivacyTogglesPage)',
@@ -91,10 +91,10 @@ function generateReport() {
         '/system/api-monitoring (ApiMonitoringPage)'
       ],
       system: [
-        '/401 (Error401Page)',
-        '/403 (Error403Page)',
-        '/404 (Error404Page)',
-        '/503 (ServerErrorPage)'
+        '/401 (UnauthorizedPage)',
+        '/403 (ForbiddenPage)',
+        '/404 (UnifiedErrorPage)',
+        '/500 (ServerErrorPage)'
       ]
     },
     features: {

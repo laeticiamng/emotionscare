@@ -53,7 +53,7 @@ const CompletePlatformValidator: React.FC = () => {
     // Analytics
     { name: 'Gamification', path: '/app/leaderboard', category: 'Analytics' },
     { name: 'Historique Activité', path: '/app/activity', category: 'Analytics' },
-    { name: 'Heatmap Vibes', path: '/app/heatmap', category: 'Analytics' },
+    { name: 'Scores & Vibes', path: '/app/scores', category: 'Analytics' },
     
     // Settings
     { name: 'Paramètres Généraux', path: '/settings/general', category: 'Settings' },

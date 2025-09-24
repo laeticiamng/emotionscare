@@ -94,6 +94,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2BSelectionPage',
   },
   {
+    name: 'b2b-reports-heatmap',
+    path: '/b2b/reports',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    guard: true,
+    component: 'B2BReportsHeatmapPage',
+  },
+  {
     name: 'login',
     path: '/login',
     segment: 'public',
@@ -314,17 +323,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/emotions'],
     deprecated: true,
   },
-  // community -> social-cocon
   {
-    name: 'community-redirect',
+    name: 'community',
     path: '/app/community',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'RedirectToSocialCocon',
+    component: 'B2CCommunautePage',
     guard: true,
     aliases: ['/community'],
-    deprecated: true,
   },
   {
     name: 'screen-silk',
@@ -480,13 +487,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   {
     name: 'heatmap',
-    path: '/app/heatmap',
+    path: '/app/scores',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'HeatmapPage',
+    component: 'ScoresPage',
     guard: true,
-    aliases: ['/heatmap-vibes'],
+    aliases: ['/app/heatmap', '/heatmap-vibes'],
   },
   
   // Routes supplémentaires
@@ -742,6 +749,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/reports'],
   },
   {
+    name: 'admin-reports-period',
+    path: '/app/reports/:period',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BReportDetailPage',
+    guard: true,
+  },
+  {
     name: 'admin-events',
     path: '/app/events',
     segment: 'manager',
@@ -836,6 +852,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       component: 'ComprehensiveSystemAuditPage',
       guard: false,
     },
+    {
+      name: 'dev-error-boundary',
+      path: '/dev/error-boundary',
+      segment: 'public',
+      layout: 'marketing',
+      component: 'ErrorBoundaryTestPage',
+      guard: false,
+    },
   // Routes de debug supprimées (pages orphelines nettoyées)
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
@@ -850,25 +874,25 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/401',
     segment: 'public',
     layout: 'marketing',
-    component: 'Error401Page',
+    component: 'UnauthorizedPage',
   },
   {
     name: 'forbidden',
     path: '/403',
     segment: 'public',
     layout: 'marketing',
-    component: 'Error403Page',
+    component: 'ForbiddenPage',
   },
   {
     name: 'not-found',
     path: '/404',
     segment: 'public',
     layout: 'marketing',
-    component: 'Error404Page',
+    component: 'UnifiedErrorPage',
   },
   {
     name: 'server-error',
-    path: '/503',
+    path: '/500',
     segment: 'public',
     layout: 'marketing',
     component: 'ServerErrorPage',
@@ -893,6 +917,30 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'LegalPrivacyPage',
     aliases: ['/privacy-policy'],
   },
+  {
+    name: 'legal-mentions',
+    path: '/legal/mentions',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalMentionsPage',
+    aliases: ['/mentions-legales', '/legal'],
+  },
+  {
+    name: 'legal-sales',
+    path: '/legal/sales',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalSalesPage',
+    aliases: ['/cgv', '/conditions-ventes'],
+  },
+  {
+    name: 'legal-cookies',
+    path: '/legal/cookies',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'LegalCookiesPage',
+    aliases: ['/cookies-policy', '/cookies'],
+  },
   
   // ═══════════════════════════════════════════════════════════
   // BILLING & SUBSCRIPTION
@@ -915,7 +963,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '*',
     segment: 'public',
     layout: 'simple',
-    component: 'Error404Page',
+    component: 'UnifiedErrorPage',
     meta: {
       title: 'Page introuvable - EmotionsCare',
       description: 'Cette page n\'existe pas',

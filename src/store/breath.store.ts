@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+
+import { createImmutableStore } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type Pattern = '4-6-8' | '5-5' | '4-2-4';
 export type Phase = 'inhale' | 'hold' | 'exhale';
@@ -13,7 +15,6 @@ export interface BreathMetrics {
 }
 
 interface BreathState {
-  // Session state
   pattern: Pattern;
   duration: number; // seconds
   running: boolean;
@@ -21,22 +22,14 @@ interface BreathState {
   finished: boolean;
   startedAt: number | null;
   elapsed: number;
-  
-  // Breath state
   phase: Phase | null;
   phaseProgress: number; // 0-1
   cycleCount: number;
-  
-  // Settings
   reduceMotion: boolean;
   hapticEnabled: boolean;
   voiceEnabled: boolean;
-  
-  // Events for metrics
   events: BreathEvent[];
   badgeEarned?: string;
-  
-  // Actions
   setPattern: (pattern: Pattern) => void;
   setDuration: (duration: number) => void;
   setRunning: (running: boolean) => void;
@@ -57,7 +50,7 @@ interface BreathState {
 
 const initialState = {
   pattern: '4-6-8' as Pattern,
-  duration: 180, // 3 minutes default
+  duration: 180,
   running: false,
   paused: false,
   finished: false,
@@ -73,11 +66,10 @@ const initialState = {
   badgeEarned: undefined,
 };
 
-export const useBreathStore = create<BreathState>()(
-  persist(
+const breathStoreBase = create<BreathState>()(
+  createImmutableStore(
     (set, get) => ({
       ...initialState,
-      
       setPattern: (pattern) => set({ pattern }),
       setDuration: (duration) => set({ duration }),
       setRunning: (running) => set({ running }),
@@ -93,37 +85,35 @@ export const useBreathStore = create<BreathState>()(
       setVoiceEnabled: (voiceEnabled) => set({ voiceEnabled }),
       addEvent: (event) => set((state) => ({ events: [...state.events, event] })),
       setBadgeEarned: (badgeEarned) => set({ badgeEarned }),
-      
-      reset: () => set({
-        ...initialState,
-        // Keep preferences
-        reduceMotion: get().reduceMotion,
-        hapticEnabled: get().hapticEnabled,
-        voiceEnabled: get().voiceEnabled,
-      }),
+      reset: () =>
+        set({
+          ...initialState,
+          reduceMotion: get().reduceMotion,
+          hapticEnabled: get().hapticEnabled,
+          voiceEnabled: get().voiceEnabled,
+        }),
     }),
     {
-      name: 'breath-store',
-      partialize: (state) => ({
-        pattern: state.pattern,
-        duration: state.duration,
-        reduceMotion: state.reduceMotion,
-        hapticEnabled: state.hapticEnabled,
-        voiceEnabled: state.voiceEnabled,
-      }),
+      persist: {
+        name: 'breath-store',
+        partialize: (state) => ({
+          pattern: state.pattern,
+          duration: state.duration,
+          reduceMotion: state.reduceMotion,
+          hapticEnabled: state.hapticEnabled,
+          voiceEnabled: state.voiceEnabled,
+        }),
+      },
     }
   )
 );
 
-// Detect reduced motion preference
+export const useBreathStore = createSelectors(breathStoreBase);
+
 if (typeof window !== 'undefined') {
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  
-  // Set initial value
   useBreathStore.getState().setReduceMotion(mediaQuery.matches);
-  
-  // Listen for changes
-  mediaQuery.addEventListener('change', (e) => {
-    useBreathStore.getState().setReduceMotion(e.matches);
+  mediaQuery.addEventListener('change', (event) => {
+    useBreathStore.getState().setReduceMotion(event.matches);
   });
 }

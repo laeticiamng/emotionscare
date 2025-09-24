@@ -48,7 +48,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/ThemeProvider';
 
 interface HeaderProps {
   className?: string;
@@ -209,7 +209,10 @@ const Header: React.FC<HeaderProps> = ({
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1" role="navigation">
+          <nav
+            className="hidden lg:flex items-center space-x-1"
+            aria-label="Navigation principale"
+          >
             {navigationItems.map((item) => (
               <div key={item.href} className="relative group">
                 {item.children ? (
@@ -242,7 +245,11 @@ const Header: React.FC<HeaderProps> = ({
                       <DropdownMenuSeparator />
                       {item.children.map((child) => (
                         <DropdownMenuItem key={child.href} asChild>
-                          <Link to={child.href} className="flex items-center gap-2">
+                          <Link
+                            to={child.href}
+                            className="flex items-center gap-2"
+                            aria-current={isActiveRoute(child.href) ? 'page' : undefined}
+                          >
                             {child.label}
                           </Link>
                         </DropdownMenuItem>
@@ -258,6 +265,7 @@ const Header: React.FC<HeaderProps> = ({
                         ? 'bg-primary/10 text-primary shadow-sm'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                     )}
+                    aria-current={isActiveRoute(item.href) ? 'page' : undefined}
                   >
                     <item.icon className="w-4 h-4" />
                     {item.label}
@@ -453,6 +461,8 @@ const Header: React.FC<HeaderProps> = ({
             className="lg:hidden w-9 h-9 p-0"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-controls="mobile-navigation"
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -468,7 +478,12 @@ const Header: React.FC<HeaderProps> = ({
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden border-t border-border bg-background/95 backdrop-blur-md"
           >
-            <div className="container mx-auto px-4 py-6 space-y-4">
+            <div
+              className="container mx-auto px-4 py-6 space-y-4"
+              id="mobile-navigation"
+              role="navigation"
+              aria-label="Navigation principale mobile"
+            >
               {/* Search Mobile */}
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -482,7 +497,7 @@ const Header: React.FC<HeaderProps> = ({
               </form>
 
               {/* Navigation Links */}
-              <nav className="space-y-1" role="navigation">
+              <nav className="space-y-1" aria-label="Navigation principale">
                 {navigationItems.map((item) => (
                   <div key={item.href}>
                     <Link
@@ -494,6 +509,7 @@ const Header: React.FC<HeaderProps> = ({
                           ? 'bg-primary/10 text-primary'
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       )}
+                      aria-current={isActiveRoute(item.href) ? 'page' : undefined}
                     >
                       <item.icon className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -510,7 +526,8 @@ const Header: React.FC<HeaderProps> = ({
                             key={child.href}
                             to={child.href}
                             onClick={() => setIsMenuOpen(false)}
-                            className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md"
+                            className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md focus-enhanced"
+                            aria-current={isActiveRoute(child.href) ? 'page' : undefined}
                           >
                             {child.label}
                           </Link>

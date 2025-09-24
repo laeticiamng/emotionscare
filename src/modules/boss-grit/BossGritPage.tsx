@@ -1,10 +1,13 @@
 "use client";
 import React from "react";
-import { PageHeader, Card, Button, ProgressBar } from "@/COMPONENTS.reg";
-import { useTimer } from "@/COMPONENTS.reg";
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ProgressBar } from "@/ui/ProgressBar";
+import { useTimer } from "@/ui/hooks/useTimer";
 import { loadTasks, upsertTask, removeTask, GritTask } from "@/lib/boss-grit/store";
 import { ff } from "@/lib/flags/ff";
-import { useSound } from "@/COMPONENTS.reg";          // si P5 dispo (sinon null)
+import { useSound } from "@/ui/hooks/useSound";          // si P5 dispo (sinon null)
 import { recordEvent } from "@/lib/scores/events";    // si P6 dispo (sinon no-op)
 
 const PRESETS: { label: string; ms: number }[] = [

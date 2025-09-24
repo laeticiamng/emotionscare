@@ -1,14 +1,12 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type Segment = 'b2c' | 'b2b';
 
 export type UTMParams = {
   source?: string;
-  medium?: string;
   campaign?: string;
-  term?: string;
-  content?: string;
 };
 
 type MarketingState = {
@@ -22,7 +20,7 @@ type MarketingState = {
   reset: () => void;
 };
 
-export const useMarketingStore = create<MarketingState>()(
+const useMarketingStoreBase = create<MarketingState>()(
   persist(
     (set) => ({
       segment: 'b2c', // Default to B2C
@@ -49,3 +47,5 @@ export const useMarketingStore = create<MarketingState>()(
     }
   )
 );
+
+export const useMarketingStore = createSelectors(useMarketingStoreBase);

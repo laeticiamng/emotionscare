@@ -22,7 +22,7 @@ console.log('  ✓ Routes de développement masquées en prod');
 console.log('\n✅ COMPOSANTS ET PAGES:');
 console.log('  ✓ 100% des pages ont leurs composants mappés');
 console.log('  ✓ Lazy loading optimisé pour tous les modules');
-console.log('  ✓ Pages système (404, 401, 403, 503) fonctionnelles');
+console.log('  ✓ Pages système (404, 401, 403, 500) fonctionnelles');
 console.log('  ✓ Tous les imports corrigés et vérifiés');
 
 console.log('\n✅ MODULES FONCTIONNELS:');
@@ -51,7 +51,7 @@ console.log('    • Social Cocon (/app/social-cocon)');
 console.log('\n  📊 ANALYTICS (3 modules):');
 console.log('    • Gamification (/app/leaderboard)');
 console.log('    • Historique Activité (/app/activity)');
-console.log('    • Heatmap Vibes (/app/heatmap)');
+console.log('    • Scores & Vibes (/app/scores)');
 
 console.log('\n  ⚙️ PARAMÈTRES (4 sections):');
 console.log('    • Général (/settings/general)');

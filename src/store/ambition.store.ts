@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export interface Upgrade {
   id: string;
@@ -132,7 +133,7 @@ const initialState: AmbitionStoreState = {
   questStartTime: null,
 };
 
-export const useAmbitionStore = create<AmbitionStore>()(
+const useAmbitionStoreBase = create<AmbitionStore>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -268,3 +269,5 @@ export const useAmbitionStore = create<AmbitionStore>()(
     }
   )
 );
+
+export const useAmbitionStore = createSelectors(useAmbitionStoreBase);

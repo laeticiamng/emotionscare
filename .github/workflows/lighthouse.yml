@@ -1,0 +1,26 @@
+name: Lighthouse
+
+on:
+  pull_request:
+
+jobs:
+  lhci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lhci
+        env:
+          PREVIEW_URL: ${{ secrets.PREVIEW_URL }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lhci-report
+          path: .lighthouseci

@@ -204,27 +204,28 @@ const B2CARFiltersPage = () => {
   };
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/app/home')}
-            className="hover:bg-white/20"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Retour
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Face AR Filters</h1>
-            <p className="text-gray-600">Filtres de réalité augmentée adaptatifs à vos émotions</p>
+    <ConsentGate>
+      <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/app/home')}
+              className="hover:bg-white/20"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Retour
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Face AR Filters</h1>
+              <p className="text-gray-600">Filtres de réalité augmentée adaptatifs à vos émotions</p>
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Caméra et prévisualisation */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Caméra et prévisualisation */}
+            <div className="lg:col-span-2 space-y-6">
             <Card className="relative overflow-hidden">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -519,12 +520,13 @@ const B2CARFiltersPage = () => {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+  </ConsentGate>
   );
 };
 

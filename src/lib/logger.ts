@@ -142,8 +142,25 @@ class Logger {
 
   private output(level: LogLevel, message: string, data?: unknown) {
     const args: unknown[] = [`[${level.toUpperCase()}] ${message}`];
+    let formattedData: unknown = undefined;
+
     if (data !== undefined) {
-      args.push(data);
+      if (this.isDevelopment) {
+        formattedData = data;
+      } else if (typeof data === 'string') {
+        formattedData = data.length > 512 ? `${data.slice(0, 512)}…` : data;
+      } else {
+        try {
+          const serialized = JSON.stringify(data);
+          formattedData = serialized && serialized.length > 512 ? `${serialized.slice(0, 512)}…` : serialized;
+        } catch {
+          formattedData = '[unserializable]';
+        }
+      }
+    }
+
+    if (formattedData !== undefined) {
+      args.push(formattedData);
     }
 
     switch (level) {

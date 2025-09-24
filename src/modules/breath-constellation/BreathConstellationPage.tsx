@@ -1,11 +1,14 @@
 "use client";
 
 import React from "react";
+import * as Sentry from "@sentry/react";
 import { useReducedMotion } from "framer-motion";
-import { PageHeader, Card, Button } from "@/COMPONENTS.reg";
-import { ConstellationCanvas } from "@/COMPONENTS.reg";
+import PageHeader from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ConstellationCanvas } from "@/ui/ConstellationCanvas";
 import { useBreathPattern, type Pattern, type Phase } from "@/ui/hooks/useBreathPattern";
-import { useSound } from "@/COMPONENTS.reg";
+import { useSound } from "@/ui/hooks/useSound";
 import { ff } from "@/lib/flags/ff";
 import { recordEvent } from "@/lib/scores/events";
 import {
@@ -13,6 +16,8 @@ import {
   BreathworkSessionAuthError,
   BreathworkSessionPersistError,
 } from "@/services/breathworkSessions.service";
+import { useSessionClock } from "@/modules/sessions/hooks/useSessionClock";
+import { logAndJournal } from "@/services/sessions/sessionsApi";
 
 type BreathProtocolId = "coherence-5-5" | "4-7-8" | "box-4-4-4-4" | "triangle-4-6-8";
 
@@ -141,6 +146,13 @@ const PROTOCOL_SEQUENCE = PROTOCOL_DEFINITIONS.map(definition => PROTOCOLS_BY_ID
 
 const DEFAULT_PROTOCOL_ID: BreathProtocolId = "coherence-5-5";
 
+const PROTOCOL_JOURNAL_SUMMARY: Record<BreathProtocolId, string> = {
+  "coherence-5-5": "Respiration cohérence cardiaque terminée, souffle plus stable.",
+  "4-7-8": "Respiration sommeil profond terminée, esprit apaisé.",
+  "box-4-4-4-4": "Respiration carré terminée, concentration renforcée.",
+  "triangle-4-6-8": "Respiration triangle terminée, tensions relâchées."
+};
+
 const formatDuration = (seconds: number): string => {
   if (!Number.isFinite(seconds) || seconds <= 0) return "0 s";
   if (seconds >= 120) {
@@ -166,6 +178,7 @@ export default function BreathConstellationPage() {
   const [saveStatus, setSaveStatus] = React.useState<SaveStatus>("idle");
   const [saveMessage, setSaveMessage] = React.useState<string | null>(null);
 
+  const clock = useSessionClock({ durationMs: cycles > 0 ? cycles * protocol.cycleDuration * 1000 : undefined });
   const bp = useBreathPattern(protocol.pattern, cycles);
   const { current, phaseProgress, running, cycle, start, stop, toggle } = bp;
   const phaseDuration = bp.phaseDuration;
@@ -173,8 +186,22 @@ export default function BreathConstellationPage() {
   const audioEnabled = ff?.("new-audio-engine") ?? false;
   const cue = useSound?.("/audio/tick.mp3", { volume: 0.45 }) ?? null;
 
-  const sessionStartRef = React.useRef<number | null>(null);
+  const sessionStartRef = React.useRef<Date | null>(null);
+  const primaryButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const lastPhaseRef = React.useRef<Phase | null>(null);
+
+  const clockState = clock.state;
+  const clockElapsedSeconds = Math.max(0, Math.round(clock.elapsedMs / 1000));
+  const plannedSeconds = cycles > 0 ? cycles * protocol.cycleDuration : 0;
+  const clockProgress = plannedSeconds > 0
+    ? Math.min(1, clock.progress ?? clockElapsedSeconds / plannedSeconds)
+    : undefined;
+  const sessionStatusMessage = React.useMemo(() => {
+    if (running) return "Séance en cours.";
+    if (clockState === "paused") return "Séance en pause.";
+    if (clockState === "completed") return "Séance terminée.";
+    return "Séance prête à démarrer.";
+  }, [clockState, running]);
 
   const resetFeedback = React.useCallback(() => {
     setSaveStatus("idle");
@@ -192,13 +219,6 @@ export default function BreathConstellationPage() {
   }, [isReducedMotion]);
 
   React.useEffect(() => {
-    if (running && sessionStartRef.current === null) {
-      sessionStartRef.current = Date.now();
-      resetFeedback();
-    }
-  }, [running, resetFeedback]);
-
-  React.useEffect(() => {
     const phase = current.phase;
     if (phase !== lastPhaseRef.current) {
       lastPhaseRef.current = phase;
@@ -213,11 +233,9 @@ export default function BreathConstellationPage() {
 
   const logSession = React.useCallback(
     async (cyclesCompleted: number, completed: boolean) => {
-      const startedAt = sessionStartRef.current;
-      if (!startedAt) return;
-
-      const endedAt = Date.now();
-      const durationSec = Math.max(1, Math.round((endedAt - startedAt) / 1000));
+      const startedAt = sessionStartRef.current ?? new Date();
+      const endedAt = new Date();
+      const durationSec = Math.max(1, clockElapsedSeconds || 0);
       const normalizedCycles = Math.max(0, cyclesCompleted);
       const cadence = durationSec > 0
         ? Number.parseFloat(((normalizedCycles * 60) / durationSec).toFixed(2))
@@ -226,8 +244,8 @@ export default function BreathConstellationPage() {
       try {
         recordEvent?.({
           module: "breath-constellation",
-          startedAt: new Date(startedAt).toISOString(),
-          endedAt: new Date(endedAt).toISOString(),
+          startedAt: startedAt.toISOString(),
+          endedAt: endedAt.toISOString(),
           durationSec,
           score: Math.min(10, Math.round((completed ? cycles : normalizedCycles) * 1.25)),
           meta: {
@@ -252,8 +270,8 @@ export default function BreathConstellationPage() {
         await logBreathworkSession({
           technique: patternKey,
           durationSec,
-          startedAt: new Date(startedAt).toISOString(),
-          endedAt: new Date(endedAt).toISOString(),
+          startedAt: startedAt.toISOString(),
+          endedAt: endedAt.toISOString(),
           cyclesPlanned: cycles,
           cyclesCompleted: normalizedCycles,
           density,
@@ -262,8 +280,31 @@ export default function BreathConstellationPage() {
           soundCues,
           haptics: hapticsEnabled && !isReducedMotion,
         });
+        await logAndJournal({
+          type: "breath",
+          duration_sec: durationSec,
+          mood_delta: null,
+          journalText: PROTOCOL_JOURNAL_SUMMARY[patternKey] ?? "Respiration terminée, souffle plus fluide.",
+          meta: {
+            protocol: patternKey,
+            density,
+            cycles_planned: cycles,
+            cycles_completed: normalizedCycles,
+            cadence,
+            completed,
+            soundCues,
+            haptics: hapticsEnabled && !isReducedMotion,
+            reduced_motion: isReducedMotion
+          }
+        });
         setSaveStatus("saved");
-        setSaveMessage("Session enregistrée dans votre historique Supabase et votre journal d'activité.");
+        setSaveMessage("Session enregistrée et ajoutée automatiquement au journal.");
+        Sentry.addBreadcrumb({
+          category: "session",
+          message: "session:complete",
+          level: "info",
+          data: { module: "breath_constellation", duration_sec: durationSec, completed }
+        });
       } catch (error) {
         if (error instanceof BreathworkSessionAuthError) {
           setSaveStatus("unauthenticated");
@@ -276,8 +317,10 @@ export default function BreathConstellationPage() {
           setSaveStatus("error");
           setSaveMessage("Impossible d'enregistrer la session pour le moment.");
         }
+        Sentry.captureException(error);
       } finally {
         sessionStartRef.current = null;
+        clock.reset();
       }
     },
     [
@@ -289,14 +332,18 @@ export default function BreathConstellationPage() {
       hapticsEnabled,
       isReducedMotion,
       logBreathworkSession,
+      clock,
+      clockElapsedSeconds,
+      logAndJournal,
     ],
   );
 
   const finalizeSession = React.useCallback(
     (cyclesCompleted: number, completed: boolean) => {
+      clock.complete();
       void logSession(cyclesCompleted, completed);
     },
-    [logSession],
+    [clock, logSession],
   );
 
   React.useEffect(() => {
@@ -314,17 +361,19 @@ export default function BreathConstellationPage() {
       setCycles(nextProtocol.recommendedCycles);
       setDensity(nextProtocol.recommendedDensity);
       sessionStartRef.current = null;
+      clock.reset();
       resetFeedback();
     },
-    [resetFeedback],
+    [clock, resetFeedback],
   );
 
   const handleCycleChange = React.useCallback(
     (value: number) => {
       setCycles(value);
+      clock.reset();
       resetFeedback();
     },
-    [resetFeedback],
+    [clock, resetFeedback],
   );
 
   const handleDensityChange = React.useCallback(
@@ -336,29 +385,66 @@ export default function BreathConstellationPage() {
   );
 
   const handleToggle = React.useCallback(() => {
-    if (!running && sessionStartRef.current === null) {
-      sessionStartRef.current = Date.now();
+    if (!running) {
+      if (clockState === "idle" || clockState === "completed") {
+        sessionStartRef.current = new Date();
+        clock.reset();
+        clock.start();
+        Sentry.addBreadcrumb({
+          category: "session",
+          message: "session:start",
+          level: "info",
+          data: { module: "breath_constellation" }
+        });
+      } else if (clockState === "paused") {
+        clock.resume();
+        Sentry.addBreadcrumb({
+          category: "session",
+          message: "session:resume",
+          level: "info",
+          data: { module: "breath_constellation" }
+        });
+      }
       resetFeedback();
+    } else {
+      clock.pause();
+      Sentry.addBreadcrumb({
+        category: "session",
+        message: "session:pause",
+        level: "info",
+        data: { module: "breath_constellation" }
+      });
     }
     toggle();
-  }, [running, toggle, resetFeedback]);
+    primaryButtonRef.current?.focus({ preventScroll: true });
+  }, [running, clockState, clock, toggle, resetFeedback]);
 
   const handleResume = React.useCallback(() => {
-    if (sessionStartRef.current === null) {
-      sessionStartRef.current = Date.now();
-    }
+    sessionStartRef.current = new Date();
+    clock.reset();
+    clock.start();
+    Sentry.addBreadcrumb({
+      category: "session",
+      message: "session:start",
+      level: "info",
+      data: { module: "breath_constellation" }
+    });
     resetFeedback();
     start();
-  }, [start, resetFeedback]);
+    primaryButtonRef.current?.focus({ preventScroll: true });
+  }, [clock, start, resetFeedback]);
 
   const handleStop = React.useCallback(() => {
     const completedCycles = Math.min(cycle, cycles);
     const completed = cycles > 0 && completedCycles >= cycles;
+    clock.complete();
     if (sessionStartRef.current) {
       finalizeSession(completedCycles, completed);
     }
     stop();
-  }, [cycle, cycles, finalizeSession, stop]);
+    sessionStartRef.current = null;
+    primaryButtonRef.current?.focus({ preventScroll: true });
+  }, [cycle, cycles, finalizeSession, stop, clock]);
 
   const phaseLabel = PHASE_LABELS[current.phase];
   const phaseDescription = PHASE_DESCRIPTIONS[current.phase];
@@ -366,10 +452,13 @@ export default function BreathConstellationPage() {
   const phaseRemaining = Math.max(0, Math.round((phaseDuration ?? 0) * (1 - phaseProgress)));
 
   const sessionProgress = React.useMemo(() => {
+    if (typeof clockProgress === "number") {
+      return clockProgress;
+    }
     if (cycles <= 0) return 0;
     const effective = Math.min(cycle, cycles) + Math.min(1, Math.max(0, phaseProgress));
     return Math.min(1, Math.max(0, effective / cycles));
-  }, [cycle, cycles, phaseProgress]);
+  }, [clockProgress, cycle, cycles, phaseProgress]);
 
   const sessionEstimate = React.useMemo(() => {
     const expectedSeconds = cycles * protocol.cycleDuration;
@@ -395,7 +484,24 @@ export default function BreathConstellationPage() {
   }, [saveStatus]);
 
   return (
-    <main aria-label="Breath Constellation">
+    <main aria-label="Breath Constellation" style={{ position: "relative" }}>
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
+      >
+        {sessionStatusMessage}
+      </div>
       <PageHeader
         title="Breath Constellation"
         subtitle="Respiration guidée par une constellation vivante"
@@ -565,7 +671,7 @@ export default function BreathConstellationPage() {
           </div>
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <Button onClick={handleToggle} data-ui="primary-cta">
+            <Button ref={primaryButtonRef} onClick={handleToggle} data-ui="primary-cta">
               {running ? "Pause" : "Démarrer"}
             </Button>
             {!running && cycle > 0 && cycle < cycles && (

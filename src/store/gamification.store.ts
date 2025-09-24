@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export type Scope = 'friends' | 'org' | 'global';
 export type Period = '7d' | '30d';
@@ -71,7 +72,7 @@ const initialState = {
   nextCursor: null,
 };
 
-export const useGamificationStore = create<GamificationState>()(
+const useGamificationStoreBase = create<GamificationState>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -125,3 +126,5 @@ export const useGamificationStore = create<GamificationState>()(
     }
   )
 );
+
+export const useGamificationStore = createSelectors(useGamificationStoreBase);

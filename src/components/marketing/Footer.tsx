@@ -30,10 +30,11 @@ const FOOTER_LINKS = {
     { label: 'Presse', href: '/press' }
   ],
   legal: [
-    { label: 'Mentions légales', href: '/legal' },
-    { label: 'Confidentialité', href: '/privacy' },
-    { label: 'Conditions', href: '/terms' },
-    { label: 'Cookies', href: '/cookies' }
+    { label: 'Mentions légales', href: '/legal/mentions' },
+    { label: 'Conditions d\'utilisation', href: '/legal/terms' },
+    { label: 'Conditions de vente', href: '/legal/sales' },
+    { label: 'Politique de confidentialité', href: '/legal/privacy' },
+    { label: 'Cookies', href: '/legal/cookies' }
   ]
 };
 

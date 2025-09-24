@@ -18,12 +18,19 @@ export function CookieConsent() {
   const acceptAll = () => { localStorage.setItem(KEY, JSON.stringify({ functional: true, analytics: true, marketing: false })); setVisible(false); };
   const essentialsOnly = () => { localStorage.setItem(KEY, JSON.stringify({ functional: true, analytics: false, marketing: false })); setVisible(false); };
   return (
-    <div role="dialog" aria-label="Consentement cookies" style={{ position: "fixed", insetInline: 16, bottom: 16, background: "var(--card)", padding: 12, borderRadius: 12 }}>
-      <p>On utilise des cookies pour améliorer ton expérience. Tu peux accepter tout ou seulement l’essentiel.</p>
-      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+    <div
+      role="dialog"
+      aria-label="Consentement cookies"
+      style={{ position: "fixed", insetInline: 16, bottom: 16, background: "var(--card)", padding: 12, borderRadius: 12 }}
+    >
+      <p>
+        Nous déposons uniquement des cookies essentiels par défaut. Les mesures d’audience anonymisées et la personnalisation
+        sont activées si vous l’acceptez, conformément à ECC-RGPD-01.
+      </p>
+      <div className="flex gap-2 mt-2 flex-wrap">
         <button onClick={essentialsOnly}>Essentiels uniquement</button>
         <button onClick={acceptAll}>Tout accepter</button>
-        <a href="/legal/privacy">En savoir plus</a>
+        <a href="/legal/cookies">Configurer</a>
       </div>
     </div>
   );

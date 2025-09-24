@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist } from './utils/createImmutableStore';
+import { createSelectors } from './utils/createSelectors';
 
 export interface StimulusSpec {
   kind: 'mail' | 'notif' | 'timer';
@@ -104,7 +105,7 @@ const initialState: BounceStoreState = {
   tipReceived: null,
 };
 
-export const useBounceStore = create<BounceStore>()(
+const useBounceStoreBase = create<BounceStore>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -305,3 +306,5 @@ export const useBounceStore = create<BounceStore>()(
     }
   )
 );
+
+export const useBounceStore = createSelectors(useBounceStoreBase);

@@ -22,6 +22,8 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
+import { useClinicalHints } from '@/hooks/useClinicalHints';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface VinylTrack {
   id: string;
@@ -91,7 +93,29 @@ const categoryIcons = {
 
 const B2CMusicEnhanced: React.FC = () => {
   const { toast } = useToast();
-  
+  const clinicalHints = useClinicalHints();
+  const musicHints = clinicalHints.moduleCues.music;
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = window.localStorage.getItem('music:favorites');
+      return raw ? JSON.parse(raw) : [];
+    } catch (error) {
+      console.warn('[music] unable to read favorites', error);
+      return [];
+    }
+  });
+  const [lastPlayedId, setLastPlayedId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.localStorage.getItem('music:lastPlayed');
+    } catch (error) {
+      console.warn('[music] unable to read last played track', error);
+      return null;
+    }
+  });
+
   // Get optimized universe config
   const universe = getOptimizedUniverse('music');
   
@@ -112,9 +136,59 @@ const B2CMusicEnhanced: React.FC = () => {
 
   // Optimized animations
   const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
-    enableComplexAnimations: true,
+    enableComplexAnimations: !prefersReducedMotion,
     useCSSAnimations: true,
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setPrefersReducedMotion(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    try {
+      window.localStorage.setItem('music:favorites', JSON.stringify(favorites));
+    } catch (error) {
+      console.warn('[music] unable to persist favorites', error);
+    }
+  }, [favorites]);
+
+  const resumeTrack = lastPlayedId ? vinylTracks.find(track => track.id === lastPlayedId) ?? null : null;
+  const intensityLabel = musicHints
+    ? musicHints.intensity === 'low'
+      ? 'douce'
+      : musicHints.intensity === 'high'
+        ? 'énergique'
+        : 'modérée'
+    : null;
+  const textureLabel = musicHints
+    ? musicHints.texture === 'airy'
+      ? 'aérienne'
+      : musicHints.texture === 'bright'
+        ? 'lumineuse'
+        : 'chaleureuse'
+    : null;
+  const categoryLabel = musicHints
+    ? {
+        doux: 'détente',
+        créatif: 'créativité',
+        énergique: 'énergie',
+        guérison: 'régénération',
+      }[musicHints.recommendedCategory]
+    : null;
+
+  const handleToggleFavorite = (trackId: string) => {
+    setFavorites(prev => (prev.includes(trackId) ? prev.filter(id => id !== trackId) : [...prev, trackId]));
+  };
 
   // Handle universe entrance
   const handleUniverseEnterComplete = () => {
@@ -160,7 +234,15 @@ const B2CMusicEnhanced: React.FC = () => {
     setSelectedTrack(track);
     setProgress(0);
     setIsPlaying(true);
-    
+    setLastPlayedId(track.id);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem('music:lastPlayed', track.id);
+      } catch (error) {
+        console.warn('[music] unable to persist last played track', error);
+      }
+    }
+
     toast({
       title: "Vinyle en rotation ♪",
       description: `${track.title} compose ton aura sonore`,
@@ -196,28 +278,31 @@ const B2CMusicEnhanced: React.FC = () => {
 
   if (showReward && selectedTrack) {
     return (
-      <RewardSystem
-        reward={{
-          type: 'crystal',
-          name: 'Cristal Sonore',
-          description: universe.artifacts.description,
-          moduleId: 'music'
-        }}
-        badgeText="Harmonie créée ♪"
-        onComplete={handleRewardComplete}
-      />
+      <ConsentGate>
+        <RewardSystem
+          reward={{
+            type: 'crystal',
+            name: 'Cristal Sonore',
+            description: universe.artifacts.description,
+            moduleId: 'music'
+          }}
+          badgeText="Harmonie créée ♪"
+          onComplete={handleRewardComplete}
+        />
+      </ConsentGate>
     );
   }
 
   return (
-    <UniverseEngine
-      universe={universe}
-      isEntering={isEntering}
-      onEnterComplete={handleUniverseEnterComplete}
-      enableParticles={true}
-      enableAmbianceSound={false}
-      className="min-h-screen"
-    >
+    <ConsentGate>
+      <UniverseEngine
+        universe={universe}
+        isEntering={isEntering}
+        onEnterComplete={handleUniverseEnterComplete}
+        enableParticles={true}
+        enableAmbianceSound={false}
+        className="min-h-screen"
+      >
       {/* Header */}
       <header className="relative z-50 p-6">
         <div className="flex items-center justify-between">
@@ -266,10 +351,35 @@ const B2CMusicEnhanced: React.FC = () => {
                   Vinyles en Apesanteur
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
-                  Choisis ton vinyle et laisse-le composer ton aura sonore. 
+                  Choisis ton vinyle et laisse-le composer ton aura sonore.
                   Chaque mélodie s'adapte à ton état pour créer l'harmonie parfaite.
                 </p>
+                {musicHints && (
+                  <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground" aria-live="polite">
+                    {textureLabel && (
+                      <Badge variant="secondary">Texture {textureLabel}</Badge>
+                    )}
+                    {intensityLabel && (
+                      <Badge variant="outline">Intensité {intensityLabel}</Badge>
+                    )}
+                    {categoryLabel && (
+                      <Badge variant="secondary">Voie {categoryLabel}</Badge>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {resumeTrack && (
+                <div className="flex justify-center">
+                  <Button
+                    variant="secondary"
+                    onClick={() => startTrack(resumeTrack)}
+                    className="px-6"
+                  >
+                    {musicHints?.resumeLabel ?? 'Reprise instantanée'}
+                  </Button>
+                </div>
+              )}
 
               {/* Vinyl Collection */}
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
@@ -286,8 +396,10 @@ const B2CMusicEnhanced: React.FC = () => {
                       whileTap={{ scale: 0.95 }}
                       className="perspective-1000"
                     >
-                      <Card 
-                        className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+                      <Card
+                        className={`h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden ${
+                          musicHints?.recommendedCategory === track.category ? 'ring-2 ring-yellow-400/50' : ''
+                        }`}
                         onClick={() => startTrack(track)}
                       >
                         <CardContent className="p-6 space-y-4">
@@ -325,26 +437,32 @@ const B2CMusicEnhanced: React.FC = () => {
                               {track.artist}
                             </p>
                             
-                            <Badge 
+                            <Badge
                               variant="secondary"
                               className="text-xs"
-                              style={{ 
+                              style={{
                                 backgroundColor: `${track.color}20`,
-                                color: track.color 
+                                color: track.color
                               }}
                             >
                               {track.mood}
                             </Badge>
-                            
+
+                            {musicHints?.recommendedCategory === track.category && (
+                              <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                                Recommandé
+                              </Badge>
+                            )}
+
                             <p className="text-xs text-muted-foreground leading-relaxed">
                               {track.description}
                             </p>
-                            
+
                             <div className="pt-2">
-                              <Button 
+                              <Button
                                 size="sm"
                                 className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                                style={{ 
+                                style={{
                                   backgroundColor: `${track.color}15`,
                                   color: track.color,
                                   borderColor: `${track.color}30`
@@ -353,6 +471,20 @@ const B2CMusicEnhanced: React.FC = () => {
                               >
                                 <Play className="h-3 w-3 mr-2" />
                                 Lancer le vinyle
+                              </Button>
+                              <Button
+                                variant={favorites.includes(track.id) ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className="mt-2 w-full"
+                                aria-pressed={favorites.includes(track.id)}
+                                aria-label={favorites.includes(track.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleToggleFavorite(track.id);
+                                }}
+                              >
+                                <Heart className={`h-3 w-3 mr-2 ${favorites.includes(track.id) ? 'fill-current text-red-500' : ''}`} />
+                                {favorites.includes(track.id) ? 'Favori enregistré' : 'Ajouter aux favoris'}
                               </Button>
                             </div>
                           </div>
@@ -497,8 +629,9 @@ const B2CMusicEnhanced: React.FC = () => {
           )}
         </AnimatePresence>
       </main>
-    </UniverseEngine>
+      </UniverseEngine>
+    </ConsentGate>
   );
-};
+}
 
 export default B2CMusicEnhanced;

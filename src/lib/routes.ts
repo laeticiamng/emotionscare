@@ -2,30 +2,47 @@
  * Routes helpers - source unique alignée sur RouterV2
  */
 
-import { ROUTES_REGISTRY } from '@/routerV2/registry';
+import { ROUTES, ROUTE_NAME_BY_PATH, ROUTES_BY_NAME } from './routerV2/routes.config';
 
-const routeLookup = new Map<string, string>();
+export type RouteName = (typeof ROUTES)[number]['name'];
 
-ROUTES_REGISTRY.forEach(route => {
-  routeLookup.set(route.name, route.path);
-});
+export const route = (name: RouteName, params?: Record<string, string | number>) => {
+  const def = ROUTES_BY_NAME.get(name);
+  if (!def) {
+    throw new Error(`Unknown route: ${name}`);
+  }
+
+  let path = def.path;
+
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      path = path.replace(`:${key}`, String(value));
+    });
+  }
+
+  return path;
+};
+
+export const routeByPath = (path: string): string => {
+  const name = ROUTE_NAME_BY_PATH.get(path);
+  if (!name) {
+    throw new Error(`Unknown path: ${path}`);
+  }
+  return route(name as RouteName);
+};
 
 function resolveRoutePath(name: string, fallback?: string): string {
-  const path = routeLookup.get(name);
-
-  if (path) {
-    return path;
+  try {
+    return route(name as RouteName);
+  } catch (error) {
+    if (fallback) {
+      return fallback;
+    }
+    if (typeof console !== 'undefined') {
+      console.error(`[routerV2] Route inconnue: "${name}"`, error);
+    }
+    return '/';
   }
-
-  if (fallback) {
-    return fallback;
-  }
-
-  if (typeof console !== 'undefined') {
-    console.error(`[routerV2] Route inconnue: "${name}"`);
-  }
-
-  return '/';
 }
 
 const loginPath = resolveRoutePath('login');
@@ -85,7 +102,7 @@ export const b2cRoutes = {
   bounceBack: () => resolveRoutePath('bounce-back'),
   bounceBackBattle: () => resolveRoutePath('bounce-back'),
   storySynth: () => resolveRoutePath('story-synth'),
-  community: () => resolveRoutePath('social-cocon-b2c'),
+  community: () => resolveRoutePath('community'),
   socialCocon: () => resolveRoutePath('social-cocon-b2c'),
   settings: () => resolveRoutePath('settings-general'),
   profile: () => resolveRoutePath('settings-profile'),
@@ -125,7 +142,7 @@ export const consumerRoutes = {
   leaderboard: () => resolveRoutePath('leaderboard'),
   gamification: () => resolveRoutePath('gamification'),
   socialCocon: () => resolveRoutePath('social-cocon-b2c'),
-  community: () => resolveRoutePath('social-cocon-b2c'),
+  community: () => resolveRoutePath('community'),
   preferences: () => resolveRoutePath('settings-privacy'),
   notifications: () => resolveRoutePath('settings-notifications'),
   settings: () => resolveRoutePath('settings-general'),
@@ -136,6 +153,7 @@ export const b2bRoutes = {
   home: () => resolveRoutePath('b2b-landing'),
   teams: () => resolveRoutePath('teams'),
   reports: () => resolveRoutePath('admin-reports'),
+  reportDetail: (period: string) => `${resolveRoutePath('admin-reports')}/${encodeURIComponent(period)}`,
   events: () => resolveRoutePath('admin-events'),
   socialCocon: () => resolveRoutePath('social-cocon-b2b'),
   optimization: () => resolveRoutePath('admin-optimization'),

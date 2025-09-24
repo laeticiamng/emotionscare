@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMarketingStore, Segment, UTMParams } from '@/store/marketing.store';
+import { LANDING_UTM_CAMPAIGN, LANDING_UTM_SOURCE, sanitizeLandingUtm } from '@/lib/utm';
 
 export const useSegment = () => {
   const [searchParams] = useSearchParams();
@@ -9,11 +10,8 @@ export const useSegment = () => {
   // Capture UTM parameters from URL
   useEffect(() => {
     const utmParams: UTMParams = {
-      source: searchParams.get('utm_source') || undefined,
-      medium: searchParams.get('utm_medium') || undefined, 
-      campaign: searchParams.get('utm_campaign') || undefined,
-      term: searchParams.get('utm_term') || undefined,
-      content: searchParams.get('utm_content') || undefined
+      source: sanitizeLandingUtm(searchParams.get('utm_source'), LANDING_UTM_SOURCE),
+      campaign: sanitizeLandingUtm(searchParams.get('utm_campaign'), LANDING_UTM_CAMPAIGN),
     };
 
     // Only update if we have UTM params

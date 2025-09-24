@@ -16,8 +16,7 @@ import { ROUTES_REGISTRY } from './registry';
 import { LegacyRedirect, ROUTE_ALIAS_ENTRIES } from './aliases';
 import { AuthGuard, ModeGuard, RoleGuard } from './guards';
 import type { RouteMeta } from './schema';
-import { withErrorBoundary } from '@/contexts/ErrorContext';
-import PageErrorFallback from '@/components/error/PageErrorFallback';
+import { PageErrorBoundary } from '@/components/error/PageErrorBoundary';
 import { LoadingState } from '@/components/loading/LoadingState';
 import EnhancedShell from '@/components/layout/EnhancedShell';
 import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
@@ -46,7 +45,7 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CAdaptiveMusicPage = lazy(() => import('@/modules/adaptive-music/AdaptiveMusicPage'));
+const B2CAdaptiveMusicPage = lazy(() => import('@/modules/adaptive-music/AdaptiveMusicPage').then(m => ({ default: m.default || m.AdaptiveMusicPage })));
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
@@ -72,6 +71,8 @@ const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
 const B2BSocialCoconPage = lazy(() => import('@/pages/B2BSocialCoconPage'));
 const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
+const B2BReportDetailPage = lazy(() => import('@/pages/B2BReportDetailPage'));
+const B2BReportsHeatmapPage = lazy(() => import('@/pages/b2b/reports'));
 const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
 
 // Additional B2B pages - use correct paths
@@ -105,6 +106,9 @@ const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 // Legal pages
 const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
+const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
+const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
 
 // Pages nouvellement créées
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
@@ -116,7 +120,7 @@ const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
-const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -144,12 +148,14 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
+const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
 
 // Pages système unifiées
-const Error401Page = lazy(() => import('@/pages/errors/401'));
-const Error403Page = lazy(() => import('@/pages/errors/403'));
-const Error404Page = lazy(() => import('@/pages/errors/404'));
-const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
+const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
+const ForbiddenPage = lazy(() => import('@/pages/errors/403/page'));
+const UnifiedErrorPage = lazy(() => import('@/pages/errors/404/page'));
+const NotFoundPage = lazy(() => import('@/pages/NotFound'));
+const ServerErrorPage = lazy(() => import('@/pages/errors/500/page'));
 
 
 
@@ -203,7 +209,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Analytics & Gamification
   GamificationPage,
   LeaderboardPage,
-  HeatmapPage,
+  ScoresPage,
   
   // Settings
   B2CSettingsPage,
@@ -215,6 +221,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BTeamsPage,
   B2BSocialCoconPage,
   B2BReportsPage,
+  B2BReportDetailPage,
+  B2BReportsHeatmapPage,
   B2BEventsPage,
   B2BOptimisationPage,
   B2BSecurityPage,
@@ -260,11 +268,15 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Legal pages
   LegalTermsPage,
   LegalPrivacyPage,
+  LegalMentionsPage,
+  LegalSalesPage,
+  LegalCookiesPage,
   
   // System unifiées
-  Error401Page,
-  Error403Page,
-  Error404Page,
+  UnauthorizedPage,
+  ForbiddenPage,
+  UnifiedErrorPage,
+  NotFoundPage,
   ServerErrorPage,
   
   // Import des nouveaux modules optimisés
@@ -283,6 +295,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
+  ErrorBoundaryTestPage,
   
   // Composants de redirection
   RedirectToScan,
@@ -365,12 +378,12 @@ function createRouteElement(routeMeta: RouteMeta) {
     return <Navigate to="/404" replace />;
   }
 
-  const ComponentWithBoundary = withErrorBoundary(Component, PageErrorFallback);
-
   const element = (
     <SuspenseWrapper>
       <LayoutWrapper layout={routeMeta.layout}>
-        <ComponentWithBoundary />
+        <PageErrorBoundary route={routeMeta.path} feature={routeMeta.name} resetKeys={[routeMeta.path]}>
+          <Component />
+        </PageErrorBoundary>
       </LayoutWrapper>
     </SuspenseWrapper>
   );
@@ -400,13 +413,18 @@ export const router = createBrowserRouter([
   // Fallback 404 pour toutes les autres routes
   {
     path: '*',
-    element: <Navigate to="/404" replace />,
+    element: (
+      <SuspenseWrapper>
+        <NotFoundPage />
+      </SuspenseWrapper>
+    ),
   },
 ], {
   basename: import.meta.env.BASE_URL ?? '/',
 });
 
 export const routerV2 = router;
+export default router;
 export type AppRouter = typeof router;
 
 // ═══════════════════════════════════════════════════════════

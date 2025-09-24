@@ -70,7 +70,7 @@ const routesValidation = {
     '✅ /app/emotions (B2CEmotionsPage) - Centre émotionnel IA',
     '✅ /app/leaderboard (B2CGamificationPage) - Gamification',
     '✅ /app/activity (B2CWeeklyBarsPage) - Historique activité',
-    '✅ /app/heatmap (B2CHeatmapVibesPage) - Cartographie émotionnelle',
+    '✅ /app/scores (ScoresPage) - Scores & heatmap émotions',
     '✅ /app/voice-journal (B2CVoiceJournalPage) - Journal vocal',
     '✅ /app/emotion-scan (B2CEmotionScanPage) - Analyse faciale'
   ],

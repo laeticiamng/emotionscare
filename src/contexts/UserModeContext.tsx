@@ -1,80 +1,128 @@
-/**
- * UserModeContext avec mode par défaut pour debug
- */
+'use client';
 
-import * as Sentry from '@sentry/react';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+const STORAGE_KEY = 'userMode';
 
-interface UserModeContextType {
+type Role = 'user' | 'manager' | 'org' | 'admin';
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | null;
+
+type UserModeContextValue = {
+  role: Role | null;
+  setRole: (role: Role | null) => void;
   userMode: UserMode;
-  setUserMode: (mode: UserMode) => void;
+  setUserMode: (mode: UserMode | null) => void;
+  changeUserMode: (mode: UserMode | null) => void;
+  clearUserMode: () => void;
   isLoading: boolean;
-}
+};
 
-const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
+const roleToMode = (role: Role | null): UserMode => {
+  switch (role) {
+    case 'user':
+      return 'b2c';
+    case 'manager':
+      return 'b2b_user';
+    case 'org':
+      return 'b2b_admin';
+    case 'admin':
+      return 'admin';
+    default:
+      return null;
+  }
+};
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>('b2c'); // Par défaut b2c pour debug
+const modeToRole = (mode: UserMode | null): Role | null => {
+  switch (mode) {
+    case 'b2c':
+      return 'user';
+    case 'b2b_user':
+      return 'manager';
+    case 'b2b_admin':
+      return 'org';
+    case 'admin':
+      return 'admin';
+    default:
+      return null;
+  }
+};
+
+const readStoredMode = (): UserMode => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY) as UserMode | null;
+    return stored ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const UserModeContext = createContext<UserModeContextValue | null>(null);
+
+export const UserModeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [role, setRoleState] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Récupérer le mode utilisateur depuis le localStorage
-    const savedMode = localStorage.getItem('userMode') as UserMode;
-    if (savedMode) {
-      setUserMode(savedMode);
-    } else {
-      // Mode par défaut pour debug
-      setUserMode('b2c');
-      localStorage.setItem('userMode', 'b2c');
+    const storedMode = readStoredMode();
+    const storedRole = modeToRole(storedMode);
+    if (storedRole) {
+      setRoleState(storedRole);
     }
     setIsLoading(false);
-    console.log('🔧 Debug: Mode utilisateur défini à b2c par défaut');
   }, []);
 
-  useEffect(() => {
-    const client = Sentry.getCurrentHub().getClient();
-    if (!client) {
+  const persistMode = useCallback((nextRole: Role | null) => {
+    if (typeof window === 'undefined') {
       return;
     }
 
-    Sentry.configureScope(scope => {
-      scope.setTag('user_mode', userMode ?? 'unknown');
-    });
-  }, [userMode]);
-
-  const handleSetUserMode = (mode: UserMode) => {
-    const client = Sentry.getCurrentHub().getClient();
-    if (client) {
-      Sentry.addBreadcrumb({
-        category: 'user',
-        level: 'info',
-        message: 'user_mode:change',
-        data: { value: mode ?? 'unset' },
-      });
-      Sentry.configureScope(scope => {
-        scope.setTag('user_mode', mode ?? 'unknown');
-      });
+    const nextMode = roleToMode(nextRole);
+    try {
+      if (nextMode) {
+        window.localStorage.setItem(STORAGE_KEY, nextMode);
+      } else {
+        window.localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch {
+      // Silently ignore persistence errors
     }
+  }, []);
 
-    setUserMode(mode);
-    if (mode) {
-      localStorage.setItem('userMode', mode);
-    } else {
-      localStorage.removeItem('userMode');
-    }
-  };
+  const setRole = useCallback((nextRole: Role | null) => {
+    setRoleState(nextRole);
+    persistMode(nextRole);
+  }, [persistMode]);
 
-  return (
-    <UserModeContext.Provider value={{
-      userMode,
-      setUserMode: handleSetUserMode,
-      isLoading
-    }}>
-      {children}
-    </UserModeContext.Provider>
-  );
+  const changeUserMode = useCallback((mode: UserMode | null) => {
+    setRole(modeToRole(mode));
+  }, [setRole]);
+
+  const clearUserMode = useCallback(() => {
+    setRole(null);
+  }, [setRole]);
+
+  const value = useMemo<UserModeContextValue>(() => ({
+    role,
+    setRole,
+    userMode: roleToMode(role),
+    setUserMode: changeUserMode,
+    changeUserMode,
+    clearUserMode,
+    isLoading,
+  }), [changeUserMode, clearUserMode, isLoading, role, setRole]);
+
+  return <UserModeContext.Provider value={value}>{children}</UserModeContext.Provider>;
 };
 
 export const useUserMode = () => {
@@ -84,3 +132,5 @@ export const useUserMode = () => {
   }
   return context;
 };
+
+export { UserModeContext };

@@ -44,7 +44,7 @@ const mockRegistry = [
   // Analytics
   { name: 'leaderboard', path: '/app/leaderboard', segment: 'consumer', component: 'B2CGamificationPage', guard: true },
   { name: 'activity', path: '/app/activity', segment: 'consumer', component: 'B2CActivityHistoryPage', guard: true },
-  { name: 'heatmap', path: '/app/heatmap', segment: 'manager', component: 'B2CHeatmapVibesPage', guard: true },
+  { name: 'scores', path: '/app/scores', segment: 'manager', component: 'ScoresPage', guard: true },
   
   // Settings
   { name: 'settings-general', path: '/settings/general', segment: 'consumer', component: 'B2CSettingsPage', guard: true },
@@ -61,10 +61,10 @@ const mockRegistry = [
   { name: 'admin-events', path: '/app/events', segment: 'manager', component: 'B2BEventsPage', guard: true },
   
   // System
-  { name: 'not-found', path: '/404', segment: 'public', component: 'Error404Page' },
-  { name: 'unauthorized', path: '/401', segment: 'public', component: 'Error401Page' },
-  { name: 'forbidden', path: '/403', segment: 'public', component: 'Error403Page' },
-  { name: 'server-error', path: '/503', segment: 'public', component: 'ServerErrorPage' },
+  { name: 'not-found', path: '/404', segment: 'public', component: 'UnifiedErrorPage' },
+  { name: 'unauthorized', path: '/401', segment: 'public', component: 'UnauthorizedPage' },
+  { name: 'forbidden', path: '/403', segment: 'public', component: 'ForbiddenPage' },
+  { name: 'server-error', path: '/500', segment: 'public', component: 'ServerErrorPage' },
   
   // Redirections
   { name: 'emotion-scan-redirect', path: '/app/emotion-scan', segment: 'consumer', component: 'RedirectToScan', deprecated: true },

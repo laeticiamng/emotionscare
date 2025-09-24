@@ -151,9 +151,9 @@ const navigationCards: NavigationCard[] = [
     category: 'Analytics'
   },
   {
-    title: 'Heatmap Vibes',
-    description: 'Cartographie émotionnelle',
-    path: '/app/heatmap',
+    title: 'Scores & vibes',
+    description: 'Courbes d’humeur et heatmap quotidienne',
+    path: '/app/scores',
     icon: Filter,
     color: 'from-purple-500 to-pink-500',
     category: 'Analytics'
