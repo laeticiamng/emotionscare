@@ -221,7 +221,7 @@ test.describe('Emotion Scan — flow complet', () => {
     });
 
     await page.route('**/src/pages/B2CDashboardPage.tsx**', async (route) => {
-      const moduleSource = `import React from "/node_modules/.vite/deps/react.js";
+      const moduleSource = `import React from "react";
 
 const StubDashboard = () => {
   return React.createElement(
