@@ -1431,6 +1431,7 @@ export type Database = {
           module_context: string
           source_instrument: string
           user_id: string
+          window_type: string
         }
         Insert: {
           created_at?: string | null
@@ -1442,6 +1443,7 @@ export type Database = {
           module_context: string
           source_instrument: string
           user_id: string
+          window_type: string
         }
         Update: {
           created_at?: string | null
@@ -1453,6 +1455,7 @@ export type Database = {
           module_context?: string
           source_instrument?: string
           user_id?: string
+          window_type?: string
         }
         Relationships: [
           {
@@ -5682,6 +5685,38 @@ export type Database = {
           },
         ]
       }
+      music_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          meta: Json
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_generation_logs: {
         Row: {
           created_at: string | null
@@ -5849,6 +5884,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "music_playlists_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_activity_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_recent: {
+        Row: {
+          id: string
+          meta: Json
+          position_sec: number
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          meta?: Json
+          position_sec?: number
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          meta?: Json
+          position_sec?: number
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_recent_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_activity_summary"

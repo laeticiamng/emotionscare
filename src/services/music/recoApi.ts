@@ -1,72 +1,127 @@
-import { SlidersSchema, type Sliders } from '@/modules/mood-mixer/types';
+/**
+ * Service de recommandations musicales basées sur l'état émotionnel
+ */
 
-export const PREVIEW_FALLBACK_URL = '/samples/preview-30s.mp3';
-const PREVIEW_TIMEOUT_MS = 4000;
+import { moodToBucket, type Mood, type MusicBucket } from './moodMap';
 
-export class PreviewUnavailableError extends Error {
-  fallbackUrl?: string;
-
-  constructor(message: string, fallbackUrl?: string) {
-    super(message);
-    this.name = 'PreviewUnavailableError';
-    this.fallbackUrl = fallbackUrl;
-  }
+export interface Track {
+  id: string;
+  title: string;
+  artist?: string;
+  cover?: string;
+  url: string;
+  duration_sec: number;
+  genre?: string;
+  bpm?: number;
 }
 
-export async function previewFromMood(sliders: Sliders): Promise<string> {
-  const payload = SlidersSchema.parse(sliders);
-  const params = new URLSearchParams({
-    energy: String(payload.energy),
-    calm: String(payload.calm),
-    focus: String(payload.focus),
-    light: String(payload.light),
-  });
+interface RecommendationOptions {
+  preview?: boolean;
+  limit?: number;
+}
 
-  const endpoint =
-    typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADAPTIVE_MUSIC_PREVIEW_URL
-      ? import.meta.env.VITE_ADAPTIVE_MUSIC_PREVIEW_URL
-      : '/api/modules/adaptive-music/preview';
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), PREVIEW_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(`${endpoint}?${params.toString()}`, {
-      method: 'GET',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) {
-      throw new PreviewUnavailableError(`Preview failed with status ${response.status}`, PREVIEW_FALLBACK_URL);
-    }
-
-    const data = await response.json().catch(() => null);
-
-    if (typeof data === 'string') {
-      return data;
-    }
-
-    if (data && typeof data.previewUrl === 'string') {
-      return data.previewUrl;
-    }
-
-    if (data && typeof data.url === 'string') {
-      return data.url;
-    }
-
-    return PREVIEW_FALLBACK_URL;
-  } catch (error) {
-    if (error instanceof PreviewUnavailableError) {
-      throw error;
-    }
-
-    if ((error as Error)?.name === 'AbortError') {
-      throw new PreviewUnavailableError('Preview timed out', PREVIEW_FALLBACK_URL);
-    }
-
-    throw new PreviewUnavailableError('Preview request failed', PREVIEW_FALLBACK_URL);
-  } finally {
-    clearTimeout(timeout);
+export async function getRecommendations(
+  mood: Mood,
+  options: RecommendationOptions = {}
+): Promise<Track[]> {
+  const { preview = false, limit = 5 } = options;
+  const bucket = moodToBucket(mood);
+  
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  if (preview) {
+    return [{
+      id: `preview:${bucket}:001`,
+      title: 'Aperçu musical',
+      artist: 'EmotionsCare',
+      url: '/audio/samples/preview-30s.mp3',
+      duration_sec: 30,
+      genre: 'Thérapeutique'
+    }];
   }
+  
+  const tracks = getTracksForBucket(bucket);
+  return tracks.slice(0, limit);
+}
+
+function getTracksForBucket(bucket: MusicBucket): Track[] {
+  const baseTracks: Record<MusicBucket, Track[]> = {
+    'calm/very_low': [
+      {
+        id: 'calm-very-low:001',
+        title: 'Cocon de sérénité',
+        artist: 'Harmonie Profonde',
+        url: '/audio/calm/very-low-serenity.mp3',
+        duration_sec: 480,
+        genre: 'Méditation'
+      }
+    ],
+    'calm/low': [
+      {
+        id: 'calm-low:001',
+        title: 'Vague douce',
+        artist: 'Océan Thérapie',
+        url: '/audio/calm/gentle-wave.mp3',
+        duration_sec: 420,
+        genre: 'Relaxation'
+      }
+    ],
+    'focus/medium': [
+      {
+        id: 'focus-medium:001',
+        title: 'Flow mental',
+        artist: 'Concentration Pure',
+        url: '/audio/focus/mental-flow.mp3',
+        duration_sec: 900,
+        genre: 'Focus'
+      }
+    ],
+    'bright/low': [
+      {
+        id: 'bright-low:001',
+        title: 'Aurore bienveillante',
+        artist: 'Lumière Douce',
+        url: '/audio/bright/gentle-dawn.mp3',
+        duration_sec: 300,
+        genre: 'Bien-être'
+      }
+    ],
+    'bright/medium': [
+      {
+        id: 'bright-medium:001',
+        title: 'Harmonie équilibrée',
+        artist: 'Balance Parfaite',
+        url: '/audio/bright/balanced-harmony.mp3',
+        duration_sec: 450,
+        genre: 'Équilibre'
+      }
+    ],
+    'reset': [
+      {
+        id: 'reset:001',
+        title: 'Page blanche',
+        artist: 'Nouveau Départ',
+        url: '/audio/reset/blank-page.mp3',
+        duration_sec: 300,
+        genre: 'Neutre'
+      }
+    ]
+  };
+  
+  return baseTracks[bucket] || baseTracks.reset;
+}
+
+export async function getTrackById(trackId: string): Promise<Track | null> {
+  const allBuckets: MusicBucket[] = [
+    'calm/very_low', 'calm/low', 'focus/medium', 
+    'bright/low', 'bright/medium', 'reset'
+  ];
+  
+  for (const bucket of allBuckets) {
+    const tracks = getTracksForBucket(bucket);
+    const track = tracks.find(t => t.id === trackId);
+    if (track) return track;
+  }
+  
+  return null;
 }
