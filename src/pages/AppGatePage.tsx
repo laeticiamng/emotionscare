@@ -5,8 +5,8 @@
 
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { useAuth } from '@/contexts/AuthContext.minimal';
+import { useUserMode } from '@/contexts/UserModeContext.minimal';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { stripUtmParams } from '@/lib/utm';
 
