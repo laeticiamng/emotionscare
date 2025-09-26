@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import RootErrorBoundary from '@/app/RootErrorBoundary';
 import { RootProvider } from '@/providers';
-import { router } from '@/routerV2/router';
+import { router as routerV2 } from '@/routerV2/router';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -105,8 +105,8 @@ createRoot(rootElement).render(
         <RootProvider>
           <AccessibilitySkipLinks />
           <RouterProvider router={routerV2} />
-        </I18nProvider>
-      </AccessibilityProvider>
-    </RootProvider>
+        </RootProvider>
+      </React.Suspense>
+    </RootErrorBoundary>
   </React.StrictMode>
 );
