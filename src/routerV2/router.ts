@@ -8,8 +8,14 @@ import { ROUTES_REGISTRY } from './registry';
 import * as Sentry from '@sentry/react';
 import React, { lazy } from 'react';
 
-// Import direct des composants pour éviter la circularité
+// Import des composants principaux
 const HomePage = lazy(() => import('@/pages/HomePage'));
+const AboutPage = lazy(() => import('@/pages/AboutPage'));
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
+const HelpPage = lazy(() => import('@/pages/HelpPage'));
+const DemoPage = lazy(() => import('@/pages/DemoPage'));
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
+const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
 const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
@@ -20,10 +26,17 @@ const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const UnifiedErrorPage = lazy(() => import('@/pages/errors/404/page'));
+const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
-// ComponentMap minimal pour éviter l'import circulaire
+// ComponentMap étendu avec les pages existantes
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   HomePage,
+  AboutPage,
+  ContactPage,
+  HelpPage,
+  DemoPage,
+  OnboardingPage,
+  PrivacyPage,
   B2CDashboardPage,
   B2CScanPage,
   B2CMusicEnhanced,
@@ -34,6 +47,11 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   SignupPage,
   NotFound,
   UnifiedErrorPage,
+  AppGatePage,
+  // Alias pour les composants de redirect manquants
+  UnifiedLoginPage: LoginPage,
+  HomeB2CPage: HomePage,
+  B2BEntreprisePage: HomePage,
 };
 
 /**
