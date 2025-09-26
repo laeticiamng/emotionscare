@@ -1,6 +1,3 @@
-import ScanView from './scan/ScanView'
-
-export default ScanView
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
