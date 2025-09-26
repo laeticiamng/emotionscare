@@ -99,7 +99,7 @@ export default defineConfig({
   
   // Configuration serveur dev
   server: {
-    port: 3000,
+    port: 8080,
     host: true,
     open: false,
   },
