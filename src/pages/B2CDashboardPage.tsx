@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { LastEmotionScansCard } from '@/features/dashboard/LastEmotionScansCard';
-import JournalSummaryCard from '@/components/dashboard/widgets/JournalSummaryCard';
 import {
   Brain,
   Music,
