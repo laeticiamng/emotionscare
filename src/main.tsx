@@ -7,26 +7,20 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import { router as routerV2 } from '@/routerV2/router';
-import { RootProvider } from '@/providers/RootProvider.minimal';
+import { RootProvider } from '@/providers/RootProvider';
 import { Loader2 } from 'lucide-react';
 
-// Configuration basique avec debug
-console.log('🚀 Application starting...');
-
+// Configuration basique
 if (typeof document !== 'undefined') {
   document.documentElement.lang = 'fr';
   document.title = "EmotionsCare - Plateforme d'intelligence émotionnelle";
-  console.log('📄 Document configured');
 }
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  console.error('❌ Root element not found');
   throw new Error('Application root element not found');
 }
-
-console.log('🎯 Root element found, creating React app...');
 
 createRoot(rootElement).render(
   <React.StrictMode>
@@ -49,5 +43,3 @@ createRoot(rootElement).render(
     </RootProvider>
   </React.StrictMode>
 );
-
-console.log('✅ React app rendered successfully');

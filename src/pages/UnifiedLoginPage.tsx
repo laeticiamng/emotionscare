@@ -6,11 +6,59 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Eye, EyeOff, Mail, Lock, User, Building } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { toast } from 'sonner';
 
 const UnifiedLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<'b2c' | 'b2b-user' | 'b2b-admin'>('b2c');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { signIn } = useAuth();
+  const { setUserMode } = useUserMode();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      console.log('🔑 Attempting login with:', { email, loginType });
+      
+      // Connexion avec Supabase Auth
+      await signIn(email, password);
+      
+      // Définir le mode utilisateur selon le type choisi
+      const modeMap = {
+        'b2c': 'b2c',
+        'b2b-user': 'b2b_user', 
+        'b2b-admin': 'b2b_admin'
+      } as const;
+      
+      setUserMode(modeMap[loginType]);
+      
+      toast.success('Connexion réussie !');
+      
+      // Redirection vers l'application
+      navigate('/app', { replace: true });
+      
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      toast.error(error.message || 'Erreur de connexion');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 flex items-center justify-center p-4" data-testid="page-root">
@@ -49,6 +97,7 @@ const UnifiedLoginPage = () => {
                 </TabsTrigger>
               </TabsList>
 
+            <form onSubmit={handleLogin}>
               <div className="mt-6 space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -59,6 +108,10 @@ const UnifiedLoginPage = () => {
                       type="email" 
                       placeholder="votre@email.com" 
                       className="pl-9"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
                     />
                   </div>
                 </div>
@@ -72,11 +125,16 @@ const UnifiedLoginPage = () => {
                       type={showPassword ? "text" : "password"} 
                       placeholder="••••••••" 
                       className="pl-9 pr-9"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                      disabled={isLoading}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -88,8 +146,8 @@ const UnifiedLoginPage = () => {
                 </div>
 
                 <TabsContent value="b2c" className="space-y-4">
-                  <Button className="w-full" size="lg">
-                    Se connecter - Personnel
+                  <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                    {isLoading ? 'Connexion...' : 'Se connecter - Personnel'}
                   </Button>
                   <div className="text-center text-sm text-muted-foreground">
                     Accès à votre espace bien-être personnel
@@ -97,8 +155,8 @@ const UnifiedLoginPage = () => {
                 </TabsContent>
 
                 <TabsContent value="b2b-user" className="space-y-4">
-                  <Button className="w-full" size="lg" variant="secondary">
-                    Se connecter - Employé
+                  <Button type="submit" className="w-full" size="lg" variant="secondary" disabled={isLoading}>
+                    {isLoading ? 'Connexion...' : 'Se connecter - Employé'}
                   </Button>
                   <div className="text-center text-sm text-muted-foreground">
                     Accès à l'espace collaborateur entreprise
@@ -106,14 +164,15 @@ const UnifiedLoginPage = () => {
                 </TabsContent>
 
                 <TabsContent value="b2b-admin" className="space-y-4">
-                  <Button className="w-full" size="lg" variant="outline">
-                    Se connecter - Manager
+                  <Button type="submit" className="w-full" size="lg" variant="outline" disabled={isLoading}>
+                    {isLoading ? 'Connexion...' : 'Se connecter - Manager'}
                   </Button>
                   <div className="text-center text-sm text-muted-foreground">
                     Accès aux outils de gestion RH
                   </div>
                 </TabsContent>
               </div>
+            </form>
 
               <Separator className="my-6" />
 
