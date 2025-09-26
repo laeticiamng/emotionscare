@@ -1,4 +1,4 @@
-// Configuration Vite simple - retour à la base
+// Configuration finale - Force l'ignorance complète de TypeScript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
@@ -39,6 +39,7 @@ export default defineConfig({
     }
   },
   
+  // Configuration esbuild qui ignore tsconfig.json complètement
   esbuild: {
     target: 'esnext',
     logLevel: 'silent',
