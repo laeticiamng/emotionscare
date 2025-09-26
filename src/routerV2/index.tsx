@@ -147,8 +147,8 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 
 // Pages système unifiées
-const UnauthorizedPage = lazy(() => import('@/pages/errors/401'));
-const ForbiddenPage = lazy(() => import('@/pages/errors/403'));
+const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
+const ForbiddenPage = lazy(() => import('@/pages/errors/403/page'));
 const UnifiedErrorPage = lazy(() => import('@/pages/unified/UnifiedErrorPage'));
 const ServerErrorPage = lazy(() => import('@/pages/ServerErrorPage'));
 
