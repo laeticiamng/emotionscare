@@ -92,6 +92,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   GeneralPage,
   ReportingPage,
   ExportPage,
+  NavigationPage,
   JournalPage,
   
   // Pages légales
