@@ -18,14 +18,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['services/**/*.test.ts'],
-    watch: false,
-  },
-});
-
-  test: {
-    globals: true,
-    environment: 'node',
     include: ['services/api/tests/**/*.test.ts'],
     maxThreads: 1,
     minThreads: 1,

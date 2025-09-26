@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bun
 import { readdir, stat } from 'fs/promises';
 import { join, extname } from 'path';

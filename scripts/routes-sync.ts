@@ -1,4 +1,3 @@
-
 #!/usr/bin/env tsx
 import { mkdir, writeFile, readdir, stat } from 'fs/promises';
 import { join, dirname } from 'path';

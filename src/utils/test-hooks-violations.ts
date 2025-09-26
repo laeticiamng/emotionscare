@@ -1,5 +1,14 @@
 // ❌ EXEMPLES DE VIOLATIONS - Ces patterns déclencheront des erreurs ESLint
 
+import React from 'react';
+
+// Dummy function for the example
+const fetchData = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve("data"), 1000);
+  });
+};
+
 // ESLint devrait détecter ces violations des règles des hooks
 
 export const BadComponent1 = ({ condition }: { condition: boolean }) => {
@@ -42,13 +51,15 @@ export const GoodComponent1 = ({ condition }: { condition: boolean }) => {
     return null;
   }
   
-  return <div onClick={() => setState(s => s + 1)}>{state}</div>;
+  return React.createElement('div', { 
+    onClick: () => setState(s => s + 1) 
+  }, state);
 };
 
 export const GoodComponent2 = () => {
   // ✅ Hooks au top level - CORRECT
-  const [data, setData] = React.useState(null);
-  const [error, setError] = React.useState(null);
+  const [data, setData] = React.useState<any>(null);
+  const [error, setError] = React.useState<any>(null);
   
   React.useEffect(() => {
     try {
@@ -60,8 +71,8 @@ export const GoodComponent2 = () => {
   }, []);
   
   if (error) {
-    return <div>Erreur: {error.message}</div>;
+    return React.createElement('div', null, `Erreur: ${error.message}`);
   }
   
-  return <div>{data || 'Chargement...'}</div>;
+  return React.createElement('div', null, data || 'Chargement...');
 };

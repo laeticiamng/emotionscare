@@ -174,6 +174,8 @@ export async function exportMonthlyReportCsv(period: string, teamId?: string | n
       },
     },
   );
+}
+
 export type HeatmapCell = {
   team_id: string | null;
   team_label: string;

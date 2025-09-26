@@ -1,4 +1,3 @@
-
 #!/usr/bin/env ts-node
 
 import * as fs from 'fs';
