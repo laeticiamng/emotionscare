@@ -1,291 +1,203 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Zap, Shield, RefreshCw, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Shield, Zap, Heart, TrendingUp, Clock, Star, Target, RefreshCw } from 'lucide-react';
 
-interface CounterSpell {
+interface Challenge {
   id: string;
-  name: string;
-  action: string;
-  duration: number;
-  type: 'silk' | 'flash' | 'breath' | 'walk';
+  title: string;
+  description: string;
+  type: 'stress' | 'setback' | 'failure' | 'rejection';
+  difficulty: number;
+  resilience: number;
+  timeLimit: number;
+  status: 'available' | 'active' | 'completed';
 }
 
 const B2CBounceBackBattlePage: React.FC = () => {
-  const navigate = useNavigate();
-  const { shouldAnimate, getDuration } = useMotionPrefs();
-  
-  const [phase, setPhase] = useState<'prep' | 'stress' | 'defusion' | 'action' | 'complete'>('prep');
-  const [stressTimer, setStressTimer] = useState(0);
-  const [selectedCounterSpell, setSelectedCounterSpell] = useState<CounterSpell | null>(null);
-  const [tensionLevel, setTensionLevel] = useState(0);
+  const [resilienceStats] = useState({
+    overall: 75,
+    stress: 68,
+    emotional: 82,
+    mental: 71,
+    streak: 5
+  });
 
-  const counterSpells: CounterSpell[] = [
-    { id: '1', name: 'Silk Break', action: 'Repos écran 2 min', duration: 120, type: 'silk' },
-    { id: '2', name: 'Flash Glow', action: 'Éclat doux 90s', duration: 90, type: 'flash' },
-    { id: '3', name: 'Marche active', action: '90s de mouvement', duration: 90, type: 'walk' },
-    { id: '4', name: 'Souffle ancré', action: '5 respirations profondes', duration: 60, type: 'breath' }
-  ];
-
-  const defusionPhrases = [
-    "Ce stress est un signal, pas une vérité.",
-    "Cette tension peut passer, comme un nuage.",
-    "Je peux observer cette émotion sans qu'elle me dirige."
-  ];
-
-  const startStressPhase = () => {
-    setPhase('stress');
-    setStressTimer(0);
-    setTensionLevel(0);
-  };
-
-  const completeStressPhase = () => {
-    setPhase('defusion');
-  };
-
-  const selectCounterSpell = (spell: CounterSpell) => {
-    setSelectedCounterSpell(spell);
-    setPhase('action');
-  };
-
-  const completeAction = () => {
-    setPhase('complete');
-  };
-
-  const resetBattle = () => {
-    setPhase('prep');
-    setStressTimer(0);
-    setSelectedCounterSpell(null);
-    setTensionLevel(0);
-  };
-
-  // Animation du niveau de tension pendant la phase stress
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (phase === 'stress') {
-      interval = setInterval(() => {
-        setStressTimer(prev => {
-          const newTime = prev + 1;
-          setTensionLevel(Math.min(newTime / 30 * 100, 100)); // Max tension à 30s
-          if (newTime >= 45) { // Auto-completion après 45s
-            setPhase('defusion');
-          }
-          return newTime;
-        });
-      }, 1000);
+  const challenges: Challenge[] = [
+    {
+      id: 'morning-setback',
+      title: 'Revers Matinal',
+      description: 'Gérez un contretemps dès le réveil',
+      type: 'setback',
+      difficulty: 2,
+      resilience: 10,
+      timeLimit: 300,
+      status: 'available'
+    },
+    {
+      id: 'work-stress',
+      title: 'Pression Professionnelle',
+      description: 'Surmontez une situation stressante au travail',
+      type: 'stress',
+      difficulty: 3,
+      resilience: 15,
+      timeLimit: 600,
+      status: 'available'
+    },
+    {
+      id: 'social-rejection',
+      title: 'Rejet Social',
+      description: 'Rebondissez après un refus ou une critique',
+      type: 'rejection',
+      difficulty: 4,
+      resilience: 20,
+      timeLimit: 900,
+      status: 'available'
+    },
+    {
+      id: 'major-failure',
+      title: 'Échec Majeur',
+      description: 'Transformez un échec en opportunité d\'apprentissage',
+      type: 'failure',
+      difficulty: 5,
+      resilience: 25,
+      timeLimit: 1200,
+      status: 'available'
     }
-    return () => clearInterval(interval);
-  }, [phase]);
+  ];
 
-  const getTensionColor = () => {
-    if (tensionLevel < 30) return 'text-green-400';
-    if (tensionLevel < 70) return 'text-yellow-400';
-    return 'text-red-400';
-  };
-
-  const getSpellIcon = (type: CounterSpell['type']) => {
+  const getTypeColor = (type: string) => {
     switch (type) {
-      case 'silk': return '🌸';
-      case 'flash': return '✨';
-      case 'breath': return '🌊';
-      case 'walk': return '🚶';
-      default: return '⚡';
+      case 'stress': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'setback': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      case 'failure': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      case 'rejection': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate('/dashboard')}
-          className="hover:bg-white/10 transition-colors"
+    <div className="min-h-screen bg-gradient-to-br from-background via-red-50/20 to-muted/20 p-6" data-testid="page-root">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
         >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Bounce Back</h1>
-          <p className="text-sm text-muted-foreground">Reprise éclair</p>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full mb-4">
+            <Shield className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-4">
+            Bounce-Back Battle
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Développez votre résilience en relevant des défis simulés. Plus vous rebondissez, plus vous devenez fort !
+          </p>
+        </motion.div>
+
+        {/* Stats de résilience */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Shield className="w-8 h-8 mx-auto mb-2 text-primary" />
+              <div className="text-2xl font-bold">{resilienceStats.overall}%</div>
+              <div className="text-sm text-muted-foreground">Résilience Globale</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Zap className="w-8 h-8 mx-auto mb-2 text-red-500" />
+              <div className="text-2xl font-bold">{resilienceStats.stress}%</div>
+              <div className="text-sm text-muted-foreground">Anti-Stress</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Heart className="w-8 h-8 mx-auto mb-2 text-pink-500" />
+              <div className="text-2xl font-bold">{resilienceStats.emotional}%</div>
+              <div className="text-sm text-muted-foreground">Émotionnel</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-blue-500" />
+              <div className="text-2xl font-bold">{resilienceStats.mental}%</div>
+              <div className="text-sm text-muted-foreground">Mental</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
+              <div className="text-2xl font-bold">{resilienceStats.streak}</div>
+              <div className="text-sm text-muted-foreground">Série</div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
 
-      <div className="max-w-md mx-auto">
-        {phase === 'prep' && (
-          <div className="text-center space-y-6">
-            <Card className="p-6 bg-card/80 backdrop-blur-sm border-border/50">
-              <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-foreground mb-2">Prêt pour le battle ?</h2>
-              <p className="text-muted-foreground mb-6">
-                30-60s face à un mini stress, puis défusion et action exacte.
-              </p>
-              <Button onClick={startStressPhase} className="w-full">
-                <Zap className="h-4 w-4 mr-2" />
-                Commencer le défi
-              </Button>
-            </Card>
-          </div>
-        )}
-
-        {phase === 'stress' && (
-          <div className="text-center space-y-6">
-            <Card className="p-6 bg-card/80 backdrop-blur-sm border-border/50">
-              <div className="mb-4">
-                <Zap className={`h-12 w-12 mx-auto mb-2 ${getTensionColor()}`} />
-                <div className="text-2xl font-light text-foreground mb-2">
-                  {Math.floor(stressTimer / 60)}:{(stressTimer % 60).toString().padStart(2, '0')}
-                </div>
-              </div>
-
-              {/* Jauge de tension */}
-              <div className="mb-6">
-                <div className="w-full bg-muted/30 rounded-full h-3">
-                  <div 
-                    className={`h-full rounded-full transition-all duration-1000 ${
-                      tensionLevel < 30 ? 'bg-green-400' :
-                      tensionLevel < 70 ? 'bg-yellow-400' : 'bg-red-400'
-                    }`}
-                    style={{ width: `${tensionLevel}%` }}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Observez la montée de tension
-                </p>
-              </div>
-
-              <p className="text-muted-foreground mb-4">
-                Respirez et observez... Le stress monte, c'est normal.
-              </p>
-
-              <Button 
-                onClick={completeStressPhase} 
-                variant="outline"
-                className="hover:bg-primary/10"
+        {/* Défis disponibles */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Défis de Résilience
+            </CardTitle>
+            <CardDescription>
+              Choisissez un défi adapté à votre niveau
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {challenges.map((challenge, index) => (
+              <motion.div
+                key={challenge.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
               >
-                Je suis prêt à défuser
-              </Button>
-            </Card>
-          </div>
-        )}
-
-        {phase === 'defusion' && (
-          <div className="space-y-4">
-            <Card className="p-6 bg-card/80 backdrop-blur-sm border-border/50 text-center">
-              <RefreshCw className="h-8 w-8 text-primary mx-auto mb-4" />
-              <h2 className="text-lg font-semibold text-foreground mb-4">Défusion</h2>
-            </Card>
-
-            {defusionPhrases.map((phrase, index) => (
-              <Card 
-                key={index}
-                className="p-4 bg-card/60 backdrop-blur-sm border-border/50 text-center hover:bg-card/80 transition-colors cursor-pointer"
-                onClick={() => setPhase('action')}
-              >
-                <p className="text-sm text-foreground italic">{phrase}</p>
-              </Card>
+                <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Badge className={getTypeColor(challenge.type)}>
+                          {challenge.type}
+                        </Badge>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: challenge.difficulty }).map((_, i) => (
+                            <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        ⏱️ {Math.floor(challenge.timeLimit / 60)} min
+                      </div>
+                    </div>
+                    
+                    <h3 className="font-semibold mb-1">{challenge.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {challenge.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm">
+                        <Shield className="w-4 h-4 inline mr-1" />
+                        +{challenge.resilience} résilience
+                      </div>
+                      <Button size="sm">
+                        Commencer
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-
-            <Button 
-              onClick={() => setPhase('action')} 
-              className="w-full mt-4"
-            >
-              Choisir mon contre-sort
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        )}
-
-        {phase === 'action' && !selectedCounterSpell && (
-          <div className="space-y-4">
-            <Card className="p-4 bg-card/80 backdrop-blur-sm border-border/50 text-center">
-              <h2 className="text-lg font-semibold text-foreground mb-2">Contre-sorts disponibles</h2>
-              <p className="text-sm text-muted-foreground">Choisissez votre action de reprise</p>
-            </Card>
-
-            {counterSpells.map((spell) => (
-              <Card 
-                key={spell.id}
-                className="p-4 bg-card/60 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all cursor-pointer group"
-                onClick={() => selectCounterSpell(spell)}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{getSpellIcon(spell.type)}</span>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
-                      {spell.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">{spell.action}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {Math.floor(spell.duration / 60)}:{(spell.duration % 60).toString().padStart(2, '0')}
-                  </span>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {phase === 'action' && selectedCounterSpell && (
-          <div className="text-center space-y-6">
-            <Card className="p-6 bg-card/80 backdrop-blur-sm border-border/50">
-              <span className="text-4xl block mb-4">{getSpellIcon(selectedCounterSpell.type)}</span>
-              <h2 className="text-xl font-semibold text-foreground mb-2">
-                {selectedCounterSpell.name}
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                {selectedCounterSpell.action}
-              </p>
-              <div className="space-y-3">
-                <Button onClick={completeAction} className="w-full">
-                  Action terminée ✨
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setSelectedCounterSpell(null)}
-                  className="w-full"
-                >
-                  Changer de contre-sort
-                </Button>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {phase === 'complete' && (
-          <div className="text-center space-y-6">
-            <Card className="p-6 bg-primary/10 border-primary/20">
-              <div className="text-4xl mb-4">🏆</div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Battle terminé !</h2>
-              <p className="text-muted-foreground mb-6">
-                Vous avez affronté le stress et rebondi avec succès.
-              </p>
-              
-              <div className="space-y-3">
-                <Button onClick={resetBattle} className="w-full">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Nouveau battle
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate('/dashboard')}
-                  className="w-full"
-                >
-                  Retour au dashboard
-                </Button>
-              </div>
-            </Card>
-
-            {/* Proposition pour demain */}
-            <Card className="p-4 bg-card/40 backdrop-blur-sm border-border/30">
-              <p className="text-sm text-muted-foreground text-center">
-                💫 On refait un tour demain ?
-              </p>
-            </Card>
-          </div>
-        )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

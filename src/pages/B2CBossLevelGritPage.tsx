@@ -1,237 +1,176 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Sparkles, Target } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Sword, Shield, Crown, Target, Zap, Star, Trophy } from 'lucide-react';
 
-interface GritChallenge {
+interface Challenge {
   id: string;
   title: string;
   description: string;
-  difficulty: 'novice' | 'warrior' | 'master' | 'legend';
-  duration: number; // en minutes
-  category: 'mental' | 'physical' | 'emotional' | 'spiritual';
-  status: 'available' | 'in_progress' | 'completed';
+  difficulty: 'facile' | 'moyen' | 'difficile' | 'boss';
+  xp: number;
+  duration: string;
+  icon: React.ElementType;
+  status: 'locked' | 'available' | 'in-progress' | 'completed';
 }
 
 const B2CBossLevelGritPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { shouldAnimate, getDuration } = useMotionPrefs();
-  const [selectedChallenge, setSelectedChallenge] = useState<GritChallenge | null>(null);
-  const [sessionActive, setSessionActive] = useState(false);
-  const [sessionTime, setSessionTime] = useState(0);
-  const [auraGlow, setAuraGlow] = useState(0);
+  const [playerLevel] = useState(5);
+  const [currentXP] = useState(750);
+  const [maxXP] = useState(1000);
 
-  const dailyChallenges: GritChallenge[] = [
+  const challenges: Challenge[] = [
     {
-      id: '1',
-      title: 'Minute de gratitude',
-      description: 'Noter 3 choses simples qui ont aidé aujourd\'hui',
-      difficulty: 'novice',
-      duration: 3,
-      category: 'mental',
+      id: 'daily-focus',
+      title: 'Maître de la Concentration',
+      description: 'Maintenez votre focus pendant 25 minutes sans interruption',
+      difficulty: 'facile',
+      xp: 50,
+      duration: '25 min',
+      icon: Target,
       status: 'available'
     },
     {
-      id: '2', 
-      title: 'Ancrage épaules',
-      description: 'Relâcher les tensions, 5 respirations profondes',
-      difficulty: 'warrior',
-      duration: 4,
-      category: 'physical',
+      id: 'stress-warrior',
+      title: 'Guerrier Anti-Stress',
+      description: 'Gérez 5 situations stressantes avec nos techniques',
+      difficulty: 'moyen',
+      xp: 100,
+      duration: '1 heure',
+      icon: Shield,
       status: 'available'
+    },
+    {
+      id: 'emotion-master',
+      title: 'Maître des Émotions',
+      description: 'Identifiez et gérez 10 émotions différentes',
+      difficulty: 'difficile',
+      xp: 200,
+      duration: '2 heures',
+      icon: Crown,
+      status: 'in-progress'
+    },
+    {
+      id: 'boss-resilience',
+      title: 'Boss Final: Résilience Ultime',
+      description: 'Défi ultime de résilience émotionnelle',
+      difficulty: 'boss',
+      xp: 500,
+      duration: '1 jour',
+      icon: Sword,
+      status: 'locked'
     }
   ];
 
-  const [challenges] = useState<GritChallenge[]>(dailyChallenges);
-
-  const startChallenge = (challenge: GritChallenge) => {
-    setSelectedChallenge(challenge);
-    setSessionActive(true);
-    setSessionTime(0);
-  };
-
-  const completeChallenge = () => {
-    if (selectedChallenge) {
-      setSessionActive(false);
-      setAuraGlow(prev => Math.min(prev + 20, 100));
-      // Micro-son de réussite (simulé)
-      if (shouldAnimate) {
-        // Animation de confetti coton
-        const duration = getDuration(800);
-        if (duration > 0) {
-          setTimeout(() => setAuraGlow(prev => prev * 0.8), duration);
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (sessionActive && selectedChallenge) {
-      timer = setInterval(() => {
-        setSessionTime(prev => {
-          if (prev >= selectedChallenge.duration * 60) {
-            setSessionActive(false);
-            completeChallenge();
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [sessionActive, selectedChallenge]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'novice': return 'text-green-300';
-      case 'warrior': return 'text-blue-300';
-      case 'master': return 'text-purple-300';
-      case 'legend': return 'text-amber-300';
-      default: return 'text-muted-foreground';
+      case 'facile': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'moyen': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'difficile': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      case 'boss': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate('/dashboard')}
-          className="hover:bg-white/10 transition-colors"
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/20 p-6" data-testid="page-root">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
         >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Boss Level Grit</h1>
-          <p className="text-sm text-muted-foreground">Un petit boss par jour, même fatigué·e</p>
-        </div>
-      </div>
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/60 rounded-full mb-6">
+            <Crown className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            Boss Level Grit
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
+            Relevez des défis émotionnels progressifs et développez votre résilience mentale.
+          </p>
 
-      {!sessionActive ? (
-        <>
-          {/* Aura du joueur */}
-          <Card className="p-6 mb-6 bg-card/80 backdrop-blur-sm border-border/50">
-            <div className="flex items-center gap-4">
-              <div 
-                className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center"
-                style={{ 
-                  boxShadow: `0 0 ${auraGlow}px hsl(var(--primary) / 0.3)`,
-                  filter: `brightness(${1 + auraGlow / 200})`
-                }}
-              >
-                <Shield className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Votre constance</h3>
-                <p className="text-sm text-muted-foreground">Éclat doux, sans pression</p>
-                {auraGlow > 0 && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <Sparkles className="h-3 w-3 text-primary" />
-                    <span className="text-xs text-primary">Aura brillante</span>
-                  </div>
-                )}
-              </div>
+          {/* Stats du joueur */}
+          <div className="flex items-center justify-center gap-6 mb-6">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-500" />
+              <span className="font-semibold">Niveau {playerLevel}</span>
             </div>
-          </Card>
-
-          {/* Défis du jour */}
-          <div className="space-y-4 mb-6">
-            <h2 className="text-lg font-medium text-foreground">Défis du jour</h2>
-            {challenges.map((challenge) => (
-              <Card 
-                key={challenge.id}
-                className="p-4 bg-card/60 backdrop-blur-sm border-border/50 hover:bg-card/80 transition-all cursor-pointer group"
-                onClick={() => startChallenge(challenge)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Target className="h-4 w-4 text-primary" />
-                      <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
-                        {challenge.title}
-                      </h3>
-                      <span className={`text-xs ${getDifficultyColor(challenge.difficulty)}`}>
-                        {challenge.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">{challenge.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>{challenge.duration} min</span>
-                      <span className="capitalize">{challenge.category}</span>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" className="hover:bg-primary/10">
-                    Commencer
-                  </Button>
-                </div>
-              </Card>
-            ))}
+            <div className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-blue-500" />
+              <span>{currentXP} / {maxXP} XP</span>
+            </div>
           </div>
 
-          {/* Message d'encouragement */}
-          <Card className="p-4 bg-primary/5 border-primary/20">
-            <p className="text-sm text-muted-foreground text-center">
-              ✨ Rater ≠ reset. Votre streak de compassion continue.
-            </p>
-          </Card>
-        </>
-      ) : (
-        /* Session active */
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Card className="p-8 bg-card/80 backdrop-blur-sm border-border/50 text-center max-w-md">
-            <div className="mb-6">
-              <Target className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-foreground mb-2">
-                {selectedChallenge?.title}
-              </h2>
-              <p className="text-muted-foreground">
-                {selectedChallenge?.description}
-              </p>
-            </div>
+          <div className="max-w-md mx-auto">
+            <Progress value={(currentXP / maxXP) * 100} className="h-3" />
+          </div>
+        </motion.div>
 
-            <div className="mb-6">
-              <div className="text-3xl font-light text-primary mb-2">
-                {formatTime(sessionTime)}
-              </div>
-              <div className="w-full bg-muted/30 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-primary/60 to-primary h-full rounded-full transition-all duration-1000"
-                  style={{ 
-                    width: selectedChallenge ? `${Math.min((sessionTime / (selectedChallenge.duration * 60)) * 100, 100)}%` : '0%'
-                  }}
-                />
-              </div>
-            </div>
+        {/* Grille des défis */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {challenges.map((challenge, index) => {
+            const Icon = challenge.icon;
+            const isLocked = challenge.status === 'locked';
+            const isCompleted = challenge.status === 'completed';
+            const isInProgress = challenge.status === 'in-progress';
 
-            <div className="space-y-3">
-              <Button onClick={completeChallenge} className="w-full">
-                Boss battu ✨
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => {
-                  setSessionActive(false);
-                  setSelectedChallenge(null);
-                }}
-                className="w-full"
+            return (
+              <motion.div
+                key={challenge.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={!isLocked ? { scale: 1.02 } : {}}
               >
-                Pause bienveillante
-              </Button>
-            </div>
-          </Card>
+                <Card className={`h-full transition-all duration-300 ${
+                  isLocked ? 'opacity-60 grayscale' : 
+                  isCompleted ? 'border-green-500 bg-green-50 dark:bg-green-950' :
+                  isInProgress ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' :
+                  'hover:shadow-lg cursor-pointer'
+                }`}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`w-6 h-6 ${
+                          challenge.difficulty === 'boss' ? 'text-red-500' : 'text-primary'
+                        }`} />
+                        <Badge className={getDifficultyColor(challenge.difficulty)}>
+                          {challenge.difficulty}
+                        </Badge>
+                      </div>
+                      {isInProgress && <Zap className="w-4 h-4 text-blue-500 animate-pulse" />}
+                    </div>
+                    <CardTitle className="text-lg">{challenge.title}</CardTitle>
+                    <CardDescription>{challenge.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>⏱️ {challenge.duration}</span>
+                        <span>✨ {challenge.xp} XP</span>
+                      </div>
+                    </div>
+                    
+                    <Button
+                      className="w-full"
+                      variant={isCompleted ? "outline" : "default"}
+                      disabled={isLocked}
+                    >
+                      {isCompleted ? 'Terminé' :
+                       isInProgress ? 'En cours...' :
+                       isLocked ? 'Verrouillé' : 'Commencer'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
-      )}
+      </div>
     </div>
   );
 };
