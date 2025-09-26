@@ -1,14 +1,12 @@
 /**
- * Main.tsx simplifié pour diagnostiquer les problèmes
- * Version minimale sans imports complexes
+ * Main.tsx ultra-simplifié pour diagnostiquer les problèmes
  */
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
-import { Loader2 } from 'lucide-react';
-import { router as routerV2 } from '@/routerV2/router';
+import HomePage from './pages/HomePage';
 
 // Configuration basique
 if (typeof document !== 'undefined') {
@@ -24,20 +22,11 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <React.StrictMode>
-    <React.Suspense
-      fallback={
-        <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6 py-16 text-center">
-          <Loader2 className="mb-6 h-12 w-12 animate-spin text-blue-600" />
-          <div className="space-y-2">
-            <p className="text-lg font-semibold text-gray-900">Chargement de l'application…</p>
-            <p className="text-sm text-gray-600">
-              Nous préparons votre espace émotionnel, merci de patienter.
-            </p>
-          </div>
-        </div>
-      }
-    >
-      <RouterProvider router={routerV2} />
-    </React.Suspense>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<HomePage />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
