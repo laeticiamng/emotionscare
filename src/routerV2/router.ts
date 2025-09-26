@@ -5,11 +5,36 @@
 
 import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
-import { componentMap } from './index';
 import * as Sentry from '@sentry/react';
+import React, { lazy } from 'react';
 
-// Export du componentMap pour utilisation externe
-export { componentMap };
+// Import direct des composants pour éviter la circularité
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
+const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
+const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
+const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const SignupPage = lazy(() => import('@/pages/SignupPage'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
+const UnifiedErrorPage = lazy(() => import('@/pages/errors/404/page'));
+
+// ComponentMap minimal pour éviter l'import circulaire
+const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
+  HomePage,
+  B2CDashboardPage,
+  B2CScanPage,
+  B2CMusicEnhanced,
+  B2CAICoachPage,
+  B2CJournalPage,
+  B2CVRBreathGuidePage,
+  LoginPage,
+  SignupPage,
+  NotFound,
+  UnifiedErrorPage,
+};
 
 /**
  * Crée une route React Router à partir d'une configuration de registre
@@ -18,8 +43,11 @@ function createRouteFromRegistry(route: any) {
   const Component = componentMap[route.component];
   
   if (!Component) {
-    console.warn(`[RouterV2] Component "${route.component}" not found for route "${route.path}"`);
-    return null;
+    // Fallback vers NotFound si le composant n'existe pas
+    return {
+      path: route.path,
+      element: React.createElement(UnifiedErrorPage),
+    };
   }
 
   return {
