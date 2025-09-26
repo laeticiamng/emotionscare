@@ -64,6 +64,11 @@ const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
 const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
 const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
 
+// Import des composants B2B manquants
+const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
+const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
+const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
+
 // ComponentMap complet avec tous les composants
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Pages principales
@@ -134,9 +139,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToEntreprise,
   
   // Fallback aliases (utilisant des pages existantes)
-  B2BSelectionPage: HomePage,
-  B2BCollabDashboard: B2CDashboardPage,
-  B2BRHDashboard: B2CDashboardPage,
+  B2BSelectionPage,
+  B2BCollabDashboard,
+  B2BRHDashboard,
 };
 
 /**
