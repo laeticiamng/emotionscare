@@ -143,9 +143,7 @@ const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
 const EmotionScanPage = lazy(() => import('@/modules/emotion-scan/EmotionScanPage'));
 const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGlowUltraPage'));
 
-// Legal pages
-const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
-const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+// Additional legal pages
 const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
 const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
 const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
