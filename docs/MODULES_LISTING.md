@@ -5,27 +5,6 @@ Pour chacun : entrées, routes, dépendances clefs (assessments Edge, sessions
 
 ## 🔗 Socles partagés
 
-### 🧠 Emotion Scan — 🟢 Livré
-- **Entrée** : `src/pages/scan/ScanView.tsx` routé via `/app/scan` (historique dans `src/pages/scan/ScanHistory.tsx`).
-- **Services** : `analyzeEmotion`, `persistScan`, `fetchRecentScans` dans `src/services/scan/scanApi.ts` (validation Zod stricte).
-- **Persistance Supabase** : table `public.emotion_scans` (JSONB `payload` + `mood_score`), RLS owner-only, indexes `user_id` & `created_at desc`.
-- **Fonctionnalités clés** :
-  - Saisie libre + champ micro optionnel, skeleton respectant `prefers-reduced-motion`, feedback vocal via `aria-live`.
-  - Appel Supabase Edge `ai-emotion-analysis` avec timeout 15s, retries, abort controller et breadcrumbs Sentry (`scan:start|success|error`).
-  - Persistance côté client (`persistScan`) puis diffusion `mood.updated` (store + `window.dispatchEvent`) pour synchroniser modules.
-  - Widget Dashboard `LastEmotionScansCard` (React Query) + timeline `/app/scan/history` filtrable (10 derniers scans).
-  - ✅ QA 06/2025 : scénario e2e `emotion-scan-flow.spec.ts` (scan → dashboard → timeline) + tests unitaires `scanApi`/`useEmotionScan`.
-
-### 🎚️ Mood Mixer — 🟢 Livré
-- **Entrée** : `src/pages/B2CMoodMixerPage.tsx` sur `/app/mood-mixer`.
-- **Services** : `src/services/moodPresetsService.ts`, `src/services/moodPlaylist.service.ts` et `adaptiveMusicService`.
-- **Persistance Supabase** : table `public.mood_presets` (nom + sliders JSONB) avec RLS owner-only, indexes `user_id` + `created_at desc`.
-- **Fonctionnalités clés** :
-  - Chargement/sauvegarde des presets `mood_presets` (Supabase) avec clamp des ratios et synchronisation utilisateur.  
-  - Génération de noms de vibes dynamiques et édition en temps réel des curseurs douceur/clarté.  
-  - Pré-écoute Adaptive Music : appel API pour récupérer une piste, contrôle lecture/pause et bascule mock/API suivant la disponibilité.
-  - Gestion accessibilité (particles conditionnels sur `prefers-reduced-motion`).
-  - ✅ QA 06/2025 : scénario e2e `mood-mixer-crud.spec.ts` (CRUD complet) + tests `useMoodMixerStore` (7 cas) et `useJournalStore` (4 cas) pour l'enrichissement historique.
 ### Assessments (Edge `/assess/*`)
 - **Fonctions** : `assess-start`, `assess-submit`, `assess-aggregate` (cf. `supabase/functions/assess-*`).
 - **Flux** :

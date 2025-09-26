@@ -6,10 +6,7 @@ import { componentTagger } from "lovable-tagger";
 
 export default defineConfig({
   plugins: [
-    react({
-      typescript: false,
-      babel: false
-    }),
+    react(),
     componentTagger(),
   ],
   

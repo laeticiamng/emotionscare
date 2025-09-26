@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { routes } from '@/routerV2';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { stripUtmParams } from '@/lib/utm';
 
@@ -15,16 +16,6 @@ const AppGatePage: React.FC = () => {
   const { userMode, isLoading: modeLoading } = useUserMode();
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Debug pour comprendre le problème d'accès
-  console.log('AppGatePage - État:', { 
-    isAuthenticated, 
-    user: user?.email, 
-    userMode, 
-    authLoading, 
-    modeLoading,
-    location: location.pathname 
-  });
 
   useEffect(() => {
     const cleanedSearch = stripUtmParams(location.search);
@@ -35,7 +26,6 @@ const AppGatePage: React.FC = () => {
 
   // Chargement en cours
   if (authLoading || modeLoading) {
-    console.log('🔄 Loading state - auth:', authLoading, 'mode:', modeLoading);
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingAnimation text="Redirection en cours..." />
@@ -45,34 +35,29 @@ const AppGatePage: React.FC = () => {
 
   // Pas authentifié -> Login
   if (!isAuthenticated) {
-    console.log('🚫 Not authenticated, redirecting to login');
-    return <Navigate to="/login" replace />;
+    return <Navigate to={routes.auth.login()} replace />;
   }
 
   // Déterminer le rôle et rediriger vers le bon dashboard
   const role = user?.role || userMode;
-  console.log('👤 User role determined:', role);
   
   switch (role) {
     case 'b2c':
     case 'consumer':
-      console.log('🎯 Redirecting to B2C dashboard');
-      return <Navigate to="/app/home" replace />;
+      return <Navigate to={routes.b2c.dashboard()} replace />;
     
     case 'b2b_user':
     case 'employee':
-      console.log('🎯 Redirecting to B2B user dashboard');
-      return <Navigate to="/app/collab" replace />;
+      return <Navigate to={routes.b2b.user.dashboard()} replace />;
     
     case 'b2b_admin':
     case 'manager':
-      console.log('🎯 Redirecting to B2B admin dashboard');
-      return <Navigate to="/app/rh" replace />;
+      return <Navigate to={routes.b2b.admin.dashboard()} replace />;
     
     default:
       // Par défaut, rediriger vers B2C
       console.warn(`[AppGatePage] Rôle inconnu: ${role}, redirection vers B2C`);
-      return <Navigate to="/app/home" replace />;
+      return <Navigate to={routes.b2c.dashboard()} replace />;
   }
 };
 

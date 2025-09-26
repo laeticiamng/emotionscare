@@ -100,7 +100,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     role: 'manager',
     layout: 'app',
     guard: true,
-    component: 'B2BReportsPage',
+    component: 'B2BReportsHeatmapPage',
   },
   {
     name: 'login',
@@ -136,7 +136,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'B2CDashboardPage',
+    component: 'HomePage',
     guard: true,
     aliases: ['/b2c/dashboard', '/dashboard'],
   },
@@ -173,16 +173,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CScanPage',
     guard: true,
     aliases: ['/scan'],
-  },
-  {
-    name: 'scan-history',
-    path: '/app/scan/history',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'ScanHistoryPage',
-    guard: true,
-    parent: '/app/scan',
   },
   {
     name: 'music',
@@ -953,18 +943,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'SubscribePage',
     guard: true,
     aliases: ['/billing', '/plans'],
-  },
-
-  // ═══════════════════════════════════════════════════════════
-  // DEBUG & DEVELOPMENT
-  // ═══════════════════════════════════════════════════════════
-  {
-    name: 'auth-debug',
-    path: '/debug',
-    segment: 'public',
-    layout: 'simple',
-    component: 'AuthDebugPage',
-    aliases: ['/auth-debug', '/debug-auth'],
   },
 
   // ═══════════════════════════════════════════════════════════

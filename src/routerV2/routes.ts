@@ -139,6 +139,3 @@ export type {
 };
 
 export type RoutesCompat = typeof Routes;
-
-// Type pour le routeur principal
-export type AppRouter = typeof Routes;

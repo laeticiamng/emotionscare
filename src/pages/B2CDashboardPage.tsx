@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { LastEmotionScansCard } from '@/features/dashboard/LastEmotionScansCard';
 import {
   Brain,
   Music,
@@ -415,7 +414,6 @@ export default function B2CDashboardPage() {
           <h2 id="recent-scans-section" className="sr-only">
             Historique Emotion Scan
           </h2>
-          <LastEmotionScansCard />
           <Suspense
             fallback={(
               <div aria-busy="true" aria-live="polite">

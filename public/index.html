@@ -2,59 +2,176 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EmotionsCare - React App v2</title>
+  
+  <!-- SEO et Accessibilité -->
+  <title>EmotionsCare - Plateforme d'intelligence émotionnelle</title>
+  <meta name="description" content="Plateforme d'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants." />
+  <meta name="keywords" content="intelligence émotionnelle, bien-être, santé mentale, analyse émotionnelle, musicothérapie, VR thérapeutique" />
+  <meta name="author" content="EmotionsCare" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://emotionscare.com/" />
+  <meta property="og:title" content="EmotionsCare - Plateforme d'intelligence émotionnelle" />
+  <meta property="og:description" content="Analysez et améliorez votre bien-être émotionnel avec nos outils innovants d'IA, musicothérapie et VR." />
+  <meta property="og:image" content="/og-image.jpg" />
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://emotionscare.com/" />
+  <meta property="twitter:title" content="EmotionsCare - Plateforme d'intelligence émotionnelle" />
+  <meta property="twitter:description" content="Analysez et améliorez votre bien-être émotionnel avec nos outils innovants." />
+  <meta property="twitter:image" content="/twitter-image.jpg" />
+  
+  <!-- Accessibilité -->
+  <meta name="theme-color" content="#9333ea" />
+  <meta name="color-scheme" content="light dark" />
+  
+  <!-- Préchargement des ressources critiques -->
+  <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+  <link rel="preload" href="/index.css" as="style" />
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+  
+  <!-- Amélioration des performances -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
   <style>
-    /* CSS d'urgence - fond blanc forcé */
-    * {
-      box-sizing: border-box;
+    /* CSS critique inline pour éviter les FOUC */
+    html {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+      tab-size: 4;
     }
-    html, body {
+    
+    body {
       margin: 0;
-      padding: 0;
-      background-color: white !important;
-      color: black !important;
-      font-family: Arial, sans-serif;
-      height: 100%;
+      background-color: #ffffff;
+      color: #1f2937;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    
+    /* Mode sombre automatique */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #111827;
+        color: #f9fafb;
+      }
+    }
+    
+    /* Respecter les préférences de mouvement */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    
+    /* Loading state */
     #root {
       min-height: 100vh;
-      background-color: white !important;
+    }
+    
+    .loading-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e5e7eb;
+      border-top: 3px solid #9333ea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Focus visible pour l'accessibilité */
+    *:focus {
+      outline: 2px solid #9333ea;
+      outline-offset: 2px;
+    }
+    
+    /* Skip links */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: #9333ea;
+      color: white;
+      padding: 8px 12px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      z-index: 1000;
+      transition: top 0.3s ease;
+    }
+    
+    .skip-link:focus {
+      top: 6px;
     }
   </style>
 </head>
 <body>
+  <noscript>
+    <div style="padding: 2rem; text-align: center; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; margin: 2rem;">
+      <h1 style="color: #92400e; margin-bottom: 1rem;">JavaScript requis</h1>
+      <p style="color: #78350f;">
+        EmotionsCare nécessite JavaScript pour fonctionner correctement. 
+        Veuillez activer JavaScript dans votre navigateur et recharger la page.
+      </p>
+      <p style="color: #78350f; font-size: 0.9em; margin-top: 1rem;">
+        Si vous avez des difficultés, contactez notre support à 
+        <a href="mailto:support@emotionscare.com" style="color: #9333ea;">support@emotionscare.com</a>
+      </p>
+    </div>
+  </noscript>
+  
   <div id="root">
-    <!-- Contenu de secours visible immédiatement -->
-    <div style="
-      min-height: 100vh;
-      background-color: white;
-      color: black;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-    ">
-      <h1 style="color: black; font-size: 24px; margin-bottom: 20px;">
-        🔄 CHARGEMENT REACT...
-      </h1>
-      <p style="color: black; margin-bottom: 10px;">
-        ✅ HTML chargé
-      </p>
-      <p style="color: black; margin-bottom: 10px;">
-        ⏳ JavaScript en cours de chargement...
-      </p>
-      <div id="js-status" style="color: red;">
-        ❌ JavaScript pas encore chargé
+    <!-- Fallback de chargement accessible -->
+    <div class="loading-fallback" role="status" aria-label="Chargement de l'application">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p style="margin-top: 1rem; color: #6b7280;">Chargement d'EmotionsCare...</p>
+      <div style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px);">
+        Chargement de la plateforme d'intelligence émotionnelle EmotionsCare
       </div>
     </div>
   </div>
   
-  <script>
-    // Test JavaScript immédiat
-    console.log('🚀 JavaScript loading...');
-    document.getElementById('js-status').innerHTML = '✅ JavaScript de base OK';
-    document.getElementById('js-status').style.color = 'green';
-  </script>
-  
   <script type="module" src="/src/main.tsx"></script>
+  
+  <!-- Service Worker pour le cache et mode hors ligne -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('✅ Service Worker registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
 </body>
 </html>

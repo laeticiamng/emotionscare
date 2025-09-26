@@ -1,161 +1,184 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Building, 
-  Users, 
-  BarChart3, 
-  Shield, 
-  Heart, 
-  CheckCircle,
-  ArrowRight,
-  Star,
-  TrendingUp
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
+import { Users, Shield, BarChart3, Heart, ArrowRight } from 'lucide-react';
 
-const B2BEntreprisePage = () => {
-  const features = [
-    {
-      icon: Users,
-      title: 'Gestion d\'équipes',
-      description: 'Suivez le bien-être de vos collaborateurs en temps réel',
-      color: 'bg-blue-500'
-    },
-    {
-      icon: BarChart3,
-      title: 'Analytics avancées',
-      description: 'Tableaux de bord et rapports détaillés sur la santé mentale',
-      color: 'bg-green-500'
-    },
-    {
-      icon: Shield,
-      title: 'Sécurité & Conformité',
-      description: 'Données sécurisées, conforme RGPD et ISO 27001',
-      color: 'bg-purple-500'
-    },
-    {
-      icon: Heart,
-      title: 'Programmes bien-être',
-      description: 'Modules personnalisés pour améliorer la QVT',
-      color: 'bg-red-500'
-    }
-  ];
-
-  const benefits = [
-    'Réduction de l\'absentéisme jusqu\'à 40%',
-    'Amélioration de la productivité de 25%',
-    'Meilleure rétention des talents',
-    'Conformité aux obligations d\'entreprise'
-  ];
-
+const B2BEntreprisePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5" data-testid="page-root">
+    <div data-testid="page-root" className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 px-6">
-        <div className="mx-auto max-w-7xl text-center">
-          <Badge variant="secondary" className="mb-4">
-            Solution B2B
-          </Badge>
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-6">
-            Le bien-être de vos équipes,
-            <br />notre priorité
+      <div className="bg-gradient-to-br from-primary/10 to-secondary/10 py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Bien-être émotionnel pour vos équipes
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Plateforme complète de bien-être mental pour entreprises. 
-            Analysez, prévenez et améliorez la santé mentale de vos collaborateurs.
+            Découvrez EmotionsCare B2B : une plateforme complète pour accompagner 
+            le bien-être mental de vos collaborateurs avec anonymat garanti et insights RH.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/b2b/selection">
-              <Button size="lg" className="text-lg px-8">
+            <Button size="lg" asChild>
+              <Link to="/signup?segment=b2b">
                 Demander une démo
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                Parler à un expert
-              </Button>
-            </Link>
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/b2b/selection">Accès équipe</Link>
+            </Button>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Features Section */}
-      <section className="py-20 px-6 bg-background/50">
-        <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
-              Une solution complète pour votre entreprise
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Tous les outils nécessaires pour prendre soin du bien-être de vos équipes
-            </p>
-          </div>
+      <div className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Une solution complète pour l'entreprise
+          </h2>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="text-center">
+              <CardHeader>
+                <Users className="h-12 w-12 mx-auto text-primary mb-4" />
+                <CardTitle>Gestion d'équipe</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Tableaux de bord RH avec données anonymisées et insights d'équipe.
+                </p>
+              </CardContent>
+            </Card>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature) => (
-              <Card key={feature.title} className="group hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className={`w-12 h-12 rounded-lg ${feature.color} text-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <feature.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+            <Card className="text-center">
+              <CardHeader>
+                <Shield className="h-12 w-12 mx-auto text-primary mb-4" />
+                <CardTitle>Anonymat garanti</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Données individuelles protégées, seules les tendances d'équipe sont visibles.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <BarChart3 className="h-12 w-12 mx-auto text-primary mb-4" />
+                <CardTitle>Analytics avancés</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Heatmaps, rapports de bien-être et métriques d'engagement équipe.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <Heart className="h-12 w-12 mx-auto text-primary mb-4" />
+                <CardTitle>Bien-être collectif</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Outils collaboratifs et défis d'équipe pour renforcer la cohésion.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Benefits Section */}
-      <section className="py-20 px-6">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-2 items-center">
+      {/* ROI Section */}
+      <div className="bg-muted/50 py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6">
-                Des résultats mesurables pour votre organisation
+              <h2 className="text-3xl font-bold mb-6">
+                Impact mesurable sur votre organisation
               </h2>
               <div className="space-y-4">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    <span className="text-lg">{benefit}</span>
+                <div className="flex items-start">
+                  <div className="bg-primary/20 p-2 rounded-lg mr-4">
+                    <BarChart3 className="h-6 w-6 text-primary" />
                   </div>
-                ))}
+                  <div>
+                    <h3 className="font-semibold">Réduction de l'absentéisme</h3>
+                    <p className="text-muted-foreground">
+                      Détection précoce des signaux de stress et burnout
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-primary/20 p-2 rounded-lg mr-4">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Amélioration de l'engagement</h3>
+                    <p className="text-muted-foreground">
+                      Outils de bien-être accessibles et gamifiés
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-primary/20 p-2 rounded-lg mr-4">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">Conformité RGPD native</h3>
+                    <p className="text-muted-foreground">
+                      Respect total de la vie privée des collaborateurs
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-
+            
             <div className="space-y-6">
-              <Card className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="bg-green-500 text-white p-2 rounded-lg">
-                    <TrendingUp className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-green-600">40%</div>
-                    <div className="text-sm text-muted-foreground">Réduction absentéisme</div>
-                  </div>
-                </div>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-2">Pour les Collaborateurs</h3>
+                  <p className="text-muted-foreground">
+                    Accès aux mêmes outils que la version B2C : Flash Glow, musicothérapie, 
+                    journal vocal, VR et coaching IA personnalisé.
+                  </p>
+                </CardContent>
               </Card>
-
-              <Card className="p-6 bg-gradient-to-br from-blue-500/5 to-blue-500/10 border-blue-500/20">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="bg-blue-500 text-white p-2 rounded-lg">
-                    <Users className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-blue-600">25%</div>
-                    <div className="text-sm text-muted-foreground">Amélioration productivité</div>
-                  </div>
-                </div>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-2">Pour les Managers RH</h3>
+                  <p className="text-muted-foreground">
+                    Dashboards anonymisés, heatmaps d'équipe, rapports de tendances 
+                    et recommandations d'actions préventives.
+                  </p>
+                </CardContent>
               </Card>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* CTA Final */}
+      <div className="py-20 text-center">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-6">
+            Prêt à transformer le bien-être de vos équipes ?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Démarrez avec une démonstration personnalisée de la plateforme.
+          </p>
+          <Button size="lg" asChild>
+            <Link to="/signup?segment=b2b">
+              Planifier une démo
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

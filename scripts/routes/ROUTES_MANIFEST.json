@@ -75,7 +75,7 @@
     {
       "name": "consumer-home",
       "path": "/app/home",
-      "component": "B2CDashboardPage",
+      "component": "HomeB2CPage",
       "segment": "consumer",
       "role": "consumer",
       "layout": "app",
@@ -108,16 +108,6 @@
       "layout": "app",
       "guard": true,
       "aliases": ["/scan", "/emotion-scan"]
-    },
-    {
-      "name": "scan-history",
-      "path": "/app/scan/history",
-      "component": "ScanHistoryPage",
-      "segment": "consumer",
-      "role": "consumer",
-      "layout": "app",
-      "guard": true,
-      "parent": "/app/scan"
     },
     {
       "name": "coach",
