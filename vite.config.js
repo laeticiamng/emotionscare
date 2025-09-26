@@ -1,4 +1,4 @@
-// Configuration spécifique Lovable - Contournement TypeScript
+// Configuration Vite simple - retour à la base
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
@@ -8,8 +8,6 @@ export default defineConfig({
   plugins: [
     react({
       jsxRuntime: 'automatic',
-      // Configuration React sans TypeScript
-      babel: undefined,
     }),
     componentTagger(),
   ],
@@ -41,23 +39,17 @@ export default defineConfig({
     }
   },
   
-  // Configuration esbuild pure sans référence à tsconfig
   esbuild: {
     target: 'esnext',
     logLevel: 'silent',
     format: 'esm',
-    jsx: 'automatic',
-    // Ignorer complètement tsconfig.json
-    tsconfig: false,
-    tsconfigRaw: false
+    jsx: 'automatic'
   },
 
   optimizeDeps: {
     esbuildOptions: {
       target: 'esnext',
-      jsx: 'automatic',
-      // Forcer l'ignorance de tsconfig
-      tsconfig: false
+      jsx: 'automatic'
     }
   }
 });
