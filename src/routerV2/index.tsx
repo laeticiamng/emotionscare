@@ -143,8 +143,16 @@ const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
 const EmotionScanPage = lazy(() => import('@/modules/emotion-scan/EmotionScanPage'));
 const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGlowUltraPage'));
 
+// Legal pages
+const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
+const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
+const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
+const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
+
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
+const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
 
 // Pages système unifiées
 const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
@@ -259,10 +267,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ProfilePage,
   GeneralPage,
   
-  // Legal pages
+// Legal pages
   LegalTermsPage,
   LegalPrivacyPage,
-  
+  LegalMentionsPage,
+  LegalSalesPage,
+  LegalCookiesPage,
+
   // System unifiées
   UnauthorizedPage,
   ForbiddenPage,
@@ -285,6 +296,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
+  ErrorBoundaryTestPage,
   
   // Composants de redirection
   RedirectToScan,

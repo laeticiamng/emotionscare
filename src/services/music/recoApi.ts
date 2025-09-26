@@ -111,6 +111,36 @@ function getTracksForBucket(bucket: MusicBucket): Track[] {
   return baseTracks[bucket] || baseTracks.reset;
 }
 
+export const PREVIEW_FALLBACK_URL = '/audio/samples/preview-30s.mp3';
+
+export class PreviewUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PreviewUnavailableError';
+  }
+}
+
+export async function previewFromMood(sliders: any): Promise<string> {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  try {
+    // Simulated preview generation based on mood
+    const moodScore = sliders.valence + sliders.arousal;
+    
+    if (moodScore > 0.5) {
+      return '/audio/bright/uplifting-preview.mp3';
+    } else if (moodScore < -0.5) {
+      return '/audio/calm/soothing-preview.mp3';
+    } else {
+      return '/audio/focus/balanced-preview.mp3';
+    }
+  } catch (error) {
+    console.warn('Preview generation failed, using fallback:', error);
+    return PREVIEW_FALLBACK_URL;
+  }
+}
+
 export async function getTrackById(trackId: string): Promise<Track | null> {
   const allBuckets: MusicBucket[] = [
     'calm/very_low', 'calm/low', 'focus/medium', 

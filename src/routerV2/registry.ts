@@ -100,7 +100,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     role: 'manager',
     layout: 'app',
     guard: true,
-    component: 'B2BReportsHeatmapPage',
+    component: 'B2BReportsPage',
   },
   {
     name: 'login',
@@ -491,7 +491,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'ScoresPage',
+    component: 'HeatmapPage',
     guard: true,
     aliases: ['/app/heatmap', '/heatmap-vibes'],
   },
