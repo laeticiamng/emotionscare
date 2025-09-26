@@ -8,6 +8,8 @@ import { ROUTES_REGISTRY } from './registry';
 import * as Sentry from '@sentry/react';
 import React, { lazy } from 'react';
 
+const AuthDebugPage = lazy(() => import('@/pages/AuthDebugPage'));
+
 // Import massif des composants principaux
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
@@ -142,6 +144,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BSelectionPage,
   B2BCollabDashboard,
   B2BRHDashboard,
+
+  // Debug page
+  AuthDebugPage,
 };
 
 /**

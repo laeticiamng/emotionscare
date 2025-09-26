@@ -956,6 +956,18 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
+  // DEBUG & DEVELOPMENT
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'auth-debug',
+    path: '/debug',
+    segment: 'public',
+    layout: 'simple',
+    component: 'AuthDebugPage',
+    aliases: ['/auth-debug', '/debug-auth'],
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // 404 FALLBACK ROUTE (must be last)
   // ═══════════════════════════════════════════════════════════
   {

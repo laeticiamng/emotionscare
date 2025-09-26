@@ -48,6 +48,12 @@ const HomePage: React.FC = () => {
             <Button size="lg" variant="outline" asChild>
               <Link to="/login">Se connecter</Link>
             </Button>
+            <Button size="lg" variant="secondary" asChild>
+              <Link to="/app">Accéder à l'application</Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link to="/debug">Diagnostic de connexion</Link>
+            </Button>
           </div>
         </div>
 
