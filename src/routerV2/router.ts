@@ -94,6 +94,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ExportPage,
   NavigationPage,
   JournalPage,
+  UnifiedLoginPage,
+  CoachChatPage,
+  VRSessionsPage,
   
   // Pages légales
   LegalPrivacyPage,
