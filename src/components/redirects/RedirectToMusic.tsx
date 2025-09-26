@@ -7,7 +7,7 @@ import { Navigate } from 'react-router-dom';
  */
 const RedirectToMusic: React.FC = () => {
   useEffect(() => {
-    console.log('Redirection depuis /music-enhanced vers /app/music');
+    // Silent redirect - no logging needed in production
   }, []);
 
   return <Navigate to="/app/music" replace />;

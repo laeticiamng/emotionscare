@@ -30,7 +30,12 @@ export default class RootErrorBoundary extends React.Component<
         extra: { componentStack: info.componentStack },
       });
     } else {
-      console.error('[RootErrorBoundary] Unhandled error', error, info);
+      // Fallback logging when Sentry is unavailable
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('app-error', { 
+          detail: { error: error.message, info: info.componentStack } 
+        }));
+      }
     }
   }
 
