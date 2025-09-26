@@ -2,10 +2,16 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
+// import { componentTagger } from "lovable-tagger"; // Will be added when available
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::",
+    port: 8080,
+  },
   plugins: [
     react(),
+    mode === 'development' && false, // componentTagger() will be enabled when package is available
     // Bundle analyzer en mode développement
     process.env.ANALYZE && visualizer({
       filename: 'dist/stats.html',
@@ -17,7 +23,7 @@ export default defineConfig({
   
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   
@@ -97,12 +103,8 @@ export default defineConfig({
     ],
   },
   
-  // Configuration serveur dev
-  server: {
-    port: 8080,
-    host: true,
-    open: false,
-  },
+  // Configuration serveur dev - Moved to top for latest Lovable version
+  // server: { ... } already defined above
   
   // Variables d'environnement
   define: {
@@ -119,4 +121,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

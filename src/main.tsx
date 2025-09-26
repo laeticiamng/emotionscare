@@ -11,6 +11,7 @@ import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import RootErrorBoundary from '@/app/RootErrorBoundary';
 import { RootProvider } from '@/providers';
 import { router as routerV2 } from '@/routerV2/router';
+import { enableLovableOptimizations } from '@/utils/lovable-helpers';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -78,6 +79,9 @@ if (typeof document !== 'undefined') {
 if (typeof window !== 'undefined') {
   document.body.classList.add('enhanced-focus');
   enableGlobalImageOptimizations();
+  
+  // Activer les optimisations Lovable Latest
+  enableLovableOptimizations();
 }
 
 const rootElement = document.getElementById('root');
