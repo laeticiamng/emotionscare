@@ -13,7 +13,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { ROUTE_ALIASES } from './aliases';
 import { AuthGuard, ModeGuard, RoleGuard } from './guards';
-import { withErrorBoundary } from '@/contexts/ErrorContext';
+import { withErrorBoundary } from 'react-error-boundary';
 import PageErrorFallback from '@/components/error/PageErrorFallback';
 import { LoadingState } from '@/components/loading/LoadingState';
 import EnhancedShell from '@/components/layout/EnhancedShell';
