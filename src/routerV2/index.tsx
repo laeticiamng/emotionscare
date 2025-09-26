@@ -48,6 +48,7 @@ const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
 const B2CAdaptiveMusicPage = lazy(() => import('@/modules/adaptive-music/AdaptiveMusicPage'));
+const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
@@ -118,6 +119,7 @@ const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const HeatmapPage = lazy(() => import('@/pages/HeatmapPage'));
+const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -194,7 +196,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
-  B2CMusicEnhanced: B2CAdaptiveMusicPage,
+  B2CMusicEnhanced: B2CMusicEnhanced,
   B2CAICoachPage,
   B2CJournalPage,
   B2CVRBreathGuidePage,
@@ -212,6 +214,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   GamificationPage,
   LeaderboardPage,
   HeatmapPage,
+  ScoresPage,
   
   // Settings
   B2CSettingsPage,
@@ -463,8 +466,8 @@ if (import.meta.env.DEV) {
 // ═══════════════════════════════════════════════════════════
 
 // Router principal (routerV2 déjà exporté ci-dessus)
-export { router } from './router';
-export type { AppRouter } from './router';
+export const router = routerV2;
+export type { AppRouter } from './routes';
 
 // Routes et configuration
 export {

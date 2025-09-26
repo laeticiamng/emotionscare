@@ -491,7 +491,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'HeatmapPage',
+    component: 'ScoresPage',
     guard: true,
     aliases: ['/app/heatmap', '/heatmap-vibes'],
   },
