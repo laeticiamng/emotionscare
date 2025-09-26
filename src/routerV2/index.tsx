@@ -1,5 +1,4 @@
-export { router } from './router';
-export type { AppRouter } from './router';
+// Exports centralisés à la fin du fichier
 
 // Type pour éviter les logs répétés
 declare global {
@@ -401,10 +400,7 @@ function createRouteElement(routeMeta: typeof ROUTES_REGISTRY[0]) {
 // CRÉATION DU ROUTER
 // ═══════════════════════════════════════════════════════════
 
-// Export des routes helpers et du router
-export { routes } from './routes';
-export { ROUTE_ALIASES } from './aliases';
-export type { RouteAlias } from './aliases';
+// Validation des composants et routeur créé
 const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
 
 export const routerV2 = createBrowserRouter([
@@ -451,9 +447,16 @@ if (import.meta.env.DEV) {
     window.__routerV2Logged = true;
   }
 }
+
+// ═══════════════════════════════════════════════════════════
+// EXPORTS CENTRALISÉS
+// ═══════════════════════════════════════════════════════════
+
+// Router principal
 export { router, routerV2 } from './router';
 export type { AppRouter } from './router';
 
+// Routes et configuration
 export {
   routes,
   publicRoutes,
@@ -464,6 +467,7 @@ export {
   specialRoutes,
   Routes,
 } from './routes';
+
 export type {
   PublicRoute,
   AuthRoute,
@@ -474,6 +478,7 @@ export type {
   RoutesCompat,
 } from './routes';
 
+// Aliases et redirections
 export {
   ROUTE_ALIASES,
   ROUTE_ALIAS_ENTRIES,
@@ -483,7 +488,7 @@ export {
 } from './aliases';
 export type { LegacyPath, RouteAlias } from './aliases';
 
+// Registry et guards
 export { ROUTES_REGISTRY } from './registry';
 export { ROUTER_V2_MANIFEST } from './manifest';
-
 export { AuthGuard, RoleGuard, ModeGuard, RouteGuard } from './guards';
