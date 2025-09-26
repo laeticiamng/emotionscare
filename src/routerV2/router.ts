@@ -53,9 +53,16 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
+const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const UnifiedLoginPage = lazy(() => import('@/pages/UnifiedLoginPage'));
+const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
+const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
+const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
 const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
+const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
+const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
 
 // ComponentMap complet avec tous les composants
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
@@ -73,7 +80,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Auth pages
   LoginPage,
   SignupPage,
-  UnifiedLoginPage: LoginPage,
+  UnifiedLoginPage,
   
   // App pages
   AppGatePage,
@@ -97,13 +104,15 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   UnifiedLoginPage,
   CoachChatPage,
   VRSessionsPage,
+  B2BEntreprisePage,
+  SubscribePage,
   
   // Pages légales
   LegalPrivacyPage,
   LegalMentionsPage,
-  LegalTermsPage: LegalMentionsPage, // Alias temporaire
-  LegalSalesPage: LegalMentionsPage, // Alias temporaire
-  LegalCookiesPage: LegalPrivacyPage, // Alias temporaire
+  LegalTermsPage: LegalMentionsPage,
+  LegalSalesPage,
+  LegalCookiesPage,
   
   // Utility pages
   MessagesPage,
