@@ -45,7 +45,19 @@ const RedirectToScan = lazy(() => import('@/pages/redirects/RedirectToScan'));
 const RedirectToJournal = lazy(() => import('@/pages/redirects/RedirectToJournal'));
 const RedirectToEntreprise = lazy(() => import('@/pages/redirects/RedirectToEntreprise'));
 
-// ComponentMap étendu avec tous les composants principaux
+// Import des nouveaux composants créés
+const ScanHistoryPage = lazy(() => import('@/pages/ScanHistoryPage'));
+const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
+const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
+const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
+const ExportPage = lazy(() => import('@/pages/ExportPage'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
+const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
+
+// ComponentMap complet avec tous les composants
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Pages principales
   HomePage,
@@ -61,7 +73,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Auth pages
   LoginPage,
   SignupPage,
-  UnifiedLoginPage: LoginPage, // Alias
+  UnifiedLoginPage: LoginPage,
   
   // App pages
   AppGatePage,
@@ -71,6 +83,23 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CAICoachPage,
   B2CJournalPage,
   B2CVRBreathGuidePage,
+  
+  // Nouvelles pages créées
+  ScanHistoryPage,
+  JournalNewPage,
+  EmotionsPage,
+  ProfilePage,
+  GeneralPage,
+  ReportingPage,
+  ExportPage,
+  JournalPage,
+  
+  // Pages légales
+  LegalPrivacyPage,
+  LegalMentionsPage,
+  LegalTermsPage: LegalMentionsPage, // Alias temporaire
+  LegalSalesPage: LegalMentionsPage, // Alias temporaire
+  LegalCookiesPage: LegalPrivacyPage, // Alias temporaire
   
   // Utility pages
   MessagesPage,
@@ -91,10 +120,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToJournal,
   RedirectToEntreprise,
   
-  // Fallback aliases pour composants manquants (temporaire)
-  B2BSelectionPage: HomePage, // Temporaire
-  B2BCollabDashboard: B2CDashboardPage, // Temporaire
-  B2BRHDashboard: B2CDashboardPage, // Temporaire
+  // Fallback aliases (utilisant des pages existantes)
+  B2BSelectionPage: HomePage,
+  B2BCollabDashboard: B2CDashboardPage,
+  B2BRHDashboard: B2CDashboardPage,
 };
 
 /**

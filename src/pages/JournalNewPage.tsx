@@ -1,318 +1,183 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useMotionPrefs } from '@/hooks/useMotionPrefs';
-import { cn } from '@/lib/utils';
+import { PenTool, Save, Mic, Image, Heart, Calendar, Tag } from 'lucide-react';
 
-const JournalNewPage: React.FC = () => {
-  const navigate = useNavigate();
+export default function JournalNewPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
-  const [isPrivate, setIsPrivate] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const { prefersReducedMotion } = useMotionPrefs();
-  const [moodAnnouncement, setMoodAnnouncement] = useState('Aucune humeur sélectionnée pour le moment');
-  const [journalAnnouncement, setJournalAnnouncement] = useState('Contenu du journal vide');
 
-  const moodOptions = [
-    { value: 'happy', label: '😊 Joyeux', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'calm', label: '😌 Calme', color: 'bg-blue-100 text-blue-800' },
-    { value: 'anxious', label: '😰 Anxieux', color: 'bg-orange-100 text-orange-800' },
-    { value: 'sad', label: '😢 Triste', color: 'bg-gray-100 text-gray-800' },
-    { value: 'excited', label: '🤩 Excité', color: 'bg-purple-100 text-purple-800' },
-    { value: 'tired', label: '😴 Fatigué', color: 'bg-indigo-100 text-indigo-800' },
-    { value: 'grateful', label: '🙏 Reconnaissant', color: 'bg-green-100 text-green-800' },
-  ];
-
-  const suggestedTags = [
-    'travail', 'famille', 'sport', 'santé', 'créativité', 'voyage', 
-    'amis', 'lecture', 'nature', 'méditation', 'objectifs', 'défis'
+  const moods = [
+    { emoji: '😊', label: 'Joyeux', color: 'bg-yellow-100 text-yellow-800' },
+    { emoji: '😌', label: 'Calme', color: 'bg-blue-100 text-blue-800' },
+    { emoji: '😔', label: 'Triste', color: 'bg-gray-100 text-gray-800' },
+    { emoji: '😠', label: 'Colère', color: 'bg-red-100 text-red-800' },
+    { emoji: '😴', label: 'Fatigué', color: 'bg-purple-100 text-purple-800' },
+    { emoji: '🤗', label: 'Reconnaissant', color: 'bg-green-100 text-green-800' }
   ];
 
   const handleSave = () => {
-    if (!title.trim() || !content.trim()) {
-      alert('Veuillez remplir au moins le titre et le contenu');
-      return;
-    }
-
-    const entry = {
-      id: Date.now().toString(),
-      title,
-      content,
-      mood,
-      tags,
-      isPrivate,
-      date: selectedDate,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Ici, sauvegarder l'entrée dans le store/API
-    console.log('Nouvelle entrée de journal:', entry);
-    
-    // Retour vers la page journal avec un message de succès
-    navigate('/app/journal', { 
-      state: { message: 'Entrée sauvegardée avec succès!' } 
-    });
+    // Logic to save journal entry
+    console.log('Saving entry:', { title, content, mood, tags });
   };
-
-  const addTag = (tag: string) => {
-    if (!tags.includes(tag)) {
-      setTags([...tags, tag]);
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    // Ici, implémenter la reconnaissance vocale
-  };
-
-  const selectedMoodData = moodOptions.find(m => m.value === mood);
-
-  useEffect(() => {
-    if (selectedMoodData) {
-      setMoodAnnouncement(`Humeur sélectionnée : ${selectedMoodData.label.replace(/^[^A-Za-zÀ-ÿ0-9\s]*/u, '').trim()}`);
-    } else {
-      setMoodAnnouncement('Aucune humeur sélectionnée pour le moment');
-    }
-  }, [selectedMoodData]);
-
-  useEffect(() => {
-    if (content.trim().length === 0) {
-      setJournalAnnouncement('Contenu du journal vide');
-    } else {
-      setJournalAnnouncement(`Contenu du journal mis à jour, ${content.length} caractères saisis`);
-    }
-  }, [content]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-100 dark:from-slate-900 dark:to-slate-800">
-      <div aria-live="polite" role="status" className="sr-only" data-testid="journal-live-region">
-        <span>{moodAnnouncement}</span>
-        <span>{journalAnnouncement}</span>
-      </div>
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(-1)}
-              aria-label="Retourner à la page précédente"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-semibold">Nouvelle Entrée</h1>
-              <p className="text-sm text-muted-foreground">Partagez vos pensées et émotions</p>
-            </div>
-          </div>
-          
-          <Button onClick={handleSave} className="flex items-center gap-2">
-            <Save className="w-4 h-4" />
-            Sauvegarder
-          </Button>
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-4">
+      <div className="container mx-auto max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+            <PenTool className="h-8 w-8 mr-3 text-purple-600" />
+            Nouvelle Entrée Journal
+          </h1>
+          <p className="text-gray-600">Exprimez vos pensées et émotions du moment</p>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        
-        {/* Métadonnées */}
-        <Card className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block" htmlFor="journal-date">
-                Date
-              </label>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="journal-date"
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                />
-              </div>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Formulaire principal */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Heart className="h-5 w-5 mr-2 text-pink-500" />
+                  Écriture libre
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Titre de l'entrée</label>
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Donnez un titre à votre entrée..."
+                    className="text-lg"
+                  />
+                </div>
 
-            <div>
-              <label className="text-sm font-medium mb-2 block" htmlFor="journal-mood">
-                Humeur
-              </label>
-              <Select value={mood} onValueChange={setMood}>
-                <SelectTrigger id="journal-mood" aria-describedby="journal-mood-help">
-                  <SelectValue placeholder="Comment vous sentez-vous ?" />
-                </SelectTrigger>
-                <SelectContent>
-                  {moodOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Votre journal</label>
+                  <Textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Écrivez librement vos pensées, émotions, expériences de la journée..."
+                    rows={12}
+                    className="resize-none"
+                  />
+                  <div className="text-xs text-gray-400 mt-1">
+                    {content.length} caractères
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={handleSave} className="bg-purple-600 hover:bg-purple-700">
+                    <Save className="h-4 w-4 mr-2" />
+                    Sauvegarder
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsRecording(!isRecording)}
+                    className={isRecording ? 'text-red-600 border-red-300' : ''}
+                  >
+                    <Mic className={`h-4 w-4 mr-2 ${isRecording ? 'text-red-500 animate-pulse' : ''}`} />
+                    {isRecording ? 'Arrêter l\'enregistrement' : 'Enregistrer audio'}
+                  </Button>
+                  <Button variant="outline">
+                    <Image className="h-4 w-4 mr-2" />
+                    Ajouter photo
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Panneau latéral */}
+          <div className="space-y-6">
+            {/* Humeur */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Comment vous sentez-vous ?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-2">
+                  {moods.map((m) => (
+                    <Badge
+                      key={m.label}
+                      variant={mood === m.label ? 'default' : 'outline'}
+                      className={`cursor-pointer p-3 justify-center hover:scale-105 transition-transform ${
+                        mood === m.label ? m.color : ''
+                      }`}
+                      onClick={() => setMood(mood === m.label ? '' : m.label)}
+                    >
+                      <span className="text-lg mr-2">{m.emoji}</span>
+                      {m.label}
+                    </Badge>
                   ))}
-                </SelectContent>
-              </Select>
-              <p id="journal-mood-help" className="sr-only">
-                Sélectionnez une humeur pour contextualiser votre entrée de journal.
-              </p>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div>
-              <label className="text-sm font-medium mb-2 block" htmlFor="journal-visibility">
-                Visibilité
-              </label>
-              <Select value={isPrivate ? 'private' : 'public'} onValueChange={(value) => setIsPrivate(value === 'private')}>
-                <SelectTrigger id="journal-visibility">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="private">🔒 Privé</SelectItem>
-                  <SelectItem value="public">🌍 Partagé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Informations */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Informations
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center text-sm text-gray-600">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {new Date().toLocaleDateString('fr-FR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {new Date().toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Conseils */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">💡 Suggestions d'écriture</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• Qu'est-ce qui vous a marqué aujourd'hui ?</li>
+                  <li>• Pour quoi êtes-vous reconnaissant ?</li>
+                  <li>• Quel défi avez-vous relevé ?</li>
+                  <li>• Comment vous sentez-vous maintenant ?</li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
+        </div>
 
-          {selectedMoodData && (
-            <div className="mt-4">
-              <Badge className={selectedMoodData.color} aria-live="polite">
-                {selectedMoodData.label}
-              </Badge>
-            </div>
-          )}
-        </Card>
-
-        {/* Contenu Principal */}
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div>
-              <Input
-                placeholder="Donnez un titre à votre entrée..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="text-lg font-medium"
-              />
-            </div>
-
-            <div className="relative">
-                <Textarea
-                  placeholder="Que s'est-il passé aujourd'hui ? Comment vous sentez-vous ? Qu'avez-vous appris ?"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="min-h-[300px] resize-none"
-                />
-
-              <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleRecording}
-                  aria-pressed={isRecording}
-                  aria-label={isRecording ? 'Arrêter la dictée vocale' : 'Commencer la dictée vocale'}
-                  className={cn(
-                    isRecording ? 'bg-red-100 text-red-700' : '',
-                    isRecording && !prefersReducedMotion ? 'animate-pulse' : ''
-                  )}
-                >
-                  {isRecording ? <MicOff className="w-4 h-4" aria-hidden="true" /> : <Mic className="w-4 h-4" aria-hidden="true" />}
-                </Button>
-                <Button variant="ghost" size="sm" aria-label="Ajouter une photo au journal">
-                  <Camera className="w-4 h-4" aria-hidden="true" />
-                </Button>
-                <Button variant="ghost" size="sm" aria-label="Ajouter une image au journal">
-                  <Image className="w-4 h-4" aria-hidden="true" />
-                </Button>
+        {/* Footer avec statistiques */}
+        <Card className="mt-6">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <span>Journal personnel · Données cryptées</span>
+              <div className="flex items-center space-x-4">
+                <span>Entrées ce mois: 12</span>
+                <span>Série en cours: 5 jours</span>
               </div>
             </div>
-
-            <div className="text-sm text-muted-foreground" aria-live="polite">
-              {content.length} caractères • ~{Math.ceil(content.split(' ').length / 200)} min de lecture
-            </div>
-          </div>
-        </Card>
-
-        {/* Tags */}
-        <Card className="p-4">
-          <h3 className="font-medium mb-3">Tags</h3>
-          
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="cursor-pointer"
-                  onClick={() => removeTag(tag)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      removeTag(tag);
-                    }
-                  }}
-                  aria-label={`Retirer le tag ${tag}`}
-                >
-                  {tag} ×
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Tags suggérés :</p>
-            <div className="flex flex-wrap gap-2">
-              {suggestedTags
-                .filter(tag => !tags.includes(tag))
-                .slice(0, 8)
-                .map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-                  onClick={() => addTag(tag)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      addTag(tag);
-                    }
-                  }}
-                  aria-label={`Ajouter le tag ${tag}`}
-                >
-                  + {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </Card>
-
-        {/* Conseils d'écriture */}
-        <Card className="p-4 bg-blue-50 border-blue-200">
-          <h3 className="font-medium text-blue-900 mb-2">💡 Conseils pour bien écrire</h3>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Soyez authentique et honnête avec vos émotions</li>
-            <li>• Décrivez les détails qui ont marqué votre journée</li>
-            <li>• Notez ce pour quoi vous êtes reconnaissant</li>
-            <li>• Identifiez les leçons apprises ou les réflexions importantes</li>
-          </ul>
+          </CardContent>
         </Card>
       </div>
     </div>
   );
-};
-
-export default JournalNewPage;
+}
