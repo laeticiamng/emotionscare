@@ -452,8 +452,8 @@ if (import.meta.env.DEV) {
 // EXPORTS CENTRALISÉS
 // ═══════════════════════════════════════════════════════════
 
-// Router principal
-export { router, routerV2 } from './router';
+// Router principal (routerV2 déjà exporté ci-dessus)
+export { router } from './router';
 export type { AppRouter } from './router';
 
 // Routes et configuration
