@@ -1,0 +1,5 @@
+{
+  "config": "vite.config.mjs",
+  "typescript": false,
+  "checkTs": false
+}
