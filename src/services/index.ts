@@ -1,32 +1,9 @@
-/**
- * Services unifiés - Point d'entrée principal
- */
+// Services API centralisés pour EmotionsCare
+export { default as openaiService } from './openai.service';
+export { default as humeService } from './hume.service';
+export { default as sunoService } from './suno.service';
+export { default as emotionAnalysisService } from './emotionAnalysis.service';
+export { default as musicTherapyService } from './musicTherapy.service';
 
-// Services principaux
-export { default as emotionService } from './emotion';
-export { default as musicService } from './music';
-export { default as coachService } from './coach';
-export { default as journalService } from './journal';
-
-// API Services
-export * from './api';
-export * from './auth-service';
-export * from './emotionService';
-export * from './musicService';
-
-// Types de services
-export interface APIStatus {
-  status: 'online' | 'offline' | 'degraded';
-  lastCheck: Date;
-  responseTime?: number;
-}
-
-// Service par défaut pour compatibilité
-const servicesStatus: APIStatus = {
-  status: 'online',
-  lastCheck: new Date(),
-  responseTime: 150
-};
-
-export default servicesStatus;
-export { servicesStatus as APIStatus };
+// Types et interfaces
+export type * from './types';

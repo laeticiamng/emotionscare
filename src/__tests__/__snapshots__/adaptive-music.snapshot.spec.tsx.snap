@@ -1,0 +1,481 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AdaptiveMusicPage > rend la page et la playlist adaptative 1`] = `
+<div>
+  <main
+    aria-label="Adaptive Music"
+    class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:px-8"
+    data-testid="adaptive-music-page"
+  >
+    <div
+      aria-live="polite"
+      class="sr-only"
+    >
+      Brume velours. Intensité velours, tout en rondeur.
+    </div>
+    <div
+      class="relative overflow-hidden rounded-2xl p-6 mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background"
+      style="opacity: 0; transform: translateY(-20px) translateZ(0);"
+    >
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/30 to-pink-50/20 dark:from-blue-900/10 dark:via-purple-900/5 dark:to-pink-900/5"
+      />
+      <div
+        class="relative z-10"
+      >
+        <div
+          class="flex items-center justify-between mb-4"
+        >
+          <div
+            class="flex items-center gap-4"
+          >
+            <button
+              class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-95 h-8 px-3 text-xs rounded-full"
+              type="button"
+            >
+              <svg
+                class="lucide lucide-arrow-left h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m12 19-7-7 7-7"
+                />
+                <path
+                  d="M19 12H5"
+                />
+              </svg>
+            </button>
+            <div
+              class="flex items-center gap-3"
+            >
+              <div>
+                <div
+                  class="flex items-center gap-3 mb-1"
+                >
+                  <h1
+                    class="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text"
+                  >
+                    Adaptive Music
+                  </h1>
+                </div>
+                <p
+                  class="text-muted-foreground"
+                >
+                  Une bulle sonore qui se cale sur ton souffle et tes ressentis du moment.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex items-center gap-2"
+        >
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-heart h-3 w-3 mr-1"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+              />
+            </svg>
+            Favoris
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-share2 h-3 w-3 mr-1"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="18"
+                cy="5"
+                r="3"
+              />
+              <circle
+                cx="6"
+                cy="12"
+                r="3"
+              />
+              <circle
+                cx="18"
+                cy="19"
+                r="3"
+              />
+              <line
+                x1="8.59"
+                x2="15.42"
+                y1="13.51"
+                y2="17.49"
+              />
+              <line
+                x1="15.41"
+                x2="8.59"
+                y1="6.51"
+                y2="10.49"
+              />
+            </svg>
+            Partager
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-star h-3 w-3 mr-1"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            Noter
+          </button>
+        </div>
+      </div>
+    </div>
+    <section
+      class="grid gap-6 lg:grid-cols-[2fr,1fr]"
+    >
+      <div
+        class="rounded-xl border bg-card text-card-foreground shadow"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="font-semibold leading-none tracking-tight"
+          >
+            Horizon sonore du moment
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Nous ajustons la texture pour rester dans le confort
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <div
+            class="rounded-lg border border-muted/60 bg-muted/20 p-4"
+          >
+            <div
+              class="flex items-center justify-between"
+            >
+              <div>
+                <p
+                  class="text-sm text-muted-foreground"
+                >
+                  Une présence nette qui accompagne les pensées avec douceur.
+                </p>
+                <p
+                  class="text-lg font-semibold"
+                >
+                  🎯
+                   
+                  Brume velours
+                </p>
+              </div>
+              <div
+                class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              >
+                Focus
+              </div>
+            </div>
+            <p
+              class="mt-3 text-sm text-muted-foreground"
+            >
+              Ambiance souple qui chuchote et laisse respirer.
+            </p>
+            <p
+              class="text-xs text-muted-foreground"
+            >
+              Le flux reste régulier, sans heurt.
+            </p>
+            <p
+              class="text-xs text-muted-foreground"
+            >
+              Intensité velours, tout en rondeur.
+            </p>
+          </div>
+          <div
+            class="rounded-lg border border-muted/60 bg-muted/10 p-4"
+          >
+            <div
+              class="flex items-center gap-2 text-sm font-medium"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-sparkles h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+                />
+                <path
+                  d="M5 3v4"
+                />
+                <path
+                  d="M19 17v4"
+                />
+                <path
+                  d="M3 5h4"
+                />
+                <path
+                  d="M17 19h4"
+                />
+              </svg>
+              Partage ton ressenti quand tu le souhaites pour affiner encore la texture.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="rounded-xl border bg-card text-card-foreground shadow"
+      >
+        <div
+          class="flex flex-col space-y-1.5 p-6"
+        >
+          <h3
+            class="font-semibold leading-none tracking-tight"
+          >
+            Favoris & reprise
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Retrouve ton cocon et tes bulles gardées précieusement.
+          </p>
+        </div>
+        <div
+          class="p-6 pt-0 space-y-4"
+        >
+          <div
+            class="rounded-md border bg-muted/20 p-4"
+          >
+            <div
+              class="flex items-center gap-2 text-sm font-semibold"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-music2 h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="8"
+                  cy="18"
+                  r="4"
+                />
+                <path
+                  d="M12 18V2l7 4"
+                />
+              </svg>
+              Ton dernier cocon
+            </div>
+            <p
+              class="mt-2 text-xs text-muted-foreground"
+            >
+              Lance une piste et nous garderons la reprise pour toi.
+            </p>
+          </div>
+          <div>
+            <div
+              class="flex items-center gap-2 text-sm font-semibold"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-heart h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                />
+              </svg>
+              Tes bulles gardées
+            </div>
+            <p
+              class="mt-2 text-xs text-muted-foreground"
+            >
+              Ajoute une bulle pour la retrouver ici à chaque visite.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+    >
+      <div
+        class="space-y-1.5 p-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <h3
+            class="font-semibold leading-none tracking-tight"
+          >
+            Plaisir d'écoute
+          </h3>
+          <p
+            class="text-sm text-muted-foreground"
+          >
+            Lance la piste qui résonne avec ton état du moment.
+          </p>
+        </div>
+        <div
+          class="flex gap-2"
+        >
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            Régénérer la sélection
+          </button>
+        </div>
+      </div>
+      <div
+        class="p-6 pt-0 space-y-6"
+      >
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Nous préparons une ambiance sur mesure…
+        </p>
+      </div>
+    </div>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+    >
+      <div
+        class="flex flex-col space-y-1.5 p-6"
+      >
+        <h3
+          class="font-semibold leading-none tracking-tight"
+        >
+          Affiner avec POMS (optionnel)
+        </h3>
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Un micro check-in avant et après permet d'ajuster encore plus finement la texture.
+        </p>
+      </div>
+      <div
+        class="p-6 pt-0 space-y-4"
+      >
+        <div
+          class="flex flex-col gap-3 rounded-lg border border-muted/60 bg-muted/10 p-4"
+        >
+          <p
+            class="text-sm font-medium"
+          >
+            Tu pourras activer le mini point d'entrée quand tu le souhaites.
+          </p>
+          <p
+            class="text-xs text-muted-foreground"
+          >
+            Aucun suivi n'est lancé pour le moment, la musique s'appuie juste sur ton état du jour.
+          </p>
+          <div
+            class="flex gap-2"
+          >
+            <button
+              class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-primary text-primary-foreground shadow hover:bg-primary/90 hover:shadow-md active:scale-95 h-8 rounded-md px-3 text-xs"
+              type="button"
+            >
+              Activer maintenant
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+    >
+      <div
+        class="flex flex-col space-y-1.5 p-6"
+      >
+        <h3
+          class="font-semibold leading-none tracking-tight"
+        >
+          Les textures proposées
+        </h3>
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Choisis librement la piste qui résonne avec toi, elles restent toutes douces et accueillantes.
+        </p>
+      </div>
+      <div
+        class="p-6 pt-0"
+      >
+        <p
+          class="text-sm text-muted-foreground"
+        >
+          Préparation de la bulle sonore…
+        </p>
+      </div>
+    </div>
+  </main>
+</div>
+`;

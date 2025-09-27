@@ -548,7 +548,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/recuperation-20'],
   },
-  // TestPage supprimée - page de debug inutile
+  {
+    name: 'test-page',
+    path: '/test',
+    segment: 'public',
+    layout: 'simple',
+    component: 'TestPage',
+  },
   {
     name: 'journal-legacy',
     path: '/journal',
@@ -575,7 +581,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'RedirectToScan',
+    component: 'EmotionsPage',
     guard: true,
     deprecated: true, // Redirection vers /app/scan
   },
@@ -804,19 +810,51 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // DÉVELOPPEMENT (UNIQUEMENT SI DEBUG)
   // ═══════════════════════════════════════════════════════════
-  // Route de validation supprimée - ValidationPage nettoyée
+  ...(process.env.NODE_ENV === 'development' ? [
+    {
+      name: 'validation',
+      path: '/validation',
+      segment: 'public',
+      layout: 'simple',
+      component: 'ValidationPage',
+    }
+  ] : []),
 
   // ═══════════════════════════════════════════════════════════
   // DEV-ONLY ROUTES (Masquées en production)
   // ═══════════════════════════════════════════════════════════
   // Routes de développement masquées en production
-  // Routes de développement supprimées - pages orphelines nettoyées
-  // - B2CNyveeCoconPage (supprimée)
-  // - ComprehensiveSystemAuditPage (supprimée) 
-  // - ErrorBoundaryTestPage (supprimée)
+  ...(import.meta.env.DEV ? [
+    {
+      name: 'nyvee-cocon',
+      path: '/app/nyvee',
+      segment: 'consumer',
+      role: 'consumer',
+      layout: 'app',
+      component: 'B2CNyveeCoconPage',
+      guard: true,
+    },
+    {
+      name: 'comprehensive-system-audit',
+      path: '/dev/system-audit',
+      segment: 'public',
+      layout: 'app',
+      component: 'ComprehensiveSystemAuditPage',
+      guard: false,
+    },
+    {
+      name: 'dev-error-boundary',
+      path: '/dev/error-boundary',
+      segment: 'public',
+      layout: 'marketing',
+      component: 'ErrorBoundaryTestPage',
+      guard: false,
+    },
+  // Routes de debug supprimées (pages orphelines nettoyées)
   // - DiagnosticPage (supprimée)
   // - SystemValidationPage (supprimée) 
   // - SystemRepairPage (supprimée)
+  ] : []),
 
   // ═══════════════════════════════════════════════════════════
   // PAGES SYSTÈME
