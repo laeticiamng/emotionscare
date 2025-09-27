@@ -43,7 +43,7 @@
 ### 6. 📊 BUSINESS INTELLIGENCE
 - [ ] **Dashboard B2B avancé** avec métriques RH
 - [ ] **Rapports exportables** PDF/Excel
-- [ ] **API publique** pour intégrations tierces
+- ✅ **API publique** pour intégrations tierces - TERMINÉ
 - [ ] **White-labeling** pour entreprises
 
 ### 7. 🎮 GAMIFICATION AVANCÉE
