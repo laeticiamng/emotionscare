@@ -1,0 +1,80 @@
+@page a3-sheet {
+  size: A3 landscape;
+  margin: 1.5cm;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font: 12pt/1.45 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    box-shadow: none !important;
+    background: #ffffff !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  header,
+  section,
+  footer,
+  article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+  }
+
+  a {
+    color: #0f172a !important;
+    text-decoration: none !important;
+  }
+
+  ul,
+  ol {
+    padding-inline-start: 1.4rem !important;
+    color: #1f2937 !important;
+  }
+
+  img,
+  svg {
+    filter: grayscale(100%);
+  }
+
+  article {
+    border-color: #d1d5db !important;
+    background: #ffffff !important;
+  }
+  body[data-print-format='a3'] {
+    font-size: 11pt !important;
+    page: a3-sheet;
+  }
+
+  body[data-print-format='a3'] main {
+    width: 100% !important;
+  }
+}

@@ -1,0 +1,64 @@
+
+/* Button hover effects */
+.premium-button {
+  @apply rounded-xl transition-all duration-300 transform hover:-translate-y-0.5;
+}
+
+.light .premium-button {
+  @apply hover:shadow-md;
+}
+
+.dark .premium-button {
+  @apply hover:shadow-[0_6px_12px_rgba(0,0,0,0.3)];
+}
+
+/* Improved transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Apple-inspired button styles */
+.button-apple {
+  @apply rounded-xl bg-primary text-primary-foreground px-6 py-2.5 font-medium transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2;
+}
+
+.light .button-apple {
+  @apply hover:shadow-md;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dark .button-apple {
+  @apply hover:shadow-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pastel .button-apple {
+  @apply hover:shadow-md;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* Secondary button style */
+.button-secondary {
+  @apply rounded-xl bg-secondary text-secondary-foreground px-6 py-2.5 font-medium transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2;
+}
+
+/* Ghost button style */
+.button-ghost {
+  @apply rounded-xl bg-transparent hover:bg-secondary/60 text-foreground px-6 py-2.5 font-medium transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2;
+}
+
+/* Button sizes */
+.button-sm {
+  @apply text-sm px-4 py-1.5;
+}
+
+.button-lg {
+  @apply text-lg px-8 py-3;
+}
+
+/* Icon button */
+.button-icon {
+  @apply rounded-full p-2 transition-all duration-300 hover:bg-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/30;
+}

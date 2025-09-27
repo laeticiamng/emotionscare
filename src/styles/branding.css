@@ -1,0 +1,91 @@
+
+/* Premium branding styles */
+:root {
+  --color-brand-primary: #9b87f5;
+  --color-brand-secondary: #7E69AB;
+  --color-brand-accent: #6E59A5;
+  --color-brand-highlight: #D6BCFA;
+  
+  --animation-speed-slow: 0.5s;
+  --animation-speed-normal: 0.3s;
+  --animation-speed-fast: 0.15s;
+  
+  --shadow-subtle: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-medium: 0 4px 8px rgba(0,0,0,0.1);
+  --shadow-strong: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+/* Base elements enhancement */
+body {
+  transition: background-color var(--animation-speed-normal) ease,
+              color var(--animation-speed-normal) ease;
+}
+
+/* Ultra premium styles */
+body.ultra-premium {
+  --shadow-subtle: 0 2px 10px rgba(155,135,245,0.08);
+  --shadow-medium: 0 4px 20px rgba(155,135,245,0.12);
+  --shadow-strong: 0 12px 28px rgba(155,135,245,0.18);
+}
+
+/* Data branding attributes styling */
+[data-branding="ultra-premium"] .card {
+  box-shadow: var(--shadow-medium);
+  transition: all 0.3s ease;
+}
+
+[data-branding="ultra-premium"] .card:hover {
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-2px);
+}
+
+/* Emotional tone specific styling */
+[data-emotional-tone="energetic"] .button-primary {
+  animation: pulse 2s infinite;
+}
+
+[data-emotional-tone="calm"] .card {
+  transition-duration: 0.5s;
+}
+
+[data-emotional-tone="focused"] input:focus,
+[data-emotional-tone="focused"] textarea:focus {
+  box-shadow: 0 0 0 2px var(--color-brand-primary);
+}
+
+/* Animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--color-brand-primary), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--color-brand-primary), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--color-brand-primary), 0);
+  }
+}
+
+/* Premium hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Premium typography enhancements */
+[data-branding="ultra-premium"] h1,
+[data-branding="ultra-premium"] h2,
+[data-branding="ultra-premium"] h3 {
+  letter-spacing: -0.02em;
+}
+
+[data-branding="ultra-premium"] .text-gradient {
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 100%;
+}

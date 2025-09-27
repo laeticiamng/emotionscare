@@ -1,0 +1,145 @@
+
+/* Premium Admin Interface Styles */
+
+/* Zen Mode Styles */
+.zen-mode .zen-content {
+  @apply transition-all duration-500;
+}
+
+.zen-background {
+  @apply bg-opacity-95 dark:bg-opacity-95 transition-all duration-500;
+}
+
+/* Premium Card Hover Effect */
+.premium-card {
+  @apply transition-all duration-300;
+}
+
+.premium-card:hover {
+  @apply shadow-lg transform translate-y-[-2px];
+}
+
+/* Audio Control & Sensorial */
+@keyframes pulse-gentle {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+.audio-pulse {
+  animation: pulse-gentle 3s infinite ease-in-out;
+}
+
+/* Artistic Visualizations */
+.art-gradient-bg {
+  @apply bg-gradient-to-br;
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Presentation Mode */
+.presentation-slide {
+  @apply h-screen w-screen relative overflow-hidden;
+}
+
+.slide-content {
+  @apply max-w-4xl mx-auto px-8;
+}
+
+/* Custom Scrollbars */
+.premium-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400/30 dark:bg-gray-600/30 rounded-full;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400/50 dark:bg-gray-600/50;
+}
+
+/* Emotional Weather Animation */
+.weather-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.cloud {
+  @apply absolute bg-white/50 dark:bg-white/30 rounded-full;
+  animation: float-cloud 30s infinite linear;
+}
+
+.rain {
+  @apply absolute bg-blue-400/50 dark:bg-blue-400/30;
+  animation: fall-rain 2s infinite linear;
+}
+
+.sun-ray {
+  @apply absolute bg-yellow-400/50 dark:bg-yellow-400/30;
+  transform-origin: top;
+  animation: sun-pulse 3s infinite ease-in-out;
+}
+
+@keyframes float-cloud {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(calc(100vw + 100%));
+  }
+}
+
+@keyframes fall-rain {
+  0% {
+    transform: translateY(-10px) rotate(15deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100px) rotate(15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sun-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+}

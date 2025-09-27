@@ -1,0 +1,188 @@
+
+/* Premium layout classes */
+.premium-layout {
+  @apply max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8;
+}
+
+.premium-section {
+  @apply py-8 md:py-12;
+}
+
+/* Spacious content sections */
+.content-spacious {
+  @apply space-y-6 md:space-y-8;
+}
+
+/* Card hover effects */
+.interactive-card {
+  @apply transform transition-all duration-300 hover:-translate-y-1;
+}
+
+.light .interactive-card {
+  @apply hover:shadow-md;
+}
+
+.dark .interactive-card {
+  @apply hover:shadow-[0_8px_16px_rgba(0,0,0,0.25)];
+}
+
+.pastel .interactive-card {
+  @apply hover:shadow-md;
+}
+
+/* Content layouts */
+.dashboard-layout {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.sidebar-layout {
+  @apply flex flex-col md:flex-row gap-6;
+}
+
+.sidebar-layout .sidebar {
+  @apply w-full md:w-64 shrink-0;
+}
+
+.sidebar-layout .content {
+  @apply flex-grow;
+}
+
+/* Full-bleed layout sections */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Section spacings */
+.section-margin {
+  @apply my-8 md:my-12;
+}
+
+.content-padding {
+  @apply p-4 md:p-6 lg:p-8;
+}
+
+/* Grid layouts */
+.grid-auto-fit {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-auto-fill {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Split layouts */
+.split-layout {
+  @apply grid md:grid-cols-2 gap-6;
+}
+
+/* Card layouts */
+.cards-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Form layouts */
+.form-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Responsive containers */
+.container-sm {
+  @apply max-w-screen-sm mx-auto px-4;
+}
+
+.container-md {
+  @apply max-w-screen-md mx-auto px-4;
+}
+
+.container-lg {
+  @apply max-w-screen-lg mx-auto px-4;
+}
+
+/* Special layout for KPI cards */
+.kpi-cards-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* Responsive header/footer adjustments */
+.responsive-header {
+  @apply py-3 sm:py-4 lg:py-5;
+}
+
+.responsive-footer {
+  @apply py-4 sm:py-6 lg:py-8;
+}
+
+/* Better responsive container padding */
+.container-responsive {
+  @apply px-4 sm:px-6 lg:px-8;
+}
+
+/* Responsive typography */
+.responsive-text-base {
+  @apply text-sm sm:text-base;
+}
+
+.responsive-text-lg {
+  @apply text-base sm:text-lg lg:text-xl;
+}
+
+.responsive-text-xl {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+.responsive-text-2xl {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+/* Responsive spacing for mobile */
+.mobile-spacing-sm {
+  @apply p-2 sm:p-4;
+}
+
+.mobile-spacing-md {
+  @apply p-3 sm:p-5;
+}
+
+.mobile-spacing-lg {
+  @apply p-4 sm:p-6 lg:p-8;
+}
+
+/* Responsive grids that adjust based on screen size */
+.responsive-grid-2-4 {
+  @apply grid gap-4 sm:gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (min-width: 640px) {
+  .responsive-grid-2-4 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid-2-4 {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+}
+
+/* Flex column on mobile, row on larger devices */
+.flex-col-to-row {
+  @apply flex flex-col sm:flex-row;
+}
+
+/* Hide on mobile / Show on mobile utility classes */
+.hide-on-mobile {
+  @apply hidden sm:block;
+}
+
+.show-on-mobile {
+  @apply block sm:hidden;
+}

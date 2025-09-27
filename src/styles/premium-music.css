@@ -1,0 +1,315 @@
+
+/* Premium Music Player Styles - Version Ultra Premium */
+.premium-music-player {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 20%, 
+    hsl(var(--background)) 100%);
+  border-radius: 1rem;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-music-player::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    hsl(var(--primary)) 20%, 
+    hsl(var(--secondary)) 80%, 
+    transparent);
+}
+
+/* Dark mode enhancements */
+.dark .premium-music-player {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 10%, 
+    hsl(var(--background)) 100%);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Glow effects for interactive elements */
+.premium-music-player button:hover {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+  transition: all 0.3s ease;
+  transform: translateY(-1px);
+}
+
+/* Enhanced scroll areas */
+.premium-music-player .scroll-area {
+  background: linear-gradient(180deg, 
+    rgba(var(--background-rgb), 0.8) 0%,
+    rgba(var(--muted-rgb), 0.4) 100%);
+  border-radius: 0.5rem;
+}
+
+/* Visualization enhancements */
+.visualization-container {
+  background: radial-gradient(circle at center, 
+    rgba(var(--primary-rgb), 0.1) 0%,
+    transparent 70%);
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+}
+
+.visualization-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(var(--secondary-rgb), 0.1) 50%, 
+    transparent 70%);
+  pointer-events: none;
+}
+
+/* Equalizer styling avec effets premium */
+.equalizer-band {
+  background: linear-gradient(180deg, 
+    hsl(var(--primary)) 0%,
+    hsl(var(--secondary)) 100%);
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);
+}
+
+.equalizer-band:hover {
+  background: linear-gradient(180deg, 
+    hsl(var(--primary)) 0%,
+    hsl(var(--secondary)) 50%,
+    hsl(var(--primary)) 100%);
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.6);
+  transform: scaleY(1.1);
+}
+
+/* Lyrics styling avec animations fluides */
+.lyrics-line {
+  background: linear-gradient(135deg, 
+    rgba(var(--background-rgb), 0.8) 0%,
+    rgba(var(--muted-rgb), 0.4) 100%);
+  border-radius: 0.75rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(var(--border-rgb), 0.3);
+}
+
+.lyrics-line.active {
+  background: linear-gradient(135deg, 
+    rgba(var(--primary-rgb), 0.2) 0%,
+    rgba(var(--secondary-rgb), 0.1) 100%);
+  box-shadow: 
+    0 4px 15px rgba(var(--primary-rgb), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.lyrics-line.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(180deg, 
+    hsl(var(--primary)), 
+    hsl(var(--secondary)));
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+/* Shadow effects ultra premium */
+.shadow-premium {
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.dark .shadow-premium {
+  box-shadow: 
+    0 15px 50px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Animation keyframes améliorées */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(var(--primary-rgb), 0.8);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(-1px) rotate(-1deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: float-gentle 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Glassmorphism effects ultra premium */
+.glass-effect-premium {
+  background: rgba(var(--background-rgb), 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-effect-premium {
+  background: rgba(var(--background-rgb), 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Effets de texte premium */
+.text-gradient-premium {
+  background: linear-gradient(135deg, 
+    hsl(var(--primary)) 0%, 
+    hsl(var(--secondary)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Boutons premium avec effets avancés */
+.button-premium {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, 
+    hsl(var(--primary)) 0%, 
+    hsl(var(--secondary)) 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.button-premium:hover::before {
+  left: 100%;
+}
+
+.button-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(var(--primary-rgb), 0.4);
+}
+
+/* Progress bar avec gradient animé */
+.progress-premium {
+  background: linear-gradient(90deg, 
+    hsl(var(--primary)), 
+    hsl(var(--secondary)), 
+    hsl(var(--primary)));
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Cards avec effets de profondeur */
+.card-premium {
+  background: linear-gradient(135deg, 
+    rgba(var(--background-rgb), 0.9) 0%,
+    rgba(var(--muted-rgb), 0.5) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(var(--border-rgb), 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .premium-music-player {
+    margin: 0.5rem;
+    border-radius: 0.75rem;
+  }
+  
+  .visualization-container {
+    height: 120px;
+  }
+}
