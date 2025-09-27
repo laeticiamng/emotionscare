@@ -1,42 +1,48 @@
-'use client';
+import React, { Component, ReactNode } from 'react';
 
-import React from 'react';
-import * as Sentry from '@sentry/react';
-import ErrorView from './ErrorView';
+interface Props {
+  children: ReactNode;
+}
 
-interface RootErrorBoundaryState {
+interface State {
   hasError: boolean;
+  error?: Error;
 }
 
-interface RootErrorBoundaryProps {
-  children: React.ReactNode;
-}
-
-export default class RootErrorBoundary extends React.Component<RootErrorBoundaryProps, RootErrorBoundaryState> {
-  state: RootErrorBoundaryState = { hasError: false };
-
-  static getDerivedStateFromError(): RootErrorBoundaryState {
-    return { hasError: true };
+class RootErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
   }
 
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
-    if (Sentry.getCurrentHub().getClient()) {
-      Sentry.captureException(error, {
-        tags: { boundary: 'root' },
-        extra: { componentStack: info.componentStack },
-      });
-    }
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
   }
 
-  private handleRetry = () => {
-    this.setState({ hasError: false });
-  };
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('RootErrorBoundary caught an error:', error, errorInfo);
+  }
 
   render() {
     if (this.state.hasError) {
-      return <ErrorView type="500" onRetry={this.handleRetry} />;
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+          <div className="text-center space-y-4">
+            <h1 className="text-2xl font-bold text-foreground">Une erreur s'est produite</h1>
+            <p className="text-muted-foreground">Veuillez rafraîchir la page ou réessayer plus tard.</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              Rafraîchir la page
+            </button>
+          </div>
+        </div>
+      );
     }
 
     return this.props.children;
   }
 }
+
+export default RootErrorBoundary;
