@@ -39,3 +39,22 @@ export const getModeDashboardPath = (mode: UserMode | null): string => {
       return '/';
   }
 };
+
+export const normalizeUserMode = (mode: string | null): UserMode => {
+  switch (mode) {
+    case 'b2c':
+    case 'consumer':
+    case 'personal':
+      return 'b2c';
+    case 'b2b_user':
+    case 'employee':
+    case 'user':
+      return 'b2b_user';
+    case 'b2b_admin':
+    case 'admin':
+    case 'manager':
+      return 'b2b_admin';
+    default:
+      return 'b2c';
+  }
+};
