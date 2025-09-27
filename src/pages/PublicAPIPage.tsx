@@ -178,7 +178,7 @@ export default function PublicAPIPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    API optimisée avec latence < 100ms et disponibilité 99.9%
+                    API optimisée avec latence &lt; 100ms et disponibilité 99.9%
                   </p>
                 </CardContent>
               </Card>
