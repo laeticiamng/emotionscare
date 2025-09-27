@@ -153,13 +153,13 @@ export { default as Page503 } from './503Page';
 export { default as NotFound } from './NotFound';
 // export { default as immersiveStyles } from './immersive-styles.css'; // CSS import removed
 
-// Admin modules (si nécessaire)
-// export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
-
 // Redirections Components
 export { default as RedirectToScan } from './RedirectToScan';
 export { default as RedirectToJournal } from './RedirectToJournal';
 export { default as RedirectToEntreprise } from './RedirectToEntreprise';
+
+// Choose Mode Page
+export { default as ChooseModePage } from './ChooseModePage';
 
 // ═══════════════════════════════════════════════════════════
 // STATS DE NETTOYAGE
