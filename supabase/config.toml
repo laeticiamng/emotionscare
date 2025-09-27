@@ -1,8 +1,72 @@
+
+project_id = "yaincoxihiqdksxgrsrk"
+
+[functions.org-dashboard-weekly]
+verify_jwt = true
+
+[functions.org-dashboard-export]
+verify_jwt = true
+
+[functions.journal-voice]
+verify_jwt = true
+
+[functions.journal-text]
+verify_jwt = true
+
+[functions.journal-entry]
+verify_jwt = true
+
+[functions.journal-weekly]
+verify_jwt = true
+
+[functions.face-filter-start]
+verify_jwt = true
+
+[functions.face-filter-comment]
+verify_jwt = true
+
+[functions.hume-ws-proxy]
+verify_jwt = true
+
+[functions.metrics]
+verify_jwt = true
+
+[functions.micro-breaks]
+verify_jwt = true
+
+[functions.vr-galaxy-metrics]
+verify_jwt = true
+
+[functions.dashboard-weekly]
+verify_jwt = true
+
+[functions.openai-realtime]
+verify_jwt = true
+
+[functions.contact-form]
+verify_jwt = true
+
+[functions.emotion-analytics]
+verify_jwt = true
+
+[functions.emotion-analysis]
+verify_jwt = true
+
+[functions.journal-analysis]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
+schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
+max_rows = 1000
+extra_allowed_origins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://app.emotionscare.com",
+  "https://admin.emotionscare.com"
+]
 
 [db]
 port = 54322
@@ -11,5 +75,71 @@ port = 54322
 enabled = true
 port = 54323
 
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
 [storage]
 enabled = true
+port = 54325
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+port = 54326
+site_url = "http://localhost:5173"
+additional_redirect_urls = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://app.emotionscare.com",
+  "https://admin.emotionscare.com",
+  "https://lovable.dev"
+]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[functions.generate-music]
+verify_jwt = true
+
+[functions.emotionscare-music-generator]
+verify_jwt = true
+
+[functions.ai-coach]
+verify_jwt = true
+
+[functions.analyze-emotion-text]
+verify_jwt = true
+
+[functions.assistant-api]
+verify_jwt = true
+
+[functions.biotune-session]
+verify_jwt = true
+
+[functions.enhanced-emotion-analyze]
+verify_jwt = true
+
+[functions.generate-grit-challenge]
+verify_jwt = true
+
+[functions.hume-analysis]
+verify_jwt = true
+
+[functions.mood-mixer]
+verify_jwt = true
+
+[functions.music-generation]
+verify_jwt = true
+
+[functions.music-weekly-org]
+verify_jwt = true
+
+[functions.music-weekly-user]
+verify_jwt = true

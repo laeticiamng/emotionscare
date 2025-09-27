@@ -1,59 +1,402 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import './styles/design-system.css';
+@import './styles/accessibility.css';
+@import './styles/base.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222 84% 5%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 84% 5%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 5%;
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 84% 5%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 84% 5%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 262 83% 58%;
-    --radius: 0.75rem;
-  }
+/* Accessibility styles */
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
 
-  .dark {
-    --background: 222 84% 5%;
-    --foreground: 210 40% 98%;
-    --card: 222 84% 5%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 84% 5%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 262 83% 58%;
-  }
+.high-contrast {
+  --border: hsl(var(--foreground) / 0.3);
+  --ring: hsl(var(--foreground) / 0.8);
+}
+
+.dyslexic-font {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Font scaling */
+:root {
+  --font-scale: 1;
+}
+
+body {
+  font-size: calc(1rem * var(--font-scale));
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  /* Base reset & full-bleed setup */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: #0B1C3A; /* Same as hero gradient base */
+    scrollbar-gutter: stable both-edges; /* Prevent layout shift */
   }
-  body {
-    @apply bg-background text-foreground;
+
+  /* iOS safe-area handling */
+  @supports (padding: max(0px)) {
+    .header-safe-area {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+
+  /* Header height variable */
+  :root {
+    --header-h: 4rem; /* 64px */
+  }
+
+  /* Configuration HTML par défaut */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+  }
+  
+  /* Respect des préférences d'accessibilité */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+    
+    /* Variables d'accessibilité */
+    --focus-ring-color: 221.2 83.2% 53.3%;
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+    
+    /* Variables pour contraste élevé */
+    --high-contrast-bg: 0 0% 100%;
+    --high-contrast-fg: 0 0% 0%;
+    --high-contrast-border: 0 0% 0%;
+    
+    /* Variables pour Glow Widget */
+    --glow-low: 38 92% 50%;
+    --glow-medium: 45 93% 47%;
+    --glow-high: 142 76% 36%;
+
+    /* Variables pour Vibe Heatmap */
+    --vibe-low: 38 92% 50%;
+    --vibe-medium: 45 93% 47%;
+    --vibe-high: 142 76% 36%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+    
+    --focus-ring-color: 217.2 91.2% 59.8%;
+    --high-contrast-bg: 0 0% 0%;
+    --high-contrast-fg: 0 0% 100%;
+    --high-contrast-border: 0 0% 100%;
+    
+    /* Variables pour Glow Widget (dark mode) */
+    --glow-low: 38 92% 60%;
+    --glow-medium: 45 93% 57%;
+    --glow-high: 142 76% 46%;
+
+    /* Variables pour Vibe Heatmap (dark mode) */
+    --vibe-low: 38 92% 60%;
+    --vibe-medium: 45 93% 57%;
+    --vibe-high: 142 76% 46%;
+  }
+  
+  /* Support du contraste élevé */
+  @media (prefers-contrast: high) {
+    :root {
+      --background: var(--high-contrast-bg);
+      --foreground: var(--high-contrast-fg);
+      --border: var(--high-contrast-border);
+      --primary: var(--high-contrast-fg);
+      --primary-foreground: var(--high-contrast-bg);
+    }
+  }
+}
+
+@layer utilities {
+  /* Animations respectueuses de l'accessibilité */
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .animate-blob {
+      animation: none;
+    }
+  }
+  
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+  
+  /* Utilitaires d'accessibilité */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  
+  .focus-visible-ring {
+    outline: var(--focus-ring-width) solid hsl(var(--focus-ring-color));
+    outline-offset: var(--focus-ring-offset);
+  }
+  
+  /* Skip links */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 8px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+    z-index: 1000;
+    transition: top 0.3s ease;
+  }
+  
+  .skip-link:focus {
+    top: 6px;
+  }
+  
+  /* Amélioration du focus pour tous les éléments interactifs */
+  .focus-enhanced {
+    transition: outline 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .focus-enhanced:focus-visible {
+    outline: 2px solid hsl(var(--focus-ring-color));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px hsl(var(--focus-ring-color) / 0.2);
+  }
+  
+  /* Contraste amélioré pour les textes */
+  .text-contrast-enhanced {
+    color: hsl(var(--foreground));
+    text-shadow: 0 0 1px hsl(var(--background));
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+/* Respect du mouvement réduit pour blob */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes blob {
+    0%, 100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+}
+
+/* Global Premium Styling */
+body {
+  font-family: var(--font-premium);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Focus par défaut pour tous les éléments interactifs */
+a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+  @apply focus-enhanced;
+}
+
+/* Amélioration des liens */
+a {
+  text-decoration-skip-ink: auto;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar Styling avec contraste amélioré */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 6px;
+  border: 2px solid hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: hsl(var(--primary) / 0.9);
+}
+
+/* Selection Styling avec meilleur contraste */
+::selection {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
+
+::-moz-selection {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
+
+/* Amélioration des formulaires */
+input, textarea, select {
+  font-family: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid hsl(var(--focus-ring-color));
+  outline-offset: 1px;
+}
+
+/* Amélioration des boutons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button:disabled:focus {
+  outline: 2px solid hsl(var(--muted-foreground));
+}
+
+/* Styles pour les messages d'erreur */
+[aria-invalid="true"] {
+  border-color: hsl(var(--destructive));
+}
+
+[role="alert"] {
+  font-weight: 600;
+  color: hsl(var(--destructive));
+}
+
+/* Amélioration de la lisibilité */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+p, li, td {
+  line-height: 1.6;
+}
+
+/* Support du mode haut contraste système */
+@media (prefers-contrast: high) {
+  * {
+    border-color: hsl(var(--high-contrast-border)) !important;
+  }
+  
+  button, a, input, select, textarea {
+    outline-width: 3px !important;
+  }
+  
+  .bg-gradient-to-r,
+  .bg-gradient-to-br,
+  .bg-gradient-to-l,
+  .bg-gradient-to-t,
+  .bg-gradient-to-b {
+    background: hsl(var(--high-contrast-bg)) !important;
+    color: hsl(var(--high-contrast-fg)) !important;
+  }
+}
+
+/* Support des préférences de couleur système */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    color-scheme: light;
   }
 }
