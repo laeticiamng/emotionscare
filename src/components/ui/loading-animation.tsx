@@ -1,106 +1,98 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { Loader2, Heart, Brain, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Loader2, Heart, Sparkles } from 'lucide-react';
 
-export interface LoadingAnimationProps {
-  type?: 'spinner' | 'dots' | 'pulse' | 'emotion' | 'brain' | 'sparkles';
-  size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'secondary' | 'accent' | 'muted';
+interface LoadingAnimationProps {
   text?: string;
-  className?: string;
+  variant?: 'default' | 'premium' | 'minimal';
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const sizeClasses = {
-  sm: 'h-4 w-4',
-  md: 'h-6 w-6', 
-  lg: 'h-8 w-8'
-};
-
-const colorClasses = {
-  primary: 'text-primary',
-  secondary: 'text-secondary',
-  accent: 'text-accent',
-  muted: 'text-muted-foreground'
-};
-
-export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
-  type = 'spinner',
-  size = 'md',
-  color = 'primary',
-  text,
-  className
+const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
+  text = "Chargement...", 
+  variant = 'default',
+  size = 'md'
 }) => {
-  const baseClasses = cn(sizeClasses[size], colorClasses[color]);
+  if (variant === 'minimal') {
+    return (
+      <div className="flex items-center justify-center">
+        <Loader2 className={`animate-spin ${
+          size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-8 h-8' : 'w-6 h-6'
+        }`} />
+      </div>
+    );
+  }
 
-  const renderAnimation = () => {
-    switch (type) {
-      case 'spinner':
-        return <Loader2 className={cn(baseClasses, 'animate-spin')} />;
-      
-      case 'dots':
-        return (
-          <div className="flex space-x-1">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className={cn(
-                  'rounded-full bg-current',
-                  size === 'sm' ? 'h-1 w-1' : size === 'md' ? 'h-2 w-2' : 'h-3 w-3',
-                  colorClasses[color]
-                )}
-                style={{
-                  animation: `bounce 1.4s ease-in-out ${i * 0.16}s infinite both`
-                }}
-              />
-            ))}
+  if (variant === 'premium') {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="relative">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute inset-0 w-12 h-12 rounded-full bg-gradient-to-r from-primary/20 to-purple-500/20"
+          />
+        </div>
+        <div className="text-center">
+          <motion.p 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-sm font-medium text-muted-foreground"
+          >
+            {text}
+          </motion.p>
+          <div className="flex items-center justify-center space-x-1 mt-2">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+            >
+              <Heart className="w-3 h-3 text-pink-500" />
+            </motion.div>
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+            >
+              <Sparkles className="w-3 h-3 text-blue-500" />
+            </motion.div>
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+            >
+              <Heart className="w-3 h-3 text-purple-500" />
+            </motion.div>
           </div>
-        );
-      
-      case 'pulse':
-        return (
-          <div className={cn(
-            'rounded-full bg-current animate-pulse',
-            size === 'sm' ? 'h-8 w-8' : size === 'md' ? 'h-12 w-12' : 'h-16 w-16',
-            colorClasses[color]
-          )} />
-        );
-      
-      case 'emotion':
-        return <Heart className={cn(baseClasses, 'animate-pulse text-pink-500')} />;
-      
-      case 'brain':
-        return <Brain className={cn(baseClasses, 'animate-pulse text-purple-500')} />;
-      
-      case 'sparkles':
-        return <Sparkles className={cn(baseClasses, 'animate-pulse text-yellow-500')} />;
-      
-      default:
-        return <Loader2 className={cn(baseClasses, 'animate-spin')} />;
-    }
-  };
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-2', className)}>
-      {renderAnimation()}
+    <div className="flex flex-col items-center justify-center space-y-3">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        className={`rounded-full border-2 border-primary/20 border-t-primary ${
+          size === 'sm' ? 'w-6 h-6' : size === 'lg' ? 'w-10 h-10' : 'w-8 h-8'
+        }`}
+      />
       {text && (
-        <p className={cn('text-sm', colorClasses[color])}>
+        <motion.p 
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className={`text-muted-foreground font-medium ${
+            size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm'
+          }`}
+        >
           {text}
-        </p>
+        </motion.p>
       )}
     </div>
   );
 };
-
-// CSS for dots animation (add to your global CSS)
-const dotsKeyframes = `
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-`;
 
 export default LoadingAnimation;

@@ -1,0 +1,198 @@
+
+/* Immersive Home Page Styling */
+:root {
+  --primary: #3651ff;
+  --accent: #7B61FF;
+  --background: #f7f9fc;
+  --text-main: #232949;
+  --card-bg: #ffffffcc;
+  --border-radius-xl: 2rem;
+  --box-shadow-xl: 0 8px 48px 0 rgba(54, 97, 255, 0.08);
+}
+
+.immersive-title {
+  font-family: 'Nunito', 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-shadow: 0 4px 28px rgba(54, 97, 255, 0.15);
+  line-height: 1.1;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Responsive font sizes optimisés pour mobile */
+@media (max-width: 320px) {
+  .immersive-title {
+    font-size: 1.1rem !important;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+    white-space: normal;
+    word-break: break-word;
+    hyphens: auto;
+    padding: 0 0.25rem;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 321px) and (max-width: 374px) {
+  .immersive-title {
+    font-size: 1.2rem !important;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+    white-space: normal;
+    word-break: break-word;
+    hyphens: auto;
+    padding: 0 0.25rem;
+    line-height: 1.2;
+  }
+}
+
+@media (min-width: 375px) and (max-width: 480px) {
+  .immersive-title {
+    font-size: 1.4rem !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 0.75rem;
+    white-space: normal;
+    word-break: break-word;
+    hyphens: auto;
+    padding: 0 0.5rem;
+    line-height: 1.15;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+  .immersive-title {
+    font-size: 1.8rem !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+    line-height: 1.1;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .immersive-title {
+    font-size: 2.2rem !important;
+    line-height: 1.1;
+  }
+}
+
+@media (min-width: 769px) {
+  .immersive-title {
+    font-size: clamp(2.5rem, 5vw, 4rem) !important;
+    line-height: 1.1;
+  }
+}
+
+.premium-button {
+  font-size: 1rem;
+  padding: 1rem 2rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--box-shadow-xl);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.premium-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(54, 97, 255, 0.15);
+}
+
+.premium-button.accent {
+  background: var(--accent);
+}
+
+/* Media queries pour les boutons responsifs */
+@media (max-width: 320px) {
+  .premium-button {
+    font-size: 0.7rem;
+    padding: 0.6rem 0.8rem;
+    white-space: normal;
+    line-height: 1.2;
+    min-height: 2.25rem;
+  }
+}
+
+@media (min-width: 321px) and (max-width: 480px) {
+  .premium-button {
+    font-size: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    white-space: normal;
+    line-height: 1.2;
+    min-height: 2.5rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .premium-button {
+    font-size: 0.85rem;
+    padding: 0.8rem 1.25rem;
+  }
+}
+
+/* Background gradient pour la page */
+.immersive-bg {
+  background: linear-gradient(120deg, #e7ebf8 0%, #f7f9fc 100%);
+  overflow-x: hidden;
+}
+
+/* Support du mode sombre */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f1729;
+    --text-main: #e1e7ef;
+    --card-bg: #1a2033cc;
+  }
+  
+  .immersive-bg {
+    background: linear-gradient(120deg, #0f1729 0%, #1a2033 100%);
+  }
+}
+
+/* Prévention du débordement de texte globalement */
+.text-responsive {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+/* Container responsive amélioré */
+.container-mobile {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (max-width: 320px) {
+  .container-mobile {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+@media (min-width: 321px) and (max-width: 480px) {
+  .container-mobile {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
