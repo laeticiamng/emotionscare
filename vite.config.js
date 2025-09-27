@@ -1,8 +1,12 @@
-// Configuration Vite - Bypass TOTAL du système TypeScript Lovable
+// Configuration d'urgence - FORCER JavaScript pur sans TypeScript 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
+
+// Forcer l'utilisation du tsconfig corrigé 
+process.env.TS_NODE_PROJECT = './tsconfig.override.json';
+process.env.TYPESCRIPT_CONFIG_FILE = './tsconfig.override.json';
 
 export default defineConfig(({ command }) => ({
   // Désactive complètement TypeScript dans tous les modes
