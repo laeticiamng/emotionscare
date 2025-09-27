@@ -1,15 +1,10 @@
-// Configuration d'urgence - FORCER JavaScript pur sans TypeScript 
+// Configuration Vite finale - JavaScript pur, esbuild only
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 
-// Forcer l'utilisation du tsconfig corrigé 
-process.env.TS_NODE_PROJECT = './tsconfig.override.json';
-process.env.TYPESCRIPT_CONFIG_FILE = './tsconfig.override.json';
-
-export default defineConfig(({ command }) => ({
-  // Désactive complètement TypeScript dans tous les modes
+export default defineConfig(() => ({
   plugins: [
     react({
       jsxRuntime: 'automatic',
@@ -17,7 +12,7 @@ export default defineConfig(({ command }) => ({
       babel: false,
       fastRefresh: true
     }),
-    ...(command === 'serve' ? [componentTagger()] : []),
+    componentTagger(),
   ],
   
   // Configuration serveur
