@@ -63,9 +63,9 @@ export { default as B2BEntreprisePage } from './B2BEntreprisePage';
 export { default as B2BSocialCoconPage } from './B2BSocialCoconPage';
 export { default as B2BReportsPage } from './B2BReportsPage';
 export { default as B2BReportDetailPage } from './B2BReportDetailPage';
-export { default as B2BReportsHeatmapPage } from './b2b/reports';
+export { default as B2BReportsHeatmapPage } from './B2BReportsHeatmapPage';
 export { default as B2BEventsPage } from './B2BEventsPage';
-export { default as B2BUserCoachPage } from './b2b/user/CoachPage';
+export { default as B2BUserCoachPage } from './B2BUserCoachPage';
 
 // B2B Admin 
 export { default as B2BOptimisationPage } from './B2BOptimisationPage';
@@ -155,6 +155,11 @@ export { default as NotFound } from './NotFound';
 
 // Admin modules (si nécessaire)
 // export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
+
+// Redirections Components
+export { default as RedirectToScan } from './RedirectToScan';
+export { default as RedirectToJournal } from './RedirectToJournal';
+export { default as RedirectToEntreprise } from './RedirectToEntreprise';
 
 // ═══════════════════════════════════════════════════════════
 // STATS DE NETTOYAGE
