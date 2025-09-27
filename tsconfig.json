@@ -5,7 +5,6 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,9 +15,9 @@
     "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@types/*": ["./types/*"],
-      "cross-fetch": ["./tests/polyfills/cross-fetch.ts"]
+      "@/*": ["src/*"],
+      "@types/*": ["types/*"],
+      "cross-fetch": ["tests/polyfills/cross-fetch.ts"]
     }
   },
   "include": [

@@ -295,24 +295,3 @@ export interface LoadingState {
 export type { MusicTrack as Track };
 export type { MusicPlaylist as Playlist };
 export type { EmotionResult as Emotion };
-
-// Types utilisateur étendus
-export * from './user';
-
-// Types de thème
-export type ThemeName = 'light' | 'dark' | 'system' | 'emotions-blue' | 'emotions-green';
-export type FontFamily = 'system' | 'inter' | 'roboto' | 'open-sans';
-export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-
-// Types d'émotion étendus
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  emotions: EmotionResult[];
-}
-
-// Types d'activité
-export interface ActivityFiltersState {
-  dateRange: { start: Date; end: Date };
-  activityType: string[];
-  userId?: string;
-}
