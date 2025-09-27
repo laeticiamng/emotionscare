@@ -1,5 +1,5 @@
 
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SecureAPIOptions {

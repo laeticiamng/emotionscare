@@ -6,10 +6,10 @@
 // --- Layout & marketing -----------------------------------------------------
 export { default as PageHeader } from './components/ui/PageHeader';
 export { LoadingSpinner } from './components/ui/LoadingSpinner.tsx';
-export { NavBar } from '@/ui/NavBar';
-export { Footer } from '@/ui/Footer';
-export { GlowSurface } from '@/ui/GlowSurface';
-export { CookieConsent, hasConsent } from '@/ui/CookieConsent';
+export { NavBar } from '@/components/ui/nav-bar';
+export { Footer } from '@/components/ui/footer';
+export { GlowSurface } from '@/components/ui/glow-surface';
+export { CookieConsent, hasConsent } from '@/components/ui/cookie-consent';
 export { SeoHead } from '@/lib/seo/SeoHead';
 
 // --- shadcn / UI primitives -------------------------------------------------
@@ -25,8 +25,8 @@ export { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar.tsx'
 export { Progress } from './components/ui/progress.tsx';
 
 // --- Animation & motion -----------------------------------------------------
-export { FadeIn } from '@/ui/motion/FadeIn';
-export { SlideIn } from '@/ui/motion/SlideIn';
+export { FadeIn } from '@/components/ui/motion/FadeIn';
+export { SlideIn } from '@/components/ui/motion/SlideIn';
 
 // --- Thème & i18n -----------------------------------------------------------
 export { ThemeProvider, useTheme, ThemeToggle } from '@/theme/ThemeProvider';
@@ -34,23 +34,23 @@ export { I18nProvider, useI18n, t } from '@/lib/i18n/i18n';
 
 // --- Hooks UI ---------------------------------------------------------------
 export { usePrefetchOnHover } from '@/hooks/usePrefetchOnHover';
-export { usePulseClock } from '@/ui/hooks/usePulseClock';
-export { useTimer } from '@/ui/hooks/useTimer';
-export { useSound } from '@/ui/hooks/useSound';
-export { useAudioBus } from '@/ui/hooks/useAudioBus';
-export { useCrossfade } from '@/ui/hooks/useCrossfade';
-export { useRaf } from '@/ui/hooks/useRaf';
-export { useDebounce } from '@/ui/hooks/useDebounce';
-export { useThrottle } from '@/ui/hooks/useThrottle';
+export { usePulseClock } from '@/components/ui/hooks/usePulseClock';
+export { useTimer } from '@/components/ui/hooks/useTimer';
+export { useSound } from '@/components/ui/hooks/useSound';
+export { useAudioBus } from '@/components/ui/hooks/useAudioBus';
+export { useCrossfade } from '@/components/ui/hooks/useCrossfade';
+export { useRaf } from '@/components/ui/hooks/useRaf';
+export { useDebounce } from '@/components/ui/hooks/useDebounce';
+export { useThrottle } from '@/components/ui/hooks/useThrottle';
 
-// --- Components data viz & feedback ----------------------------------------
-export { ProgressBar } from '@/ui/ProgressBar';
-export { Sparkline } from '@/ui/Sparkline';
-export { BadgeLevel } from '@/ui/BadgeLevel';
-export { AudioPlayer } from '@/ui/AudioPlayer';
-export { FeedbackForm } from '@/ui/FeedbackForm';
-export { ConstellationCanvas } from '@/ui/ConstellationCanvas';
-export { CommandPalette, useCommandPalette } from '@/ui/CommandPalette';
+// --- Composants UI spécialisés ---------------------------------------------
+export { ProgressBar } from '@/components/ui/progress-bar-custom';
+export { Sparkline } from '@/components/ui/sparkline';
+export { BadgeLevel } from '@/components/ui/badge-level';
+export { AudioPlayer } from '@/components/ui/audio-player';
+export { FeedbackForm } from '@/components/ui/feedback-form';
+export { ConstellationCanvas } from '@/components/ui/constellation-canvas';
+export { CommandPalette, useCommandPalette } from '@/components/ui/command-palette';
 
 // --- Notifications & overlays ----------------------------------------------
 export { NotificationProvider } from '@/components/ui/notification-system';
