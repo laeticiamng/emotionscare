@@ -1,0 +1,135 @@
+{
+  "consent": {
+    "title": "Consentement clinique (opt-in)",
+    "body": "Vous pouvez accepter ou refuser librement. Vous pourrez révoquer à tout moment. Aucun chiffre ne sera affiché à l’écran.",
+    "accept": "J’accepte",
+    "decline": "Refuser",
+    "revoked": "Consentement révoqué",
+    "more": "En savoir plus",
+    "error": "Impossible de charger le consentement clinique.",
+    "update_error": "Une erreur est survenue lors de la mise à jour du consentement."
+  },
+  "ar": {
+    "face": {
+      "title": "Filtres Visage AR", 
+      "enable": "Activer la caméra",
+      "noCam": "Pas de caméra ? Choisis ton humeur.",
+      "connected": "Caméra connectée",
+      "disconnected": "Caméra déconnectée",
+      "fallback": {
+        "title": "Choisis ton humeur",
+        "subtitle": "Sélectionne comment tu te sens"
+      },
+      "comments": {
+        "joy": "Tu rayonnes ✨",
+        "calm": "Zen attitude 🧘‍♀️",
+        "sad": "Petite baisse de moral ? 💙",
+        "anger": "On respire profondément ? 🌬️",
+        "fear": "Tout va bien se passer 🌱",
+        "surprise": "Quelle surprise ! 🎉",
+        "neutral": "Mode contemplation 🤔"
+      }
+    }
+  },
+  "hr": {
+    "connect": "Connecter un capteur cardiaque",
+    "connected": "Capteur connecté",
+    "demo": "Mode démo", 
+    "help": "Besoin d'aide ?",
+    "status": {
+      "connecting": "Connexion en cours...",
+      "failed": "Connexion échouée",
+      "disconnected": "Déconnecté"
+    }
+  },
+  "silk": {
+    "title": "Screen-Silk Break",
+    "cta": {
+      "start": "Commencer"
+    },
+    "pause": "Pause",
+    "resume": "Reprendre", 
+    "done": "Beau reset ✨",
+    "phases": {
+      "inhale": "Inspire...",
+      "hold": "Tiens...",
+      "exhale": "Expire...",
+      "pause": "Pause..."
+    }
+  },
+  "vr": {
+    "title": "VR Galactique",
+    "cta": {
+      "enter": "Entrer en VR",
+      "start": "Démarrer",
+      "exit": "Quitter la VR"
+    },
+    "toast": {
+      "saved": "Session enregistrée ✨"
+    },
+    "phases": {
+      "inhale": "Inspire",
+      "hold": "Tiens",
+      "exhale": "Expire", 
+      "pause": "Pause"
+    }
+  },
+  "glow": {
+    "widget": {
+      "title": "Instant Glow",
+      "state": {
+        "low": "Recharge",
+        "medium": "Stable", 
+        "high": "Au top"
+      },
+      "tip": {
+        "cta": "Voir une suggestion"
+      }
+    }
+  },
+  "weekly": {
+    "title": "Ta semaine",
+    "summary": {
+      "up": "Tendance en hausse",
+      "down": "Tendance en baisse",
+      "flat": "Tendance stable"
+    }
+  },
+  "common": {
+    "enable": "Activer",
+    "disable": "Désactiver",
+    "retry": "Réessayer",
+    "close": "Fermer"
+  },
+  "rh": {
+    "title": "Scores & vibes",
+    "legend": {
+      "low": "Bas",
+      "medium": "Stable", 
+      "high": "Haut"
+    },
+    "trend": {
+      "up": "En hausse",
+      "flat": "Stable",
+      "down": "En baisse"
+    },
+    "anonymity": "Échantillon insuffisant (≥ {min} requis)"
+  },
+  "journal": {
+    "title": "Journal",
+    "voice": {
+      "start": "Enregistrer",
+      "stop": "Stop"
+    },
+    "text": {
+      "label": "Écrire une note"
+    },
+    "result": {
+      "clear": "Lucide",
+      "mixed": "Nuancé",
+      "pressured": "Sous pression"
+    },
+    "suggestion": "Suggestion",
+    "export": "Exporter"
+  }
+}
