@@ -1,8 +1,8 @@
-// Configuration d'urgence - JS pur sans TypeScript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
+// @ts-ignore
 export default defineConfig({
   plugins: [
     react({
@@ -36,20 +36,17 @@ export default defineConfig({
     reportCompressedSize: false,
   },
   
-  // Transformation pure esbuild - aucune validation TypeScript
   esbuild: {
     target: 'esnext',
-    jsx: 'transform',
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment',
+    jsx: 'automatic',
+    jsxImportSource: 'react',
   },
 
   optimizeDeps: {
     esbuildOptions: {
       target: 'esnext',
-      jsx: 'transform',
-      jsxFactory: 'React.createElement',
-      jsxFragment: 'React.Fragment',
+      jsx: 'automatic',
+      jsxImportSource: 'react',
     }
   },
 });
