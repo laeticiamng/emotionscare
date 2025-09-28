@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "jsx": "react-jsx"
+    }
+  }
+}
