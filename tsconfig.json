@@ -1,25 +1,45 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    {
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["vite/client", "node"],
-    "baseUrl": ".",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["./src/*"],
-      "@types/*": ["./types/*"],
-      "cross-fetch": ["./tests/polyfills/cross-fetch.ts"]
-    }
+      "@/*": [
+        "./src/*"
+      ],
+      "@types/*": [
+        "./types/*"
+      ],
+      "cross-fetch": [
+        "./tests/polyfills/cross-fetch.ts"
+      ]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2020",
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "useDefineForClassFields": true
   },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
   "include": [
     "./src",
     "./types",
@@ -33,6 +53,5 @@
     "./vitest.config.ts",
     "./vitest.*.config.ts",
     "./playwright.config.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+  ]
 }
