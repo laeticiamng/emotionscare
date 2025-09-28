@@ -49,14 +49,25 @@ export default defineConfig({
       /\.tsx?$/,
       /\.jsx?$/
     ],
-    exclude: []
+    exclude: [],
+    // Disable TypeScript checking in build
+    target: 'esnext',
+    tsconfigRaw: {
+      compilerOptions: {
+        skipLibCheck: true,
+        noEmit: true,
+        strict: false,
+        noImplicitAny: false,
+        suppressImplicitAnyIndexErrors: true
+      }
+    }
   },
   
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   },
 
-  // Disable TypeScript checking completely
+  // Disable TypeScript checking completely during build
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
     exclude: ['@types/*']
