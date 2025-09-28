@@ -21,7 +21,7 @@ import {
   Star
 } from 'lucide-react';
 
-const Code100CleanReport: React.FC = () => {
+const Code100CleanReport = () => {
   const [currentTime, setCurrentTime] = useState(new Date().toISOString());
 
   useEffect(() => {

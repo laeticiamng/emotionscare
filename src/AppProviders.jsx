@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -14,16 +13,12 @@ import { AccessibilityProvider } from '@/components/common/AccessibilityProvider
 import { NotificationProvider } from '@/components/ui/notification-system';
 import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 
-interface AppProvidersProps {
-  children: React.ReactNode;
-}
-
 /**
  * PROVIDERS UNIFIÉS - Architecture Premium
  * Single provider tree optimisé pour les performances et l'accessibilité
  * Note: BrowserRouter supprimé car RouterProvider gère déjà le routing
  */
-const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
+const AppProviders = ({ children }) => {
   return (
     <HelmetProvider>
       <RootErrorBoundary>
