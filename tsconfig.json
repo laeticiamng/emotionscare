@@ -15,8 +15,8 @@
     "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@types/*": ["types/*"],
+      "@/*": ["/src/*"],
+      "@types/*": ["/types/*"],
       "cross-fetch": ["tests/polyfills/cross-fetch.ts"]
     }
   },
