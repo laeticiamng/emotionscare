@@ -1,16 +1,17 @@
-// Configuration Vite d'urgence - JavaScript pur pour éviter TypeScript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import path from 'path';
+import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react({
-      // Pas de TypeScript du tout
+      jsxRuntime: 'automatic',
       typescript: false,
-      babel: false
-    })
-  ],
+      babel: false,
+    }),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   
   server: {
     host: "::",
@@ -24,7 +25,7 @@ export default defineConfig({
   
   resolve: {
     alias: {
-      "@": resolve(process.cwd(), "./src"),
+      "@": path.resolve(process.cwd(), "./src"),
     },
   },
   
@@ -34,12 +35,29 @@ export default defineConfig({
     sourcemap: false,
     cssCodeSplit: true,
     reportCompressedSize: false,
+    rollupOptions: {
+      onwarn() {
+        // Ignore all warnings
+      }
+    }
   },
   
-  // Transformation pure esbuild - aucun TypeScript
   esbuild: {
     target: 'esnext',
-    logLevel: 'silent',
-    format: 'esm'
+    jsx: 'automatic',
+    jsxImportSource: 'react',
+    logLevel: 'silent'
+  },
+
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+      jsx: 'automatic',
+      jsxImportSource: 'react',
+    }
+  },
+  
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(mode)
   }
-});
+}));
