@@ -1,31 +1,114 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card.jsx';
-import { Button } from '../components/ui/button.jsx';
-import { Badge } from '../components/ui/badge.jsx';
-import { Switch } from '../components/ui/switch.jsx';
+import { useState, useEffect } from 'react';
 import { 
   Check, 
   Star, 
-  Zap, 
-  Crown, 
   Building2,
   Users,
   Heart,
   Brain,
   Shield,
-  Headphones
+  Headphones,
+  Zap
 } from 'lucide-react';
-import { Header } from '../components/layout/index.js';
 
-export default function PricingPage() {
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children, className = '' }) => (
+  <div className={`p-6 ${className}`}>
+    {children}
+  </div>
+);
+
+const CardContent = ({ children, className = '' }) => (
+  <div className={`px-6 pb-6 ${className}`}>
+    {children}
+  </div>
+);
+
+const CardTitle = ({ children, className = '' }) => (
+  <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className}`}>
+    {children}
+  </h3>
+);
+
+const CardDescription = ({ children, className = '' }) => (
+  <p className={`text-sm text-gray-600 ${className}`}>
+    {children}
+  </p>
+);
+
+const Button = ({ children, className = '', variant = 'default', size = 'default', ...props }) => {
+  const baseClasses = 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50';
+  
+  const variants = {
+    default: 'bg-blue-600 text-white hover:bg-blue-700',
+    outline: 'border border-gray-300 bg-white hover:bg-gray-50 text-gray-900',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+  };
+  
+  const sizes = {
+    default: 'h-10 px-4 py-2',
+    lg: 'h-11 px-8',
+    sm: 'h-9 px-3'
+  };
+  
+  return (
+    <button 
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Badge = ({ children, className = '', variant = 'default' }) => {
+  const variants = {
+    default: 'bg-blue-600 text-white',
+    secondary: 'bg-gray-100 text-gray-800'
+  };
+  
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variants[variant]} ${className}`}>
+      {children}
+    </span>
+  );
+};
+
+const Switch = ({ checked, onCheckedChange, className = '' }) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    onClick={() => onCheckedChange(!checked)}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+      checked ? 'bg-blue-600' : 'bg-gray-200'
+    } ${className}`}
+  >
+    <span
+      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+        checked ? 'translate-x-6' : 'translate-x-1'
+      }`}
+    />
+  </button>
+);
+
+export default function PricingPageWorking() {
   const [isYearly, setIsYearly] = useState(false);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const plans = [
+  const defaultPlans = [
     {
       id: 'free',
       name: 'Découverte',
       description: 'Parfait pour commencer votre parcours de bien-être',
-      price: { monthly: 0, yearly: 0 },
+      price_monthly: 0,
+      price_yearly: 0,
       badge: null,
       icon: Heart,
       color: 'text-green-600',
@@ -47,7 +130,8 @@ export default function PricingPage() {
       id: 'premium',
       name: 'Premium',
       description: 'Accès complet aux technologies de pointe',
-      price: { monthly: 19.99, yearly: 199.99 },
+      price_monthly: 19.99,
+      price_yearly: 199.99,
       badge: 'Populaire',
       icon: Star,
       color: 'text-blue-600',
@@ -68,7 +152,8 @@ export default function PricingPage() {
       id: 'pro',
       name: 'Professionnel',
       description: 'Pour thérapeutes et professionnels de santé',
-      price: { monthly: 49.99, yearly: 499.99 },
+      price_monthly: 49.99,
+      price_yearly: 499.99,
       badge: 'Thérapeutes',
       icon: Brain,
       color: 'text-purple-600',
@@ -86,6 +171,12 @@ export default function PricingPage() {
     }
   ];
 
+  useEffect(() => {
+    // Use default plans for now
+    setPlans(defaultPlans);
+    setLoading(false);
+  }, []);
+
   const enterpriseFeatures = [
     'Déploiement sur site ou cloud privé',
     'Personnalisation complète de l\'interface',
@@ -97,46 +188,73 @@ export default function PricingPage() {
     'SLA garanti 99.9%'
   ];
 
-  const getPrice = (plan: any) => {
-    if (plan.price.monthly === 0) return 'Gratuit';
-    const price = isYearly ? plan.price.yearly : plan.price.monthly;
+  const getPrice = (plan) => {
+    if (plan.price_monthly === 0) return 'Gratuit';
+    const price = isYearly ? plan.price_yearly : plan.price_monthly;
     const period = isYearly ? '/an' : '/mois';
     return `${price}€${period}`;
   };
 
-  const getSavings = (plan: any) => {
-    if (plan.price.monthly === 0) return null;
-    const yearlyCost = plan.price.yearly;
-    const monthlyCost = plan.price.monthly * 12;
+  const getSavings = (plan) => {
+    if (plan.price_monthly === 0) return null;
+    const yearlyCost = plan.price_yearly;
+    const monthlyCost = plan.price_monthly * 12;
     const savings = monthlyCost - yearlyCost;
     const percentage = Math.round((savings / monthlyCost) * 100);
     return { amount: savings, percentage };
   };
 
+  const handleSubscribe = (planId) => {
+    if (planId === 'free') {
+      alert('Plan gratuit activé !');
+    } else {
+      alert(`Redirection vers le paiement pour le plan ${planId}`);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-lg">Chargement...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-gray-50">
+      {/* Simple header */}
+      <header className="bg-white shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-blue-600">EmotionsCare</h1>
+            <nav className="hidden md:flex space-x-6">
+              <a href="/" className="text-gray-600 hover:text-gray-900">Accueil</a>
+              <a href="/pricing" className="text-blue-600 font-medium">Tarifs</a>
+            </nav>
+          </div>
+        </div>
+      </header>
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto space-y-12">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold">Choisissez votre plan</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <h1 className="text-4xl font-bold text-gray-900">Choisissez votre plan</h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Démarrez gratuitement et évoluez selon vos besoins. 
               Toutes les données restent privées et sécurisées.
             </p>
             
             {/* Toggle annuel/mensuel */}
             <div className="flex items-center justify-center gap-4 mt-8">
-              <span className={`text-sm ${!isYearly ? 'font-medium' : 'text-muted-foreground'}`}>
+              <span className={`text-sm ${!isYearly ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
                 Mensuel
               </span>
               <Switch
                 checked={isYearly}
                 onCheckedChange={setIsYearly}
               />
-              <span className={`text-sm ${isYearly ? 'font-medium' : 'text-muted-foreground'}`}>
+              <span className={`text-sm ${isYearly ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
                 Annuel
               </span>
               {isYearly && (
@@ -156,7 +274,7 @@ export default function PricingPage() {
                   key={plan.id}
                   className={`relative ${
                     plan.badge === 'Populaire' 
-                      ? 'border-primary shadow-lg scale-105' 
+                      ? 'border-blue-500 shadow-lg scale-105' 
                       : ''
                   }`}
                 >
@@ -170,14 +288,14 @@ export default function PricingPage() {
                   )}
                   
                   <CardHeader className="text-center pb-4">
-                    <div className={`w-12 h-12 rounded-lg bg-background border mx-auto mb-4 flex items-center justify-center`}>
+                    <div className={`w-12 h-12 rounded-lg bg-gray-50 border mx-auto mb-4 flex items-center justify-center`}>
                       <PlanIcon className={`h-6 w-6 ${plan.color}`} />
                     </div>
                     <CardTitle className="text-2xl">{plan.name}</CardTitle>
                     <CardDescription className="text-sm">{plan.description}</CardDescription>
                     
                     <div className="pt-4">
-                      <div className="text-4xl font-bold">{getPrice(plan)}</div>
+                      <div className="text-4xl font-bold text-gray-900">{getPrice(plan)}</div>
                       {savings && isYearly && (
                         <p className="text-sm text-green-600 font-medium">
                           Économisez {savings.amount}€ ({savings.percentage}%)
@@ -188,19 +306,16 @@ export default function PricingPage() {
                   
                   <CardContent className="space-y-4">
                     <Button 
-                      className={`w-full ${
-                        plan.badge === 'Populaire' 
-                          ? '' 
-                          : 'variant-outline'
-                      }`}
+                      className="w-full"
                       variant={plan.badge === 'Populaire' ? 'default' : 'outline'}
+                      onClick={() => handleSubscribe(plan.id)}
                     >
-                      {plan.price.monthly === 0 ? 'Commencer gratuitement' : 'Choisir ce plan'}
+                      {plan.price_monthly === 0 ? 'Commencer gratuitement' : 'Choisir ce plan'}
                     </Button>
                     
                     <div className="space-y-3">
                       <div>
-                        <h4 className="font-medium text-sm mb-2">Inclus :</h4>
+                        <h4 className="font-medium text-sm mb-2 text-gray-900">Inclus :</h4>
                         <ul className="space-y-2">
                           {plan.features.map((feature, index) => (
                             <li key={index} className="flex items-start gap-2 text-sm">
@@ -213,10 +328,10 @@ export default function PricingPage() {
                       
                       {plan.limitations.length > 0 && (
                         <div className="pt-3 border-t">
-                          <h4 className="font-medium text-sm mb-2 text-muted-foreground">Limitations :</h4>
+                          <h4 className="font-medium text-sm mb-2 text-gray-500">Limitations :</h4>
                           <ul className="space-y-1">
                             {plan.limitations.map((limitation, index) => (
-                              <li key={index} className="text-sm text-muted-foreground">
+                              <li key={index} className="text-sm text-gray-500">
                                 • {limitation}
                               </li>
                             ))}
@@ -231,10 +346,10 @@ export default function PricingPage() {
           </div>
 
           {/* Plan Entreprise */}
-          <Card className="bg-gradient-to-r from-slate-50 to-slate-100 border-slate-200">
+          <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200">
             <CardHeader>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-600 text-white flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-gray-600 text-white flex items-center justify-center">
                   <Building2 className="h-6 w-6" />
                 </div>
                 <div>
@@ -260,7 +375,7 @@ export default function PricingPage() {
                 <div className="space-y-6">
                   <div>
                     <div className="text-3xl font-bold mb-2">Sur devis</div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-gray-600 text-sm">
                       Tarification adaptée selon vos besoins et votre effectif
                     </p>
                   </div>
@@ -274,7 +389,7 @@ export default function PricingPage() {
                     </Button>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Headphones className="h-4 w-4" />
                     <span>Accompagnement dédié inclus</span>
                   </div>
@@ -288,7 +403,7 @@ export default function PricingPage() {
             <div className="text-center space-y-3">
               <Shield className="h-8 w-8 text-blue-600 mx-auto" />
               <h3 className="font-semibold">30 jours satisfait ou remboursé</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-600">
                 Testez sans risque pendant un mois complet
               </p>
             </div>
@@ -296,7 +411,7 @@ export default function PricingPage() {
             <div className="text-center space-y-3">
               <Zap className="h-8 w-8 text-yellow-600 mx-auto" />
               <h3 className="font-semibold">Activation immédiate</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-600">
                 Accès instantané à toutes vos fonctionnalités
               </p>
             </div>
@@ -304,7 +419,7 @@ export default function PricingPage() {
             <div className="text-center space-y-3">
               <Users className="h-8 w-8 text-green-600 mx-auto" />
               <h3 className="font-semibold">Support expert</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-600">
                 Équipe spécialisée en bien-être numérique
               </p>
             </div>

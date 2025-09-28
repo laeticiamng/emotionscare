@@ -17,6 +17,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'HomePage',
     guard: false, // Pas de guard - accessible à tous
   },
+  {
+    name: 'pricing',
+    path: '/pricing',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'PricingPageWorking',
+    guard: false,
+  },
   // /home redirect supprimé - confus et inutile
   {
     name: 'about',

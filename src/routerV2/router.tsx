@@ -121,6 +121,7 @@ const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
+const PricingPageWorking = lazy(() => import('../pages/PricingPageWorking.jsx'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -254,6 +255,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ReportingPage,
   ExportPage,
   NavigationPage,
+  PricingPageWorking,
   
   // Pages existantes consolidées
   MessagesPage,

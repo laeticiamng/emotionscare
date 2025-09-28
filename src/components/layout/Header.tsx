@@ -83,6 +83,7 @@ const Header: React.FC<HeaderProps> = ({
     { label: 'Accueil', href: '/', icon: Heart },
     { label: 'Personnel (B2C)', href: '/b2c', icon: User },
     { label: 'Entreprise (B2B)', href: '/entreprise', icon: Building2 },
+    { label: 'Tarifs', href: '/pricing', icon: Crown },
     { label: 'Aide', href: '/help', icon: HelpCircle },
   ];
 
