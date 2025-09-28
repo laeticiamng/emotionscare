@@ -8,8 +8,8 @@ import { Link } from 'react-router-dom';
 import { Heart, Users, Zap, Star, ArrowRight, Sparkles, Shield } from 'lucide-react';
 import './immersive-styles.css';
 import '../components/home/immersive-home.css';
-import EnhancedHeader from '@/components/ui/enhanced-header';
-import EnhancedFooter from '@/components/ui/enhanced-footer';
+import EnhancedHeader from '../components/ui/enhanced-header';
+import EnhancedFooter from '../components/ui/enhanced-footer';
 
 const Index: React.FC = () => {
   return (
