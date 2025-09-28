@@ -1,16 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import path from 'path';
+import { componentTagger } from "lovable-tagger";
 
-// @ts-ignore
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       jsxRuntime: 'automatic',
       typescript: false,
       babel: false,
     }),
-  ],
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   
   server: {
     host: "::",
@@ -24,7 +25,7 @@ export default defineConfig({
   
   resolve: {
     alias: {
-      "@": resolve(process.cwd(), "./src"),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   
@@ -49,4 +50,4 @@ export default defineConfig({
       jsxImportSource: 'react',
     }
   },
-});
+}));
