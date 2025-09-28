@@ -39,14 +39,17 @@ export default defineConfig({
   // Transformation pure esbuild - aucune validation TypeScript
   esbuild: {
     target: 'esnext',
-    format: 'esm',
-    jsx: 'automatic',
+    jsx: 'transform',
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment',
   },
 
   optimizeDeps: {
     esbuildOptions: {
       target: 'esnext',
-      jsx: 'automatic',
+      jsx: 'transform',
+      jsxFactory: 'React.createElement',
+      jsxFragment: 'React.Fragment',
     }
   },
 });
