@@ -1,13 +1,15 @@
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 
 const CARDS = [
   {
     href: '/b2b/reports',
     title: 'Rapports mensuels',
     description: 'Consulter un récit de trois phrases et une action douce, prêt à imprimer.',
+  },
+  {
     href: '/b2b/rh',
     title: 'Heatmap RH textuelle',
-    description: 'Visualiser le climat d’équipe sans chiffres, avec redirection vers les rapports détaillés.',
+    description: 'Visualiser le climat d\'équipe sans chiffres, avec redirection vers les rapports détaillés.',
   },
   {
     href: '/b2b/teams',
@@ -16,7 +18,7 @@ const CARDS = [
   },
   {
     href: '/b2b/events',
-    title: 'Événements d’équipe',
+    title: 'Événements d\'équipe',
     description: 'Planifier des temps collectifs, orchestrer les rappels opt-in et suivre les réponses.',
   },
   {
@@ -31,12 +33,12 @@ const CARDS = [
   },
   {
     href: '/b2b/audit',
-    title: 'Journal d’audit',
+    title: 'Journal d\'audit',
     description: 'Filtrer les événements et générer un export CSV signé sans PII.',
   },
   {
     href: '/b2b/help-center',
-    title: 'Centre d’aide',
+    title: 'Centre d\'aide',
     description: 'Consulter la FAQ B2B, contacter le support et partager un retour sécurisé.',
   },
 ];
@@ -47,7 +49,7 @@ export default function B2BHubPage() {
       {CARDS.map((card) => (
         <Link
           key={card.href}
-          href={card.href}
+          to={card.href}
           role="listitem"
           className="group flex h-full flex-col justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
         >

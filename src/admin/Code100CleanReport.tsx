@@ -215,7 +215,7 @@ const Code100CleanReport: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="text-xs text-muted-foreground">{phase.title}</div>
-                {phaseKey === 'phase1' && (
+                {phaseKey === 'phase1' && 'filesAnalyzed' in phase && (
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Fichiers analysés</span>
@@ -227,7 +227,7 @@ const Code100CleanReport: React.FC = () => {
                     </div>
                   </>
                 )}
-                {phaseKey === 'phase2' && (
+                {phaseKey === 'phase2' && 'sizeReduced' in phase && (
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Fichiers supprimés</span>
@@ -239,19 +239,19 @@ const Code100CleanReport: React.FC = () => {
                     </div>
                   </>
                 )}
-                {phaseKey === 'phase3' && (
+                {phaseKey === 'phase3' && 'orphanFilesRemoved' in phase && (
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Fichiers nettoyés</span>
                       <span className="font-mono">{phase.filesDeleted}</span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span>Orphelins supprimés</span>
+                      <span>Orphelins supprimés</span>  
                       <span className="font-mono">{phase.orphanFilesRemoved}</span>
                     </div>
                   </>
                 )}
-                {phaseKey === 'phase4' && (
+                {phaseKey === 'phase4' && 'consoleLogsReplaced' in phase && (
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Console.log nettoyés</span>
@@ -263,7 +263,7 @@ const Code100CleanReport: React.FC = () => {
                     </div>
                   </>
                 )}
-                {phaseKey === 'phase5' && (
+                {phaseKey === 'phase5' && 'performanceImproved' in phase && (
                   <>
                     <div className="flex justify-between text-xs items-center">
                       <span>Sécurité</span>

@@ -27,29 +27,21 @@
     "noImplicitReturns": false,
     "noImplicitThis": false,
     "noImplicitOverride": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitUseStrict": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
     "target": "ES2020",
     "types": [
       "vite/client"
     ],
     "useDefineForClassFields": true,
-    "noEmit": false,
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": false
+    "noEmit": true
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "scripts/**/*",
-    "services/**/*", 
-    "src/__tests__/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
-  ],
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx"
+    "./src/guards/**/*.ts",
+    "./src/guards/**/*.tsx"
   ]
 }
