@@ -7,6 +7,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
     "lib": [
       "ES2020",
       "DOM",
@@ -17,34 +18,38 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@types/*": [
-        "./types/*"
-      ],
-      "cross-fetch": [
-        "./tests/polyfills/cross-fetch.ts"
       ]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "noImplicitOverride": false,
     "target": "ES2020",
     "types": [
-      "vite/client",
-      "node"
+      "vite/client"
     ],
     "useDefineForClassFields": true,
-    "noEmit": false
+    "noEmit": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
   },
   "exclude": [
     "node_modules",
     "dist",
-    "scripts",
-    "services",
-    "src/__tests__"
+    "scripts/**/*",
+    "services/**/*", 
+    "src/__tests__/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ],
   "include": [
-    "./src/**/*",
-    "./types"
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
   ]
 }

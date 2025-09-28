@@ -33,12 +33,20 @@ export default defineConfig({
     rollupOptions: {
       onwarn(warning, warn) {
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
+        if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
         warn(warning);
       }
     }
   },
   
   esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    logOverride: { 
+      'this-is-undefined-in-esm': 'silent',
+      'direct-eval': 'silent'
+    }
+  },
+  
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   }
 });
