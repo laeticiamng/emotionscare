@@ -1,17 +1,13 @@
-// Configuration Vite - FINAL SOLUTION pour erreurs TypeScript JSX
+// Configuration Vite - JavaScript pur pour éviter tsconfig.json cassé
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 
-export default defineConfig(() => ({
+export default defineConfig({
   plugins: [
     react({
       jsxRuntime: 'automatic',
-      typescript: {
-        // Utiliser notre tsconfig personnalisé avec JSX
-        configFile: './tsconfig.jsx.json'
-      },
       babel: false,
       fastRefresh: true,
       include: "**/*.{jsx,js,tsx,ts}"
@@ -40,38 +36,15 @@ export default defineConfig(() => ({
     minify: 'esbuild',
     sourcemap: false,
     cssCodeSplit: true,
-    reportCompressedSize: false,
-    rollupOptions: {
-      onwarn: () => {} // Ignorer TOUS les warnings
-    }
+    reportCompressedSize: false
   },
   
-  // Configuration esbuild avec JSX
   esbuild: {
     target: 'esnext',
-    logLevel: 'silent',
-    format: 'esm',
     jsx: 'automatic',
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment',
     loader: {
       '.ts': 'tsx',
       '.tsx': 'tsx'
     }
-  },
-
-  optimizeDeps: {
-    esbuildOptions: {
-      target: 'esnext',
-      jsx: 'automatic',
-      loader: {
-        '.ts': 'tsx',
-        '.tsx': 'tsx'
-      }
-    }
-  },
-  
-  define: {
-    __BYPASS_TYPESCRIPT__: true
   }
-}));
+});
