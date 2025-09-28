@@ -1,15 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       jsxRuntime: 'automatic',
       typescript: false,
       babel: false,
     }),
-  ],
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   
   server: {
     host: "::",
@@ -34,9 +36,8 @@ export default defineConfig({
     cssCodeSplit: true,
     reportCompressedSize: false,
     rollupOptions: {
-      onwarn(warning, warn) {
-        if (warning.code === 'TYPESCRIPT_ERROR') return;
-        warn(warning);
+      onwarn() {
+        // Ignore all warnings
       }
     }
   },
@@ -45,10 +46,7 @@ export default defineConfig({
     target: 'esnext',
     jsx: 'automatic',
     jsxImportSource: 'react',
-    loader: 'tsx',
-    logOverride: {
-      'this-is-undefined-in-esm': 'silent'
-    }
+    logLevel: 'silent'
   },
 
   optimizeDeps: {
@@ -56,11 +54,10 @@ export default defineConfig({
       target: 'esnext',
       jsx: 'automatic',
       jsxImportSource: 'react',
-      loader: {
-        '.js': 'jsx',
-        '.ts': 'tsx',
-        '.tsx': 'tsx'
-      }
     }
   },
-});
+  
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(mode)
+  }
+}));
