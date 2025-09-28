@@ -51,20 +51,18 @@ const testUsers: TestUser[] = [
 
 async function ensureTestUsers() {
   for (const { email, password, role, name } of testUsers) {
-    // Find user by email using listUsers
-    const { data: { users }, error: fetchError } = await supabase.auth.admin.listUsers();
+    const { data: existing, error: fetchError } = await supabase.auth.admin.getUserByEmail(email);
+
     if (fetchError) {
-      console.error(`Error fetching users:`, fetchError.message);
+      console.error(`Error fetching user ${email}:`, fetchError.message);
       continue;
     }
-    
-    const existing = users.find(user => user.email === email);
 
-    if (existing) {
-      const currentRole = existing.user_metadata?.role;
-      const currentName = existing.user_metadata?.name;
+    if (existing?.user) {
+      const currentRole = existing.user.user_metadata?.role;
+      const currentName = existing.user.user_metadata?.name;
       if (currentRole !== role || currentName !== name) {
-        const { error: updateError } = await supabase.auth.admin.updateUserById(existing.id, {
+        const { error: updateError } = await supabase.auth.admin.updateUserById(existing.user.id, {
           password,
           email_confirm: true,
           user_metadata: { role, name }

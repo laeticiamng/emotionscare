@@ -1,6 +1,5 @@
 import '@/observability/sentry.client';
 import i18n from '@/lib/i18n';
-/// <reference path="./typescript-bypass.d.ts" />
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';

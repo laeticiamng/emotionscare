@@ -26,7 +26,6 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 // ═══════════════════════════════════════════════════════════
 
 // Pages publiques unifiées 
-const Index = lazy(() => import('@/pages/Index'));
 const HomePage = lazy(() => import('@/components/HomePage'));
 const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
 const SimpleB2CPage = lazy(() => import('@/components/SimpleB2CPage'));
@@ -172,7 +171,6 @@ const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusi
 
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
-  Index,
   HomePage,
   HomeB2CPage: SimpleB2CPage,
   AboutPage,
