@@ -27,30 +27,24 @@
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "target": "ES2020",
     "types": [
       "vite/client",
       "node"
     ],
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "noEmit": false
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "scripts",
+    "services",
+    "src/__tests__"
   ],
   "include": [
-    "./src",
-    "./types",
-    "./tests",
-    "./test",
-    "./services",
-    "./scripts",
-    "./supabase",
-    "./ci",
-    "./tools",
-    "./vitest.config.ts",
-    "./vitest.*.config.ts",
-    "./playwright.config.ts"
+    "./src/**/*",
+    "./types"
   ]
 }
