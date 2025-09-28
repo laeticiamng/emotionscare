@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
-    {
-  "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "react",
+"jsxImportSource": "react",
+"allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
