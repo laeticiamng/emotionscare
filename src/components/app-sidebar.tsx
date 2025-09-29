@@ -39,7 +39,7 @@ import {
   Star,
   Shield,
   Sparkles
-} from "lucide-react";
+} from "@/lib/icons";
 
 // Types
 interface NavigationItem {

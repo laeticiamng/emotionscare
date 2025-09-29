@@ -18,7 +18,7 @@ import {
   Palette,
   Filter,
   RotateCcw
-} from 'lucide-react';
+} from '@/lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
 

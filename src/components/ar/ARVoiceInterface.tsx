@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff } from "lucide-react";
+import { Mic, MicOff } from "@/lib/icons";
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
